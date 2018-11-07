@@ -12,7 +12,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetModalModel} from '../../model/asset-modal.model';
-import {SharedAllAssets} from '../asset/shared-all-assets';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
 
 declare var jQuery: any;
 
@@ -23,7 +23,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 	}) class ApplicationShowComponent implements OnInit {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
-		protected isHighField = SharedAllAssets.isHighField;
+		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			private activeDialog: UIActiveDialogService,

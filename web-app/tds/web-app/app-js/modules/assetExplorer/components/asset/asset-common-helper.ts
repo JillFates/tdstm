@@ -1,7 +1,7 @@
 /**
- * Class to group shared functionality used by Show and Create/Edit assets view
+ * Class to group common functionality used by Show and Create/Edit assets view
  */
-export class SharedAllAssets {
+export class AssetCommonHelper {
 	/**
 	 * Determine if the class belongs to Yellow and Green and if the value is set
 	 */

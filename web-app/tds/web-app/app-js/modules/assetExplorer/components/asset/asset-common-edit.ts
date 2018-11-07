@@ -10,7 +10,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
-import {SharedAllAssets} from './shared-all-assets';
+import {AssetCommonHelper} from './asset-common-helper';
 
 declare var jQuery: any;
 
@@ -26,7 +26,7 @@ export class AssetCommonEdit implements OnInit {
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
 	protected defaultValidation = 'Discovery';
-	protected isHighField = SharedAllAssets.isHighField;
+	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
 	constructor(
