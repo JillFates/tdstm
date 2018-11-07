@@ -179,6 +179,11 @@ class CustomValidators {
 	 * @return
 	 */
 	static  controlDateTimeMockValidator( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+
+			}
+		}
 	}
 
 	/**
