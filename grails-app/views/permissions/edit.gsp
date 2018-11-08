@@ -31,14 +31,14 @@
 							</tr>
 						</thead>
 						<tbody>
-							<g:each var="permissionGroup" in="${permissions}" var="permission" status="i">
+							<g:each in="${permissions}" var="permission" status="i">
 							<input type="hidden" name="column" value="${permission.id}"/>
 								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
 									<td style="text-align: left;">
 										${permission.permissionItem}
 									</td>
 									<g:each in="${Permissions.Roles.values()}" var='role'>
-										<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+										<g:if test="${permission.rolePermissions.find {it.role == role?.name()}}">
 											<td style="text-align: center;background-color:lightGreen;">
 												<input type="checkbox" name="role_${permission.id}_${role.toString()}" checked="checked">
 											</td>

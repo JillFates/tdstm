@@ -42,7 +42,11 @@
 											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
 										</tdsAngular:tooltipSpan>
 									</td>
-                                    <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
+
+                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
+                                    <td class="label ${standardFieldSpecs.locationSource.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.locationSource.imp}','${assetEntity.sourceLocationName}')}"
+                                        nowrap="nowrap">
                                         <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
                                     </td>
                                     <td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}">${assetEntity.sourceLocationName}</td>
@@ -61,7 +65,9 @@
 										</tdsAngular:tooltipSpan>
 									</td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
-                                    <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+                                    <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${roomSource?.roomName}')}"
+                                        nowrap="nowrap">
                                         <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
                                     </td>
                                     <td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}">${roomSource?.roomName}</td>
@@ -72,7 +78,9 @@
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.os}" value="${assetEntity.os}" />
                                     <%-- The following fields will be displayed based on the assetType --%>
                                     <%-- rackable --%>
-                                    <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}" nowrap="nowrap" id="rackId">
+                                    <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetEntity.rackSource?.tag}')}"
+                                        nowrap="nowrap" id="rackId">
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
                                     </td>
                                     <td class="valueNW nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}">${assetEntity.rackSource?.tag}</td>
@@ -87,7 +95,9 @@
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}" />
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}" />
-                                    <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
+                                    <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetEntity.sourceRackPosition}')}"
+                                        nowrap="nowrap">
                                         <label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
                                             Position
                                         </label>
@@ -110,7 +120,9 @@
                                         ${assetEntity?.moveBundle}
                                         <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.size.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${assetEntity.size}')}"
+                                        nowrap="nowrap">
                                         <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
                                             Size/Scale
                                         </label>
@@ -127,7 +139,9 @@
                                 <tr>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}" />
                                     <g:if test="! assetEntity.isVM()">
-                                        <td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
+                                        <td class="label ${standardFieldSpecs.truck.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.truck.imp}','${assetEntity.truck}')}"
+                                            nowrap="nowrap">
                                             <label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
                                                 Truck/Cart/Shelf
                                             </label>
@@ -169,10 +183,10 @@
     <div class="modal-footer form-group-center">
         <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
-        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
-        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
-        <a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
+        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
+        <a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
     </div>
 </div>

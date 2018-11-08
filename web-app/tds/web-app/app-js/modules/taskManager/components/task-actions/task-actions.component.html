@@ -1,4 +1,23 @@
 <!-- Main content -->
-<div>
-	<button>Task Actions</button>
+<div class="task-actions-component">
+	<button *ngIf="options && options.showStart" (click)="onStart()" class="btn btn-default" type="button" title="Start">
+		<i class="fa fa-med fa-play-circle"></i> <span>Start</span>
+	</button>
+
+	<button  *ngIf="options && options.showDone" (click)="onDone()" class="btn btn-default" type="button" title="Done">
+		<i class="fa fa-med fa-check"></i> <span>Done</span>
+	</button>
+
+	<button  *ngIf="options && options.showAssignToMe" (click)="onAssignToMe()" class="btn btn-default" type="button" title="Assign To Me">
+		<i class="fa fa-med fa-user"></i> <span>Assign To Me</span>
+	</button>
+
+	<button  *ngIf="options && options.showNeighborhood" (click)="onNeighborhood()" class="btn btn-default" type="button" title="Neighborhood">
+		<i class="fa fa-med fa-align-left"></i> <span>Neighborhood</span>
+	</button>
+
+	<button  *ngIf="options && options.invoke" [disabled]="!hasInvokePermission"
+	         (click)="onInvoke()" class="btn btn-default" type="button" title="Invoke">
+		<i class="fa fa-med fa-cogs"></i> <span>Invoke</span>
+	</button>
 </div>

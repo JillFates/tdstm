@@ -6,7 +6,6 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {DataIngestionService} from '../../../../modules/dataIngestion/service/data-ingestion.service';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -18,12 +17,11 @@ export class AssetExplorerViewSaveComponent {
 
 	constructor(
 		model: ViewModel,
-		@Inject('favorites') private favorites: ViewGroupModel,
+		private favorites: ViewGroupModel,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
-		private notifier: NotifierService,
-		private dataIngestionService: DataIngestionService) {
+		private notifier: NotifierService) {
 
 		this.model = { ...model };
 		if (this.model.id) {

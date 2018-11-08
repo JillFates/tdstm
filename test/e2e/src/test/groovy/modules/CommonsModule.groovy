@@ -185,7 +185,7 @@ class CommonsModule extends Module {
     */
     def verifyElementDisplayed(selector){
         try {
-            waitFor(0.5){element.displayed}
+            waitFor(0.5){selector.displayed}
         } catch (WaitTimeoutException e){
             false
         }

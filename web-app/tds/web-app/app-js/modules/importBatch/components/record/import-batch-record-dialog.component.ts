@@ -5,12 +5,16 @@ import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {ImportBatchRecordFieldsComponent} from './import-batch-record-fields.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 import {PROMPT_DEFAULT_MESSAGE_KEY, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'import-batch-record-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-dialog.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-dialog.component.html',
+	host: {
+		'(keydown)': 'keyDownHandler($event)'
+	}
 })
 export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 
@@ -44,6 +48,16 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 			}, (reason: any) => console.log('confirm rejected', reason));
 		} else {
 			this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
+		}
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	private keyDownHandler($event: KeyboardEvent): void {
+		if ($event && $event.code === KEYSTROKE.ESCAPE) {
+			this.onCancelCloseDialog();
 		}
 	}
 

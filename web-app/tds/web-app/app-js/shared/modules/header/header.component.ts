@@ -1,80 +1,88 @@
-import {Component, Inject, AfterViewInit, Renderer2} from '@angular/core';
-import { StateService } from '@uirouter/angular';
-import { NotifierService } from '../../services/notifier.service';
-import { AlertType } from '../../model/alert.model';
-import { UIPromptService } from '../../directives/ui-prompt.directive';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { ASSET_MENU_CSS_TREE } from '../../../modules/assetExplorer/model/asset-menu.model';
+import {Component, Renderer2} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {NotifierService} from '../../services/notifier.service';
+import {UIPromptService} from '../../directives/ui-prompt.directive';
+import {TranslatePipe} from '../../pipes/translate.pipe';
+import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
+import {TaskService} from '../../../modules/taskManager/service/task.service';
+import {Title} from '@angular/platform-browser';
 
 declare var jQuery: any;
+
 @Component({
-	selector: 'header',
+	selector: 'tds-header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 	providers: [TranslatePipe],
-	styles: [`.font-weight-bold { font-weight:bold; }`]
+	styles: [`.font-weight-bold {
+        font-weight: bold;
+    }`]
 })
 
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent {
 
-	private state: StateService;
 	private pageMetaData: {
+		id: any,
 		title: string,
 		instruction: string,
 		menu: Array<string>,
 		topMenu: any
 	};
-	taskCount: Number;
 
 	constructor(
-		@Inject('taskCount') tasks,
-		translatePipe: TranslatePipe,
-		state: StateService,
-		notifierService: NotifierService,
+		private taskService: TaskService,
+		private translatePipe: TranslatePipe,
+		private route: ActivatedRoute,
+		private notifierService: NotifierService,
+		private titleService: Title,
 		promptService: UIPromptService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
-			if (state.$current.data.hasPendingChanges) {
+			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
 				promptService.open(
 					'Confirmation Required',
 					'You have changes that have not been saved. Do you want to continue and lose those changes?',
 					'Confirm', 'Cancel').then(result => {
-						if (result) {
-							state.$current.data.hasPendingChanges = false;
-							window.location.assign(e.currentTarget.href);
-						}
-					});
+					if (result) {
+						this.route.snapshot.data['hasPendingChanges'] = false;
+						window.location.assign(e.currentTarget.href);
+					}
+				});
 			}
 		});
-		tasks.subscribe(
+
+		this.taskService.retrieveUserToDoCount().subscribe(
 			(result) => {
-				this.taskCount = result.count;
 				// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
-				jQuery('#todoCountProjectId').html(this.taskCount);
+				jQuery('#todoCountProjectId').html(result.count);
+			}
+		);
 
-			},
-			(err) => {
-				notifierService.broadcast({
-					name: AlertType.WARNING,
-					message: err
-				});
+		jQuery('.menu-parent-tasks > a')[0].onclick = null;
 
-				console.log(err);
-			});
-		this.state = state;
-		// this language will be used as a fallback when a translation isn't found in the current language
-		// translate.setDefaultLang('en');
-
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.pageMetaData = this.state.$current.data.page;
-			document.title = translatePipe.transform(this.pageMetaData.title, []);
-		}
+		this.headerListeners();
 	}
 
-	ngAfterViewInit(): void {
-		// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
-		jQuery('.menu-parent-tasks > a')[0].onclick = null;
-		this.selectTopMenuSections();
+	/**
+	 * Create the Lister for any changes made to the Routing that affects the Header Component
+	 * Includes breadcrumbs, tiles, and other menu changes
+	 */
+	private headerListeners(): void {
+		this.notifierService.on('notificationRouteNavigationEnd', event => {
+			if (event.route.snapshot.data && event.route.snapshot.data.page) {
+				this.pageMetaData = event.route.snapshot.data.page;
+				const {report} = event.route.snapshot.data;
+				this.pageMetaData.id = report && report.id;
+				// Set Title
+				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));
+				this.selectTopMenuSections();
+			}
+		});
+		this.notifierService.on('notificationHeaderTitleChange', event => {
+			// Set Title
+			this.titleService.setTitle(event.title);
+			this.pageMetaData.title = event.title;
+		});
 	}
 
 	/**
@@ -99,14 +107,15 @@ export class HeaderComponent implements AfterViewInit {
 		}
 
 		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.subMenu) {
-			const selectedMenu = this.state.params;
+			const selectedMenu = this.pageMetaData;
 			if (ASSET_MENU_CSS_TREE.PARENT_MENU === this.pageMetaData.topMenu.parent
 				&& ASSET_MENU_CSS_TREE.CHILD_MENU === this.pageMetaData.topMenu.child) {
 				jQuery('li.menu-child-item').removeClass('active');
 				let elements: any = document.getElementsByClassName(ASSET_MENU_CSS_TREE.CHILD_CLASS);
 				if (elements && elements.length > 0) {
+					const targetMenuId = selectedMenu.id && selectedMenu.id.toString();
 					for (let i = 0; i < elements.length; i++) {
-						if (elements[i].firstElementChild.id === selectedMenu.id) {
+						if (elements[i].firstElementChild.id === targetMenuId) {
 							this.renderer.addClass(elements[i], 'active');
 						}
 					}

@@ -4,6 +4,7 @@ import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
@@ -207,9 +208,12 @@ class ETLProcessorResult {
 	 *
 	 * @return and instance of RowResult
 	 */
-	private RowResult findOrCreateCurrentRow() {
+	RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
-			reference.data.add(new RowResult(rowNum: processor.iterateIndex.pos))
+			reference.data.add(new RowResult(
+				rowNum: processor.iterateIndex.pos,
+				domain: reference.domain)
+			)
 			resultIndex = reference.data.size() - 1
 		}
 		return reference.data[resultIndex]
@@ -394,10 +398,14 @@ class ETLProcessorResult {
  *  "domains": {
  *    "domain": "Device",
  *    "fieldNames": [
- *          "assetName",
- *          "externalRefId"
- *     ],
- *
+ *      "assetName",
+ *      "externalRefId"
+ *    ],
+ * 	  "fieldLabelMap": {
+ * 		"asset": "asset",
+ *      "dependent": "dependent",
+ *      "c1": "c1"
+ *    },
  *    "data": [ list of RowResult instances]
  * 	}
  * </pre>
@@ -406,9 +414,38 @@ class ETLProcessorResult {
 @ConfigureMarshalling
 class DomainResult {
 
+	/**
+	 * An instance of {@code DomainResult} is represented as list of {@RowResult}
+	 * that are defined by a {@code ETLDomain}. This field saves that value as String.
+	 */
 	String domain
+	/**
+	 * <p>Saves a list of fields used during a ETL script executions for this particular domain</p>
+	 * <pre>
+	 *  ...,
+	 *  "fieldNames": [
+	 *     "asset",
+	 *     "dependent",
+	 *     "c1"
+	 *  ],
+	 *  ....
+	 * </pre>
+	 */
 	Set fieldNames = [] as Set
+	/**
+	 * <p>This map is used to have a map between field label and field name used in an ETL processor results</p>
+	 * <pre>
+	 *  ....
+	 *  "fieldLabelMap": {
+	 *  	"asset": "asset",
+	 *      "dependent": "dependent",
+	 *      "c1": "c1"
+	 *  },
+	 *  ....
+	 * <pre>
+	 */
 	Map<String, String> fieldLabelMap = [:]
+
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
@@ -464,13 +501,15 @@ class RowResult {
 	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
+	@DoNotMarshall
+	String domain
 
 	/**
 	 * Add element to the current row data
 	 * @param element
 	 */
 	void addLoadElement(Element element){
-		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
 		this.errorCount = fieldData.errors.size()
 	}
@@ -480,7 +519,7 @@ class RowResult {
 	 * @param element
 	 */
 	void addInitElement(Element element){
-		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.init = element.init
 	}
 	/**
@@ -495,13 +534,13 @@ class RowResult {
 	 * 		"warn":true,
 	 * 		"errors": ["found with wrong asset class"],
 	 * 		    ....
-	 * 	    }
+	 * 	   }
 	 * 	}
 	 * </pre>
 	 * @param findElement the find element with the warn message
 	 */
 	void addFindElement(ETLFindElement findElement){
-		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData(findElement.currentFind.fieldDefinition)
 		fieldData.addFindElement(findElement)
 
 		if (fieldData.find.results.isEmpty()) {
@@ -516,7 +555,7 @@ class RowResult {
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition)
 		fieldData.addFoundElement(foundElement)
 	}
 
@@ -540,7 +579,7 @@ class RowResult {
 	void addFindElementWarnMessage(ETLFindElement findElement) {
 		warn = true
 		errors.add(findElement.warnMessage)
-		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData(findElement.currentFind.fieldDefinition)
 		fieldData.addFindElementWarnMessage(findElement)
 	}
 
@@ -559,11 +598,11 @@ class RowResult {
 	 * @param element
 	 * @return
 	 */
-	FieldResult findOrCreateFieldData(String fieldName){
-		if(!fields.containsKey(fieldName)){
-			fields[fieldName] = new FieldResult(fieldOrder: fields.size())
+	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition){
+		if(!fields.containsKey(fieldDefinition.name)){
+			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)
 		}
-		return fields[fieldName]
+		return fields[fieldDefinition.name]
 	}
 }
 
@@ -594,6 +633,8 @@ class RowResult {
 @ConfigureMarshalling
 class FieldResult {
 
+	@DoNotMarshall
+	ETLFieldDefinition fieldDefinition
 	Object originalValue
 	Object value
 	Object init

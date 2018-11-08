@@ -20,6 +20,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
 
 declare var jQuery: any;
 
@@ -31,6 +32,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
 		public manufacturerName: string;
+		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			private activeDialog: UIActiveDialogService,
@@ -133,7 +135,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		onDeleteAsset() {
 
 			this.prompt.open('Confirmation Required',
-				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
 				'OK', 'Cancel')
 				.then( success => {
 					if (success) {
@@ -171,6 +173,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 					this.dialogService
 						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				} else if (!result.clonedAsset && result.showView) {
+					this.showAssetDetailView(DOMAIN.DEVICE, result.assetId);
 				}
 			})
 				.catch( error => console.log('error', error));

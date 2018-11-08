@@ -2,6 +2,7 @@ package pages.Planning.Bundle
 
 import geb.Page
 import modules.PlanningModule
+import modules.CommonsModule
 import org.openqa.selenium.Keys
 
 class ListBundlesPage extends Page {
@@ -19,15 +20,49 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
+        individualRows (required: false) {$("a.cell-url-element")}
+        commonsModule {module CommonsModule}
+        firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
 
         //filters section
         filterRow {$("tr.k-filter-row")}
+        namefilterKind {$("span.k-select")[2]}
         nameFilter {filterRow.find("[data-text-field='name']")}
+        planningFilterWrapper {$(".k-operator-hidden")}
+        isPlanningRadio {filterRow.find(("label>input"))[0]}
+        isNonPlanningRadio {filterRow.find(("label>input"))[1]}
+        clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
+    }
+
+    def validateBundleIsListed(bName){
+        filterByName(bName)
+        numberOfRows()==1
+    }
+
+    def verifyRowsDisplayed(){
+        selectFilter()
+        numberOfRows()>0
+    }
+
+    def clickNonPlanningFilter(){
+       isNonPlanningRadio.click()
+    }
+
+    def clickPlanningFilter(){
+        isPlanningRadio.click()
+    }
+
+    def clearPlanningFilter(){
+        clearPlanningFilter.click()
     }
 
     def clickCreate(){
         createButton.click()
+    }
+
+    def numberOfRows(){
+        individualRows.size()
     }
 
     def filterByName(name){
@@ -36,6 +71,17 @@ class ListBundlesPage extends Page {
         //from the field
         nameFilter<< Keys.chord(Keys.TAB)
     }
+
+    def selectFilter(){
+        namefilterKind.click()
+        waitFor{$("li.k-item", text:"Contains").click()}
+    }
+
+    def clickOnBundle(){
+        def bundleLocator = "('tbody.tr')"
+        $(".cell-url-element")[0].click()
+    }
+
     /**
      * This filter actually has different options to filter.
      * this method will validate the "equal to" option
@@ -66,7 +112,11 @@ class ListBundlesPage extends Page {
      * returns false if the parameter value and the presence of the tick do not match     *
      */
     def validatePlanningTick(value){
-        !(value=="on" ^ tickIcon.displayed)
+        if(value=="on"){
+            return commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        } else {
+            return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        }
     }
 
 }

@@ -1,9 +1,10 @@
 /**
- * Created by Jorge Morayta on 6/30/2017.
+ * Created by Jorge Morayta on 13/09/2018.
  */
 
-const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
+const webpack = require('webpack');
+
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
@@ -22,19 +23,19 @@ module.exports = function (env) {
 			path: path.resolve(__dirname, './web-app/dist/'),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: '../'
+			publicPath: '../tds/web-app/dist/'
+		},
+		resolve: {
+			extensions: [".ts", ".tsx", ".js"]
 		},
 		module: {
 			rules: [
 				{test: /\.tsx?$/, loader: 'ts-loader'},
+				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
-		},
-		resolve: {
-			extensions: ['.ts', '.tsx', '.js'],
-			unsafeCache: true
 		},
 		plugins: [
 			new webpack.DefinePlugin({
@@ -57,24 +58,7 @@ module.exports = function (env) {
 					commons: {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
-						chunks: 'all',
-						test(module, chunks) {
-							const name = module.nameForCondition && module.nameForCondition();
-							return chunks.some(chunk => {
-								return (chunk.name === 'app' || chunk.name === 'polyfills') && /[\\/]node_modules[\\/]/.test(name);
-							});
-						}
-					},
-					codemirror: {
-						name: 'codemirror',
-						chunks: chunk => chunk.name == 'codemirror',
-						priority: 1,
-						enforce: true,
-						test(module, chunks) {
-							return chunks.some((chunk) =>  {
-								return chunk.name === 'codemirror'
-							});
-						}
+						chunks: 'all'
 					}
 				}
 			}

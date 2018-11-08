@@ -26,6 +26,33 @@ class BundleDetailPage extends Page {
         planningModule {module PlanningModule }
         menuModule {module MenuModule }
         planningCheck {$("input#useForPlanning")}
+        listbundles {$("a.list")}
+        message {$("div.message")}
+        startTime {$(".name", text:"Start Time:")next()}
+        completionTime {$(".name", text: "Completion Time:").next()}
+        //buttons section
+        btnsContainer {$("form")}
+        editBtn {$("input.edit")[0]}
+        deleteBtn {btnsContainer.find("[name='_action_Delete']")}
+    }
+
+    def cancelDeletion(){
+        withConfirm(false) {deleteBtn.click() }
+    }
+    def confirmDeletion(){
+        withConfirm(true) {deleteBtn.click() }
+    }
+
+    def clickDelete(){
+        delete.click()
+    }
+
+    def goToListbundles(){
+        listbundles.click()
+    }
+
+    def clickEdit(){
+        editBtn.click()
     }
 
     def isPlanning(){
@@ -48,9 +75,34 @@ class BundleDetailPage extends Page {
         allFieldsAsExpected
     }
 
+
     def bundleCreatedMsgIsDisplayed(data){
         creationMessage.text()== "MoveBundle "+data[0]+" created"
     }
+    /**
+     * Returns bundle data displayed
+     */
+    def getDataDisplayed(){
+        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text(),isPlanning()]
+        dispData
+    }
+    /**
+     * Validates that the original bundle data has been edited and the changes were saved
+     * @param origData     *
+     */
+    def dataIsEdited(origData){
+        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
+        assert(isPlanning()!=origData[3])
+        assert(origData[0]+" Edited"== dispData[0])
+        assert(origData[1]+" Edited"== dispData[1])
+        assert(origData[2]== dispData[2])
+        assert (startTime.text().compareTo(origData[4])== 0 )
+        assert(completionTime.text().compareTo(origData[5])==0)
+        return true
+    }
 
+    def validateUpdateMesage(name){
+       message.text()=="MoveBundle "+name+" updated"
+    }
 }
 

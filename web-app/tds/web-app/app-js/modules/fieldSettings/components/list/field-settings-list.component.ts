@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit, ViewChildren, QueryList } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { StateService } from '@uirouter/angular';
+import { Component, Inject, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -18,12 +18,14 @@ import { Permission } from '../../../../shared/model/permission.model';
 	selector: 'field-settings-list',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
-export class FieldSettingsListComponent implements OnInit {
+export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	@ViewChildren('grid') grids: QueryList<FieldSettingsGridComponent>;
 	public domains: DomainModel[] = [];
 	private dataSignature: string;
 	selectedTab = '';
 	editing = false;
+	private lastSnapshot;
+	protected navigationSubscription;
 
 	private filter = {
 		search: '',
@@ -33,24 +35,58 @@ export class FieldSettingsListComponent implements OnInit {
 	private fieldsToDelete = {};
 
 	constructor(
-		@Inject('fields') fields: Observable<DomainModel[]>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private fieldService: FieldSettingsService,
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
-		private state: StateService
 	) {
-		fields.subscribe(
-			(result) => {
-				this.domains = result;
-				if (this.domains.length > 0) {
-					this.selectedTab = this.domains[0].domain;
-				}
-			},
-			(err) => console.log(err));
+		this.domains = this.route.snapshot.data['fields'];
+		if (this.domains.length > 0) {
+			this.selectedTab = this.domains[0].domain;
+		}
+		this.reloadStrategy();
 	}
 
 	ngOnInit(): void {
+		this.initialiseComponent();
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
+	}
+
+	/**
+	 * Reload Strategy keep listen To change to the route so we can reload whatever is inside the component
+	 * Increase dramatically the Performance
+	 */
+	private reloadStrategy(): void {
+		// The following code Listen to any change made on the rout to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event.snapshot && event.snapshot.data && event.snapshot.data.fields) {
+				this.lastSnapshot = event.snapshot;
+			}
+			// If it is a NavigationEnd event re-initalise the component
+			if (event instanceof NavigationEnd) {
+				console.log(event);
+				this.domains = this.lastSnapshot.data['fields'];
+				if (this.domains.length > 0) {
+					this.selectedTab = this.domains[0].domain;
+				}
+			}
+		});
+	}
+
+	/**
+	 * Calls every time the Component is recreated by calling same URL
+	 */
+	private initialiseComponent(): void {
 		this.dataSignature = JSON.stringify(this.domains);
 		for (let domain of this.domains) {
 			this.fieldsToDelete[domain.domain] = [];
@@ -134,9 +170,10 @@ export class FieldSettingsListComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.domains);
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result;
-		}
+		// TODO: STATE SERVICE GO
+		// if (this.state && this.state.$current && this.state.$current.data) {
+		// 	this.state.$current.data.hasPendingChanges = result;
+		// }
 		result = result || this.hasPendingDeletes();
 		return result;
 	}

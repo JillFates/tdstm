@@ -1,6 +1,5 @@
 <div class="task-comment-component dialog-container">
     <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
-        <h1>Tasks:</h1>
         <kendo-grid
                 *ngIf="dataGridTaskHelper"
                 class="task-comment-grid"
@@ -47,8 +46,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
                         <!-- not yet supported -->
-                        <button [hidden]="true"
-                                (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+                        <button (click)="openTaskEdit(dataItem)" class="btn btn-action btn-default" title="Edit">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                         <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
@@ -74,7 +72,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>
@@ -82,7 +80,6 @@
         </kendo-grid>
     </div>
     <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
-        <h1>Comments:</h1>
         <kendo-grid
                 *ngIf="dataGridCommentHelper"
                 class="task-comment-grid"
@@ -141,7 +138,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>

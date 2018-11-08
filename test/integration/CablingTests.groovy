@@ -12,8 +12,8 @@ class CablingTests extends IntegrationSpec {
 
 	def "Test model create functionality"(){
 		when:
-			def manufacturer = new Manufacturer(name : "Dell")
-			if(!manufacturer.validate() || !manufacturer.save()){
+			def manufacturer = new Manufacturer(name : "Dell Enterprise Test")
+			if(!manufacturer.validate() || !manufacturer.save(flush: true)){
 				def etext = "Unable to create manufacturer" +
 					GormUtil.allErrorsString( manufacturer )
 				log.error etext
@@ -29,7 +29,7 @@ class CablingTests extends IntegrationSpec {
 					connectorPosX  : 250,
 					connectorPosY  : 90
 			)
-			if(!modelInstance.validate() || !modelInstance.save()){
+			if(!modelInstance.validate() || !modelInstance.save(flush:true)){
 				def etext = "Unable to create modelInstance" +
 					GormUtil.allErrorsString( modelInstance )
 				log.error etext

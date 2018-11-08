@@ -822,6 +822,7 @@ class DataImportService implements ServiceMethods {
 							record.status = ImportBatchStatusEnum.COMPLETED
 						} else {
 							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
+							record.addError(GormUtil.allErrorsString(entity))
 							entity.discard()
 							entity = null
 						}

@@ -9,6 +9,7 @@ export class StringUtils {
 	 * @returns {string}
 	 */
 	public static toCapitalCase(source: string, allCapitalCase = false): string {
+		source = source.toLowerCase();
 		let result: any = '';
 		const toTitle = R.compose(R.join(''), R.over(R.lensIndex(0), R.toUpper));
 		if (!allCapitalCase) {
