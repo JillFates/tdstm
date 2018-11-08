@@ -118,7 +118,7 @@ class Element implements RangeChecker {
 		processor.validateStack()
 		if(processor.hasSelectedDomain()){
 			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			processor.addElementLoaded(this)
 			return this
 		} else{
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -809,7 +809,7 @@ class Element implements RangeChecker {
 	private void checkLoadedElement(){
 		if(loadedElement){
 			this.originalValue = this.value
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			processor.addElementLoaded(this)
 			loadedElement = false
 		}
 	}
@@ -829,7 +829,7 @@ class Element implements RangeChecker {
 	Element with(Object value) {
 		this.value = ETLValueHelper.valueOf(value)
 		this.originalValue = ETLValueHelper.valueOf(value)
-		processor.addElementLoaded(processor.selectedDomain.domain, this)
+		processor.addElementLoaded(this)
 		return this
 	}
 

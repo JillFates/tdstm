@@ -102,7 +102,7 @@
 																	(open)="onOpenAgentMethod()"
 																	(valueChange)="onMethodValueChange($event)"
 																	[(ngModel)]="apiActionModel.agentMethod"
-																	[disabled]="apiActionModel.agentClass.id === '0'"
+																	[disabled]="!apiActionModel.agentClass.id"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == '0'}">
 													<ng-template kendoDropDownListItemTemplate let-dataItem>
 														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
@@ -347,6 +347,7 @@
 														[valueField]="'assetClass'"
 														(valueChange)="onContextValueChange(dataItem)"
 														[(ngModel)]="dataItem.context"
+														[valuePrimitive]="true"
 														required
 														[ngClass]="{'has-error': !dataItem.context || dataItem.context.value === ''}" >
 												</kendo-dropdownlist>

@@ -174,7 +174,7 @@ class SearchQueryHelper {
 				//
 
 				// 1. See if this property based on ID is in the cache already
-				if (context.cache) {
+				if (context.cache && fieldsInfo.containsKey(fieldName)) {
 					md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
 					// log.debug 'fetchEntityByFieldMetaData() has cache key {}', md5
 					entity = context.cache.get(md5)

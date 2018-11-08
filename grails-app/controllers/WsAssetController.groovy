@@ -371,13 +371,15 @@ class WsAssetController implements ControllerMethods {
 			asset: fetchDomain(AssetEntity, params)
 		]
 
-		// prepare value names as well (needed for UI)
 		if (model.asset.manufacturer) {
-			model.manufacturerName = model.asset.manufacturer.name
+			model.manufacturerName = model.asset.manufacturer.name;
 		}
+
 		if (model.asset.model) {
-			model.modelName = model.asset.model.modelName
+			model.modelName = model.asset.model.modelName;
 		}
+
+
 
 		String domainName = AssetClass.getDomainForAssetType(model.asset.assetClass.toString())
 		if (mode == 'show') {

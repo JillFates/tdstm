@@ -51,9 +51,9 @@ class DeviceUtils {
 	 * @return List<Map<id,value>>
 	 */
 	static List getRoomSelectOptions(Project project, boolean isSource, boolean allowAdd = true) {
-		def rsl = []
+		List<Map> options = []
 		if (allowAdd) {
-			rsl << [id: -1, value: 'Add Room...']
+			options << [id: -1, value: 'Add Room...']
 		}
 
 		Room.executeQuery(
@@ -61,10 +61,10 @@ class DeviceUtils {
 			[p: project, s: isSource ? 1 : 0]
 		)
 		.each { Room room ->
-			rsl << [id: room.id, value: room.location + ' / ' + room.roomName]
+			options << [id: room.id, value: room.location + ' / ' + room.roomName]
 		}
 
-		return rsl
+		return options
 	}
 
 	/**
@@ -75,9 +75,9 @@ class DeviceUtils {
 	 * @return List<Map<id,value>>
 	 */
 	static List getRackSelectOptions(Project project, roomId, allowAdd) {
-		def rsl = []
+		List<Map> options = []
 		if (allowAdd) {
-			rsl << [id: -1, value: 'Add Rack...']
+			options << [id: -1, value: 'Add Rack...']
 		}
 
 		roomId = NumberUtil.toLong(roomId)
@@ -88,11 +88,11 @@ class DeviceUtils {
 				order by r.tag
 			''', [p: project, r: roomId, t: 'Rack'])
 			racks.each { rack ->
-					rsl << [id: rack[0].id, value: rack[0].tag]
+				options << [id: rack[0].id, value: rack[0].tag]
 			}
 		}
 
-		return rsl
+		return options
 	}
 
 	/**
@@ -102,16 +102,18 @@ class DeviceUtils {
 	 * @return List<Map<id, value>>
 	 */
 	static List getChassisSelectOptions(Project project, roomId) {
-		def rsl = [ ]
+		List<Map> options = []
 		roomId = NumberUtil.toLong(roomId)
 		if (roomId) {
 			Room room = GormUtil.findInProject(project, Room, roomId, true)
-			def roomProp = room.source ? 'roomSource' : 'roomTarget'
+			String roomProp = room.source ? 'roomSource' : 'roomTarget'
 			List chassisList = getAssetsWithCriteriaMap(project, AssetClass.DEVICE, [(roomProp): room, assetType: AssetType.bladeChassisTypes])
-			chassisList.each { rsl << [id: it.id, value: it.assetName + '/' + it.assetTag] }
+			chassisList.each {
+				options << [id: it.id, value: it.assetName + '/' + it.assetTag]
+			}
 		}
 
-		return rsl
+		return options
 	}
 
 	/**
@@ -121,14 +123,16 @@ class DeviceUtils {
 	 * @param criteriaMap - the property names to be associated
 	 * @param includeJoinData - a flag that when true, if there is a join in the query (e.g. referencing assetType) will return a multi-dimensional array of the dataset
 	 * @return the list of assets found
+	 * @comment This method does not make much sense in this class but was moved here as part of refactoring the getChassisSelectOptions method which is the only place this is used.
 	 */
 	static List getAssetsWithCriteriaMap(Project project, AssetClass ac, Map criteriaMap, boolean includeJoinData=false) {
-		def params = [project: project, ac: ac]
+		Map params = [project: project, ac: ac]
 		String domainName = AssetClass.domainNameFor(ac)
+		// TODO : JPM 11/2018 : should domainClass be an Object or a Class?
 		Object domainClass = AssetClass.domainClassFor(ac)
 		StringBuilder from = new StringBuilder("from $domainName a ")
 		StringBuilder where = new StringBuilder("where a.project=:project and a.assetClass=:ac ")
-		def map
+		Map map
 		boolean hasJoin = false
 
 		// Go through the params and construct the query appropriately
@@ -153,7 +157,7 @@ class DeviceUtils {
 
 		String hql = from.toString() + where
 		// log.debug "getAssetsWithCriteriaMap() HQL=$hql, params=$params"
-		def assets = domainClass.findAll(hql, params)
+		List assets = domainClass.findAll(hql, params)
 		// log.debug "getAssetsWithCriteriaMap() found ${assets.size()} : $assets"
 
 		if (assets && hasJoin) {

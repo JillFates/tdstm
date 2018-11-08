@@ -1329,6 +1329,7 @@ class AssetEntityService implements ServiceMethods {
 			assetEntityInstance: device,
 			assetType: assetType,
 			manufacturer: device.manufacturer,
+			priorityOption: getAssetPriorityOptions(),
 			manufacturers: getManufacturers(assetType),
 			models: getModelSortedByStatus(device.manufacturer),
 			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
@@ -1398,29 +1399,37 @@ class AssetEntityService implements ServiceMethods {
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
 		Map map = [
-			assetId: asset.id,
-			environmentOptions: getAssetEnvironmentOptions(),
+			assetId: 			asset.id,
+			project: 			project,
+
+			// Used for change detection/optimistic locking
+			version: 			asset.version,
+
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
 			// TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
-			escapedName: getEscapedName(asset),
-			moveBundleList: assetService.getMoveBundleOptions(project),
-			planStatusOptions: getAssetPlanStatusOptions(),
-			project: project,
-			// The page to return to after submitting changes
+			escapedName: 		getEscapedName(asset),
+
+			// Various Select Option lists
+			environmentOptions: getAssetEnvironmentOptions(),
+			moveBundleList: 	assetService.getMoveBundleOptions(project),
+			planStatusOptions: 	getAssetPlanStatusOptions(),
+			priorityOption:		assetService.getAssetPriorityOptions(),
+			// Required for Supports On and Depends On
+			dependencyMap:		dependencyEditMap(asset.project, asset),
+			dataFlowFreq:		AssetDependency.constraints.dataFlowFreq.inList,
+
+			// The page to return to after submitting changes (2018-11 JPM - believe this to be legacy and not needed)
 			redirectTo: params.redirectTo,
-			version: asset.version,
+
+			// Field Specifications
 			customs: customFields,
 			standardFieldSpecs: standardFieldSpecs,
 		]
 
-		// Required lists for Device type
+		// Additional Select Option lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
 			map << DeviceUtils.deviceModelOptions(project, asset)
 		}
-
-		// Required for Supports On and Depends On
-		map.dependencyMap = dependencyEditMap(asset.project, asset)
-		map.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 
 		map
 	}
