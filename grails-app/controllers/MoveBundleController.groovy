@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.DependencyAnalyzerTabs
 import com.tdsops.tm.enums.domain.AssetClass
@@ -13,12 +14,14 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DependencyConsoleCommand
+import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -32,6 +35,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
@@ -193,42 +198,25 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.BundleEdit)
-	def update() {
-
-		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
-
-		def moveBundle = MoveBundle.get(params.id)
-		if (!moveBundle) {
-			flash.message = "MoveBundle not found with id $params.id"
-			redirect(action: 'edit', id: params.id)
-			return
-		}
-
+	def update(Long id) {
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
 
-		moveBundle.name = params.name
-		moveBundle.description = params.description
-		moveBundle.workflowCode = params.workflowCode
-		moveBundle.useForPlanning = params.useForPlanning==null? false: params.useForPlanning as Boolean
-		if (params.moveEvent.id) {
-			moveBundle.moveEvent = MoveEvent.get(params.moveEvent.id)
-		} else {
-			moveBundle.moveEvent = null
+		Project currentUserProject = controllerService.getProjectForPage(this)
+		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
+		command.useForPlanning = params.getBoolean('useForPlanning', false)
+		if (params?.moveEvent?.id) {
+			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
 		}
-		moveBundle.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
-		def completionTime = params.completionTime
+		command.operationalOrder = params.getInt('operationalOrder', 1)
+		command.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		command.completionTime = TimeUtil.parseDateTime(params.completionTime)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
 
-		moveBundle.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		try {
+			MoveBundle moveBundle = moveBundleService.update(id, command)
 
-		moveBundle.completionTime = TimeUtil.parseDateTime(completionTime)
-
-		// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
-		// validating that the rooms even exist.
-		moveBundle.sourceRoom = Room.read(params.sourceRoom)
-		moveBundle.targetRoom = Room.read(params.targetRoom)
-
-		if (moveBundle.save()) {
 			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
 			boolean errorInSteps = false
 			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
@@ -247,35 +235,42 @@ class MoveBundleController implements ControllerMethods {
 				}
 			}
 
-			if(errorInSteps){
+			if (errorInSteps) {
 				flash.message = "Validation error while adding steps."
 				redirect(action: "show", id: moveBundle.id)
 				return
 			}
 
-			//def projectManeger = Party.get(projectManagerId)
 			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
 			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
+
 			flash.message = "MoveBundle $moveBundle updated"
-			//redirect(action:"show",params:[id:moveBundle.id, projectId:projectId])
 			redirect(action: "show", id: moveBundle.id)
 			return
+
+		} catch (EmptyResultException e) {
+			flash.message = "MoveBundle not found with id $params.id"
+			redirect(action: 'edit', id: params.id)
+		} catch (DomainUpdateException e) {
+			flash.message = "Error updating MoveBundle with id $params.id"
 		}
 
+		// in case of error updating move bundle
 		//	get the all Dashboard Steps that are associated to moveBundle.project
 		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
 		def remainingSteps = allDashboardSteps.remainingSteps
 
-		moveBundle.discard()
-
-		String projectId = securityService.userCurrentProjectId
-
 		render(view: 'edit',
-		       model: [moveBundleInstance: moveBundle, projectId: projectId, projectManager: projectManagerId,
-		               managers: partyRelationshipService.getProjectStaff(projectId),
-		               moveManager: moveManagerId, rooms: Room.findAllByProject(Project.load(projectId)),
-		               dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps: remainingSteps,
-		               workflowCodes: stateEngineService.getWorkflowCode()])
+				model: [moveBundleInstance: moveBundleService.findById(id),
+						projectId: currentUserProject.id,
+						projectManager: projectManagerId,
+						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
+						moveManager: moveManagerId,
+						rooms: Room.findAllByProject(currentUserProject),
+						dashboardSteps: allDashboardSteps.dashboardSteps,
+						remainingSteps: remainingSteps,
+						workflowCodes: stateEngineService.getWorkflowCode()
+				])
 	}
 
 	@HasPermission(Permission.BundleCreate)
@@ -286,7 +281,7 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.BundleCreate)
-	def save() {
+	def __save() {
 
 		def startTime = params.startTime
 		def completionTime = params.completionTime
@@ -326,6 +321,92 @@ class MoveBundleController implements ControllerMethods {
 		       model: [moveBundleInstance: moveBundle, moveManager: moveManager, projectManager: projectManager,
 		               managers: partyRelationshipService.getProjectStaff(project.id), rooms: Room.findAllByProject(project),
 		               workflowCodes: stateEngineService.getWorkflowCode()])
+	}
+
+	@HasPermission(Permission.BundleCreate)
+	def save() {
+
+//		def startTime = params.startTime
+//		def completionTime = params.completionTime
+//		if (startTime){
+//			params.startTime = TimeUtil.parseDateTime(startTime)
+//		}
+//		if (completionTime){
+//			params.completionTime = TimeUtil.parseDateTime(completionTime)
+//		}
+//
+//		params.sourceRoom = Room.read(params.sourceRoom)
+//		params.targetRoom = Room.read(params.targetRoom)
+//
+//		MoveBundle moveBundle = new MoveBundle(params)
+//		Project project = securityService.userCurrentProject
+//		def projectManager = params.projectManager
+//		def moveManager = params.moveManager
+//
+//		moveBundle.useForPlanning = params.useForPlanning == 'true'
+
+		// -------
+		def projectManagerId = params.projectManager
+		def moveManagerId = params.moveManager
+
+
+		Project currentUserProject = controllerService.getProjectForPage(this)
+		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
+		command.useForPlanning = params.getBoolean('useForPlanning', false)
+		if (params?.moveEvent?.id) {
+			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
+		}
+		command.operationalOrder = params.getInt('operationalOrder', 1)
+		command.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		command.completionTime = TimeUtil.parseDateTime(params.completionTime)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
+
+		try {
+			MoveBundle moveBundle = moveBundleService.save(command)
+
+			if (projectManagerId){
+				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+						Party.load(projectManager), "PROJ_MGR")
+			}
+			if (moveManagerId) {
+				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+						Party.load(moveManager), "MOVE_MGR")
+			}
+
+			flash.message = "MoveBundle $moveBundle created"
+			redirect(action: "show", params: [id: moveBundle.id])
+			return
+
+		} catch (ServiceException e) {
+			flash.message = "Error creating MoveBundle"
+		}
+
+
+//		if (!moveBundle.hasErrors() && moveBundle.save()) {
+//			if (projectManager){
+//				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+//						Party.load(projectManager), "PROJ_MGR")
+//			}
+//			if (moveManager) {
+//				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+//						Party.load(moveManager), "MOVE_MGR")
+//			}
+//
+//			flash.message = "MoveBundle $moveBundle created"
+//			redirect(action: "show", params: [id: moveBundle.id])
+//			return
+//		}
+
+		// in case of error saving new move bundle
+		render(view: 'create',
+				model: [moveBundleInstance: command,
+						moveManager: moveManagerId,
+						projectManager: projectManagerId,
+						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
+						rooms: Room.findAllByProject(currentUserProject),
+						workflowCodes: stateEngineService.getWorkflowCode()
+				])
 	}
 
 	/**
