@@ -2,13 +2,16 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.GreenMailUtil
 import grails.plugin.mail.MailService
 import grails.test.spock.IntegrationSpec
+import spock.lang.Ignore
 
 /**
  * Created by octavio on 7/26/17.
  * This is a placehoder to Test sending mail using the GreenMail Plugin
  * TODO: oluna this currently gives no value to the app is just an example of how to use the greenmail
  * to test the result of mails being sent, should we remove it?
+ * TM-12341 Ignored in the mean time, we will create a new ticket to integrate this with the test flow
  */
+@Ignore
 class TestGreenMailSpec extends IntegrationSpec {
 	GreenMail greenMail
 	MailService mailService
