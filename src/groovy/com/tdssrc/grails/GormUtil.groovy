@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.orm.hibernate.cfg.CompositeIdentity
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
@@ -1269,7 +1270,7 @@ class GormUtil {
 		List<String> minimalProperties = ["id", "name"]
 		Map domainMap = [:]
 
-		Class domainClass = domainObject.class
+		Class domainClass = GrailsHibernateUtil.unwrapIfProxy(domainObject).class
 		if (isDomainClass(domainClass)) {
 			// Get all the domain properties.
 			List<GrailsDomainClassProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
