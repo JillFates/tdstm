@@ -283,7 +283,7 @@ newsEditor,newsEditorList,NewsView
 newsEditor,listEventNewsJson,NewsView
 newsEditor,getEventNewsList,NewsView
 newsEditor,retrieveCommetOrNewsData,NewsView
-newsEditor,updateNewsOrComment,NewsEdit
+newsEditor,NewsEdit
 newsEditor,saveNews,NewsCreate
 newsEditor,updateNews,NewsEdit
 newsEditor,deleteNews,NewsDelete

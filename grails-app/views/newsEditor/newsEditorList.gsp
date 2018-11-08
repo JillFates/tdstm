@@ -209,7 +209,7 @@ $('#reportsMenu').hide();
 					<div id="newsAndIssuesList"></div>
 				</div>
 				<div id="showEditCommentDialog" title="Edit Issue Comment" style="display: none;" class="static-dialog">
-					<g:form action="updateNewsOrComment" method="post" name="editCommentForm">
+					<g:form action="updateNews" method="post" name="editCommentForm">
 						<div class="dialog" style="border: 1px solid #5F9FCF">
 							<input name="id" value="" id="commentId" type="hidden"/>
 							<input name="commentType" value="" id="commentTypeId" type="hidden"/>
@@ -251,7 +251,7 @@ $('#reportsMenu').hide();
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="comment">Comment:</label></td>
-										<td valign="top" class="value" ><textarea cols="80" rows="5" id="commentTdId" name="comment" onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea> </td>
+										<td valign="top" class="value" ><textarea cols="80" rows="5" id="commentTdId" name="message" onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea> </td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>

@@ -1,7 +1,5 @@
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
@@ -12,6 +10,7 @@ import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.NewsEditorService
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -19,8 +18,9 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class NewsEditorController implements ControllerMethods {
 
-	ControllerService controllerService
-	JdbcTemplate jdbcTemplate
+	NewsEditorService     newsEditorService
+	ControllerService     controllerService
+	JdbcTemplate          jdbcTemplate
 	UserPreferenceService userPreferenceService
 
 	static defaultAction = 'newsEditorList'
@@ -286,47 +286,6 @@ class NewsEditorController implements ControllerMethods {
 	}
 
 	/**
-	 * Saves the data and redirects to action newsEditorList
-	 */
-	@HasPermission(Permission.NewsEdit)
-	def updateNewsOrComment() {
-		String commentType = params.commentType
-		if (commentType == "issue") {
-			AssetComment assetComment = AssetComment.get(params.id)
-			if (params.isResolved == '1' && !assetComment.isResolved()) {
-				assetComment.resolvedBy = securityService.loadCurrentPerson()
-				assetComment.dateResolved = new Date()
-			}
-			else if (!(params.isResolved == '1' && assetComment.isResolved())) {
-				assetComment.resolvedBy = null
-				assetComment.dateResolved = null
-			}
-
-			assetComment.properties = params
-			assetComment.save(flush:true)
-		}
-		else if (commentType == "news") {
-			MoveEventNews moveEventNews = MoveEventNews.get(params.id)
-			if (params.isResolved == '1' && moveEventNews.isArchived == 0) {
-				moveEventNews.isArchived = 1
-				moveEventNews.archivedBy = securityService.loadCurrentPerson()
-				moveEventNews.dateArchived = new Date()
-			}
-			else if (!(params.isResolved == '1' && moveEventNews.isArchived == 1)) {
-				moveEventNews.isArchived = 0
-				moveEventNews.archivedBy = null
-				moveEventNews.dateArchived = null
-			}
-			moveEventNews.message = params.comment
-			moveEventNews.resolution = params.resolution
-			moveEventNews.save(flush:true)
-		}
-
-		redirect(action: "newsEditorList",
-			      params: [moveBundle: params.moveBundle, viewFilter: params.viewFilter])
-	}
-
-	/**
 	 * Used to create new MoveEventNews records that returns AJax Response for error or redirects if successful to newsEditorList
 	 * @param mode - indicates the mode to respond to the request, if 'ajax' then it uses the ServiceResponse format otherwise does the redirect
 	 * @param moveEvent.id
@@ -338,40 +297,14 @@ class NewsEditorController implements ControllerMethods {
 	@HasPermission(Permission.NewsCreate)
 	def saveNews() {
 		Project project = controllerService.getProjectForPage(this)
+
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		String error
-		MoveEvent me
-
-		// Check to make sure that the moveEvent id exists and is associated to the project
-		Long meId = params.long('moveEvent.id')
-		if (meId == null || meId < 1) {
-			error = 'Invalid move event id specified'
-		}
-		else {
-			// Check that the move event exists and is assoicated to the user's project
-			me = MoveEvent.get(meId)
-			if (!me) {
-				error = 'Move event was not found'
-			}
-			else if (me.project.id != project.id) {
-				securityService.reportViolation("Accessing move event ($meId) not associated with project ($project.id)")
-				error = 'Invalid move event id specified'
-			}
-		}
-
-		if (error) {
-			renderErrorJson(error)
-			return
-		}
-
-		// Create the new news domain
-		def men = new MoveEventNews(moveEvent: me, createdBy: securityService.loadCurrentPerson())
-
-		saveUpdateNewsHandler(project, men, params, this)
+		MoveEventNews men = newsEditorService.save(project, params)
+		renderHandler(men, params)
 	}
 
 	/**
@@ -389,66 +322,31 @@ class NewsEditorController implements ControllerMethods {
 			return
 		}
 
-		String error
-		MoveEventNews men
-
-		// Check to make sure that the MoveEventNews id exists and is associated to the project
-		Long id = NumberUtil.toLong(params['id'])
-		if (id == null || id < 1) {
-			error = 'Invalid news id specified'
-		} else {
-			// Check that the move event news id exists and is assoicated to the user's project
-			men = MoveEventNews.get(id)
-			if (!id) {
-				error = 'News id was not found'
-			} else {
-				if (men.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
-					error = 'Invalid news id specified'
-				}
-			}
-		}
-		if (error) {
-			renderErrorJson(error)
-			return
-		}
-
-		saveUpdateNewsHandler(project, men, params, this)
+		MoveEventNews men = newsEditorService.update(project, params)
+		renderHandler(men, params)
 	}
 
 	/**
 	 * Used by the saveNews and updateNews controller methods to perform the actual update of the new or existing MoveEventNews domain record
 	 */
-	private void saveUpdateNewsHandler(Project project, MoveEventNews men, params, controller) {
-
-		men.message = params.message
-		men.resolution = params.resolution
-
-		if (params.isArchived == '1') {
-			men.isArchived = 1
-			men.archivedBy = securityService.loadCurrentPerson()
-			men.dateArchived = TimeUtil.nowGMT()
-		} else {
-			men.isArchived = 0
-		}
-
-		if (!men.validate() || !men.save(flush:true)) {
-			error = "Error saving news : ${GormUtil.allErrorsString(men)}"
-			log.info "saveNews() user:$securityService.currentUsername, project:$project.id - $error"
-			renderErrorJson(error)
-			return
-		}
+	private void renderHandler(MoveEventNews moveEventNews, params) {
 
 		String mode = params.mode ?: 'redirect'
 
 		if (mode == 'ajax') {
-			Map menModel = [id:men.id, message:men.message, resolution:men.resolution,
-			                isArchived:men.isArchived, moveEventId: men.moveEvent.id]
+			Map menModel = [
+				id         : moveEventNews.id,
+				message    : moveEventNews.message,
+				resolution : moveEventNews.resolution,
+				isArchived : moveEventNews.isArchived,
+				moveEventId: moveEventNews.moveEvent.id
+			]
+
 			renderSuccessJson(moveEventNews: menModel)
 		} else {
-			controller.redirect(
+			redirect(
 				action: "newsEditorList",
-				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent.id]
+				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent ? params.moveEvent.id : null]
 			)
 		}
 	}
@@ -458,40 +356,14 @@ class NewsEditorController implements ControllerMethods {
 	 * @param id
 	 */
 	@HasPermission(Permission.NewsDelete)
-	def deleteNews() {
+	def deleteNews(Long id) {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		String error
-		MoveEventNews men
-
-		// Check to make sure that the MoveEventNews id exists and is associated to the project
-		Long id = NumberUtil.toLong(params['id'])
-		if (id == null || id < 1) {
-			error = 'Invalid news id specified'
-		} else {
-			// Check that the move event news id exists and is assoicated to the user's project
-			men = MoveEventNews.get(id)
-			if (!id) {
-				error = 'News id was not found'
-			} else {
-				if (men.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
-					error = 'Invalid news id specified'
-				}
-			}
-		}
-
-		if (!error) {
-			try {
-				men.delete(flush:true)
-			} catch (e) {
-				error = "Delete failed :  ${GormUtil.allErrorsString(men)}"
-			}
-		}
+		String error = newsEditorService.delete(id, project)
 
 		if (error) {
 			renderErrorJson(error)
