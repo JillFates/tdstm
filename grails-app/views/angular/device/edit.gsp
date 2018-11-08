@@ -66,8 +66,7 @@
                                         [ngClass]="{'highField': isHighField('${standardFieldSpecs.manufacturer.imp}','${asset.manufacturer}')}"
                                         nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
-                                            <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${asset.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
-                                            <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
+                                            <label>Manufacturer</label>
                                         </label>
                                     </td>
                                     <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="14">
