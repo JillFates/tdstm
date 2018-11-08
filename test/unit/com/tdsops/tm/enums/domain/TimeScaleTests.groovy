@@ -47,4 +47,17 @@ class TimeScaleTests extends Specification {
 		// Days to Weeks
 		2 == TimeScale.D.toWeeks(14)
 	}
+
+	void 'test fromLabel'() {
+		expect: 'the correct enum is determined'
+			TimeScale.fromLabel(label) == expectedResult
+		where:
+			label       |   expectedResult
+			'Minutes'   |   TimeScale.M
+			'MINutES'   |   TimeScale.M
+			'M'         |   null
+			null        |   null
+			''          |   null
+			'Hours'     |   TimeScale.H
+	}
 }
