@@ -109,59 +109,82 @@ a:hover {
 			<div>
 				<h1 style="margin-right: 0px;"><b>Misc Administrative Functions</b></h1>
 				<table class="admin-home">
+					<thead>
+						<tr>
+							<th>Misc Admin Functions</th>
+							<th>Description</th>
+						</tr>
+					</thead>
 					<tbody>
 						<tr class="odd">
 							<td><g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link></td>
-							<td><g:link controller="roleType" style="color:black">Teams</g:link></td>
+							<td>Provides current system technical performance data</td>
 						</tr>
 						<tr class="even">
-							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
-							<td><a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a></td>
-						</tr>
-						<tr class="odd">
-							<td><g:link controller="admin" action="orphanSummary"
-								style="color:black">Manage Orphan Records</g:link></td>
-							<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
-							</td>
-						</tr>
-						<tr class="even">
-							<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Purge Unused Asset Types </a></td>
-							<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
-						</tr>
-						<tr class="odd">
-							<td>
-								<tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
-									<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
-								</tds:hasPermission>
-							</td>
-
-							<td>
-								<tds:hasPermission permission="${Permission.ModelEdit}">
-									<g:link controller="admin" action="modelConflicts" style="color:black">Model / Alias Conflicts</g:link>
-								</tds:hasPermission>
-							</td>
-						</tr>
-						<tr class="even">
-							<td>
-								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess }">
-									<g:link controller="reports" action="metricDefinitions" style="color:black">Edit Metric Definitions</g:link>
-								</tds:hasPermission>
-							</td>
 							<td>
 								<tds:hasPermission permission="${Permission.ApplicationRestart}">
 									<g:link controller="admin" action="restartAppServiceForm" style="color:black">Restart Application Service</g:link>
 								</tds:hasPermission>
 							</td>
+							<td>Dialog that allows user to restart TransitionManager</td>
 						</tr>
 						<tr class="odd">
+							<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
+							<td>A report to show a summary of assets in use by each project</td>
+						</tr>
+						<tr class="even">
 							<td>
 								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess}">
 									<g:link controller="apiCatalog" action="manager" style="color:black">API Dictionaries</g:link>
 								</tds:hasPermission>
 							</td>
+							<td>Manage dictionaries used by API Actions</td>
+						</tr>
+						<tr class="odd">
 							<td>
-								&nbsp;
+								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess }">
+									<g:link controller="reports" action="metricDefinitions" style="color:black">Edit Metric Definitions</g:link>
+								</tds:hasPermission>
 							</td>
+							<td>Manage queries used in generating daily metrics</td>
+						</tr>
+						<tr class="even">
+							<td>
+								<g:link controller="roleType" style="color:black">Teams</g:link>
+							</td>
+							<td>Used to add/modify the Team labels for all projects on instance</td>
+						</tr>
+						<tr class="odd">
+							<td>
+								<g:link controller="admin" action="orphanSummary" style="color:black">Manage Orphan Records</g:link>
+							</td>
+							<td>Checks for orphaned records like assets without a project</td>
+						</tr>
+						<tr class="even">
+							<td>
+								<a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a>
+							</td>
+							<td>This process will update assets' assetType property to match the value stored in the associated model</td>
+						</tr>
+						<tr class="odd">
+							<td>
+								<tds:hasPermission permission="${Permission.ModelEdit}">
+									<g:link controller="admin" action="modelConflicts" style="color:black">Model / Alias Conflicts</g:link>
+								</tds:hasPermission>
+							</td>
+							<td>A report that identifies any Model / Alias naming conflicts</td>
+						</tr>
+						<tr class="even">
+							<td>
+								<a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
+							</td>
+							<td>Cleans out the database from old import batches (you can select all or older than a specific date)</td>
+						</tr>
+						<tr class="odd">
+							<td>
+								<a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a>
+							</td>
+							<td>Encrypt values that will be used for installer configuration settings (such as Database Password)</td>
 						</tr>
 					</tbody>
 				</table>
