@@ -74,6 +74,7 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
+			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberMockValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
 			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeMockValidator
 			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeMockValidator
@@ -180,6 +181,26 @@ class CustomValidators {
 	 */
 	static  controlDateTimeMockValidator( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
+			void validate() {
+
+			}
+		}
+	}
+
+	/**
+	 * THIS IS JUST A MOCK VALIDATOR FOR NUMBER TO MAKE WORK THE FE LOGIC FOR
+	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
+	 * FOR TICKET TM-8447, AND WILL BE MERGED ONCE IT'S APPROVED.
+	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
+	 * TM-12545 IS MERGED.
+	 * See TM-8447
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlNumberMockValidator ( String value, Map fieldSpec ) {
+		new Validator(fieldSpec) {
 			void validate() {
 
 			}
