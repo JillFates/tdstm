@@ -11,6 +11,7 @@ import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configurat
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {FIELD_COLORS} from '../../model/field-settings.model';
+import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
 
 declare var jQuery: any;
 
@@ -65,7 +66,8 @@ export class FieldSettingsGridComponent implements OnInit {
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.String, value: CUSTOM_FIELD_CONTROL_TYPE.String},
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.YesNo, value: CUSTOM_FIELD_CONTROL_TYPE.YesNo},
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.Date, value: CUSTOM_FIELD_CONTROL_TYPE.Date},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.DateTime, value: CUSTOM_FIELD_CONTROL_TYPE.DateTime}
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.DateTime, value: CUSTOM_FIELD_CONTROL_TYPE.DateTime},
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.Number, value: CUSTOM_FIELD_CONTROL_TYPE.Number}
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
@@ -337,7 +339,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			}).catch(result => {
 				console.log('Dismissed MinMaxConfigurationPopupComponent Dialog');
 			});
-		} else {
+		} else if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.dialogService.open(SelectListConfigurationPopupComponent, [
 				{ provide: FieldSettingsModel, useValue: dataItem },
 				{ provide: 'domain', useValue: this.data.domain }
@@ -345,6 +347,15 @@ export class FieldSettingsGridComponent implements OnInit {
 				// when popup closes ..
 			}).catch(result => {
 				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
+			});
+		} else {
+			this.dialogService.open(NumberConfigurationPopupComponent, [
+				{ provide: FieldSettingsModel, useValue: dataItem },
+				{ provide: 'domain', useValue: this.data.domain }
+			]).then(result => {
+				// when popup closes ..
+			}).catch(result => {
+				console.log('Dismissed MinMaxConfigurationPopupComponent Dialog');
 			});
 		}
 	}
@@ -356,7 +367,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	 */
 	protected isAllowedConfigurationForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
 		if (control === CUSTOM_FIELD_CONTROL_TYPE.List
-		|| control === CUSTOM_FIELD_CONTROL_TYPE.String) {
+			|| control === CUSTOM_FIELD_CONTROL_TYPE.String
+			|| control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
 			return true;
 		}
 		return false;

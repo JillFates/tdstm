@@ -66,5 +66,6 @@ export enum CUSTOM_FIELD_CONTROL_TYPE {
 	String = 'String',
 	YesNo = 'YesNo',
 	Date = 'Date',
-	DateTime = 'DateTime'
+	DateTime = 'DateTime',
+	Number = 'Number'
 }
