@@ -361,7 +361,6 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getModel(Long id, String mode) {
-		println "*** getModel() called"
 		final List modes = ['edit','show']
 		if (! modes.contains(mode) || id == null) {
 			sendBadRequest()
