@@ -83,7 +83,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         then: 'Application list should be displayed'
             at ViewPage
         when: 'The User searches by the App Name already created'
-            filterByName "QAE2E"//(appNameOld)
+            filterByName appNameOld
         and: 'The User clicks on that Application'
             openFirstAssetDisplayed()
 
@@ -91,7 +91,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             at AssetDetailsPage
     }
 
-    def "2. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
+    def "2. Using the Edit and Cancel Buttons on the Application Modal Windows"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Details Page'
             at AssetDetailsPage
@@ -112,7 +112,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         given: 'The User is on the Application List Page'
             at ViewPage
         when: 'The User searches by the App Name already created'
-            filterByName "QAE2E"//(appNameOld)
+            filterByName appNameOld
         and: 'The User clicks on the "Edit" Button right on the left'
             clickOnEditButtonForFirstAssetDisplayed()
 
@@ -205,7 +205,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         then: 'Every value should be accordingly added'
             aeModalSuppFreqValue.text().trim() == suppFreq
             aeModalSuppClassValue.text().trim() == suppClass
-            aeModalSuppNameValue == suppName
+            aeModalSuppNameValue.value() == suppName
             aeModalSuppBundleValue.text().trim() == suppBundle
             aeModalSuppTypeValue.text().trim() == suppType
             aeModalSuppStatusValue.text().trim() == suppStatus
@@ -248,7 +248,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         then: 'Every value should be accordingly added'
             aeModalIsDepFreqValue.text().trim() == isDepFreq
             aeModalIsDepClassValue.text().trim() == isDepClass
-            aeModalIsDepNameValue == isDepName
+            aeModalIsDepNameValue.value() == isDepName
             aeModalIsDepBundleValue.text().trim() == isDepBundle
             aeModalIsDepTypeValue.text().trim() == isDepType
             aeModalIsDepStatusValue.text().trim() == isDepStatus

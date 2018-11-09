@@ -18,8 +18,8 @@ class AssetDetailsPage extends Page{
     static content = {
         assetDetailModal { $("div.tds-angular-component-content")}
         modalTitle { assetDetailModal.find(".modal-title")}
-        editButton { assetDetailModal.find("button span.glyphicon-pencil")}
-        closeButton { assetDetailModal.find("button span.glyphicon-ban-circle")}
+        editButton { assetDetailModal.find(".modal-footer button span.glyphicon-pencil")}
+        closeButton { assetDetailModal.find(".modal-footer button span.glyphicon-ban-circle")}
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
