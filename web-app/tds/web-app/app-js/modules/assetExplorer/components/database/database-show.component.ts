@@ -20,8 +20,6 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 	})
 	class DatabaseShowComponent extends AssetCommonShow {
 
-		protected isHighField = AssetCommonHelper.isHighField;
-
 		constructor(
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,

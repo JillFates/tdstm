@@ -22,8 +22,6 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 	})
 	class ApplicationShowComponent extends AssetCommonShow {
 
-		protected isHighField = AssetCommonHelper.isHighField;
-
 		constructor(
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,

@@ -27,7 +27,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	class DeviceShowComponent extends AssetCommonShow {
 
 		protected manufacturerName: string;
-		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			activeDialog: UIActiveDialogService,

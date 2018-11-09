@@ -10,6 +10,7 @@ import {AssetEditComponent} from './asset-edit.component';
 import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetCommonHelper} from './asset-common-helper';
 
 declare var jQuery: any;
 
@@ -19,6 +20,7 @@ export class AssetCommonShow implements OnInit {
 	protected userTimeZone: string;
 	protected mainAsset;
 	protected assetTags: Array<TagModel>;
+	protected isHighField = AssetCommonHelper.isHighField;
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
