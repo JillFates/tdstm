@@ -187,6 +187,61 @@ class ControlAngularTagLib {
 	}
 
 	/**
+	 * Used to render the value for any of the supported custom fields in the Asset Show Views.
+	 * @param field - the field spec Map
+	 * @param value - the current or default value to populate the control with (optional)
+	 * @param ngModel - The String representation of the Model on Angular
+	 * @param size - used to define the HTML size attribute on controls (optional)
+	 * @param tabIndex - the tab offset (optional)
+	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
+	 * @param min - used to specify minimum allowed value (used by the number fields)
+	 * @example <tds:showValue field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
+	 */
+	def showValue = { Map attrs ->
+
+		// The field Specifications
+		Map fieldSpec = attrs.field
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tdsAngular:inputControl> tag requires field=fieldSpec Map')
+		}
+		// The value that the control should be set to (optional)
+		String value = ( attrs.value ?: '' )
+
+		Integer size = NumberUtil.toInteger(attrs.size,null)
+
+		// Get tabIndex from attrib tabIndex, tabindex or tabOffset which if passed will override
+		// the order specified in the fieldSpec.
+		String tabIndex = attrs.tabIndex
+		String tabOffset = attrs.tabOffset
+		String min = attrs.min
+		String placeholder = attrs.placeholder ?: ''
+
+		switch (fieldSpec.control) {
+			case ControlType.LIST.toString():
+				out << value  // render value as it is
+				break
+			case ControlType.YES_NO.toString():
+				out << value  // render value as it is
+				break
+			case ControlType.DATE.toString():
+				out << "{{'$value | tdsDate: userDateFormat }}"
+				break
+			case ControlType.DATETIME.toString():
+				out << "{{ $value | tdsDateTime: userTimeZone }}"
+				break
+			case ControlType.NUMBER.toString():
+				out << "{{ $value | tdsNumber: {allowNegative: $fieldSpec.constraints.allowNegative," +
+						" precision: $fieldSpec.constraints.precision, maxRange: $fieldSpec.constraints.maxRange," +
+						" minRange: $fieldSpec.constraints.minRange, required: $fieldSpec.constraints.required," +
+						" separator: $fieldSpec.constraints.separator} }}"
+				break
+			case ControlType.STRING.toString():
+			default: // call textAsLink
+				out << tds.textAsLink(text: value, target: "_new")
+		}
+	}
+
+	/**
 	 * Used to render the label and the value for a field in show views.
 	 */
 	def showLabelAndField = { Map attrs ->
