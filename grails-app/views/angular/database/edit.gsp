@@ -51,7 +51,9 @@
 											</td>
 										</tr>
 										<tr>
-											<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+											<td class="label ${standardFieldSpecs.size.imp?:''}"
+												[ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${asset.size}')}"
+												nowrap="nowrap">
 												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
 													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 												</label>
@@ -81,7 +83,7 @@
 												</kendo-datepicker>
 											</td>
 
-											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.dependencyBundle?.value}"/>
 											<td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
 												<kendo-dropdownlist
 														[tabIndex]="22"

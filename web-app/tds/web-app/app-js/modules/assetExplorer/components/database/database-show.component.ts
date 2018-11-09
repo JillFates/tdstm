@@ -11,6 +11,7 @@ import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -18,6 +19,8 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 		template: template
 	})
 	class DatabaseShowComponent extends AssetCommonShow {
+
+		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			activeDialog: UIActiveDialogService,

@@ -11,6 +11,9 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
+
+declare var jQuery: any;
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -18,6 +21,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		template: template
 	})
 	class ApplicationShowComponent extends AssetCommonShow {
+
+		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			activeDialog: UIActiveDialogService,

@@ -80,6 +80,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			this.bulkChangeService.getAssetListOptions(this.domains[0].id === 'COMMON' ? 'DEVICE' : this.domains[0].id).subscribe( result => {
 				this.listOptions['planStatus'] = result.planStatusOptions.map(item => { return {id: item, text: item} });
 				this.listOptions['validation'] = result.validationOptions.map(item => { return {id: item, text: item} });
+				this.listOptions['moveBundle'] = result.dependencyMap.moveBundleList.map(item => { return {id: item.id.toString(), text: item.name} });
 				if (this.domains[0].id === 'DEVICE') {
 					this.listOptions['railType'] = result.railTypeOption.map(item => { return {id: item, text: item} });
 				}
