@@ -20,8 +20,6 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 	})
 	class StorageShowComponent extends AssetCommonShow {
 
-		protected isHighField = AssetCommonHelper.isHighField;
-
 		constructor(
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,
