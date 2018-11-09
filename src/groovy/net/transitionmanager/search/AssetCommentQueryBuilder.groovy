@@ -75,6 +75,11 @@ class AssetCommentQueryBuilder {
 	boolean viewUnpublished
 
 	/**
+	 * Flag that keeps track of invalid filter such as non-existent enum strings.
+	 */
+	boolean invalidCriterion = false
+
+	/**
 	 * Constructor that takes all the parameters required for building the query for tasks.
 	 *
 	 * @param project - the project the tasks must belong to.
@@ -117,7 +122,8 @@ class AssetCommentQueryBuilder {
 		return [
 			query: query,
 			countQuery: countQuery,
-			queryParams: whereParams
+			queryParams: whereParams,
+			invalidCriterion: invalidCriterion
 		]
 	}
 
@@ -125,10 +131,14 @@ class AssetCommentQueryBuilder {
 	 * Construct the query and count query by putting the 'from', 'where' and 'order by' parts together.
 	 */
 	private void buildQueryAndCount() {
-		String join = joinTables.join("\n")
-		String whereClause = whereClauses.join(" AND ")
-		query = "SELECT ac FROM ${join} WHERE ${whereClause} ${sorting}"
-		countQuery = "SELECT count(ac.id) FROM ${join} WHERE ${whereClause}"
+		if (invalidCriterion) {
+			whereParams = null
+		} else {
+			String join = joinTables.join("\n")
+			String whereClause = whereClauses.join(" AND ")
+			query = "SELECT ac FROM ${join} WHERE ${whereClause} ${sorting}"
+			countQuery = "SELECT count(ac.id) FROM ${join} WHERE ${whereClause}"
+		}
 	}
 
 
@@ -147,7 +157,15 @@ class AssetCommentQueryBuilder {
 	 * constructing the corresponding clause for every parameter.
 	 */
 	private void processParameters() {
-		requestParams.each{ String param, paramValue ->
+
+		// If the viewUnpublished flags wasn't set, limit the query only to published tasks.
+		if (!viewUnpublished) {
+			whereClauses << "ac.isPublished = true"
+		}
+
+		// Iterate over the filters provided by the user creating the corresponding where clause.
+		for (param in requestParams.keySet()) {
+			def paramValue = requestParams[param]
 			Map fieldInfo = fieldsInfoMap[param]
 			if (paramValue != null && !StringUtil.isBlank(paramValue.toString()) && fieldInfo) {
 				// Check if the field requires an additional join.
@@ -158,12 +176,12 @@ class AssetCommentQueryBuilder {
 				if (fieldInfo.containsKey('builder')) {
 					fieldInfo['builder'](param, fieldInfo)
 				}
-			}
-		}
 
-		// If the viewUnpublished flags wasn't set, limit the query only to published tasks.
-		if (!viewUnpublished) {
-			whereClauses << "ac.isPublished = true"
+				// If the filter was invalid, stop processing.
+				if (invalidCriterion) {
+					break
+				}
+			}
 		}
 	}
 
@@ -223,8 +241,10 @@ class AssetCommentQueryBuilder {
 	 * Create the where clause for handling time scale values.
 	 */
 	Closure timeScaleBuilder = { String field, Map fieldMap ->
-		TimeScale timeScaleValue = TimeScale.asEnum(requestParams[field])
-		if (timeScaleValue != null) {
+		TimeScale timeScaleValue = TimeScale.fromLabel(requestParams[field])
+		if (timeScaleValue == null) {
+			invalidCriterion = true
+		} else {
 			processField(field, fieldMap, '=', ":${field}", timeScaleValue)
 		}
 	}
@@ -238,15 +258,23 @@ class AssetCommentQueryBuilder {
 		if (fieldMap['type'] == Integer) {
 			value = NumberUtil.toInteger(value)
 		}
-		processField(field, fieldMap, '=', ":${field}", value)
+		if (value == null) {
+			invalidCriterion = true
+		} else {
+			processField(field, fieldMap, '=', ":${field}", value)
+		}
 	}
 
 	/**
 	 * Construct a clause 'field = true' or 'field = false'
 	 */
 	Closure boolEqBuilder = { String field, Map fieldMap ->
-		Boolean value = BooleanUtils.toBoolean(requestParams[field])
-		processField(field, fieldMap, '=', ":${field}", value)
+		Boolean value = StringUtil.toBoolean(requestParams[field])
+		if (value == null) {
+			invalidCriterion = true
+		} else {
+			processField(field, fieldMap, '=', ":${field}", value)
+		}
 	}
 
 	/**
