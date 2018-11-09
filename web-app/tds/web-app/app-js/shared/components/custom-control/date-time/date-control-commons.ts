@@ -19,6 +19,9 @@ export abstract class DateControlCommons implements OnInit {
 		this.outputFormat = outputFormat;
 	}
 
+	/**
+	 * OnInit set a date value.
+	 */
 	ngOnInit(): void {
 		this.dateValue = this.value ? DateUtils.toDate(this.value) : new Date();
 		this.onValueChange(this.dateValue);

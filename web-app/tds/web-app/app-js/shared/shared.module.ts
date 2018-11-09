@@ -40,7 +40,8 @@ import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 import { UtilsPipe } from './pipes/utils.pipe';
-import {DatePipe} from './pipes/date.pipe';
+import { DatePipe } from './pipes/date.pipe';
+import {NumericPipe} from './pipes/numeric.pipe';
 
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
@@ -91,6 +92,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		FilterPipe,
 		UtilsPipe,
 		DatePipe,
+		NumericPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -133,6 +135,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		FilterPipe,
 		UtilsPipe,
 		DatePipe,
+		NumericPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		DynamicComponent,

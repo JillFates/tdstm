@@ -26,9 +26,12 @@ export class DateControlComponent extends DateControlCommons {
 		this.displayFormat = this.userPreferenceService.getUserDateFormatForKendo();
 	}
 
+	/**
+	 * Emit value changed.
+	 * @param {Date} $event
+	 */
 	onValueChange($event: Date): void {
 		this.value = this.intl.formatDate($event, this.outputFormat);
-		console.log(this.value)
 		this.valueChange.emit(this.value);
 	}
 }

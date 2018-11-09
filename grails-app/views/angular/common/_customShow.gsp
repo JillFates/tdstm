@@ -10,6 +10,9 @@
             <g:elseif test="${custom.control == 'DateTime' && asset?.(custom.field) }">
                 {{'${asset?.(custom.field)}' | tdsDateTime: userTimeZone}}
             </g:elseif>
+            <g:elseif test="${custom.control == 'Number' && asset?.(custom.field) }">
+                {{'${asset?.(custom.field)}' | tdsNumber: {allowNegatives: false, decimalPlaces: 2, maxRange: 10000, minRange: 0, required: 0, useThousandsSeparator: true} }}
+            </g:elseif>
             <g:else>
                 <span><tds:textAsLink text="${asset?.(custom.field)}" target="_new"/></span>
             </g:else>

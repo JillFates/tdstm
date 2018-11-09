@@ -1,3 +1,4 @@
+import grails.converters.JSON
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
@@ -161,7 +162,6 @@ class ControlAngularTagLib {
 
 		String placeholder = attrs.placeholder ?: ''
 		boolean isRequired = fieldSpec.constraints?.required
-
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
 				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
@@ -170,7 +170,9 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 			case ControlType.NUMBER.toString():
-				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\" constraints='$fieldSpec.constraints'></tds-number-control>"
+                println(attrs.ngmodel)
+                println(fieldSpec.constraints as JSON);
+				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\" [constraints]=\"{allowNegatives: false, decimalPlaces: 2, maxRange: 10000, minRange: 0, required: 0, useThousandsSeparator: true}\"></tds-number-control>"
 				break
 			case ControlType.DATE.toString():
 				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"

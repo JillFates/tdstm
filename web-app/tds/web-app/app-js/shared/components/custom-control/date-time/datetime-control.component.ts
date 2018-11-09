@@ -28,6 +28,10 @@ export class DateTimeControlComponent extends DateControlCommons {
 		this.displayFormat = this.DISPLAY_FORMAT;
 	}
 
+	/**
+	 * Emit value changed.
+	 * @param {Date} $event
+	 */
 	onValueChange($event: Date): void {
 		this.value = this.intl.formatDate($event, this.outputFormat);
 		this.valueChange.emit(this.value);
