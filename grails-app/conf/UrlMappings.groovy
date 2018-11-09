@@ -462,6 +462,11 @@ class UrlMappings {
 			action = [POST:"resetPreferences"]
 		}
 
+		"/ws/user/updateAccount" {
+			controller = "wsUser"
+			action = [POST:"updateAccount"]
+		}
+
 		"/ws/progress" {
 			controller = "wsProgress"
 			action = [GET:"list"]

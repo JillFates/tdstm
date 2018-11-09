@@ -1,3 +1,4 @@
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
@@ -15,6 +16,8 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
@@ -190,6 +193,42 @@ class WsUserController implements ControllerMethods {
 			renderSuccessJson()
 		} catch (e) {
 			renderErrorJson(e.message)
+		}
+	}
+
+	/**
+	 * Update the person account that is invoked by the user himself
+	 * @param  : person id and input password
+	 * @return : pass:"no" or the return of the update method
+	 */
+	@HasPermission(Permission.UserUpdateOwnAccount)
+	def updateAccount() {
+		String errMsg = ''
+		Map results = [:]
+		try {
+			//params.id = securityService.currentUserLoginId
+			String tzId = userPreferenceService.timeZone
+			Person person = personService.updatePerson(params, false)
+
+			if (params.tab) {
+				// Funky use-case that we should try to get rid of
+				forward(action:'loadGeneral', params:[tab: params.tab, personId:securityService.getUserLogin().person])
+				return
+			} else {
+				results = [ name:person.firstName, tz:tzId ]
+			}
+
+		} catch (InvalidParamException | DomainUpdateException e) {
+			errMsg = e.message
+		} catch (e) {
+			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			errMsg = 'An error occurred during the update process'
+		}
+
+		if (errMsg) {
+			renderErrorJson(errMsg)
+		} else {
+			renderSuccessJson(results)
 		}
 	}
 }
