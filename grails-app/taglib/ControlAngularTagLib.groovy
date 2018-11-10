@@ -172,10 +172,10 @@ class ControlAngularTagLib {
 			case ControlType.NUMBER.toString():
                 println(attrs.ngmodel)
                 println(fieldSpec.constraints as JSON);
-				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\" [allowNegative]=$fieldSpec.constraints?.allowNegative" +
-						" [precision]=$fieldSpec.constraints?.precision [separator]=$fieldSpec.constraints?.separator" +
-						" [minRange]=$fieldSpec.constraints?.minRange [maxRange]=$fieldSpec.constraints?.maxRange" +
-						" [required]=$fieldSpec.constraints?.required ></tds-number-control>"
+				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\" [allowNegative]=\"$fieldSpec.constraints?.allowNegative\"" +
+						" [precision]=\"$fieldSpec.constraints?.precision\" [separator]=\"$fieldSpec.constraints?.separator\"" +
+						" [minRange]=\"$fieldSpec.constraints?.minRange\" [maxRange]=\"$fieldSpec.constraints?.maxRange\"" +
+						" [required]=\"$fieldSpec.constraints?.required\" ></tds-number-control>"
 				break
 			case ControlType.DATE.toString():
 				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
@@ -236,7 +236,7 @@ class ControlAngularTagLib {
 				out << "{{ $value | tdsNumber: {allowNegative: $fieldSpec.constraints.allowNegative," +
 						" precision: $fieldSpec.constraints.precision, maxRange: $fieldSpec.constraints.maxRange," +
 						" minRange: $fieldSpec.constraints.minRange, required: $fieldSpec.constraints.required," +
-						" separator: $fieldSpec.constraints.separator} }}"
+						" separator: $fieldSpec.constraints.separator, format: $fieldSpec.constraints.format} }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink
