@@ -1,11 +1,12 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
-import net.transitionmanager.service.InvalidParamException
 import groovy.json.StringEscapeUtils
+import groovy.transform.CompileStatic
+import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.codec.binary.Base64
-import org.apache.commons.lang3.StringUtils
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.lang3.StringUtils
 import org.owasp.html.HtmlPolicyBuilder
 import org.owasp.html.PolicyFactory
 
@@ -545,17 +546,39 @@ class StringUtil {
 	}
 
 	/**
-	 * Sanitize Unsafe HTML String, removing Javascript, images and allowing only certain format tags
+	 * check Unsafe HTML String, returns a list of HTML elements that contains non-compliance code
 	 * @param unsafeHtmlString
 	 * @return
 	 */
-	static String sanitizeHTML(String unsafeHtmlString) {
-		PolicyFactory policy = new HtmlPolicyBuilder()
-				  .allowCommonBlockElements()
-				  .allowCommonInlineFormattingElements()
-				  .toFactory()
+	static List<String> checkHTML(String unsafeHtmlString) {
 
-		return policy.sanitize(unsafeHtmlString)
+		List<String> results = []
+		HTML_POLICY_DEFINITION.sanitize(unsafeHtmlString, new HtmlChangeListener(), results)
+		return results
 	}
+
+	/**
+	 * Class that collects the discarded elements when sanitizing HTML
+	 */
+	@CompileStatic
+	private static class HtmlChangeListener implements org.owasp.html.HtmlChangeListener<List<String>> {
+
+		void discardedTag(List<String> context, String elementName) {
+			context << elementName
+		}
+
+		void discardedAttributes(List<String> context, String tagName, String... attributeNames) {
+			context << tagName
+		}
+	}
+
+	/**
+	 * A policy that can be used to produce policies that sanitize to HTML sinks
+	 * via {@link PolicyFactory#apply}.
+	 */
+	public static final PolicyFactory HTML_POLICY_DEFINITION = new HtmlPolicyBuilder()
+			  .allowCommonBlockElements()
+			  .allowCommonInlineFormattingElements()
+			  .toFactory()
 
 }

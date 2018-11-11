@@ -435,7 +435,7 @@ class StringUtilTests extends Specification {
 
 
 	def 'test sanitizeHTML' () {
-		given: 'an External HTML with potential XSS malicious code'
+		setup: 'an External HTML with potential XSS malicious code'
 			String maliciousHTML = '''
 				<div>
 				  <b>Lorem</b> <i>Ipsum</i>
@@ -457,29 +457,11 @@ class StringUtilTests extends Specification {
 				</div>
 			'''.trim()
 
-			String cleaneddHTML = '''
-				<div>
-				  <b>Lorem</b> <i>Ipsum</i>
-				  <div>
-				    a link and an image:
-				    <p></p>
-				  </div>
-				   <br />
-				  <div>
-				    this won&#39;t run
-				    and neither will this: 
-				  </div>
-				<h2>Da new Notice</h2>
-				<p>BAda dum</p>
-				<p>Toroto</p>
-				<p>Ya <strong>aqui</strong></p>
-				<p><em>vamos</em></p>
-				<p></p>
-				</div>
-			'''.trim()
+		when: 'check the HTML looking for non secure items'
+			 List<String> result = StringUtil.checkHTML(maliciousHTML)
 
-		expect: 'that the potential exploitable elements are removed'
-			 cleaneddHTML == StringUtil.sanitizeHTML(maliciousHTML)
+		then: 'we get a list of items with forbidden code'
+			['div', 'a', 'img', 'div', 'a', 'script', 'span', 'p', 'p', 'img'] == result
 	}
 
 }
