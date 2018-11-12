@@ -338,7 +338,11 @@ class DataviewService implements ServiceMethods {
 	Map getAssetIdsHql(Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
 		Dataview dataview = get(Dataview, dataViewId, project)
 		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
-		Map whereInfo = hqlWhere(dataviewSpec, project)
+
+		// TODO: Ask John how to test thhis functionality
+		FieldSpecMapper fieldSpecMapper = new FieldSpecMapper(customDomainService.fieldSpecsWithCommon(project))
+
+		Map whereInfo = hqlWhere(dataviewSpec, project, fieldSpecMapper)
 		String conditions = whereInfo.conditions
 		String hqlJoins = hqlJoins(dataviewSpec)
 
@@ -396,10 +400,10 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 
 		String hqlColumns = hqlColumns(dataviewSpec, fieldSpecMapper)
-		Map whereInfo = hqlWhere(dataviewSpec, project)
+		Map whereInfo = hqlWhere(dataviewSpec, project, fieldSpecMapper)
 		String conditions = whereInfo.conditions
 		Map whereParams = whereInfo.params
-		String hqlOrder = hqlOrder(dataviewSpec)
+		String hqlOrder = hqlOrder(dataviewSpec, fieldSpecMapper)
 		String hqlJoins = hqlJoins(dataviewSpec)
 
 		String hql = """
@@ -620,7 +624,7 @@ class DataviewService implements ServiceMethods {
      * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
-        dataviewSpec.columns.collect { Map column ->
+		return dataviewSpec.columns.collect { Map column ->
             "${joinFor(column)}"
         }.join(" ")
     }
@@ -633,7 +637,7 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	private String hqlColumns(DataviewSpec dataviewSpec, FieldSpecMapper fieldSpecMapper){
-		dataviewSpec.columns.collect { Map column ->
+		return dataviewSpec.columns.collect { Map column ->
 			"${projectionPropertyFor(column, fieldSpecMapper)}"
 		}.join(", ")
 	}
@@ -642,9 +646,10 @@ class DataviewService implements ServiceMethods {
      * Creates a String with all the columns correctly set for where clause
      * @param dataviewSpec
 	 * @param project
+	 * @param fieldSpecMapper
      * @return
      */
-	private Map hqlWhere(DataviewSpec dataviewSpec, Project project) {
+	private Map hqlWhere(DataviewSpec dataviewSpec, Project project, FieldSpecMapper fieldSpecMapper) {
 
 		// List of conditions for the WHERE clause.
 		List whereConditions = []
@@ -679,18 +684,20 @@ class DataviewService implements ServiceMethods {
 
 			// Check if the user provided a filter expression.
 			if (filterFor(column)) {
+				String whereProperty = wherePropertyFor(column, fieldSpecMapper)
+
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
-						column: propertyFor(column),
+						column: propertyFor(column, fieldSpecMapper),
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
 						filter: filterFor(column),
-						type: typeFor(column),
-						whereProperty: wherePropertyFor(column),
+						type: typeFor(column, fieldSpecMapper),
+						whereProperty: whereProperty,
 						manyToManyQueries: manyToManyQueriesFor(column),
 				])
 
-				String property = propertyFor(column)
+				String property = propertyFor(column, fieldSpecMapper)
 				// Check if the current column requires special treatment (e.g. startupBy, etc.)
 
 				if (property in mixedKeys) {
@@ -728,21 +735,18 @@ class DataviewService implements ServiceMethods {
 
 			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
 			} else {
-				String property = propertyFor(column)
+				String property = propertyFor(column, fieldSpecMapper)
 				if (property in mixedKeys) {
 					Closure sourceForField = sourceFor(property)
 					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
 					// Keep a copy of this results for later use.
 					mixedFieldsInfo[property] = additionalResults
 				}
-
 			}
-
 		}
 
 		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: mixedFieldsInfo]
 	}
-
 
     /**
      * Columnn filters value could be split by '|' separator
@@ -752,7 +756,7 @@ class DataviewService implements ServiceMethods {
      * 		{ "domain": "common", "property": "environment", "filter": "production|development" }
      */
 	private String[] splitColumnFilter(Map column) {
-        column.filter.split("\\|")
+        return column.filter.split("\\|")
     }
 
     /**
@@ -760,12 +764,12 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return a String HQL order sentence
      */
-	private String hqlOrder(DataviewSpec dataviewSpec){
-        "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
+	private String hqlOrder(DataviewSpec dataviewSpec, FieldSpecMapper fieldSpecMapper){
+		return "${orderFor(dataviewSpec.order, fieldSpecMapper)} ${dataviewSpec.order.sort}"
     }
 
     private static String namedParameterFor(Map column) {
-        transformations[column.property].namedParameter
+		return transformations[column.property].namedParameter
     }
 
 	/**
@@ -782,8 +786,12 @@ class DataviewService implements ServiceMethods {
 
 			switch (fieldSpecMapper.getType(column.domain, column.property)) {
 				case 'Number':
-					property = "cast($property as integer)"
+					property = "cast($property as long)"
 					break
+				case 'Decimal':
+					property = "cast($property as float)"
+					break
+				case 'Date':
 				case 'DateTime':
 					property = "cast($property as time)"
 					break
@@ -795,15 +803,15 @@ class DataviewService implements ServiceMethods {
 	}
 
 	private static String propertyFor(Map column) {
-		transformations[column.property].property
+		return transformations[column.property].property
 	}
 
     private static String joinFor(Map column) {
-        transformations[column.property].join
+		return transformations[column.property].join
     }
 
-	private static String orderFor(Map column) {
-		transformations[column.property].alias ?: propertyFor(column)
+	private static String orderFor(Map column, FieldSpecMapper fieldSpecMapper) {
+		return transformations[column.property].alias ?: propertyFor(column, fieldSpecMapper)
 	}
 
 	/**
@@ -811,8 +819,28 @@ class DataviewService implements ServiceMethods {
 	 * @param column
 	 * @return
 	 */
-	private static Class typeFor(Map column) {
-		transformations[column.property].type
+	private static Class typeFor(Map column, FieldSpecMapper fieldSpecMapper) {
+
+		Class type = transformations[column.property].type
+
+		if(column.property.startsWith('custom')){
+
+			switch (fieldSpecMapper.getType(column.domain, column.property)) {
+				case 'Number':
+					type = Long
+					break
+				case 'Decimal':
+					type = BigDecimal
+					break
+				case 'Date':
+				case 'DateTime':
+					type = Date
+					break
+			}
+
+		}
+
+		return type
 	}
 
 	/**
@@ -873,10 +901,11 @@ class DataviewService implements ServiceMethods {
 	 * This is added to catch scenarios, such as tags, where the expression for projecting the field
 	 * and for filtering it are different.
 	 * @param column
+	 * @param fieldSpecMapper an instance of {@code FieldSpecMapper}
 	 * @return
 	 */
-	private static String wherePropertyFor(Map column) {
-		return transformations[column.property].whereProperty?: propertyFor(column)
+	private static String wherePropertyFor(Map column, FieldSpecMapper fieldSpecMapper) {
+		return transformations[column.property].whereProperty?: propertyFor(column, fieldSpecMapper)
 	}
 
 	/**

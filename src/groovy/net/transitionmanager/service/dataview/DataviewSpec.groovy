@@ -101,7 +101,6 @@ class DataviewSpec {
 		if(command.limit != 0){
 			args.max = command.limit
 		}
-		order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 
 		if(dataview) {
 			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
@@ -115,6 +114,8 @@ class DataviewSpec {
 				}
 			}
 		}
+
+		order = [domain: command.sortDomain, property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 	}
 
     void addColumn(domain, property, filter = null){
