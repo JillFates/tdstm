@@ -25,12 +25,12 @@ databaseChangeLog = {
 					if (settingsJson.fields) {
 
 						//update actions for moveBundle
-						def mapForTags = settingsJson.fields.find { it.field == "moveBundle" }
+						def fieldsToUpdate = settingsJson.fields.find { it.field == "moveBundle" }
 
-						if (mapForTags) {
-							mapForTag.control = 'Reference'
-							mapForTags.bulkChangeActions = [
-								'remove'
+						if (fieldsToUpdate) {
+							fieldsToUpdate.control = 'Reference'
+							fieldsToUpdate.bulkChangeActions = [
+								'replace'
 							]
 						}
 					}
