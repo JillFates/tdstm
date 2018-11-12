@@ -28,54 +28,6 @@ class BulkAssetChangeService implements ServiceMethods {
 	TagAssetService tagAssetService
 	DataviewService dataviewService
 
-	/**
-	 * A list of valid field names
-	 */
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	static final List<String> fields = [
-		'tagAssets',
-		'purchaseDate', 'maintExpDate', 'retireDate',
-		'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'externalRefId',
-		'priority', 'purchasePrice', 'usize', 'sourceRackPosition', 'sourceBladePosition', 'targetRackPosition', 'targetBladePosition', 'dependencyBundle', 'size', 'rateOfChange',
-		'appOwner', 'modifiedBy',
-		'validation'
-	]
-
-	/**
-	 * A map of field control types to actions, and to the methods that support them.
-	 */
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	static final Map actions = [
-		'tagAssetService'   : [
-			add    : 'bulkAdd',
-			clear  : 'bulkClear',
-			replace: 'bulkReplace',
-			remove : 'bulkRemove'
-		],
-		'date-time-selector': [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'string-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'number-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'person-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'yes-no-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		]
-	]
-
 	//Maps field control types to services.
 	static Map bulkClassMapping = [
 		(TagAsset.class.name)  : BulkChangeTag.class,
