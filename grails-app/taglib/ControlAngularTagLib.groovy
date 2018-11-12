@@ -233,7 +233,7 @@ class ControlAngularTagLib {
 				out << "{{ $value | tdsDateTime: userTimeZone }}"
 				break
 			case ControlType.NUMBER.toString():
-				out << "{{ $value | tdsNumber: '$fieldSpec.constraints.format' }}"
+				out << "{{ ${value ? value : '0'} | tdsNumber: 'n2' }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink
