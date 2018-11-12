@@ -20,19 +20,83 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
-        individualRows (required: false) {$("a.cell-url-element")}
+        individualRows {$("tbody>tr")}
+        individualBundles (required: false) {$("a.cell-url-element")}
         commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
+        pagerInfo {$(".k-pager-info")}
 
         //filters section
         filterRow {$("tr.k-filter-row")}
-        namefilterKind {$("span.k-select")[2]}
+        nameFilterKind {$("span.k-select")[2]}
+        descFilterKind {$("span.k-select")[3]}
         nameFilter {filterRow.find("[data-text-field='name']")}
+        descriptionFilter {filterRow.find("[data-text-field='description']")}
         planningFilterWrapper {$(".k-operator-hidden")}
         isPlanningRadio {filterRow.find(("label>input"))[0]}
         isNonPlanningRadio {filterRow.find(("label>input"))[1]}
         clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
+        nameFilterWrapper {$("span.k-filtercell")[1]}
+        clearName {nameFilterWrapper.find("button.k-button")}
+        descFilterWrapper {$("span.k-filtercell")[2]}
+        clearDesc {descFilterWrapper.find("button.k-button")}
+        clearAssetQtty {filterRow.find("[title='Clear']")[4]}
+        clearStarting {filterRow.find("[title='Clear']")[5]}
+        clearCompletion {filterRow.find("[title='Clear']")[6]}
+        qttyFilter {filterRow.find("input.k-formatted-value.k-input")[1]}
+        editedQty {filterRow.find("span.k-state-focused")}
+        startDate {$("[data-role='datepicker']")[0]}
+        completionDate {$("[data-role='datepicker']")[1]}
+    }
+
+    def filterByQuantity(qtty){
+        qttyFilter=qtty
+        //This is necessary for the filter will not be applied until the focus is moved away
+        //from the field. Tabbing does not work in this case, so just clicking elsewhere
+        nameFilter.click()
+    }
+
+    def validateFilteredByPlanning(option){
+        def validation=true
+        for (int i=1;i<numberOfRows();i++){
+            if(option){
+                if(!individualRows[i].find("span.glyphicon-ok").displayed) {
+                    validation=false
+                    break;
+                }
+            }else{
+                if(individualRows[i].find("span.glyphicon-ok").displayed){
+                    validation=false
+                    break;
+                }
+            }
+        }
+        return validation
+    }
+
+    /**
+     * this method validates that all of the bundle names in the list contain a specified string
+     * passed as parameter
+     */
+    def validateFilteredByName(name){
+        def validation=true
+        individualBundles.each{
+            if(!it.text().contains("QAE2E")){
+                validation=false
+            }
+        }
+        return validation
+    }
+
+    def validateFilteredByDesc(name){
+        def validation=true
+        for (int i=1;i<numberOfRows();i++){
+            if(!individualRows[i].find("td")[2].text().contains("QAE2E")){
+                validation=false
+            }
+        }
+        return validation
     }
 
     def validateBundleIsListed(bName){
@@ -57,12 +121,32 @@ class ListBundlesPage extends Page {
         clearPlanningFilter.click()
     }
 
+    def clearNameFilter(){
+        clearName.click()
+    }
+
+    def clearDescription(){
+        clearDesc.click()
+    }
+
+    def clearAssetQtty(){
+        clearAssetQtty.click()
+    }
+
+    def clearStartingDate(){
+        clearStarting.click()
+    }
+
+    def clearCompletionDate(){
+        clearCompletion.click()
+    }
+
     def clickCreate(){
         createButton.click()
     }
 
     def numberOfRows(){
-        individualRows.size()
+        individualBundles.size()
     }
 
     def filterByName(name){
@@ -71,9 +155,28 @@ class ListBundlesPage extends Page {
         //from the field
         nameFilter<< Keys.chord(Keys.TAB)
     }
+    /**
+     * Filters bundles by description
+     * @param name
+     * @return
+     */
+    def filterByDesc(name){
+        descriptionFilter=name
+        //This tab is necessary for the filter will not be applied until the focus is moved away
+        //from the field
+        descriptionFilter<< Keys.chord(Keys.TAB)
+    }
 
     def selectFilter(){
-        namefilterKind.click()
+        nameFilterKind.click()
+        waitFor{$("li.k-item", text:"Contains").click()}
+    }
+    /**
+     * selecta the filter type for description
+     * @return
+     */
+    def selectDescFilter(){
+        descFilterKind.click()
         waitFor{$("li.k-item", text:"Contains").click()}
     }
 
@@ -117,6 +220,65 @@ class ListBundlesPage extends Page {
         } else {
             return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
         }
+    }
+    /**
+     * This method validates that each row displayed will contain the expected Asset
+     * Quantity
+     */
+    def validateAssetQtyFilter(qty){
+        def validation=true
+        for (int i=1;i<numberOfRows();i++){
+            if(!rows[i].find(("[role='gridcell']")[3]).contains(qty)) {
+                validation=false
+                break;
+            }
+        }
+        return validation
+    }
+
+    /**
+     *  filters by start date if parameter is true, will filter by
+     * completion date otherwise
+     * @param dt
+     * @param isStart
+     * @return
+     */
+    def filterByDate(dt,isStart){
+        if(isStart){
+            startDate= dt.format("MM/dd/YYYY")
+            startDate << Keys.chord(Keys.TAB)
+            return dt.format("MM/dd/YYYY")
+        }else{
+            completionDate = dt.format("MM/dd/YYYY")
+            completionDate << Keys.chord(Keys.TAB)
+            return dt.format("MM/dd/YYYY")
+        }
+    }
+
+    def validateStartDate(dte){
+        def validation=true
+        for (int i=1;i<numberOfRows();i++){
+            if(!rows[i].find(("[role='gridcell']")[5]).contains(dte)) {
+                validation=false
+                break;
+            }
+        }
+        return validation
+    }
+
+    def validateCompletionDate(dte){
+        def validation=true
+        for (int i=1;i<numberOfRows();i++){
+            if(!rows[i].find(("[role='gridcell']")[6]).contains(dte)) {
+                validation=false
+                break;
+            }
+        }
+        return validation
+    }
+
+    def validatePagerInfo(txt){
+        pagerInfo.text()==txt
     }
 
 }
