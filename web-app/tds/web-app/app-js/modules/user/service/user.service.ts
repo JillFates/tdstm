@@ -30,7 +30,7 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
-	getUserName() {
+	getPerson() {
 		return this.http.get(`${this.userPreferenceUrl}/person`)
 			.map((res: Response) => {
 				let result = res.json();
@@ -41,7 +41,7 @@ export class UserService {
 	}
 
 	removePreference(prefCode) {
-		return this.http.post(`${this.userPreferenceUrl}/removePreference/${prefCode}`, null)
+		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -50,7 +50,7 @@ export class UserService {
 	}
 
 	resetPreferences() {
-		return this.http.post(`${this.userPreferenceUrl}/resetPreferences`, null)
+		return this.http.delete(`${this.userPreferenceUrl}/preferences`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

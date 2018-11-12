@@ -18,7 +18,7 @@
                     <th colspan="2">Preferences: Name / Value</th>
                 </tr>
                 <tr *ngFor="let preference of currentUserPreferences" id="{{preference.prefCode}}">
-                        <td nowrap="nowrap"><span>{{preference.value}}</span></td><td><span class="clear_filter spanAnchor" (click)="removePreference($event)">X</span></td>
+                        <td nowrap="nowrap"><span>{{preference.value}}</span></td><td><span class="clear_filter spanAnchor" (click)="handleRemoveClick($event)">X</span></td>
                 </tr>
             </div>
         </table>

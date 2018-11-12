@@ -130,7 +130,9 @@ export class HeaderComponent {
 	 */
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
-			console.error(result);
+			if(result) {
+				console.error(result);
+			}
 		});
 	}
 }

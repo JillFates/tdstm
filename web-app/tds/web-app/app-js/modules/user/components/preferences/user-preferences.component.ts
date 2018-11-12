@@ -47,7 +47,7 @@ export class UserPreferencesComponent implements OnInit {
 	}
 
 	private retrieveUserName() {
-		this.userService.getUserName().subscribe(
+		this.userService.getPerson().subscribe(
 			(result: any) => {
 				this.currentUserName = result.person.firstName;
 			},
