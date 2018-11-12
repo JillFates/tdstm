@@ -43,8 +43,7 @@ import {DependenciesService} from './service/dependencies.service';
 		DependenciesService
 	],
 	exports: [DependenciesListComponent],
-	entryComponents: [
-	]
+	entryComponents: []
 })
 
 export class DependenciesModule {
