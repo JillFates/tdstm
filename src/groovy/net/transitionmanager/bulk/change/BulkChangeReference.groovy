@@ -1,6 +1,7 @@
 package net.transitionmanager.bulk.change
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.MoveBundle
@@ -13,7 +14,7 @@ import net.transitionmanager.service.ServiceMethods
  * A service for managing bulk operations on Assets for assigning moveBundles.
  */
 @Transactional
-class BulkChangeMoveBundle implements ServiceMethods {
+class BulkChangeReference implements ServiceMethods {
 
 	/**
 	 * Actions that are allowed to be dynamically called by the Bulk Services.
@@ -30,21 +31,18 @@ class BulkChangeMoveBundle implements ServiceMethods {
 	 *
 	 * @return a moveBundle.
 	 */
-	static MoveBundle coerceBulkValue(Project currentProject, String value) {
+	static Object coerceBulkValue(Project currentProject, String value, String fieldName, Class type) {
 		Long id = NumberUtil.toPositiveLong(value)
 
 		if (!id) {
 			throw new InvalidParamException("Invaid move bundle id $value")
 		}
 
-		//Can't use the get method from the service methods, because, it and its dependents are not static.
-		MoveBundle moveBundle = MoveBundle.findByIdAndProject(id, currentProject)
+		Class clazz = GormUtil.getDomainPropertyType(type, fieldName)
+		Object referenceObject = GormUtil.findInProject(currentProject, clazz, id)
 
-		if (moveBundle) {
-			return moveBundle
-		}
+		return referenceObject
 
-		throw new EmptyResultException()
 	}
 
 	/**
@@ -55,17 +53,34 @@ class BulkChangeMoveBundle implements ServiceMethods {
 	 * @param ids The ids of the domain to replace the moveBundle for.
 	 * @param idsFilterQuery filtering query to use if ids are not present.
 	 */
-	static void replace(Class type, MoveBundle moveBundle, String field, List<Long> ids = [], Map idsFilterQuery = null) {
-		if (!moveBundle) {
-			throw new InvalidParamException("For bulk replace you need to specify a valid move bundle.")
+	static void replace(Class type, Object object, String field, List<Long> ids = [], Map idsFilterQuery = null) {
+		if (!object) {
+			throw new InvalidParamException("For bulk replace you need to specify a valid $field.")
 		}
 
 		Map params = [:]
 		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
-		params['moveBundle'] = moveBundle
+		params[field] = object
 
-		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :moveBundle WHERE a.id in($queryForIds)", params)
+		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)", params)
 	}
 
+	/**
+	 * Clears the current value from a list with null.
+	 *
+	 * @param type the class to use in the query.
+	 * @param value the value which should be null for clear.
+	 * @param field the list field to update
+	 * @param ids The ids of the domain to clear the list for.
+	 * @param idsFilterQuery filtering query to use if ids are not present.
+	 */
+	static void clear(Class type, Object object, String field, List<Long> ids = [], Map idsFilterQuery = null) {
+
+		Map params = [:]
+		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		params[field] = null
+
+		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)", params)
+	}
 
 }
