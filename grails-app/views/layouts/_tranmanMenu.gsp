@@ -441,24 +441,6 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <tds:hasPermission permission="${Permission.ReportViewDiscovery}">
-                                <li class="menu-parent-item">Discovery</li>
-                                <li class="menu-child-item menu-reports-cabling-conflict">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict">Cabling Conflict</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-cabling-data">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-power">
-                                    <a href="/tdstm/reports/powerReport">Power</a>
-                                </li>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
-                            </tds:hasPermission>
-                            <li class="divider"></li>
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
                                 <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
@@ -490,12 +472,6 @@
                                         <a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a>
                                     </li>
                                 </tds:hasPermission>
-                                <li class="menu-child-item menu-reports-asset-tags">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-transport-worksheets">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a>
-                                </li>
                                 <tds:hasPermission permission="${Permission.HelpMenuView}">
                                     <li class="menu-child-item">
                                         <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
@@ -507,12 +483,6 @@
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
                                     <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-issue-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report">Issue Report</a>
-                                </li>
-                                <li class="menu-child-item">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a>
                                 </li>
                                 <tds:hasPermission permission="${Permission.HelpMenuView}">
                                     <li class="menu-child-item">
