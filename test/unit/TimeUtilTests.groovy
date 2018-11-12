@@ -445,4 +445,20 @@ class TimeUtilTests extends AbstractUnitSpec {
 			hence2 == label
 	}
 
+	void 'Test the validateFormat function with various options'() {
+		expect: "Using various date/datetime formats along with different date/datetime strings validates and return the correct result"
+
+		TimeUtil.validateFormat(dateString, format) == validationResult
+
+		where:
+		dateString					| format								| validationResult
+		'02/08/1979'				| TimeUtil.FORMAT_DATE					| true
+		'02-08-1979'				| TimeUtil.FORMAT_DATE					| false
+		'02/08/1979 10:00 PM'		| TimeUtil.FORMAT_DATE_TIME				| true
+		'02/08/1979 10:00'			| TimeUtil.FORMAT_DATE_TIME				| false
+		'1979-08-02'				| TimeUtil.FORMAT_DATE_TIME_6			| true
+		'1979/08/02'				| TimeUtil.FORMAT_DATE_TIME_6			| false
+		'1979-08-02 10:00'			| TimeUtil.FORMAT_DATE_TIME_14			| true
+		'1979-08-02'				| TimeUtil.FORMAT_DATE_TIME_14			| false
+	}
 }

@@ -4,14 +4,12 @@ import com.tds.asset.AssetOptions
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
-
-import java.text.ParseException
-import java.text.SimpleDateFormat
 
 @Slf4j
 class CustomValidators {
@@ -75,7 +73,7 @@ class CustomValidators {
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
-			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeValidator
+			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateValidator
 			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeValidator
 
 			// check all the custom fields against the validators
@@ -179,18 +177,51 @@ class CustomValidators {
 	static  controlDateTimeValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-				// get the date format to be used
-				def format = fieldSpec.constraints?.format ?: null
-				try {
-					SimpleDateFormat sdf = new SimpleDateFormat(format)
-					Date date = sdf.parse(value)
-					if (!value.equals(sdf.format(date))) {
-						// the date format is incorrect
-						addError('field.incorrect.dateFormat', [value, getLabel(), format])
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('field.invalid.notEmpty', [value, getLabel()])
 					}
-				} catch (ParseException e) {
-					// the date format is invalid
-					addError('field.invalid.dateFormat', [value, getLabel(), format, e.getMessage()])
+					return // with or without error, as the value is empty, just return
+				}
+				// Validate date value using yyyy-MM-dd'T'HH:mm:ss'Z' format
+				String format = TimeUtil.FORMAT_DATE_TIME_ISO8601_2
+				boolean result = TimeUtil.validateFormat(value, format)
+				if (!result) {
+					addError('field.incorrect.dateFormat', [value, getLabel(), format])
+
+				}
+			}
+		}
+	}
+
+	/**
+	 * Date Validator that Checks that the given <code>String</code> value
+	 * represents a date, and its format is the ISO 8601 format.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlDateValidator ( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('field.invalid.notEmpty', [value, getLabel()])
+					}
+					return // with or without error, as the value is empty, just return
+				}
+				// Validate date value using yyyy-MM-dd format
+				String format = TimeUtil.FORMAT_DATE_TIME_6
+				boolean result = TimeUtil.validateFormat(value, format)
+				if (!result) {
+					addError('field.incorrect.dateFormat', [value, getLabel(), format])
+
 				}
 			}
 		}

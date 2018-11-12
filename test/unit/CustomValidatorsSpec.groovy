@@ -10,7 +10,7 @@ class CustomValidatorsSpec extends Specification{
 
 	List<ErrorHolder> errors
 
-	void 'test controlDefaultValidator validator'() {
+	void '01. Test controlDefaultValidator validator'() {
 		setup: 'setting the Field Specification Map'
 			Map<String, Object> fieldSpec = [
 
@@ -29,54 +29,53 @@ class CustomValidatorsSpec extends Specification{
 			! validator.hasErrors()
 	}
 
-	void '02. Test controlDateTimeValidator validator with format MM/dd/yyyy hh:mm a'() {
+	void '02. Test controlDateValidator validator'() {
 		setup: 'setting the Field Specification Map'
 			Map<String, Object> fieldSpec = [
 					constraints: [
-							format : "MM/dd/yyyy hh:mm a"
+							required : 0
 					]
 
 			]
-		when: 'the value "10/26/2018 02:31 PM" is passed'
-			def validator = CustomValidators.controlDateTimeValidator("10/26/2018 02:31 PM", fieldSpec)
+		when: 'the value "2018-10-26" is passed'
+			def validator = CustomValidators.controlDateValidator("2018-10-26", fieldSpec)
 			validator.apply()
 		then: 'no error should be reported'
 			!validator.hasErrors()
 		when: 'the date string does not match the format'
-			validator = CustomValidators.controlDateTimeValidator("10/26/2018 02:31:15 PM", fieldSpec)
+			validator = CustomValidators.controlDateValidator("10/26/2018 02:31:15 PM", fieldSpec)
 			errors = validator.apply()
-		then: 'an invalid date format should be reported'
+		then: 'a "field.incorrect.dateFormat" error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.dateFormat' == errors[0].i18nMessageId
+			'field.incorrect.dateFormat' == errors[0].i18nMessageId
 		when: 'the string is an invalid value'
-			validator = CustomValidators.controlDateTimeValidator("invalid", fieldSpec)
+			validator = CustomValidators.controlDateValidator("invalid", fieldSpec)
 			errors = validator.apply()
-		then: 'an invalid date format should be reported'
+		then: 'a "field.incorrect.dateFormat" error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.dateFormat' == errors[0].i18nMessageId
+			'field.incorrect.dateFormat' == errors[0].i18nMessageId
 	}
 
-	void '03. Test controlDateTimeValidator validator with format MM/dd/yyyy hh:mm:ss a'() {
+	void '03. Test controlDateTimeValidator validator'() {
 		setup: 'setting the Field Specification Map'
 		Map<String, Object> fieldSpec = [
 				constraints: [
-						format : "MM/dd/yyyy hh:mm:ss a"
+						required : 0
 				]
-
 		]
-		when: 'the value "10/26/2018 02:31:15 PM" is passed'
-			def validator = CustomValidators.controlDateTimeValidator("10/26/2018 02:31:15 PM", fieldSpec)
+		when: "the value 2018-10-26'T'22:00:15'Z' is passed"
+			def validator = CustomValidators.controlDateTimeValidator("2018-10-26T22:00:15Z", fieldSpec)
 			validator.apply()
 		then: 'no error should be reported'
 			!validator.hasErrors()
 		when: 'the date string does not match the format'
 			validator = CustomValidators.controlDateTimeValidator("10/26/2018 02:31 PM", fieldSpec)
 			errors = validator.apply()
-		then: 'a valueOutOfRange error should be reported'
+		then: 'a "field.incorrect.dateFormat" error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.dateFormat' == errors[0].i18nMessageId
+			'field.incorrect.dateFormat' == errors[0].i18nMessageId
 	}
 }

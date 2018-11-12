@@ -13,6 +13,7 @@ import org.springframework.util.Assert
 import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 /**
@@ -1021,5 +1022,27 @@ class TimeUtil {
 	 */
 	static String hence(Date futureDate, int  indefinitelyYearsThreshold = Integer.MAX_VALUE, String indefinitelyString = "Indefinitely") {
 		return agoOrIndefinitely(nowGMT(), futureDate, indefinitelyYearsThreshold, indefinitelyString)
+	}
+
+	/**
+	 * Parses a string value and validates that is in the specified format.
+	 *
+	 * @param dateString  The date to validate
+	 * @param format  The date format that will be used to validate the given dateString
+	 * @return  {@code true} if the dateString is in the specified format, {@code false} otherwise
+	 */
+	static boolean validateFormat(String dateString, String format) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(format)
+			Date date = sdf.parse(dateString)
+			if (!dateString.equals(sdf.format(date))) {
+				// the date format is incorrect
+				return false
+			}
+		} catch (ParseException e) {
+			// the date format is invalid
+			return false
+		}
+		return true
 	}
 }
