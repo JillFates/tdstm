@@ -65,47 +65,66 @@
 										</tdsAngular:tooltipSpan>
 									</td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
-                                    <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${roomSource?.roomName}')}"
-                                        nowrap="nowrap">
-                                        <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
-                                    </td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}">${roomSource?.roomName}</td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.roomTarget.imp?:''}">${roomTarget?.roomName}</td>
+
+                                   <g:if test="${!(assetEntity.assetType in ['VM'])}">
+                                        <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${roomSource?.roomName}')}"
+                                            nowrap="nowrap">
+                                            <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
+                                        </td>
+                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}">${roomSource?.roomName}</td>
+                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.roomTarget.imp?:''}">${roomTarget?.roomName}</td>
+                                   </g:if>
+
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}" />
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.os}" value="${assetEntity.os}" />
                                     <%-- The following fields will be displayed based on the assetType --%>
                                     <%-- rackable --%>
-                                    <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetEntity.rackSource?.tag}')}"
-                                        nowrap="nowrap" id="rackId">
-                                        <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
-                                    </td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}">${assetEntity.rackSource?.tag}</td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.rackTarget.imp?:''}">${assetEntity.rackTarget?.tag}</td>
+									<g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetEntity.rackSource?.tag}')}"
+                                            nowrap="nowrap" id="rackId">
+                                            <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
+                                        </td>
+                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}">${assetEntity.rackSource?.tag}</td>
+                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.rackTarget.imp?:''}">${assetEntity.rackTarget?.tag}</td>
+                                    </g:if>
+
                                     <%-- blade --%>
-                                    <td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
-                                        <label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
-                                    </td>
-                                    <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none">${sourceChassis}</td>
-                                    <td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none">${targetChassis}</td>
+                                    <g:if test="${assetEntity.assetType in ['Blade']}">
+                                        <td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId">
+                                            <label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
+                                        </td>
+                                        <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
+                                        <td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}">${targetChassis}</td>
+                                    </g:if>
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}" />
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}" />
-                                    <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetEntity.sourceRackPosition}')}"
-                                        nowrap="nowrap">
-                                        <label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
-                                            Position
-                                        </label>
-                                    </td>
-                                    <td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">${assetEntity.sourceRackPosition}</td>
-                                    <td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">${assetEntity.targetRackPosition}</td>
-                                    <td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}" style="	display: none">${assetEntity.sourceBladePosition}</td>
-                                    <td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}" style="display: none">${assetEntity.targetBladePosition}</td>
+
+                                    <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                        <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetEntity.sourceRackPosition}')}"
+                                            nowrap="nowrap">
+                                            <label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
+                                                Position
+                                            </label>
+                                        </td>
+                                        <td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">${assetEntity.sourceRackPosition}</td>
+                                        <td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">${assetEntity.targetRackPosition}</td>
+                                    </g:if>
+
+
+                                    <g:if test="${assetEntity.assetType in ['Blade']}">
+                                        <td class="label positionLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceBladePosition.imp}','${assetEntity.sourceBladePosition}')}"
+                                            nowrap="nowrap">Position</td>
+                                        <td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}">${assetEntity.sourceBladePosition}</td>
+                                        <td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}">${assetEntity.targetBladePosition}</td>
+                                    </g:if>
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}" />
