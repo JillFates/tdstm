@@ -5,4 +5,5 @@ export class NumberConfigurationConstraintsModel {
 	decimalPlaces: number;
 	useThousandSeparator: boolean;
 	allowNegatives: boolean;
+	format: string;
 }

@@ -12,7 +12,6 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 export class NumberConfigurationPopupComponent {
 
 	protected model: NumberConfigurationConstraintsModel;
-	protected outputFormat: string;
 
 	constructor(
 		public field: FieldSettingsModel,
@@ -20,14 +19,21 @@ export class NumberConfigurationPopupComponent {
 		private activeDialog: UIActiveDialogService) {
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
 			NumberControlHelper.initConfiguration(this.model);
-			this.outputFormat = NumberControlHelper.buildFormat(this.model);
+			this.model.format = this.model.format ? this.model.format : NumberControlHelper.buildFormat(this.model);
+	}
+
+	/**
+	 * On AllowNegatives change.
+	 */
+	protected onAllowNegativesChange(): void {
+		// work in progress
 	}
 
 	/**
 	 * On thousandsSeparator, decimalPlaces change recalculate the number format.
 	 */
 	protected onFormatChange(): void {
-		this.outputFormat = NumberControlHelper.buildFormat(this.model);
+		this.model.format = NumberControlHelper.buildFormat(this.model);
 	}
 
 	/**

@@ -5,7 +5,7 @@ import {NumberControlHelper} from '../components/custom-control/number/number-co
 
 /**
  * Usage:
- *		{{ myDateValue | tdsNumber : {constraints} }}
+ *		{{ myDateValue | tdsNumber : 'n2' }}
  */
 @Pipe({
 	name: 'tdsNumber'
@@ -23,7 +23,7 @@ export class NumericPipe implements PipeTransform {
 			return '';
 		}
 		let number = +value;
-		let constraints: NumberConfigurationConstraintsModel = args ? args : new NumberConfigurationConstraintsModel();
-		return formatNumber(number, NumberControlHelper.buildFormat(constraints));
+		// let constraints: NumberConfigurationConstraintsModel = args ? args : new NumberConfigurationConstraintsModel();
+		return formatNumber(number, args /*NumberControlHelper.buildFormat(constraints)*/);
 	}
 }

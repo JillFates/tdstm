@@ -58,7 +58,7 @@
                         <div class="col-sm-5 text-left">
                             <input name="allowNegatives" type="checkbox"
                                    [(ngModel)]="model.allowNegatives"
-                                   (change)="onFormatChange()"/>
+                                   (change)="onAllowNegativesChange()"/>
                         </div>
                     </div>
                     <div class="row">
@@ -69,7 +69,7 @@
                                                   [autoCorrect]="true"
                                                   [spinners]="false"
                                                   [readonly]="true"
-                                                  [format]="outputFormat"
+                                                  [format]="model.format"
                                                   [(ngModel)]="model.maxRange"
                                                   [min]="model.minRange" [max]="model.maxRange">
                             </kendo-numerictextbox>

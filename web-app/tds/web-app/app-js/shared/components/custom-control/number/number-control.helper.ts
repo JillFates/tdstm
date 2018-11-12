@@ -27,4 +27,22 @@ export class NumberControlHelper {
 		constraints.useThousandSeparator = constraints.useThousandSeparator ? constraints.useThousandSeparator : false;
 		constraints.allowNegatives = constraints.allowNegatives ? constraints.allowNegatives : false;
 	}
+
+	/**
+	 * Init the model values if is a new number field configuration.
+	 * @param {NumberConfigurationConstraintsModel} constraints
+	 */
+	public static buildConfiguration(
+		minRange: number, maxRange: number, decimalPlaces: number, format: string,
+		useThousandSeparator: boolean, allowNegatives: boolean, required: boolean): NumberConfigurationConstraintsModel {
+			let constraints = new NumberConfigurationConstraintsModel();
+			constraints.minRange = minRange;
+			constraints.maxRange = maxRange;
+			constraints.decimalPlaces = decimalPlaces;
+			constraints.useThousandSeparator = useThousandSeparator;
+			constraints.allowNegatives = allowNegatives;
+			constraints.format = format;
+			constraints.required = required;
+			return constraints;
+	}
 }

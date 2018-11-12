@@ -7,10 +7,9 @@ import { formatNumber } from '@telerik/kendo-intl';
 	selector: 'tds-number-control',
 	template: `
 		<div>
-			<!-- [min]="0" [max]="" -->
-            <kendo-numerictextbox [format]="outputFormat"
+            <kendo-numerictextbox [format]="format"
 								  [(ngModel)]="numberValue"
-                                  [min]="constraints.minRange" [max]="constraints.maxRange"
+                                  [min]="minRange" [max]="maxRange"
                                   [autoCorrect]="true"
 								  (ngModelChange)="onValueChange($event)"
                                   class="form-control">
@@ -21,12 +20,21 @@ import { formatNumber } from '@telerik/kendo-intl';
 export class NumberControlComponent implements OnInit {
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
-	@Input('constraints') constraints: any;
+	// @Input('constraints') constraints: any;
+	@Input('format') format: string;
+	@Input('decimalPlaces') decimalPlaces: number;
+	@Input('maxRange') maxRange: number;
+	@Input('minRange') minRange: number;
+	@Input('required') required: boolean;
+	@Input('allowNegatives') allowNegatives: boolean;
+	@Input('useThousandSeparator') useThousandSeparator: boolean;
 	protected numberValue: number;
-	protected outputFormat: string;
+	protected constraints: NumberConfigurationConstraintsModel;
+	// protected outputFormat: string;
 
 	constructor() {
-		this.outputFormat = '';
+		// this.outputFormat = '';
+		this.constraints = new NumberConfigurationConstraintsModel();
 	}
 
 	/**
@@ -34,8 +42,8 @@ export class NumberControlComponent implements OnInit {
 	 */
 	ngOnInit(): void {
 		this.numberValue = +this.value;
-		NumberControlHelper.initConfiguration(this.constraints);
-		this.outputFormat = NumberControlHelper.buildFormat(this.constraints);
+		this.constraints = NumberControlHelper.buildConfiguration(this.minRange, this.maxRange, this.decimalPlaces, this.format, this.useThousandSeparator, this.allowNegatives, this.required);
+		// this.outputFormat = NumberControlHelper.buildFormat(this.constraints);
 	}
 
 	/**

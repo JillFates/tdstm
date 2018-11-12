@@ -233,10 +233,7 @@ class ControlAngularTagLib {
 				out << "{{ $value | tdsDateTime: userTimeZone }}"
 				break
 			case ControlType.NUMBER.toString():
-				out << "{{ $value | tdsNumber: {allowNegative: $fieldSpec.constraints.allowNegative," +
-						" precision: $fieldSpec.constraints.precision, maxRange: $fieldSpec.constraints.maxRange," +
-						" minRange: $fieldSpec.constraints.minRange, required: $fieldSpec.constraints.required," +
-						" separator: $fieldSpec.constraints.separator, format: $fieldSpec.constraints.format} }}"
+				out << "{{ $value | tdsNumber: '$fieldSpec.constraints.format' }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink
