@@ -35,6 +35,7 @@
     "specs.LandingPages.PlanningLandingPageSpec",
     "specs.Login.LoginSpec",
     "specs.Planning.Bundle.CreatePlanningBundlesSpec",
+    "specs.Planning.Bundle.SearchBundlesSpec",
     "specs.Projects.AssetFields.ApplicationNonDisplayedFieldCreationSpec",
     "specs.Projects.AssetFields.ApplicationFieldCleanUpSpec",
     "specs.Projects.ETLScripts.ETLScriptsCreationSpec",
