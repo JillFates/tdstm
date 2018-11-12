@@ -26,7 +26,6 @@ export class DependenciesListComponent implements OnInit {
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	public gridData: GridDataResult;
 	protected state: State;
-
 	constructor(
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
@@ -75,5 +74,4 @@ export class DependenciesListComponent implements OnInit {
 			skip: 0
 		}
 	}
-
 }
