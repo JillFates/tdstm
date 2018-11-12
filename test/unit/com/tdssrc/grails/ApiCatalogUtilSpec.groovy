@@ -182,4 +182,49 @@ class ApiCatalogUtilSpec extends Specification {
 			e.message == "Error transforming ApiCatalog dictionary. Api method testMethod has an invalid httpMethod value: HTTP"
 
 	}
+
+	@See('TM-13027')
+	def 'test can transform method definition'() {
+		when: 'transforming a method definition into a DictionaryItem'
+			def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod",' +
+					'       "httpMethod": "GET",' +
+					'       "description": "Hello test method",' +
+					'       "endpointUrl": "http://endpoint.url",' +
+					'       "docUrl": "http://documentation.url",' +
+					'       "method": "invokeHttpRequest",' +
+					'       "producesData": 0,' +
+					'       "params": [{"param1":"value1"}],' +
+					'       "script": {"SUCCESS": "task.done()"}' +
+					'	}' +
+					']}}'
+			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
+		then: 'method definition is transformed correctly'
+			jsonDictionaryTransformed
+		when: 'transforming an invalid method definition'
+			def invalidDictionaryMethodDefinition =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod",' +
+					'       "httpMethod": "GET",' +
+					'       "description": "Hello test method",' +
+					'       "endpointUrl": "http://endpoint.url",' +
+					'       "docUrl": "http://documentation.url",' +
+					'       "method": "invokeHttpRequest",' +
+					'       "producesData": 0,' +
+					'       "params": [{"param1":"value1"}],' +
+					'       "scripts": {"SUCCESS": "task.done()"}' +
+					'	}' +
+					']}}'
+			ApiCatalogUtil.transformDictionary(invalidDictionaryMethodDefinition)
+		then: 'InvalidParamException is thrown'
+			def e = thrown InvalidParamException
+			e.message == 'Error transforming ApiCatalog dictionary. Api method definition has an invalid property: scripts'
+	}
 }

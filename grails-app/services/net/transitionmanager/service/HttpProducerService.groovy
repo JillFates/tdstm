@@ -645,7 +645,11 @@ class HttpProducerService {
 
         // create a temporary file with the http response input stream
         def (String tmpFilename, OutputStream os) = fileSystemService.createTemporaryFile(RESPONSE_TEMPORARY_FILENAME_PREFIEX)
-        IOUtils.copy(closeableHttpResponse?.entity?.content, os)
+
+        // check whether http response has content
+        if (closeableHttpResponse?.entity?.content != null) {
+            IOUtils.copy(closeableHttpResponse?.entity?.content, os)
+        }
         os.flush()
         os.close()
 

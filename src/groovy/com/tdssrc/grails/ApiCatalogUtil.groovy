@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey as ACDK
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
+import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -301,6 +302,13 @@ class ApiCatalogUtil {
 	private static void validateHttpMethod(JSONObject jsonDictionary) {
 		// iterate method to validate
 		jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { Map method ->
+			// validate if method can be unmarshal into a Groovy object, in this case DictionaryItem
+			try {
+				new DictionaryItem(method)
+			} catch (MissingPropertyException e) {
+				throw new InvalidParamException("Api method definition has an invalid property: ${e.property}")
+			}
+
 			// validate whether method.httpMethod is valid within ApiActionHttpMethod enum
 			if (!ApiActionHttpMethod.isValidHttpMethod(method.httpMethod)) {
 				throw new InvalidParamException("Api method ${method.apiMethod} has an invalid httpMethod value: ${method.httpMethod}")
