@@ -7,7 +7,16 @@ import {CHECK_ACTION} from './model/check-action.model';
 
 @Component({
 	selector: 'tds-check-action',
-	templateUrl: '../tds/web-app/app-js/shared/components/check-action/check-action.component.html',
+	template: `
+        <button type="button" class="btn btn-default" [ngClass]="class"
+                (click)="onCheckThumbBindAction()"
+                [disabled]="disabled">
+            <i aria-hidden="true"
+               [ngClass]="getIcon()">
+            </i>
+            <span *ngIf="name" style="margin-right: 3px;"> {{name}} </span>
+        </button>
+	`,
 	styles: [`
         i.fa {
             padding-right: 0px;
