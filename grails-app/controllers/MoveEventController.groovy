@@ -161,11 +161,19 @@ class MoveEventController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.EventEdit)
-	def update() {
-		CreateEventCommand event = populateCommandObject(CreateEventCommand)
+	def update(Long id) {
+		if (id == null) {
+			flash.message = "Invalid MoveEvent Id provided"
+			redirect(action: 'list')
+			return
+		}
+
+		// populate create event command from request
+		CreateEventCommand command = populateCommandObject(CreateEventCommand)
+
 		// TODO : SLC 11/2018 : this try/catch can be removed when this view gets moved to Angular
 		try {
-			MoveEvent moveEvent = moveEventService.update(params.getLong(id), event)
+			MoveEvent moveEvent = moveEventService.update(id, command)
 			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues('moveBundle') as List)
 			flash.message = "MoveEvent '$moveEvent.name' updated"
 			redirect(action: 'show', id: moveEvent.id)
@@ -173,7 +181,7 @@ class MoveEventController implements ControllerMethods {
 			flash.message = "MoveEvent not found with id $params.id"
 			redirect(action: 'list')
 		} catch (DomainUpdateException e) {
-			render(view: 'edit', model: [moveEventInstance: event])
+			render(view: 'edit', model: [moveEventInstance: command])
 		}
 	}
 
@@ -364,8 +372,8 @@ class MoveEventController implements ControllerMethods {
 	 * The controller that actually does the runbook export generation to an Excel spreadsheet
 	 */
 	@HasPermission(Permission.TaskView)
-	def exportRunbookToExcel() {
-		MoveEvent moveEvent = moveEventService.findById(params.eventId as Long, false)
+	def exportRunbookToExcel(Long eventId) {
+		MoveEvent moveEvent = moveEventService.findById(eventId, false)
 		if (! moveEvent) return
 
 		// TODO : SLC 11/2018 : this try/catch can be removed when this view gets moved to Angular
