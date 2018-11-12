@@ -98,6 +98,9 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
+	'DEPENDENCIES': {
+		'LIST_TITLE': 'Dependencies List'
+	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
 		'API_ACTION': 'API Action',
