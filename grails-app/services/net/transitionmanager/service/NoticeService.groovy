@@ -1,5 +1,7 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.exceptions.ServiceException
+import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.NoticeAcknowledgment
@@ -90,7 +92,17 @@ class NoticeService implements ServiceMethods {
 	private Map<String, ?> saveUpdate(json, Notice notice) {
 		TYPES.each { String propertyName, Class type ->
 			def val = json[propertyName]
+
 			if (val != null) {
+
+				// Sanitize the 3rd Party HTML
+				if (propertyName == 'htmlText') {
+					List<String> results = StringUtil.checkHTML(val as String)
+					if (!results.isEmpty()) {
+						throw new ServiceException("HTML passed is unsafe to render as it contains forbidden code in: [${results.join(',')}]")
+					}
+				}
+
 				switch (type) {
 					case Date:
 						val = DatatypeConverter.parseDateTime(val).time
