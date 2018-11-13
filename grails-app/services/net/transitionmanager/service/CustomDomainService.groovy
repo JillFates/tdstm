@@ -188,10 +188,19 @@ class CustomDomainService implements ServiceMethods {
      */
     void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
+
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
+
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
+
+                for (JSONObject field : customFieldSpec.fields) {
+                    if (((String) field.field).startsWith('custom')) {
+                        field.bulkChangeActions = ['replace', 'clear']
+                    }
+                }
+
                 settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
             } else {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")
