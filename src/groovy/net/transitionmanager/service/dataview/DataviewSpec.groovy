@@ -1,6 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.asset.FieldSpecCache
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -94,7 +95,7 @@ class DataviewSpec {
 		}
 	}
 
-	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
+	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null, FieldSpecCache fieldSpecCache = null) {
 		spec = command.filters
 		justPlanning = command.justPlanning
 		args = [offset: command.offset]
@@ -110,12 +111,24 @@ class DataviewSpec {
 				dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
 				Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
 				if(!specColumn){
-					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
+					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter, fieldSpecCache)
 				}
 			}
 		}
 
-		order = [domain: command.sortDomain, property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
+		order = [
+			domain: command.sortDomain,
+			property: command.sortProperty,
+			sort: command.sortOrder == ASCENDING ? 'asc' : 'desc',
+			fieldSpec: fieldSpecCache?.getFieldSpec(command.sortDomain, command.sortProperty)
+		]
+
+		//TODO: problems with this Ojbect when it is serialized from JSON data
+		this.spec.columns = this.spec.columns.collect {
+			Map map = it as Map
+			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))
+			map
+		}
 	}
 
     void addColumn(domain, property, filter = null){
