@@ -177,7 +177,7 @@ class ControlAngularTagLib {
 						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
 						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
 						" [required]=\"$isRequired\" " +
-						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0} '\">" +
+						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0}'\">" +
 						"</tds-number-control>"
 				break
 			case ControlType.DATE.toString():
