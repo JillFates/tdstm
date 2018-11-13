@@ -1,5 +1,4 @@
 import {NumberConfigurationConstraintsModel} from '../../../../modules/fieldSettings/components/number/number-configuration-constraints.model';
-import { formatNumber } from '@telerik/kendo-intl';
 
 export class NumberControlHelper {
 
@@ -10,8 +9,8 @@ export class NumberControlHelper {
 	 */
 	public static buildFormat(constraints: NumberConfigurationConstraintsModel): string {
 		let format = '';
-		if (constraints.decimalPlaces > 0 || constraints.useThousandSeparator) {
-			format = `n${(constraints.decimalPlaces > 0 ? constraints.decimalPlaces : '')}`;
+		if (constraints.precision > 0 || constraints.separator) {
+			format = `n${(constraints.precision > 0 ? constraints.precision : '')}`;
 		}
 		return format;
 	}
@@ -23,9 +22,9 @@ export class NumberControlHelper {
 	public static initConfiguration(constraints: NumberConfigurationConstraintsModel): void {
 		constraints.minRange = constraints.minRange ? constraints.minRange : 0;
 		constraints.maxRange = constraints.maxRange ? constraints.maxRange : 1000;
-		constraints.decimalPlaces = constraints.decimalPlaces ? constraints.decimalPlaces : 0;
-		constraints.useThousandSeparator = constraints.useThousandSeparator ? constraints.useThousandSeparator : false;
-		constraints.allowNegatives = constraints.allowNegatives ? constraints.allowNegatives : false;
+		constraints.precision = constraints.precision ? constraints.precision : 0;
+		constraints.separator = constraints.separator ? constraints.separator : false;
+		constraints.allowNegative = constraints.allowNegative ? constraints.allowNegative : false;
 	}
 
 	/**
@@ -38,9 +37,9 @@ export class NumberControlHelper {
 			let constraints = new NumberConfigurationConstraintsModel();
 			constraints.minRange = minRange;
 			constraints.maxRange = maxRange;
-			constraints.decimalPlaces = decimalPlaces;
-			constraints.useThousandSeparator = useThousandSeparator;
-			constraints.allowNegatives = allowNegatives;
+			constraints.precision = decimalPlaces;
+			constraints.separator = useThousandSeparator;
+			constraints.allowNegative = allowNegatives;
 			constraints.format = format;
 			constraints.required = required;
 			return constraints;

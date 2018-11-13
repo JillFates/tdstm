@@ -2,8 +2,8 @@ export class NumberConfigurationConstraintsModel {
 	required: boolean;
 	maxRange: number;
 	minRange: number;
-	decimalPlaces: number;
-	useThousandSeparator: boolean;
-	allowNegatives: boolean;
+	precision: number;
+	separator: boolean;
+	allowNegative: boolean;
 	format: string;
 }

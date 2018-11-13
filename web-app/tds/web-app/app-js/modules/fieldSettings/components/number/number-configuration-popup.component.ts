@@ -1,5 +1,5 @@
-import {Component, Input, ViewChild, OnInit, Inject} from '@angular/core';
-import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
+import {Component, Inject} from '@angular/core';
+import { FieldSettingsModel } from '../../model/field-settings.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NumberConfigurationConstraintsModel} from './number-configuration-constraints.model';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';

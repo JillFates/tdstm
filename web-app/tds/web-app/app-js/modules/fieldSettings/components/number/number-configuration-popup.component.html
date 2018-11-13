@@ -39,7 +39,7 @@
                             <kendo-numerictextbox style="width: 70px;"
                                                   name="decimalPlace"
                                                   [format]="'n'"
-                                                  [(ngModel)]="model.decimalPlaces"
+                                                  [(ngModel)]="model.precision"
                                                   [min]="0" [max]="10"
                                                   (ngModelChange)="onFormatChange()">
                             </kendo-numerictextbox>
@@ -49,7 +49,7 @@
                         <label class="col-sm-5">Use 1000 Separator</label>
                         <div class="col-sm-5 text-left">
                             <input name="useThousandSeparator" type="checkbox"
-                                   [(ngModel)]="model.useThousandSeparator"
+                                   [(ngModel)]="model.separator"
                                    (change)="onFormatChange()"/>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                         <label class="col-sm-5">Allow Negative Integers</label>
                         <div class="col-sm-5 text-left">
                             <input name="allowNegatives" type="checkbox"
-                                   [(ngModel)]="model.allowNegatives"
+                                   [(ngModel)]="model.allowNegative"
                                    (change)="onAllowNegativesChange()"/>
                         </div>
                     </div>
@@ -70,8 +70,8 @@
                                                   [spinners]="false"
                                                   [readonly]="true"
                                                   [format]="model.format"
-                                                  [(ngModel)]="model.maxRange"
-                                                  [min]="model.minRange" [max]="model.maxRange">
+                                                  [value]="model.allowNegative ? -model.maxRange : model.maxRange"
+                                                  [max]="model.maxRange">
                             </kendo-numerictextbox>
                         </div>
                     </div>

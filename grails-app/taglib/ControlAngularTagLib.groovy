@@ -170,12 +170,19 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 			case ControlType.NUMBER.toString():
-                println(attrs.ngmodel)
-                println(fieldSpec.constraints as JSON);
-				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\" [allowNegative]=\"$fieldSpec.constraints?.allowNegative\"" +
-						" [precision]=\"$fieldSpec.constraints?.precision\" [separator]=\"$fieldSpec.constraints?.separator\"" +
-						" [minRange]=\"$fieldSpec.constraints?.minRange\" [maxRange]=\"$fieldSpec.constraints?.maxRange\"" +
-						" [required]=\"$fieldSpec.constraints?.required\" ></tds-number-control>"
+                if (fieldSpec.constraints.format) {
+                    out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
+                            " [allowNegative]=\"$fieldSpec.constraints.allowNegative\"" +
+                            " [precision]=\"$fieldSpec.constraints.precision\"" +
+                            " [separator]=\"$fieldSpec.constraints.separator\"" +
+                            " [minRange]=\"$fieldSpec.constraints.minRange\"" +
+                            " [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
+                            " [required]=\"$isRequired\" " +
+                            " [format]=\"$fieldSpec.constraints.format\">" +
+                            "</tds-number-control>"
+                } else {
+                    out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
+                }
 				break
 			case ControlType.DATE.toString():
 				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
@@ -227,13 +234,13 @@ class ControlAngularTagLib {
 				out << value  // render value as it is
 				break
 			case ControlType.DATE.toString():
-				out << "{{'$value | tdsDate: userDateFormat }}"
+				out << "{{ '$value' | tdsDate: userDateFormat }}"
 				break
 			case ControlType.DATETIME.toString():
-				out << "{{ $value | tdsDateTime: userTimeZone }}"
+				out << "{{ '$value' | tdsDateTime: userTimeZone }}"
 				break
 			case ControlType.NUMBER.toString():
-				out << "{{ ${value ? value : '0'} | tdsNumber: 'n2' }}"
+				out << "{{ ${value ? value : '0'} | tdsNumber: '${fieldSpec.constraints.format}' }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink

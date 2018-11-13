@@ -98,24 +98,11 @@
                                     <tds-number-control *ngIf="canShowControl('Number', rowIndex)"
                                                     [(value)]="editRows.selectedValues[rowIndex].value"></tds-number-control>
 
-                                    <b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | tdsNumber: 'n2'}}<br>
-                                    <tds-number-control [(value)]="editRows.selectedValues[rowIndex].value"
-                                                        [format]="'n2'"
-                                                        [allowNegatives]="false"
-                                                        [decimalPlaces]="2"
-                                                        [maxRange]="10000"
-                                                        [minRange]="0"
-                                                        [required]="0"
-                                                        [useThousandSeparator]="true">
-                                    </tds-number-control>
-                                    <!-- Datetime Fields -->
-                                    <b>Output:</b> {{editRows.selectedValues[rowIndex].value}}<br>
+                                    <!-- Date Fields -->
+                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
+                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>
 
-                                    <!--<b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | tdsDate: userDateFormat}}<br>-->
-                                    <!--<tds-date-control *ngIf="canShowControl('DateTime', rowIndex)"-->
-                                                       <!--[(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>-->
                                     <!-- Datetime Fields -->
-                                    <!--<b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | tdsDateTime: userTimeZone}}<br>-->
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
                                                        [(value)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
 
