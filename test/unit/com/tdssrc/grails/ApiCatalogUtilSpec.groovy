@@ -225,6 +225,6 @@ class ApiCatalogUtilSpec extends Specification {
 			ApiCatalogUtil.transformDictionary(invalidDictionaryMethodDefinition)
 		then: 'InvalidParamException is thrown'
 			def e = thrown InvalidParamException
-			e.message == 'Error transforming ApiCatalog dictionary. Api method definition has an invalid property: scripts'
+			e.message == 'Error transforming ApiCatalog dictionary. Api method name: "Test Method" definition has an invalid property: scripts'
 	}
 }
