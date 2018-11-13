@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
+import {NumberControlHelper} from './number-control.helper';
 
 @Component({
 	selector: 'tds-number-control',
@@ -17,7 +18,7 @@ import {Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
 export class NumberControlComponent implements OnInit {
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
-	@Input('format') format = '';
+	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
 	@Input('precision') precision: number;
 	@Input('maxRange') maxRange: number;
 	@Input('minRange') minRange: number;
