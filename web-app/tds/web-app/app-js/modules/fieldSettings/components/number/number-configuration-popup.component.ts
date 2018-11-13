@@ -18,8 +18,6 @@ export class NumberConfigurationPopupComponent {
 		@Inject('domain') public domain: string,
 		private activeDialog: UIActiveDialogService) {
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
-			NumberControlHelper.initConfiguration(this.model);
-			this.model.format = this.model.format ? this.model.format : NumberControlHelper.buildFormat(this.model);
 	}
 
 	/**

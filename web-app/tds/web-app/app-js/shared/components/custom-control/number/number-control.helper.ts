@@ -2,15 +2,26 @@ import {NumberConfigurationConstraintsModel} from '../../../../modules/fieldSett
 
 export class NumberControlHelper {
 
+	public static readonly DEFAULT_NUMBER_FORMAT = '0';
+
 	/**
 	 * Builds a format based on the number constraints.
 	 * @param {NumberConfigurationConstraintsModel} constraints
 	 * @returns {string}
 	 */
 	public static buildFormat(constraints: NumberConfigurationConstraintsModel): string {
-		let format = '';
-		if (constraints.precision > 0 || constraints.separator) {
-			format = `n${(constraints.precision > 0 ? constraints.precision : '')}`;
+		let format = this.DEFAULT_NUMBER_FORMAT;
+		if (constraints.precision > 0) {
+			if (constraints.separator) {
+				format = `n${constraints.precision}`;
+			} else {
+				format = '0.';
+				for (let i = 0; i < constraints.precision; i++) {
+					format = format.concat('0');
+				}
+			}
+		} else if (constraints.separator) {
+			format = 'n';
 		}
 		return format;
 	}
@@ -25,6 +36,7 @@ export class NumberControlHelper {
 		constraints.precision = constraints.precision ? constraints.precision : 0;
 		constraints.separator = constraints.separator ? constraints.separator : false;
 		constraints.allowNegative = constraints.allowNegative ? constraints.allowNegative : false;
+		constraints.format = constraints.format ? constraints.format : this.buildFormat(constraints);
 	}
 
 	/**

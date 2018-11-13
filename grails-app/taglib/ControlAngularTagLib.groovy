@@ -170,19 +170,15 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 			case ControlType.NUMBER.toString():
-                if (fieldSpec.constraints.format) {
-                    out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
-                            " [allowNegative]=\"$fieldSpec.constraints.allowNegative\"" +
-                            " [precision]=\"$fieldSpec.constraints.precision\"" +
-                            " [separator]=\"$fieldSpec.constraints.separator\"" +
-                            " [minRange]=\"$fieldSpec.constraints.minRange\"" +
-                            " [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
-                            " [required]=\"$isRequired\" " +
-                            " [format]=\"$fieldSpec.constraints.format\">" +
-                            "</tds-number-control>"
-                } else {
-                    out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
-                }
+				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
+						" [allowNegative]=\"$fieldSpec.constraints.allowNegative\"" +
+						" [precision]=\"$fieldSpec.constraints.precision\"" +
+						" [separator]=\"$fieldSpec.constraints.separator\"" +
+						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
+						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
+						" [required]=\"$isRequired\" " +
+						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0} '\">" +
+						"</tds-number-control>"
 				break
 			case ControlType.DATE.toString():
 				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"

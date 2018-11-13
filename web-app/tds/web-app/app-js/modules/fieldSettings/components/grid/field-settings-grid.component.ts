@@ -12,6 +12,8 @@ import { SelectListConfigurationPopupComponent } from '../select-list/selectlist
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {FIELD_COLORS} from '../../model/field-settings.model';
 import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
+import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
+import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
 
 declare var jQuery: any;
 
@@ -250,6 +252,11 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
+	/**
+	 * TODO: I need to remove this specific type of custom field code, create a helper for each field type and put code in there.
+	 * TODO: Just like has been done on the Number Field Type.
+	 * @param dataItem
+	 */
 	protected onControlChange(dataItem: FieldSettingsModel): void {
 		switch (dataItem.control) {
 			case CUSTOM_FIELD_CONTROL_TYPE.List:
@@ -283,6 +290,9 @@ export class FieldSettingsGridComponent implements OnInit {
 				if (!dataItem.constraints.required) {
 					dataItem.constraints.values.splice(0, 0, '');
 				}
+				break;
+			case CUSTOM_FIELD_CONTROL_TYPE.Number:
+				NumberControlHelper.initConfiguration(dataItem.constraints as NumberConfigurationConstraintsModel);
 				break;
 			default:
 				break;
