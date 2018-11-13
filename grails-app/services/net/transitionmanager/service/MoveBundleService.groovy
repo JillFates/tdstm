@@ -20,6 +20,7 @@ import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
 import net.transitionmanager.domain.MoveEvent
@@ -48,7 +49,7 @@ class MoveBundleService implements ServiceMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	TagService tagService
-	TagAssetService tagAssetService
+	AssetOptionsService assetOptionsService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
@@ -423,7 +424,7 @@ class MoveBundleService implements ServiceMethods {
 		// Used by the Assignment Dialog
 		def allMoveBundles = MoveBundle.findAllByProject(project, [sort: 'name'])
 		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def assetDependencyList = AssetDependencyBundle.executeQuery(
 				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?', [project])
 
@@ -887,8 +888,8 @@ class MoveBundleService implements ServiceMethods {
 			asset.save(failOnError: true)
 		}
 
-		tagAssetService.validateBulkValues(currentProject, tagIds)
-		tagAssetService.bulkReplace(tagIds, assets)
+		BulkChangeTag.validateBulkValues(currentProject, tagIds)
+		BulkChangeTag.replace(null, tagIds, 'tagAssets', assets)
 
 		session.ASSIGN_BUNDLE = moveBundle
 		session.SELECTED_TAG_IDS = tagIds ?: []

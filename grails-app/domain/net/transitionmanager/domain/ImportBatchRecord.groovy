@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
@@ -193,12 +194,16 @@ class ImportBatchRecord {
 			// Populate the results of the find/elseFind queries if the record is pending
 			if (status == ImportBatchStatusEnum.PENDING) {
 				Map context = [
-					domainClass:importBatch.domainClassName.getClazz(),
+					domainClass: importBatch.domainClassName,
+					domainClassName: importBatch.domainClassName.name(),
 					project: importBatch.project
 				]
 				Object entity = SearchQueryHelper.findEntityByMetaData('id', domainMap.fieldsInfo, context)
 				if (entity && GormUtil.isDomainClass(entity.getClass())) {
 					domainMap.existingRecord = getMapOfFieldsFromEntity(domainMap.fieldsInfo, entity)
+					domainMap.operation = ImportOperationEnum.UPDATE.name()
+				} else {
+					domainMap.operation = ImportOperationEnum.INSERT.name()
 				}
 			}
 		}

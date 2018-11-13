@@ -137,7 +137,14 @@ class SearchQueryHelper {
 		// Flags that a search by ID failed which will result in an error so that duplicates are not created
 		boolean searchedById = false
 
-		Class domainClassOfProperty = (entityInstance ? entityInstance.getClass() : context.domainClass)
+		Class domainClassOfProperty
+		if (entityInstance) {
+			domainClassOfProperty = entityInstance.getClass()
+		} else {
+			// The context.domainClass seems to vary (bug) between the actual domain class and the ETLDomain
+			domainClassOfProperty = (context.domainClass in ETLDomain) ? context.domainClass.getClazz() : context.domainClass
+		}
+
 		Class domainClass
 		(domainClass, entity) = classOfDomainProperty(fieldName, fieldsInfo, domainClassOfProperty)
 		String domainShortName = domainClass ? GormUtil.domainShortName(domainClass) : null

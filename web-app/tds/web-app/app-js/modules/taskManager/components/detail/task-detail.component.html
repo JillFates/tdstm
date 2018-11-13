@@ -3,8 +3,8 @@
         <div class="modal-content resizable tds-angular-component-content"
              tds-ui-modal-decorator=""
              [options]="modalOptions"
-             [style.width.px]="860"
-             [style.height.px]="706">
+             [style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
+             [style.height.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_WIDTH">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>

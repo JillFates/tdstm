@@ -14,6 +14,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
@@ -42,6 +43,7 @@ class FilesController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
 	AssetService assetService
+	AssetOptionsService assetOptionsService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -291,8 +293,8 @@ class FilesController implements ControllerMethods {
 		[
 			fileInstance      : files,
 			moveBundleList    : MoveBundle.findAllByProject(project, [sort: 'name']),
-			planStatusOptions : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
-			environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
+			planStatusOptions : assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION),
+			environmentOptions: assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION),
 			standardFieldSpecs: standardFieldSpecs,
 			project           : project,
 			customs           : customFields

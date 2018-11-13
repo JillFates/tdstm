@@ -102,7 +102,7 @@ export class HttpInterceptor extends Http {
 				name: 'httpRequestInitial'
 			});
 		}
-		return observable.pipe(catchError((error, source) => {
+		return observable.catch((error, source) => {
 
 			let errorMessage = error.message;
 
@@ -123,14 +123,14 @@ export class HttpInterceptor extends Http {
 			} else {
 				return Observable.throw(error);
 			}
-		})).pipe(finalize(() => {
+		}).finally(() => {
 			// Invokes after the source observable sequence terminates gracefully or exceptionally.
 			if (requestInfo) {
 				this.notifierService.broadcast({
 					name: 'httpRequestCompleted',
 				});
 			}
-		}));
+		});
 	}
 
 	/**

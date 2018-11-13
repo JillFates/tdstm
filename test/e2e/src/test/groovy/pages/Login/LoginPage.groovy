@@ -3,6 +3,8 @@ package pages.Login
 import utils.CommonActions
 import geb.Page
 import utils.Login
+import pages.Admin.User.*
+import pages.Login.MenuPage
 
 class LoginPage extends Page {
     static url = "/tdstm/auth/login"
@@ -12,10 +14,10 @@ class LoginPage extends Page {
     }
 
     static content = {
-        username        { $("#usernameid") }
-        password        { $("input", name:"password") }
-        submitButton    { $("#submitButton") }
-        errorMessage    { $("#loginForm").find("div", class:"message")}
+        username { $("#usernameid") }
+        password { $("input", name:"password") }
+        submitButton { $("#submitButton") }
+        errorMessage { $("#loginForm").find("div", class:"message")}
     }
 
     def getCredentials(userIndex, passIndex){
@@ -73,5 +75,24 @@ class LoginPage extends Page {
 
     def verifyWrongUserError(){
         errorMessage.text() == "Invalid username and/or password"
+    }
+
+    def verifyLockedUserError(){
+        errorMessage.text().contains("Your account is presently locked")
+    }
+
+    def lockUsername(userIndex = 6){
+        //On the testDataFile.txt we find the username based on the index which is 6 by default (login_e2e_test_user)
+        // The loginWrongPass also assumes we're using said user, but I added the parameter to make it extensible
+        loginWrongPass(1)
+
+        if(verifyWrongPassError()){ //This means that the username is valid and it is not locked
+            while(verifyLockedUserError()!=true)
+            {
+                loginWrongPass(1)
+            }
+            true //We break once the user is locked
+        } else if(verifyLockedUserError()) //This is the scenario where the username is already locked, so we do nothing
+            true
     }
 }

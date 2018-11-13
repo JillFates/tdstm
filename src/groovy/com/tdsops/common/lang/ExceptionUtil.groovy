@@ -13,7 +13,7 @@ class ExceptionUtil {
 	 * @param lines - the number of lines to include in the trace (default 40)
 	 * @return The string containing the stacktrace
 	 */
-	static String stackTraceToString(Exception e, Integer lines = 40) {
+	static String stackTraceToString(Throwable e, Integer lines = 40) {
 		stackTraceToString('', e, lines)
 	}
 
@@ -24,7 +24,7 @@ class ExceptionUtil {
 	 * @param lines - the number of lines to include in the trace (default 40), set to zero (0) will show all
 	 * @return The string containing the stacktrace
 	 */
-	static String stackTraceToString(String msg, Exception e, Integer lines = 40) {
+	static String stackTraceToString(String msg, Throwable e, Integer lines = 40) {
 		StringWriter sw = new StringWriter()
 		PrintWriter pw = new PrintWriter(sw)
 		e.printStackTrace(pw)

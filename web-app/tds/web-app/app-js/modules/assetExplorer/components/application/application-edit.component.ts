@@ -4,9 +4,8 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
@@ -28,7 +27,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			{ provide: 'model', useValue: editModel }
 		]
 	})
-	class ApplicationShowComponent extends AssetCommonEdit {
+	class ApplicationShowComponent extends AssetCommonEdit implements OnInit {
 		defaultItem = {fullName: 'Please Select', personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
@@ -51,7 +50,11 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			private prompt: UIPromptService,
 			) {
 				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-				this.initModel();
+		}
+
+		ngOnInit() {
+			this.initModel();
+			this.focusControlByName('assetName');
 		}
 
 		/**
@@ -108,6 +111,12 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			modelRequest.asset.shutdownBy = modelRequest.asset.shutdownBy && modelRequest.asset.shutdownBy.id || '';
 			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
 			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
+
+			modelRequest.asset.environment  = modelRequest.asset.environment === this.defaultSelectOption ?
+												'' : modelRequest.asset.environment;
+
+			modelRequest.asset.criticality  = modelRequest.asset.criticality === this.defaultSelectOption ?
+				'' : modelRequest.asset.criticality;
 
 			// Custom Fields
 			this.model.customs.forEach((custom: any) => {

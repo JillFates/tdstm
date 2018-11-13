@@ -138,6 +138,7 @@ export class APIActionViewEditComponent implements OnInit {
 		name: 'Select...'
 	};
 	private savedApiAction = false;
+	private defaultAgentModel = { name: '', id: 0 };
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -147,9 +148,16 @@ export class APIActionViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
+	}
 
+	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
+
+		// set the default empty values for agentClass in case they are not defined
+		if (!this.apiActionModel.agentClass) {
+			this.apiActionModel.agentClass = this.defaultAgentModel;
+		}
 
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
@@ -163,9 +171,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.getAgents();
 		this.getCommonFieldSpecs();
 		this.getModalTitle();
-	}
 
-	ngOnInit(): void {
 		this.prepareFormListener();
 	}
 
@@ -454,6 +460,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	protected onAgentValueChange(agentModel: AgentModel): void {
+		agentModel = agentModel ?  agentModel : this.defaultAgentModel;
+		this.apiActionModel.agentClass = agentModel;
+
 		if (this.lastSelectedAgentModel && this.lastSelectedAgentModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {

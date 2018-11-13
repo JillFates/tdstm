@@ -120,8 +120,7 @@
                                             [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
-                                            [data]="editRows.listOptions[rowIndex]"
-                                            (valueChange)="onListValueChange($event, rowIndex)">
+                                            [data]="editRows.listOptions[rowIndex]">
                                     </kendo-dropdownlist>
 
                                     <!-- Custom Fields - List -->
@@ -131,8 +130,7 @@
                                             [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
-                                            [data]="editRows.listOptions[rowIndex]"
-                                            (valueChange)="onListValueChange($event, rowIndex)">
+                                            [data]="editRows.listOptions[rowIndex]">
                                     </kendo-dropdownlist>
 
                                     <!-- Asset Tag Fields -->

@@ -1,4 +1,5 @@
 import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveEvent
@@ -180,17 +181,18 @@ class PartyRelationshipServiceTests extends Specification {
 			partyRelationshipService.getCompanyStaff(company, true)
 	}
 
-	void "Test getProjectCompanies with a client, owner and partner" () {
+	void "Test getProjectCompanies with a client, owner and partner"() {
 		setup: "Create a project with different owner, client and partner"
-			Project project = projectHelper.createProject(null, true)
+			Project project = projectHelper.createProject()
+			projectHelper.createPartner(projectHelper.createCompany('partner'), project)
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
 			companies.size() == 3
 		and: "There are no duplicated companies"
-			companies.unique {it.id}.size() == 3
+			companies.unique { it.id }.size() == 3
 		and: "It contains the owner"
-			companies.find {it.id == project.owner.id}
+			companies.find { it.id == project.owner.id }
 		and: "It contains the client"
 			companies.find {it.id == project.client.id}
 

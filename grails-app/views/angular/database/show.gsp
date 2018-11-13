@@ -31,7 +31,9 @@
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                     </tr>
                                     <tr class="prop">
-                                        <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+                                        <td class="label ${standardFieldSpecs.size.imp?:''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${asset.size}')}"
+                                            nowrap="nowrap">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
                                                 ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
                                             </label>
@@ -91,12 +93,12 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
-        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
-        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
-        <a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
+        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
+        <a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
     </div>
 </div>

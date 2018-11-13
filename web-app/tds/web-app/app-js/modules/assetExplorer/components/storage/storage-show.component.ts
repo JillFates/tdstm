@@ -12,6 +12,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
 
 declare var jQuery: any;
 
@@ -22,6 +23,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 	}) class StorageShowComponent implements OnInit {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
+		protected isHighField = AssetCommonHelper.isHighField;
 
 		constructor(
 			private activeDialog: UIActiveDialogService,
