@@ -198,8 +198,6 @@ class CustomDomainService implements ServiceMethods {
                 for (JSONObject field : customFieldSpec.fields) {
                     if (((String) field.field).startsWith('custom')) {
                         field.bulkChangeActions = ['replace', 'clear']
-                        println field.field
-                        println field.bulkChangeActions
                     }
                 }
 
