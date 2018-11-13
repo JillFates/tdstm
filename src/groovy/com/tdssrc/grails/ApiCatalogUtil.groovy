@@ -306,7 +306,7 @@ class ApiCatalogUtil {
 			try {
 				new DictionaryItem(method)
 			} catch (MissingPropertyException e) {
-				throw new InvalidParamException("Api method definition has an invalid property: ${e.property}")
+				throw new InvalidParamException("Api method name: \"${method.name}\" definition has an invalid property: ${e.property}")
 			}
 
 			// validate whether method.httpMethod is valid within ApiActionHttpMethod enum
