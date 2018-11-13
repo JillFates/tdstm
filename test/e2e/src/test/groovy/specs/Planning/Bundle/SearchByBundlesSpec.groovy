@@ -23,6 +23,7 @@ class SearchBundlesSpec extends GebReportingSpec {
     static qty=new Random().nextInt(20) + 1
     static def today = new Date()
 
+
     def setupSpec() {
         testCount = 0
         to LoginPage
@@ -87,7 +88,7 @@ class SearchBundlesSpec extends GebReportingSpec {
     def "6. Filter by start date"(){
         when: 'The user filters bundles by Start Date'
              clearAssetQtty()
-             def today = filterByDate(today,true)
+             def today = filterByDate(today.format("MM/dd/YYYY"),true)
         then: 'All the bundles listed have the expected start date'
              validateStartDate(today)
     }
@@ -95,7 +96,7 @@ class SearchBundlesSpec extends GebReportingSpec {
     def "7. Filter by completion date"(){
         when: 'The user filters bundles by Completion Date'
             clearStartingDate()
-            def tomorrow = filterByDate(today+1,false)
+            def tomorrow = filterByDate((today+1).format("MM/dd/YYYY"),false)
         then: 'All the bundles listed have the expected Completion date'
             validateCompletionDate(tomorrow)
         }
@@ -121,7 +122,7 @@ class SearchBundlesSpec extends GebReportingSpec {
     def "10. Negative start date scenario"(){
         when: 'The user filters by a start date no bundle will have'
              clearDescription()
-             filterByDate(today-9000,true)
+             filterByDate((today-9000).format("MM/dd/YYYY"),true)
         then: 'There are no rows returned'
             numberOfRows()==0
             validatePagerInfo("No items to display")
@@ -130,7 +131,7 @@ class SearchBundlesSpec extends GebReportingSpec {
     def "11. Negative completion date scenario"(){
         when: 'The user filters by a start date no bundle will have'
              clearStartingDate()
-             filterByDate(today-9000,false)
+             filterByDate((today-9000).format("MM/dd/YYYY"),false)
         then: 'There are no rows returned'
             numberOfRows()==0
             validatePagerInfo("No items to display")

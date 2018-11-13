@@ -45,17 +45,27 @@ class ListBundlesPage extends Page {
         clearStarting {filterRow.find("[title='Clear']")[5]}
         clearCompletion {filterRow.find("[title='Clear']")[6]}
         qttyFilter {filterRow.find("input.k-formatted-value.k-input")[1]}
+        qttyFilterFocused{filterRow.find("[data-role='numerictextbox']")[1]}
         editedQty {filterRow.find("span.k-state-focused")}
         startDate {$("[data-role='datepicker']")[0]}
         completionDate {$("[data-role='datepicker']")[1]}
     }
 
     def filterByQuantity(qtty){
-        qttyFilter=qtty
+        qttyFilter.click()
+        qttyFilterFocused=qtty
         //This is necessary for the filter will not be applied until the focus is moved away
         //from the field. Tabbing does not work in this case, so just clicking elsewhere
         nameFilter.click()
     }
+
+    /**
+     * This method will validate that bundles are correctly filtered by either checking
+     * on the presence or absence of "is Planned" ticks in each row. The options parameter
+     * will define which of the two possibilities to check for.
+     * @param option
+     * @return
+     */
 
     def validateFilteredByPlanning(option){
         def validation=true
@@ -155,11 +165,13 @@ class ListBundlesPage extends Page {
         //from the field
         nameFilter<< Keys.chord(Keys.TAB)
     }
+
     /**
      * Filters bundles by description
      * @param name
      * @return
      */
+
     def filterByDesc(name){
         descriptionFilter=name
         //This tab is necessary for the filter will not be applied until the focus is moved away
@@ -171,10 +183,12 @@ class ListBundlesPage extends Page {
         nameFilterKind.click()
         waitFor{$("li.k-item", text:"Contains").click()}
     }
+
     /**
      * selecta the filter type for description
      * @return
      */
+
     def selectDescFilter(){
         descFilterKind.click()
         waitFor{$("li.k-item", text:"Contains").click()}
@@ -190,6 +204,7 @@ class ListBundlesPage extends Page {
      * this method will validate the "equal to" option
      * @author ingrid
      */
+
     def validateFilteredListEqTo(name){
         $("a.cell-url-element", text:name).displayed
     }
@@ -202,18 +217,22 @@ class ListBundlesPage extends Page {
         filterByName(name)
         $("a.cell-url-element", text:name).click()
     }
+
     /**
      * Returns true if description and tick presence are as expected.
      * name has already been validated
      * @param data
      * @return
      */
+
     def validateBundleRowData(data){
         validateFilteredDescription(data[1])&& validatePlanningTick(data[3])
     }
+
     /**
      * returns false if the parameter value and the presence of the tick do not match     *
      */
+
     def validatePlanningTick(value){
         if(value=="on"){
             return commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
@@ -221,10 +240,12 @@ class ListBundlesPage extends Page {
             return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
         }
     }
+
     /**
      * This method validates that each row displayed will contain the expected Asset
      * Quantity
      */
+
     def validateAssetQtyFilter(qty){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
@@ -243,15 +264,16 @@ class ListBundlesPage extends Page {
      * @param isStart
      * @return
      */
+
     def filterByDate(dt,isStart){
         if(isStart){
-            startDate= dt.format("MM/dd/YYYY")
+            startDate= dt
             startDate << Keys.chord(Keys.TAB)
-            return dt.format("MM/dd/YYYY")
+            return dt
         }else{
-            completionDate = dt.format("MM/dd/YYYY")
+            completionDate = dt
             completionDate << Keys.chord(Keys.TAB)
-            return dt.format("MM/dd/YYYY")
+            return dt
         }
     }
 
