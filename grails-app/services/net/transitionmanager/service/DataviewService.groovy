@@ -12,6 +12,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewApiParamsCommand
 import grails.transaction.Transactional
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
@@ -676,7 +677,7 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec.columns.each { Map column ->
 
 			// Check if the user provided a filter expression.
-			if (filterFor(column)) {
+			if (StringUtil.isNotBlank(filterFor(column))) {
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
 						column: propertyFor(column),

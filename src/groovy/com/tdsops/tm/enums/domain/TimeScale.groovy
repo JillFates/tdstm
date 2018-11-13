@@ -94,4 +94,17 @@ enum TimeScale {
 	static final List<String> labels = keys.collect { it.value }.asImmutable()
 
 	static List<String> getLabels(String locale = 'en') { labels }
+
+	/**
+	 * Return the corresponding TimeScale for the given label ('Minutes', 'Hours', etc.)
+	 * @param label
+	 * @return a TimeScale enum or null if the label is invalid.
+	 */
+	static TimeScale fromLabel(String label) {
+		TimeScale result = null
+		if (label) {
+			result = values().find { it.value().toLowerCase() == label.toLowerCase()}
+		}
+		return result
+	}
 }

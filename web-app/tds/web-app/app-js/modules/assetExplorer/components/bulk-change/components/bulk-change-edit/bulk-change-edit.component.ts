@@ -29,11 +29,12 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	protected readonly TYPE_OPTIONS_CONTROL = 'Options';
 	protected readonly TYPE_INLIST_CONTROL = 'InList';
 	protected readonly TYPE_CUSTOM_FIELD_LIST_CONTROL = 'List';
+	protected readonly TYPE_CUSTOM_FIELD_YES_NO = 'YesNo';
 
 	isLoaded: boolean;
 	private defaultDomain: IdTextItem = {id: 'COMMON', text: 'Common Fields'};
 	tagList: TagModel[] = [];
-	yesNoList: IdTextItem[] = [{ id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
+	yesNoList: IdTextItem[] = [{ id: 'Yes', text: 'Yes'}, { id: 'No', text: 'No'}];
 	protected domains: IdTextItem[];
 	selectedItems: string[] = [];
 	commonFieldSpecs: any[] = [];
@@ -73,6 +74,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			this.bulkChangeService.getAssetListOptions(this.domains[0].id === 'COMMON' ? 'DEVICE' : this.domains[0].id).subscribe( result => {
 				this.listOptions['planStatus'] = result.planStatusOptions.map(item => { return {id: item, text: item} });
 				this.listOptions['validation'] = result.validationOptions.map(item => { return {id: item, text: item} });
+				this.listOptions['moveBundle'] = result.dependencyMap.moveBundleList.map(item => { return {id: item.id.toString(), text: item.name} });
 				if (this.domains[0].id === 'DEVICE') {
 					this.listOptions['railType'] = result.railTypeOption.map(item => { return {id: item, text: item} });
 				}
@@ -296,7 +298,9 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	 */
 	private getUpdateValueForBulkAction(fieldName: string, originalValue: any, action: string, control: string): string {
 			// let value = action === this.CLEAR_ACTION ? null : originalValue;
-			if (this.isFieldControlOptionsList(control)) {
+			if (this.isFieldControlOptionsList(control)
+				|| control === this.TYPE_CUSTOM_FIELD_LIST_CONTROL
+				|| control === this.TYPE_CUSTOM_FIELD_YES_NO) {
 				if (action === this.CLEAR_ACTION) {
 					return null;
 				}
