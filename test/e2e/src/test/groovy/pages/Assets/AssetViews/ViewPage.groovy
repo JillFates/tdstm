@@ -447,6 +447,10 @@ class ViewPage extends Page{
         waitFor{noRecords.text() == text}
     }
 
+    def verifyRowsDisplayed(){
+        commonsModule.verifyElementDisplayed($(".asset-detail-name-column"))
+    }
+
     def addColumnByName(name){
         clickOnGear()
         createViewModule.clickSpecificCheckbox name
