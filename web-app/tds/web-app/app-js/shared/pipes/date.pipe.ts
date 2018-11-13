@@ -3,7 +3,9 @@ import {DateUtils} from '../utils/date.utils';
 
 /**
  * Usage:
- *		{{ myDateValue | tdsDate : userDateFormat }}
+ *		{{ ${myDateValue} | tdsDate : ${userDateFormat} }}
+ *
+ * userDateFormat: taken from user preference settings.
  */
 @Pipe({
 	name: 'tdsDate'

@@ -1,11 +1,10 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import { formatNumber } from '@telerik/kendo-intl';
-import {NumberConfigurationConstraintsModel} from '../../modules/fieldSettings/components/number/number-configuration-constraints.model';
-import {NumberControlHelper} from '../components/custom-control/number/number-control.helper';
 
 /**
  * Usage:
- *		{{ myDateValue | tdsNumber : 'n2' }}
+ *		{{ ${myDateValue} | tdsNumber : ${format} }}
+ *	format example: 'n2'
  */
 @Pipe({
 	name: 'tdsNumber'
@@ -13,7 +12,7 @@ import {NumberControlHelper} from '../components/custom-control/number/number-co
 export class NumericPipe implements PipeTransform {
 
 	/**
-	 * Transform.
+	 * Formats a number with the given format.
 	 * @param {string} value
 	 * @param args should be #NumberConfigurationConstraintsModel type object.
 	 * @returns {any}
@@ -23,7 +22,6 @@ export class NumericPipe implements PipeTransform {
 			return '';
 		}
 		let number = +value;
-		// let constraints: NumberConfigurationConstraintsModel = args ? args : new NumberConfigurationConstraintsModel();
-		return formatNumber(number, args /*NumberControlHelper.buildFormat(constraints)*/);
+		return formatNumber(number, args);
 	}
 }

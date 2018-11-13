@@ -355,7 +355,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			]).then(result => {
 				// when popup closes ..
 			}).catch(result => {
-				console.log('Dismissed MinMaxConfigurationPopupComponent Dialog');
+				// when popup is Cancelled.
 			});
 		}
 	}
