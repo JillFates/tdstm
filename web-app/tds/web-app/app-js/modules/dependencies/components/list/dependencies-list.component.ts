@@ -3,6 +3,7 @@ import { GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-gri
 import {BehaviorSubject} from 'rxjs';
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
+import { State } from '@progress/kendo-data-query';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -21,7 +22,6 @@ import {tap, map, mergeMap} from 'rxjs/operators';
 })
 export class DependenciesListComponent implements OnInit {
 	protected gridStateSubject: BehaviorSubject<State>;
-	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected assets: any[];
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -104,46 +104,18 @@ export class DependenciesListComponent implements OnInit {
 	}
 
 	/**
-	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * Handle pageChange, filterChange, sortChange events
+	 * @param {DataStateChangeEvent} state
 	 */
-	protected cellClick(event: CellClickEvent): void {
+	protected dataStateChange(state: DataStateChangeEvent): void {
+		this.gridStateSubject.next(state);
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * Get the initial state of the grid
+	 * @returns {State} default grid state properties
 	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		// this.gridData = process(this.assets, this.state);
-	}
-
-	protected dataStateChange(state: DataStateChangeEvent): void {
-		console.log('State:');
-		console.log(state);
-
-		/*
-		if (state.sort[0]) {
-			// Invert the Order to remove the Natural/Default from the UI (no arrow)
-			if (!state.sort[0].dir) {
-				state.sort[0].dir = (this.model.sort.order === 'a' ? 'desc' : 'asc');
-			}
-
-			let field = state.sort[0].field.split('_');
-			this.model.sort.domain = field[0];
-			this.model.sort.property = field[1];
-			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
-		}
-		this.updateGridState(state);
-		this.modelChange.emit();
-		*/
-	}
-
-	getInitialGridState(): any {
+	getInitialGridState(): State {
 		return {
 			sort: [{
 				dir: 'asc',
@@ -152,7 +124,9 @@ export class DependenciesListComponent implements OnInit {
 			filter: {
 				filters: [],
 				logic: 'and'
-			}
+			},
+			take: GRID_DEFAULT_PAGE_SIZE,
+			skip: 0
 		}
 	}
 
