@@ -652,45 +652,6 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	/*
-	*1. On upload the system should put the data into temporary tables and then perform validation to make sure the data is proper and ready.
-	*2. Step through each imported model:
-	*2a if it's SourceTDSVersion is higher than the one in the database, update the database with the new model and connector data.
-	*2b If it is lower, skip it.
-	*3. Report the number of Model records updated.
-	*/
-	@HasPermission(Permission.ModelImport)
-	def upload() {
-		UserLogin userLogin = securityService.userLogin
-		MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request
-		CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
-		try {
-			Map results = modelService.upload(file, userLogin, params.importCheckbox)
-			if (results.error) {
-				flash.message = results.error
-				redirect(action:"importExport", params:[message:flash.message])
-			}
-			else {
-				if (results.manuSkipped.size() > 0 || results.modelSkipped.size() > 0 || results.connectorSkipped.size() > 0) {
-					flash.message = " File Uploaded Successfully with Manufactures:$results.manuAdded,Model:$results.modelAdded,Connectors:$results.connectorAdded records. and Manufactures:$results.manuSkipped,Model:$results.modelSkipped,Connectors:$results.connectorSkipped Records skipped Please click the Manage Batches to review and post these changes."
-				} else {
-					flash.message = " File uploaded successfully with Manufactures:$results.manuAdded,Model:$results.modelAdded,Connectors:$results.connectorAdded records. Please click the Manage Batches to review and post these changes."
-				}
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-			}
-		} catch(NumberFormatException ex) {
-				flash.message = ex
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-		} catch(Exception ex) {
-				ex.printStackTrace()
-				flash.message = ex
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-		}
-	}
-
 	private String checkHeader(List<String> list, sheetColumnNames) {
 		String missingHeader = ""
 		int listSize = list.size()
@@ -746,25 +707,6 @@ class ModelController implements ControllerMethods {
 						powerDesign : powerDesign]
 		render modelMap as JSON
 	}
-
-	/**
-	 * Validates a Model instance.
-	 */
-	@HasPermission(Permission.ModelValidate)
-	def validateModel() {
-		if (!params.id) {
-			throw new InvalidParamException("ModelController.validateModel() - id cannot be null.")
-		}
-		Long modelId = NumberUtil.toLong(params.id)
-		Model modelInstance = modelService.validateModel(modelId)
-		if (!modelInstance.hasErrors()) {
-			flash.message = "$modelInstance.modelName Validated"
-		}
-		else {
-			flash.message = "There was an error validating $modelInstance.modelName: ${modelInstance.errors.allErrors.each { println it }}"
-		}
-		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
-	}
 	
 	/**
 	* Validate whether requested alias already exist in DB or not
@@ -789,27 +731,6 @@ class ModelController implements ControllerMethods {
 			render 'valid'
 		else
 			render 'invalid'
-	}
-	
-	/**
-	 * Updates a model for audit view , not using update method as there have a lot of code in update action might degrade performance.
-	 * @param id : id of model for update
-	 */
-	@HasPermission(Permission.ModelEdit)
-	def updateModel() {
-		def modelId = params.id
-		if (modelId && modelId.isNumber()) {
-			def model = Model.get(params.id)
-			model.properties = params
-			if (!model.save(flush:true)) {
-				model.errors.allErrors.each {
-					log.error it
-				}
-			}
-			render(template: "modelAuditView", model: [modelInstance:model])
-		} else {
-			render "<b> No Model found for id: $params.id</b>"
-		}
 	}
 
 	/**
