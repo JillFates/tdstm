@@ -13,10 +13,14 @@ export class DependenciesService {
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
-	getDependencies(): Observable<any> {
-		return this.http.get(`../assetEntity/listDepJson?_search=false&nd=1542120332047&rows=25&page=1&sidx=assetName&sord=asc`)
+	getDependencies(params: any): Observable<any> {
+		const page: number = (params.skip / params.take) + 1;
+		const queryString = `?_search=false&nd=1542120332047&rows=${params.take}&page=${page}&sidx=assetName&sord=asc`;
+		const url = `../assetEntity/listDepJson${queryString}`
+
+		return this.http.get(url)
 			.pipe(
-				switchMap((res: Response) => this.mapDependenciesOutputResult(25, res.json()))
+				switchMap((res: Response) => this.mapDependenciesOutputResult(params.take, res.json()))
 			)
 			/*
 			.map((res: Response) => res.json())
@@ -27,7 +31,6 @@ export class DependenciesService {
 	private mapDependenciesOutputResult(pageSize: number, legacyFormat: any): Observable<any> {
 		return Observable.create((observer) => {
 			const result = {
-				data: {
 					assets: legacyFormat.rows.map((row) => {
 						const [
 							assetName, assetType, dependentBundle, type, dependentName, dependentType,
@@ -38,14 +41,14 @@ export class DependenciesService {
 							assetName, assetType, dependentBundle, type, dependentName, dependentType,
 							assetBundle, multiField1, multiField2, status
 						}
-					}),
+					})
+					.filter((item, index) => index <= pageSize - 1),
 					pagination: {
 						max: pageSize,
 						offset: pageSize * (legacyFormat.page - 1),
 						total: legacyFormat.records
 					},
 					status: 'success'
-				}
 			};
 
 			observer.next(result);
