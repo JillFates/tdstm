@@ -2,6 +2,8 @@ import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import net.transitionmanager.command.newseditor.SaveNewsCommand
+import net.transitionmanager.command.newseditor.UpdateNewsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -297,14 +299,16 @@ class NewsEditorController implements ControllerMethods {
 	@HasPermission(Permission.NewsCreate)
 	def saveNews() {
 		Project project = controllerService.getProjectForPage(this)
+		SaveNewsCommand news = populateCommandObject(SaveNewsCommand)
+		validateCommandObject(news)
 
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		MoveEventNews men = newsEditorService.save(project, params)
-		renderHandler(men, params)
+		MoveEventNews men = newsEditorService.save(project, news.moveEventId, news.message, news.resolution, news.isArchived)
+		renderHandler(men, news.mode, news.moveBundle, news.viewFilter, news.moveEventId)
 	}
 
 	/**
@@ -316,23 +320,23 @@ class NewsEditorController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.NewsEdit)
 	def updateNews() {
+		UpdateNewsCommand news = populateCommandObject(UpdateNewsCommand)
+		validateCommandObject(news)
 		Project project = controllerService.getProjectForPage(this)
+
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		MoveEventNews men = newsEditorService.update(project, params)
-		renderHandler(men, params)
+		MoveEventNews men = newsEditorService.update(project, news.id, news.message, news.resolution, news.isArchived)
+		renderHandler(men, news.mode, news.moveBundle, news.viewFilter, null)
 	}
 
 	/**
 	 * Used by the saveNews and updateNews controller methods to perform the actual update of the new or existing MoveEventNews domain record
 	 */
-	private void renderHandler(MoveEventNews moveEventNews, params) {
-
-		String mode = params.mode ?: 'redirect'
-
+	private void renderHandler(MoveEventNews moveEventNews, String mode, String moveBundle, String viewFilter, Long moveEventId) {
 		if (mode == 'ajax') {
 			Map menModel = [
 				id         : moveEventNews.id,
@@ -346,7 +350,7 @@ class NewsEditorController implements ControllerMethods {
 		} else {
 			redirect(
 				action: "newsEditorList",
-				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent ? params.moveEvent.id : null]
+				params: [ moveBundle: moveBundle, viewFilter: viewFilter, moveEvent: moveEventId ?: null]
 			)
 		}
 	}
@@ -358,17 +362,13 @@ class NewsEditorController implements ControllerMethods {
 	@HasPermission(Permission.NewsDelete)
 	def deleteNews(Long id) {
 		Project project = controllerService.getProjectForPage(this)
+
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		String error = newsEditorService.delete(id, project)
-
-		if (error) {
-			renderErrorJson(error)
-			return
-		}
+		newsEditorService.delete(id, project)
 
 		renderSuccessJson()
 	}

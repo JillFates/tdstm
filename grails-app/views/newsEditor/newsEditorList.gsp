@@ -257,7 +257,7 @@ $('#reportsMenu').hide();
 										<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
 										<td valign="top" class="value" id="resolveTdId">
 											<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
-											<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId"/>
+											<input type="hidden" name="isArchived" value="0" id="isResolvedHiddenId"/>
 										</td>
 									</tr>
 									<tr class="prop">
@@ -290,7 +290,7 @@ $('#reportsMenu').hide();
 						<input name="projectId" value="${projectId}" type="hidden"/>
 						<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
 						<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
-						<input name="moveEvent.id" value="${moveEventId}" type="hidden" id="moveEventId"/>
+						<input name="moveEventId" value="${moveEventId}" type="hidden" id="moveEventId"/>
 						<div class="dialog" style="border: 1px solid #5F9FCF">
 							<table id="createCommentTable" style="border: 0px">
 								<tr>

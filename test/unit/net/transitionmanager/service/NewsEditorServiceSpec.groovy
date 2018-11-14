@@ -57,13 +57,7 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '01. Test save'() {
 		when: 'saving a valid move event news'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
-
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none', 0)
 			MoveEventNews savedNews = MoveEventNews.get(news.id)
 		then: 'the news is saved to the db'
 			savedNews.id == news.id
@@ -77,13 +71,7 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '02. Test save archived'() {
 		when: 'saving a valid move event news, setting it to archived'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '1'
-			])
-
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none', 1)
 			MoveEventNews savedNews = MoveEventNews.get(news.id)
 		then: 'the news is saved, and archived by is also saved.'
 			savedNews.id == news.id
@@ -96,56 +84,31 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '03. Test save invalid move event'() {
 		when: 'trying to save a move event news with a -1 for the move event id'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': -1,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : 1
-			])
+			MoveEventNews news = service.save(project, -1, 'a message', 'none', 1)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 		when: 'trying to save a move event news with a null for the move event id'
-			news = service.save(project, [
-				'moveEvent.id': null,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : 1
-			])
+			news = service.save(project, null, 'a message', 'none', 1)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 		when: 'trying to save a move event news with an invalid id for the move event id'
-			news = service.save(project, [
-				'moveEvent.id': 999999,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : 1
-			])
+			news = service.save(project,999999, 'a message',  'none', 1)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 	}
 
 
 	void '04. Test update'() {
 		setup: 'given a saved MoveEventNews'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none', 0)
 		when: 'Updating the MoveEventNews with a new message and resolution'
-			service.update(project, [
-				'id'      : news.id,
-				message   : 'a  new message',
-				resolution: 'resolved',
-				isArchived: '0'
-			])
+			service.update(project, news.id,  'a  new message', 'resolved', 0)
 
 			MoveEventNews savedNews = MoveEventNews.get(news.id)
 		then: 'the changes are saved to the db'
@@ -159,19 +122,9 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '05. Test update archived'() {
 		setup: 'given a saved MoveEventNews'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none',0)
 		when: 'Updating the MoveEventNews with a new message, resolution, and archiving it'
-			service.update(project, [
-				'id'      : news.id,
-				message   : 'a  new message',
-				resolution: 'resolved',
-				isArchived: '1'
-			])
+			service.update(project, news.id, 'a  new message', 'resolved', 1)
 
 			MoveEventNews savedNews = MoveEventNews.get(news.id)
 		then: 'the changes are saved to the db, and archivedBy is set'
@@ -185,55 +138,30 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '06. Test update invalid id'() {
 		setup: 'given a saved MoveEventNews'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none', 0)
 		when: 'trying to update a move event news with a -1 for the move event id'
-			service.update(project, [
-				'id'      : -1,
-				message   : 'a  new message',
-				resolution: 'resolved',
-				isArchived: '0'
-			])
+			service.update(project,  -1, 'a  new message', 'resolved', 0)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 		when: 'trying to update a move event news with a null for the move event id'
-			service.update(project, [
-				'id'      : null,
-				message   : 'a  new message',
-				resolution: 'resolved',
-				isArchived: '0'
-			])
+			service.update(project, null, 'a  new message', 'resolved', 0)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 		when: 'trying to save a move event news with an invalid id for the move event id'
-			service.update(project, [
-				'id'      : 9999999,
-				message   : 'a  new message',
-				resolution: 'resolved',
-				isArchived: '0'
-			])
+			service.update(project, 9999999, 'a  new message', 'resolved', 0)
 
 			MoveEventNews.get(news.id)
 		then: 'An Invalid Param Exception is thrown'
-			thrown InvalidParamException
+			thrown EmptyResultException
 	}
 
 	void '07. Test delete'() {
 		setup: 'given a saved MoveEventNews'
-			MoveEventNews news = service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
+			MoveEventNews news = service.save(project, moveEvent.id, 'a message', 'none', 0)
 		when: 'deleting the news'
 			service.delete(news.id, project)
 			MoveEventNews savedNews = MoveEventNews.get(news.id)
@@ -244,24 +172,18 @@ class NewsEditorServiceSpec extends Specification {
 
 	void '08. Test delete invalid id'() {
 		setup: 'given a saved MoveEventNews'
-			service.save(project, [
-				'moveEvent.id': moveEvent.id,
-				message       : 'a message',
-				resolution    : 'none',
-				isArchived    : '0'
-			])
+			service.save(project, moveEvent.id, 'a message', 'none', 0)
 		when: 'trying to delete a null id  MoveEventNews'
-			String error = service.delete(null, project)
-
+			service.delete(null, project)
 		then: 'an error message is returned'
-			error == 'Invalid news id specified'
+			thrown InvalidParamException
 		when: 'trying to delete a -1 id  MoveEventNews'
-			error = service.delete(-1, project)
+			service.delete(-1, project)
 		then: 'an error message is returned'
-			error == 'Invalid news id specified'
+			thrown InvalidParamException
 		when: 'trying to delete an invalid id  MoveEventNews'
-			error = service.delete(999999, project)
+			service.delete(999999, project)
 		then: 'an error message is returned'
-			error == 'News id was not found'
+			thrown EmptyResultException
 	}
 }

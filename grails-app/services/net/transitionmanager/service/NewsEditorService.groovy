@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
@@ -20,29 +21,13 @@ class NewsEditorService {
 	 *
 	 * @return The saved MoveEventNews object.
 	 */
-	MoveEventNews save(Project project, params) {
-		MoveEvent moveEvent
-		Long moveEventId = NumberUtil.toLong(params['moveEvent.id'])
-
-		// Check to make sure that the moveEvent id exists and is associated to the project
-		if (moveEventId == null || moveEventId < 1) {
-			throw new InvalidParamException('Invalid move event id specified')
-		} else {
-			// Check that the move event exists and is associated to the user's project
-			moveEvent = MoveEvent.get(moveEventId)
-
-			if (!moveEvent) {
-				throw new InvalidParamException('Move event was not found')
-			} else if (moveEvent.project.id != project.id) {
-				securityService.reportViolation("Accessing move event ($moveEventId) not associated with project ($project.id)")
-				throw new InvalidParamException('Invalid move event id specified')
-			}
-		}
+	MoveEventNews save(Project project, Long moveEventId, String message, String resolution, Integer isArchived ) {
+		MoveEvent moveEvent = GormUtil.findInProject(project, MoveEvent, moveEventId, true)
 
 		// Create the new news domain
 		MoveEventNews moveEventNews = new MoveEventNews(moveEvent: moveEvent, createdBy: securityService.loadCurrentPerson())
 
-		return saveUpdateNewsHandler(moveEventNews, params)
+		return saveUpdateNewsHandler(moveEventNews, message, resolution, isArchived)
 
 	}
 
@@ -54,40 +39,20 @@ class NewsEditorService {
 	 *
 	 * @return The updated MoveEventNews object.
 	 */
-	MoveEventNews update(Project project, params) {
-		MoveEventNews moveEventNews
-
-		// Check to make sure that the MoveEventNews id exists and is associated to the project
-		Long id = NumberUtil.toLong(params['id'])
-
-		if (id == null || id < 1) {
-			throw new InvalidParamException('Invalid news id specified')
-		} else {
-			// Check that the move event news id exists and is associated to the user's project
-			moveEventNews = MoveEventNews.get(id)
-
-			if (!moveEventNews) {
-				throw new InvalidParamException('News id was not found')
-			} else {
-				if (moveEventNews.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
-					throw new InvalidParamException('Invalid news id specified')
-				}
-			}
-		}
-
-		return saveUpdateNewsHandler(moveEventNews, params)
+	MoveEventNews update(Project project, Long id, String message, String resolution, Integer isArchived) {
+		MoveEventNews moveEventNews = GormUtil.findInProject(project, MoveEventNews, id, true)
+		return saveUpdateNewsHandler(moveEventNews, message, resolution, isArchived)
 	}
 
 	/**
 	 * Used by the saveNews and updateNews methods to perform the actual save of the new or existing MoveEventNews domain record.
 	 */
-	private MoveEventNews saveUpdateNewsHandler(MoveEventNews moveEventNews, params) {
+	private MoveEventNews saveUpdateNewsHandler(MoveEventNews moveEventNews, String message, String resolution, Integer isArchived) {
 
-		moveEventNews.message = params.message
-		moveEventNews.resolution = params.resolution
+		moveEventNews.message = message
+		moveEventNews.resolution = resolution
 
-		if (params.isArchived == '1') {
+		if (isArchived ==  1) {
 			moveEventNews.isArchived = 1
 			moveEventNews.archivedBy = securityService.loadCurrentPerson()
 			moveEventNews.dateArchived = TimeUtil.nowGMT()
@@ -101,38 +66,21 @@ class NewsEditorService {
 	}
 
 	/**
-	 * Deletes a MoveEventNews object, and returns any errors as a string.
+	 * Deletes a MoveEventNews object.
 	 *
 	 * @param id The Id of the MoveEventNews to delete.
 	 * @param project The project associated with the MoveEventNews.
-	 *
-	 * @return Any errors as a string or ''
 	 */
-	String delete(Long id, Project project) {
-		String error = ''
+	void delete(Long id, Project project) {
 		MoveEventNews moveEventNews
 
 		// Check to make sure that the MoveEventNews id exists and is associated to the project
 		if (id == null || id < 1) {
-			error = 'Invalid news id specified'
+			throw new InvalidParamException('Invalid news id specified')
 		} else {
-			// Check that the move event news id exists and is associated to the user's project
-			moveEventNews = MoveEventNews.get(id)
-
-			if (!moveEventNews) {
-				error = 'News id was not found'
-			} else {
-				if (moveEventNews.moveEvent.project.id != project.id) {
-					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project ($project.id)")
-					error = 'Invalid news id specified'
-				}
-			}
+			moveEventNews = GormUtil.findInProject(project, MoveEventNews, id, true)
 		}
 
-		if (!error) {
 			moveEventNews.delete(failOnError: true)
-		}
-
-		return error
 	}
 }
