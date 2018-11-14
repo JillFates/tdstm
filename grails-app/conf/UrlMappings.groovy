@@ -425,12 +425,14 @@ class UrlMappings {
 		"/ws/user/preferences/$id?" {
 			controller = "wsUser"
 			action = [GET:"preferences",
-					  DELETE: "removePreferences"]
+					  DELETE: "removePreference"]
 		}
 
-		"/ws/user/preference" {
+		"/ws/user/preference/$id?" {
 			controller = "wsUser"
-			action = [POST:"savePreference"]
+			action = [GET:"preferences",
+					  POST:"savePreference",
+					  DELETE: "removePreference"]
 		}
 
 		"/ws/user/person" {

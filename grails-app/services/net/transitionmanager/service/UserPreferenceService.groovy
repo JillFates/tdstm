@@ -8,6 +8,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 
@@ -299,19 +300,41 @@ class UserPreferenceService implements ServiceMethods {
 	boolean removePreference(UserLogin user = null, String prefCode) {
 		user = resolve(user)
 		if (!user) return false
+		if(prefCode) {
+			int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
+			if (updateCount) {
+				log.debug 'Removed {} preference', prefCode
 
-		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
-		if (updateCount) {
-			log.debug 'Removed {} preference', prefCode
+				//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
+				if (prefCode == CURR_PROJ.value()) {
+					removeProjectAssociatedPreferences(user)
+				}
+			}
 
-			//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
-			if (prefCode == CURR_PROJ.value()) {
-				removeProjectAssociatedPreferences(user)
+
+			session?.removeAttribute(prefCode)
+			return true
+		}
+		else
+		{
+			// Copied from PersonController
+			Person person = securityService.getUserLogin().person
+			UserLogin userLogin = securityService.getPersonUserLogin(person)
+			if (!userLogin) {
+				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
+				sendNotFound()
+				return
+			}
+			// TODO : JPM 5/2015 : Change the way that the delete is occurring
+			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
+			prePreference.each { preference ->
+				def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference, userLogin)
+				// When clearing preference, the RefreshMyTasks should be the same.
+				if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
+					preferenceInstance.delete()
+				}
 			}
 		}
-
-		session?.removeAttribute(prefCode)
-		return true
 	}
 
 	/**

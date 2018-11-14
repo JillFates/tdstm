@@ -40,10 +40,10 @@ class WsUserController implements ControllerMethods {
 	 */
 	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserGeneralAccess)
-	def preferences() {
-        if(params.id) {
+	def preferences(String id) {
+        if(id) {
             def data = [:]
-            for (String preferenceCode in params.id?.toString()?.split(',')) {
+            for (String preferenceCode in id?.toString()?.split(',')) {
 				data[preferenceCode] = userPreferenceService.getPreference(preferenceCode)
 			}
 			renderSuccessJson(preferences: data)
@@ -146,37 +146,9 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson([person:person])
 	}
 
-	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserGeneralAccess)
-	def removePreferences() {
-		if(params.id) {
-			String prefCode = params.id
-			userPreferenceService.removePreference(null, prefCode)
-			renderSuccessJson()
-		}
-		else {
-			// Copied from PersonController
-			try {
-				Person person = securityService.getUserLogin().person
-				UserLogin userLogin = securityService.getPersonUserLogin(person)
-				if (!userLogin) {
-					log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-					sendNotFound()
-					return
-				}
-				// TODO : JPM 5/2015 : Change the way that the delete is occurring
-				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-				prePreference.each { preference ->
-					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference, userLogin)
-					// When clearing preference, the RefreshMyTasks should be the same.
-					if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
-						preferenceInstance.delete()
-					}
-				}
-				renderSuccessJson()
-			} catch (e) {
-				renderErrorJson(e.message)
-			}
-		}
+	def removePreference(String id) {
+		userPreferenceService.removePreference(null, id)
+		renderSuccessJson()
 	}
 }
