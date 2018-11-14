@@ -1,6 +1,6 @@
 <div id="actionLookupModal" draggable class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
-		<span id="ui-id-5" class="ui-dialog-title">Action - ${apiAction.agent}</span>
+		<span id="ui-id-5" class="ui-dialog-title">Action Summary</span>
 		<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
 		<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
 		<span class="ui-button-text">close</span>
@@ -14,7 +14,7 @@
                     <table id="updateCommentTable" class="inner">
                         <tr class="prop">
                             <td valign="top" class="name">
-                                <label><b>Agent:</b></label>
+                                <label><b>Dictionary:</b></label>
                             </td>
                             <td valign="top" class="value">
                                 <label>${apiAction.agent}</label>
