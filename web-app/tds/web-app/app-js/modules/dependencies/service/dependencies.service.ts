@@ -29,30 +29,5 @@ export class DependenciesService {
 	}
 
 	private mapDependenciesOutputResult(pageSize: number, legacyFormat: any): Observable<any> {
-		return Observable.create((observer) => {
-			const result = {
-					assets: legacyFormat.rows.map((row) => {
-						const [
-							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status
-						] = row.cell;
-
-						return {
-							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status
-						}
-					})
-					.filter((item, index) => index <= pageSize - 1),
-					pagination: {
-						max: pageSize,
-						offset: pageSize * (legacyFormat.page - 1),
-						total: legacyFormat.records
-					},
-					status: 'success'
-			};
-
-			observer.next(result);
-			observer.complete();
-		});
 	}
 }

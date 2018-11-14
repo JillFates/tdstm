@@ -5,59 +5,42 @@
 			<div class="box-body box-with-empty-header">
 				<kendo-grid
 						[data]="gridData"
+						[filter]="state.filter"
+						[filterable]="true"
+						(filterChange)="filterChange($event)"
 						[sort]="state.sort"
-						[skip]="state.skip"
-						[pageSize]="state.take"
+						[skip]="skip"
 						[sortable]="{mode:'single'}"
+						[pageSize]="pageSize"
 						[resizable]="true"
-						[pageable]="{ pageSizes: maxOptions, info: true}"
-						(dataStateChange)="dataStateChange($event)"
+						(sortChange)="sortChange($event)"
+						[pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
+						(pageChange)="pageChange($event)"
+						(cellClick)="cellClick($event)"
 						[selectable]="true">
-
-					<!-- Select All column -->
-					<kendo-grid-column [width]="55" [filterable]="false">
-						<ng-template kendoGridHeaderTemplate>
-							<div>
-							</div>
-							<!--
-							<div class="row">
-								<div class="col-md-12 text-center">
-									<tds-checkbox name="assetsSelector"
-									              [hasThirdState]="true"
-									              (changeState)="onChangeBulkCheckbox($event)"
-									              id="assetSelector"
-									              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-								</div>
-							</div>
-							-->
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate let-dataItem>
-							<label class="selectall-checkbox-column text-center">
-								<input type="checkbox" />
-							</label>
-						</ng-template>
-					</kendo-grid-column>
 
 					<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
 					                   format="{{column.format}}"
 					                   [locked]="column.locked"
 					                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
 						<ng-template kendoGridHeaderTemplate>
 							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
+								<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
+							</div>
+						</ng-template>
+
+						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+							<div class="text-center">
+								<button class="btn btn-default" (click)="onEdit(dataItem)">
+									<span class="glyphicon glyphicon-pencil"></span>
+								</button>
+								<button class="btn btn-default" (click)="onDelete(dataItem)">
+									<span class="fa fa-fw fa-trash"></span>
+								</button>
 							</div>
 						</ng-template>
 					</kendo-grid-column>
-
-					<!-- Pagination Footer -->
-					<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
-						<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
-						<kendo-pager-next-buttons></kendo-pager-next-buttons>
-						<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
-						<kendo-pager-info></kendo-pager-info>
-					</ng-template>
-
 				</kendo-grid>
 			</div>
 		</div>

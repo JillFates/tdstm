@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
 import {BehaviorSubject} from 'rxjs';
+import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -20,12 +21,23 @@ import {tap, map, mergeMap} from 'rxjs/operators';
 })
 export class DependenciesListComponent implements OnInit {
 	protected gridStateSubject: BehaviorSubject<State>;
+	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	protected assets: any[];
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
-	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	public gridData: GridDataResult;
-	protected state: State;
+	protected state: State = {
+		sort: [{
+			dir: 'asc',
+			field: 'name'
+		}],
+		filter: {
+			filters: [],
+			logic: 'and'
+		}
+	};
+
 	constructor(
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
@@ -74,4 +86,47 @@ export class DependenciesListComponent implements OnInit {
 			skip: 0
 		}
 	}
+
+
+	onEdit(dataItem: any) {
+	}
+
+	onDelete(dataItem: any) {
+	}
+
+	clearValue(dataItem: any) {
+	}
+
+	onFilter(dataItem: any) {
+	}
+
+	protected filterChange(filter: CompositeFilterDescriptor): void {
+		this.state.filter = filter;
+		this.gridData = process(this.assets, this.state);
+	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.gridData = process(this.assets, this.state);
+	}
+
+	/**
+	 * Catch the Selected Row
+	 * @param {SelectionEvent} event
+	 */
+	protected cellClick(event: CellClickEvent): void {
+	}
+
+	/**
+	 * Manage Pagination
+	 * @param {PageChangeEvent} event
+	 */
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.state.take = event.take || this.state.take;
+		this.pageSize = this.state.take;
+		this.gridData = process(this.assets, this.state);
+	}
+
 }
