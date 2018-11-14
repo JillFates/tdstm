@@ -17,6 +17,7 @@ import {DependenciesListComponent} from './components/list/dependencies-list.com
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
+import {DependenciesService} from './service/dependencies.service';
 
 @NgModule({
 	imports: [
@@ -38,9 +39,10 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 	],
 	providers: [
 		// Resolve
-		ModuleResolveService
+		ModuleResolveService,
+		DependenciesService
 	],
-	exports: [],
+	exports: [DependenciesListComponent],
 	entryComponents: [
 	]
 })
