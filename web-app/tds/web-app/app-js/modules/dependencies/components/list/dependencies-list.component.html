@@ -3,21 +3,15 @@
 	<section>
 		<div *ngIf="dependenciesColumnModel">
 			<div class="box-body box-with-empty-header">
-				<!--(pageChange)="pageChange($event)"-->
 				<kendo-grid
 						[data]="gridData"
-						[filter]="state.filter"
-						[filterable]="true"
-						(filterChange)="filterChange($event)"
 						[sort]="state.sort"
-						[skip]="skip"
-						[sortable]="{mode:'single'}"
+						[skip]="state.skip"
 						[pageSize]="state.take"
+						[sortable]="{mode:'single'}"
 						[resizable]="true"
-						(sortChange)="sortChange($event)"
 						[pageable]="{ pageSizes: maxOptions, info: true}"
 						(dataStateChange)="dataStateChange($event)"
-						(cellClick)="cellClick($event)"
 						[selectable]="true">
 
 					<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
