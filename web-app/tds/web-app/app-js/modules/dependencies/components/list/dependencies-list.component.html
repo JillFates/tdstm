@@ -3,6 +3,7 @@
 	<section>
 		<div *ngIf="dependenciesColumnModel">
 			<div class="box-body box-with-empty-header">
+				<!--(pageChange)="pageChange($event)"-->
 				<kendo-grid
 						[data]="gridData"
 						[filter]="state.filter"
@@ -11,11 +12,11 @@
 						[sort]="state.sort"
 						[skip]="skip"
 						[sortable]="{mode:'single'}"
-						[pageSize]="pageSize"
+						[pageSize]="state.take"
 						[resizable]="true"
 						(sortChange)="sortChange($event)"
-						[pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
-						(pageChange)="pageChange($event)"
+						[pageable]="{ pageSizes: maxOptions, info: true}"
+						(dataStateChange)="dataStateChange($event)"
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 
@@ -41,6 +42,15 @@
 							</div>
 						</ng-template>
 					</kendo-grid-column>
+
+					<!-- Pagination Footer -->
+					<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+						<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+						<kendo-pager-next-buttons></kendo-pager-next-buttons>
+						<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
+						<kendo-pager-info></kendo-pager-info>
+					</ng-template>
+
 				</kendo-grid>
 			</div>
 		</div>
