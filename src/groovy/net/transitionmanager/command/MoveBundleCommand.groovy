@@ -1,0 +1,39 @@
+package net.transitionmanager.command
+
+import grails.validation.Validateable
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Room
+
+@Validateable
+class MoveBundleCommand implements CommandObject {
+
+	Long id
+	String name
+	String description
+	Date startTime                   // Time that the MoveBundle Tasks will begin
+	Date completionTime              // Planned Completion Time of the MoveBundle
+	Integer operationalOrder = 1     // Order that the bundles are performed in (NOT BEING USED)
+	MoveEvent moveEvent
+	String workflowCode
+	Boolean useForPlanning = true
+	Room sourceRoom
+	Room targetRoom
+	Boolean tasksCreated = false
+	Collection assets
+
+	static constraints = {
+		completionTime nullable: true
+		description nullable: true
+		moveEvent nullable: true
+		name blank: false, unique: ['project']
+		operationalOrder range: 1..25
+		sourceRoom nullable: true
+		startTime nullable: true
+		targetRoom nullable: true
+		tasksCreated nullable: true
+		workflowCode blank: false
+	}
+
+}
+
+

@@ -281,74 +281,9 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.BundleCreate)
-	def __save() {
-
-		def startTime = params.startTime
-		def completionTime = params.completionTime
-		if (startTime){
-			params.startTime = TimeUtil.parseDateTime(startTime)
-		}
-		if (completionTime){
-			params.completionTime = TimeUtil.parseDateTime(completionTime)
-		}
-
-		params.sourceRoom = Room.read(params.sourceRoom)
-		params.targetRoom = Room.read(params.targetRoom)
-
-		MoveBundle moveBundle = new MoveBundle(params)
-		Project project = securityService.userCurrentProject
-		def projectManager = params.projectManager
-		def moveManager = params.moveManager
-
-		moveBundle.useForPlanning = params.useForPlanning == 'true'
-
-		if (!moveBundle.hasErrors() && moveBundle.save()) {
-			if (projectManager){
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(projectManager), "PROJ_MGR")
-			}
-			if (moveManager) {
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(moveManager), "MOVE_MGR")
-			}
-
-			flash.message = "MoveBundle $moveBundle created"
-			redirect(action: "show", params: [id: moveBundle.id])
-			return
-		}
-
-		render(view: 'create',
-		       model: [moveBundleInstance: moveBundle, moveManager: moveManager, projectManager: projectManager,
-		               managers: partyRelationshipService.getProjectStaff(project.id), rooms: Room.findAllByProject(project),
-		               workflowCodes: stateEngineService.getWorkflowCode()])
-	}
-
-	@HasPermission(Permission.BundleCreate)
 	def save() {
-
-//		def startTime = params.startTime
-//		def completionTime = params.completionTime
-//		if (startTime){
-//			params.startTime = TimeUtil.parseDateTime(startTime)
-//		}
-//		if (completionTime){
-//			params.completionTime = TimeUtil.parseDateTime(completionTime)
-//		}
-//
-//		params.sourceRoom = Room.read(params.sourceRoom)
-//		params.targetRoom = Room.read(params.targetRoom)
-//
-//		MoveBundle moveBundle = new MoveBundle(params)
-//		Project project = securityService.userCurrentProject
-//		def projectManager = params.projectManager
-//		def moveManager = params.moveManager
-//
-//		moveBundle.useForPlanning = params.useForPlanning == 'true'
-
-		// -------
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
-
 
 		Project currentUserProject = controllerService.getProjectForPage(this)
 		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
@@ -379,24 +314,8 @@ class MoveBundleController implements ControllerMethods {
 			return
 
 		} catch (ServiceException e) {
-			flash.message = "Error creating MoveBundle"
+			flash.message = e.message
 		}
-
-
-//		if (!moveBundle.hasErrors() && moveBundle.save()) {
-//			if (projectManager){
-//				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-//						Party.load(projectManager), "PROJ_MGR")
-//			}
-//			if (moveManager) {
-//				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-//						Party.load(moveManager), "MOVE_MGR")
-//			}
-//
-//			flash.message = "MoveBundle $moveBundle created"
-//			redirect(action: "show", params: [id: moveBundle.id])
-//			return
-//		}
 
 		// in case of error saving new move bundle
 		render(view: 'create',

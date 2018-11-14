@@ -898,11 +898,23 @@ class MoveBundleService implements ServiceMethods {
 		session.SELECTED_TAG_IDS = tagIds ?: []
 	}
 
+	/**
+	 * Find move bundle by id
+	 * @param id - move bundle id
+	 * @param throwException - whether to throw an exception if move bundle is not found
+	 * @return
+	 */
 	MoveBundle findById(Long id, boolean throwException = false) {
 		Project currentProject = securityService.getUserCurrentProject()
 		return GormUtil.findInProject(currentProject, MoveBundle, id, throwException)
 	}
 
+	/**
+	 * Update a move bundle
+	 * @param id - move bundle id to update
+	 * @param command - move bundle command object
+	 * @return
+	 */
 	MoveBundle update(Long id, MoveBundleCommand command) {
 		MoveBundle moveBundle = findById(id, true)
 		command.populateDomain(moveBundle, false)
@@ -916,6 +928,11 @@ class MoveBundleService implements ServiceMethods {
 
 	}
 
+	/**
+	 * Save a new move bundle
+	 * @param command - move bundle command object
+	 * @return
+	 */
 	MoveBundle save(MoveBundleCommand command) {
 		MoveBundle moveBundle = new MoveBundle()
 		command.populateDomain(moveBundle, false)
