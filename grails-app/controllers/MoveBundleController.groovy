@@ -214,45 +214,49 @@ class MoveBundleController implements ControllerMethods {
 		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
 		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
 
-		try {
-			MoveBundle moveBundle = moveBundleService.update(id, command)
+		if (command.validate()) {
+			try {
+				MoveBundle moveBundle = moveBundleService.update(id, command)
 
-			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
-			boolean errorInSteps = false
-			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
-				def checkbox = params["checkbox_" + it.id]
-				if (checkbox == 'on') {
-					MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
-					if (step.hasErrors()) {
-						errorInSteps = true
-						return
-					}
-				} else {
-					def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
-					if (moveBundleStep) {
-						moveBundleService.deleteMoveBundleStep(moveBundleStep)
+				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
+				boolean errorInSteps = false
+				stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
+					def checkbox = params["checkbox_" + it.id]
+					if (checkbox == 'on') {
+						MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
+						if (step.hasErrors()) {
+							errorInSteps = true
+							return
+						}
+					} else {
+						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
+						if (moveBundleStep) {
+							moveBundleService.deleteMoveBundleStep(moveBundleStep)
+						}
 					}
 				}
-			}
 
-			if (errorInSteps) {
-				flash.message = "Validation error while adding steps."
+				if (errorInSteps) {
+					flash.message = "Validation error while adding steps."
+					redirect(action: "show", id: moveBundle.id)
+					return
+				}
+
+				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
+				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
+
+				flash.message = "MoveBundle $moveBundle updated"
 				redirect(action: "show", id: moveBundle.id)
 				return
+
+			} catch (EmptyResultException e) {
+				flash.message = "MoveBundle not found with id $params.id"
+				redirect(action: 'edit', id: params.id)
+			} catch (DomainUpdateException e) {
+				flash.message = "Error updating MoveBundle with id $params.id"
 			}
-
-			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
-			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
-
-			flash.message = "MoveBundle $moveBundle updated"
-			redirect(action: "show", id: moveBundle.id)
-			return
-
-		} catch (EmptyResultException e) {
-			flash.message = "MoveBundle not found with id $params.id"
-			redirect(action: 'edit', id: params.id)
-		} catch (DomainUpdateException e) {
-			flash.message = "Error updating MoveBundle with id $params.id"
+		} else {
+			flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.errorsAsUL(command)
 		}
 
 		// in case of error updating move bundle
@@ -297,24 +301,28 @@ class MoveBundleController implements ControllerMethods {
 		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
 		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
 
-		try {
-			MoveBundle moveBundle = moveBundleService.save(command)
+		if (command.validate()) {
+			try {
+				MoveBundle moveBundle = moveBundleService.save(command)
 
-			if (projectManagerId){
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(projectManager), "PROJ_MGR")
+				if (projectManagerId) {
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+							Party.load(projectManager), "PROJ_MGR")
+				}
+				if (moveManagerId) {
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+							Party.load(moveManager), "MOVE_MGR")
+				}
+
+				flash.message = "MoveBundle $moveBundle created"
+				redirect(action: "show", params: [id: moveBundle.id])
+				return
+
+			} catch (ServiceException e) {
+				flash.message = e.message
 			}
-			if (moveManagerId) {
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(moveManager), "MOVE_MGR")
-			}
-
-			flash.message = "MoveBundle $moveBundle created"
-			redirect(action: "show", params: [id: moveBundle.id])
-			return
-
-		} catch (ServiceException e) {
-			flash.message = e.message
+		} else {
+			flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.errorsAsUL(command)
 		}
 
 		// in case of error saving new move bundle
