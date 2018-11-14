@@ -780,19 +780,7 @@ class DataviewService implements ServiceMethods {
 		FieldSpec fieldSpec = column.fieldSpec
 
 		if(fieldSpec?.isCustom()){
-
-			switch (fieldSpec?.type) {
-				case 'Number':
-					property = "cast($property as long)"
-					break
-				case 'Decimal':
-					property = "cast($property as float)"
-					break
-				case 'Date':
-				case 'DateTime':
-					property = "cast($property as time)"
-					break
-			}
+			property = "cast($property as ${fieldSpec.getHibernateType()})"
 		}
 
 		return property
@@ -817,20 +805,7 @@ class DataviewService implements ServiceMethods {
 		FieldSpec fieldSpec = column.fieldSpec
 
 		if(fieldSpec?.isCustom()){
-
-			switch (fieldSpec.type) {
-				case 'Number':
-					type = Long
-					break
-				case 'Decimal':
-					type = BigDecimal
-					break
-				case 'Date':
-				case 'DateTime':
-					type = Date
-					break
-			}
-
+			type = fieldSpec.getClassType()
 		}
 
 		return type
