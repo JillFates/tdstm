@@ -11,7 +11,97 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 declare var jQuery: any;
 @Component({
 	selector: 'tds-date-range-selector',
-	templateUrl: '../tds/web-app/app-js/shared/components/date-range-selector/date-range-selector.component.html'
+	template: `
+        <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in date-range-selector-component" id="date-range-selector-component" data-backdrop="static" tabindex="0" role="dialog">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content" tds-ui-modal-decorator=""
+                     [options]="modalOptions">
+                    <div class="modal-header">
+                        <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">{{getTitle()}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-body-container">
+                            <form name="dateRangeSelectorForm" role="form" data-toggle="validator" #dateRangeSelectorForm='ngForm' class="form-horizontal left-alignment">
+                                <div>
+                                    <div class="times-container">
+                                        <div class="times-section">
+                                            <kendo-dateinput
+                                                    [disabled]="model.locked"
+                                                    (valueChange)="onDateChanged('start', $event)"
+                                                    [format]="getDateTimeFormat(model.start)"
+                                                    [(value)]="model.start"></kendo-dateinput>
+                                        </div>
+                                        <div class="times-section">
+                                            <kendo-dateinput
+                                                    (valueChange)="onDateChanged('end', $event)"
+                                                    [format]="getDateTimeFormat(model.end)"
+                                                    [(value)]="model.end"></kendo-dateinput>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <kendo-multiviewcalendar
+                                                [(activeRangeEnd)]="activeRangeEnd"
+                                                (selectionRangeChange)="handleSelectionRange($event)"
+                                                kendoDateRangeSelection [selectionRange]="model"></kendo-multiviewcalendar>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="duration-controls">
+                                        <div class="duration-value"><label>Estimated duration</label></div>
+                                        <div class="duration-value">
+                                            <input type="number"
+                                                   min="0"
+                                                   (change)="onChangeDuration('days')"
+                                                   [(ngModel)]="model.duration.days" name="durationDays" id="durationDays" >
+                                            <label class="label-part" for="durationDays">Days</label>
+                                        </div>
+                                        <div  class="duration-value">
+                                            <input type="number"
+                                                   min="0"
+                                                   (change)="onChangeDuration('hours')"
+                                                   [(ngModel)]="model.duration.hours" name="durationHours" id="durationHours" >
+                                            <label class="label-part" for="durationHours">Hours</label>
+                                        </div>
+                                        <div  class="duration-value">
+                                            <input type="number"
+                                                   min="0"
+                                                   (change)="onChangeDuration('minutes')"
+                                                   [(ngModel)]="model.duration.minutes" name="durationMinutes" id="durationMinutes" >
+                                            <label class="label-part" for="durationMinutes">Minutes</label>
+                                        </div>
+                                        <label data-toggle="popover"
+                                               data-trigger="hover"
+                                               class="duration-value label-part"
+                                               data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+                                            <i class="fa fa-fw  lock-state"
+                                               [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
+                                               (click)="model.locked = !model.locked">
+                                            </i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer form-group-center">
+                        <button type="button"
+                                [disabled]="!canSave()"
+                                class="btn btn-primary pull-left component-action-save" (click)="save()"><span
+                                class="fa fa-fw fa-floppy-o"></span> Save
+                        </button>
+                        <button type="button"
+                                class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
+                            <span class="glyphicon glyphicon-ban-circle"></span>
+                            <span>Cancel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+	`
 })
 export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnInit {
 	dataSignature: string;

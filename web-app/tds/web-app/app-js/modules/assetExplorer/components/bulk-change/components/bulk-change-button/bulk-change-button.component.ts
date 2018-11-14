@@ -6,7 +6,11 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 
 @Component({
 	selector: 'tds-bulk-change-button',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component.html',
+	template: `
+        <button type="button" (click)="onClick()" class="btn btn-default btnBulkChange pull-left" id="btnBulkChange" [disabled]="!enabled">
+            <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.TITLE' | translate}}
+        </button>
+	`,
 	providers: [TranslatePipe]
 })
 export class BulkChangeButtonComponent {

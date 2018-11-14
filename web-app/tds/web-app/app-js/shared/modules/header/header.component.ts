@@ -11,7 +11,27 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-header',
-	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
+	template: `
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <ng-container *ngIf="pageMetaData">
+                <h1>
+                    {{pageMetaData.title | translate}}
+                    <small>{{pageMetaData.instruction | translate}}</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}" >
+                        <a *ngIf="!last">{{(menu.text || menu) | translate}}</a>
+                        <ng-container *ngIf="last">
+                            {{ menu | translate }}
+                        </ng-container>
+                    </li>
+                </ol>
+            </ng-container>
+        </section>
+        <tds-ui-dialog></tds-ui-dialog>
+        <tds-ui-prompt></tds-ui-prompt>
+	`,
 	providers: [TranslatePipe],
 	styles: [`.font-weight-bold {
         font-weight: bold;
