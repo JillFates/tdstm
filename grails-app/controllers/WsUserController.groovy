@@ -50,22 +50,10 @@ class WsUserController implements ControllerMethods {
         }
         else {
             def prefArray = []
-            def labelMap = [CONSOLE_TEAM_TYPE: "Console Team Type", SUPER_CONSOLE_REFRESH: "Console Refresh Time",
-                            CART_TRACKING_REFRESH: "Cart tarcking Refresh Time", BULK_WARNING: "Bulk Warning",
-                            (PREF.DASHBOARD_REFRESH.value()): "Dashboard Refresh Time", (PREF.CURR_TZ.value()): "Time Zone",
-                            (PREF.CURR_POWER_TYPE.value()): "Power Type", (PREF.START_PAGE.value()): "Welcome Page",
-                            (PREF.STAFFING_ROLE.value()): "Default Project Staffing Role",
-                            (PREF.STAFFING_LOCATION.value()): "Default Project Staffing Location",
-                            (PREF.STAFFING_PHASES.value()): "Default Project Staffing Phase",
-                            (PREF.STAFFING_SCALE.value()): "Default Project Staffing Scale", preference: "Preference",
-                            (PREF.DRAGGABLE_RACK.value()): "Draggable Rack", PMO_COLUMN1: "PMO Column 1 Filter",
-                            PMO_COLUMN2: "PMO Column 2 Filter", PMO_COLUMN3: "PMO Column 3 Filter",
-                            PMO_COLUMN4: "PMO Column 4 Filter", (PREF.SHOW_ADD_ICONS.value()): "Rack Add Icons",
-                            MY_TASK: "My Task Refresh Time"]
 
             String currTimeZone = TimeUtil.defaultTimeZone
             String currDateTimeFormat = TimeUtil.getDefaultFormatType()
-
+            List<Map> test = userPreferenceService.getPreferences(null, [])
             def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
             for (pref in prefs) {
                 switch (pref.preferenceCode) {

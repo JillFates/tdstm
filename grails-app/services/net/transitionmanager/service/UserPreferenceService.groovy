@@ -178,6 +178,23 @@ class UserPreferenceService implements ServiceMethods {
 		return userPrefValue
 	}
 
+	@Transactional(readOnly=true)
+	List<Map> getPreferences(UserLogin userLogin = null, List<String> codeList) {
+		userLogin = resolve(userLogin)
+		def test = UserPreference.where {
+			userLogin == userLogin
+			if (codeList)
+				preferenceCode in codeList
+		}
+		.projections {
+			property 'preferenceCode'
+			property 'value'
+		}
+		.list(sort: 'preferenceCode', order: 'asc').resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+
+		return test
+	}
+
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
 	 * Note that if it is setting CURR_PROJ to a new value it will automatically call
