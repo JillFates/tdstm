@@ -37,7 +37,7 @@ class AssetService {
     Map getCreateModel(Project project, String assetClassName) {
         Map assetModel
         Map model = [:]
-        switch (assetClassName.toUpperCase()) {
+        switch (assetClassName?.toUpperCase()) {
 			case "APPLICATION":
 				assetModel = applicationService.getModelForCreate()
                 model.criticalityOptions = Application.CRITICALITY
@@ -53,7 +53,7 @@ class AssetService {
 				assetModel = storageService.getModelForCreate()
 				break
             default:
-                throw new InvalidParamException('Unsupported Asset Class type ' + asstClassName)
+                throw new InvalidParamException('Unsupported Asset Class type ' + (assetClassName ?: '(undefined)') )
 		}
 
         model.asset = assetModel.assetInstance
