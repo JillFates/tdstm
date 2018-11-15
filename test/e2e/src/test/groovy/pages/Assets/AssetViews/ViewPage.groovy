@@ -11,11 +11,14 @@ class ViewPage extends Page{
 
     static at = {
         waitFor {view.displayed}
+        createButton.displayed
+        exportViewButton.displayed
     }
     static content = {
         view (wait:true) { $("section","class":"page-asset-explorer-config")}
         sectionHeaderTitle { $("section.content-header h1")}
         clearBtn {$("button", id:"btnClear")}
+        createButton {$("button[type=button]", text: "Create")}
         bulkChangeButton {$('#btnBulkChange')}
         exportViewButton {$("button", id:"btnExport")}
         exportModalContainer {$('#tdsUiDialog')}
@@ -38,17 +41,17 @@ class ViewPage extends Page{
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
-        nameFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("input",type:"text")}
-        nameFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("span")}
-        assetClassFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("input",type:"text")}
-        assetClassFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("span")}
-        descriptionFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("input")}
-        descriptionFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("span.fa-times")}
-        environmentFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("input")}
-        environmentFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("span.fa-times")}
-        allFilterXIcons {$('td[kendogridfiltercell] span.fa-times')}
-        nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
-        descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
+        nameFilter {$('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetName")}
+        nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
+        assetClassFilter {$('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
+        assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
+        descriptionFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
+        descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
+        environmentFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
+        environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
+        allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
+        nameColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Name")).parent("a.k-link")}
+        descColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Description")).parent("a.k-link")}
         refreshBtn {$("div", class:"component-action-reload").find("span", class:"glyphicon-refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
@@ -57,6 +60,7 @@ class ViewPage extends Page{
         paginationSizes {$("kendo-pager-page-sizes select")}
         selectedAssets {$('.selected-assets')}
         gridHeader {$(".k-grid-header")}
+        editAssetButtons { $("button", title: "Edit Asset")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -89,6 +93,17 @@ class ViewPage extends Page{
 
     def openFirstAssetDisplayed(){
         waitFor{ assetNames[0].click() }
+    }
+
+    def clickOnEditButtonForFirstAssetDisplayed(){
+        waitFor{editAssetButtons[0].click()}
+    }
+
+    def openRandomAssetDisplayed(){
+        waitFor{ assetNames[0].displayed }
+        def asset = CommonActions.getRandomOption(assetNames)
+        commonsModule.goToElement asset
+        asset.click()
     }
 
     /**
@@ -432,6 +447,10 @@ class ViewPage extends Page{
         waitFor{noRecords.text() == text}
     }
 
+    def verifyRowsDisplayed(){
+        commonsModule.verifyElementDisplayed($(".asset-detail-name-column"))
+    }
+
     def addColumnByName(name){
         clickOnGear()
         createViewModule.clickSpecificCheckbox name
@@ -518,5 +537,9 @@ class ViewPage extends Page{
         goToBulkChangeButton()
         waitFor{firstElementAssetClass.displayed}
         firstElementAssetClass.text()
+    }
+
+    def clickOnCreateButton(){
+        createButton.click()
     }
 }

@@ -138,6 +138,7 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 				FROM AssetEntity AE
 
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
+				group by AE.id
 			'''.stripIndent()
 
 			hql.params == [project: project, assetClasses: [AssetClass.DEVICE]]

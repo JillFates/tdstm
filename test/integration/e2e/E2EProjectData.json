@@ -1,0 +1,212 @@
+{
+  // Projects [project_code max size 20 chars and make sure does not exist]
+  "e2eProjectData": { // Main E2E project, must be first.
+    "projectName": "E2E Project",
+    "projectCode": "e2eProject",
+    "projectDesc": "E2E Project for automation purposes",
+    "projectClient": "E2E Project",
+    "projectCompany": "E2E Project"
+  },
+  "projectToBeDeleted": { // Used by ProjectListCleanUpSpec
+    "projectName": "ProjectToBeDeleted",
+    "projectCode": "ToDelete",
+    "projectDesc": "E2E Project for automation purposes",
+    "projectClient": "E2E Project", // Make client main E2E project
+    "projectCompany": "E2E Project" // Make company main E2E project
+  },
+  // Companies
+  "companyToBeEdited": {
+    "name": "CompanytoBeEdited"
+  },
+  "companyToBeDeleted": {
+    "name": "CompanytoBeDeleted"
+  },
+  // Person and User
+  "userData1": { // Main E2E user test execution
+    "firstName": "Primary",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ],
+    "email": "e2e_test_user@e2e.com"
+  },
+  "userData2": { // Main E2E user test execution
+    "firstName": "Secondary",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ],
+    "email": "e2e_test_user2@e2e.com"
+  },
+  "userData3": { // Main E2E user test execution for Projects specs
+    "firstName": "Projects",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ],
+    "email": "e2e_projects_user@e2e.com"
+  },
+  "userData4": { // Main E2E user test execution
+    "firstName": "Login",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ],
+    "email": "login_e2e_test_user@e2e.com"
+  },
+  "staffFiltering": { // StaffSearchndFilteringSpec
+    "firstName": "StaffFirst",
+    "middleName": "Middle",
+    "lastName": "StaffLast",
+    "userName": "StaffTest",
+    "email": "staff@transitionaldata.com"
+  },
+  "userFiltering": { // UserSearchndFilteringSpec
+    "firstName": "userFirst",
+    "middleName": "userMiddle",
+    "lastName": "userLast",
+    "userName": "userTest",
+    "email": "user@transitionaldata.com",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ]
+  },
+  // Events
+  "eventName1": "Buildout", // Used in several specs to create and edit
+  "eventName2": "M1-Physical", // Used in several specs to create and edit
+  //Bundles
+  "bundleName1": "Buildout", // Used in several specs to create and edit
+  "bundleName2": "M1-Phy1", // Used in several specs to create and edit
+  // Providers, only name is required
+  "projectProvider": { // Used in several specs to create and edit
+    "name": "E2E Project Provider"
+  },
+  "providerToBeDeleted1": { // Used by ProviderDeletionSpec
+    "name": "ProviderToBeDeleted1"
+  },
+  "providerToBeDeleted2": { // Used by ProviderDeletionSpec
+    "name": "ProviderToBeDeleted2"
+  },
+  "providerToBeEdited": { // Used by ProviderEditionSpec
+    "name": "ProviderToBeEdited"
+  },
+  // ETL Scripts, only name is required
+  "etlToBeTransformedWithPastedData": { // Used by ETLScriptsDesignerTransformWithPastedDataSpec
+    "name": "Script To Transform With Pasted Data"
+  },
+  "etlToBeEdited": { // Used by ETLScriptsEditionSpec
+    "name": "etlToBeEdited"
+  },
+  "etlToBeSearched": { // Used by ETLScriptsListSpec
+    "name": "etlToBeSearched"
+  },
+  // Assets
+  "applications": { // will create bulk applications to use by All Assets specs
+    "name": "App",
+    "planStatus": "Confirmed",
+    "environment": "Production"
+  },
+  "applicationToBeEdited": {
+    "name": "AppToBeEdited",
+    "planStatus": "Confirmed",
+    "environment": "Production"
+  },
+  "applicationToBeDeleted": {
+    "name": "AppToBeDeleted",
+    "planStatus": "Confirmed",
+    "environment": "Production"
+  },
+  // Views
+  "customViews":{ // will create bulk views to use by ViewManager specs
+    "name": "View",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "commonViewSchema": {
+      "columns": [{
+        "domain": "common",
+        "edit": false,
+        "filter": "",
+        "label": "Name",
+        "locked": false,
+        "property": "assetName",
+        "width": 200
+      }],
+      "domains": ["common", "application"],
+      "sort": {
+        "domain": "common",
+        "order": "a",
+        "property": "assetName"
+      }
+  },
+  // Tags
+  "tagToBeEdited": {
+    "name": "TagToBeEdited",
+    "description": "",
+    "color": "White"
+  },
+  "tagToBeDeleted": {
+    "name": "TagToBeDeleted",
+    "description": "",
+    "color": "White"
+  },
+  "tagsForAssets": {
+    "name": "CustomTag",
+    "description": "",
+    "color": "White"
+  },
+  // Recipes
+  "recipePrincipal": "Principal Recipe",
+  "recipeToBeEdited": "RecipeToBeEdited",
+  "recipeToBeDeleted": "RecipeToBeDeleted",
+  "recipeTaskGeneration": "RecipeTaskGeneration",
+  "recipeHistory1": "RecipeHistory",
+  "recipeHistory2": "RecipeHistory_SourceCode",
+  // Recipe SourceCode
+  "commonRecipeSourceCode": "groups: [[name: 'QAE2E', filter: [class: 'application', asset: [planStatus: 'Confirmed']]]], tasks: [[id: 1100, filter: [group: 'QAE2E']]]",
+  // Tasks: for now Name is only required from E2E
+  "taskPrincipal": "Principal Task",
+  "taskToBeEdited": "TaskToBeEdited",
+  "taskToBeDeleted": "TaskToBeDeleted",
+  // Custom fields
+  "customFieldToBeDeleted1": {
+    "constraints": {
+      "required": 0
+    },
+    "control": "String",
+    "default":"ToBeDeleted",
+    "field": "",
+    "imp": "N",
+    "label": "ToBeDeleted",
+    "order": 180,
+    "shared": 0,
+    "show": 0,
+    "tip":"ToBeDeleted",
+    "udf": 1
+  },
+  "customFieldToBeDeleted2": {
+    "constraints": {
+      "required": 0
+    },
+    "control": "String",
+    "default":"ToBeDeleted",
+    "field": "",
+    "imp": "N",
+    "label": "ToBeDeleted",
+    "order": 180,
+    "shared": 0,
+    "show": 0,
+    "tip":"ToBeDeleted",
+    "udf": 1
+  }
+}

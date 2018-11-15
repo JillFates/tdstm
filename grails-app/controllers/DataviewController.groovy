@@ -61,14 +61,13 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	 * @param apiParamsCommand API params validated by a typicall
 	 */
 	@HasPermission(Permission.AssetView)
-	def data() {
+	def data(Long id) {
 
 		Project project = getProjectForWs()
 		DataviewApiParamsCommand apiParamsCommand = populateCommandObject(DataviewApiParamsCommand)
 
 		validateCommandObject(apiParamsCommand)
-
-		Dataview dataview = fetchDomain(Dataview, params)
+		Dataview dataview = dataviewService.fetch(id)
 
 		Map queryResult = dataviewService.query(project, dataview, apiParamsCommand)
 		renderSuccessJson(queryResult)

@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -25,7 +25,7 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class StorageCreateComponent extends AssetCommonEdit {
+	class StorageCreateComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -37,7 +37,11 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
+
+		ngOnInit() {
 			this.initModel();
+			this.focusControlByName('assetName');
 		}
 
 		/**
@@ -45,8 +49,8 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		 */
 		private initModel(): void {
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
-			this.model.asset.planStatus = this.model.planStatusOptions[0];
-			this.model.asset.environment = this.model.environmentOptions[0];
+			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
+			this.model.asset.validation =  this.defaultValidation;
 		}
 
 		/**

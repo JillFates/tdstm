@@ -285,8 +285,10 @@ class PersonServiceIntegrationTests extends Specification {
 		when:
 			Person person = personHelper.createPerson(adminPerson, project.client, null,
 				[lastName:'Buster', firstName:'Brock'],
-				['SYS_ADMIN', 'DB_ADMIN'],
-				['editor'])
+				['SYS_ADMIN', 'DB_ADMIN'], ['editor'])
+
+			personService.addToTeam(person, 'SYS_ADMIN')
+			personService.addToTeam(person, 'DB_ADMIN')
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
@@ -645,22 +647,19 @@ class PersonServiceIntegrationTests extends Specification {
 
 	def "16. Bulk Delete Persons Test"() {
 		when: 'creating a new person with a user account'
-		Person newPerson = personHelper.createPerson(adminPerson, project.client)
-		Long newPID = newPerson.id
-		UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
-		Long userId = user.id
-		Application app = assetHelper.createApplication(newPerson, project)
-		app.save(flush:true)
+			Person newPerson = personHelper.createPerson(adminPerson, project.client)
+			Long newPID = newPerson.id
+			Application app = assetHelper.createApplication(newPerson, project)
+			app.save(flush: true)
 
 		then: 'have valid ids'
-		userId != null
-		newPID != null
+			newPID != null
 
 		when: 'the person is deleted and all associations with the individual are removed'
-		Map result = personService.bulkDelete(adminPerson, [newPID], true)
-		app.refresh()
+			Map result = personService.bulkDelete(adminPerson, [newPID], true)
+			app.refresh()
 		then: 'deleted count should greater than zero'
-		result['deleted'] == 1
+			result['deleted'] == 1
 	}
 
 
@@ -732,5 +731,14 @@ class PersonServiceIntegrationTests extends Specification {
 		def test = personService.processMergePersonRequest(toUser, new PersonCO(), params)
 		then: 'the From UserLogin should be switched to the To Person'
         test == "John Jeffrey Doe was merged to Jane Mary Doe"
+	}
+
+	// Used to convert a person object into a map used by the PersonService
+	private Map personToNameMap(Person p) {
+		[first: p.firstName, middle: p.middleName, last: p.lastName]
+	}
+
+	private Map emptyNameMap() {
+		[first: '', middle: '', last: '']
 	}
 }

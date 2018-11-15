@@ -1,8 +1,8 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
-import com.tdsops.etl.ETLBaseSpec
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
@@ -10,12 +10,10 @@ import com.tdsops.etl.FindOperator
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.etl.QueryResult
 import com.tdsops.etl.TDSExcelDriver
-import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.WorkbookUtil
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
-import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -38,7 +36,7 @@ import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
 @TestFor (ScriptProcessorService)
 @TestMixin (ControllerUnitTestMixin)
-@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
+@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
 class ScriptProcessorServiceSpec extends Specification {
 
 	String sixRowsDataSetFileName
@@ -133,12 +131,12 @@ class ScriptProcessorServiceSpec extends Specification {
 				!validSyntax
 				errors.size() == 1
 				with(errors[0]) {
-					startLine == 2
-					endLine == 2
-					startColumn == 10
-					endColumn == 11
+					startLine == 4
+					endLine == 4
+					startColumn == 1
+					endColumn == 2
 					fatal
-					message == 'unexpected token:  @ line 2, column 10.'
+					message == 'unexpected token:  @ line 4, column 1.'
 				}
 			}
 	}
@@ -203,7 +201,7 @@ class ScriptProcessorServiceSpec extends Specification {
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -218,7 +216,7 @@ class ScriptProcessorServiceSpec extends Specification {
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -251,6 +249,67 @@ class ScriptProcessorServiceSpec extends Specification {
 						!find.query
 					}
 				}
+			}
+	}
+
+	void 'test can test a script content can have blank lines at the top without failing the line number in error messages'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """
+application id,vendor name,technology,location
+152254,Microsoft,(xlsx updated),ACME Data Center
+152255,Mozilla,NGM,ACME Data Center""".stripIndent())
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and:
+			String script = """
+			
+			
+			// Make sure to include the above blank lines
+			skip 1
+			read labels
+			domain Application
+			iterate {
+				extract 'vendor name' set nameVar
+				extract 'vendor name' set nameVar
+			}
+            """.stripIndent()
+
+		when: 'Service executes the script with incorrect syntax'
+			Map<String, ?> result = service.testScript(
+				GMDEMO,
+				script,
+				fileSystemService.getTemporaryFullFilename(fileName)
+			)
+
+		then: 'Service result has validSyntax equals false and a list of errors'
+			with(result) {
+				!validSyntax
+				with(error) {
+					startLine == 10
+					endLine == 10
+					startColumn == null
+					endColumn == null
+					fatal
+					message == "Invalid variable name specified for 'set' command. Variable names must end in 'Var' and can not be reassigned within iterate loop. at line 10"
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -324,7 +383,7 @@ application id,vendor name,technology,location
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -339,7 +398,7 @@ application id,vendor name,technology,location
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -375,7 +434,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			if (fileName){
+			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
@@ -426,9 +485,16 @@ application id,vendor name,technology,location
 		then: 'Service result has validSyntax equals false and a list of errors'
 			with(result) {
 				!isValid
-				error == 'No such property: Unknown'
 				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
 				!data.domains
+				with(error){
+					message == 'No such property: Unknown at line 5'
+					startLine == 5
+					endLine  == 5
+					startColumn == null
+					endColumn == null
+					fatal == true
+				}
 			}
 	}
 
@@ -502,7 +568,7 @@ application id,vendor name,technology,location
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -517,7 +583,7 @@ application id,vendor name,technology,location
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						assertQueryResult (
+						assertQueryResult(
 							find.query[0],
 							ETLDomain.Application,
 							[
@@ -562,7 +628,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			if (outputFilename){
+			if (outputFilename) {
 				fileSystemService.deleteTemporaryFile(outputFilename)
 			}
 
@@ -572,86 +638,86 @@ application id,vendor name,technology,location
 		(AssetClass.APPLICATION.toString()): [
 			fields: [
 				[constraints: [required: 0],
-					"control": "Number",
-					"default": "",
-					"field": "id",
-					"imp": "U",
-					"label": "Id",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "Number",
+				 "default"  : "",
+				 "field"    : "id",
+				 "imp"      : "U",
+				 "label"    : "Id",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				],
 				[constraints: [required: 0],
-					"control": "String",
-					"default": "",
-					"field": "appVendor",
-					"imp": "N",
-					"label": "Vendor",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "String",
+				 "default"  : "",
+				 "field"    : "appVendor",
+				 "imp"      : "N",
+				 "label"    : "Vendor",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				],
 				[constraints: [required: 0],
-					"control": "String",
-					"default": "",
-					"field": "environment",
-					"imp": "N",
-					"label": "Environment",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "String",
+				 "default"  : "",
+				 "field"    : "environment",
+				 "imp"      : "N",
+				 "label"    : "Environment",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				],
 				[constraints: [required: 0],
-					"control": "String",
-					"default": "",
-					"field": "location",
-					"imp": "N",
-					"label": "Location",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "String",
+				 "default"  : "",
+				 "field"    : "location",
+				 "imp"      : "N",
+				 "label"    : "Location",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				]
 			]
 		],
-		(AssetClass.DEVICE.toString()): [
+		(AssetClass.DEVICE.toString())     : [
 			fields: [
 				[constraints: [required: 0],
-					"control": "Number",
-					"default": "",
-					"field": "id",
-					"imp": "U",
-					"label": "Id",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "Number",
+				 "default"  : "",
+				 "field"    : "id",
+				 "imp"      : "U",
+				 "label"    : "Id",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				],
 				[constraints: [required: 0],
-					"control": "String",
-					"default": "",
-					"field": "location",
-					"imp": "N",
-					"label": "Location",
-					"order": 0,
-					"shared": 0,
-					"show": 0,
-					"tip": "",
-					"udf": 0
+				 "control"  : "String",
+				 "default"  : "",
+				 "field"    : "location",
+				 "imp"      : "N",
+				 "label"    : "Location",
+				 "order"    : 0,
+				 "shared"   : 0,
+				 "show"     : 0,
+				 "tip"      : "",
+				 "udf"      : 0
 				]
 			]
 		],
-		(AssetClass.STORAGE.toString()): [fields: []],
-		(AssetClass.DATABASE.toString()): [fields: []],
-		(CustomDomainService.COMMON): [fields: []]
+		(AssetClass.STORAGE.toString())    : [fields: []],
+		(AssetClass.DATABASE.toString())   : [fields: []],
+		(CustomDomainService.COMMON)       : [fields: []]
 	]
 
 	/**
@@ -690,7 +756,7 @@ application id,vendor name,technology,location
 	 * @param domain
 	 * @param values
 	 */
-	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values){
+	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
 		queryResult.criteria.eachWithIndex { Map map, int i ->
 			assert map['propertyName'] == values[i][0]

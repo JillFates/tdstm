@@ -166,7 +166,7 @@
 		<g:if test="${preLoginList && preLoginList.size() > 0}">
 			<g:each var="notice" in="${preLoginList}">
 				<div class="callout pre-login-message">
-					${notice.htmlText}
+					${raw( notice.htmlText )}
 				</div>
 			</g:each>
 		</g:if>

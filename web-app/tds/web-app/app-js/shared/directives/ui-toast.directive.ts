@@ -12,7 +12,28 @@ import {KEYSTROKE} from '../model/constants';
 
 @Component({
 	selector: 'tds-ui-toast',
-	templateUrl: '../tds/web-app/app-js/shared/directives/ui-toast.directive.html'
+	template: `
+        <div class="message-wrapper">
+            <div class="message-wrapper-container" *ngIf="showsPopUp">
+                <div class="alert alert-danger alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.DANGER">
+                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fa fa-ban"></i>{{alertModel.message}}</h5>
+                </div>
+                <div class="alert alert-warning alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.WARNING">
+                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fa fa-warning"></i>{{alertModel.message}}</h5>
+                </div>
+                <div class="alert alert-success alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.SUCCESS">
+                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fa fa-check"></i>{{alertModel.message}}</h5>
+                </div>
+                <div class="alert alert-info alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.INFO">
+                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fa fa-info"></i>{{alertModel.message}}</h5>
+                </div>
+            </div>
+        </div>
+	`
 })
 
 export class UIToastDirective {

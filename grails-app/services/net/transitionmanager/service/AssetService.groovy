@@ -1,16 +1,175 @@
 package net.transitionmanager.service
 
+import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
+import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.asset.AssetFacade
+import grails.transaction.Transactional
+
 
 class AssetService {
 
-    def customDomainService
-    def securityService
+    // DO NOT ADD AssetEntityService due to circular references of services
+    ApplicationService applicationService
+    AssetOptionsService assetOptionsService
+    CustomDomainService customDomainService
+    DatabaseService DatabaseService
+    DeviceService DeviceService
+    SecurityService securityService
+    StorageService storageService
+
+    /**
+     * Used to return a Map that contains all of the details of the asset and the Options that will be used in the SELECT controls for the Asset CREATE/EDIT
+     * @param assetClassName - the name of the asset class
+     * @return Map of the asset default values and all of the select control options
+     */
+	@Transactional(readOnly = true)
+    Map getCreateModel(Project project, String assetClassName) {
+        Map assetModel
+        Map model = [:]
+        switch (assetClassName?.toUpperCase()) {
+			case "APPLICATION":
+				assetModel = applicationService.getModelForCreate()
+                model.criticalityOptions = Application.CRITICALITY
+				break
+			case "DATABASE":
+				assetModel = databaseService.getModelForCreate()
+				break
+			case "DEVICE":
+				assetModel = deviceService.getModelForCreate()
+                model << DeviceUtils.deviceModelOptions(project)
+				break
+			case "STORAGE":
+				assetModel = storageService.getModelForCreate()
+				break
+            default:
+                throw new InvalidParamException('Unsupported Asset Class type ' + (assetClassName ?: '(undefined)') )
+		}
+
+        model.asset = assetModel.assetInstance
+
+        // Set the defaults for the custom fields based on the field specs
+        for (spec in assetModel.customs) {
+            model.asset[spec.field] = spec.default
+        }
+
+        model << commonModelOptions(project)
+
+        return model
+    }
+
+    /**
+     * Used to return a Map that contains all of the details of the asset and the Options that will be used in the SELECT controls for the Asset CREATE/EDIT
+     * NOTE that this is not yet used but should be filling in for WsAssetController.getModel
+     * @param assetClassName - the name of the asset class
+     * @return Map of the asset default values and all of the select control options
+     */
+	@Transactional(readOnly = true)
+    Map getEditModel(Project project, AssetEntity asset) {
+        Map model = [:]
+
+        model << commonModelOptions(project)
+
+        return model
+    }
+
+    /**
+     * Generates the List<Map> objects that represent the Select Options that are common for all asset classes
+     * @param project - the user's current project
+     * @return Map of the various option lists
+     */
+	@Transactional(readOnly = true)
+    Map commonModelOptions(Project project) {
+        [
+            environmentOptions : getAssetEnvironmentOptions(),
+            planStatusOptions : getAssetPlanStatusOptions(),
+            validationOptions : ValidationType.list,
+            dataFlowFreq : AssetDependency.constraints.dataFlowFreq.inList,
+            moveBundleList : getMoveBundleOptions(project),
+            dependencyMap : dependencyCreateMap(project)
+        ]
+    }
+
+	/**
+	 * Return the map of information for show/create dependencies.
+	 * @param project
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyCreateMap(Project project) {
+		return [
+            assetClassOptions: AssetClass.classOptions,
+            dependencyStatus: getDependencyStatusOptions(),
+            dependencyType: getDependencyTypeOptions(),
+            moveBundleList: getMoveBundleOptions(project),
+            nonNetworkTypes: AssetType.nonNetworkTypes,
+		]
+	}
+
+    /**
+     * Used to return the list of MoveBundle Options use in a Select control
+     * @param project - the user's current project
+     * @return a List of maps consisting of id and name for the bundles
+     */
+	@Transactional(readOnly = true)
+    List<Map> getMoveBundleOptions(Project project) {
+        GormUtil.listDomainForProperties(project, MoveBundle, ['id','name'], [['name']])
+    }
+
+	/**
+	 * Asset Environment options
+	 * @return the values
+	 */
+	@Transactional(readOnly = true)
+	List<String> getAssetEnvironmentOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+	}
+
+	/**
+	 * Asset Status options
+	 * @return the values
+	 */
+	@Transactional(readOnly = true)
+	List<String> getAssetPlanStatusOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+	}
+
+	/**
+	 * The types used to assign to AssetDependency.type
+	 * @return the values
+	 */
+	@Transactional(readOnly = true)
+	List<String> getDependencyTypeOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+	}
+
+	/**
+	 * Asset Priority Options.
+	 * @return the values
+	 */
+	@Transactional(readOnly = true)
+	List<String> getAssetPriorityOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+	}
+
+	/**
+	 * The valid values that can be assigned to AssetDependency.status
+	 * @return the values
+	 */
+	@Transactional(readOnly = true)
+	List<String> getDependencyStatusOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+	}
 
     /**
      * Used to set default values for custom fields on the given asset
