@@ -10,7 +10,12 @@ import grails.converters.JSON
 import groovy.transform.TypeCheckingMode
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 
@@ -25,6 +30,7 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 
 @Slf4j
 @GrailsCompileStatic(TypeCheckingMode.SKIP)
+// @GrailsCompileStatic
 class UserPreferenceService implements ServiceMethods {
 
 	/*
@@ -142,6 +148,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param defaultIfNotSet	default value in case that is not set
 	 * @return the value of a preference if found or the defaultIfNotSet value
 	 */
+	@GrailsCompileStatic
 	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null) {
 		def userPrefValue
 
@@ -237,7 +244,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin - the user for which to retrieve their preferences
      * @return Success Structure with preferences property containing List<Map>
      */
-	// @GrailsCompileStatic
+	@GrailsCompileStatic
 	@Transactional(readOnly=true)
     List<Map> preferenceListForEdit(UserLogin userLogin) {
 		List<Map> preferences = []
@@ -258,81 +265,37 @@ class UserPreferenceService implements ServiceMethods {
 		preferences = preferences.sort { a, b -> a.label.toLowerCase() <=> b.label.toLowerCase() }
 
 		// Closure that will be reused in the following for loop
-		def setValueToReferenceName = { Class domainClass, Map preference ->
-			Object record = domainClass.read(pref.value)
+		Closure setValueToReferenceName = { Class domainClass, Map preferenceArg ->
+			Object record = domainClass.read(preferenceArg.value)
 			if (record) {
-				pref.value = record.toString()
+				preferenceArg.value = record.toString() + " (${preferenceArg.value})"
 			}
 		}
 
+		// Transform the value of the preferences that reference domains to display the name of the domain
+		// instead of the ID to improve the user experience.
 		for (pref in preferences) {
-			switch (pref.code) {
+			switch (PREF.valueOfNameOrValue(pref.code)) {
 				case PREF.MOVE_EVENT:
 					setValueToReferenceName(MoveEvent.class, pref)
 					break
+				case PREF.MOVE_BUNDLE:
+				case PREF.CURR_BUNDLE:
+					setValueToReferenceName(MoveBundle.class, pref)
+					break
 				case PREF.CURR_PROJ:
 					setValueToReferenceName(Project.class, pref)
+					break
+				case PREF.PARTY_GROUP:
+					setValueToReferenceName(PartyGroup.class, pref)
+					break
+				case PREF.CURR_ROOM:
+					setValueToReferenceName(Room.class, pref)
 					break
 			}
 		}
 
 		return preferences
-		/*
-		def preferences = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
-		for (pref in preferences) {
-			switch (pref.preferenceCode) {
-				case PREF.MOVE_EVENT.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Event / " + MoveEvent.get(pref.value).name]
-					break
-
-				case PREF.CURR_PROJ.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Project / " + Project.get(pref.value).name]
-					break
-
-				case PREF.CURR_BUNDLE.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Bundle / " + MoveBundle.get(pref.value).name]
-					break
-
-				case PREF.PARTY_GROUP.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Company / " + (!pref.value.equalsIgnoreCase("All") ?
-							PartyGroup.get(pref.value).name : 'All')]
-					break
-
-				case PREF.CURR_ROOM.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Room / " + Room.get(pref.value).roomName]
-					break
-
-				case PREF.STAFFING_ROLE.value():
-					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefArray << [prefCode:pref.preferenceCode, value:"Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)]
-					break
-
-				case PREF.AUDIT_VIEW.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefArray << [prefCode:pref.preferenceCode, value:"Room Audit View / " + value]
-					break
-
-				case PREF.JUST_REMAINING.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefArray << [prefCode:pref.preferenceCode, value:"Just Remaining Check / " + value]
-					break
-
-				// This doesn't make any sense - variable is set but never used
-				case PREF.CURR_DT_FORMAT:
-					currDateTimeFormat = pref.value
-					break
-
-				// This doesn't make any sense - variable is set but never used
-				case PREF.CURR_TZ:
-					currTimeZone = pref.value
-					break
-
-				default:
-					prefArray << [prefCode:pref.preferenceCode, value:(labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value]
-					break
-			}
-        }
-		*/
 	}
 
 	/**
