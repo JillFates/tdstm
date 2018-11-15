@@ -14,28 +14,21 @@ export class UserService {
 
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
-	private userPreferenceUrl = '../ws/user';
+	private userPreferenceUrl = this.baseURL + '/ws/user';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
 	}
 
-	getUserPreferences() {
-		return this.http.get(`${this.userPreferenceUrl}/preferences`)
+	/**
+	 * Used to retrieve all of the model data that will be used by the component
+	 */
+	fetchComponentModel() {
+		return this.http.get(`${this.userPreferenceUrl}/preferencesForEdit`)
 			.map((res: Response) => {
 				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
-				return providerModels;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getPerson() {
-		return this.http.get(`${this.userPreferenceUrl}/person`)
-			.map((res: Response) => {
-				let result = res.json();
-				let person = result && result.status === 'success' && result.data;
-				return person;
+				let data = result && result.status === 'success' && result.data;
+				return data;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -50,7 +43,7 @@ export class UserService {
 	}
 
 	resetPreferences() {
-		return this.http.delete(`${this.userPreferenceUrl}/preferences`, null)
+		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

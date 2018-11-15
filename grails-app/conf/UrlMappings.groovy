@@ -422,17 +422,27 @@ class UrlMappings {
 			action = [GET: "getUser"]
 		}
 
+		"/ws/user/preferencesForEdit" {
+			controller = "wsUser"
+			action = [ GET: "preferencesForEdit" ]
+		}
+
+		"/ws/user/resetPreferences" {
+			controller = "wsUser"
+			action = [ DELETE: "resetPreferences" ]
+		}
+
 		"/ws/user/preferences/$id?" {
 			controller = "wsUser"
-			action = [GET:"preferences",
-					  DELETE: "removePreference"]
+			action = [	GET:"preferences",
+						DELETE: "removePreference"]
 		}
 
 		"/ws/user/preference/$id?" {
 			controller = "wsUser"
-			action = [GET:"preferences",
-					  POST:"savePreference",
-					  DELETE: "removePreference"]
+			action = [	GET:"preferences",
+						POST:"savePreference",
+						DELETE: "removePreference"]
 		}
 
 		"/ws/user/person" {

@@ -41,75 +41,38 @@ class WsUserController implements ControllerMethods {
 	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserGeneralAccess)
 	def preferences(String id) {
-        if(id) {
-            def data = [:]
-            for (String preferenceCode in id?.toString()?.split(',')) {
-				data[preferenceCode] = userPreferenceService.getPreference(preferenceCode)
-			}
-			renderSuccessJson(preferences: data)
-        }
-        else {
-            def prefArray = []
-
-            String currTimeZone = TimeUtil.defaultTimeZone
-            String currDateTimeFormat = TimeUtil.getDefaultFormatType()
-            List<Map> test = userPreferenceService.getPreferences(null, [])
-            def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
-            for (pref in prefs) {
-                switch (pref.preferenceCode) {
-                    case PREF.MOVE_EVENT.value():
-                        prefArray << [prefCode:pref.preferenceCode, value:"Event / " + MoveEvent.get(pref.value).name]
-                        break
-
-                    case PREF.CURR_PROJ.value():
-                        prefArray << [prefCode:pref.preferenceCode, value:"Project / " + Project.get(pref.value).name]
-                        break
-
-                    case PREF.CURR_BUNDLE.value():
-                        prefArray << [prefCode:pref.preferenceCode, value:"Bundle / " + MoveBundle.get(pref.value).name]
-                        break
-
-                    case PREF.PARTY_GROUP.value():
-                        prefArray << [prefCode:pref.preferenceCode, value:"Company / " + (!pref.value.equalsIgnoreCase("All") ?
-                                PartyGroup.get(pref.value).name : 'All')]
-                        break
-
-                    case PREF.CURR_ROOM.value():
-                        prefArray << [prefCode:pref.preferenceCode, value:"Room / " + Room.get(pref.value).roomName]
-                        break
-
-                    case PREF.STAFFING_ROLE.value():
-                        def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-                        prefArray << [prefCode:pref.preferenceCode, value:"Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)]
-                        break
-
-                    case PREF.AUDIT_VIEW.value():
-                        def value = pref.value == "0" ? "False" : "True"
-                        prefArray << [prefCode:pref.preferenceCode, value:"Room Audit View / " + value]
-                        break
-
-                    case PREF.JUST_REMAINING.value():
-                        def value = pref.value == "0" ? "False" : "True"
-                        prefArray << [prefCode:pref.preferenceCode, value:"Just Remaining Check / " + value]
-                        break
-
-                    case PREF.CURR_DT_FORMAT:
-                        currDateTimeFormat = pref.value
-                        break
-
-                    case PREF.CURR_TZ:
-                        currTimeZone = pref.value
-                        break
-
-                    default:
-                        prefArray << [prefCode:pref.preferenceCode, value:(labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value]
-                        break
-                }
-            }
-
-            renderSuccessJson(prefMap: prefArray)
-        }
+        UserLogin userLogin = currentPerson().userLogin
+        Map preferences = userPreferenceService.getPreferences(userLogin, id)
+    	renderSuccessJson(preferences: preferences)
 	}
+
+    /**
+     * Used by the User Preference Edit dialog. This will return a List<Map> where the map will
+     * consist of the following:
+     *    code - the Preference Code
+     *    label - the human readable name of the code
+     *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
+     * @return Success Structure with preferences property containing List<Map>
+     */
+    def preferencesForEdit() {
+        Person person = currentPerson()
+        UserLogin userLogin = person.userLogin
+        List<Map> preferences = userPreferenceService.preferenceEditList(userLogin)
+        Map model = [
+            fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
+            person: [firstName: person.firstName],
+            preferences: preferences
+        ]
+    	renderSuccessJson(model)
+    }
+
+    /**
+     * Used to reset all preferences of a user
+     */
+    def resetPreferences() {
+        userPreferenceService.resetPreferences()
+        renderSuccessJson()
+    }
 
 	/**
 	 * Sets a user preference through an AJAX call
@@ -136,7 +99,7 @@ class WsUserController implements ControllerMethods {
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def removePreference(String id) {
-		userPreferenceService.removePreference(null, id)
+		userPreferenceService.removePreference(id)
 		renderSuccessJson()
 	}
 }

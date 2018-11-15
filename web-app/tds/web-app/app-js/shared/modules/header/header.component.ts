@@ -62,6 +62,7 @@ export class HeaderComponent {
 			}
 		);
 
+		// TODO : TM-13098 Jorge - what is going on with this?  This is null some times and blows up
 		jQuery('.menu-parent-tasks > a')[0].onclick = null;
 
 		this.headerListeners();
