@@ -422,9 +422,9 @@ class UrlMappings {
 			action = [GET: "getUser"]
 		}
 
-		"/ws/user/preferencesForEdit" {
+		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
-			action = [ GET: "preferencesForEdit" ]
+			action = [ GET: "modelForPreferenceManager" ]
 		}
 
 		"/ws/user/resetPreferences" {

@@ -54,14 +54,14 @@ class WsUserController implements ControllerMethods {
      *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
      * @return Success Structure with preferences property containing List<Map>
      */
-    def preferencesForEdit() {
+    def modelForPreferenceManager() {
         Person person = currentPerson()
         UserLogin userLogin = person.userLogin
-        List<Map> preferences = userPreferenceService.preferenceEditList(userLogin)
+
         Map model = [
             fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
             person: [firstName: person.firstName],
-            preferences: preferences
+            preferences: userPreferenceService.preferenceListForEdit(userLogin)
         ]
     	renderSuccessJson(model)
     }

@@ -781,20 +781,16 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.UserGeneralAccess)
 	def editPreference() {
         UserLogin userLogin = currentPerson().userLogin
-        List<Map> preferences = userPreferenceService.preferenceEditList(userLogin)
-
-		String currTimeZone = TimeUtil.defaultTimeZone
-		String currDateTimeFormat = TimeUtil.getDefaultFormatType()
 
 		render(
 			template: "showPreference",
 		    model: [
 				areas: userPreferenceService.timezonePickerAreas(),
-				currTimeZone: currTimeZone,
-				currDateTimeFormat: currDateTimeFormat,
+				currTimeZone: TimeUtil.defaultTimeZone,
+				currDateTimeFormat: TimeUtil.getDefaultFormatType(),
 				currentPersonId: securityService.currentPersonId,
 				fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
-				preferences: preferences,
+				preferences: userPreferenceService.preferenceListForEdit(userLogin),
 				timezones: Timezone.findAll()
 			]
 		)
