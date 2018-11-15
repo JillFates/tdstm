@@ -14,7 +14,7 @@ import java.sql.Timestamp
  *       "show": 1,
  *       "tip": "",
  *       "udf": 1,
- *{*       "constraint: {*         "maxRange": 100,
+ *{* "constraint: {* "maxRange": 100,
  *         "minRange": 0,
  *         "precision": 2,
  *         "separator": true,
@@ -69,14 +69,13 @@ class FieldSpec {
 
 	/**
 	 * <pre>
-	 * 	"constraints": {
-	 * 		"maxRange": 100,
+	 * 	"constraints": {* 		"maxRange": 100,
 	 *      "minRange": 0,
 	 *      "precision": 2,
 	 *      "separator": true,
 	 *      "allowNegative": true,
 	 *      "required": 0
-	 * },
+	 *},
 	 *  </pre>
 	 * @return
 	 */
