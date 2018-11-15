@@ -14,25 +14,38 @@
 						(dataStateChange)="dataStateChange($event)"
 						[selectable]="true">
 
+					<!-- Select All column -->
+					<kendo-grid-column [width]="55" [filterable]="false">
+						<ng-template kendoGridHeaderTemplate>
+							<div>
+							</div>
+							<!--
+							<div class="row">
+								<div class="col-md-12 text-center">
+									<tds-checkbox name="assetsSelector"
+									              [hasThirdState]="true"
+									              (changeState)="onChangeBulkCheckbox($event)"
+									              id="assetSelector"
+									              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+								</div>
+							</div>
+							-->
+						</ng-template>
+
+						<ng-template kendoGridCellTemplate let-dataItem>
+							<label class="selectall-checkbox-column text-center">
+								<input type="checkbox" />
+							</label>
+						</ng-template>
+					</kendo-grid-column>
+
 					<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
 					                   format="{{column.format}}"
 					                   [locked]="column.locked"
 					                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
 						<ng-template kendoGridHeaderTemplate>
 							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-							<div class="text-center">
-								<button class="btn btn-default" (click)="onEdit(dataItem)">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button class="btn btn-default" (click)="onDelete(dataItem)">
-									<span class="fa fa-fw fa-trash"></span>
-								</button>
+								<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
 							</div>
 						</ng-template>
 					</kendo-grid-column>
