@@ -51,7 +51,7 @@
 						</li>
 					</ul>
 				</div>
-				<tds-bulk-change-button [bulkData]="bulkData"
+				<tds-bulk-change-button #tdsBulkChangeButton
 				                        [enabled]="hasSelectedItems()"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
