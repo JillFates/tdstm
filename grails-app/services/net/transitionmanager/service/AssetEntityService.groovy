@@ -2898,12 +2898,12 @@ class AssetEntityService implements ServiceMethods {
 
 		return [
 			assetClassOptions: AssetClass.classOptions,
-			dependentAssets: getDependentsOrSupporting(asset, true),
+			dependentAssets: getDependentsOrSupporting(asset.id ? asset : null, true),
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			moveBundleList: getMoveBundles(project),
 			nonNetworkTypes: AssetType.nonNetworkTypes,
-			supportAssets: getDependentsOrSupporting(asset, false)
+			supportAssets: getDependentsOrSupporting(asset.id ? asset : null, false)
 		]
 	}
 
