@@ -24,7 +24,7 @@ export class UserService {
 	 * Used to retrieve all of the model data that will be used by the component
 	 */
 	fetchComponentModel() {
-		return this.http.get(`${this.userPreferenceUrl}/preferencesForEdit`)
+		return this.http.get(`${this.userPreferenceUrl}/modelForPreferenceManager`)
 			.map((res: Response) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
