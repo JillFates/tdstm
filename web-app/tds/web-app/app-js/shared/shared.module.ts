@@ -11,6 +11,7 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
+
 // Shared Services
 import { PreferenceService } from '../shared/services/preference.service';
 import { NotifierService } from '../shared/services/notifier.service';
