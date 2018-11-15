@@ -9,7 +9,13 @@ import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
 	selector: 'tds-app',
-	templateUrl: '../tds/web-app/app-js/app/tds-app.component.html',
+	template: `
+        <tds-ui-loader></tds-ui-loader>
+        <tds-ui-toast></tds-ui-toast>
+
+        <tds-header></tds-header>
+        <router-outlet></router-outlet>
+	`,
 })
 
 export class TDSAppComponent implements OnInit {

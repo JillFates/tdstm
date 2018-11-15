@@ -346,15 +346,6 @@ class UserLoginController implements ControllerMethods {
 
 	}
 
-	/*======================================================
-	 *  Update recent page load time into userLogin
-	 *=====================================================*/
-	@HasPermission(Permission.UserGeneralAccess)
-	def updateLastPageLoad() {
-		userPreferenceService.updateLastPageLoad(params.url)
-		render "SUCCESS"
-	}
-
 	/**
 	 * The 1st phase of user changing password during the forced password change process
 	 */
@@ -373,7 +364,6 @@ class UserLoginController implements ControllerMethods {
 		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
 		UserLogin userLogin = securityService.userLogin
 		try {
-
 			securityService.updatePassword(userLogin, command)
 			flash.message = "Password was successfully updated"
 			redirect(controller: 'project', action: 'show', params: [userLoginInstance: userLogin])

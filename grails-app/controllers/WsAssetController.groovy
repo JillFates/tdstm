@@ -4,13 +4,13 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
@@ -367,29 +367,28 @@ class WsAssetController implements ControllerMethods {
 			return
 		}
 
-		AssetEntity asset = fetchDomain(AssetEntity, params)
-		if (asset) {
-			Map model = [
-				asset: asset
-			]
-			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
-            // prepare value names as well (needed for UI)
-            if (model.asset.manufacturer) {
-                model.manufacturerName = model.asset.manufacturer.name;
-            }
-            if (model.asset.model) {
-                model.modelName = model.asset.model.modelName;
-            }
-			if (mode == 'show') {
-				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
-			} else {
-				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
-				// Required for Supports On and Depends On
-				model.dependencyMap = assetEntityService.dependencyEditMap(asset.project, asset)
-				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
-			}
-			renderAsJson(model)
+		Map model = [
+			asset: fetchDomain(AssetEntity, params)
+		]
+
+		if (model.asset.manufacturer) {
+			model.manufacturerName = model.asset.manufacturer.name;
 		}
+
+		if (model.asset.model) {
+			model.modelName = model.asset.model.modelName;
+		}
+
+
+
+		String domainName = AssetClass.getDomainForAssetType(model.asset.assetClass.toString())
+		if (mode == 'show') {
+			model << assetEntityService.getCommonModelForShows(domainName, model.asset.project, params)
+		} else {
+			model << assetEntityService.getDefaultModelForEdits(domainName, model.asset.project, model.asset, params)
+		}
+
+		renderAsJson(model)
 	}
 
 	/**
@@ -399,40 +398,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getDefaultCreateModel(String assetClass) {
-		Project project = securityService.getUserCurrentProject()
-        Map model = [:]
-		Map asset = [:]
-
-		switch (assetClass) {
-			case "APPLICATION":
-				asset << applicationService.getModelForCreate(params)
-				break
-			case "DEVICE":
-				asset << deviceService.getModelForCreate(params)
-				break
-			case "STORAGE":
-				asset << storageService.getModelForCreate(params)
-				break
-			case "DATABASE":
-				asset << databaseService.getModelForCreate(params)
-				break
-		}
-		// Set the default values on the custom properties
-		assetService.setCustomDefaultValues(asset['assetInstance'])
-		model.asset = asset['assetInstance']
-
-        // Required for Supports On and Depends On
-        model.dependencyMap = assetEntityService.dependencyCreateMap(project)
-        model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
-        model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
-        model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
-        model.validationOptions = ValidationType.list
-        if (assetClass == AssetClass.DEVICE.toString()) {
-            model << assetEntityService.getCommontDeviceMapForCreateEdit(project, null)
-        } else if (assetClass == AssetClass.APPLICATION.toString()) {
-            model.criticalityOptions = Application.CRITICALITY
-        }
-		renderAsJson(model)
+		renderAsJson( assetService.getCreateModel(getProjectForWs(), assetClass) )
 	}
 
 	/**
@@ -442,9 +408,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.BundleView)
 	def retrieveBundleChange() {
-		// Fetch the information for this request.
 		BundleChangeCommand command = populateCommandObject(BundleChangeCommand)
-
 		Project project = getProjectForWs()
 
 		// The id of the bundle retrieve from the asset in the dependency (if such dependency exists).
@@ -474,7 +438,7 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to delete one or more assets for the current project 
+	 * Used to delete one or more assets for the current project
 	 * @params ids - a list of asset id numbers
 	 * @return JSON Success response with data.message with results
 	 */
@@ -538,7 +502,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetCreate)
 	def retrieveChassisSelectOptions(Long id) {
 		Project project = getProjectForWs()
-		List chassisOptions = assetEntityService.getChassisSelectOptions(project, id)
+		List chassisOptions = DeviceUtils.getChassisSelectOptions(project, id)
 		renderSuccessJson(chassisOptions)
 	}
 
@@ -550,7 +514,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetCreate)
 	def retrieveRackSelectOptions(Long id) {
 		Project project = getProjectForWs()
-		List rackOptions = assetEntityService.getRackSelectOptions(project, id, true)
+		List rackOptions = DeviceUtils.getRackSelectOptions(project, id, true)
 		renderSuccessJson(rackOptions)
 	}
 

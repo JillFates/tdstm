@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
@@ -29,7 +30,7 @@ import spock.util.mop.ConfineMetaClassChanges
  * </ul>
  */
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model, AssetOptions])
 class ETLFindSpec extends ETLBaseSpec {
 
 	String assetDependencyDataSetContent

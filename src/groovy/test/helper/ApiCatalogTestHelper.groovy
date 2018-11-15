@@ -115,12 +115,6 @@ class ApiCatalogTestHelper {
           {
             "key": "value"
           }
-        ],
-        "params_no_replacement": [
-          "a",
-          "b",
-          "z",
-          "aa"
         ]
       },
       {

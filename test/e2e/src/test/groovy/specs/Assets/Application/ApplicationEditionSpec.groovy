@@ -2,10 +2,10 @@ package specs.Assets.Application
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Assets.Application.ApplicationCreationPage
-import pages.Assets.Application.ApplicationDetailsPage
-import pages.Assets.Application.ApplicationEditionPage
-import pages.Assets.Application.ApplicationListPage
+import pages.Assets.AssetViews.AssetCreatePage
+import pages.Assets.AssetViews.AssetDetailsPage
+import pages.Assets.AssetViews.AssetEditPage
+import pages.Assets.AssetViews.ViewPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
@@ -56,12 +56,12 @@ class ApplicationEditionSpec extends GebReportingSpec {
         login()
         at MenuPage
         waitFor { assetsModule.goToApplications() }
-        at ApplicationListPage
+        at ViewPage
         clickOnCreateButton()
-        at ApplicationCreationPage
+        at AssetCreatePage
         createApplication appDataMap
-        at ApplicationDetailsPage
-        closeDetailsModal()
+        at AssetDetailsPage
+        clickOnCloseButton()
     }
 
     def setup() {
@@ -81,215 +81,212 @@ class ApplicationEditionSpec extends GebReportingSpec {
             assetsModule.goToApplications()
 
         then: 'Application list should be displayed'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User searches by the App Name already created'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appNameOld
-
-        then: 'That App should be shown'
-            commonsModule.waitForLoadingMessage()
-            waitFor{alFirstAppName.text().trim() == appNameOld}
-        when: 'The User clicks on that Application'
-            waitFor{alFirstAppName.click()}
+            filterByName appNameOld
+        and: 'The User clicks on that Application'
+            openFirstAssetDisplayed()
 
         then: 'The Application should be displayed'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
     }
 
-    def "2. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
+    def "2. Using the Edit and Cancel Buttons on the Application Modal Windows"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Details Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The User clicks the "Edit" Button'
-            waitFor {adModalEditBtn.click()}
+            waitFor {editButton.click()}
 
         then: 'The Option to edit every Option should be displayed'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User clicks the "Cancel" Button'
-            aeModalCancelBtn.click()
+            clickOnCloseButton()
 
         then: 'The User should be redirected to the Application List Page'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "3. Using the Edit Button on the Application List section, right on the Left"() {
         testKey = "TM-8492"
         given: 'The User is on the Application List Page'
-         at ApplicationListPage
+            at ViewPage
         when: 'The User searches by the App Name already created'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appNameOld
-
-        then: 'That App should be shown'
-            commonsModule.waitForLoadingMessage()
-            waitFor{alFirstAppName.text().trim() == appNameOld}
-        when: 'The User clicks on the "Edit" Button right on the left'
-            waitFor{alFirstAppEdit.click()}
+            filterByName appNameOld
+        and: 'The User clicks on the "Edit" Button right on the left'
+            clickOnEditButtonForFirstAssetDisplayed()
 
         then: 'The Option to edit every Option should be displayed'
-            at ApplicationEditionPage
+            at AssetEditPage
     }
 
     def "4. Edit Application - Changing Names and Static dropdowns"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User changes the App Name, description, Bundle and Status values'
             aeModalAppName = appName
             aeModalDescription = appDesc
-            aeModalBundleSelector.click()
-            waitFor { aeModalBundleSelector.find("option", text: appBundle).first().click() }
-            aeModalPlanStatusSelector.click()
-            waitFor { aeModalPlanStatusSelector.find("option", text: appStatus).first().click() }
+            aeModalBundleArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==appBundle}.click() }
+            aeModalPlanStatusArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==appStatus}.click() }
 
         then: 'Every value should be accordingly changed'
             aeModalAppName.value() == appName
             aeModalDescription.value() == appDesc
-            aeModalBundleSelector.find("option", value:aeModalBundleSelector.value()).text() == appBundle
-            aeModalPlanStatusSelector.find("option", value:aeModalPlanStatusSelector.value()).text() == appStatus
+            aeModalBundleValue.text() == appBundle
+            aeModalPlanStatusValue.text() == appStatus
     }
 
     def "5. Edit Application - Changing dynamic Dropdowns"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User changes the App SME1, SME2, appOwner values'
-            aeModalSME1Selector.click()
+            aeModalSME1Arrow.click()
             waitFor { aeModalSelectorValues.size() > 2 }
-            appSME1 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-            aeModalSelectorValues.find("div", role: "option", text: appSME1).first().click()
-            aeModalSME2Selector.click()
+            def selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            appSME1 = selector.text()
+            selector.click()
+            aeModalSME2Arrow.click()
             waitFor { aeModalSelectorValues.size() > 2 }
-            appSME2 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-            aeModalSelectorValues.find("div", role: "option", text: appSME2).first().click()
-            aeModalAppOwnerSelector.click()
+            selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            appSME2 = selector.text()
+            selector.click()
+            aeModalAppOwnerArrow.click()
             waitFor { aeModalSelectorValues.size() > 2 }
-            appOwner = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-            aeModalSelectorValues.find("div", role: "option", text: appOwner).first().click()
+            selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            appOwner = selector.text()
+            selector.click()
 
         then: 'Every value should be accordingly changed'
-            at ApplicationEditionPage
-            aeModalSME1Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME1
-            aeModalSME2Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME2
-            aeModalAppOwnerSelector.find("span",id: startsWith("select2-chosen")).text().trim() == appOwner
+            at AssetEditPage
+            aeModalSME1Value.text().trim() == appSME1
+            aeModalSME2Value.text().trim() == appSME2
+            aeModalAppOwnerValue.text().trim() == appOwner
     }
 
     def "6. Edit Application - Adding Support Dependencies"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User clicks the "Support" Button'
+            commonsModule.goToElement(updateButton) // avoid element not found
             aeModalAddSuppBtn.click()
 
         then: 'A New Layout containing different Options should be displayed'
-            waitFor { aeModalSuppColTitles[0].text().trim() == "Frequency" }
-            aeModalSuppColTitles[1].text().trim() == "Class"
-            aeModalSuppColTitles[2].text().trim() == "Name"
-            aeModalSuppColTitles[3].text().trim() == "Bundle"
-            aeModalSuppColTitles[4].text().trim() == "Type"
-            aeModalSuppColTitles[5].text().trim() == "Status"
+            waitFor { aeModalSuppColTitles[1].text().trim() == "Frequency" }
+            aeModalSuppColTitles[2].text().trim() == "Class"
+            aeModalSuppColTitles[3].text().trim() == "Name"
+            aeModalSuppColTitles[4].text().trim() == "Bundle"
+            aeModalSuppColTitles[5].text().trim() == "Type"
+            aeModalSuppColTitles[6].text().trim() == "Status"
             aeModalSuppList.size() > 0
         when: 'The User completes information related to Frequency, Calls, Name, Bundle, Type and Status'
-            aeModalSuppFreqSelector.click()
-            waitFor { aeModalSuppFreqSelector.find("option", text: suppFreq).first().click() }
-            aeModalSuppClassSelector.click()
-            waitFor { aeModalSuppClassSelector.find("option", text: suppClass).first().click() }
-            aeModalSuppNameSelector.click()
+            aeModalSuppFreqArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==suppFreq}.click() }
+            aeModalSuppClassArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==suppClass}.click() }
+            aeModalSuppNameArrow.click()
+            commonsModule.waitForLoader(2) // assets list is loaded
             waitFor { aeModalSelectorValues.size() > 2 }
-            suppName = aeModalSelectorValues[Math.abs(new Random().nextInt() % (aeModalSelectorValues.size()))].text()
-            waitFor { aeModalSelectorValues.find("div", role: "option", text: suppName).first().click() }
-            aeModalSuppBundleSelector.click()
-            waitFor { aeModalSuppBundleSelector.find("option", text: suppBundle).first().click() }
-            aeModalSuppTypeSelector.click()
-            waitFor { aeModalSuppTypeSelector.find("option", text: suppType).first().click() }
-            aeModalSuppStatusSelector.click()
-            waitFor { aeModalSuppStatusSelector.find("option", text: suppStatus).first().click() }
+            def selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            suppName = selector.text()
+            selector.click()
+            commonsModule.waitForLoader(1) // bundle associated to asset is loaded
+            aeModalSuppBundleArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==suppBundle}.click() }
+            aeModalSuppTypeArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==suppType}.click() }
+            aeModalSuppStatusArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==suppStatus}.click() }
 
         then: 'Every value should be accordingly added'
-            aeModalSuppFreqSelector.find("option", value: aeModalSuppFreqSelector.value()).text().trim() == suppFreq
-            aeModalSuppClassSelector.find("option", value: aeModalSuppClassSelector.value()).text().trim() == suppClass
-            aeModalSuppNameSelector.find("span", id: startsWith("select2-chosen")).text().trim() == suppName
-            aeModalSuppBundleSelector.find("option", value: aeModalSuppBundleSelector.value()).text().trim() == suppBundle
-            aeModalSuppTypeSelector.find("option", value: aeModalSuppTypeSelector.value()).text().trim() == suppType
-            aeModalSuppStatusSelector.find("option", value: aeModalSuppStatusSelector.value()).text().trim() == suppStatus
+            aeModalSuppFreqValue.text().trim() == suppFreq
+            aeModalSuppClassValue.text().trim() == suppClass
+            aeModalSuppNameValue.value() == suppName
+            aeModalSuppBundleValue.text().trim() == suppBundle
+            aeModalSuppTypeValue.text().trim() == suppType
+            aeModalSuppStatusValue.text().trim() == suppStatus
     }
 
     def "7. Edit Application - Adding Dependencies"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User clicks the "Dependency" Button'
             aeModalAddIsDepBtn.click()
 
         then: 'A New Layout containing different Options should be displayed'
-            waitFor {aeModalIsDepColTitles[0].text().trim() == "Frequency"}
-            aeModalIsDepColTitles[1].text().trim() == "Class"
-            aeModalIsDepColTitles[2].text().trim() == "Name"
-            aeModalIsDepColTitles[3].text().trim() == "Bundle"
-            aeModalIsDepColTitles[4].text().trim() == "Type"
-            aeModalIsDepColTitles[5].text().trim() == "Status"
+            waitFor {aeModalIsDepColTitles[1].text().trim() == "Frequency"}
+            aeModalIsDepColTitles[2].text().trim() == "Class"
+            aeModalIsDepColTitles[3].text().trim() == "Name"
+            aeModalIsDepColTitles[4].text().trim() == "Bundle"
+            aeModalIsDepColTitles[5].text().trim() == "Type"
+            aeModalIsDepColTitles[6].text().trim() == "Status"
             aeModalIsDepList.size() > 0
         when: 'The User completes information related to Frequency, Calls, Name, Bundle, Type and Status'
-            aeModalIsDepFreqSelector.click()
-            waitFor { aeModalIsDepFreqSelector.find("option", text: isDepFreq).first().click() }
-            aeModalIsDepClassSelector.click()
-            waitFor { aeModalIsDepClassSelector.find("option", text: isDepClass).first().click() }
-            aeModalIsDepNameSelector.click()
+            aeModalIsDepFreqArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==isDepFreq}.click() }
+            aeModalIsDepClassArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==isDepClass}.click() }
+            aeModalIsDepNameArrow.click()
+            commonsModule.waitForLoader(2) // assets list is loaded
             waitFor { aeModalSelectorValues.size() > 2 }
-            isDepName = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()))].text()
-            waitFor { aeModalSelectorValues.find("div", role: "option", text: isDepName).first().click() }
-            aeModalIsDepBundleSelector.click()
-            waitFor { aeModalIsDepBundleSelector.find("option", text: isDepBundle).first().click() }
-            aeModalIsDepTypeSelector.click()
-            waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
-            aeModalIsDepStatusSelector.click()
-            isDepStatus = CommonActions.getRandomOption(aeModalIsDepStatusSelector.find("option")).text()
-            waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).click() }
+            def selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            isDepName = selector.text()
+            selector.click()
+            commonsModule.waitForLoader(1) // bundle associated to asset is loaded
+            aeModalIsDepBundleArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==isDepBundle}.click() }
+            aeModalIsDepTypeArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==isDepType}.click() }
+            aeModalIsDepStatusArrow.click()
+            waitFor { aeModalSelectorValues.find{it.text()==isDepStatus}.click() }
 
         then: 'Every value should be accordingly added'
-            aeModalIsDepFreqSelector.find("option", value:aeModalIsDepFreqSelector.value()).text().trim() == isDepFreq
-            aeModalIsDepClassSelector.find("option", value:aeModalIsDepClassSelector.value()).text().trim() == isDepClass
-            aeModalIsDepNameSelector.find("span",id: startsWith("select2-chosen")).text().trim() == isDepName
-            aeModalIsDepBundleSelector.find("option", value:aeModalIsDepBundleSelector.value()).text().trim() == isDepBundle
-            aeModalIsDepTypeSelector.find("option", value:aeModalIsDepTypeSelector.value()).text().trim() == isDepType
-            aeModalIsDepStatusSelector.find("option", value:aeModalIsDepStatusSelector.value()).text().trim() == isDepStatus
+            aeModalIsDepFreqValue.text().trim() == isDepFreq
+            aeModalIsDepClassValue.text().trim() == isDepClass
+            aeModalIsDepNameValue.value() == isDepName
+            aeModalIsDepBundleValue.text().trim() == isDepBundle
+            aeModalIsDepTypeValue.text().trim() == isDepType
+            aeModalIsDepStatusValue.text().trim() == isDepStatus
     }
 
     def "8. Edit Application - Save Changes and close modal"() {
         testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User clicks the "Update" Button'
-            waitFor { aeModalUpdateBtn.click() }
+            clickOnUpdateButton()
 
         then: 'The User should be redirected to the Application Details Pop-Up'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The User clicks the "Close" Button'
-            waitFor { adModalCloseBtn.click() }
+            clickOnCloseButton()
 
         then: 'The User should be redirected to the Application List Section'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "9. Filter edited Application on List"() {
         testKey = "TM-8492"
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User searches by the Application already edited'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appName
-            waitFor{alFirstAppName.text().trim() == appName}
+            filterByName(appName)
         and: 'The User clicks on that Application'
-            waitFor{alFirstAppName.click()}
+            openFirstAssetDisplayed()
 
         then: 'The User should be redirected to the Application Details Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
     }
 
     def "10. Validate Application Details"() {
         testKey = "TM-8492"
         when: 'The User is on the Application Details Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
 
         then: 'New AppName, SME1, SME2 and AppOwner values should be displayed'
             // TODO following items are located by array instead of itself because cannot be identified

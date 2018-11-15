@@ -8,17 +8,25 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.ManufacturerSync
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ModelConnector
+import net.transitionmanager.domain.ModelSync
+import net.transitionmanager.domain.ModelSyncBatch
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 class ModelService implements ServiceMethods {
 
@@ -36,7 +44,7 @@ class ModelService implements ServiceMethods {
 	 * @return : updated assetCount
 	 */
 	@Transactional
-	def mergeModel(Model fromModel, Model toModel){
+	def merge(Model fromModel, Model toModel){
 		//	Revise Asset, and any other records that may point to this model
 		int assetUpdated = 0 // assetUpdated flag to count the assets updated by merging models .
 
@@ -83,18 +91,6 @@ class ModelService implements ServiceMethods {
 			//toModel.findOrCreateAliasByName(fromModel.modelName, true)
 			findOrCreateAliasByName(toModel, fromModel.modelName, true)
 
-
-			String principal = securityService.currentUsername
-			if (principal) {
-				def user = UserLogin.findByUsername(principal)
-				def person = user.person
-				int bonusScore = person.modelScoreBonus ?: 0
-				if (user) {
-					person.modelScoreBonus = bonusScore+10
-					person.modelScore = person.modelScoreBonus + person.modelScore
-					person.save(flush:true)
-				}
-			}
 			/**/
 		} else {
 			//	Delete model record
@@ -493,14 +489,6 @@ class ModelService implements ServiceMethods {
 				ModelAlias.executeUpdate('delete ModelAlias where model.id = :modelId', [modelId: model.id])
 				model.delete(flush: true)
 
-				// <SL> Could this be a function?
-				if (user) {
-					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus : 0
-					person.modelScoreBonus = bonusScore + 1
-					int score = person.modelScore ?: 0
-					person.modelScore = score+bonusScore
-				}
-
 				if (!person.save(flush:true)) {
 					person.errors.allErrors.each { log.error it }
 				}
@@ -532,4 +520,42 @@ class ModelService implements ServiceMethods {
 		alias
 	}
 
+    /**
+     * Merge a list of Models referenced by {@code fromIds} to the target Model referenced by {@code toId}.
+	 * It also receives a {@code toModelProperties} param, containing new property values entered by the user
+	 * in the merge process to be saved in the resulting Model (this may however have no new values to save).
+	 *
+     * @param fromIds  The list of Model ids of the Models to be merged in the target model.
+     * @param toId  The id of the target Model where everything will be merged into.
+     * @param toModelProperties  The list of modified properties to be saved into the target Model,
+     * in case the user wants to modify any values before merging.
+     * @return  A Map with the process result:
+	 * 				{@code toModel}  The resulting merged Model instance. If the process failed, this contains the validation errors
+	 * 				{@code mergedModels}  The list of Models that were merged into {@code toModel}
+	 * 				{@code assetsUpdated}  The number of assets that were updated in the process
+     */
+    Map mergeModels(List fromIds, Long toId, toModelProperties) {
+        Model toModel = Model.get(toId)
+        if (!toModel) {
+            throw new ServiceException("ModelService.mergeModels() - No Model found with id $toId")
+        }
+        if (!fromIds) {
+            throw new ServiceException('ModelService.mergeModels() - fromIds list cannot be empty')
+        }
+        List mergedModels = []
+        String msg = ""
+        int assetsUpdated = 0
+        //Saving toModel before merge
+        toModel.properties = toModelProperties
+        if (!toModel.save(flush:true)) {
+            toModel.errors.allErrors.each {println it }
+        } else {
+			fromIds.each {
+				def fromModel = Model.get(it)
+				assetsUpdated += merge(fromModel, toModel)
+				mergedModels << fromModel
+			}
+		}
+        return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
+    }
 }

@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
@@ -22,6 +23,7 @@ import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.bulk.change.BulkChangeTag
+import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
 import net.transitionmanager.domain.MoveEvent
@@ -51,6 +53,7 @@ class MoveBundleService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	TagService tagService
 	AssetOptionsService assetOptionsService
+	SecurityService securityService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
@@ -894,5 +897,53 @@ class MoveBundleService implements ServiceMethods {
 
 		session.ASSIGN_BUNDLE = moveBundle
 		session.SELECTED_TAG_IDS = tagIds ?: []
+	}
+
+	/**
+	 * Find move bundle by id
+	 * @param id - move bundle id
+	 * @param throwException - whether to throw an exception if move bundle is not found
+	 * @return
+	 */
+	MoveBundle findById(Long id, boolean throwException = false) {
+		Project currentProject = securityService.getUserCurrentProject()
+		return GormUtil.findInProject(currentProject, MoveBundle, id, throwException)
+	}
+
+	/**
+	 * Update a move bundle
+	 * @param id - move bundle id to update
+	 * @param command - move bundle command object
+	 * @return
+	 */
+	MoveBundle update(Long id, MoveBundleCommand command) {
+		MoveBundle moveBundle = findById(id, true)
+		command.populateDomain(moveBundle, false)
+
+		if (!moveBundle.hasErrors() && moveBundle.save()) {
+			return moveBundle
+		}
+
+		logger.info("Error updating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
+		throw new DomainUpdateException("Error updating MoveBundle.")
+
+	}
+
+	/**
+	 * Save a new move bundle
+	 * @param command - move bundle command object
+	 * @return
+	 */
+	MoveBundle save(MoveBundleCommand command) {
+		MoveBundle moveBundle = new MoveBundle()
+		command.populateDomain(moveBundle, false)
+		moveBundle.project = securityService.getUserCurrentProject()
+
+		if (!moveBundle.hasErrors() && moveBundle.save()) {
+			return moveBundle
+		}
+
+		logger.info("Error creating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
+		throw new ServiceException("Error creating MoveBundle.")
 	}
 }

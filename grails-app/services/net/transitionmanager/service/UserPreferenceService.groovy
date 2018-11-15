@@ -471,16 +471,6 @@ class UserPreferenceService implements ServiceMethods {
 		JSON.parse(ExportUtil.getResource('templates/timezone/world_map_areas.json').inputStream.text)
 	}
 
-	@Transactional
-	def updateLastPageLoad(String url) {
-		UserLogin userLogin = securityService.userLogin
-		if (userLogin) {
-			userLogin.lastPage = TimeUtil.nowGMT()
-			userLogin.save(flush: true)
-			session.REDIRECT_URL = url
-		}
-	}
-
 	/**
 	 * Used to load the current user's UserLogin object if not already loaded
 	 * @param userLogin - the reference to the UserLogin object that can be null
