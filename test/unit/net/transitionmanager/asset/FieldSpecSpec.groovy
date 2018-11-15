@@ -1,9 +1,9 @@
 package net.transitionmanager.asset
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class FieldSpecSpec extends Specification {
-
 
 	void 'test if a field spec is custom'() {
 
@@ -29,12 +29,15 @@ class FieldSpecSpec extends Specification {
 			new FieldSpec(fieldSpecMap).isCustom() == isCustom
 
 		where:
-			control  | field       | label             || isCustom
-			'String' | 'assetName' | 'Name'            || false
-			'Number' | 'custom10' || 'My Cutsom Field' || true
+			control    | field       | label             || isCustom
+			'String'   | 'assetName' | 'Name'            || false
+			'Number'   | 'custom10' || 'My Cutsom Field' || true
+			'Date'     | 'custom10' || 'My Cutsom Field' || true
+			'DateTime' | 'custom10' || 'My Cutsom Field' || true
 	}
 
-	void 'test can determine hibernate type for a custom field spec'() {
+	@Unroll
+	void 'test can return hibernate type for a custom field spec with control #control'() {
 
 		setup: 'a field spec definition from database'
 			Map fieldSpecMap = [
@@ -63,8 +66,12 @@ class FieldSpecSpec extends Specification {
 			new FieldSpec(fieldSpecMap).getHibernateType() == hibernateType
 
 		where:
-			control  | field       | label             | precision | separator | allowNegative || hibernateType
-			'String' | 'assetName' | 'Name'            | null      | false     | false         || 'string'
-			'Number' | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || 'long'
+			control    | field       | label             | precision | separator | allowNegative || hibernateType
+			'String'   | 'assetName' | 'Name'            | null      | false     | false         || ''
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || 'big_decimal'
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || 'long'
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'long'
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'date'
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'timestamp'
 	}
 }

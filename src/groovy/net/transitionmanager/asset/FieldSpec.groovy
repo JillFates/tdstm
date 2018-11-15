@@ -46,12 +46,12 @@ class FieldSpec {
 		this.field = fieldSpecMap.field
 		this.label = fieldSpecMap.label
 
-		this.max = fieldSpecMap.max
-		this.min = fieldSpecMap.min
-		this.precision = fieldSpecMap.precision
-		this.separator = fieldSpecMap.separator
-		this.allowNegative = fieldSpecMap.allowNegative
-		this.required = fieldSpecMap.required
+		this.max = fieldSpecMap.constraints.max
+		this.min = fieldSpecMap.constraints.min
+		this.precision = fieldSpecMap.constraints.precision
+		this.separator = fieldSpecMap.constraints.separator
+		this.allowNegative = fieldSpecMap.constraints.allowNegative
+		this.required = fieldSpecMap.constraints.required
 	}
 
 	/**
@@ -81,7 +81,7 @@ class FieldSpec {
 	 */
 	String buildNumericHibernateType() {
 		if (separator && precision) {
-			return 'big_decimal'
+			return 'float'
 		} else {
 			return 'long'
 		}
@@ -89,7 +89,7 @@ class FieldSpec {
 
 	Class<?> buildNumericClass() {
 		if (separator && precision) {
-			return BigDecimal
+			return Float
 		} else {
 			return Long
 		}
@@ -255,6 +255,9 @@ class FieldSpec {
 			case 'DateTime':
 				hibernateType = 'timestamp'
 				break
+			case 'String':
+				hibernateType = ''
+				break
 		}
 
 		return hibernateType
@@ -274,6 +277,9 @@ class FieldSpec {
 				break
 			case 'DateTime':
 				classType = Timestamp
+				break
+			case 'String':
+				classType = String
 				break
 		}
 
