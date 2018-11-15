@@ -43,7 +43,6 @@ export class BulkChangeButtonComponent {
 		}
 	}
 
-
 	showBulkActions() {
 		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.selectedAssets, affected: this.selectedItems.length };
 

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
 import {BehaviorSubject} from 'rxjs';
@@ -16,12 +16,14 @@ import {tap, map, mergeMap} from 'rxjs/operators';
 import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
 import {BulkActionResult} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 
 @Component({
 	selector: 'tds-dependencies-list',
 	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/list/dependencies-list.component.html'
 })
 export class DependenciesListComponent implements OnInit {
+	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	protected gridStateSubject: BehaviorSubject<State>;
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -119,14 +121,14 @@ export class DependenciesListComponent implements OnInit {
 		this.bulkCheckboxService
 			.getBulkSelectedItems(null,
 				this.dependenciesService.getDependencies({skip: 0, take: this.gridData.total}))
-			.then((results: any) => {
+			.subscribe((results: any) => {
 				console.log('The results are');
 				console.log(results);
 				this.bulkItems = [...results.selectedAssetsIds];
 				// this.selectedAssetsForBulk = [...results.selectedAssets];
-				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: [...results.selectedAssets]};
-			})
-			.catch ((err) => console.log('Error:', err))
+				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: [...results.selectedAssets]});
+
+			}, (err) => console.log('Error', err));
 	}
 
 	hasSelectedItems(): boolean {
