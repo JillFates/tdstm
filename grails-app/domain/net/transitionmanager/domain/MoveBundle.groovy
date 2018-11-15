@@ -72,7 +72,7 @@ class MoveBundle extends Party {
 	 * MoveBundles that are set true for UseForPlanning
 	 */
 	static List<MoveBundle> getUseForPlanningBundlesByProject(Project project) {
-		project ? MoveBundle.findAllByProjectAndUseForPlanning(project, true) : []
+		project ? findAllByProjectAndUseForPlanning(project, true) : []
 	}
 
 	static final List<String> dependecyBundlingAssetTypes = (AssetType.allServerTypes + ['Application', 'Files',
