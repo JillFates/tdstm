@@ -298,8 +298,8 @@ class MoveBundleController implements ControllerMethods {
 		command.operationalOrder = params.getInt('operationalOrder', 1)
 		command.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
 		command.completionTime = TimeUtil.parseDateTime(params.completionTime)
-		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
-		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
 
 		if (command.validate()) {
 			try {
@@ -322,7 +322,7 @@ class MoveBundleController implements ControllerMethods {
 				flash.message = e.message
 			}
 		} else {
-			flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.errorsAsUL(command)
+			flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.allErrorsString(command)
 		}
 
 		// in case of error saving new move bundle

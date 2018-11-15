@@ -22,7 +22,9 @@ class MoveBundleCommand implements CommandObject {
 	Collection assets
 
 	static constraints = {
-		completionTime nullable: true
+		id nullable: true
+		description nullable: true
+		completionTime nullable: true, blank: true
 		description nullable: true
 		moveEvent nullable: true
 		name blank: false, unique: ['project']
@@ -32,6 +34,7 @@ class MoveBundleCommand implements CommandObject {
 		targetRoom nullable: true
 		tasksCreated nullable: true
 		workflowCode blank: false
+		assets nullable: true
 	}
 
 }
