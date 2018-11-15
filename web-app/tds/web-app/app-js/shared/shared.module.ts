@@ -56,6 +56,7 @@ import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset
 import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
+import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -105,7 +106,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		InputPasteDirective,
 		AkaComponent,
 		ConnectorComponent,
-		FieldReferencePopupComponent
+		FieldReferencePopupComponent,
+		TDSCheckboxComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -139,13 +141,15 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AkaComponent,
 		ConnectorComponent,
 		PopupModule,
-		FieldReferencePopupComponent
+		FieldReferencePopupComponent,
+		TDSCheckboxComponent
 	],
 	entryComponents: [
 		DynamicComponent,
 		DependentCommentComponent,
 		AddPersonComponent,
-		DateRangeSelectorComponent
+		DateRangeSelectorComponent,
+		TDSCheckboxComponent
 	]
 })
 export class SharedModule {
