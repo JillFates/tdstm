@@ -81,23 +81,4 @@ class ModelServiceTests extends IntegrationSpec {
 		// test the model name parameter
 		assert modelService.isValidAlias('frisbee', modRoundFrisbee, false, null, 'ultimate frisbee') : 'VALID: model alias matches own name, using different name'
 	}
-
-	def '2. Test validateModel() method'() {
-		setup: 'create a Model and save'
-			def testManufacturer = new Manufacturer(name: 'Test Manufacturer').save(flush: true)
-			Model model = new Model(modelName: 'Test Model', manufacturer: testManufacturer)
-			assert model.valid == false
-			model.save(flush: true)
-		when: 'the validate() method is called on the service'
-			modelService.validateModel(model.id)
-		then: 'the model is now validated'
-			Model vModel = Model.get(model.id)
-			vModel.valid
-		and: 'it was validated by the logged person'
-			securityService.loadCurrentPerson() == vModel.validatedBy
-		when: 'the method is invoked with an invalid model id'
-			modelService.validateModel(null)
-		then: 'an exception is thrown'
-			thrown ServiceException
-	}
 }
