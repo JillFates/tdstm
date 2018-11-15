@@ -119,7 +119,11 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		ManufacturerService,
 		ModelService
 	],
-	exports: [AssetExplorerIndexComponent, TaskCommentComponent, BulkChangeButtonComponent],
+	exports: [
+		AssetExplorerIndexComponent,
+		TaskCommentComponent,
+		BulkChangeButtonComponent,
+		BulkChangeActionsComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
