@@ -17,7 +17,7 @@
 					<!-- Header Toolbar -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 						<div class="col-sm-6 bulkchange-section">
-							<tds-bulk-change-button [bulkData]="bulkData"
+							<tds-bulk-change-button #tdsBulkChangeButton
 							                        [enabled]="hasSelectedItems()"
 							                        (clickBulk)="onClickBulkButton()"
 							                        (operationResult)="onBulkOperationResult($event)">
