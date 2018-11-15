@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
-import {CheckboxState, CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import { AssetExplorerService } from './asset-explorer.service';
 import { ViewSpec } from '../model/view-spec.model';
 import {Observable} from 'rxjs';

@@ -63,7 +63,7 @@ import { FieldReferencePopupComponent } from './components/field-reference-popup
 import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
-
+import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -119,6 +119,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
+		TDSCheckboxComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -158,12 +159,14 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
+		TDSCheckboxComponent
 	],
 	entryComponents: [
 		DynamicComponent,
 		DependentCommentComponent,
 		AddPersonComponent,
-		DateRangeSelectorComponent
+		DateRangeSelectorComponent,
+		TDSCheckboxComponent
 	]
 })
 export class SharedModule {
