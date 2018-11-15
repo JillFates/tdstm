@@ -14,6 +14,22 @@
 						(dataStateChange)="dataStateChange($event)"
 						[selectable]="true">
 
+					<!-- Header Toolbar -->
+					<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+						<div class="col-sm-6 bulkchange-section">
+							<tds-bulk-change-button [bulkData]="bulkData"
+							                        [enabled]="hasSelectedItems()"
+							                        (clickBulk)="onClickBulkButton()"
+							                        (operationResult)="onBulkOperationResult($event)">
+							</tds-bulk-change-button>
+
+							<div *ngIf="hasSelectedItems()" class="selected-assets">
+								<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+							</div>
+						</div>
+						<div class="col-sm-6 filters-section"></div>
+					</ng-template>
+
 					<!-- Select All column -->
 					<kendo-grid-column [width]="55" [filterable]="false">
 						<ng-template kendoGridHeaderTemplate>

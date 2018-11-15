@@ -4,6 +4,8 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
+// Asset explorer
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
 import {DependenciesRouteModule} from './dependencies-routing.states';
 // Kendo
@@ -24,6 +26,7 @@ import {DependenciesService} from './service/dependencies.service';
 		// Angular
 		CommonModule,
 		SharedModule,
+		AssetExplorerModule,
 		FormsModule,
 		// Kendo
 		DropDownsModule,

@@ -130,4 +130,22 @@ export class DependenciesListComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get the current selected items counter
+	 * @returns {number}
+	 */
+	getSelectedItemsCount(): number {
+		return 0;
+	}
+
+	hasSelectedItems(): boolean {
+		return false;
+	}
+
+	onClickBulkButton(): void {
+	}
+
+	onBulkOperationResult(operation: any): void {
+	}
+
 }
