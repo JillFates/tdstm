@@ -7,7 +7,7 @@ import net.transitionmanager.domain.Room
 @Validateable
 class MoveBundleCommand implements CommandObject {
 
-	Long id
+ 	Long id
 	String name
 	String description
 	Date startTime                   // Time that the MoveBundle Tasks will begin
@@ -19,7 +19,6 @@ class MoveBundleCommand implements CommandObject {
 	Room sourceRoom
 	Room targetRoom
 	Boolean tasksCreated = false
-	Collection assets
 
 	static constraints = {
 		id nullable: true
@@ -34,7 +33,6 @@ class MoveBundleCommand implements CommandObject {
 		targetRoom nullable: true
 		tasksCreated nullable: true
 		workflowCode blank: false
-		assets nullable: true
 	}
 
 }

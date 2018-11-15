@@ -199,6 +199,11 @@ class MoveBundleController implements ControllerMethods {
 
 	@HasPermission(Permission.BundleEdit)
 	def update(Long id) {
+		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
+		// implement the way dates are sent to backend
+		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
+
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
 
@@ -209,10 +214,8 @@ class MoveBundleController implements ControllerMethods {
 			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
 		}
 		command.operationalOrder = params.getInt('operationalOrder', 1)
-		command.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
-		command.completionTime = TimeUtil.parseDateTime(params.completionTime)
-		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom as Long, false)
-		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom as Long, false)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
 
 		if (command.validate()) {
 			try {
@@ -256,16 +259,16 @@ class MoveBundleController implements ControllerMethods {
 				flash.message = "Error updating MoveBundle with id $params.id"
 			}
 		} else {
-			flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.errorsAsUL(command)
+			flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.allErrorsString(command)
 		}
 
 		// in case of error updating move bundle
 		//	get the all Dashboard Steps that are associated to moveBundle.project
-		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
+		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundleService.findById(id))
 		def remainingSteps = allDashboardSteps.remainingSteps
 
 		render(view: 'edit',
-				model: [moveBundleInstance: moveBundleService.findById(id),
+				model: [moveBundleInstance: command,
 						projectId: currentUserProject.id,
 						projectManager: projectManagerId,
 						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
@@ -286,6 +289,11 @@ class MoveBundleController implements ControllerMethods {
 
 	@HasPermission(Permission.BundleCreate)
 	def save() {
+		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
+		// implement the way dates are sent to backend
+		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
+
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
 
@@ -296,8 +304,6 @@ class MoveBundleController implements ControllerMethods {
 			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
 		}
 		command.operationalOrder = params.getInt('operationalOrder', 1)
-		command.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
-		command.completionTime = TimeUtil.parseDateTime(params.completionTime)
 		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
 		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
 
