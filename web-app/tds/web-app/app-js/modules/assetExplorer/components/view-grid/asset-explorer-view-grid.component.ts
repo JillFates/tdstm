@@ -640,7 +640,12 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Gather the List of Selected Items for the Bulk Process
 	 */
 	public onClickBulkButton(): void {
-		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning).subscribe((results: any) => {
+		this.bulkCheckboxService.getBulkSelectedItems({
+			viewId: this._viewId,
+			model: this.model,
+			justPlanning: this.justPlanning
+		})
+		.subscribe((results: any) => {
 			this.bulkItems = [...results.selectedAssetsIds];
 			this.selectedAssetsForBulk = [...results.selectedAssets];
 			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});

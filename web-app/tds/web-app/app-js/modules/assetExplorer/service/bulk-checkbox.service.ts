@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
 import {CheckboxState, CheckboxStates} from '../../../shared/components/tds-checkbox/model/tds-checkbox.model';
@@ -14,6 +15,7 @@ export class BulkCheckboxService {
 	bulkItems: any;
 	private excludedBag: ExcludedAssetsBag;
 	private availableAssets: Array<any>;
+	private idFieldName = 'common_id';
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.currentState = CheckboxStates.unchecked;
@@ -24,6 +26,10 @@ export class BulkCheckboxService {
 
 	setPageSize(size: number): void {
 		this.pageSize = size;
+	}
+
+	setIdFieldName(name: string): void {
+		this.idFieldName = name;
 	}
 
 	changeState(state: CheckboxState): void {
@@ -47,7 +53,7 @@ export class BulkCheckboxService {
 	initializeKeysBulkItems(assets: Array<any>): void {
 		this.bulkItems = {};
 		this.availableAssets = [...assets];
-		assets.map(asset => asset.common_id).forEach((id: string) => this.bulkItems[id] = false);
+		assets.map(asset => asset[this.idFieldName]).forEach((id: string) => this.bulkItems[id] = false);
 		this.handlePageChange();
 		this.setExcludedAssets();
 	}
@@ -86,16 +92,24 @@ export class BulkCheckboxService {
 
 	}
 
-	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Observable<any> {
+	getBulkSelectedItems(params: any, getAllIds: any = null): Observable<any> {
 		return new Observable((observer: any) => {
 			if (this.isIndeterminateState()) {
-				return this.getBulkAssetIds(viewId, model, justPlanning)
-					.then((result: any) => {
+				let bulkIds = getAllIds;
+				if (params) {
+					const {viewId, model, justPlanning} = params;
+					bulkIds = this.getBulkAssetIdsFromView(viewId, model, justPlanning);
+				}
+				return bulkIds
+					.subscribe((result: any) => {
 						const assets = result && result.assets || [];
 						// TODO side effect
-						const selectedAssetsIds = assets.map((asset) => asset.common_id)
+						const selectedAssetsIds = assets
+							.map((asset) => asset[this.idFieldName])
 							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
-						const selectedAssets = assets.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
+						const selectedAssets = assets
+							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
+
 						return observer.next({selectedAssetsIds: selectedAssetsIds, selectedAssets:  selectedAssets});
 					});
 			} else {
@@ -165,7 +179,7 @@ export class BulkCheckboxService {
 		}
 	}
 
-	private getBulkAssetIds(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
+	private getBulkAssetIdsFromView(viewId: number, model: ViewSpec, justPlanning: boolean): Observable<any> {
 		let params = {
 				forExport: true,
 				offset: 0,
@@ -183,10 +197,7 @@ export class BulkCheckboxService {
 			params['justPlanning'] = true;
 		}
 
-		return new Promise((resolve, reject) => {
-			this.assetExplorerService.query(viewId, params)
-				.subscribe(result => resolve(result), err => reject(err));
-		});
+		return this.assetExplorerService.query(viewId, params);
 	}
 }
 

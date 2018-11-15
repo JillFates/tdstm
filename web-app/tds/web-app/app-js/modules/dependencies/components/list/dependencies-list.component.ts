@@ -15,6 +15,9 @@ import {DependenciesColumnModel} from '../../model/dependencies-column.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 
 import {tap, map, mergeMap} from 'rxjs/operators';
+import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
+import {BulkActionResult} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 
 @Component({
 	selector: 'tds-dependencies-list',
@@ -29,28 +32,40 @@ export class DependenciesListComponent implements OnInit {
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	public gridData: GridDataResult;
 	protected state: State;
+	protected idFieldName = 'dependencyId';
+	public bulkItems: number[] = [];
+	private bulkData: any;
 
 	constructor(
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
-		private dependenciesService: DependenciesService) {
+		private bulkCheckboxService: BulkCheckboxService,
+		private dependenciesService: DependenciesService
+	) {
+		this.gridData = { data: [], total: 0 };
+		this.state = this.getInitialGridState();
+		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
+		this.bulkCheckboxService.setIdFieldName(this.idFieldName);
+		this.dependenciesColumnModel = new DependenciesColumnModel();
+		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
 	}
 
 	ngOnInit() {
-		this.gridData = { data: [], total: 0 };
-		this.state = this.getInitialGridState();
-		this.dependenciesColumnModel = new DependenciesColumnModel();
-		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
-
 		this.gridStateSubject
 			.pipe(
-				tap((state: State) => this.state = state),
+				tap((state: State) => {
+					this.state = state;
+					this.bulkCheckboxService.setPageSize(this.state.take);
+				}),
 				mergeMap((state) => this.dependenciesService.getDependencies(state)),
 				map((results) => ({data: results.assets, total: results.pagination.total}))
 			)
-			.subscribe((results) => this.gridData = results);
+			.subscribe((results) => {
+				this.gridData = results;
+				this.bulkCheckboxService.initializeKeysBulkItems(results.data || []);
+			});
 	}
 
 	/**
@@ -135,17 +150,41 @@ export class DependenciesListComponent implements OnInit {
 	 * @returns {number}
 	 */
 	getSelectedItemsCount(): number {
-		return 0;
+		const allCounter = (this.gridData && this.gridData.total) || 0;
+		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
 	}
 
-	hasSelectedItems(): boolean {
-		return false;
+	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
+		this.bulkCheckboxService.changeState(checkboxState);
+	}
+
+	checkItem(id: number, checked: boolean): void {
+		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
+	}
+
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		if (operationResult.success) {
+			this.bulkCheckboxService.uncheckItems();
+			// this.onReload();
+		}
 	}
 
 	onClickBulkButton(): void {
+		this.bulkCheckboxService
+			.getBulkSelectedItems(null,
+				this.dependenciesService.getDependencies({skip: 0, take: this.gridData.total}))
+			.then((results: any) => {
+				console.log('The results are');
+				console.log(results);
+				this.bulkItems = [...results.selectedAssetsIds];
+				// this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: [...results.selectedAssets]};
+			})
+			.catch ((err) => console.log('Error:', err))
 	}
 
-	onBulkOperationResult(operation: any): void {
+	hasSelectedItems(): boolean {
+		return this.bulkCheckboxService.hasSelectedItems();
 	}
 
 }
