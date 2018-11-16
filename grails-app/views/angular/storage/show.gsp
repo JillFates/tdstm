@@ -39,8 +39,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</td>
-								<td class="valueNW ${standardFieldSpecs.scale.imp?:''}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
+								<tdsAngular:showLabelAndField field="${standardFieldSpecs.size}" value="${(filesInstance.size ? filesInstance.size : '') + ' ' + (filesInstance.scale ? filesInstance.scale : '')}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
@@ -75,19 +74,19 @@
 					<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 				</tr>
 				<tr id="commentListId">
-					<g:render template="/angular/common/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]"></g:render>
+					<g:render template="/angular/common/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, currentUserId: currentUserId]"></g:render>
 				</tr>
 			</table>
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Close</button>
+		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
-		<a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
+		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
+		<a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
 
 	</div>
 </div>

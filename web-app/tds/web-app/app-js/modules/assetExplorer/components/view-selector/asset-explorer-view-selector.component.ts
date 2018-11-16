@@ -1,7 +1,16 @@
-import {Component, Inject, ViewChild, OnInit, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {
+	Component,
+	Inject,
+	ViewChild,
+	AfterViewInit,
+	Input,
+	Output,
+	ViewEncapsulation,
+	EventEmitter,
+	ElementRef
+} from '@angular/core';
+import {Observable} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {StateService} from '@uirouter/angular';
 
 import {ViewGroupModel} from '../../model/view.model';
 import {ViewType} from '../../model/view.model';
@@ -9,7 +18,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 
 import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {AssetExplorerStates} from '../../asset-explorer-routing.states';
+import {Router} from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-view-selector',
@@ -30,6 +39,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@Input() isDisabled ? = false;
 	@Output() onSelectView = new EventEmitter<any>();
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
+	@ViewChild('viewSelectorFilter') viewSelectorFilter: ElementRef;
 	private reports: ViewGroupModel[];
 	public data: ViewGroupModel[];
 	private searchFilterSelector = '';
@@ -40,11 +50,10 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	public selectedItem = '';
 
 	constructor(
+		private router: Router,
 		private service: AssetExplorerService,
-		private stateService: StateService,
-		private permissionService: PermissionService,
-		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
-		reportsResolve.subscribe((result) => {
+		private permissionService: PermissionService) {
+		service.getReports().subscribe((result) => {
 			this.data = result;
 			this.reports = result.slice();
 		});
@@ -61,7 +70,14 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	}
 
 	protected onToggle() {
-		setTimeout(() => this.dropdown.toggle(!this.dropdown.isOpen));
+		setTimeout(() => {
+			this.dropdown.toggle(!this.dropdown.isOpen)
+			setTimeout( () => {
+				if (this.dropdown.isOpen && this.viewSelectorFilter) {
+					this.viewSelectorFilter.nativeElement.focus();
+				}
+			}, 300);
+		});
 	}
 
 	protected onSearch(): void {
@@ -90,8 +106,10 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	 */
 	protected onCreateNew(item: ViewGroupModel): void {
 		if (this.isCreateAvailable(item)) {
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{system: item.type === ViewType.SYSTEM_VIEWS});
+			// TODO: STATE SERVICE GO
+			// this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
+			// 	{system: item.type === ViewType.SYSTEM_VIEWS});
+			this.router.navigate(['asset', 'views', 'create']);
 		}
 	}
 
@@ -121,5 +139,11 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 			.subscribe(result => {
 				this.data = result as ViewGroupModel[];
 			});
+	}
+
+	protected onFocusOut($event): void {
+		if (this.dropdown.isOpen) {
+			this.onToggle();
+		}
 	}
 }

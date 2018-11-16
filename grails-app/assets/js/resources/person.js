@@ -14,7 +14,9 @@ var Person = function () {
 		$('#bulkDeleteMessages').html("");
 		$('#bulkModalDeleteBtn').show();
 		$('#bulkModalCancelBtn').show();
+		$('#bulkDeleteClose').show();
 		$('#bulkModalCloseBtn').hide();
+		$('#bulkDeleteCloseAndReloadButton').hide();
 		$("#bulkDeleteModal").modal("show");
 	}
 	
@@ -37,7 +39,9 @@ var Person = function () {
 					if (data.status == 'success') {
 						$('#bulkModalDeleteBtn').hide();
 						$('#bulkModalCancelBtn').hide();
+						$('#bulkDeleteClose').hide();
 						$('#bulkModalCloseBtn').show();
+						$('#bulkDeleteCloseAndReloadButton').show();
 
 						var responseMsg = '<b>Results:</b><br><lu>' +
 							'<li>People deleted: ' + data.data.deleted +

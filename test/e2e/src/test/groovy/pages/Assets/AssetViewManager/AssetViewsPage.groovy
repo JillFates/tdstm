@@ -18,7 +18,7 @@ class AssetViewsPage extends Page{
     }
 
     static content = {
-        viewMgrPageWindow(wait:true) { $("div","class":"col-md-2 asset-explorer-index-left-menu")}
+        viewMgrPageWindow { $("div","class":"col-md-2 asset-explorer-index-left-menu")}
         viewsMenu {viewMgrPageWindow.find("ul",class:"nav nav-pills nav-stacked")}
         viewOptions {viewMgrPageWindow.find("a")}
         viewMgrAllViews {viewOptions[0]}

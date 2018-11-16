@@ -60,7 +60,7 @@ boolean isIE6 = tds.isIE6()
 			<strong>
 
 			<div style="float: left;">
-	              		Welcome,&nbsp;<span id="loginUserId">${person?.firstName}(${person?.modelScore}) </span>
+	              		Welcome,&nbsp;<span id="loginUserId">${person?.firstName} </span>
 	              	</div>
 	              	&nbsp;|
 	              </strong>

@@ -4,15 +4,18 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {HostListener, Inject, OnInit} from '@angular/core';
+import {OnInit, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
+import {AssetCommonHelper} from './asset-common-helper';
 
 declare var jQuery: any;
 
 export class AssetCommonEdit implements OnInit {
+	@ViewChild('form') protected form: NgForm;
 
 	private assetTagsDirty = false;
 	protected assetTagsModel: any = {tags: []};
@@ -20,6 +23,10 @@ export class AssetCommonEdit implements OnInit {
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
 	protected isDependenciesValidForm = true;
+	protected defaultSelectOption = 'Please Select';
+	protected defaultPlanStatus = 'Unassigned';
+	protected defaultValidation = 'Discovery';
+	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
 	constructor(
@@ -128,13 +135,15 @@ export class AssetCommonEdit implements OnInit {
 	/**
 	 * Notify user there are changes
 	 */
-	protected prompSaveChanges(): void {
+	protected promptSaveChanges(): void {
 		this.promptService.open(
 			'Confirmation Required',
 			'You have changes that have not been saved. Do you want to continue and lose those changes?',
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
 				this.cancelCloseDialog();
+			} else {
+				this.focusAssetModal();
 			}
 		});
 	}
@@ -144,11 +153,26 @@ export class AssetCommonEdit implements OnInit {
 	 */
 	protected onCancelEdit(): void {
 		if (this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
-			this.prompSaveChanges();
-			return;
+			this.promptSaveChanges();
+		} else {
+			this.cancelCloseDialog();
 		}
+	}
 
-		this.cancelCloseDialog();
+	/**
+	 * Submit the form in case errors select the first invalid field
+	 */
+	protected submitForm(event): void {
+		if (!this.form.onSubmit(event) ) {
+			this.focusFirstInvalidFieldInput();
+		}
+	}
+
+	/**
+	 * Focus the first control that belongs to the asset entry form and has an invalid status
+	 */
+	private focusFirstInvalidFieldInput(): void {
+		jQuery('form.asset-entry-form .tm-input-control.ng-invalid:first').focus();
 	}
 
 	/**
@@ -157,7 +181,7 @@ export class AssetCommonEdit implements OnInit {
 	deleteAsset(assetId) {
 
 		this.promptService.open('Confirmation Required',
-			'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
 			'OK', 'Cancel')
 			.then( success => {
 				if (success) {
@@ -172,5 +196,19 @@ export class AssetCommonEdit implements OnInit {
 				}
 			})
 			.catch((error) => console.log(error));
+	}
+
+	protected focusAssetModal(): void {
+		setTimeout(() => jQuery('.modal-content').focus(), 500);
+	}
+
+	/**
+	 * Focus a control matching by name
+	 */
+	protected focusControlByName(name): void {
+		// delay selection until bootstrap effects are done
+		setTimeout(() => {
+			jQuery(`form.asset-entry-form .tm-input-control[name='${name}']:first`).focus();
+		}, 600);
 	}
 }

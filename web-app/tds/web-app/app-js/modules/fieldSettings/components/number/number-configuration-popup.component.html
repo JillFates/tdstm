@@ -1,0 +1,86 @@
+<style>
+    .modal-container .row {
+        margin-top: 10px;
+    }
+</style>
+<div class="modal-content selectlist-configuration-popup">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">String Configuration - {{field.field}}</h4>
+    </div>
+    <div class="modal-body">
+        <form #templateForm="ngForm">
+            <div class="modal-container">
+                <div class="text-right">
+                    <div class="row">
+                        <label class="col-sm-5">Defined Range</label>
+                        <div class="col-sm-5 text-left">
+                            <kendo-numerictextbox style="width: 100px;"
+                                                  name="minRange"
+                                                  [format]="'n'"
+                                                  [(ngModel)]="model.minRange"
+                                                  [min]="0" [max]="model.maxRange">
+                            </kendo-numerictextbox> To
+                            <kendo-numerictextbox style="width: 100px;"
+                                                  name="maxRange"
+                                                  [format]="'n'"
+                                                  [(ngModel)]="model.maxRange"
+                                                  [min]="model.minRange">
+                            </kendo-numerictextbox>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-5">Decimal Places</label>
+                        <div class="col-sm-5 text-left">
+                            <kendo-numerictextbox style="width: 100px;"
+                                                  name="decimalPlace"
+                                                  [format]="'n'"
+                                                  [(ngModel)]="model.precision"
+                                                  [min]="0" [max]="10"
+                                                  (ngModelChange)="onFormatChange()">
+                            </kendo-numerictextbox>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-5">Use 1000 Separator</label>
+                        <div class="col-sm-5 text-left">
+                            <input name="useThousandSeparator" type="checkbox"
+                                   [(ngModel)]="model.separator"
+                                   (change)="onFormatChange()"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-5">Allow Negative Integers</label>
+                        <div class="col-sm-5 text-left">
+                            <input name="allowNegatives" type="checkbox"
+                                   [(ngModel)]="model.allowNegative"
+                                   (change)="onAllowNegativesChange()"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-5">Example</label>
+                        <div class="col-sm-5 text-left">
+                            <kendo-numerictextbox style="width: 100px;"
+                                                  name="example"
+                                                  [autoCorrect]="true"
+                                                  [spinners]="false"
+                                                  [readonly]="true"
+                                                  [format]="model.format"
+                                                  [value]="model.allowNegative ? -model.maxRange : model.maxRange"
+                                                  [max]="model.maxRange">
+                            </kendo-numerictextbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer form-group-right">
+        <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid">
+            <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
+        </button>
+        <button name="cancelButton" class="btn btn-default btn-sm" (click)="cancelCloseDialog()">
+            <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}
+        </button>
+    </div>
+</div>

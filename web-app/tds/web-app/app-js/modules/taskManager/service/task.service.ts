@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Response, RequestOptions, Headers} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
 
 import 'rxjs/add/operator/map';
@@ -175,6 +175,19 @@ export class TaskService {
 	}
 
 	/**
+	 * Get the asset classes list
+	 * @returns {Observable<any>}
+	 */
+	getAssetClasses(): Observable<any> {
+		return this.http.get(`${this.baseURL}/assetEntity/assetClasses`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 *
 	 * Returns a set of filtered tasks
 	 * @param searchParams
@@ -183,9 +196,19 @@ export class TaskService {
 	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.searchTasks(searchParams)
 			.map(res => {
+				const result = res.result.filter((item) => item.id);
+
 				return {
-					result: res.result.map((item) =>
-						({id: item.id, text: item.desc, metaFields: {category: item.category, status: item.status, taskNumber: item.taskNumber}})),
+					result: result.map((item) =>
+						({
+							id: item.id,
+							text: item.desc,
+							metaFields: {
+								category: item.category,
+								status: item.status,
+								taskNumber: item.taskNumber
+							}
+						})),
 					total: res.total,
 					page: res.page
 				}
@@ -201,11 +224,17 @@ export class TaskService {
 	searchTasks(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		const {metaParam, currentPage, maxPage, query} = searchParams;
 		const params = [
-			{name: 'commentId', value: metaParam},
+			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
 			{name: 'filter[filters][0][value]', value: query }
 		];
+
+		if (metaParam.eventId) {
+			params.unshift({name: 'moveEvent', value: metaParam.eventId});
+
+		}
+
 		const queryString = params
 			.map((param) =>  `${param.name}=${param.value}`)
 			.join('&');
@@ -215,7 +244,7 @@ export class TaskService {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: (response.data && response.data.list || []),
-					total: response.data && response.total,
+					total: response.data && response.data.total,
 					page: response.page || currentPage
 				};
 				return comboBoxSearchResultModel;
@@ -233,6 +262,117 @@ export class TaskService {
 		return this.http.post(url, JSON.stringify(payload))
 			.map(res =>  res && res.json())
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * Create a task
+	 * @param payload model to create
+	 * @returns {Observable<any>}
+	 */
+	createTask(payload: any): Observable<any> {
+		const url = `${this.baseURL}/assetEntity/saveComment`;
+		return this.http.post(url, JSON.stringify(payload))
+			.map(res =>  res && res.json())
+			.catch((error: any) => error);
+	}
+
+	/**
+	 *
+	 * Get categories
+	 * @returns {Observable<any>}
+	 */
+	getCategories(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
+			.map((res: Response) => {
+				let response = res.json();
+				return response && response.data || [];
+
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * Get events list
+	 * @returns {Observable<any>}
+	 */
+	getEvents(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
+			.map((res: Response) => {
+				let response = res.json();
+				return response && response.data || [];
+
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Update a task
+	 * @param payload model to update
+	 * @returns {Observable<any>}
+	 */
+	updateTaskStatus(payload: any): Observable<any> {
+		return this.http.post(`${this.baseURL}/task/update`, JSON.stringify(payload))
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Assign the task to the current user
+	 * @param payload
+	 * @returns {Observable<any>}
+	 */
+	assignToMe(payload: any): Observable<any> {
+		return this.http.post(`${this.baseURL}/task/assignToMe`, JSON.stringify(payload))
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Invoke an api action
+	 * @param taskId
+	 * @returns {Observable<any>}
+	 */
+	invokeAction(taskId: string): Observable<any> {
+		return this.http.post(`${this.baseURL}/ws/task/${taskId}/invokeAction`, '')
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the action list
+	 * @returns {Observable<any>}
+	 */
+	getActionList(): Observable<any> {
+		return this.http.get(`${this.baseURL}/ws/apiAction`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data || [];
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the asset class that correspond to the provided asset
+	 * @param assetId  Id of the provided asset
+	 * @returns {Observable<any>}
+	 */
+	getClassForAsset(assetId: string): Observable<any> {
+		return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data || null;
+			})
+			.catch((error: any) => error.json());
 	}
 
 }

@@ -79,7 +79,7 @@ class Project extends PartyGroup {
 	                     'projectDefaultBundle', 'projectService', 'status']
 
 	String toString() {
-		"$id : $projectCode : $name"
+		projectCode
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import grails.converters.JSON
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
@@ -160,22 +161,86 @@ class ControlAngularTagLib {
 		String min = (attrs.min ?: (attrs.min ?: "" ))
 
 		String placeholder = attrs.placeholder ?: ''
-
+		boolean isRequired = fieldSpec.constraints?.required
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
 				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
-
 			case ControlType.YES_NO.toString():
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
-
 			case ControlType.NUMBER.toString():
-				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder, min)
+				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
+						" [allowNegative]=\"$fieldSpec.constraints.allowNegative\"" +
+						" [precision]=\"$fieldSpec.constraints.precision\"" +
+						" [separator]=\"$fieldSpec.constraints.separator\"" +
+						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
+						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
+						" [required]=\"$isRequired\" " +
+						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0}'\">" +
+						"</tds-number-control>"
+				break
+			case ControlType.DATE.toString():
+				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				break
+			case ControlType.DATETIME.toString():
+				out << "<tds-datetime-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
 				break
 			case ControlType.STRING.toString():
 			default:
 				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
+		}
+	}
+
+	/**
+	 * Used to render the value for any of the supported custom fields in the Asset Show Views.
+	 * @param field - the field spec Map
+	 * @param value - the current or default value to populate the control with (optional)
+	 * @param ngModel - The String representation of the Model on Angular
+	 * @param size - used to define the HTML size attribute on controls (optional)
+	 * @param tabIndex - the tab offset (optional)
+	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
+	 * @param min - used to specify minimum allowed value (used by the number fields)
+	 * @example <tds:showValue field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
+	 */
+	def showValue = { Map attrs ->
+
+		// The field Specifications
+		Map fieldSpec = attrs.field
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tdsAngular:inputControl> tag requires field=fieldSpec Map')
+		}
+		// The value that the control should be set to (optional)
+		String value = ( attrs.value ?: '' )
+
+		Integer size = NumberUtil.toInteger(attrs.size,null)
+
+		// Get tabIndex from attrib tabIndex, tabindex or tabOffset which if passed will override
+		// the order specified in the fieldSpec.
+		String tabIndex = attrs.tabIndex
+		String tabOffset = attrs.tabOffset
+		String min = attrs.min
+		String placeholder = attrs.placeholder ?: ''
+
+		switch (fieldSpec.control) {
+			case ControlType.LIST.toString():
+				out << value  // render value as it is
+				break
+			case ControlType.YES_NO.toString():
+				out << value  // render value as it is
+				break
+			case ControlType.DATE.toString():
+				out << "{{ '$value' | tdsDate: userDateFormat }}"
+				break
+			case ControlType.DATETIME.toString():
+				out << "{{ '$value' | tdsDateTime: userTimeZone }}"
+				break
+			case ControlType.NUMBER.toString():
+				out << "{{ ${value ? value : '0'} | tdsNumber: '${fieldSpec.constraints.format}' }}"
+				break
+			case ControlType.STRING.toString():
+			default: // call textAsLink
+				out << tds.textAsLink(text: value, target: "_new")
 		}
 	}
 
@@ -211,8 +276,10 @@ class ControlAngularTagLib {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
+		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
+		sb.append(' [valuePrimitive]="true" ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 
 		List<Object> stringList = new ArrayList<Object>();
@@ -251,6 +318,7 @@ class ControlAngularTagLib {
 		sb.append('>')
 
 		sb.append('</kendo-dropdownlist>')
+		sb.append(renderRequiredLabel(fieldSpec))
 
 		sb.toString()
 	}
@@ -265,11 +333,32 @@ class ControlAngularTagLib {
 	 * @return the INPUT Component HTML
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' +
+			attribute('type', 'text') + attribute('placeholder', placeholder) +
+			commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
+			renderRequiredLabel(fieldSpec)
+	}
+
+	/**
+	 * Generates a String HTML label used to show a required missing field warning
+	 * @param fieldSpec - the map of field specifications
+	 * @return the INPUT Component HTML
+	 */
+	private String renderRequiredLabel(Map fieldSpec) {
+		if (fieldSpec?.constraints?.required) {
+			def field = 'field' + fieldSpec.field
+
+			return "<div class=\"error\" *ngIf=\"form && (form.submitted && ${field} && !${field}.valid) || " +
+					" (${field}.dirty && !${field}.valid)\">${fieldSpec.label} is required</div>"
+		}
+		return ''
 	}
 
 	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) +
+				attribute('placeholder', placeholder) +
+				commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
+				renderRequiredLabel(fieldSpec)
 	}
 
 	/**
@@ -286,8 +375,9 @@ class ControlAngularTagLib {
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append(' style="width: 80px;"')
+		sb.append(' #' + 'field' + fieldSpec.field + '="ngModel"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
+		sb.append(' [valuePrimitive]="true" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
 
 		List<Object> stringList = new ArrayList<Object>();
@@ -326,6 +416,7 @@ class ControlAngularTagLib {
 		sb.append('>')
 
 		sb.append('</kendo-dropdownlist>')
+		sb.append(renderRequiredLabel(fieldSpec))
 
 		sb.toString()
 	}

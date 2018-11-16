@@ -13,6 +13,7 @@ class CommonsModule extends Module {
         prompDialogButton {prompDialog.find("button")}
         modalDialogButton {modalDialog.find("button")}
         confirmationAlertMessage {prompDialog.find(".box-body p")}
+        confirmationDialogTitle {prompDialog.find(".modal-title")}
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
@@ -122,6 +123,11 @@ class CommonsModule extends Module {
         waitForPromptModalHidden()
     }
 
+    def getConfirmationTitleText(){
+        waitFor{confirmationDialogTitle.displayed}
+        confirmationDialogTitle.text()
+    }
+
     def getConfirmationAlertMessageText(){
         waitFor{confirmationAlertMessage.displayed}
         confirmationAlertMessage.text()
@@ -185,7 +191,7 @@ class CommonsModule extends Module {
     */
     def verifyElementDisplayed(selector){
         try {
-            waitFor(0.5){element.displayed}
+            waitFor(0.5){selector.displayed}
         } catch (WaitTimeoutException e){
             false
         }

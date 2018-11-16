@@ -143,7 +143,7 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
-		"/ws/asset/defaultCreateModel/$assetClass" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
+		"/ws/asset/defaultCreateModel/$assetClass?" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
@@ -188,6 +188,11 @@ class UrlMappings {
 			]
 		}
 		/******************************************************/
+
+		"/ws/moveEvent/list" {
+			controller = "wsEvent"
+			action = [GET: "listEvents"]
+		}
 
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
@@ -412,14 +417,37 @@ class UrlMappings {
 			action = [GET:"demoFailed"]
 		}
 
-		"/ws/user/preferences/$id" {
+		"/ws/user" {
 			controller = "wsUser"
-			action = [GET:"preferences"]
+			action = [GET: "getUser"]
 		}
 
-		"/ws/user/preference" {
+		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
-			action = [POST:"savePreference"]
+			action = [ GET: "modelForPreferenceManager" ]
+		}
+
+		"/ws/user/resetPreferences" {
+			controller = "wsUser"
+			action = [ DELETE: "resetPreferences" ]
+		}
+
+		"/ws/user/preferences/$id?" {
+			controller = "wsUser"
+			action = [	GET:"preferences",
+						DELETE: "removePreference"]
+		}
+
+		"/ws/user/preference/$id?" {
+			controller = "wsUser"
+			action = [	GET:"preferences",
+						POST:"savePreference",
+						DELETE: "removePreference"]
+		}
+
+		"/ws/user/person" {
+			controller = "wsUser"
+			action = [GET:"getPerson"]
 		}
 
 		"/ws/progress" {
@@ -1085,8 +1113,9 @@ class UrlMappings {
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
-		// Angular 2 and future latest version
+		// Angular 6 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
+		"/module/**" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
 		// Angular Single Page App Named mappings
@@ -1099,23 +1128,26 @@ class UrlMappings {
 		"/" (controller: "auth")
 
 		// API via /ws/ endpoints
-		"/ws/${controller}s"(version: "1.0", namespace: "v1", method: "GET")
-
+		"/ws/${controller}"(version: "1.0", namespace: "v1", method: "GET")
+		"/ws/${controller}/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
+		"/ws/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
 
 		// REST API
 		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")
 
-		"/api/${controller}s"(version: "1.0", namespace: "v1", method: "GET")
-		"/api/${controller}s/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
-		"/api/${controller}s/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
-		"/api/${controller}s/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
-		"/api/${controller}s(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")
+		"/api/${controller}"(version: "1.0", namespace: "v1", method: "GET")
+		"/api/${controller}/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
+		"/api/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
 
-		"/api/${controller}s"(version: "2.0", namespace: "v2", method: "GET")
-		"/api/${controller}s/$id(.$format)?"(version: "2.0", action: "show", namespace: "v2", method: "GET")
-		"/api/${controller}s/$id(.$format)?"(action: "delete", version: "2.0", namespace: "v2", method: "DELETE")
-		"/api/${controller}s/$id(.$format)?"(action: "update", version: "2.0", namespace: "v2", method: "PUT")
-		"/api/${controller}s(.$format)?"(action: "save", version: "2.0", namespace: "v2", method: "POST")
+		"/api/${controller}/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
+		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
+		"/api/${controller}(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")
+
+		"/api/${controller}"(version: "2.0", namespace: "v2", method: "GET")
+		"/api/${controller}/$id(.$format)?"(version: "2.0", action: "show", namespace: "v2", method: "GET")
+		"/api/${controller}/$id(.$format)?"(action: "delete", version: "2.0", namespace: "v2", method: "DELETE")
+		"/api/${controller}/$id(.$format)?"(action: "update", version: "2.0", namespace: "v2", method: "PUT")
+		"/api/${controller}(.$format)?"(action: "save", version: "2.0", namespace: "v2", method: "POST")
 		// End: REST API
 
 		// Various error pages

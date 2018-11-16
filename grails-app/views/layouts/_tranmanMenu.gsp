@@ -198,74 +198,43 @@
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
                                 <g:link class="mmlink" controller="module" action="asset" id="views">
-                                    <asset:image src="icons/cat.png" width="16" height="16" alt="Dependencies" /> View Manager
+                                    <asset:image src="icons/cat.png" width="16" height="16" alt="Dependencies" style="font-size:20px; margin-right: 0px;" /> View Manager
                                 </g:link>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-child-item menu-parent-assets-asset-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="1">
+                            <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
 	                                <asset:image src="icons/magnifier.png" width="16" height="16" /> All Assets
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">
-                                    <tds:svgIcon name="database_menu" width="16" height="16" /> All Databases
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">
-                                    <tds:svgIcon name="application_menu" width="16" height="16" /> All Applications
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> All Storage - Physical
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> All Storage - Virtual
+                                    <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-all-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="3" elementId="3">
-                                    <tds:svgIcon name="other_menu" width="16" height="16" /> All Devices
+                                    <tds:svgIcon name="other_menu" width="16" height="16" /> Devices
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-server-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="4" elementId="4">
-                                    <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> All Servers
-                                </g:link>
-                            </li>
-                            <li class="divider"></li>
-                            <li class="menu-child-item menu-parent-assets-application-list">
-                                <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-all-list">
-                                <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <tds:svgIcon name="other_menu" width="16" height="16" /> Devices
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-server-list">
-                                <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
                                     <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> Servers
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-database-list">
-                                <g:link class="mmlink" controller="database" action="list" onclick="hideMegaMenu('assetMegaMenu')">
+                            <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">
                                     <tds:svgIcon name="database_menu" width="16" height="16" /> Databases
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-storage-list">
-                                <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Storage-Devices
+                            <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
+                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Storage - Devices
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-storage-logical-list">
-                                <g:link class="mmlink" controller="files" action="list" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Storage-Logical
+                            <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
+                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Storage - Logical
                                 </g:link>
                             </li>
                             <li class="divider"></li>
@@ -306,7 +275,7 @@
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                                <g:link controller="module" action="import" id="assets">Import Assets (ETL)</g:link>
+                                <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
@@ -472,24 +441,6 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <tds:hasPermission permission="${Permission.ReportViewDiscovery}">
-                                <li class="menu-parent-item">Discovery</li>
-                                <li class="menu-child-item menu-reports-cabling-conflict">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict">Cabling Conflict</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-cabling-data">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-power">
-                                    <a href="/tdstm/reports/powerReport">Power</a>
-                                </li>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
-                            </tds:hasPermission>
-                            <li class="divider"></li>
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
                                 <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
@@ -521,12 +472,6 @@
                                         <a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a>
                                     </li>
                                 </tds:hasPermission>
-                                <li class="menu-child-item menu-reports-asset-tags">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-transport-worksheets">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a>
-                                </li>
                                 <tds:hasPermission permission="${Permission.HelpMenuView}">
                                     <li class="menu-child-item">
                                         <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
@@ -538,12 +483,6 @@
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
                                     <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
-                                </li>
-                                <li class="menu-child-item menu-reports-issue-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report">Issue Report</a>
-                                </li>
-                                <li class="menu-child-item">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a>
                                 </li>
                                 <tds:hasPermission permission="${Permission.HelpMenuView}">
                                     <li class="menu-child-item">

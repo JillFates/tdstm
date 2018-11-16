@@ -1,10 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewGroupModel, ViewModel, ViewType } from '../../model/view.model';
-import { Observable } from 'rxjs/Observable';
-import { zip } from 'rxjs/observable/zip';
-
+import { Observable } from 'rxjs';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -18,6 +15,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-index',
@@ -30,30 +28,31 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 	private gridColumns: GridColumnModel[];
+	private report;
 
 	constructor(
-		private stateService: StateService,
-		@Inject('reports') private report: Observable<ViewGroupModel[]>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
 		private dictionary: DictionaryService,
 		private preferenceService: PreferenceService) {
+		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
 	}
 	ngOnInit() {
 		this.gridColumns = ViewManagerColumnsHelper.createColumns();
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
-		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
-			.subscribe(this.setupDefaultSettings.bind(this), (err) => console.log(err.message || err));
+		this.preferenceService.getPreferences(preferencesCodes).subscribe((preferences) => {
+			this.setupDefaultSettings(preferences);
+		});
 	}
 
-	private setupDefaultSettings(defaultSettings: any[]) {
-		const [reportResult, preferences] = defaultSettings;
-
+	private setupDefaultSettings(preferences: any[]) {
 		const userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(userDateFormat);
-		this.reportGroupModels = reportResult;
+		this.reportGroupModels = this.report;
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 		this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
@@ -77,25 +76,18 @@ export class AssetExplorerIndexComponent implements OnInit {
 
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
-			const selectedFolderType: ViewType = this.selectedFolder.type;
-			const params: ViewModel = Object.assign(new ViewModel(),
-				{
-					isSystem: selectedFolderType === this.viewType.SYSTEM_VIEWS,
-					isShared: selectedFolderType === this.viewType.SHARED_VIEWS,
-					isFavorite: selectedFolderType === this.viewType.FAVORITES
-				});
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, params);
+			this.router.navigate(['asset', 'views', 'create']);
 		}
 	}
 
 	protected onEditReport(report: ViewModel): void {
 		if (this.isEditAvailable(report)) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
+			this.router.navigate(['asset', 'views', report.id, 'edit']);
 		}
 	}
 
 	protected onShowReport(report: ViewModel): void {
-		this.stateService.go(AssetExplorerStates.REPORT_SHOW.name, { id: report.id });
+		this.router.navigate(['asset', 'views', report.id, 'show']);
 	}
 
 	protected onDeleteReport(report: ViewModel): void {

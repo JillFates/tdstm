@@ -2,9 +2,11 @@ package net.transitionmanager.service
 
 import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
@@ -35,6 +37,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	LicensedClient delete(String id) {
 		LicensedClient lic = fetch(id)
 
@@ -45,6 +48,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	LicensedClient revoke(String id) {
 		LicensedClient lic = fetch(id)
 
@@ -56,6 +60,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	def loadRequest(String body) {
 		body = StringUtil.openEnvelop(License.BEGIN_REQ_TAG, License.END_REQ_TAG, body)
 		String decodedString = Smaz.decompress(Base64.decodeBase64(body))
@@ -161,6 +166,7 @@ class LicenseManagerService extends LicenseCommonService {
 	 * @return
 	 * @throws InvalidLicenseException
 	 */
+	@Transactional
 	String activate(String id) throws InvalidLicenseException{
 		LicensedClient lic = fetch(id)
 		if (lic) {
@@ -229,6 +235,30 @@ class LicenseManagerService extends LicenseCommonService {
 		} else {
 			log.error("no email found for the client")
 			false
+		}
+	}
+
+	@Transactional
+	void updateLicense(id, json) throws Exception{
+		LicensedClient lic
+		if(id) {
+			json.id = id
+			lic = LicensedClient.fetch(json)
+		}
+
+		if(lic) {
+			if(! lic.save() ){
+				if( log.isDebugEnabled() ) {
+					String errors = ""
+					lic.errors.each { err ->
+						errors << "${err}/n"
+					}
+					log.debug("Errors {}", errors)
+				}
+				throw new ServiceException("${id} not found.")
+			}
+		}else{
+			throw new FileNotFoundException("${id} not found.")
 		}
 	}
 }

@@ -98,7 +98,7 @@ a:hover {
 		$("#queryTextDialog").dialog('option', 'width', 500);
 		$('#queryTextDialog').dialog('option', 'modal', 'true');
 		$('#queryTextDialog').dialog('open');
-		$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+		$('div.ui-dialog.ui-widget');
 	}
 	function replaceNullsAndUndefined(tableBody) {
         return tableBody.replace(/(null|undefined)/mg, "");

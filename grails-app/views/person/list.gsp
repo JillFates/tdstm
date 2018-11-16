@@ -113,7 +113,15 @@
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
+		     <button id="bulkDeleteCloseAndReloadButton" aria-label="Close"
+					 class="close" type="button" onclick='Person.closePopup()' title="Close">
+				 <span aria-hidden="true">×</span>
+			 </button>
+			  <button id="bulkDeleteClose" aria-label="Close"
+					  class="close" type="button" data-dismiss="modal" title="Close">
+				  <span aria-hidden="true">×</span>
+			  </button>
+			  <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
 	      </div>
 	      <div class="modal-body">
 	      	<p>

@@ -26,6 +26,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
+import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Permissions
 import net.transitionmanager.domain.Person
@@ -388,6 +389,51 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		logger.info('Cleanup Password Reset: Finished.')
 	}
 
+	@Transactional
+	void updatePassword(UserLogin userLogin, UserUpdatePasswordCommand command) throws ServiceException{
+		String msg
+		try {
+			if (!userLogin) {
+				msg = 'Failed to load your user account'
+
+			} else {
+
+				// See if the user account is properly configured to a state that they're allowed to change their password
+				securityService.validateAllowedToChangePassword(userLogin)
+
+
+				//
+				// Made it throught the guantlet of password requirements so lets update the password
+				//
+				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
+
+				if (!userLogin.save(failOnError: false)) {
+					logger.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
+					throw new DomainUpdateException('An error occured while trying to save your password')
+
+				} else {
+					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged())
+
+				}
+
+			}
+
+		} catch (InvalidParamException | DomainUpdateException e) {
+			msg = e.message
+
+		} catch (ServiceException e) {
+			msg = "You are not allowed to change your password at this time."
+
+		} catch (e) {
+			logger.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			msg = 'An error occurred during the update process'
+		}
+
+		if ( msg ) {
+			throw new ServiceException(msg)
+		}
+	}
+
 	/**
 	 * Unlocks a user's account
 	 */
@@ -545,7 +591,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			String bodyTemplate = "passwordReset"
 			String personFromEmail = grailsApplication.config.grails.mail.default.from
 			def createdBy = person
-			String subject = "Reset your password"
+			String subject = "Forgot your password"
 
 			switch(resetType) {
 				case PasswordResetType.WELCOME:
@@ -559,6 +605,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				case PasswordResetType.ADMIN_RESET:
 					createdBy = userLogin.person
 					bodyTemplate = "adminResetPassword"
+					subject = "Reset Password Request"
 					break
 
 			}
@@ -810,12 +857,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * Used to delete a UserLogin and clear out any references in other tables
 	 * @param userLogin - the UserLogin to be deleted
 	 */
+	@Transactional
 	void deleteUserLogin(UserLogin userLogin) {
 		auditService.logMessage("deleting user account $userLogin")
 		try {
 			GormUtil.deleteOrNullDomainReferences(userLogin, true)
 		} catch(e) {
-			log.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
+			logger.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
 		}
 	}
 
@@ -830,8 +878,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @param toPerson: instance of toPerson
 	 * @return
 	 */
+	@Transactional
 	void mergePersonsUserLogin(UserLogin byWhom, Person fromPerson, Person toPerson) {
-logger.debug "mergePersonsUserLogin() entered"
+		logger.debug "mergePersonsUserLogin() entered"
 		UserLogin toUserLogin = toPerson.userLogin
 		UserLogin fromUserLogin = fromPerson.userLogin
 
@@ -926,51 +975,6 @@ logger.debug "mergePersonsUserLogin() entered"
 		GormUtil.mergeDomainReferences(fromUser, toUser, true)
 	}
 
-	/**
-	 * Used to replace any user security roles from one user to another or deleting if preference already existed
-	 * @param byWhom - the user that is performing the replace
-	 * @param fromUser - the UserLogin that preferences are being replaced from
-	 * @param toUser - the UserLogin that any new preferences will be replaced into
-	 */
-	private void replaceUserSecurityRoles(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
-
-		Person fromPerson = fromUser.person
-		Person toPerson = toUser.person
-
-		List roles = PartyRole.findAllByParty(fromPerson)
-		roles.each { fromRole ->
-			PartyRole toRole = PartyRole.findByPartyAndRoleType(toPerson, fromRole.roleType)
-			if (! toRole) {
-				PartyRole newPR = new PartyRole(party: toPerson, roleType: fromRole.roleType)
-				newPR.save()
-				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} to $toUser"
-			} else {
-				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} pre-existed for $toUser"
-			}
-			fromRole.delete(flush:true)
-		}
-	}
-
-	/**
-	 * Used to replace any user preferences from one user to another or deleting if preference already existed
-	 * @param byWhom - the user that is performing the replace
-	 * @param fromUser - the UserLogin that preferences are being replaced from
-	 * @param toUser - the UserLogin that any new preferences will be replaced into
-	 */
-	private void replaceUserPreferences(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
-		List prefs = UserPreference.findAllByUserLogin(fromUser)
-		prefs.each { fromUserPref ->
-			UserPreference toUserPref = UserPreference.findByUserLoginAndPreferenceCode(toUser, fromUserPref.preferenceCode)
-			if (! toUserPref) {
-				UserPreference newUP = new UserPreference(userLogin: toUser, preferenceCode:fromUserPref.preferenceCode, value: fromUserPref.value)
-				newUP.save()
-				log.debug "$byWhom replaced ${fromUser} preference ${fromUserPref.preferenceCode} to ${toUser}"
-			} else {
-				log.debug "$byWhom merging ${fromUser} preference ${fromUserPref.preferenceCode} pre-existed"
-			}
-			fromUserPref.delete(flush:true)
-		}
-	}
 	/**
 	 * Update the UserLogin and the associated permissions for the account.
 	 * @param params - request params
@@ -1777,7 +1781,7 @@ logger.debug "mergePersonsUserLogin() entered"
 			throw new UnauthorizedException('Assuming User Identity is not allowed')
 		}
 
-		log.info "SECURITY: assumeUserIdentity called for user $username"
+		logger.info "SECURITY: assumeUserIdentity called for user $username"
 
 		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
 		UserCache userCache = ApplicationContextHolder.getBean("userCache")

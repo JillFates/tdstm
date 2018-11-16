@@ -107,7 +107,8 @@ class DeviceService implements ServiceMethods {
 			assetEntity: assetEntity,
 			/*label: frontEndLabel,*/
 			canEdit: securityService.hasPermission(Permission.AssetEdit),
-			deleteChassisWarning: deleteChassisWarning
+			deleteChassisWarning: deleteChassisWarning,
+			currentUserId: securityService.currentPersonId
 		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
 
 		model.roomSource = null
@@ -153,11 +154,10 @@ class DeviceService implements ServiceMethods {
 	 * @return a Map that includes the list of common properties
 	 */
 	@Transactional(readOnly = true)
-	Map getModelForCreate(Map params) {
+	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
-		AssetEntity assetEntity = new AssetEntity();
-		def model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
-
+		AssetEntity assetEntity = new AssetEntity(project: project)
+		Map model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
 		model.assetInstance = assetEntity
 		model.roomSource = null
 		model.roomTarget = null

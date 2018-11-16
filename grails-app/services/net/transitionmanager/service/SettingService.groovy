@@ -3,17 +3,21 @@ package net.transitionmanager.service
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
+import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 
 @CompileStatic
 class SettingService implements ServiceMethods {
-    public static final String VERSION_KEY = "version"
-    public static final String PLAN_METHODOLOGY_KEY = "planMethodology"
+    public static final String VERSION_KEY = 'version'
+    public static final String FIELDS_KEY = 'fields'
+    public static final String LABEL_KEY = 'label'
+    public static final String PLAN_METHODOLOGY_KEY = 'planMethodology'
 
     MessageSource messageSource
 
@@ -142,6 +146,7 @@ class SettingService implements ServiceMethods {
      * @param json
      * @param version
      */
+    @Transactional
     protected void save(Setting setting, Project project, SettingType type, String key, String json, Integer version) {
         String jsonValidatedAndOptimized = validateAndOptimizeJSON(json)
 
@@ -173,7 +178,10 @@ class SettingService implements ServiceMethods {
      */
     private String validateAndOptimizeJSON(String json) {
         JSONObject parsedJson = JsonUtil.parseJson(json)
-        removeVersionKeyIfPresent(parsedJson)
+        if (parsedJson) {
+            removeVersionKeyIfPresent(parsedJson)
+            sanitizeFieldLabels(parsedJson)
+        }
         return JsonUtil.validateJsonAndConvertToString(parsedJson)
     }
 
@@ -182,8 +190,20 @@ class SettingService implements ServiceMethods {
      * @param jsonObject
      */
     private void removeVersionKeyIfPresent(JSONObject jsonObject) {
-        if (jsonObject) {
+        if (jsonObject.containsKey(VERSION_KEY)) {
             jsonObject.remove(VERSION_KEY)
+        }
+    }
+
+    /**
+     * Remove spaces/blanks from both ends of the field label
+     * @param jsonObject
+     */
+    private void sanitizeFieldLabels(JSONObject jsonObject) {
+        if (jsonObject.containsKey(FIELDS_KEY)) {
+            jsonObject.get(FIELDS_KEY).each { Map<String, ?> field ->
+                field.put(LABEL_KEY, StringUtils.trim(field[LABEL_KEY] as String))
+            }
         }
     }
 }

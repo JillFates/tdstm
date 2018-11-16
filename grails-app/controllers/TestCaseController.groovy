@@ -1,10 +1,8 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.AccountImportExportService
@@ -47,20 +45,6 @@ class TestCaseController implements ControllerMethods {
 
 	def agents() {
 		renderAsJson(apiCatalogService.listCatalogNames())
-	}
-		
-	def api() {
-
-		log.debug "=====================\nAbout to save ApiAction\n====================="
-		ApiAction aa = new ApiAction(params)
-		if (! aa.save() ) {
-			render 'save failed:' + GormUtil.allErrorsString(aa)
-			return
-		}
-
-		def apis = ApiAction.findAll()[0]
-
-		render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
 	}
 
 	@HasPermission('ViewAdminTools')

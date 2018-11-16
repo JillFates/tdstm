@@ -14,18 +14,15 @@ import {
 	Headers
 } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/finally';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/observable/empty';
-import { NotifierService } from '../services/notifier.service';
-import { AlertType } from '../model/alert.model';
+import {Observable} from 'rxjs';
+import {catchError, finalize} from 'rxjs/operators';
+import {NotifierService} from '../services/notifier.service';
+import {AlertType} from '../model/alert.model';
 // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #2
-import { cache, CacheSignature } from '../services/cache';
-import { ERROR_STATUS } from '../model/constants';
+import {cache, CacheSignature} from '../services/cache';
+import {ERROR_STATUS} from '../model/constants';
 
-Observable.prototype.cache = cache;
+Observable.prototype['cache'] = cache;
 
 declare module 'rxjs/Observable' {
 	interface Observable<T> {
@@ -73,9 +70,9 @@ export class HttpInterceptor extends Http {
 	}
 
 	getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
-		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let headers = new Headers({'Content-Type': 'application/json'});
 		if (!options) {
-			options = new RequestOptions({ headers: headers });
+			options = new RequestOptions({headers: headers});
 		}
 		return options;
 	}

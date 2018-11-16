@@ -6,40 +6,52 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 
 @Component({
 	selector: 'tds-bulk-change-button',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component.html',
+	template: `
+        <button type="button" (click)="onClick()" class="btn btn-default btnBulkChange pull-left" id="btnBulkChange" [disabled]="!enabled">
+            <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.TITLE' | translate}}
+        </button>
+	`,
 	providers: [TranslatePipe]
 })
 export class BulkChangeButtonComponent {
 	@Input() enabled: boolean ;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 	@Output() clickBulk = new EventEmitter<void>();
-	@Input()
-	set bulkItems(items: number[]) {
-		this.selectedItems = items;
-		if (this.selectedItems && this.selectedItems.length) {
-			this.showBulkActions();
-		}
-	}
+
 	private selectedItems: number[];
+	private selectedAssets: Array<any>;
 
 	constructor(private dialogService: UIDialogService) {
 		this.enabled = false;
 		this.selectedItems = [];
+		this.selectedAssets = [];
 	}
 
 	onClick() {
 		this.clickBulk.emit();
 	}
 
+	/**
+	 * Opens the dialog windows to Bulk Data
+	 * @param data
+	 */
+	public bulkData(data: any): void {
+		this.selectedItems = data && data.bulkItems ? data.bulkItems : null;
+		this.selectedAssets = data && data.assetsSelectedForBulk ? data.assetsSelectedForBulk : null;
+		if (this.selectedItems && this.selectedItems.length) {
+			this.showBulkActions();
+		}
+	}
+
+
 	showBulkActions() {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, affected: this.selectedItems.length };
+		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.selectedAssets, affected: this.selectedItems.length };
 
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}
 		], true, false).then(bulkOperationResult => {
 			this.operationResult.emit(bulkOperationResult);
 		}).catch(err => {
-			console.log(err);
 			this.operationResult.emit(err);
 		});
 	}

@@ -35,7 +35,6 @@ class Person extends Party {
 	String workPhone
 	String mobilePhone
 	Integer modelScore = 0
-	Integer modelScoreBonus = 0
 	String personImageURL
 	String keyWords
 	String tdsNote
@@ -52,7 +51,7 @@ class Person extends Party {
 		active blank: false, inList: ['Y', 'N']
 		country nullable: true
 		department nullable: true
-		email matches: "(?:[a-zA-Z0-9!#\$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#\$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])", nullable: true
+		email matches: "(?:[a-zA-Z0-9!#\\\$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#\\\$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}|(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\]))", nullable: true
 		firstName blank: false, size: 1..34
 		keyWords nullable: true
 		lastName size: 0..34
@@ -60,7 +59,6 @@ class Person extends Party {
 		middleName size: 0..20
 		mobilePhone nullable: true, phoneNumber: true
 		modelScore nullable: true
-		modelScoreBonus nullable: true
 		nickName nullable: true, size: 0..34
 		personImageURL nullable: true
 		staffType blank: false, inList: ['Contractor', 'Hourly', 'Salary']

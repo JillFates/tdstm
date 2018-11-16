@@ -1,10 +1,12 @@
 package com.tdsops.validators
 
 import com.tds.asset.AssetOptions
+import com.tds.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
@@ -51,9 +53,10 @@ class CustomValidators {
 	 * @param type - the AssetOptions type to lookup values for
 	 * @return the list closure
 	 */
-	static Closure optionsClosure(type) {
+	static Closure optionsClosure(AssetOptionsType type) {
 		return {
-			AssetOptions.findAllByType(type)*.value
+			AssetOptionsService assetOptionsService = ApplicationContextHolder.getBean('assetOptionsService', AssetOptionsService)
+			assetOptionsService.findAllValuesByType(type)
 		}
 	}
 
@@ -71,7 +74,10 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
+			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberMockValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
+			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeMockValidator
+			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeMockValidator
 
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
@@ -157,6 +163,46 @@ class CustomValidators {
 				if( ! hasErrors() && StringUtils.isNotBlank(value) && ! optValues.contains(value) ) {
 					addError ( 'field.invalid.notInList', [value, getLabel(), optValues.join(', ')] )
 				}
+			}
+		}
+	}
+
+	/**
+	 * THIS IS JUST A MOCK VALIDATOR FOR DATE/DATETIME TO MAKE WORK THE FE LOGIC FOR
+	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
+	 * FOR TICKET TM-11723, AND WILL BE MERGED ONCE IT'S APPROVED.
+	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
+	 * TM-12545 IS MERGED.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlDateTimeMockValidator( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+
+			}
+		}
+	}
+
+	/**
+	 * THIS IS JUST A MOCK VALIDATOR FOR NUMBER TO MAKE WORK THE FE LOGIC FOR
+	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
+	 * FOR TICKET TM-8447, AND WILL BE MERGED ONCE IT'S APPROVED.
+	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
+	 * TM-12545 IS MERGED.
+	 * See TM-8447
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlNumberMockValidator ( String value, Map fieldSpec ) {
+		new Validator(fieldSpec) {
+			void validate() {
+
 			}
 		}
 	}

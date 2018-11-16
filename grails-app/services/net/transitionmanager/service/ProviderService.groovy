@@ -171,14 +171,22 @@ class ProviderService implements ServiceMethods {
 
     /**
      * Clone any existing providers associated to sourceProject (if any),
-     * then associate those newly created tags to targetProject.
+     * then associate those newly created providers to targetProject.
      *
-     * @param sourceProject  The project from which the existing tags will be cloned.
-     * @param targetProject  The project to which the new tags will be associated.
+     * @param sourceProject  The project from which the existing providers will be cloned.
+     * @param targetProject  The project to which the new providers will be associated.
      */
-    Provider cloneProvider(Provider sourceProvider, Project targetProject) {
-        Provider newProvider = (Provider)GormUtil.cloneDomainAndSave(sourceProvider, [project: targetProject], false)
-        log.debug "Cloned provider ${newProvider.name} for project ${targetProject.toString()}"
-        return newProvider
+    void cloneProjectProviders(Project sourceProject, Project targetProject) {
+        List<Provider> providers = Provider.where {
+            project == sourceProject
+        }.list()
+
+        if (!providers.isEmpty()) {
+            providers.each { Provider sourceProvider ->
+                Provider newProvider = (Provider)GormUtil.cloneDomainAndSave(sourceProvider,
+                        [project: targetProject], false, false);
+                log.debug "Cloned provider ${newProvider.name} for project ${targetProject.toString()}"
+            }
+        }
     }
 }

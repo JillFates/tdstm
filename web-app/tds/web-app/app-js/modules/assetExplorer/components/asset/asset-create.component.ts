@@ -46,7 +46,21 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 				.subscribe(res => {
 					let template = res[0].text();
 					let model = res[1].json();
-					model.asset = {};
+
+					// Get the default custom values
+					const customs = {};
+					Object.keys(model.asset || {})
+							.filter((key: string) => key.startsWith('custom'))
+							.forEach((key: string) => {
+								if (model.asset[key]) {
+									customs[key] = model.asset[key]
+								}
+							});
+					model.asset = customs;
+
+					if (!model.moveBundleList && model.dependencyMap && model.dependencyMap.moveBundleList) {
+						model.moveBundleList = model.dependencyMap.moveBundleList;
+					}
 					setTimeout( () => {
 						switch (this.asset) {
 							case 'APPLICATION':

@@ -241,99 +241,6 @@ class PersonController implements ControllerMethods {
 	}
 
 	/**
-	 * Note: No reference found to this method
-	 */
-	@HasPermission(Permission.PersonView)
-	def show() {
-		Person person = Person.get(params.id)
-		def companyId = params.companyId
-		if (!person) {
-			flash.message = "Person not found with id $params.id"
-			redirect(action:"list", params:[ id:companyId ])
-		} else {
-			[personInstance: person, companyId: person.company.id]
-		}
-	}
-
-	/**
-	 * Note: No reference found to this method
-	 */
-	@HasPermission(Permission.PersonDelete)
-	def delete() {
-		Person person = Person.get(params.id)
-
-		def companyId = params.companyId
-		if (person) {
-			Map deleteResultMap = personService.deletePerson(person, true, true)
-			if (deleteResultMap["deleted"]) {
-				flash.message = "Person $person deleted"
-			}else{
-				StringBuilder message = new StringBuilder()
-				deleteResultMap["messages"].each {
-					message.append("it\n")
-				}
-				flash.message = message.toString()
-			}
-		}
-		else {
-			flash.message = "Person not found with id $params.id"
-		}
-
-		redirect(action:"list", params:[ id:companyId ])
-	}
-
-	/**
-	 * return person details to EDIT form
-	 * Note: No reference found to this method
-	 */
-	@HasPermission(Permission.PersonEdit)
-	def edit() {
-		Person person = Person.get(params.id)
-		def companyId = params.companyId
-		if (!person) {
-			flash.message = "Person not found with id $params.id"
-			redirect(action:"list", params:[ id:companyId ])
-		} else {
-			[personInstance: person, companyId: companyId]
-		}
-	}
-
-	/**
-	 * Used to update the Person domain objects
-	 * Note: No reference found to this method
-	 */
-	@HasPermission(Permission.PersonEdit)
-	def update() {
-		def person = Person.get(params.id)
-
-		def companyId = params.company
-
-		// TODO : Security - Need to harden this
-
-		if (person) {
-			person.properties = params
-			if (person.validate() && person.save()) {
-				UserLogin userLogin = person.userLogin
-				userLogin.active = person.active
-				if (companyId != null) {
-					def companyParty = Party.get(companyId)
-					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
-				}
-				flash.message = "Person '$person' was updated"
-				redirect(action:"list", params:[ id:companyId ])
-			}
-			else {
-				flash.message = "Person '$person' not updated due to: ${GormUtil.errorsToUL(person)}"
-				redirect(action:"list", params:[ id:companyId ])
-			}
-		}
-		else {
-			flash.message = "Person not found with id $params.id"
-			redirect(action:"list", params:[ id:companyId ])
-		}
-	}
-
-	/**
 	 * Used to save a new Person domain object
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
@@ -354,9 +261,10 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
+		Map personParams = (request.format == 'json') ? request.JSON : params
 		def duplicatePersonId
 		try {
-			person = personService.savePerson(params, companyId, project, true)
+			person = personService.savePerson(personParams, companyId, project, true)
 		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
@@ -383,100 +291,6 @@ class PersonController implements ControllerMethods {
 			}
 			redirect(action:"list", params:[ companyId:companyId ])
 		}
-	}
-
-	/*
-	 *  Remote method to edit Staff Details
-	 *  Note: No reference found to this method
-	 */
-	@HasPermission(Permission.PersonEdit)
-	def editShow(String companyId) {
-		Person person = Person.get(params.id)
-		if (!person) {
-			flash.message = "Person not found with id $params.id"
-			redirect(action: "list", params: [id: params.companyId])
-			return
-		}
-
-		renderAsJson(id: person.id, firstName: person.firstName, lastName: person.lastName, nickName: person.nickName,
-		             title: person.title, active: person.active, dateCreated: TimeUtil.formatDateTime(person.dateCreated),
-		             lastUpdated: TimeUtil.formatDateTime(person.lastUpdated), companyId: companyId,
-		             companyParty: Party.get(companyId), email: person.email, department: person.department,
-		             location: person.location, workPhone: person.workPhone, mobilePhone: person.mobilePhone)
-	}
-
-	/*
-	 *  Remote method to edit Staff Details
-	 *  Note: Used only in projectStaff.gsp
-	 */
-	@HasPermission(Permission.ProjectStaffEdit)
-	def editStaff() {
-		Person person = Person.read(params.id)
-		def role = params.role
-		def company = person.company
-		Map map = [id: person.id, firstName: person.firstName, lastName: person.lastName, nickName: person.nickName,
-		           title: person.title, email: person.email, active: person.active, role: role]
-		if (company) {
-			map.companyId = company.id
-			map.companyName = company.name
-		}
-		else {
-			map.companyId = ''
-		}
-		renderAsJson map
-	}
-
-	/*
-	 *  Remote method to update Staff Details
-	 *  Note: Used only in projectStaff.gsp
-	 */
-	@HasPermission(Permission.ProjectStaffEdit)
-	def updateStaff() {
-		Person person = Person.get(params.id)
-		def projectId = securityService.userCurrentProjectId
-		def roleType = params.roleType
-		def companyId = params.company
-		//person.lastUpdated = new Date()
-		if (person) {
-			person.properties = params
-			if (person.lastName == null) {
-				person.lastName = ""
-			}
-			if (!person.hasErrors() && person.save()) {
-				if (companyId != "") {
-					def companyParty = Party.get(companyId)
-					if (!personService.isAssociatedTo(person, companyParty)) {
-						throw new DomainUpdateException("The person $person is not associated with the company $companyParty")
-					}
-					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
-				}
-				partyRelationshipService.updatePartyRelationshipRoleTypeTo(
-					"PROJ_STAFF", securityService.userCurrentProject, 'PROJECT', person, roleType)
-
-				flash.message = "Person $person updated"
-				redirect(action:"projectStaff", params:[ projectId:projectId ])
-			} else {
-				flash.message = "Person $person not updated"
-				redirect(action:"projectStaff", params:[ projectId:projectId ])
-			}
-		} else {
-			flash.message = "Person not found with id $params.id"
-			redirect(action:"projectStaff", params:[ projectId:projectId ])
-		}
-	}
-	/*
-	 *  Return Project Staff
-	 *  Note: there is no direct call to this method
-	 */
-	@HasPermission(Permission.ProjectStaffList)
-	def projectStaff() {
-		def projectId = securityService.userCurrentProjectId
-		def submit = params.submit
-		def projectStaff = partyRelationshipService.getProjectStaff(projectId)
-		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'', true)
-		def projectCompanies = partyRelationshipService.getProjectCompanies(projectId)
-		[projectStaff: projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
-		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission(Permission.AddPerson)]
 	}
 
 	/*
@@ -509,38 +323,6 @@ class PersonController implements ControllerMethods {
 		}
 
 		renderSuccessJson(flag: flag, message: message)
-	}
-	/*
-	 * Method to save person details and create party relation with Project as well
-	 * Note: Used only in projectStaff.gsp
-	 */
-	@HasPermission(Permission.PersonCreate)
-	def savePerson() {
-		Person person = new Person(params)
-		if (person.lastName == null) {
-			person.lastName = ""
-		}
-
-		def companyId = params.company
-		def projectId = securityService.userCurrentProjectId
-		def roleType = params.roleType
-		if (!person.hasErrors() && person.save()) {
-
-			if (companyId) {
-				partyRelationshipService.savePartyRelationship("STAFF", Party.get(companyId), "COMPANY", person, "STAFF")
-			}
-
-			if (projectId && roleType != null) {
-				partyRelationshipService.savePartyRelationship("PROJ_STAFF",
-						securityService.userCurrentProject, "PROJECT", person, roleType)
-			}
-
-			flash.message = "Person $person created"
-			redirect(action:'projectStaff', params:[ projectId:projectId, submit:'Add' ])
-		} else {
-			flash.message = " Person FirstName cannot be blank. "
-			redirect(action:'projectStaff', params:[ projectId:projectId,submit:'Add' ])
-		}
 	}
 
 	/**
@@ -620,48 +402,6 @@ class PersonController implements ControllerMethods {
 			renderErrorJson(errMsg)
 		} else {
 			renderSuccessJson(results)
-		}
-	}
-
-	/**
-	 * Used to clear out person's preferences. User can clear out own or requires permission
-	 */
-// TODO : JPM 8/31/2015 : Need to test
-	@HasPermission(Permission.UserGeneralAccess)
-	def resetPreferences() {
-		try {
-			Person person = personService.validatePersonAccess(params.user)
-			UserLogin userLogin = securityService.getPersonUserLogin(person)
-			if (!userLogin) {
-				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-				sendNotFound()
-				return
-			}
-
-			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
-			if (params.dateTimezoneOnly) {
-				userPreferenceService.removePreference(PREF.CURR_TZ)
-				userPreferenceService.removePreference(PREF.CURR_DT_FORMAT)
-
-			// else reset all preferences
-			} else {
-				// TODO : JPM 5/2015 : Change the way that the delete is occurring
-				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-				prePreference.each { preference ->
-					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-						// When clearing preference, the RefreshMyTasks should be the same.
-						if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
-							preferenceInstance.delete()
-						}
-				}
-
-				//userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
-			}
-
-			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
-			render person
-		} catch (e) {
-			renderErrorJson(e.message)
 		}
 	}
 
@@ -1020,7 +760,7 @@ class PersonController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreferences() {
+	def saveDateAndTimePreferences() {
 		// Checks that timezone is valid
 		def timezone = TimeZone.getTimeZone(params.timezone)
 		userPreferenceService.setTimeZone timezone.getID()
@@ -1040,81 +780,20 @@ class PersonController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def editPreference() {
+        UserLogin userLogin = currentPerson().userLogin
 
-		def prefMap = [:]
-		def labelMap = [CONSOLE_TEAM_TYPE: "Console Team Type", SUPER_CONSOLE_REFRESH: "Console Refresh Time",
-		                CART_TRACKING_REFRESH: "Cart tarcking Refresh Time", BULK_WARNING: "Bulk Warning",
-		                (PREF.DASHBOARD_REFRESH.value()): "Dashboard Refresh Time", (PREF.CURR_TZ.value()): "Time Zone",
-		                (PREF.CURR_POWER_TYPE.value()): "Power Type", (PREF.START_PAGE.value()): "Welcome Page",
-		                (PREF.STAFFING_ROLE.value()): "Default Project Staffing Role",
-		                (PREF.STAFFING_LOCATION.value()): "Default Project Staffing Location",
-		                (PREF.STAFFING_PHASES.value()): "Default Project Staffing Phase",
-		                (PREF.STAFFING_SCALE.value()): "Default Project Staffing Scale", preference: "Preference",
-		                (PREF.DRAGGABLE_RACK.value()): "Draggable Rack", PMO_COLUMN1: "PMO Column 1 Filter",
-		                PMO_COLUMN2: "PMO Column 2 Filter", PMO_COLUMN3: "PMO Column 3 Filter",
-		                PMO_COLUMN4: "PMO Column 4 Filter", (PREF.SHOW_ADD_ICONS.value()): "Rack Add Icons",
-		                MY_TASK: "My Task Refresh Time"]
-
-		String currTimeZone = TimeUtil.defaultTimeZone
-		String currDateTimeFormat = TimeUtil.getDefaultFormatType()
-
-		def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
-		for (pref in prefs) {
-			switch (pref.preferenceCode) {
-				case PREF.MOVE_EVENT.value():
-					prefMap[pref.preferenceCode] = "Event / " + MoveEvent.get(pref.value).name
-					break
-
-				case PREF.CURR_PROJ.value():
-					prefMap[pref.preferenceCode] = "Project / " + Project.get(pref.value).name
-					break
-
-				case PREF.CURR_BUNDLE.value():
-					prefMap[pref.preferenceCode] = "Bundle / " + MoveBundle.get(pref.value).name
-					break
-
-				case PREF.PARTY_GROUP.value():
-					prefMap[pref.preferenceCode] = "Company / " + (!pref.value.equalsIgnoreCase("All") ?
-							PartyGroup.get(pref.value).name : 'All')
-					break
-
-				case PREF.CURR_ROOM.value():
-					prefMap[pref.preferenceCode] = "Room / " + Room.get(pref.value).roomName
-					break
-
-				case PREF.STAFFING_ROLE.value():
-					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefMap[pref.preferenceCode] = "Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)
-					break
-
-				case PREF.AUDIT_VIEW.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefMap[pref.preferenceCode] = "Room Audit View / " + value
-					break
-
-				case PREF.JUST_REMAINING.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefMap[pref.preferenceCode] = "Just Remaining Check / " + value
-					break
-
-				case PREF.CURR_DT_FORMAT:
-					currDateTimeFormat = pref.value
-					break
-
-				case PREF.CURR_TZ:
-					currTimeZone = pref.value
-					break
-
-				default:
-					prefMap[pref.preferenceCode] = (labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value
-					break
-			}
-		}
-
-		render(template: "showPreference",
-		       model: [prefMap: prefMap.sort{it.value}, areas: userPreferenceService.timezonePickerAreas(),
-		               timezones: Timezone.findAll(), currTimeZone: currTimeZone,
-		               currDateTimeFormat: currDateTimeFormat, currentPersonId: securityService.currentPersonId])
+		render(
+			template: "showPreference",
+		    model: [
+				areas: userPreferenceService.timezonePickerAreas(),
+				currTimeZone: TimeUtil.defaultTimeZone,
+				currDateTimeFormat: TimeUtil.getDefaultFormatType(),
+				currentPersonId: securityService.currentPersonId,
+				fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
+				preferences: userPreferenceService.preferenceListForEdit(userLogin),
+				timezones: Timezone.findAll()
+			]
+		)
 	}
 
 	/**

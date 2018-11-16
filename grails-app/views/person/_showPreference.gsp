@@ -1,26 +1,33 @@
 <form id="userPreferencesForm">
-	<table>
-		<g:if test="${prefMap.size() == 0}">
+	<table class="table table-striped col-md-6">
+		<thead>
 			<tr>
-				<th>Preferences: Name / Value</th>
+				<th class="col-md-2">Preference</th>
+				<th class="col-md-8">Value</th>
+				<th class="col-md-2" style="text-align: center;">Remove</th>
 			</tr>
+		</thead>
+		<g:if test="${preferences.size() == 0}">
 			<tr>
-				<td>No preferences</td>
+				<td colspan="3" style="text-align: center;">No preferences</td>
 			</tr>
 		</g:if>
 		<g:else>
-			<tr>
-				<th colspan="2">Preferences: Name / Value</th>
-			</tr>
-			<g:each in="${prefMap}" var="pref">
-				<tr id="pref_${pref.getKey()}">
-					<td nowrap="nowrap"><span>${pref.getValue()}</span></td><td><span class="clear_filter spanAnchor" onclick="UserPreference.removeUserPrefs('${pref.getKey()}')">X</span></td>
+			<g:each in="${preferences}" var="pref">
+				<tr id="pref_${pref.code}">
+					<td nowrap="nowrap">${pref.label}</td>
+					<td nowrap="nowrap">${pref.value}</td>
+					<td style="text-align: center;">
+						<g:if test="${ ! (pref.code in fixedPreferenceCodes) }">
+							<span class="clear_filter spanAnchor" onclick="UserPreference.removeUserPreference('${pref.code}')">X</span>
+						</g:if>
+					</td>
 				</tr>
 			</g:each>
 		</g:else>
 	</table>
 
 	<div class="buttons">
-		<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetPreference(${currentPersonId})" value="Reset All"/> </span>
+		<span class="button"><input id="prefButton" type="button" class="delete" onclick="UserPreference.resetPreferences()" value="Reset All"/> </span>
 	</div>
 </form>

@@ -47,7 +47,7 @@ class ETLTransformDataJob {
 				Map result = dataImportService.transformEtlData(projectId, dataScriptId, filename, progressKey)
 				log.info('ETL transform data execution result: {}', result)
 			}
-		} catch (e) {
+		} catch (Throwable e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
 

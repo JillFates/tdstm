@@ -21,7 +21,7 @@ class DatabaseService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
-		[databaseInstance: db] + assetEntityService.getCommonModelForShows('Database', project, params)
+		[databaseInstance: db, currentUserId: securityService.currentPersonId] + assetEntityService.getCommonModelForShows('Database', project, params)
 	}
 
 	/**
@@ -29,9 +29,9 @@ class DatabaseService implements ServiceMethods {
 	 * @param params - request parameters
 	 */
 	@Transactional(readOnly = true)
-	Map getModelForCreate(Map params) {
+	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
-		Database database = new Database()
+		Database database = new Database(project: project)
 		return [assetInstance: database] + assetEntityService.getCommonModelForCreate('Database', project, database)
 	}
 
