@@ -192,7 +192,7 @@
 			<!-- Last Updated Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
 				<div>
-					{{dataItem[column.domain+'_'+column.property]| userDateTime : userTimeZone }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>
