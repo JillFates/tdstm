@@ -1,5 +1,4 @@
 import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef} from '@angular/core';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
@@ -149,9 +148,12 @@ export class APIActionViewEditComponent implements OnInit {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
 
-		// set the default empty values for agentClass in case they are not defined
-		if (!this.apiActionModel.agentClass) {
-			this.apiActionModel.agentClass = this.defaultDictionaryModel;
+		// set the default empty values for dictionary in case it is not defined
+		if (!this.apiActionModel['apiCatalog']) {
+			this.apiActionModel.dictionary = this.defaultDictionaryModel;
+		} else {
+			// Internally the Dictionary is called Api Catalog
+			this.apiActionModel.dictionary = this.apiActionModel['apiCatalog'];
 		}
 
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
@@ -214,12 +216,12 @@ export class APIActionViewEditComponent implements OnInit {
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.dictionaryList.push({ id: 0, name: 'Select...' });
-					this.apiActionModel.agentClass = this.dictionaryList[0];
-					this.modifySignatureByProperty('agentClass');
+					this.apiActionModel.dictionary = this.dictionaryList[0];
+					this.modifySignatureByProperty('dictionary');
 				}
 				this.dictionaryList.push(...result.data.agentNames);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
-					this.onDictionaryValueChange(this.apiActionModel.agentClass);
+					this.onDictionaryValueChange(this.apiActionModel.dictionary);
 				} else {
 					this.agentMethodList.push({ id: '0', name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
@@ -428,7 +430,7 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.apiActionForm) {
 			this.validInfoForm = this.apiActionForm.valid &&
 				(this.apiActionModel.agentMethod.id !== '0'
-					&& this.apiActionModel.agentClass.id !== 0
+					&& this.apiActionModel.dictionary.id !== 0
 					&& this.apiActionModel.provider.id !== 0
 					&& this.apiActionModel.httpMethod !== 'Select...');
 
@@ -456,7 +458,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
 		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
-		this.apiActionModel.agentClass = dictionaryModel;
+		this.apiActionModel.dictionary = dictionaryModel;
 
 		if (this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
@@ -499,9 +501,9 @@ export class APIActionViewEditComponent implements OnInit {
 				return method.id === this.lastSelectedDictionaryModel.id;
 			});
 			if (agent) {
-				this.apiActionModel.agentClass = R.clone(this.lastSelectedDictionaryModel);
+				this.apiActionModel.dictionary = R.clone(this.lastSelectedDictionaryModel);
 			} else {
-				this.apiActionModel.agentClass = R.clone(this.dictionaryList[0]);
+				this.apiActionModel.dictionary = R.clone(this.dictionaryList[0]);
 			}
 		}
 	}
@@ -659,8 +661,8 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Track the Last Agent Selected
 	 */
 	protected onOpenDictionary(): void {
-		if (this.apiActionModel.agentClass && this.apiActionModel.agentClass.id !== 0) {
-			this.lastSelectedDictionaryModel = R.clone(this.apiActionModel.agentClass);
+		if (this.apiActionModel.dictionary && this.apiActionModel.dictionary.id !== 0) {
+			this.lastSelectedDictionaryModel = R.clone(this.apiActionModel.dictionary);
 		}
 	}
 

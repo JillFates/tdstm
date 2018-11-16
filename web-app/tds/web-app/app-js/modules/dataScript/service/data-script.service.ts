@@ -354,7 +354,7 @@ export class DataScriptService {
 			name: model.name,
 			description: model.description,
 			provider: { id: model.provider.id },
-			apiCatalog: { id: model.agentClass.id },
+			apiCatalog: { id: model.dictionary.id },
 			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
