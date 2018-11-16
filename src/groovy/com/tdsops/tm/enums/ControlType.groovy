@@ -20,7 +20,7 @@ enum ControlType {
     CHASSIS_T("Chassis.T"),
     CHASSIS_S("Chassis.S"),
     DATE("Date"),
-    DATETIME("Datetime")
+    DATETIME("DateTime")
 
     private String value
 
