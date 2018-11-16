@@ -14,7 +14,7 @@ import {APIActionService} from '../../service/api-action.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
-import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
+import {DictionaryModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
 import {DataScriptModel} from '../../../dataScript/model/data-script.model';
 import {NgForm} from '@angular/forms';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
@@ -57,11 +57,6 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
-	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
-	@ViewChild('apiActionAgent', { read: DropDownListComponent }) apiActionAgent: DropDownListComponent;
-	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent }) apiActionAgentMethod: DropDownListComponent;
-	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
-
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
 
@@ -69,7 +64,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
-	public agentList = new Array<AgentModel>();
+	public dictionaryList = new Array<DictionaryModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
 	protected httpMethodList = new Array<any>();
 	public agentCredentialList = new Array<CredentialModel>();
@@ -129,7 +124,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedAgentModel: AgentModel = {
+	private lastSelectedDictionaryModel: DictionaryModel = {
 		id: 0,
 		name: 'Select...'
 	};
@@ -138,7 +133,7 @@ export class APIActionViewEditComponent implements OnInit {
 		name: 'Select...'
 	};
 	private savedApiAction = false;
-	private defaultAgentModel = { name: '', id: 0 };
+	private defaultDictionaryModel = { name: '', id: 0 };
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -156,7 +151,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 		// set the default empty values for agentClass in case they are not defined
 		if (!this.apiActionModel.agentClass) {
-			this.apiActionModel.agentClass = this.defaultAgentModel;
+			this.apiActionModel.agentClass = this.defaultDictionaryModel;
 		}
 
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
@@ -218,13 +213,13 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getAPIActionEnums().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.agentList.push({ id: 0, name: 'Select...' });
-					this.apiActionModel.agentClass = this.agentList[0];
+					this.dictionaryList.push({ id: 0, name: 'Select...' });
+					this.apiActionModel.agentClass = this.dictionaryList[0];
 					this.modifySignatureByProperty('agentClass');
 				}
-				this.agentList.push(...result.data.agentNames);
+				this.dictionaryList.push(...result.data.agentNames);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
-					this.onAgentValueChange(this.apiActionModel.agentClass);
+					this.onDictionaryValueChange(this.apiActionModel.agentClass);
 				} else {
 					this.agentMethodList.push({ id: '0', name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
@@ -456,27 +451,27 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * On a new Agent change
+	 * On a new Dictionary selected
 	 * @param value
 	 */
-	protected onAgentValueChange(agentModel: AgentModel): void {
-		agentModel = agentModel ?  agentModel : this.defaultAgentModel;
-		this.apiActionModel.agentClass = agentModel;
+	protected onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
+		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
+		this.apiActionModel.agentClass = dictionaryModel;
 
-		if (this.lastSelectedAgentModel && this.lastSelectedAgentModel.id !== 0) {
+		if (this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
-					this.loadAgentModel(agentModel, res);
+					this.loadDictionaryModel(dictionaryModel, res);
 				});
 		} else {
-			this.loadAgentModel(agentModel, true);
+			this.loadDictionaryModel(dictionaryModel, true);
 		}
 	}
 
-	private loadAgentModel(agentModel: AgentModel, changeAgent: boolean): void {
+	private loadDictionaryModel(dictionaryModel: DictionaryModel, changeAgent: boolean): void {
 		if (changeAgent) {
-			if (agentModel.id !== 0) {
-				this.apiActionService.getActionMethodById(agentModel.id).subscribe(
+			if (dictionaryModel.id !== 0) {
+				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
 						this.agentMethodList.push({id: '0', name: 'Select...'});
@@ -498,15 +493,15 @@ export class APIActionViewEditComponent implements OnInit {
 				this.agentMethodList.push({id: '0', name: 'Select...'});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
-		} else if (this.lastSelectedAgentModel) {
+		} else if (this.lastSelectedDictionaryModel) {
 			// Return the value to the previous one if is on the same List
-			let agent = this.agentList.find((method) => {
-				return method.id === this.lastSelectedAgentModel.id;
+			let agent = this.dictionaryList.find((method) => {
+				return method.id === this.lastSelectedDictionaryModel.id;
 			});
 			if (agent) {
-				this.apiActionModel.agentClass = R.clone(this.lastSelectedAgentModel);
+				this.apiActionModel.agentClass = R.clone(this.lastSelectedDictionaryModel);
 			} else {
-				this.apiActionModel.agentClass = R.clone(this.agentList[0]);
+				this.apiActionModel.agentClass = R.clone(this.dictionaryList[0]);
 			}
 		}
 	}
@@ -663,9 +658,9 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Track the Last Agent Selected
 	 */
-	protected onOpenAgent(): void {
+	protected onOpenDictionary(): void {
 		if (this.apiActionModel.agentClass && this.apiActionModel.agentClass.id !== 0) {
-			this.lastSelectedAgentModel = R.clone(this.apiActionModel.agentClass);
+			this.lastSelectedDictionaryModel = R.clone(this.apiActionModel.agentClass);
 		}
 	}
 

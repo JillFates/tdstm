@@ -7,7 +7,7 @@ import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../../apiAction/model/api-action.model';
-import {AgentModel, AgentMethodModel} from '../../apiAction/model/agent.model';
+import {AgentMethodModel} from '../../apiAction/model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../../credential/model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
