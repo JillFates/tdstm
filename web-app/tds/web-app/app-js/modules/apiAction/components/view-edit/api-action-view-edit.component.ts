@@ -149,11 +149,8 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionModel = R.clone(this.originalModel);
 
 		// set the default empty values for dictionary in case it is not defined
-		if (!this.apiActionModel['apiCatalog']) {
+		if (!this.apiActionModel.dictionary) {
 			this.apiActionModel.dictionary = this.defaultDictionaryModel;
-		} else {
-			// Internally the Dictionary is called Api Catalog
-			this.apiActionModel.dictionary = this.apiActionModel['apiCatalog'];
 		}
 
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
