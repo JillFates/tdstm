@@ -21,7 +21,7 @@ class UserPreferenceEnumTests extends Specification {
 
     def '3. getting valueOfNameOrCode passing value results in a UserPreferenceEnum instance'() {
         expect:
-            UserPreferenceEnum.ASSET_LIST_SIZE == UserPreferenceEnum.valueOfNameOrValue('assetListSize')
+            UserPreferenceEnum.ASSET_LIST_SIZE == UserPreferenceEnum.valueOfNameOrValue('ASSET_LIST_SIZE')
     }
 
     def '4. getting valueOfNameOrCode entry has no value results in a UserPreferenceEnum instance'() {
