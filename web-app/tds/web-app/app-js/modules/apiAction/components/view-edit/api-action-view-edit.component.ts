@@ -333,7 +333,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isParameterListDirty(): boolean {
-		return this.dataParameterListSignature !== JSON.stringify(this.parameterList);
+		if (this.dataParameterListSignature !== "" && this.parameterList.length > 0) {
+			return this.dataParameterListSignature !== JSON.stringify(this.parameterList);
+		}
 	}
 
 	/**
@@ -374,7 +376,6 @@ export class APIActionViewEditComponent implements OnInit {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
-		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
 	}
