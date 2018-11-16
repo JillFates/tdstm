@@ -8,6 +8,7 @@ import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.bulk.change.BulkChangeNumber
 import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
@@ -40,6 +41,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		(ControlType.REFERENCE.value())         : BulkChangeReference.class,
 		(ControlType.DATE.value())              : BulkChangeString.class,
 		(ControlType.DATETIME.value())          : BulkChangeString.class,
+		(ControlType.NUMBER.value())            : BulkChangeNumber.class
 	].asImmutable()
 
 	/**
