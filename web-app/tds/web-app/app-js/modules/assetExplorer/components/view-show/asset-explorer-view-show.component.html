@@ -37,7 +37,9 @@
             </span>
             <button type="button" class="btn btn-default" id="btnExport" (click)="onExport()">
                 <i class="fa fa-fw fa-download"></i> Export</button>
-            <asset-explorer-view-selector #select="assetExplorerViewSelector"></asset-explorer-view-selector>
+            <asset-explorer-view-selector
+                    #select="assetExplorerViewSelector">
+            </asset-explorer-view-selector>
             <span class="btn" (click)="onEdit()" *ngIf="isEditAvailable()" style="margin:0 10px;padding:5px 10px;float:right;">
                 <i style="font-size:20px;" class="fa fa-cog"></i>
             </span>
@@ -46,8 +48,13 @@
         <div>
             <!-- /.box-header -->
             <div class="box-body">
-                <asset-explorer-view-grid #grid="assetExplorerViewGrid"
+                <asset-explorer-view-grid
+                                          [data]=data
                                           (modelChange)="onQuery()"
+                                          (justPlanningChange)="onJustPlanningChange($event)"
+                                          [gridState]="gridState"
+                                          (gridStateChange)="onGridStateChange($event)"
+                                          [fields]="fields"
                                           [edit]="false"
                                           [model]="model.schema"
                                           [viewId]="model.id"

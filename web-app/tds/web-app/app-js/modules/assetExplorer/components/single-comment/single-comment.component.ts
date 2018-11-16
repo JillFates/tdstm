@@ -6,7 +6,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
@@ -41,7 +41,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 			if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
 				this.singleCommentModel.category = this.commentCategories[0];
 			}
-			this.dataSignature = JSON.stringify(this.singleCommentModel);
+			this.dataSignature = JSON.stringify(this.getModelFields());
 		});
 	}
 
@@ -50,7 +50,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.singleCommentModel);
+		return this.dataSignature !== JSON.stringify(this.getModelFields());
 	}
 
 	/**
@@ -65,6 +65,15 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		this.taskManagerService.saveComment(this.singleCommentModel).subscribe((res) => {
 			this.close();
 		});
+	}
+
+	/**
+	 * Get only the fields relevants to the model
+	 */
+	getModelFields(): any {
+		const {id, archive, comment, category, assetClass, asset} = this.singleCommentModel;
+
+		return {id, archive, comment, category, assetClass, asset};
 	}
 
 	/**
@@ -83,16 +92,6 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 				}
 			})
 			.catch((error) => console.log(error));
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
 	}
 
 	/**

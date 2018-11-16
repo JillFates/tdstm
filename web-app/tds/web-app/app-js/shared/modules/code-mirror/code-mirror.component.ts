@@ -76,7 +76,7 @@ export class CodeMirrorComponent implements OnInit {
 	 */
 	public getCodeMirrorLibrary(): any {
 		return import(
-			/* webpackChunkName: "codemirror" */
+			/* webpackChunkName: "vendors-codemirror" */
 			/* webpackMode: "lazy" */
 			'codemirror/lib/codemirror')
 			.catch(error => 'An error occurred while loading the component');

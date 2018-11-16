@@ -10,6 +10,7 @@ import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
@@ -188,10 +189,19 @@ class CustomDomainService implements ServiceMethods {
      */
     void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
+
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
+
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
+
+                for (JSONObject field : customFieldSpec.fields) {
+                    if (((String) field.field).startsWith('custom')) {
+                        field.bulkChangeActions = ["replace", "clear"] as JSONArray
+                    }
+                }
+
                 settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
             } else {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")

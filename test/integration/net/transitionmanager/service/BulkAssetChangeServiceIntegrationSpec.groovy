@@ -461,6 +461,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test person field bulkChange replace'() {
 		setup: 'given an edit command for replacing person field, and a bulk change command holding the edit'
+			BulkChangePerson.projectService = [getAssignableStaff: { Project project, Person forWhom ->[[test:true]]}] as ProjectService
 			EditCommand editCommand = new EditCommand(fieldName: 'appOwner', action: 'replace', value: "${person.id}")
 			bulkChangeCommand.edits = [editCommand]
 

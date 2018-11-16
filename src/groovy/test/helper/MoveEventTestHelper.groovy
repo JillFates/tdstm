@@ -14,4 +14,19 @@ class MoveEventTestHelper {
 		).save(flush: true, failOnError: true)
 		return moveEvent
 	}
+
+	/**
+	 * Create a move event if not exists from given name for E2EProjectSpec to persist at server DB
+	 * @param: project
+	 * @param: name
+	 * @returm the event
+	 */
+	MoveEvent createMoveEvent(Project project, String name) {
+		MoveEvent event = MoveEvent.findWhere([name: name, project: project])
+		if (!event) {
+			event = new MoveEvent([project: project, name: name, calcMethod: MoveEvent.METHOD_LINEAR])
+			event.save(flush: true)
+		}
+		return event
+	}
 }

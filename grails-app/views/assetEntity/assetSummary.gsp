@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -83,7 +84,7 @@
             var isChecked = $(input).attr('checked') === 'checked';
             jQuery.ajax({
                 url: tdsCommon.createAppURL('/ws/user/preference'),
-                data: { 'value': isChecked, 'code': 'assetJustPlanning' },
+                data: { 'value': isChecked, 'code': '${UserPreferenceEnum.ASSET_JUST_PLANNING.name()' },
                 type: 'POST',
                 success: function (data) {
                     window.location.reload();

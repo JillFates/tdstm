@@ -550,7 +550,10 @@ export class TaskEditCreateModelHelper {
 	 * @returns {boolean}
 	 */
 	deleteSuccessor(index: number): boolean {
-		return this.deleteTaskItem(index, this.model.successorList, this.model.deletedSuccessorList);
+		const deleted =  this.deleteTaskItem(index, this.model.successorList, this.model.deletedSuccessorList);
+		this.model.successorList = this.model.successorList.slice();
+		return deleted;
+
 	}
 
 	/**
@@ -559,7 +562,10 @@ export class TaskEditCreateModelHelper {
 	 * @returns {boolean}
 	 */
 	deletePredecessor(index: number): boolean {
-		return this.deleteTaskItem(index, this.model.predecessorList, this.model.deletedPredecessorList);
+		const deleted = this.deleteTaskItem(index, this.model.predecessorList, this.model.deletedPredecessorList);
+		this.model.predecessorList = this.model.predecessorList.slice();
+
+		return deleted;
 	}
 
 	/**
@@ -629,7 +635,7 @@ export class TaskEditCreateModelHelper {
 	 * @param {string} taskNumber Task number to delete
 	 * @returns {string}
 	 */
-	private removeTaskNumberFromDescription(description: string, taskNumber: string): string {
+	public removeTaskNumberFromDescription(description: string, taskNumber: string): string {
 		return description.replace(new RegExp(`^${taskNumber}: `), '')
 	}
 

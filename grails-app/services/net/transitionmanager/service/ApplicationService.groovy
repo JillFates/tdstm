@@ -103,18 +103,23 @@ class ApplicationService implements ServiceMethods {
 	 * @param params - request parameters
 	 * @return a map of the properties
 	 */
-	Map getModelForCreate(Map params) {
+	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
-		Application application = new Application()
-		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+		Application application = new Application(project: project)
+		List moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 
-		def personList = partyRelationshipService.getProjectApplicationStaff(project)
-		def availableRoles = partyRelationshipService.getStaffingRoles()
-		def partyGroupList = partyRelationshipService.getCompaniesList()
+		List personList = partyRelationshipService.getProjectApplicationStaff(project)
+		List availableRoles = partyRelationshipService.getStaffingRoles()
+		List partyGroupList = partyRelationshipService.getCompaniesList()
 
-		return [assetInstance: application, moveEventList: moveEventList, availableRoles: availableRoles, partyGroupList: partyGroupList,
-				staffTypes: Person.constraints.staffType.inList, personList: personList] +
-				assetEntityService.getCommonModelForCreate('Application', project, application)
+		return [
+			assetInstance: application,
+			moveEventList: moveEventList,
+			availableRoles: availableRoles,
+			partyGroupList: partyGroupList,
+			staffTypes: Person.constraints.staffType.inList,
+			personList: personList
+		] + assetEntityService.getCommonModelForCreate('Application', project, application)
 	}
 
 	/**

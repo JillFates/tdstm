@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
@@ -47,6 +48,7 @@ class ApplicationController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AssetService assetService
+	AssetOptionsService assetOptionsService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -353,8 +355,8 @@ class ApplicationController implements ControllerMethods {
 		assetService.setCustomDefaultValues(application)
 
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		List<AssetOptions> environmentOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort: 'name'])
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)

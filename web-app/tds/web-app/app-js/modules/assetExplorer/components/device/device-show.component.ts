@@ -1,13 +1,8 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { AssetShowComponent } from '../asset/asset-show.component';
-import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
-import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
 import {AssetEditComponent} from '../asset/asset-edit.component';
-import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {TagModel} from '../../../assetTags/model/tag.model';
 import { DeviceModel } from './model-device/model/device-model.model';
 import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.model';
 import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
@@ -20,45 +15,33 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
-
-declare var jQuery: any;
+import {AssetCommonShow} from '../asset/asset-common-show';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetCommonHelper} from '../asset/asset-common-helper';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
 		selector: `tds-device-show`,
 		template: template
-	}) class DeviceShowComponent implements OnInit {
-		mainAsset = modelId;
-		protected assetTags: Array<TagModel> = metadata.assetTags;
-		public manufacturerName: string;
+	})
+	class DeviceShowComponent extends AssetCommonShow {
+
+		protected manufacturerName: string;
 
 		constructor(
-			private activeDialog: UIActiveDialogService,
-			private dialogService: UIDialogService,
-			private assetService: DependecyService,
+			activeDialog: UIActiveDialogService,
+			dialogService: UIDialogService,
+			assetService: DependecyService,
 			private modelService: ModelService,
 			private manufacturerService: ManufacturerService,
-			private prompt: UIPromptService,
-			private assetsExplorerService: AssetExplorerService,
-			private notifierService: NotifierService) {
-			this.manufacturerName = null;
-		}
-
-		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-			if (event && event.code === KEYSTROKE.ESCAPE) {
-				this.cancelCloseDialog();
-			}
-		}
-
-		/**
-		 * Initiates The Injected Component
-		 */
-		ngOnInit(): void {
-			jQuery('[data-toggle="popover"]').popover();
-		}
-
-		cancelCloseDialog(): void {
-			this.activeDialog.dismiss();
+			prompt: UIPromptService,
+			assetExplorerService: AssetExplorerService,
+			notifierService: NotifierService,
+			preferenceService: PreferenceService) {
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService);
+				this.mainAsset = modelId;
+				this.assetTags = metadata.assetTags;
+				this.manufacturerName = null;
 		}
 
 		getManufacturer(manufacturerName): string {
@@ -66,30 +49,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				this.manufacturerName = manufacturerName;
 			}
 			return this.manufacturerName;
-		}
-
-		showAssetDetailView(assetClass: string, id: number) {
-			this.dialogService.replace(AssetShowComponent, [
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.LG);
-		}
-
-		showDependencyView(assetId: number, dependencyAsset: number) {
-			this.assetService.getDependencies(assetId, dependencyAsset)
-				.subscribe((result) => {
-					this.dialogService.extra(AssetDependencyComponent, [
-						{ provide: 'ASSET_DEP_MODEL', useValue: result }])
-						.then(res => console.log(res))
-						.catch(res => console.log(res));
-				}, (error) => console.log(error));
-		}
-
-		showAssetEditView() {
-			this.dialogService.replace(AssetEditComponent, [
-					{ provide: 'ID', useValue: this.mainAsset },
-					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.LG);
 		}
 
 		showModel(id: string): void {
@@ -127,27 +86,11 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				});
 		}
 
-		/**
-		 allows to delete the application assets
-		 */
-		onDeleteAsset() {
-
-			this.prompt.open('Confirmation Required',
-				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'OK', 'Cancel')
-				.then( success => {
-					if (success) {
-						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
-							if (res) {
-								this.notifierService.broadcast({
-									name: 'reloadCurrentAssetList'
-								});
-								this.activeDialog.dismiss();
-							}
-						}, (error) => console.log(error));
-					}
-				})
-				.catch((error) => console.log(error));
+		showAssetEditView() {
+			this.dialogService.replace(AssetEditComponent, [
+					{ provide: 'ID', useValue: this.mainAsset },
+					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
+				DIALOG_SIZE.LG);
 		}
 
 		/**
@@ -176,10 +119,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				}
 			})
 				.catch( error => console.log('error', error));
-		}
-
-		getGraphUrl(): string {
-			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

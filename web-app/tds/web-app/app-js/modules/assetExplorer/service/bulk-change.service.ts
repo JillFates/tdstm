@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 
@@ -46,7 +46,6 @@ export class BulkChangeService {
 			userParams: defaultUserParams,
 			type: type
 		}
-
 		return this.http.put(this.getURL(), JSON.stringify(payload))
 			.map((res: Response) => {
 				let result = res.json();
@@ -63,6 +62,12 @@ export class BulkChangeService {
 	 */
 	getActions(): Observable<any[]> {
 		return this.http.get(this.getURL('actions'))
+			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
+	}
+
+	getAssetListOptions(assetClass: string): Observable<any> {
+		return this.http.get(`../ws/asset/defaultCreateModel/${assetClass}`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}

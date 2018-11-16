@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Headers, RequestOptions, Response} from '@angular/http';

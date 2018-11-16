@@ -17,6 +17,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
+import test.helper.DataviewTestHelper
 
 
 class ProjectServiceIntegrationSpec extends Specification {
