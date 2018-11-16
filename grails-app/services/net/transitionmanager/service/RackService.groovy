@@ -1,5 +1,7 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetCableMap
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -9,6 +11,7 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.security.Permission
 
 class RackService implements ServiceMethods {
 
@@ -146,5 +149,34 @@ class RackService implements ServiceMethods {
 			}
 		}
 		return racks
+	}
+
+	/**
+	 * This method is used  give power connection to a selected rack.
+	 * @param rackId - id of requested rack.
+	 * @return -  rack
+	 */
+	@Transactional
+	def assignPowerForRack(rackId) {
+		def rack = Rack.read(rackId)
+		def toPowers = ["A", "B", "C"]
+		rack.assets.each { asset ->
+			def assetCablePowerList = AssetCableMap.findAllByAssetFrom(asset).findAll { it.assetFromPort.type == "Power" }
+			assetCablePowerList = assetCablePowerList.size() > 3 ? assetCablePowerList[0..2] : assetCablePowerList
+			assetCablePowerList.eachWithIndex { assetCablePower, i ->
+				if (!assetCablePower.toPower) {
+					assetCablePower.assetTo = assetCablePower.assetFrom
+					assetCablePower.assetToPort = null
+					assetCablePower.toPower = toPowers[i]
+					assetCablePower.cableColor = 'Black'
+					assetCablePower.cableStatus = 'Cabled'
+
+					if (!assetCablePower.save(flush: true)) {
+						assetCablePower.errors.allErrors.each { println it }
+					}
+				}
+			}
+		}
+		return rack
 	}
 }

@@ -1200,42 +1200,13 @@ class RackLayoutsController implements ControllerMethods {
 		def rack
 		if (params.roomId) {
 			Rack.findAllByRoom(Room.load(params.roomId), [sort: "tag"]).each { r ->
-				rack = assignPowerForRack(r.id)
+				rack = rackService.assignPowerForRack(r.id)
 			}
 		}
 		else {
-			rack = assignPowerForRack(params.rackId)
+			rack = rackService.assignPowerForRack(params.rackId)
 		}
 		render "Rack ${rack.tag} wired"
-	}
-
-	/**
-	 * This method is used  give power connection to a selected rack.
-	 * @param rackId - id of requested rack.
-	 * @return -  rack
-	 */
-	@HasPermission(Permission.RackEdit)
-	def assignPowerForRack(rackId) {
-		def rack = Rack.read(rackId)
-		def toPowers = ["A", "B", "C"]
-		rack.assets.each { asset ->
-			def assetCablePowerList = AssetCableMap.findAllByAssetFrom(asset).findAll { it.assetFromPort.type == "Power" }
-			assetCablePowerList = assetCablePowerList.size() > 3 ? assetCablePowerList[0..2] : assetCablePowerList
-			assetCablePowerList.eachWithIndex { assetCablePower, i ->
-				if (!assetCablePower.toPower) {
-					assetCablePower.assetTo = assetCablePower.assetFrom
-					assetCablePower.assetToPort = null
-					assetCablePower.toPower = toPowers[i]
-					assetCablePower.cableColor = 'Black'
-					assetCablePower.cableStatus = 'Cabled'
-
-					if (!assetCablePower.save(flush: true)) {
-						assetCablePower.errors.allErrors.each { println it }
-					}
-				}
-			}
-		}
-		return rack
 	}
 
 	/**
