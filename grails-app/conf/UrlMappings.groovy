@@ -121,6 +121,13 @@ class UrlMappings {
 			]
 		}
 
+		'/ws/asset/listDependencies' {
+			controller = 'wsAsset'
+			action = [
+			    GET: 'listDependencies'
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}

@@ -526,5 +526,18 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(AssetClass.classOptions)
 	}
 
+	/**
+	 * Return the list of dependencies for the Dependency List.
+	 */
+	@HasPermission(Permission.AssetView)
+	def listDependencies() {
+		Project project = getProjectForWs()
+		int maxRows = params.int('rows', 25)
+		int currentPage = params.int('page', 1)
+		int rowOffset = (currentPage - 1) * maxRows
+		Map paginationParams = [max: params.int('rows', 25), offset: rowOffset]
+		Map sortingParams = [index: params.sidx ?: 'asset', order: params.sord ?: 'asc']
+		renderSuccessJson(assetEntityService.listDependencies(project, params, sortingParams, paginationParams))
+	}
 
 }
