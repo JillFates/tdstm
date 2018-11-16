@@ -55,7 +55,7 @@
 				                        [enabled]="hasSelectedItems()"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="hasSelectedItems()" class="selected-assets">
+				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
 					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 				</div>
 				<div class="checkbox just-planning">
