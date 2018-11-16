@@ -6,6 +6,9 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
+import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
+import {UserService} from '../../../modules/user/service/user.service';
+import {UIDialogService} from '../../services/ui-dialog.service';
 
 declare var jQuery: any;
 
@@ -15,6 +18,8 @@ declare var jQuery: any;
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <ng-container *ngIf="pageMetaData">
+	            <!-- Used for the user preferences until fully converted to angular -->
+                <span (click)="openPrefModal()" class="open-pref-modal"></span>
                 <h1>
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
@@ -55,6 +60,7 @@ export class HeaderComponent {
 		private notifierService: NotifierService,
 		private titleService: Title,
 		promptService: UIPromptService,
+		private dialogService: UIDialogService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
@@ -78,6 +84,7 @@ export class HeaderComponent {
 			}
 		);
 
+		// TODO : TM-13098 Jorge - what is going on with this?  This is null some times and blows up
 		jQuery('.menu-parent-tasks > a')[0].onclick = null;
 
 		this.headerListeners();
@@ -142,5 +149,16 @@ export class HeaderComponent {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This is a hack to open the modal window properly before the user menu is angular.
+	 */
+	public openPrefModal(): void {
+		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			if(result) {
+				console.error(result);
+			}
+		});
 	}
 }

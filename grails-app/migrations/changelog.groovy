@@ -1,3 +1,5 @@
+import version.*
+
 databaseChangeLog = {
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
@@ -277,4 +279,6 @@ databaseChangeLog = {
     include file: '20181024-person-table-drop-column-model-score-bonus.groovy'
 	include file: '20181012-add-bulk-actions-for-standard-custom-and-other.groovy'
 	include file: '20181105-move-bundle-should-have-list-control.groovy'
+	include file: 'version/v4_6_0/20181115-delete-bogus-user-preferences.groovy'
+
 }
