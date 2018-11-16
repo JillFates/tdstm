@@ -49,6 +49,22 @@ class DomainClassQueryHelper {
 	static final String MODEL_ALIAS = 'MDL_ALIAS'
 
 	/**
+	 * Static map of fields that require special alternate key query joins
+	 */
+	static Map otherAlternateKeys = [
+		locationSource: [
+			property: DOMAIN_ALIAS + '.roomSource.location',
+			namedParameter: 'roomSource_location',
+			join: 'left outer join ' + DOMAIN_ALIAS + '.roomSource'
+		],
+		locationTarget: [
+			property: DOMAIN_ALIAS + '.roomTarget.location',
+			namedParameter: 'roomTarget_location',
+			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
+		],
+	]
+
+	/**
 	 * Executes the HQL query related to the domain defined.
 	 * @param domain an instance of ETLDomain used to defined the correct HQL query to be executed
 	 * @param project a project instance used as a param in the HQL query
@@ -599,56 +615,61 @@ class DomainClassQueryHelper {
 	 */
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
-		if (property.contains("${DOMAIN_ALIAS}.manufacturer.name")) {
-			/**
-			 * find Device by manufacturer eq '...' into '..'
-			 */
-			return """
-				( ${sentence} or 
-					D.manufacturer in ( 
-						select ${MANUFACTURER_ALIAS}.manufacturer
-                  		  from ManufacturerAlias ${MANUFACTURER_ALIAS}
-                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter} 
-                     )	
-				 )
-			"""
-		} else if (property.contains("${DOMAIN_ALIAS}.name") && clazz in Manufacturer) {
+		if (clazz == AssetEntity.class) {
+			if ( property == "${DOMAIN_ALIAS}.manufacturer.name" ) {
+				/**
+				* find Device by manufacturer eq '...' into '..'
+				*/
+				return """
+					( ${sentence} or
+						D.manufacturer in (
+							select ${MANUFACTURER_ALIAS}.manufacturer
+							from ManufacturerAlias ${MANUFACTURER_ALIAS}
+							where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
+						)
+					)
+				"""
+			}
+
+			if ( property == "${DOMAIN_ALIAS}.model.modelName" ) {
+				/**
+				* find Device by model eq '...' into '..'
+				*/
+				return """
+					( ${sentence} or
+						D.model in (
+							select ${MODEL_ALIAS}.model
+							from ModelAlias ${MODEL_ALIAS}
+							where ${MODEL_ALIAS}.name = :${namedParameter}
+						)
+					)
+				"""
+			}
+		} else if ( clazz in Manufacturer && property == "${DOMAIN_ALIAS}.name" ) {
 			/**
 			 * find Manufacturer by name eq '...' into '..'
 			 */
 			return """
-				( ${sentence} or 
-					D in ( 
+				( ${sentence} or
+					D in (
 						select ${MANUFACTURER_ALIAS}.manufacturer
                   		  from ManufacturerAlias ${MANUFACTURER_ALIAS}
-                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter} 
-                     )	
+                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
+                     )
 				 )
 			"""
-		} else if (property.contains("${DOMAIN_ALIAS}.model.modelName")) {
-			/**
-			 * find Device by model eq '...' into '..'
-			 */
-			return """
-			( ${sentence} or 
-			  D.model in ( 
-				select ${MODEL_ALIAS}.model
-				  from ModelAlias ${MODEL_ALIAS}
-				 where ${MODEL_ALIAS}.name = :${namedParameter} 
-			  )	
-			)
-			"""
-		} else if ((property.contains("${DOMAIN_ALIAS}.modelName") && clazz in Model)) {
+
+		} else if ( clazz in Model && property == "${DOMAIN_ALIAS}.modelName" ) {
 			/**
 			 * find Model by modelName eq '...' into '..'
 			 */
 			return """
-			( ${sentence} or 
-			  D in ( 
+			( ${sentence} or
+			  D in (
 				select ${MODEL_ALIAS}.model
 				  from ModelAlias ${MODEL_ALIAS}
-				 where ${MODEL_ALIAS}.name = :${namedParameter} 
-			  )	
+				 where ${MODEL_ALIAS}.name = :${namedParameter}
+			  )
 			)
 			"""
 		}
@@ -656,17 +677,4 @@ class DomainClassQueryHelper {
 		return sentence
 	}
 
-
-	static Map otherAlternateKeys = [
-		locationSource: [
-			property: DOMAIN_ALIAS + '.roomSource.location',
-			namedParameter: 'roomSource_location',
-			join: 'left outer join ' + DOMAIN_ALIAS + '.roomSource'
-		],
-		locationTarget: [
-			property: DOMAIN_ALIAS + '.roomTarget.location',
-			namedParameter: 'roomTarget_location',
-			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
-		],
-	]
 }
