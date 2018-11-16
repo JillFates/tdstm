@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
 import {BehaviorSubject} from 'rxjs';
@@ -13,12 +13,17 @@ import {DependenciesColumnModel} from '../../model/dependencies-column.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 
 import {tap, map, mergeMap} from 'rxjs/operators';
+import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
+import {BulkActionResult} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 
 @Component({
 	selector: 'tds-dependencies-list',
 	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/list/dependencies-list.component.html'
 })
 export class DependenciesListComponent implements OnInit {
+	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	protected gridStateSubject: BehaviorSubject<State>;
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -26,27 +31,39 @@ export class DependenciesListComponent implements OnInit {
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	public gridData: GridDataResult;
 	protected state: State;
+	protected idFieldName = 'dependencyId';
+	public bulkItems: number[] = [];
+	private bulkData: any;
 
 	constructor(
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
-		private dependenciesService: DependenciesService) {
+		private bulkCheckboxService: BulkCheckboxService,
+		private dependenciesService: DependenciesService
+	) {
+		this.gridData = { data: [], total: 0 };
+		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
+		this.bulkCheckboxService.setIdFieldName(this.idFieldName);
+		this.dependenciesColumnModel = new DependenciesColumnModel();
+		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
 	}
 
 	ngOnInit() {
-		this.gridData = { data: [], total: 0 };
-		this.dependenciesColumnModel = new DependenciesColumnModel();
-		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
-
 		this.gridStateSubject
 			.pipe(
-				tap((state: State) => this.state = state),
+				tap((state: State) => {
+					this.state = state;
+					this.bulkCheckboxService.setPageSize(this.state.take);
+				}),
 				mergeMap((state) => this.dependenciesService.getDependencies(state)),
 				map((results) => ({data: results.assets, total: results.pagination.total}))
 			)
-			.subscribe((results) => this.gridData = results);
+			.subscribe((results) => {
+				this.gridData = results;
+				this.bulkCheckboxService.initializeKeysBulkItems(results.data || []);
+			});
 	}
 
 	/**
@@ -74,6 +91,48 @@ export class DependenciesListComponent implements OnInit {
 			take: GRID_DEFAULT_PAGE_SIZE,
 			skip: 0
 		}
+	}
+
+	/**
+	 * Get the current selected items counter
+	 * @returns {number}
+	 */
+	getSelectedItemsCount(): number {
+		const allCounter = (this.gridData && this.gridData.total) || 0;
+		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
+	}
+
+	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
+		this.bulkCheckboxService.changeState(checkboxState);
+	}
+
+	checkItem(id: number, checked: boolean): void {
+		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
+	}
+
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		if (operationResult.success) {
+			this.bulkCheckboxService.uncheckItems();
+			// this.onReload();
+		}
+	}
+
+	onClickBulkButton(): void {
+		this.bulkCheckboxService
+			.getBulkSelectedItems(null,
+				this.dependenciesService.getDependencies({skip: 0, take: this.gridData.total}))
+			.subscribe((results: any) => {
+				console.log('The results are');
+				console.log(results);
+				this.bulkItems = [...results.selectedAssetsIds];
+				// this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: [...results.selectedAssets]});
+
+			}, (err) => console.log('Error', err));
+	}
+
+	hasSelectedItems(): boolean {
+		return this.bulkCheckboxService.hasSelectedItems();
 	}
 
 }

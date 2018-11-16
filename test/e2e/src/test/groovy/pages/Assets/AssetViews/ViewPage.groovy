@@ -61,6 +61,7 @@ class ViewPage extends Page{
         selectedAssets {$('.selected-assets')}
         gridHeader {$(".k-grid-header")}
         editAssetButtons { $("button", title: "Edit Asset")}
+        cloneAssetButtons { $("button", title: "Clone Asset")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -447,6 +448,10 @@ class ViewPage extends Page{
         waitFor{noRecords.text() == text}
     }
 
+    def verifyRowsDisplayed(){
+        commonsModule.verifyElementDisplayed($(".asset-detail-name-column"))
+    }
+
     def addColumnByName(name){
         clickOnGear()
         createViewModule.clickSpecificCheckbox name
@@ -525,8 +530,7 @@ class ViewPage extends Page{
 
     def getFirstElementNameText(){
         goToBulkChangeButton()
-        waitFor{firstElementName.displayed}
-        firstElementName.text()
+        assetNames[0].text()
     }
 
     def getFirstElementClassText(){
@@ -537,5 +541,14 @@ class ViewPage extends Page{
 
     def clickOnCreateButton(){
         createButton.click()
+    }
+
+    def getRowsSize(){
+        def assetRowDataDisplayed = rows.find("tr")
+        assetRowDataDisplayed.size()
+    }
+
+    def clickOnFirstAssetCloneActionButton(){
+        waitFor{cloneAssetButtons[0].click()}
     }
 }

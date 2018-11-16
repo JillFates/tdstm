@@ -35,7 +35,6 @@ class Person extends Party {
 	String workPhone
 	String mobilePhone
 	Integer modelScore = 0
-	Integer modelScoreBonus = 0
 	String personImageURL
 	String keyWords
 	String tdsNote
@@ -60,7 +59,6 @@ class Person extends Party {
 		middleName size: 0..20
 		mobilePhone nullable: true, phoneNumber: true
 		modelScore nullable: true
-		modelScoreBonus nullable: true
 		nickName nullable: true, size: 0..34
 		personImageURL nullable: true
 		staffType blank: false, inList: ['Contractor', 'Hourly', 'Salary']

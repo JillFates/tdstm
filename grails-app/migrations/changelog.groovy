@@ -274,6 +274,7 @@ databaseChangeLog = {
 	include file: '20180829-rename-agent-to-connector.groovy'
 	include file: '20180815-date-columns-to-have-date-controls-for-common-fields.groovy'
 	include file: '20180917-move-bulk-specification-to-field-specs.groovy'
+    include file: '20181024-person-table-drop-column-model-score-bonus.groovy'
 	include file: '20181012-add-bulk-actions-for-standard-custom-and-other.groovy'
 	include file: '20181105-move-bundle-should-have-list-control.groovy'
 }

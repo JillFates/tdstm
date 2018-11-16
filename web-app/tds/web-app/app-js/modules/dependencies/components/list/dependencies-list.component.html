@@ -14,12 +14,25 @@
 						(dataStateChange)="dataStateChange($event)"
 						[selectable]="true">
 
+					<!-- Header Toolbar -->
+					<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+						<div class="col-sm-6 bulkchange-section">
+							<tds-bulk-change-button #tdsBulkChangeButton
+							                        [enabled]="hasSelectedItems()"
+							                        (clickBulk)="onClickBulkButton()"
+							                        (operationResult)="onBulkOperationResult($event)">
+							</tds-bulk-change-button>
+
+							<div *ngIf="hasSelectedItems()" class="selected-assets">
+								<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+							</div>
+						</div>
+						<div class="col-sm-6 filters-section"></div>
+					</ng-template>
+
 					<!-- Select All column -->
 					<kendo-grid-column [width]="55" [filterable]="false">
 						<ng-template kendoGridHeaderTemplate>
-							<div>
-							</div>
-							<!--
 							<div class="row">
 								<div class="col-md-12 text-center">
 									<tds-checkbox name="assetsSelector"
@@ -29,12 +42,14 @@
 									              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 								</div>
 							</div>
-							-->
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate let-dataItem>
 							<label class="selectall-checkbox-column text-center">
-								<input type="checkbox" />
+								<input type="checkbox" id="checkbox_{{dataItem.dependencyId}}"
+								       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.dependencyId)"
+								       (change)="checkItem(dataItem.dependencyId, $event.target.checked)"
+								       name="checkbox_{{dataItem.dependencyId}}">
 							</label>
 						</ng-template>
 					</kendo-grid-column>

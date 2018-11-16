@@ -34,12 +34,13 @@ export class DependenciesService {
 					assets: legacyFormat.rows.map((row) => {
 						const [
 							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status
+							assetBundle, multiField1, multiField2, status, sourceDependencyId, targetDependencyId
 						] = row.cell;
 
 						return {
 							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status
+							assetBundle, multiField1, multiField2, status, sourceDependencyId, targetDependencyId,
+							dependencyId: row.id
 						}
 					})
 					.filter((item, index) => index <= pageSize - 1),

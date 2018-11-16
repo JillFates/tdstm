@@ -14,12 +14,14 @@ class AssetDetailsPage extends Page{
         modalTitle.text().contains("Detail")
         editButton.present
         closeButton.present
+        cloneButton.present
     }
     static content = {
         assetDetailModal { $("div.tds-angular-component-content")}
         modalTitle { assetDetailModal.find(".modal-title")}
         editButton { assetDetailModal.find(".modal-footer button span.glyphicon-pencil")}
-        closeButton { assetDetailModal.find(".modal-footer button span.glyphicon-ban-circle")}
+        closeButton { assetDetailModal.find(".modal-header .close")}
+        cloneButton { assetDetailModal.find(".modal-footer button span.glyphicon-duplicate")}
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
@@ -28,11 +30,11 @@ class AssetDetailsPage extends Page{
         addCommentsButton(wait: true) { commentsContent.find('button.btn-add')}
         commentsSectionTitle(wait: true) { commentsContent.find('label.task')}
         commentRows(wait: true) { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
-        adModalAppName                  { assetDetailModal.find("td.assetName").next()}
-        adModalDescription              { assetDetailModal.find("td.description").next()}
-        adModalSME1                     { assetDetailModal.find("td.sme").next()}
-        adModalSME2                     { assetDetailModal.find("td.sme2").next()}
-        adModalAppOwner                 { assetDetailModal.find("td.appOwner").next()}
+        adModalAppName { assetDetailModal.find("td.assetName").next()}
+        adModalDescription { assetDetailModal.find("td.description").next()}
+        adModalSME1 { assetDetailModal.find("td.sme").next()}
+        adModalSME2 { assetDetailModal.find("td.sme2").next()}
+        adModalAppOwner { assetDetailModal.find("td.appOwner").next()}
     }
 
     def validateDataIsPresent(List rowData, List dataDisplayed){
@@ -127,12 +129,12 @@ class AssetDetailsPage extends Page{
     }
 
     def closeDetailsModal(){
-        waitFor {adModalCloseBtn.click()}
-        waitFor {!adModalWindow.displayed}
+        waitFor {closeButton.click()}
     }
 
     def clickOnCloneButton(){
-        waitFor { adModalCloneBtn.click() }
+        commonsModule.goToElement(cloneButton)
+        waitFor { cloneButton.click() }
     }
 
     def getApplicationName(){
