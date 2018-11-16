@@ -24,6 +24,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
@@ -35,6 +36,7 @@ class RackLayoutsController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
 	ControllerService controllerService
+	RackService rackService
 	JdbcTemplate jdbcTemplate
 	TaskService taskService
 	UserPreferenceService userPreferenceService
@@ -974,110 +976,6 @@ class RackLayoutsController implements ControllerMethods {
 		}
 
 		renderAsJson(connectors: modelConnectorMap, assets: sortedAssets)
-	}
-
-	/*
-	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
-	 */
-	@HasPermission(Permission.RackEdit)
-	def updateCablingDetails() {
-		def jsonInput = request.JSON
-		def assetCableId = jsonInput.assetCable
-		def assetCableMap
-		def toCableId
-		if (assetCableId) {
-			def actionType = jsonInput.actionType
-			def status = jsonInput.status ?: AssetCableStatus.UNKNOWN
-			def toConnector
-			def assetTo
-			def toPower
-			def connectorType = jsonInput.connectorType
-			assetCableMap = AssetCableMap.get(assetCableId)
-
-			if (connectorType != "Power") {
-				int count = AssetCableMap.countByAssetToAndAssetToPortAndAssetLoc(
-						assetCableMap.assetFrom, assetCableMap.assetFromPort, jsonInput.roomType)
-				if (count) {
-					AssetCableMap.executeUpdate('''
-						update AssetCableMap
-						set cableStatus=?, assetTo=null, assetToPort=null, cableColor=null
-						where assetTo = ? and assetToPort = ? and assetLoc=?
-					''', [status, assetCableMap.assetFrom, assetCableMap.assetFromPort, jsonInput.roomType])
-				}
-			}
-			switch (actionType) {
-				case "emptyId": status = AssetCableStatus.EMPTY; break
-				case "cabledId": status = AssetCableStatus.CABLED; break
-				case "assignId":
-					if (connectorType != "Power") {
-						if (jsonInput.assetFromId != 'null') {
-							def assetEntity = AssetEntity.get(jsonInput.assetFromId)
-							if (assetEntity?.model) {
-								assetTo = assetEntity
-								toConnector = ModelConnector.get(jsonInput.modelConnectorId)
-								toCableId = AssetCableMap.findByAssetToAndAssetToPortAndAssetLoc(assetTo, toConnector, jsonInput.roomType)
-								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,
-																assetToPort=null, cableColor=null
-																where assetTo = ? and assetToPort = ? and assetLoc=?""", [status, assetTo, toConnector, jsonInput.roomType])
-							}
-						}
-					}
-					else {
-						assetTo = assetCableMap.assetFrom
-						toConnector = null
-						toPower = jsonInput.staticConnector
-					}
-					break
-			}
-
-			GormUtil.flushAndClearSession()
-			assetCableMap.cableStatus = status
-			assetCableMap.assetTo = assetTo
-			assetCableMap.assetToPort = toConnector
-			assetCableMap.toPower = toPower
-			assetCableMap.cableColor = jsonInput.color
-			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(), 0).round()
-			assetCableMap.cableComment = jsonInput.cableComment
-			assetCableMap.assetLoc = jsonInput.roomType
-			if (assetCableMap.save(flush: true)) {
-				if (assetTo && connectorType != "Power") {
-					def toAssetCableMap = AssetCableMap.find("from AssetCableMap where assetFrom=? and assetFromPort=? and assetLoc=?",
-							[assetTo, toConnector, jsonInput.roomType])
-					toAssetCableMap.cableStatus = status
-					toAssetCableMap.assetTo = assetCableMap.assetFrom
-					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
-					toAssetCableMap.cableColor = jsonInput.color
-					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(), 0).round()
-					toAssetCableMap.cableComment = jsonInput.cableComment
-					toAssetCableMap.assetLoc = jsonInput.roomType
-					if (!toAssetCableMap.save(flush: true)) {
-						def etext = "Unable to create toAssetCableMap" +
-								GormUtil.allErrorsString(toAssetCableMap)
-						println etext
-					}
-				}
-			}
-			else {
-				def etext = "Unable to create FromAssetCableMap" + GormUtil.allErrorsString(assetCableMap)
-				println etext
-			}
-		}
-		def connectorLabel = assetCableMap.assetToPort ? assetCableMap.assetToPort.label : ""
-		def powerA = 'power'
-		def powerB = 'nonPower'
-		if (assetCableMap.assetFromPort.type == "Power") {
-			connectorLabel = assetCableMap.toPower ? assetCableMap.toPower : ""
-			powerA = 'nonPower'
-			powerB = 'power'
-		}
-
-		renderAsJson(label: assetCableMap.assetFromPort.label, type: assetCableMap.assetFromPort.type,
-				color: assetCableMap.cableColor, length: assetCableMap.cableLength ?: '', powerA: powerA, powerB: powerB,
-				asset: assetCableMap.assetTo?.assetName ?: '', status: assetCableMap.cableStatus,
-				comment: assetCableMap.cableComment ?: '', fromAssetId: assetCableMap.assetTo?.id ?: '',
-				fromAsset: (assetCableMap.assetTo ? assetCableMap.assetTo.assetName + "/" + connectorLabel : ''),
-				rackUposition: connectorLabel, connectorId: assetCableMap.assetToPort ? assetCableMap.assetToPort.id : "",
-				toCableId: toCableId?.id, locRoom: assetCableMap.assetLoc == 'S' ? 'Current' : 'Target')
 	}
 
 	/*
