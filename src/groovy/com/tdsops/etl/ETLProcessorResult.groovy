@@ -600,7 +600,7 @@ class RowResult {
 	 */
 	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition){
 		if(!fields.containsKey(fieldDefinition.name)){
-			fields[fieldDefinition.name] = new FieldResult(fieldDefinition: fieldDefinition)
+			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)
 		}
 		return fields[fieldDefinition.name]
 	}
@@ -638,6 +638,22 @@ class FieldResult {
 	Object originalValue
 	Object value
 	Object init
+	/**
+	 * Define order in which fields are created during an ETL script execution
+	 * <pre>
+	 *  domain Device
+	 *  iterate {
+	 *  	extract 1 load 'Name'
+	 *  	extract 2 load 'Description'
+	 *  }
+	 * </pre>
+	 * Then {@code RowResult.data} will be added using this order:
+	 * <pre>
+	 *  rowResult.data.put('assetName', new FieldResult(fieldOrder: 0, value:..))
+	 *  rowResult.data.put('description', new FieldResult(fieldOrder: 1, value:..))
+	 * </pre>
+	 */
+	Integer fieldOrder
 	List<String> errors = []
 	Boolean warn = false
 	FindResult find = new FindResult()

@@ -10,6 +10,7 @@ import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
@@ -197,7 +198,7 @@ class CustomDomainService implements ServiceMethods {
 
                 for (JSONObject field : customFieldSpec.fields) {
                     if (((String) field.field).startsWith('custom')) {
-                        field.bulkChangeActions = ['replace', 'clear']
+                        field.bulkChangeActions = ["replace", "clear"] as JSONArray
                     }
                 }
 
