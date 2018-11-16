@@ -84,7 +84,7 @@
             var isChecked = $(input).attr('checked') === 'checked';
             jQuery.ajax({
                 url: tdsCommon.createAppURL('/ws/user/preference'),
-                data: { 'value': isChecked, 'code': '${UserPreferenceEnum.ASSET_JUST_PLANNING.name()' },
+                data: { 'value': isChecked, 'code': '${UserPreferenceEnum.ASSET_JUST_PLANNING.name()}' },
                 type: 'POST',
                 success: function (data) {
                     window.location.reload();
