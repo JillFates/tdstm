@@ -615,7 +615,7 @@ class DomainClassQueryHelper {
 	 */
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
-		if (clazz == AssetEntity.class || clazz == Model.class) {
+		if (clazz == AssetEntity.class) {
 			if ( property == "${DOMAIN_ALIAS}.manufacturer.name" ) {
 				/**
 				* find Device by manufacturer eq '...' into '..'
@@ -672,6 +672,19 @@ class DomainClassQueryHelper {
 			  )
 			)
 			"""
+		} else if ( clazz in Model && "${DOMAIN_ALIAS}.manufacturer.name" ) {
+			/**
+			 * find Model by manufacturer eq '...' into '..'
+			 */
+			return """
+					( ${sentence} or
+						D.manufacturer in (
+							select ${MANUFACTURER_ALIAS}.manufacturer
+							from ManufacturerAlias ${MANUFACTURER_ALIAS}
+							where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
+						)
+					)
+				"""
 		}
 
 		return sentence
