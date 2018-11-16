@@ -12,7 +12,8 @@ export const TDSAppRoute: Routes = [
 	{path: 'provider', loadChildren: '../modules/provider/provider.module#ProviderModule'},
 	{path: 'credential', loadChildren: '../modules/credential/credential.module#CredentialModule'},
 	{path: 'action', loadChildren: '../modules/apiAction/api-action.module#APIActionModule'},
-	{path: 'datascript', loadChildren: '../modules/dataScript/data-script.module#DataScriptModule'}
+	{path: 'datascript', loadChildren: '../modules/dataScript/data-script.module#DataScriptModule'},
+	{path: 'user', loadChildren: '../modules/user/user.module#UserModule'}
 ];
 
 @NgModule({
