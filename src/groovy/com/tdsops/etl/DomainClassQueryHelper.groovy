@@ -615,7 +615,7 @@ class DomainClassQueryHelper {
 	 */
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
-		if (clazz == AssetEntity.class) {
+		if (clazz == AssetEntity.class || clazz == Model.class) {
 			if ( property == "${DOMAIN_ALIAS}.manufacturer.name" ) {
 				/**
 				* find Device by manufacturer eq '...' into '..'
