@@ -374,6 +374,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
+		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
 	}

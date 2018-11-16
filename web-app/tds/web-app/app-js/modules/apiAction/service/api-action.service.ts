@@ -85,7 +85,7 @@ export class APIActionService {
 
 	private transformApiActionModel(model: any): void {
 		model.dictionary = model.apiCatalog;
-		model.agentMethod = {id: model.agentMethod};
+		model.agentMethod = {id: model.connectorMethod};
 		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
 		model.lastUpdated = ((model.lastUpdated) ? new Date(model.lastUpdated) : '');
 		model.producesData = (model.producesData === 1);
