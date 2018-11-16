@@ -12,10 +12,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DateUtils } from '../utils/date.utils';
 
+/**
+ * Usage:
+ *		{{ ${myDateValue} | tdsDateTime : ${userDateTimeFormat} }}
+ *
+ *	userDateTimeFormat: taken from user preference settings.
+ */
 @Pipe({
-	name: 'userDateTime'
+	name: 'tdsDateTime'
 })
-export class UserDateTime implements PipeTransform {
+export class DateTimePipe implements PipeTransform {
 
 	transform(value: string, args?: any): any {
 		return DateUtils.formatUserDateTime(args, value);
