@@ -148,7 +148,7 @@ enum UserPreferenceEnum {
 	 */
 	static boolean isSessionOnlyPreference(String preferenceString){
 		sessionOnlyPreferences.find {
-			preferenceString == it.name().toString()
+			preferenceString == it.name()
 		}
 	}
 }
