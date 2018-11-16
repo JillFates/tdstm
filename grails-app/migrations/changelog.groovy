@@ -280,5 +280,5 @@ databaseChangeLog = {
 	include file: '20181012-add-bulk-actions-for-standard-custom-and-other.groovy'
 	include file: '20181105-move-bundle-should-have-list-control.groovy'
 	include file: 'version/v4_6_0/20181115-delete-bogus-user-preferences.groovy'
-
+	include file: '20181115-reorder-system-views-columns.groovy'
 }
