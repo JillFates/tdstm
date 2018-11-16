@@ -189,4 +189,10 @@ class AssetEditPage extends Page {
     def verifyNoTagsSelected() {
         !commonsModule.verifyElementDisplayed(assetTagSelector.find("kendo-taglist li"))
     }
+
+    def deleteAsset(){
+        commonsModule.goToElement(deleteButton)
+        waitFor{deleteButton.click()}
+        commonsModule.clickOnButtonPromptModalByText("OK")
+    }
 }

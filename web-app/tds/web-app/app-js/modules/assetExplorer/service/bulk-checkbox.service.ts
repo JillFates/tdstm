@@ -4,6 +4,7 @@ import { Subject } from 'rxjs/Subject';
 import {CheckboxState, CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.model';
 import { AssetExplorerService } from './asset-explorer.service';
 import { ViewSpec } from '../model/view-spec.model';
+import {Observable} from 'rxjs';
 
 @Injectable()
 export class BulkCheckboxService {
@@ -85,8 +86,8 @@ export class BulkCheckboxService {
 
 	}
 
-	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
-		return new Promise((resolve, reject) => {
+	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Observable<any> {
+		return new Observable((observer: any) => {
 			if (this.isIndeterminateState()) {
 				return this.getBulkAssetIds(viewId, model, justPlanning)
 					.then((result: any) => {
@@ -95,19 +96,19 @@ export class BulkCheckboxService {
 						const selectedAssetsIds = assets.map((asset) => asset.common_id)
 							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
 						const selectedAssets = assets.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
-						return resolve({selectedAssetsIds: selectedAssetsIds, selectedAssets:  selectedAssets});
-					})
-					.catch((err) => reject(err))
+						return observer.next({selectedAssetsIds: selectedAssetsIds, selectedAssets:  selectedAssets});
+					});
+			} else {
+				let selectedAssetsIds = this.getBulkItemsSelectedAsArray();
+				let selectedAssets: Array<any> = [];
+				selectedAssetsIds.forEach( (id: number) => {
+					const match = this.availableAssets.find( asset => asset['common_id'] === id);
+					if (match) {
+						selectedAssets.push(match);
+					}
+				});
+				return observer.next({selectedAssetsIds: selectedAssetsIds, selectedAssets: selectedAssets});
 			}
-			let selectedAssetsIds = this.getBulkItemsSelectedAsArray();
-			let selectedAssets: Array<any> = [];
-			selectedAssetsIds.forEach( (id: number) => {
-				const match = this.availableAssets.find( asset => asset['common_id'] === id);
-				if (match) {
-					selectedAssets.push(match);
-				}
-			});
-			return resolve({selectedAssetsIds: selectedAssetsIds, selectedAssets: selectedAssets});
 		});
 	}
 

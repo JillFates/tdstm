@@ -38,6 +38,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -62,6 +63,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	@Input() metadata: any;
 	@Input() fields: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -93,7 +95,6 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	public bulkItems: number[] = [];
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
-	private bulkData: any;
 	private currentUser: any;
 
 	constructor(
@@ -633,14 +634,15 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.onFilter();
 	}
 
-	onClickBulkButton(): void {
-		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: any) => {
-				this.bulkItems = [...results.selectedAssetsIds];
-				this.selectedAssetsForBulk = [...results.selectedAssets];
-				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
-			})
-			.catch ((err) => console.log('Error:', err))
+	/**
+	 * Gather the List of Selected Items for the Bulk Process
+	 */
+	public onClickBulkButton(): void {
+		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning).subscribe((results: any) => {
+			this.bulkItems = [...results.selectedAssetsIds];
+			this.selectedAssetsForBulk = [...results.selectedAssets];
+			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+		}, (err) => console.log('Error:', err));
 	}
 
 	hasSelectedItems(): boolean {

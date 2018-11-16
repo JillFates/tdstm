@@ -4,6 +4,7 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.RandomStringUtils
 
@@ -29,4 +30,26 @@ class AssetCommentTestHelper {
 		return assetComment
 	}
 
+	/**
+	 * Create a task if not exists from given name for E2EProjectSpec to persist at server DB
+	 * @param: name
+	 * @param: project
+	 * @returm the task
+	 */
+	AssetComment createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
+		AssetComment existingTask = AssetComment.findWhere([comment: taskName, project: project])
+		if (!existingTask) {
+			AssetComment assetComment = new AssetComment(
+					project: project,
+					moveEvent: moveEvent,
+					createdBy: person,
+					comment: taskName,
+					status: AssetCommentStatus.READY,
+					commentType: AssetCommentType.TASK,
+					sendNotification: true
+			).save(flush: true)
+			return assetComment
+		}
+		return existingTask
+	}
 }
