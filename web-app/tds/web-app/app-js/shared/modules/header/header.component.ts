@@ -6,12 +6,37 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
+import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
+import {UserService} from '../../../modules/user/service/user.service';
+import {UIDialogService} from '../../services/ui-dialog.service';
 
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-header',
-	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
+	template: `
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <ng-container *ngIf="pageMetaData">
+	            <!-- Used for the user preferences until fully converted to angular -->
+                <span (click)="openPrefModal()" class="open-pref-modal"></span>
+                <h1>
+                    {{pageMetaData.title | translate}}
+                    <small>{{pageMetaData.instruction | translate}}</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}" >
+                        <a *ngIf="!last">{{(menu.text || menu) | translate}}</a>
+                        <ng-container *ngIf="last">
+                            {{ menu | translate }}
+                        </ng-container>
+                    </li>
+                </ol>
+            </ng-container>
+        </section>
+        <tds-ui-dialog></tds-ui-dialog>
+        <tds-ui-prompt></tds-ui-prompt>
+	`,
 	providers: [TranslatePipe],
 	styles: [`.font-weight-bold {
         font-weight: bold;
@@ -35,6 +60,7 @@ export class HeaderComponent {
 		private notifierService: NotifierService,
 		private titleService: Title,
 		promptService: UIPromptService,
+		private dialogService: UIDialogService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
@@ -58,6 +84,7 @@ export class HeaderComponent {
 			}
 		);
 
+		// TODO : TM-13098 Jorge - what is going on with this?  This is null some times and blows up
 		jQuery('.menu-parent-tasks > a')[0].onclick = null;
 
 		this.headerListeners();
@@ -71,6 +98,8 @@ export class HeaderComponent {
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
 				this.pageMetaData = event.route.snapshot.data.page;
+				const {report} = event.route.snapshot.data;
+				this.pageMetaData.id = report && report.id;
 				// Set Title
 				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));
 				this.selectTopMenuSections();
@@ -111,13 +140,25 @@ export class HeaderComponent {
 				jQuery('li.menu-child-item').removeClass('active');
 				let elements: any = document.getElementsByClassName(ASSET_MENU_CSS_TREE.CHILD_CLASS);
 				if (elements && elements.length > 0) {
+					const targetMenuId = selectedMenu.id && selectedMenu.id.toString();
 					for (let i = 0; i < elements.length; i++) {
-						if (elements[i].firstElementChild.id === selectedMenu.id) {
+						if (elements[i].firstElementChild.id === targetMenuId) {
 							this.renderer.addClass(elements[i], 'active');
 						}
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * This is a hack to open the modal window properly before the user menu is angular.
+	 */
+	public openPrefModal(): void {
+		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			if(result) {
+				console.error(result);
+			}
+		});
 	}
 }

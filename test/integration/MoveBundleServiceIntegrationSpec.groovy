@@ -3,10 +3,13 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -14,10 +17,12 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.SettingService
+import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
 import spock.lang.See
 import spock.lang.Shared
@@ -452,5 +457,55 @@ class MoveBundleServiceIntegrationSpec extends IntegrationSpec {
 			]
 
 			dependencyConsole.dependencyBundleCount == 4
+	}
+
+	void '11. Create move bundle'() {
+		when: 'creating a move bundle with blank workflowCode'
+			MoveBundleCommand command = new MoveBundleCommand(
+					name: RandomStringUtils.randomAscii(10),
+					description: RandomStringUtils.randomAscii(10)
+			)
+			moveBundleService.save(command)
+		then: 'exception is thrown'
+			thrown(ServiceException)
+		when: 'fixing failing constraint'
+			command.workflowCode = 'STD'
+			MoveBundle moveBundle = moveBundleService.save(command)
+		then: 'move bundle is saved to db'
+			moveBundle
+			moveBundle.id
+			moveBundle.workflowCode == 'STD'
+		when: 'saving a second move bundle with same name and project'
+			moveBundleService.save(command)
+		then: 'exception is thrown'
+			thrown(ServiceException)
+
+	}
+
+	void '12. Update move bundle'() {
+		given: 'a move bundle'
+			MoveBundleCommand command = new MoveBundleCommand(
+					name: RandomStringUtils.randomAscii(10),
+					description: RandomStringUtils.randomAscii(10),
+					workflowCode: 'STD'
+			)
+			MoveBundle moveBundle = moveBundleService.save(command)
+		when: 'updating a move bundle'
+			command.id = moveBundle.id
+			command.startTime = TimeUtil.parseDateTime('2018-11-13')
+			command.completionTime = TimeUtil.parseDateTime('2018-11-30')
+			command.name = 'Test update MoveBundle'
+			MoveBundle moveBundleUpdated = moveBundleService.update(moveBundle.id, command)
+		then: 'move bundle is updated in db'
+			moveBundleUpdated
+			moveBundleUpdated.id
+			moveBundleUpdated.name == 'Test update MoveBundle'
+			moveBundleUpdated.startTime == TimeUtil.parseDateTime('2018-11-13')
+			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
+		when: 'updating a move bundle with errors'
+			command.workflowCode = null
+			moveBundleService.update(moveBundle.id, command)
+		then: 'exception is thrown'
+			thrown(DomainUpdateException)
 	}
 }

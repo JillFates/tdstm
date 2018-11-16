@@ -310,7 +310,7 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	private getPreferences(): void {
 		this.preferenceService.getPreferences(PREFERENCES_LIST.VIEW_UNPUBLISHED).subscribe((preferences: any) => {
-			this.viewUnpublished =  preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() ===  'true';
+			this.viewUnpublished = (preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED]) ? preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() === 'true' : false;
 		});
 	}
 

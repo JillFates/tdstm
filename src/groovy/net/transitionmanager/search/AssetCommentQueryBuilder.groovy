@@ -5,6 +5,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
@@ -74,6 +75,11 @@ class AssetCommentQueryBuilder {
 	boolean viewUnpublished
 
 	/**
+	 * Flag that keeps track of invalid filter such as non-existent enum strings.
+	 */
+	boolean invalidCriterion = false
+
+	/**
 	 * Constructor that takes all the parameters required for building the query for tasks.
 	 *
 	 * @param project - the project the tasks must belong to.
@@ -88,9 +94,14 @@ class AssetCommentQueryBuilder {
 		this.sortIndex = sortIndex
 		this.sortOrder = sortOrder
 		requestParams = params
-		whereClauses = ["ac.project = :project", "ac.commentType = :commentType"]
-		whereParams = ['project': project, 'commentType': AssetCommentType.TASK]
+		whereClauses = ["ac.project = :project"]
+		whereParams = ['project': project]
 		joinTables = ["AssetComment ac"]
+
+		if (!params.containsKey("commentType")) {
+			whereClauses << "ac.commentType = :commentType"
+			whereParams['commentType'] = AssetCommentType.TASK
+		}
 	}
 
 	/**
@@ -111,7 +122,8 @@ class AssetCommentQueryBuilder {
 		return [
 			query: query,
 			countQuery: countQuery,
-			queryParams: whereParams
+			queryParams: whereParams,
+			invalidCriterion: invalidCriterion
 		]
 	}
 
@@ -119,10 +131,14 @@ class AssetCommentQueryBuilder {
 	 * Construct the query and count query by putting the 'from', 'where' and 'order by' parts together.
 	 */
 	private void buildQueryAndCount() {
-		String join = joinTables.join("\n")
-		String whereClause = whereClauses.join(" AND ")
-		query = "SELECT ac FROM ${join} WHERE ${whereClause} ${sorting}"
-		countQuery = "SELECT count(ac.id) FROM ${join} WHERE ${whereClause}"
+		if (invalidCriterion) {
+			whereParams = null
+		} else {
+			String join = joinTables.join("\n")
+			String whereClause = whereClauses.join(" AND ")
+			query = "SELECT ac FROM ${join} WHERE ${whereClause} ${sorting}"
+			countQuery = "SELECT count(ac.id) FROM ${join} WHERE ${whereClause}"
+		}
 	}
 
 
@@ -141,7 +157,15 @@ class AssetCommentQueryBuilder {
 	 * constructing the corresponding clause for every parameter.
 	 */
 	private void processParameters() {
-		requestParams.each{ String param, paramValue ->
+
+		// If the viewUnpublished flags wasn't set, limit the query only to published tasks.
+		if (!viewUnpublished) {
+			whereClauses << "ac.isPublished = true"
+		}
+
+		// Iterate over the filters provided by the user creating the corresponding where clause.
+		for (param in requestParams.keySet()) {
+			def paramValue = requestParams[param]
 			Map fieldInfo = fieldsInfoMap[param]
 			if (paramValue != null && !StringUtil.isBlank(paramValue.toString()) && fieldInfo) {
 				// Check if the field requires an additional join.
@@ -152,12 +176,12 @@ class AssetCommentQueryBuilder {
 				if (fieldInfo.containsKey('builder')) {
 					fieldInfo['builder'](param, fieldInfo)
 				}
-			}
-		}
 
-		// If the viewUnpublished flags wasn't set, limit the query only to published tasks.
-		if (!viewUnpublished) {
-			whereClauses << "ac.isPublished = true"
+				// If the filter was invalid, stop processing.
+				if (invalidCriterion) {
+					break
+				}
+			}
 		}
 	}
 
@@ -170,7 +194,7 @@ class AssetCommentQueryBuilder {
 			Map<String, String> references = [
 				"assetName": "assetEntity.assetName",
 				"assetType": "assetEntity.assetType",
-				"bundle": "moveBundle.name",
+				"bundle": "assetEntity.moveBundle.name",
 				"event": "moveEvent.name"
 			]
 			if (references[sortIndex]) {
@@ -214,6 +238,18 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
+	 * Create the where clause for handling time scale values.
+	 */
+	Closure timeScaleBuilder = { String field, Map fieldMap ->
+		TimeScale timeScaleValue = TimeScale.fromLabel(requestParams[field])
+		if (timeScaleValue == null) {
+			invalidCriterion = true
+		} else {
+			processField(field, fieldMap, '=', ":${field}", timeScaleValue)
+		}
+	}
+
+	/**
 	 * Handle cases where the resulting expression is 'field = someValue'
 	 */
 	Closure eqBuilder = { String field, Map fieldMap ->
@@ -222,14 +258,23 @@ class AssetCommentQueryBuilder {
 		if (fieldMap['type'] == Integer) {
 			value = NumberUtil.toInteger(value)
 		}
-		processField(field, fieldMap, '=', ":${field}", value)
+		if (value == null) {
+			invalidCriterion = true
+		} else {
+			processField(field, fieldMap, '=', ":${field}", value)
+		}
 	}
 
 	/**
 	 * Construct a clause 'field = true' or 'field = false'
 	 */
 	Closure boolEqBuilder = { String field, Map fieldMap ->
-		processField(field, fieldMap, '=', ":${field}", BooleanUtils.toBoolean(requestParams[field]))
+		Boolean value = StringUtil.toBoolean(requestParams[field])
+		if (value == null) {
+			invalidCriterion = true
+		} else {
+			processField(field, fieldMap, '=', ":${field}", value)
+		}
 	}
 
 	/**
@@ -348,7 +393,7 @@ class AssetCommentQueryBuilder {
 		'assignedTo':           [property: SqlUtil.personFullName('assignedTo','ac'), builder: likeBuilder],
 		'attribute':            [property: 'ac.attribute', builder: likeBuilder],
 		'autogenerated':        [property: 'ac.autogenerated', builder: eqBuilder],
-		'bundle':               [property: 'ac.moveBundle.name', builder: likeBuilder, joinTable: 'ac.moveBundle'],
+		'bundle':               [property: 'bundle.name', builder: likeBuilder, joinTable: 'ac.assetEntity.moveBundle bundle'],
 		'category':             [property: 'ac.category', builder: likeBuilder],
 		'comment':              [property: 'ac.comment', builder: likeBuilder],
 		'commentType':          [property: 'ac.commentType', builder: likeBuilder],
@@ -357,7 +402,7 @@ class AssetCommentQueryBuilder {
 		'dateResolved':         [property: 'ac.dateResolved', builder: likeBuilder, type: Date],
 		'displayOption':        [property: 'ac.displayOption', builder: likeBuilder],
 		'dueDate':              [property: 'ac.dueDate', builder: likeBuilder, type: Date],
-		'durationScale':        [property: 'ac.durationScale', builder: likeBuilder],
+		'durationScale':        [property: 'ac.durationScale', builder: timeScaleBuilder],
 		'duration':             [property: 'ac.duration', builder: likeBuilder],
 		'estStart':             [property: 'ac.estStart', builder: likeBuilder, type: Date],
 		'estFinish':            [property: 'ac.estFinish', builder: likeBuilder, type: Date],
@@ -371,13 +416,14 @@ class AssetCommentQueryBuilder {
 		'justMyTasks':          [property: 'ac.assignedTo', builder: justMyTasksBuilder],
 		'justRemaining':        [property: 'ac.status', builder: justRemainingBuilder],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
-		'priority':             [property: 'ac.priority', builder: eqBuilder, type: Integer],
+		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
 		'resolvedBy':           [property: SqlUtil.personFullName('resolvedBy', 'ac'), builder: likeBuilder],
 		'role':                 [property: 'ac.role', builder: likeBuilder],
-		'sendNotification':     [property: 'ac.status', builder: boolEqBuilder],
+		'sendNotification':     [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status':               [property: 'ac.status', builder: likeBuilder],
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
+		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
 		'workflowTransition':   [property: 'ac.workflowTransition.id', builder: eqBuilder, joinTable: 'ac.workflowTransition'],
 	]

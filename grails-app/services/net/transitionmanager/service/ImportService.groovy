@@ -74,6 +74,7 @@ class ImportService implements ServiceMethods {
 	def jdbcTemplate
 	CustomDomainService customDomainService
 	MessageSource messageSource
+	AssetOptionsService assetOptionsService
 
 	static final String indent = '&nbsp;&nbsp;&nbsp;'
 	static final String NULL_INDICATOR='NULL'
@@ -2190,13 +2191,10 @@ class ImportService implements ServiceMethods {
 					dependencySkipped--
 				}
 
-				// def assetDepTypeList = AssetDependencyType.getList()
-				// def assetDepStatusList = AssetDependencyStatus.getList()
-				String lookupQuery = 'select value from AssetOptions where type=? order by value'
-				List assetDepTypeList = AssetOptions.executeQuery(lookupQuery, [AssetOptions.AssetOptionsType.DEPENDENCY_TYPE])
-				List assetDepStatusList = AssetOptions.executeQuery(lookupQuery, [ AssetOptions.AssetOptionsType.DEPENDENCY_STATUS ])
+				List<AssetOptions> assetDepTypeList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+				List<AssetOptions> assetDepStatusList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
-				def lookupValue = { value, list ->
+				def lookupValue = { String value, List<AssetOptions> list ->
 					for (it in list) {
 						if (it.equalsIgnoreCase(value)) {
 							return it

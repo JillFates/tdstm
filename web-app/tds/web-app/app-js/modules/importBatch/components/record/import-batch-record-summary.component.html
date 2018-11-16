@@ -25,8 +25,8 @@
                 {{importBatch.status.label}}
             </div>
             <div class="col-sm-2">{{importBatch.domainClassName}}</div>
-            <div class="col-sm-2">{{importBatch.lastUpdated | userDateTime: userTimeZone }}</div>
-            <div class="col-sm-2">{{importBatch.dateCreated | userDateTime: userTimeZone }}</div>
+            <div class="col-sm-2">{{importBatch.lastUpdated | tdsDateTime: userTimeZone }}</div>
+            <div class="col-sm-2">{{importBatch.dateCreated | tdsDateTime: userTimeZone }}</div>
             <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.dataScript?.name}}</div>
         </div>

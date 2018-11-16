@@ -19,7 +19,7 @@ var tdsCommon = {
 
 	// creates relative or fully qualified url to for the application
 	// @param uri - the URI to append to the application base URI or FQU
-	// @param fqu - optional flag if true will create fully qualified URL or default to the relative 
+	// @param fqu - optional flag if true will create fully qualified URL or default to the relative
 	createAppURL: function (uri, fqu) {
 		fqu = fqu || false;
 		var url = '';
@@ -30,7 +30,7 @@ var tdsCommon = {
 		return url;
 	},
 
-	// Generate a random string 
+	// Generate a random string
 	// @param Integer the length of string to generate (default 5)
 	// @param String the characterset to build the random string from (default A-Za-z0-9)
 	// @return String the random string
@@ -108,9 +108,9 @@ var tdsCommon = {
 	})(),
 
 	/**
-	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
+	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was
 	 * done to correct a problem with DIVs being populated with content that would not be cleared out and duplicate
-	 * DOM IDs would be created causing DOM lookup issues. It also closes any currently open select2 controls that might 
+	 * DOM IDs would be created causing DOM lookup issues. It also closes any currently open select2 controls that might
 	 * be expanded on the page.
 	 *
 	 * To disable this behavior add the class 'static-dialog' to the DIV (class="static-dialog" or modal.addClass('static-dialog'))
@@ -483,7 +483,7 @@ var tdsCommon = {
 			case "maintExpDate":
 				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
 				if (momentObj.isValid()) {
-					// Strip off any time 
+					// Strip off any time
 					momentObj.tz('GMT');
 					result = momentObj.format(tdsCommon.defaultDateFormat());
 				} else {
@@ -513,7 +513,7 @@ var tdsCommon = {
 		return html + '</div>';
 	},
 
-	// Used to escape the text cells to prevent XSS 
+	// Used to escape the text cells to prevent XSS
 	jqgridTextCellFormatter: function (cellvalue, options, rowObject) {
 		return _.escape(cellvalue);
 	},
@@ -588,7 +588,7 @@ var UserPreference = function () {
 	// opens the edit user date and timezone dialog
 	var editDateAndTimezone = function () {
 		jQuery.ajax({
-			url: '/tdstm/person/editTimezone',
+			url: tdsCommon.createAppURL('/person/editTimezone'),
 			success: function (e) {
 				var prefDialog = $("#userTimezoneDivId")
 				prefDialog.html(e);
@@ -605,33 +605,38 @@ var UserPreference = function () {
 		return false;
 	}
 
-	// opens the edit user preferences dialog
+	// opens the edit user preferences dialog (Will open angular version or grails depending on the page).
 	var editPreference = function () {
-		jQuery.ajax({
-			url: '/tdstm/person/editPreference',
-			success: function (e) {
+		modalOpener = jQuery('.open-pref-modal');
+		if(modalOpener.length) {
+			modalOpener.click();
+		}
+		else {
+			jQuery.ajax({
+				url: tdsCommon.createAppURL('/person/editPreference'),
+				success: function (e) {
 				var prefDialog = $("#userPrefDivId")
-				var pageHeight = Math.max($(window).outerHeight(), 200)
-				prefDialog.html(e)
-				prefDialog.dialog('option', 'width', 'auto');
-				prefDialog.dialog('option', 'maxHeight', pageHeight);
-				prefDialog.dialog('option', 'containment', 'body');
-				prefDialog.dialog('option', 'modal', true);
-				prefDialog.dialog("open");
-
-                $('.ui-widget-overlay').addClass('old-legacy-content');
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while attempting to update task/comment")
-			}
-		})
+					var pageHeight = Math.max($(window).outerHeight(), 200)
+					prefDialog.html(e)
+					prefDialog.dialog('option', 'width', 'auto');
+					prefDialog.dialog('option', 'maxHeight', pageHeight);
+					prefDialog.dialog('option', 'containment', 'body');
+					prefDialog.dialog('option', 'modal', true);
+					prefDialog.dialog("open");
+					$('.ui-widget-overlay').addClass('old-legacy-content');
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					alert("An unexpected error occurred while attempting to update task/comment")
+				}
+			})
+		}
 		return false;
 	}
 
 	// saves the new preference values
 	var savePreferences = function (formId) {
 		var data = $('#' + formId).serialize();
-		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function () {
+		$.post(tdsCommon.createAppURL('/person/saveDateAndTimePreferences'), data, function () {
 			window.location.reload();
 		})
 			.fail(function () {
@@ -640,53 +645,53 @@ var UserPreference = function () {
 	}
 
 	// resets the user's preferences to their default values
-	var resetPreference = function (user, dateTimezoneOnly) {
-		var params = { 'user': user }
-		if (dateTimezoneOnly)
-			params.dateTimezoneOnly = true
+	var resetPreferences = function () {
 		jQuery.ajax({
-			url: '/tdstm/person/resetPreferences',
-			data: params,
-			success: function (e) {
-				changeResetMessage(e)
+			url: tdsCommon.createAppURL('/ws/user/resetPreferences'),
+			method: "DELETE",
+			dataType: 'json',
+			complete: function (jqXHR) {
+				var json = JSON.parse(jqXHR.responseText);
+				if (json && json.status == 'success') {
+					// Close the Dialog
+					$("#userPrefDivId").html('').dialog('close');
+				} else if (json.status == 'error') {
+					alert("Resetting Preferences Failed: \n\n" + json.errors);
+				} else {
+					alert("Failed to Reset Preferences");
+				}
 			}
+
 		});
 	}
 
-
-	// closes the preference dialog then refreshes the page
-	var changeResetMessage = function (e) {
-		var prefDialog = $("#userPrefDivId")
-		prefDialog.html("")
-		prefDialog.dialog('close')
-		//window.location.reload()
-		window.location.href = tdsCommon.createAppURL('/project/list');
-	}
-
 	// removes the specified preference for the current user
-	var removeUserPrefs = function (prefCode) {
-
-		jQuery.ajax({
-            url: '/tdstm/person/removeUserPreference?prefCode=' + prefCode,
-            success: function(response) {
-            	if(response === 'true'){
-                    $("#pref_" + prefCode).remove();
+	var removeUserPreference = function (prefCode) {
+		$.ajax({
+			url: tdsCommon.createAppURL('/ws/user/preference/' + encodeURI(prefCode)),
+			method: 'DELETE',
+			dataType: 'json',
+			complete: function (jqXHR) {
+				var json = JSON.parse(jqXHR.responseText);
+				if (json && json.status == 'success') {
+					$("#pref_" + prefCode).remove();
+				} else if(json.status == 'error') {
+					alert("Removing Preference Failed: \n\n" +json.errors);
+				} else {
+					alert("Failed to invoke Remove Preference");
 				}
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log("/tdstm/person/removeUserPreference - " + errorThrown);
-            }
+			}
         });
 
 	}
 
+	// The following methods are to be exported
 	return {
 		editDateAndTimezone: editDateAndTimezone,
 		editPreference: editPreference,
 		savePreferences: savePreferences,
-		resetPreference: resetPreference,
-		changeResetMessage: changeResetMessage,
-		removeUserPrefs: removeUserPrefs
+		resetPreferences: resetPreferences,
+		removeUserPreference: removeUserPreference
 	}
 }();
 

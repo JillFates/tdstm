@@ -2,7 +2,16 @@ import {Component, Input} from '@angular/core';
 
 @Component({
 	selector: 'tds-popup-asset-message',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/popups/popup-asset-message.component.html',
+	template: `
+        <span style="cursor:pointer;" #popUpPolling (click)="onToggle()"><i class="fa  fa-fw fa-question-circle"></i></span>
+        <kendo-popup [anchor]="popUpPolling" [popupClass]="'content popup'" *ngIf="show">
+            <div>
+                <label>
+                    {{message}}
+                </label>
+            </div>
+        </kendo-popup>
+	`,
 	styles: [`
 		div { width: 180px; padding: 10px; }
     `]

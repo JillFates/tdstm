@@ -1,21 +1,25 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
+import test.helper.MoveEventTestHelper
 import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
@@ -32,6 +36,9 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+
+	@Shared
+	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 
 	@Shared
 	PersonTestHelper personTestHelper = new PersonTestHelper()
@@ -74,8 +81,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-			moveBundleTestHelper.createBundle(otherProject, null))
+		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundleTestHelper.createBundle(otherProject, null))
 		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
 		context.record = new ImportBatchRecord(sourceRowId: 1)
 
@@ -184,7 +190,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			Rack rack = rackTestHelper.createRack(project, room)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Rack, project, [room: room])
+			List results = DomainClassQueryHelper.where(ETLDomain.Rack, project, [room: room.id])
 
 		then:
 			results.size() == 1
@@ -361,17 +367,24 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == room.id
 	}
 
-	void '20. can throws an Exception if find a Room by id with a negative String value'() {
+	void '20. can throw an exception if domain does not have alternate key'() {
 
 		given:
-			Room room = roomTestHelper.createRoom(project)
-			Long negativeId = room.id * -1
-		when:
-			DomainClassQueryHelper.where(ETLDomain.Room, project, [id: (negativeId).toString()])
+			MoveBundle bundle = moveBundleTestHelper.createBundle(project, 'TEST')
+			MoveEvent event = moveEventTestHelper.createMoveEvent(project)
+			bundle.save(failOnError: true, flush: true)
 
-		then: 'It throws an Exception because find command is incorrect'
-			Exception e = thrown Exception
-			e.message == 'java.lang.String cannot be cast to java.lang.Long'
+		when:
+			DomainClassQueryHelper.where(
+				ETLDomain.Bundle, project,
+				[
+					moveEvent: event.name
+				]
+			)
+
+		then: 'It throws an Exception because MoveEvent does not have an alternate key'
+			RuntimeException e = thrown RuntimeException
+			e.message == 'MoveEvent does not have alternate key'
 	}
 
 	void '21. can find a Device by its id using a FindCondition'() {
@@ -677,4 +690,150 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
 	}
 
+	void '35. can find Model by a modelName and manufacturer id'() {
+
+		given:
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', model.modelName),
+					new FindCondition('manufacturer', manufacturer.id)
+				]
+			)
+		then:
+			results.size() == 1
+	}
+
+	void '36. can find Model by a modelName and manufacturer id Integer value'() {
+
+		given:
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', model.modelName),
+					new FindCondition('manufacturer', manufacturer.id.intValue())
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
+
+	void '37. can find Device by a Model id'() {
+
+		given:
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', model.id)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
+
+	void '38. can find Device by a Model id'() {
+
+		given:
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', model.modelName)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
+
+	void '39. can skip query if Conditions contains null values'() {
+
+		given: 'a list of conditions with null values'
+			List<FindCondition> conditions = [new FindCondition('model', null)]
+
+		when: 'where method is evaluated'
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, conditions)
+
+		then: 'results are an empty list'
+			results.size() == 0
+	}
 }

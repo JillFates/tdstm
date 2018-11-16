@@ -43,8 +43,9 @@ class AssetTestHelper {
 
 	/**
 	 * Used to create an application and reference the person in all possible properties
-	 * @param person - the person to be referenced
-	 * @return the newly created Application
+	 * @param person  The person to be referenced
+	 * @param project  The Project to be assigned
+	 * @return  The newly created Application
 	 */
 	Application createApplication(Person person, Project project) {
 		String pRef = person.id.toString()
@@ -73,8 +74,9 @@ class AssetTestHelper {
 
 	/**
 	 * This method creates a random device using the deviceService.saveAssetFromForm
-	 * @param project: prroject to be assigned.
+	 * @param project: project to be assigned.
 	 * @param assetType: what kind of asset it should be as an Enum
+	 * @return  The newly created AssetEntity
 	 */
 	public AssetEntity createDevice(Project project, AssetType assetType, Map params = [:]) {
 	 	return createDevice(project, assetType.toString(), params)
@@ -82,9 +84,10 @@ class AssetTestHelper {
 
 	/**
 	 * This method creates a random device using the deviceService.saveAssetFromForm
-	 * @param project: prroject to be assigned.
+	 * @param project: project to be assigned.
 	 * @param assetType: what kind of asset it should be. It has to be a String because
 	 *    not all the possible values have a corresponding keyword.
+	 * @return  The newly created AssetEntity
 	 */
 	public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
 		 /* Most the values in this map replicate what the front-end sends to the

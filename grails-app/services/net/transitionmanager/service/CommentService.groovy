@@ -831,11 +831,15 @@ class CommentService implements ServiceMethods {
 	 */
 	Map filterTasks(Project project, Map params, boolean viewUnpublished, String sortIndex, String sortOrder, Integer maxRows, Integer rowOffset) {
 
+		List<AssetComment> results = []
+		Integer totalCount = 0
 		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder, viewUnpublished)
 		Map queryInfo = queryBuilder.buildQueries()
-		Map metaParams = [max: maxRows, offset: rowOffset, readOnly: true]
-		List<AssetComment> results = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
-		Integer totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
+		if (!queryInfo.invalidCriterion) {
+			Map metaParams = [max: maxRows, offset: rowOffset, readOnly: true]
+			results = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
+			totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
+		}
 
 		return [
 			tasks: results,

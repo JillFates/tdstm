@@ -53,7 +53,7 @@ class ScriptProcessorService {
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
-	    etlProcessor.execute(scriptContent?.trim())
+	    etlProcessor.execute(scriptContent)
 
         return etlProcessor
     }
@@ -90,7 +90,7 @@ class ScriptProcessorService {
 			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
 		}
 
-		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
+		etlProcessor.evaluate(scriptContent, progressCallback)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
 		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
@@ -151,11 +151,11 @@ class ScriptProcessorService {
                     new DebugConsole(buffer: new StringBuilder()),
                     createFieldsSpecValidator(project))
 
-			etlProcessor.evaluate(scriptContent?.trim())
+			etlProcessor.evaluate(scriptContent)
             result.isValid = true
         } catch (all) {
             log.warn('Error testing script: ' + all.getMessage(), all)
-            result.error = all.getMessage()
+            result.error = ETLProcessor.getErrorMessage(all)
         }
 
 	     if (etlProcessor) {
@@ -235,7 +235,7 @@ class ScriptProcessorService {
 
         try {
 
-            new GroovyShell(this.class.classLoader, etlProcessor.binding).parse(scriptContent?.trim(), ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding).parse(scriptContent, ETLProcessor.class.name)
 
         } catch (MultipleCompilationErrorsException cfe) {
             ErrorCollector errorCollector = cfe.getErrorCollector()

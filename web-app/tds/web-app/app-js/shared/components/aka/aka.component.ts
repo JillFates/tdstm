@@ -4,7 +4,20 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
 
 @Component({
 	selector: 'tds-aka',
-	templateUrl: '../tds/web-app/app-js/shared/components/aka/aka.component.html'
+	template: `
+        <div class="aka-component">
+            <div class="aka-items">
+                <div class="aka-item" *ngFor="let aka of akas;let index = index;trackBy:trackByIndex;">
+                    <input type="text" [(ngModel)]="akas[index]" (change)="onAkaChange($event, index)" [disabled]="hasError && indexError !== index">
+                    <span *ngIf="!hasError || (hasError && indexError === index)" class="glyphicon glyphicon-remove delete-aka" (click)="onDelete(index)" title="Delete aka"></span>
+                </div>
+                <div>
+                    <label *ngIf="hasError" style="color: red">{{errorMessage}}</label>
+                </div>
+            </div>
+            <button (click)="onAdd('')" [disabled]="hasError" id="btnAdAka">Add AKA</button>
+        </div>
+	`
 })
 export class AkaComponent implements OnInit {
 	@Input('aka') akaCollection: Array<Aka>;

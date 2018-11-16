@@ -10,15 +10,15 @@ import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';
 
 // add constants as needed
 export const PREFERENCES_LIST = {
-	ASSET_JUST_PLANNING: 'assetJustPlanning',
-	ASSET_LIST_SIZE : 'assetListSize',
-	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
+	ASSET_JUST_PLANNING: 'ASSET_JUST_PLANNING',
+	ASSET_LIST_SIZE: 'ASSET_LIST_SIZE',
+	VIEW_MANAGER_DEFAULT_SORT: 'VIEW_MANAGER_DEFAULT_SORT',
 	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
 	CURR_TZ: 'CURR_TZ',
-	DATA_SCRIPT_SIZE: 'DataScriptSize',
-	VIEW_UNPUBLISHED: 'viewUnpublished',
-	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize',
-	IMPORT_BATCH_RECORDS_FILTER: 'ImportBatchRecordsFilter'
+	DATA_SCRIPT_SIZE: 'DATA_SCRIPT_SIZE',
+	VIEW_UNPUBLISHED: 'VIEW_UNPUBLISHED',
+	IMPORT_BATCH_LIST_SIZE: 'IMPORT_BATCH_LIST_SIZE',
+	IMPORT_BATCH_RECORDS_FILTER: 'IMPORT_BATCH_RECORDS_FILTER'
 };
 
 @Injectable()
@@ -77,6 +77,14 @@ export class PreferenceService {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
+	}
+	getUserDateFormatForMomentJS(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return currentUserDateFormat
+	}
+	getUserDateFormatForKendo(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return DateUtils.translateDateFormatToKendoFormat(currentUserDateFormat);
 	}
 
 	/**

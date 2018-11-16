@@ -1,11 +1,10 @@
-import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
@@ -347,20 +346,6 @@ class UserLoginController implements ControllerMethods {
 
 	}
 
-	/*======================================================
-	 *  Update recent page load time into userLogin
-	 *=====================================================*/
-	@HasPermission(Permission.UserGeneralAccess)
-	def updateLastPageLoad() {
-		UserLogin userLogin = securityService.userLogin
-		if (userLogin) {
-			userLogin.lastPage = TimeUtil.nowGMT()
-			userLogin.save(flush: true)
-			session.REDIRECT_URL = params.url
-		}
-		render "SUCCESS"
-	}
-
 	/**
 	 * The 1st phase of user changing password during the forced password change process
 	 */
@@ -376,55 +361,18 @@ class UserLoginController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserResetOwnPassword)
 	def updatePassword() {
+		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
 		UserLogin userLogin = securityService.userLogin
-		String msg
 		try {
-			while (true) {
-				if (!userLogin) {
-					msg = 'Failed to load your user account'
-					break
-				}
+			securityService.updatePassword(userLogin, command)
+			flash.message = "Password was successfully updated"
+			redirect(controller: 'project', action: 'show', params: [userLoginInstance: userLogin])
 
-				try {
-					// See if the user account is properly configured to a state that they're allowed to change their password
-					securityService.validateAllowedToChangePassword(userLogin)
-				}
-				catch (e) {
-					msg = "You are not allowed to change your password at this time."
-					break
-				}
-
-				//
-				// Made it throught the guantlet of password requirements so lets update the password
-				//
-				securityService.setUserLoginPassword(userLogin, params.password, params.confirmPassword)
-
-				if (!userLogin.save()) {
-					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
-					msg = 'An error occured while trying to save your password'
-					break
-				}
-				else {
-					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged())
-				}
-
-				flash.message = "Password was successfully updated"
-				redirect(controller: 'project', action: 'show', params: [userLoginInstance: userLogin])
-				break
-			}
-		}
-		catch (InvalidParamException | DomainUpdateException e) {
-			msg = e.message
-		}
-		catch (e) {
-			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			msg = 'An error occurred during the update process'
-		}
-
-		if (msg) {
-			flash.message = msg
+		}catch(e) {
+			flash.message = e.message
 			redirect(action: 'changePassword', params: [userLoginInstance: userLogin])
 		}
+
 	}
 
 	/**
