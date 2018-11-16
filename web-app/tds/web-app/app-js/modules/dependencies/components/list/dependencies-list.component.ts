@@ -20,6 +20,7 @@ import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.
 import {BulkActionResult} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {DependencyResults} from '../../model/dependencies.model';
 
 @Component({
 	selector: 'tds-dependencies-list',
@@ -35,9 +36,8 @@ export class DependenciesListComponent implements OnInit {
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	public gridData: GridDataResult;
 	protected state: State;
-	protected idFieldName = 'dependencyId';
+	protected idFieldName = 'id';
 	public bulkItems: number[] = [];
-	private bulkData: any;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -63,7 +63,7 @@ export class DependenciesListComponent implements OnInit {
 					this.bulkCheckboxService.setPageSize(this.state.take);
 				}),
 				mergeMap((state) => this.dependenciesService.getDependencies(state)),
-				map((results) => ({data: results.assets, total: results.pagination.total}))
+				map((results: DependencyResults) => ({data: results.dependencies, total: results.total}))
 			)
 			.subscribe((results) => {
 				this.gridData = results;
@@ -180,7 +180,6 @@ export class DependenciesListComponent implements OnInit {
 				console.log('The results are');
 				console.log(results);
 				this.bulkItems = [...results.selectedAssetsIds];
-				// this.selectedAssetsForBulk = [...results.selectedAssets];
 				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: [...results.selectedAssets]});
 
 			}, (err) => console.log('Error', err));
