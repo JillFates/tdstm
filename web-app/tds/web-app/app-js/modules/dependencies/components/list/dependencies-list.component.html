@@ -1,80 +1,77 @@
-<!-- Main content -->
-<div class="content body tds-kendo-grid api-action-list-component">
-	<section>
-		<div *ngIf="dependenciesColumnModel">
-			<div class="box-body box-with-empty-header">
-				<kendo-grid
-						[data]="gridData"
-						[sort]="state.sort"
-						[skip]="state.skip"
-						[pageSize]="state.take"
-						[sortable]="{mode:'single'}"
-						[resizable]="true"
-						[pageable]="{ pageSizes: maxOptions, info: true}"
-						(dataStateChange)="dataStateChange($event)"
-						[selectable]="true">
+<div class="dependencies-list-component">
+	<kendo-grid
+			class="dependencies"
+			[data]="gridData"
+			[sort]="state.sort"
+			[skip]="state.skip"
+			[pageSize]="state.take"
+			[sortable]="{mode:'single'}"
+			[resizable]="true"
+			[pageable]="{ pageSizes: maxOptions, info: true}"
+			(dataStateChange)="dataStateChange($event)"
+			[selectable]="true">
 
-					<!-- Header Toolbar -->
-					<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
-						<div class="col-sm-6 bulkchange-section">
-							<tds-bulk-change-button #tdsBulkChangeButton
-							                        [enabled]="hasSelectedItems()"
-							                        (clickBulk)="onClickBulkButton()"
-							                        (operationResult)="onBulkOperationResult($event)">
-							</tds-bulk-change-button>
+		<!-- Header Toolbar -->
+		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+			<div class="col-sm-6 bulkchange-section">
+				<tds-bulk-change-button #tdsBulkChangeButton
+				                        [enabled]="hasSelectedItems()"
+				                        (clickBulk)="onClickBulkButton()"
+				                        (operationResult)="onBulkOperationResult($event)">
+				</tds-bulk-change-button>
 
-							<div *ngIf="hasSelectedItems()" class="selected-assets">
-								<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
-							</div>
-						</div>
-						<div class="col-sm-6 filters-section"></div>
-					</ng-template>
-
-					<!-- Select All column -->
-					<kendo-grid-column [width]="55" [filterable]="false">
-						<ng-template kendoGridHeaderTemplate>
-							<div class="row">
-								<div class="col-md-12 text-center">
-									<tds-checkbox name="assetsSelector"
-									              [hasThirdState]="true"
-									              (changeState)="onChangeBulkCheckbox($event)"
-									              id="assetSelector"
-									              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-								</div>
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate let-dataItem>
-							<label class="selectall-checkbox-column text-center">
-								<input type="checkbox" id="checkbox_{{dataItem.dependencyId}}"
-								       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.dependencyId)"
-								       (change)="checkItem(dataItem.dependencyId, $event.target.checked)"
-								       name="checkbox_{{dataItem.dependencyId}}">
-							</label>
-						</ng-template>
-					</kendo-grid-column>
-
-					<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
-					                   format="{{column.format}}"
-					                   [locked]="column.locked"
-					                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-						<ng-template kendoGridHeaderTemplate>
-							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
-							</div>
-						</ng-template>
-					</kendo-grid-column>
-
-					<!-- Pagination Footer -->
-					<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
-						<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
-						<kendo-pager-next-buttons></kendo-pager-next-buttons>
-						<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
-						<kendo-pager-info></kendo-pager-info>
-					</ng-template>
-
-				</kendo-grid>
+				<div *ngIf="hasSelectedItems()" class="selected-assets">
+					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+				</div>
 			</div>
-		</div>
-	</section>
+			<div class="col-sm-6 filters-section"></div>
+		</ng-template>
+
+		<!-- Select All column -->
+		<kendo-grid-column [width]="45" [locked]="false" [filterable]="false">
+			<ng-template kendoGridHeaderTemplate>
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<tds-checkbox name="assetsSelector"
+						              [hasThirdState]="true"
+						              (changeState)="onChangeBulkCheckbox($event)"
+						              id="assetSelector"
+						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+					</div>
+				</div>
+			</ng-template>
+
+			<ng-template kendoGridCellTemplate let-dataItem>
+				<div class="check-row">
+					<input type="checkbox" id="checkbox_{{dataItem.id}}"
+					       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.id)"
+					       (change)="checkItem(dataItem.id, $event.target.checked)"
+					       name="checkbox_{{dataItem.id}}">
+				</div>
+			</ng-template>
+		</kendo-grid-column>
+
+		<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
+		                   format="{{column.format}}"
+		                   [locked]="column.locked"
+		                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+			<ng-template kendoGridHeaderTemplate>
+				<div class="sortable-column" (click)="onClickTemplate($event)">
+					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
+				</div>
+			</ng-template>
+		</kendo-grid-column>
+
+		<!-- Pagination Footer -->
+		<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+			<kendo-pager-next-buttons></kendo-pager-next-buttons>
+			<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
+			<kendo-pager-info></kendo-pager-info>
+		</ng-template>
+
+	</kendo-grid>
 </div>
+
+
+
