@@ -50,6 +50,8 @@ export class BulkChangeButtonComponent {
 		], true, false).then(bulkOperationResult => {
 			this.operationResult.emit(bulkOperationResult);
 		}).catch(err => {
+			console.log('Error:');
+			console.log(err);
 			this.operationResult.emit(err);
 		});
 	}

@@ -123,6 +123,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetExplorerIndexComponent,
 		TaskCommentComponent,
 		BulkChangeButtonComponent,
+		BulkChangeEditComponent,
 		BulkChangeActionsComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,

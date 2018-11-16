@@ -2,6 +2,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+// Services
+import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DependenciesListComponent} from './components/list/dependencies-list.component';
 
@@ -24,6 +28,7 @@ export const DependenciesRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: DependenciesListComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

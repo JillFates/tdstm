@@ -157,6 +157,12 @@
                                 Actions
                             </g:link>
                         </li>
+
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="dependencies" id="list">
+                                Dependencies
+                            </g:link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown menu-parent-data-centers">
