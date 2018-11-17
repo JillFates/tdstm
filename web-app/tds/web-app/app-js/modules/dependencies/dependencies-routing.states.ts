@@ -10,6 +10,12 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DependenciesListComponent} from './components/list/dependencies-list.component';
 
+/**
+ * Top menu parent section class for all Dependencies module.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
+
 export class DependenciesStates {
 	public static readonly DEPENDENCIES_LIST = {
 		url: 'list'
@@ -22,9 +28,15 @@ export const DependenciesRoute: Routes = [
 		path: DependenciesStates.DEPENDENCIES_LIST.url,
 		data: {
 			page: {
+				title: 'DEPENDENCIES.MENU_TITLE',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', 'DEPENDENCIES.MENU_TITLE'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list', subMenu: true }
+				/*
 				title: 'DEPENDENCIES.LIST_TITLE',
 				instruction: '',
 				menu: []
+				*/
 			},
 			requiresAuth: true,
 		},
