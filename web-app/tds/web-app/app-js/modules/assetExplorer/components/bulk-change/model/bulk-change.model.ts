@@ -11,6 +11,8 @@ export interface IdTextItem {
 export class BulkChangeModel {
 	public selectedItems: number[];
 	public affected: number;
+	public showEdit?: boolean;
+	public showDelete?: boolean;
 	selectedAssets: Array<any>;
 }
 

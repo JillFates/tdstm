@@ -91,17 +91,18 @@ export class BulkCheckboxService {
 
 	}
 
-	getBulkSelectedItems(params: any, getAllIds: any = null): Observable<any> {
+	getBulkSelectedItems(params: any, getBulkIds: any = null): Observable<any> {
 		return new Observable((observer: any) => {
 			if (this.isIndeterminateState()) {
-				let bulkIds = getAllIds;
-				if (params) {
-					const {viewId, model, justPlanning} = params;
-					bulkIds = this.getBulkAssetIdsFromView(viewId, model, justPlanning);
+				let bulkIds = null; // getAllIds;
+				if (getBulkIds) {
+					bulkIds = getBulkIds;
+				} else {
+					bulkIds = this.getBulkAssetIdsFromView.bind(this);
 				}
-				return bulkIds
+				return bulkIds(params)
 					.subscribe((result: any) => {
-						const assets = result && result.assets || [];
+						const assets = result && (result.assets || result.dependencies) || [];
 						// TODO side effect
 						const selectedAssetsIds = assets
 							.map((asset) => asset[this.idFieldName])
@@ -178,8 +179,10 @@ export class BulkCheckboxService {
 		}
 	}
 
-	private getBulkAssetIdsFromView(viewId: number, model: ViewSpec, justPlanning: boolean): Observable<any> {
-		let params = {
+	private getBulkAssetIdsFromView(params): Observable<any> {
+		const {viewId, model, justPlanning} = params;
+
+		let payload = {
 				forExport: true,
 				offset: 0,
 				limit: 0,
@@ -193,10 +196,10 @@ export class BulkCheckboxService {
 		};
 
 		if (justPlanning) {
-			params['justPlanning'] = true;
+			payload['justPlanning'] = true;
 		}
 
-		return this.assetExplorerService.query(viewId, params);
+		return this.assetExplorerService.query(viewId, payload);
 	}
 }
 
