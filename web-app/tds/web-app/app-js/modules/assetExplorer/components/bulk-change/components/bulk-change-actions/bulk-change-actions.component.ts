@@ -100,10 +100,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		const items = this.selectedItems.map((value: number) => value.toString());
 		return new Promise((resolve, reject) =>  {
 			if (this.hasAssetDeletePermission()) {
-				this.bulkChangeService.bulkDelete(items)
-					.subscribe((result) =>  {
-						resolve({action: BulkActions.Delete, success: true, message: result.message});
-					}, err => reject({action: BulkActions.Delete, success: false, message: err.message || err}))
+				this.bulkChangeService
+					.bulkDelete(this.bulkChangeType, items)
+					.subscribe(
+						result => resolve({action: BulkActions.Delete, success: true, message: result.message || result.resp}),
+						err => reject({action: BulkActions.Delete, success: false, message: err.message || err}));
 			} else {
 				reject({action: BulkActions.Delete, success: false, message: 'Forbidden operation' });
 			}

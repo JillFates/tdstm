@@ -169,8 +169,12 @@ export class DependenciesListComponent implements OnInit {
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
-			// this.onReload();
+			this.reload();
 		}
+	}
+
+	reload() {
+		this.gridStateSubject.next(this.state);
 	}
 
 	onClickBulkButton(): void {
