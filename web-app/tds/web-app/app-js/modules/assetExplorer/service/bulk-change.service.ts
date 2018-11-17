@@ -5,6 +5,7 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {BulkChangeType} from '../components/bulk-change/model/bulk-change.model';
 
 @Injectable()
 export class BulkChangeService {
@@ -62,12 +63,32 @@ export class BulkChangeService {
 	 * @param {string[]} ids: array of ids to be deleted
 	 * @returns {Observable<any>}
 	 */
-	bulkDelete(ids: string[]): Observable<any> {
+	bulkDelete(actionType: BulkChangeType, ids: string[]): Observable<any> {
+		return (actionType === BulkChangeType.Assets) ? this.bulkDeleteAssets(ids) : this.bulkDeleteDependencies(ids);
+	}
+
+	/**
+	 * Execute a bulk assets deleted
+	 * @param {string[]} ids: array of ids assets to be deleted
+	 * @returns {Observable<any>}
+	 */
+	bulkDeleteAssets(ids: string[]): Observable<any> {
 		return this.http.post(`../ws/asset/deleteAssets`, JSON.stringify({ids: ids}))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
 			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Execute a bulk dependencies deleted
+	 * @param {string[]} ids: array of ids dependencies to be deleted
+	 * @returns {Observable<any>}
+	 */
+	bulkDeleteDependencies(ids: string[]): Observable<any> {
+		return this.http.post(`/tdstm/wsAsset/bulkDeleteDependencies`, JSON.stringify({dependencies: ids}))
+			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
 
