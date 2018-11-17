@@ -5,7 +5,6 @@ import {Observable} from 'rxjs';
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
 import {BulkActionResult} from '../../model/bulk-change.model';
-import {AssetExplorerService} from '../../../../service/asset-explorer.service';
 import {CustomDomainService} from '../../../../../fieldSettings/service/custom-domain.service';
 import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
@@ -48,7 +47,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	constructor(
 		protected bulkChangeModel: BulkChangeModel,
 		private promptService: UIPromptService,
-		private assetExplorerService: AssetExplorerService,
 		private permissionService: PermissionService,
 		private customDomainService: CustomDomainService,
 		private bulkChangeService: BulkChangeService,
