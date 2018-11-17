@@ -5,7 +5,7 @@
 			[sort]="state.sort"
 			[skip]="state.skip"
 			[pageSize]="state.take"
-			[sortable]="{mode:'single'}"
+			[sortable]="{ allowUnsort: false, mode:'single'}"
 			[resizable]="true"
 			[pageable]="{ pageSizes: maxOptions, info: true}"
 			(dataStateChange)="dataStateChange($event)"
@@ -59,7 +59,8 @@
 		                   [locked]="column.locked"
 		                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 			<ng-template kendoGridHeaderTemplate>
-				<div class="sortable-column" (click)="onClickTemplate($event)">
+				<!--(click)="onClickTemplate($event)"-->
+				<div class="sortable-column">
 					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
 				</div>
 			</ng-template>
