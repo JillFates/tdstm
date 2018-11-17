@@ -18,12 +18,13 @@
 				                        [enabled]="hasSelectedItems()"
 				                        [showDelete]="true"
 				                        [showEdit]="false"
+				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)">
 				</tds-bulk-change-button>
 
 				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
-					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Dependency(s) selected</label>
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section"></div>

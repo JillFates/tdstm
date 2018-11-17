@@ -13,19 +13,23 @@
 						<div class="box-body">
 							<div class="row">
 								<div class="col-md-12">
-									<div class="form-group">
+									<div class="form-group" *ngIf="bulkChangeAction === ACTION_TYPE.Assets">
 										{{'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[affected]}}
+									</div>
+
+									<div class="form-group" *ngIf="bulkChangeAction === ACTION_TYPE.Dependencies">
+										{{'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_DEPENDENCIES' | translate:[affected]}}
 									</div>
 								</div>
 								<div class="col-md-12">
 									<div class="form-group" *ngIf="showEdit">
 										<label>
-											<input type="radio" [value]="ACTION.Edit" name="operation" [(ngModel)]="selectedAction" checked> Edit Assets
+											<input type="radio" [value]="ACTION.Edit" name="operation" [(ngModel)]="selectedAction" checked> Edit {{itemType}}
 										</label>
 									</div>
 									<div class="form-group" *ngIf="showDelete">
 										<label>
-											<input type="radio" [value]="ACTION.Delete" name="operation" [(ngModel)]="selectedAction">Delete Assets
+											<input type="radio" [value]="ACTION.Delete" name="operation" [(ngModel)]="selectedAction">Delete {{itemType}}
 										</label>
 									</div>
 

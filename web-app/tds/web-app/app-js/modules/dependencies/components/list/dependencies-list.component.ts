@@ -17,7 +17,7 @@ import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../
 
 import {tap, map, mergeMap} from 'rxjs/operators';
 import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
-import {BulkActionResult} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
+import {BulkActionResult, BulkChangeType} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
@@ -28,6 +28,7 @@ import {DependencyResults} from '../../model/dependencies.model';
 })
 export class DependenciesListComponent implements OnInit {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
+	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	protected gridStateSubject: BehaviorSubject<State>;
 	protected assets: any[];
 	protected skip = 0;
