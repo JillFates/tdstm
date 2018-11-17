@@ -12,6 +12,28 @@
       cursor: pointer
       label
         cursor: pointer
+
+    .k-filtercell-wrapper
+      position: relative
+      .k-textbox
+        padding: 6px 22px 6px 6px
+        height: 31px
+      .k-filtercell-operator
+        .k-dropdown-operator
+          display: none
+        position: absolute
+        right: -5px
+        .k-button
+          background: transparent
+          border: none
+          margin-right: 4px
+          span
+            font-size: 14px
+            font-weight: bold
+
+    .k-i-filter-clear::before
+      content: "\e11b"
+
     .k-grid-toolbar
       padding: 5px 8px
     .check-row
