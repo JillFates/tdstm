@@ -3,6 +3,8 @@
 			class="dependencies"
 			[data]="gridData"
 			[sort]="state.sort"
+			[filter]="state.filter"
+			[filterable]="true"
 			[skip]="state.skip"
 			[pageSize]="state.take"
 			[sortable]="{ allowUnsort: false, mode:'single'}"
@@ -64,6 +66,35 @@
 					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
 				</div>
 			</ng-template>
+
+			<ng-template kendoGridFilterCellTemplate let-filter let-column="column">
+				<kendo-grid-string-filter-cell
+						[showOperators]="false"
+						[column]="column"
+						[filter]="filter">
+				</kendo-grid-string-filter-cell>
+			</ng-template>
+
+			<!-- Default Generic Filter Template -->
+			<!--
+			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
+				<div class=" has-feedback" style="margin-bottom:0px;">
+					--
+					       (keyup)="onFilterKeyUp($event, column)"
+					       (keydown)="onFilterKeyDown($event)" input-paste
+					       (onPaste)="onPaste(column)"
+					--
+					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value=""
+					       [(ngModel)]="column.filter">
+					--(click)="clearText(column)" --
+					<span *ngIf="column.filter"
+					      style="cursor:pointer;color:#656565;pointer-events:all"
+					      class="fa fa-times form-control-feedback component-action-clear-filter"
+					      aria-hidden="true"></span>
+				</div>
+			</ng-template>
+			-->
+
 		</kendo-grid-column>
 
 		<!-- Pagination Footer -->
