@@ -13,6 +13,8 @@ import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {DependenciesListComponent} from './components/list/dependencies-list.component';
@@ -32,6 +34,8 @@ import {DependenciesService} from './service/dependencies.service';
 		DropDownsModule,
 		GridModule,
 		PopupModule,
+		SortableModule,
+		IntlModule,
 		InputsModule,
 		DateInputsModule,
 		// Route

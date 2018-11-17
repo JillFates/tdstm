@@ -4,6 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -28,7 +29,8 @@ export const DependenciesRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: DependenciesListComponent,
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always'
 	}
 ];
 

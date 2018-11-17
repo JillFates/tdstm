@@ -47,7 +47,8 @@ export class BulkChangeButtonComponent {
 		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.selectedAssets, affected: this.selectedItems.length };
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}
-		], true, false).then(bulkOperationResult => {
+		], true, false)
+			.then(bulkOperationResult => {
 			this.operationResult.emit(bulkOperationResult);
 		}).catch(err => {
 			console.log('Error:');
