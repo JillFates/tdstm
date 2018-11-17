@@ -12,49 +12,49 @@ export class DependenciesColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				type: 'text',
-				width: 100
+				width: 160
 			},
 			{
 				label: 'Asset Type',
-				property: 'dependentType',
+				property: 'assetType',
 				type: 'text',
-				width: 100
+				width: 120
 			},
 			{
 				label: 'Bundle',
 				property: 'assetBundle',
 				type: 'text',
-				width: 70
+				width: 120
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
-				width: 70
+				width: 120
 			},
 			{
 				label: 'Depends On',
 				property: 'dependentName',
 				type: 'text',
-				width: 100
+				width: 160
 			},
 			{
 				label: 'Dep Asset Type',
 				property: 'dependentType',
 				type: 'text',
-				width: 110
+				width: 140
 			},
 			{
 				label: 'Dep Asset Bundle',
-				property: 'assetBundle',
+				property: 'dependentBundle',
 				type: 'text',
-				width: 120
+				width: 140
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 70
+				width: 100
 			},
 			{
 				label: 'Comment',
@@ -66,7 +66,7 @@ export class DependenciesColumnModel {
 				label: 'Frequency',
 				property: 'frequency',
 				type: 'text',
-				width: 100
+				width: 120
 			},
 			{
 				label: 'Direction',

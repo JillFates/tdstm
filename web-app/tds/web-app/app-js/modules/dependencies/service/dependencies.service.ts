@@ -13,8 +13,11 @@ export class DependenciesService {
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
 	getDependencies(params: any): Observable<DependencyResults> {
-		const page: number = (params.skip / params.take) + 1;
-		const queryString = `?_search=false&rows=${params.take}&page=${page}&sidx=assetName&sord=asc`;
+		const {skip, take, sort} = params;
+
+		const page: number = (skip / take) + 1;
+		const sorting = sort && sort.length ? sort[0] : {dir: 'asc', field: 'assetName'};
+		let queryString = `?_search=false&rows=${take}&page=${page}&sidx=${sorting.field}&sord=${sorting.dir}`;
 		const url = `../ws/asset/listDependencies${queryString}`;
 
 		return this.http.get(url)

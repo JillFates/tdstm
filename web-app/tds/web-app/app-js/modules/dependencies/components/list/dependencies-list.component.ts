@@ -88,7 +88,7 @@ export class DependenciesListComponent implements OnInit {
 		return {
 			sort: [{
 				dir: 'asc',
-				field: 'name'
+				field: 'assetName'
 			}],
 			filter: {
 				filters: [],
