@@ -15,6 +15,8 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 })
 export class BulkChangeButtonComponent {
 	@Input() enabled: boolean ;
+	@Input() showEdit: boolean;
+	@Input() showDelete: boolean;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 	@Output() clickBulk = new EventEmitter<void>();
 
@@ -44,7 +46,14 @@ export class BulkChangeButtonComponent {
 	}
 
 	showBulkActions() {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.selectedAssets, affected: this.selectedItems.length };
+		const bulkChangeModel: BulkChangeModel = {
+			selectedItems: this.selectedItems,
+			selectedAssets: this.selectedAssets,
+			affected: this.selectedItems.length,
+			showDelete: this.showDelete,
+			showEdit: this.showEdit
+		};
+
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}
 		], true, false)

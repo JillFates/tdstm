@@ -20,6 +20,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	selectedItems: number[] = [];
 	selectedAction: BulkActions;
 	affected: number;
+	showEdit: boolean;
+	showDelete: boolean;
 	ACTION = BulkActions; // Make enum visible to the view
 
 	constructor(
@@ -33,6 +35,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			this.selectedItems = this.bulkChangeModel.selectedItems || [];
 			this.affected = this.bulkChangeModel.affected;
 			this.selectedAction = this.ACTION.Edit;
+			this.showDelete = this.bulkChangeModel.showDelete;
+			this.showEdit = this.bulkChangeModel.showEdit;
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
@@ -48,7 +52,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private editAction(): void {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.bulkChangeModel.selectedAssets, affected: this.bulkChangeModel.affected };
+		const bulkChangeModel: BulkChangeModel = {
+			selectedItems: this.selectedItems,
+			selectedAssets: this.bulkChangeModel.selectedAssets,
+			affected: this.bulkChangeModel.affected
+		};
 
 		this.dialogService.extra(BulkChangeEditComponent, [
 			UIDialogService,

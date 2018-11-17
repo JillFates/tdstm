@@ -174,8 +174,8 @@ export class DependenciesListComponent implements OnInit {
 
 	onClickBulkButton(): void {
 		this.bulkCheckboxService
-			.getBulkSelectedItems(null,
-				this.dependenciesService.getDependencies({skip: 0, take: this.gridData.total}))
+			.getBulkSelectedItems({skip: 0, take: this.gridData.total},
+				this.dependenciesService.getDependencies.bind(this.dependenciesService))
 			.subscribe((results: any) => {
 				console.log('The results are');
 				console.log(results);
