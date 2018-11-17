@@ -20,7 +20,7 @@ import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult, BulkChangeType} from '../bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
@@ -98,6 +98,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 	private currentUser: any;
+	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 
 	constructor(
 		private preferenceService: PreferenceService,

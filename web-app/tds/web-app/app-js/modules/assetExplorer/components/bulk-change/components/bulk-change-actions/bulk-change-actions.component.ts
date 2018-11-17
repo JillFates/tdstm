@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
 import { TranslatePipe } from '../../../../../../shared/pipes/translate.pipe';
 
-import {BulkChangeModel} from '../../model/bulk-change.model';
+import {BulkChangeModel, BulkChangeType} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
 import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
 import {BulkActions, BulkActionResult} from '../../model/bulk-change.model';
@@ -17,12 +17,15 @@ import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.comp
 	providers: [TranslatePipe]
 })
 export class BulkChangeActionsComponent extends UIExtraDialog {
-	selectedItems: number[] = [];
-	selectedAction: BulkActions;
-	affected: number;
-	showEdit: boolean;
-	showDelete: boolean;
-	ACTION = BulkActions; // Make enum visible to the view
+	protected bulkChangeType: BulkChangeType;
+	protected showEdit: boolean;
+	protected showDelete: boolean;
+	protected selectedItems: number[] = [];
+	protected selectedAction: BulkActions;
+	protected affected: number;
+	protected ACTION = BulkActions; // Make enum visible to the view
+	protected ACTION_TYPE = BulkChangeType;
+	protected itemType: string;
 
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
@@ -34,9 +37,12 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			super('#bulk-change-action-component');
 			this.selectedItems = this.bulkChangeModel.selectedItems || [];
 			this.affected = this.bulkChangeModel.affected;
-			this.selectedAction = this.ACTION.Edit;
+			this.selectedAction = this.bulkChangeModel.showEdit ? this.ACTION.Edit : this.ACTION.Delete;
 			this.showDelete = this.bulkChangeModel.showDelete;
 			this.showEdit = this.bulkChangeModel.showEdit;
+			this.bulkChangeType = this.bulkChangeModel.bulkChangeType;
+			this.itemType =  this.bulkChangeType === BulkChangeType.Assets ?
+				'Assets' : 'Dependencies'
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
@@ -76,7 +82,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private confirmDelete(): Promise<boolean> {
-		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE', [this.affected]);
+		const translationKey = this.bulkChangeType === BulkChangeType.Assets
+			? 'ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE_ASSETS'
+			: 'ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE_DEPENDENCIES';
+
+		const message = this.translatePipe.transform(translationKey, [this.affected]);
 		return new Promise((resolve, reject) =>  {
 			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				message,

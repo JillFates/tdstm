@@ -55,6 +55,7 @@
 				                        [enabled]="hasSelectedItems()"
 				                        [showDelete]="true"
 				                        [showEdit]="true"
+				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
