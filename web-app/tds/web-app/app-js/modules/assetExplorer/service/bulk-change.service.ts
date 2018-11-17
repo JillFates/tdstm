@@ -45,7 +45,8 @@ export class BulkChangeService {
 			edits: edits,
 			userParams: defaultUserParams,
 			type: type
-		}
+		};
+
 		return this.http.put(this.getURL(), JSON.stringify(payload))
 			.map((res: Response) => {
 				let result = res.json();
@@ -54,6 +55,20 @@ export class BulkChangeService {
 			.catch((error: any) => {
 				return error;
 			});
+	}
+
+	/**
+	 * Execute a bulk assets deleted
+	 * @param {string[]} ids: array of ids to be deleted
+	 * @returns {Observable<any>}
+	 */
+	bulkDelete(ids: string[]): Observable<any> {
+		return this.http.post(`../ws/asset/deleteAssets`, JSON.stringify({ids: ids}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	/**

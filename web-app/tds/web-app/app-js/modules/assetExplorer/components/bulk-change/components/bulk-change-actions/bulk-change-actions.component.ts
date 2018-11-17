@@ -6,7 +6,7 @@ import {BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
 import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
 import {BulkActions, BulkActionResult} from '../../model/bulk-change.model';
-import {AssetExplorerService} from '../../../../service/asset-explorer.service';
+import {BulkChangeService} from '../../../../service/bulk-change.service';
 import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
 import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.component';
@@ -27,7 +27,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
 		private promptService: UIPromptService,
-		private assetExplorerService: AssetExplorerService,
+		private bulkChangeService: BulkChangeService,
 		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
 		private translatePipe: TranslatePipe) {
@@ -88,10 +88,9 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 
 	private deleteBulk(): Promise<BulkActionResult> {
 		const items = this.selectedItems.map((value: number) => value.toString());
-		// return Promise.resolve({action: BulkActions.Delete, success: true});
 		return new Promise((resolve, reject) =>  {
 			if (this.hasAssetDeletePermission()) {
-				this.assetExplorerService.deleteAssets(items)
+				this.bulkChangeService.bulkDelete(items)
 					.subscribe((result) =>  {
 						resolve({action: BulkActions.Delete, success: true, message: result.message});
 					}, err => reject({action: BulkActions.Delete, success: false, message: err.message || err}))
