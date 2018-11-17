@@ -102,6 +102,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'DEPENDENCIES': {
+		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List'
 	},
 	'API_ACTION': {
