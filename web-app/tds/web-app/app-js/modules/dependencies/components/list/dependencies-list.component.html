@@ -17,7 +17,7 @@
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 			<div class="col-sm-6 bulkchange-section">
 				<tds-bulk-change-button #tdsBulkChangeButton
-				                        [enabled]="hasSelectedItems()"
+				                        [enabled]="bulkCheckboxService.hasSelectedItems()"
 				                        [showDelete]="true"
 				                        [showEdit]="false"
 				                        [bulkChangeType]="bulkChangeType"
@@ -25,7 +25,7 @@
 				                        (operationResult)="onBulkOperationResult($event)">
 				</tds-bulk-change-button>
 
-				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
+				<div *ngIf="bulkCheckboxService.hasSelectedItems()" class="bulk-change-counter">
 					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Dependency(s) selected</label>
 				</div>
 			</div>
@@ -39,7 +39,7 @@
 					<div class="col-md-12 text-center">
 						<tds-checkbox name="assetsSelector"
 						              [hasThirdState]="true"
-						              (changeState)="onChangeBulkCheckbox($event)"
+						              (changeState)="bulkCheckboxService.changeState(($event))"
 						              id="assetSelector"
 						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 					</div>
@@ -50,7 +50,7 @@
 				<div class="check-row">
 					<input type="checkbox" id="checkbox_{{dataItem.id}}"
 					       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.id)"
-					       (change)="checkItem(dataItem.id, $event.target.checked)"
+					       (change)="bulkCheckboxService.checkItem(dataItem.id, $event.target.checked)"
 					       name="checkbox_{{dataItem.id}}">
 				</div>
 			</ng-template>
@@ -61,7 +61,6 @@
 		                   [locked]="column.locked"
 		                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 			<ng-template kendoGridHeaderTemplate>
-				<!--(click)="onClickTemplate($event)"-->
 				<div class="sortable-column">
 					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
 				</div>
@@ -74,27 +73,6 @@
 						[filter]="filter">
 				</kendo-grid-string-filter-cell>
 			</ng-template>
-
-			<!-- Default Generic Filter Template -->
-			<!--
-			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
-				<div class=" has-feedback" style="margin-bottom:0px;">
-					--
-					       (keyup)="onFilterKeyUp($event, column)"
-					       (keydown)="onFilterKeyDown($event)" input-paste
-					       (onPaste)="onPaste(column)"
-					--
-					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value=""
-					       [(ngModel)]="column.filter">
-					--(click)="clearText(column)" --
-					<span *ngIf="column.filter"
-					      style="cursor:pointer;color:#656565;pointer-events:all"
-					      class="fa fa-times form-control-feedback component-action-clear-filter"
-					      aria-hidden="true"></span>
-				</div>
-			</ng-template>
-			-->
-
 		</kendo-grid-column>
 
 		<!-- Pagination Footer -->
