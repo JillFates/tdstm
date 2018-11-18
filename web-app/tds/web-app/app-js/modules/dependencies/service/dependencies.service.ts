@@ -7,17 +7,25 @@ import {DependencyResults} from '../model/dependencies.model';
 
 import {map} from 'rxjs/operators';
 
+export interface DependenciesRequestParams {
+	page: number;
+	take: number;
+	sorting: any;
+	filters: any[];
+}
+
 @Injectable()
 export class DependenciesService {
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
-	getDependencies(params: any): Observable<DependencyResults> {
-		const {skip, take, sort} = params;
+	getDependencies(params: DependenciesRequestParams): Observable<DependencyResults> {
+		const {page, take, sorting, filters} = params;
+		let queryString = '';
 
-		const page: number = (skip / take) + 1;
-		const sorting = sort && sort.length ? sort[0] : {dir: 'asc', field: 'assetName'};
-		let queryString = `?_search=false&rows=${take}&page=${page}&sidx=${sorting.field}&sord=${sorting.dir}`;
+		queryString += `?rows=${take}&page=${page}&sidx=${sorting.field}&sord=${sorting.dir}`;
+		queryString += filters.map(filter => `&${filter.field}=${filter.value}`).join('');
+		queryString += `&_search=${filters.length ? 'true' : 'false'}`;
 		const url = `../ws/asset/listDependencies${queryString}`;
 
 		return this.http.get(url)
