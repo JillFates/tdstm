@@ -589,6 +589,52 @@ class DomainClassQueryHelper {
 	}
 
 	/**
+	 * <p>Prepare HQL manufacturer alias sentence.</p>
+	 * It can be used in different scenarios:
+	 * <pre>
+	 *     find Manufacturer by name eq '...' into '..'
+	 *     find Device by manufacturer eq '...' into '..'
+	 * </pre>
+	 * @param field original hql sentence
+	 * @param sentence original hql sentence
+	 * @param namedParameter
+	 * @return an HQL sentence improved with Manufacturer alias
+	 */
+	static String hqlManufacturerAlias(String field, String sentence, String namedParameter) {
+		return """
+			( ${sentence} or
+				${field} in (
+					select ${MANUFACTURER_ALIAS}.manufacturer
+					  from ManufacturerAlias ${MANUFACTURER_ALIAS}
+					 where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
+					)
+			)"""
+	}
+
+	/**
+	 * <p>Prepare HQL manufacturer alias sentence.</p>
+	 * It can be used in 2 different scenarios:
+	 * <pre>
+	 *     find Device by model eq '...' into '..'
+	 *     find Model by modelName eq '...' into '..'
+	 * </pre>
+	 * @param field original hql sentence
+	 * @param sentence original hql sentence
+	 * @param namedParameter
+	 * @return an HQL sentence improved with Model alias
+	 */
+	static String hqlModelAlias(String field, String sentence, String namedParameter) {
+		return """
+			( ${sentence} or
+				${field} in (
+					select ${MODEL_ALIAS}.model
+					  from ModelAlias ${MODEL_ALIAS}
+					 where ${MODEL_ALIAS}.name = :${namedParameter}
+				)
+			)"""
+	}
+
+	/**
 	 * <p>Add aliases query parameters for Manufacturer and Model domains</p>
 	 * <p>If a ETL find command contains a manufacturer name</p>
 	 * <pre>
@@ -616,75 +662,38 @@ class DomainClassQueryHelper {
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
 		if (clazz == AssetEntity.class) {
+			
 			if ( property == "${DOMAIN_ALIAS}.manufacturer.name" ) {
 				/**
-				* find Device by manufacturer eq '...' into '..'
-				*/
-				return """
-					( ${sentence} or
-						D.manufacturer in (
-							select ${MANUFACTURER_ALIAS}.manufacturer
-							from ManufacturerAlias ${MANUFACTURER_ALIAS}
-							where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
-						)
-					)
-				"""
+				 * find Device by manufacturer eq '...' into '..'
+				 */
+				return hqlManufacturerAlias('D.manufacturer', sentence, namedParameter)
 			}
 
 			if ( property == "${DOMAIN_ALIAS}.model.modelName" ) {
 				/**
 				* find Device by model eq '...' into '..'
 				*/
-				return """
-					( ${sentence} or
-						D.model in (
-							select ${MODEL_ALIAS}.model
-							from ModelAlias ${MODEL_ALIAS}
-							where ${MODEL_ALIAS}.name = :${namedParameter}
-						)
-					)
-				"""
+				return hqlModelAlias('D.model', sentence, namedParameter)
 			}
+
 		} else if ( clazz in Manufacturer && property == "${DOMAIN_ALIAS}.name" ) {
 			/**
 			 * find Manufacturer by name eq '...' into '..'
 			 */
-			return """
-				( ${sentence} or
-					D in (
-						select ${MANUFACTURER_ALIAS}.manufacturer
-                  		  from ManufacturerAlias ${MANUFACTURER_ALIAS}
-                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
-                     )
-				 )
-			"""
+			return hqlManufacturerAlias('D', sentence, namedParameter)
 
 		} else if ( clazz in Model && property == "${DOMAIN_ALIAS}.modelName" ) {
 			/**
 			 * find Model by modelName eq '...' into '..'
 			 */
-			return """
-			( ${sentence} or
-			  D in (
-				select ${MODEL_ALIAS}.model
-				  from ModelAlias ${MODEL_ALIAS}
-				 where ${MODEL_ALIAS}.name = :${namedParameter}
-			  )
-			)
-			"""
+			return hqlModelAlias('D', sentence, namedParameter)
+
 		} else if ( clazz in Model && "${DOMAIN_ALIAS}.manufacturer.name" ) {
 			/**
 			 * find Model by manufacturer eq '...' into '..'
 			 */
-			return """
-					( ${sentence} or
-						D.manufacturer in (
-							select ${MANUFACTURER_ALIAS}.manufacturer
-							from ManufacturerAlias ${MANUFACTURER_ALIAS}
-							where ${MANUFACTURER_ALIAS}.name = :${namedParameter}
-						)
-					)
-				"""
+			return hqlManufacturerAlias('D.manufacturer', sentence, namedParameter)
 		}
 
 		return sentence
