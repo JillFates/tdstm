@@ -2,6 +2,7 @@ import {BehaviorSubject} from 'rxjs';
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
 import {State} from '@progress/kendo-data-query';
+import {GridComponent, SortSettings} from '@progress/kendo-angular-grid';
 import {GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
 import {Observable, BehaviorSubject, Subject} from 'rxjs';
 
@@ -17,7 +18,7 @@ import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../
 import {tap, map, mergeMap, takeUntil} from 'rxjs/operators';
 import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
 import {BulkActionResult, BulkChangeType} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 
@@ -27,20 +28,17 @@ import {DependencyResults} from '../../model/dependencies.model';
 })
 export class DependenciesListComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
+	@ViewChild('grid') grid: GridComponent;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	protected assets: any[];
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
 	private gridStateSubject: BehaviorSubject<State>;
 	private destroySubject: Subject<any>;
-	private defaultSorting: any = { dir: 'asc', field: 'assetName' };
-	// protected pageSize = GRID_DEFAULT_PAGE_SIZE;
+	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected gridData: GridDataResult;
-	protected state: State;
-	// protected idFieldName = 'id';
-	// protected bulkItems: number[] = [];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -52,15 +50,27 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	) { }
 
 	ngOnInit() {
+		this.destroySubject = new Subject<any>();
+		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
 		this.gridData = { data: [], total: 0 };
-		this.state = this.getInitialGridState();
+
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
-		this.dependenciesColumnModel = new DependenciesColumnModel();
-		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
-		this.destroySubject = new Subject<any>();
-
+		this.setupGridConfiguration();
 		this.setupGridStateChanges();
+	}
+
+	/**
+	 * Set the grid fixed settings, this configuration doesn't change over time
+	 */
+	private setupGridConfiguration() {
+		this.dependenciesColumnModel = new DependenciesColumnModel();
+
+		this.grid.selectable = true;
+		this.grid.filterable = true;
+		this.grid.sortable = <SortSettings>{ allowUnsort: false, mode: 'single'};
+		this.grid.resizable = true;
+		this.grid.pageable = { pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true};
 	}
 
 	/**
@@ -73,18 +83,20 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	/**
 	 * Define the chain of operations that are executed every time the grid state has suffered changes
 	 */
-	setupGridStateChanges(): void {
+	private setupGridStateChanges(): void {
+		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
+
 		this.gridStateSubject
 			.pipe(
 				// take events until destroy subject emits
 				takeUntil(this.destroySubject),
 				// Grab the reference to the new grid state
-				tap((state: State) => this.setGridState(state)),
+				tap(this.setGridState.bind(this)),
 				// Extract from the state the parameters required by the endpoint
-				map((state: State): DependenciesRequestParams => this.getParametersForEndpoint(state)),
+				map(this.getParametersForEndpoint),
 				// Call the endpoint to get new data
-				mergeMap((params: DependenciesRequestParams) => this.dependenciesService.getDependencies(params)),
-				// Map the endpoint results to the grid format data
+				mergeMap(getDependencies),
+				// Map the endpoint results to the format used by the grid
 				map((results: DependencyResults) => ({data: results.dependencies, total: results.total}))
 			)
 			.subscribe((results) => {
@@ -115,9 +127,14 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	 * Set the new grid state
 	 * @param {State} state
 	 */
-	protected setGridState(state: State): void {
-		this.state = state;
-		this.bulkCheckboxService.setPageSize(this.state.take);
+	private setGridState(state: State): void {
+		const {sort, filter, skip, take} = state;
+
+		this.grid.sort = sort;
+		this.grid.filter = filter;
+		this.grid.skip = skip;
+		this.grid.pageSize = take;
+		this.bulkCheckboxService.setPageSize(take);
 	}
 
 	/**
@@ -132,7 +149,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	 * Get the initial state of the grid
 	 * @returns {State} default grid state properties
 	 */
-	getInitialGridState(): State {
+	private getInitialGridState(): State {
 		return {
 			sort: [this.defaultSorting],
 			filter: {
@@ -195,10 +212,20 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Get the current grid state
+	 * @returns {State} grid state properties
+	 */
+	private getCurrentGridState(): State {
+		const {sort, pageSize: take, skip, filter} = this.grid;
+
+		return {sort, take, skip, filter};
+	}
+
+	/**
 	 * Get the current selected items counter
 	 * @returns {number}
 	 */
-	getSelectedItemsCount(): number {
+	protected getSelectedItemsCount(): number {
 		const allCounter = (this.gridData && this.gridData.total) || 0;
 		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
 	}
@@ -208,10 +235,10 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	 * uncheck all dependencies and reload the grid
 	 * @param {BulkActionResult} operationResult result of bulk edit or delete operation
 	 */
-	onBulkOperationResult(operationResult: BulkActionResult): void {
+	protected onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
-			this.gridStateSubject.next(this.state);
+			this.gridStateSubject.next(this.getCurrentGridState());
 		}
 	}
 
@@ -219,10 +246,10 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	 * Get the current bulk selected items
 	 * @returns {Observable<any>} bulkItems selected
 	 */
-	getCurrentBulkSelectedItems(): Observable<any> {
+	private getCurrentBulkSelectedItems(): Observable<any> {
 		return this.bulkCheckboxService
 			.getBulkSelectedItems(
-				this.getParametersForEndpoint(Object.assign({}, this.state, { skip: 0, take: this.gridData.total } )),
+				this.getParametersForEndpoint( {...this.getCurrentGridState(), skip: 0, take: this.gridData.total}),
 				this.dependenciesService.getDependencies.bind(this.dependenciesService))
 			.pipe(
 				takeUntil(this.destroySubject),
@@ -234,7 +261,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	/**
 	 * Open the bulk actions selection window
 	 */
-	onClickBulkButton(): void {
+	protected onClickBulkButton(): void {
 		this.getCurrentBulkSelectedItems()
 			.subscribe((results) => this.tdsBulkChangeButton.bulkData(results))
 	}
