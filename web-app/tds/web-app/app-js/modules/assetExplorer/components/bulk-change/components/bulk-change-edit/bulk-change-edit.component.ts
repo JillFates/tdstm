@@ -26,11 +26,13 @@ import {PreferenceService} from '../../../../../../shared/services/preference.se
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	private readonly CLEAR_ACTION = 'clear';
-	private readonly TYPE_OPTIONS_CONTROL = 'Options';
-	private readonly TYPE_INLIST_CONTROL = 'InList';
-	private readonly TYPE_CUSTOM_FIELD_LIST_CONTROL = 'List';
-	private readonly TYPE_CUSTOM_FIELD_YES_NO = 'YesNo';
-	private readonly DEFAULT_DOMAIN: IdTextItem = {id: 'COMMON', text: 'Common Fields'};
+
+	protected readonly TYPE_OPTIONS_CONTROL = 'Options';
+	protected readonly TYPE_INLIST_CONTROL = 'InList';
+	protected readonly TYPE_CUSTOM_FIELD_LIST_CONTROL = 'List';
+	protected readonly TYPE_CUSTOM_FIELD_YES_NO = 'YesNo';
+	protected readonly TYPE_REFERENCE_CONTROL = 'Reference';
+	private readonly DEFAULT_DOMAIN: IdTextItem = { id: 'COMMON', text: 'Common Fields' };
 
 	protected tagList: Array<TagModel>;
 	protected yesNoList: IdTextItem[] = [{ id: 'Yes', text: 'Yes'}, { id: 'No', text: 'No'}];
@@ -190,14 +192,16 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	/**
-	 * Check if field control is any system Options or InList.
-	 * @param fieldControl
+	 * Check if field control is any system Options or InList where the select options will be
+	 * from the this.listOptions.
+	 * @param fieldControl -
 	 * @returns {boolean}
 	 */
-	private isFieldControlOptionsList(fieldControl: any): boolean {
-		return fieldControl === this.TYPE_OPTIONS_CONTROL
-			|| fieldControl === this.TYPE_INLIST_CONTROL
-			|| fieldControl.startsWith(this.TYPE_OPTIONS_CONTROL);
+	private isFieldControlOptionsList(fieldControlName: String): boolean {
+		return fieldControlName === this.TYPE_OPTIONS_CONTROL
+			|| fieldControlName === this.TYPE_INLIST_CONTROL
+			|| fieldControlName.startsWith(this.TYPE_OPTIONS_CONTROL)
+			|| fieldControlName === this.TYPE_REFERENCE_CONTROL;
 	}
 
 	/**

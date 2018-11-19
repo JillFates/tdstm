@@ -1,6 +1,6 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
+
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import grails.util.Holders
@@ -85,7 +85,7 @@ class BulkChangePerson {
 	private static void update(Class type, Person person, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 		String setFieldQueryPart
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 
 		if (person) {
 			params.value = person
