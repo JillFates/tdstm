@@ -23,10 +23,10 @@ import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-
 import {DependencyResults} from '../../model/dependencies.model';
 
 @Component({
-	selector: 'tds-dependencies-list',
-	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/list/dependencies-list.component.html'
+	selector: 'tds-dependencies-view-grid',
+	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html'
 })
-export class DependenciesListComponent implements OnInit, OnDestroy {
+export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
@@ -36,6 +36,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	private gridStateSubject: BehaviorSubject<State>;
 	private destroySubject: Subject<any>;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
+	private getDependencies: any;
 	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected gridData: GridDataResult;
@@ -53,6 +54,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 		this.destroySubject = new Subject<any>();
 		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
 		this.gridData = { data: [], total: 0 };
+		this.getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
 
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
@@ -84,8 +86,6 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 	 * Define the chain of operations that are executed every time the grid state has suffered changes
 	 */
 	private setupGridStateChanges(): void {
-		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
-
 		this.gridStateSubject
 			.pipe(
 				// take events until destroy subject emits
@@ -95,7 +95,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 				// Extract from the state the parameters required by the endpoint
 				map(this.getParametersForEndpoint),
 				// Call the endpoint to get new data
-				mergeMap(getDependencies),
+				mergeMap(this.getDependencies),
 				// Map the endpoint results to the format used by the grid
 				map((results: DependencyResults) => ({data: results.dependencies, total: results.total}))
 			)
@@ -250,7 +250,7 @@ export class DependenciesListComponent implements OnInit, OnDestroy {
 		return this.bulkCheckboxService
 			.getBulkSelectedItems(
 				this.getParametersForEndpoint( {...this.getCurrentGridState(), skip: 0, take: this.gridData.total}),
-				this.dependenciesService.getDependencies.bind(this.dependenciesService))
+				this.getDependencies)
 			.pipe(
 				takeUntil(this.destroySubject),
 				map(results =>

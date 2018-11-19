@@ -17,7 +17,7 @@ import { SortableModule } from '@progress/kendo-angular-sortable';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
-import {DependenciesListComponent} from './components/list/dependencies-list.component';
+import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -42,15 +42,16 @@ import {DependenciesService} from './service/dependencies.service';
 		DependenciesRouteModule
 	],
 	declarations: [
-		DependenciesListComponent
+		DependenciesViewGridComponent
 	],
 	providers: [
 		// Resolve
 		ModuleResolveService,
 		DependenciesService
 	],
-	exports: [DependenciesListComponent],
-	entryComponents: []
+	exports: [DependenciesViewGridComponent],
+	entryComponents: [
+	]
 })
 
 export class DependenciesModule {
