@@ -19,6 +19,11 @@ export class DependenciesService {
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
+	/**
+	 * Get the dependencies matched by the reques parameters
+	 * @param {DependenciesRequestParams} params paremeters to filter and sorting
+	 * @return {Observable<DependencyResults>)
+	 */
 	getDependencies(params: DependenciesRequestParams): Observable<DependencyResults> {
 		const {page, take, sorting, filters} = params;
 		let queryString = '';

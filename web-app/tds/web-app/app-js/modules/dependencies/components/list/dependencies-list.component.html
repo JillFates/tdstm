@@ -1,17 +1,5 @@
 <div class="dependencies-list-component">
-	<kendo-grid
-			class="dependencies"
-			[data]="gridData"
-			[sort]="state.sort"
-			[filter]="state.filter"
-			[filterable]="true"
-			[skip]="state.skip"
-			[pageSize]="state.take"
-			[sortable]="{ allowUnsort: false, mode:'single'}"
-			[resizable]="true"
-			[pageable]="{ pageSizes: maxOptions, info: true}"
-			(dataStateChange)="dataStateChange($event)"
-			[selectable]="true">
+	<kendo-grid #grid [data]="gridData" (dataStateChange)="dataStateChange($event)">
 
 		<!-- Header Toolbar -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
