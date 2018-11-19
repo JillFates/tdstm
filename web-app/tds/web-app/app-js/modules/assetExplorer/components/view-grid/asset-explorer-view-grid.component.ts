@@ -366,7 +366,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
-		if (operationResult.success) {
+		if (operationResult && operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
