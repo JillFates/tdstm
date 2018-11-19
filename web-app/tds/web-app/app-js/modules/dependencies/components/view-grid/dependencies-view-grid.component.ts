@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
-import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {State} from '@progress/kendo-data-query';
 import {GridComponent, SortSettings} from '@progress/kendo-angular-grid';
 import {GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
@@ -24,7 +24,8 @@ import {DependencyResults} from '../../model/dependencies.model';
 
 @Component({
 	selector: 'tds-dependencies-view-grid',
-	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;

@@ -30,8 +30,9 @@ export class DependenciesService {
 
 		const pagination = `rows=${take}&page=${page}`;
 		const sorting = `&sidx=${sort.field}&sord=${sort.dir}`;
-		const filtering  = filters.map(filter => `&${filter.field}=${filter.value}`).join('') +
-			`&_search=${filters.length ? 'true' : 'false'}`;
+		const filtering  = filters
+				.map(filter => `&${filter.field}=${filter.value}`).join('') +
+				`&_search=${filters.length > 0 ? 'true' : 'false'}`;
 
 		const url = `${endpoint}?${pagination}${sorting}${filtering}`;
 		return this.http.get(`${url}`)
