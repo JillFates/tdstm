@@ -333,7 +333,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isParameterListDirty(): boolean {
-		if (this.dataParameterListSignature !== "" && this.parameterList.length > 0) {
+		if (this.dataParameterListSignature !== '' && this.parameterList.length > 0) {
 			return this.dataParameterListSignature !== JSON.stringify(this.parameterList);
 		}
 	}
