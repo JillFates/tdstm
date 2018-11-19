@@ -308,11 +308,11 @@ class ProjectService implements ServiceMethods {
 			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
-					COUNT(IF(ae.asset_type = "$AssetType.FILES",1,NULL)) AS filesCount,
-					COUNT(IF(ae.asset_type = "$AssetType.DATABASE",1,NULL)) AS dbCount,
-					COUNT(IF(ae.asset_type = "$AssetType.APPLICATION",1,NULL)) AS appCount,
-					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}), 1, NULL)) AS totalServCount,
-					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}) and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
+					COUNT(IF(ae.asset_class = 'STORAGE',1,NULL)) AS filesCount,
+					COUNT(IF(ae.asset_class = 'DATABASE',1,NULL)) AS dbCount,
+					COUNT(IF(ae.asset_class = 'APPLICATION',1,NULL)) AS appCount,
+					COUNT(IF(ae.asset_class = 'DEVICE', 1, NULL)) AS totalServCount,
+					COUNT(IF(ae.asset_class = 'DEVICE' and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
 					COUNT(*) AS totalAssetCount,
 					DATE(p.start_date) AS startDate,
 					DATE(p.completion_date) AS completionDate,
@@ -341,7 +341,6 @@ class ProjectService implements ServiceMethods {
 			query.append(""" GROUP BY ae.project_id
 					) inside
 				ORDER BY inside.projName """)
-			
 			projects = jdbcTemplate.queryForList(query.toString())
 
 			// add the staff count to each project
