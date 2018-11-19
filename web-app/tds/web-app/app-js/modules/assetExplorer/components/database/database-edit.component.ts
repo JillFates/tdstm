@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -26,7 +26,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 		providers: [
 			{ provide: 'model', useValue: editModel }
 		]
-	}) class DatabaseShowComponent extends AssetCommonEdit {
+	}) class DatabaseShowComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -38,7 +38,9 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
 
+		ngOnInit() {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
@@ -46,6 +48,8 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			if (this.model.asset.scale && this.model.asset.scale.name) {
 				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
+
+			this.focusControlByName('assetName');
 		}
 
 		/**
@@ -63,6 +67,9 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
+
+			modelRequest.asset.environment = modelRequest.asset.environment === this.defaultSelectOption ?
+				''	 : modelRequest.asset.environment;
 
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({

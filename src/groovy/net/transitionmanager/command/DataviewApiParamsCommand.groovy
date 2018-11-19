@@ -44,15 +44,14 @@ class DataviewApiParamsCommand implements CommandObject {
 /**
  * Used to represent Dataview API command filters structure:
  * <pre>
- *   common.environment=Production&filter=assetName=PDV*
+ *   common_environment=Production&filter=assetName=PDV*
  * </pre>
  */
 @grails.validation.Validateable
 class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
-	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '.'
-	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '\\.'
+	static final String FIELD_NAME_SEPARATOR_CHARACTER = '_'
 
 	String content
 	String domain
@@ -62,11 +61,11 @@ class DataviewApiFilterParam {
 	/**
 	 * It constructs an instance of {@code DataviewApiFilterParam}
 	 * splitting String param by {@code FILTER_PARAMETER_SEPARATOR_CHARACTER}
-	 * and then by {@code FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER}
+	 * and then by {@code FIELD_NAME_SEPARATOR_CHARACTER}
 	 * <dl>
 	 * 	<dt>
 	 * 	    <pre>
-	 * 			common.environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
+	 * 			common_environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
 	 * 			assetName=Production ==  DataviewApiFilterParam(domain: null, fieldName: 'assetName', filter: 'Production')
 	 * 	    </pre>
 	 * 	</dt>
@@ -90,8 +89,8 @@ class DataviewApiFilterParam {
 			obj.fieldName = filter[0]
 			obj.filter = filter[1]
 
-			if (obj.fieldName.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)) {
-				List<String> parts = obj.fieldName.split(FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER) as List
+			if (obj.fieldName.contains(FIELD_NAME_SEPARATOR_CHARACTER)) {
+				List<String> parts = obj.fieldName.split(FIELD_NAME_SEPARATOR_CHARACTER) as List
 				if (parts?.size() != 2 || StringUtil.isBlank(parts[0]) || StringUtil.isBlank(parts[1])) {
 					return false
 				}

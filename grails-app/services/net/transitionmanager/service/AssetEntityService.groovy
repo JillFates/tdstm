@@ -30,6 +30,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.controller.ServiceResults
@@ -162,6 +163,7 @@ class AssetEntityService implements ServiceMethods {
     def assetService
     def commentService
 	def tagAssetService
+	AssetOptionsService assetOptionsService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1090,7 +1092,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
+		return assetService.getDependencyTypeOptions()
 	}
 
 	/**
@@ -1098,7 +1100,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyStatuses() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)*.value
+		return assetService.getDependencyStatusOptions()
 	}
 
 	/**
@@ -1106,7 +1108,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
+		return assetService.getAssetEnvironmentOptions()
 	}
 
 	/**
@@ -1114,7 +1116,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetPlanStatusOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value
+		return assetService.getAssetPlanStatusOptions()
 	}
 
 	/**
@@ -1122,15 +1124,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetPriorityOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)*.value
-	}
-
-	/**
-	 * Use to get the list of the device RailType Options
-	 * @return List of RailTypes
-	 */
-	List<String> getAssetRailTypeOptions() {
-		AssetEntity.RAIL_TYPES
+		return assetService.getAssetPriorityOptions()
 	}
 
 	/**
@@ -1283,6 +1277,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	List getDeviceModelForEdit(Project project, deviceId, Map params) {
+		println "*** in getDeviceModelForEdit()"
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, deviceId, params)
 		if (device) {
 			// TODO : JPM 9/2014 : refactor the quote strip into StringUtil.stripQuotes method or escape the name.
@@ -1334,12 +1329,13 @@ class AssetEntityService implements ServiceMethods {
 			assetEntityInstance: device,
 			assetType: assetType,
 			manufacturer: device.manufacturer,
+			priorityOption: getAssetPriorityOptions(),
 			manufacturers: getManufacturers(assetType),
 			models: getModelSortedByStatus(device.manufacturer),
 			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
 			modelName: modelName,
 			nonNetworkTypes: AssetType.nonNetworkTypes,
-			railTypeOption: getAssetRailTypeOptions(),
+			railTypeOption: DeviceUtils.getAssetRailTypeOptions(),
 			// TODO : JPM 9/2014 : determine if the views use source/targetRacks - I believe these can be removed as they are replaced by source/targetRackSelect
 			sourceRacks: [],
 			targetRacks: [],
@@ -1348,10 +1344,10 @@ class AssetEntityService implements ServiceMethods {
 			version: device.version)
 
 		// List of the room and racks to be used in the SELECTs
-		model.sourceRoomSelect = getRoomSelectOptions(project, true, true)
-		model.targetRoomSelect = getRoomSelectOptions(project, false, true)
-		model.sourceRackSelect = getRackSelectOptions(project, device?.roomSourceId, true)
-		model.targetRackSelect = getRackSelectOptions(project, device?.roomTargetId, true)
+		model.sourceRoomSelect = DeviceUtils.getRoomSelectOptions(project, true, true)
+		model.targetRoomSelect = DeviceUtils.getRoomSelectOptions(project, false, true)
+		model.sourceRackSelect = DeviceUtils.getRackSelectOptions(project, device?.roomSourceId, true)
+		model.targetRackSelect = DeviceUtils.getRackSelectOptions(project, device?.roomTargetId, true)
 
 		model.putAll(getDefaultModelForEdits('AssetEntity', project, device, params))
 
@@ -1361,8 +1357,8 @@ class AssetEntityService implements ServiceMethods {
 		if (device) {
 			// TODO : JPM 9/2014 : Need to make the value flip based on user pref to show name or tag (enhancement TM-3390)
 			// Populate the listings of the Chassis SELECT name/values
-			model.sourceChassisSelect = getChassisSelectOptions(project, device?.roomSourceId)
-			model.targetChassisSelect = getChassisSelectOptions(project, device?.roomTargetId)
+			model.sourceChassisSelect = DeviceUtils.getChassisSelectOptions(project, device?.roomSourceId)
+			model.targetChassisSelect = DeviceUtils.getChassisSelectOptions(project, device?.roomTargetId)
 		}
 
 		// This is used to track the current assetType in the crud form. If the asset is new, it will default to Server otherwise
@@ -1398,46 +1394,45 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
-
 		String domain = asset.assetClass.toString()
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
-		Map map =
-		[	assetId: asset.id,
-			environmentOptions: getAssetEnvironmentOptions(),
+		Map map = [
+			assetId: 			asset.id,
+			project: 			project,
+
+			// Used for change detection/optimistic locking
+			version: 			asset.version,
+
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
 			// TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
-			escapedName: getEscapedName(asset),
-			moveBundleList: getMoveBundles(project),
-			planStatusOptions: getAssetPlanStatusOptions(),
-			project: project,
-			// The page to return to after submitting changes
+			escapedName: 		getEscapedName(asset),
+
+			// Various Select Option lists
+			environmentOptions: getAssetEnvironmentOptions(),
+			moveBundleList: 	assetService.getMoveBundleOptions(project),
+			planStatusOptions: 	getAssetPlanStatusOptions(),
+			priorityOption:		assetService.getAssetPriorityOptions(),
+			// Required for Supports On and Depends On
+			dependencyMap:		dependencyEditMap(asset.project, asset),
+			dataFlowFreq:		AssetDependency.constraints.dataFlowFreq.inList,
+
+			// The page to return to after submitting changes (2018-11 JPM - believe this to be legacy and not needed)
 			redirectTo: params.redirectTo,
-			version: asset.version,
+
+			// Field Specifications
 			customs: customFields,
 			standardFieldSpecs: standardFieldSpecs,
 		]
 
-		// Required lists for Device type
+		// Additional Select Option lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
-			map << getCommontDeviceMapForCreateEdit(project, asset)
+			map << DeviceUtils.deviceModelOptions(project, asset)
 		}
 
 		map
 	}
-
-    Map getCommontDeviceMapForCreateEdit(Project project, Object asset) {
-        return [
-                railTypeOption: getAssetRailTypeOptions(),
-                sourceRoomSelect: getRoomSelectOptions(project, true, true),
-                targetRoomSelect: getRoomSelectOptions(project, false, true),
-                sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
-                targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
-                sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
-                targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
-        ]
-    }
 
 	/**
 	 * The default/common properties shared between all of the Asset Show views
@@ -1514,14 +1509,14 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	Map getCommonModelForCreate(String type, Project project, assetEntity) {
-
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		// Obtains the domain out of the asset type string
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
-		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
+		List customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
+
 		[
 			prefValue: prefValue,
 			project: project,
@@ -1644,129 +1639,6 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		return attributes
-	}
-
-	/**
-	 * Used to get an Select Option list of the Rooms for the source or target of the specified Project
-	 * @param project
-	 * @param isSource - flag to indicate that it should return Source rooms if true
-	 * @param allowAdd - flag if true will include a Add Room... option (-1) default true
-	 * @return List<Map<id,value>>
-	 */
-	List getRoomSelectOptions(Project project, boolean isSource, boolean allowAdd = true) {
-		def rsl = []
-		if (allowAdd) {
-			rsl << [id: -1, value: 'Add Room...']
-		}
-
-		Room.executeQuery(
-				'from Room where project=:p and source=:s order by location, roomName',
-				[p: project, s: isSource ? 1 : 0]).each { Room room -> rsl << [id: room.id, value: room.location + ' / ' + room.roomName] }
-		return rsl
-	}
-
-	/**
-	 * Used to get a list of the options available for a Rack
-	 * @param project
-	 * @param room - the room  idto find associated racks for
-	 * @param allowAdd - flag if true will include a Add Room... option (-1) default true
-	 * @return List<Map<id,value>>
-	 */
-	List getRackSelectOptions(Project project, roomId, allowAdd) {
-		def rsl = []
-		if (allowAdd) {
-			rsl << [id: -1, value: 'Add Rack...']
-		}
-
-		roomId = NumberUtil.toLong(roomId)
-		if (roomId) {
-			def racks = Rack.executeQuery('''
-				from Rack r inner join r.model m
-				where r.project=:p and r.room.id=:r and m.assetType=:t
-				order by r.tag
-			''', [p: project, r: roomId, t: 'Rack'])
-			racks.each { rack ->
-					rsl << [id: rack[0].id, value: rack[0].tag]
-			}
-		}
-
-		return rsl
-	}
-
-	/**
-	 * Used to get an Select Option list of the chassis located in the specified Room
-	 * @param project
-	 * @param roomId - the id of the room to find chassis in
-	 * @return List<Map<id, value>>
-	 */
-	List getChassisSelectOptions(Project project, roomId) {
-		def rsl = [ ]
-		roomId = NumberUtil.toLong(roomId)
-		if (roomId) {
-			def room = Room.get(roomId)
-			if (room.project != project) {
-				securityService.reportViolation("Attemped to assess room ($roomId') unassociated with project ($project.id)")
-			}
-			else {
-				def roomProp = room.source ? 'roomSource' : 'roomTarget'
-				def chassisList = getAssetsWithCriteriaMap(project, AssetClass.DEVICE, [(roomProp): room, assetType: AssetType.bladeChassisTypes])
-
-				chassisList.each { rsl << [id: it.id, value: it.assetName + '/' + it.assetTag] }
-			}
-		}
-
-		return rsl
-	}
-
-	/**
-	 * Used to retrieve a list of assets based on with a criteria map
-	 * @param project - the project object for the associated assets
-	 * @param ac - the AssetClass to retrieve
-	 * @param criteriaMap - the property names to be associated
-	 * @param includeJoinData - a flag that when true, if there is a join in the query (e.g. referencing assetType) will return a multi-dimensional array of the dataset
-	 * @return the list of assets found
-	 */
-	List getAssetsWithCriteriaMap(Project project, AssetClass ac, Map criteriaMap, boolean includeJoinData=false) {
-		def params = [project: project, ac: ac]
-		String domainName = AssetClass.domainNameFor(ac)
-		Object domainClass = AssetClass.domainClassFor(ac)
-		StringBuilder from = new StringBuilder("from $domainName a ")
-		StringBuilder where = new StringBuilder("where a.project=:project and a.assetClass=:ac ")
-		def map
-		boolean hasJoin = false
-
-		// Go through the params and construct the query appropriately
-		criteriaMap.each { propName, value ->
-
-			if (propName == 'assetType') {
-				from.append('inner join a.model m ')
-				map = SqlUtil.whereExpression('m.assetType', value, 'assetType')
-				hasJoin = true
-			} else {
-				map = SqlUtil.whereExpression('a.' + propName, value, propName)
-			}
-
-			if (map) {
-				where.append(' and ' + map.sql)
-				params[propName] = map.param
-			} else {
-				log.error "getAssetsWithCriteriaMap() SqlUtil.whereExpression() returned no value property $propName, criteria $value"
-				return null
-			}
-		}
-
-		String hql = from.toString() + where
-		// log.debug "getAssetsWithCriteriaMap() HQL=$hql, params=$params"
-		def assets = domainClass.findAll(hql, params)
-		// log.debug "getAssetsWithCriteriaMap() found ${assets.size()} : $assets"
-
-		if (assets && hasJoin) {
-			if (!includeJoinData) {
-				// Just get the Asset objects and exclude the joined domains
-				assets = assets.collect { it[0] }
-			}
-		}
-		return assets
 	}
 
 	/**
@@ -3042,6 +2914,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	Map dependencyCreateMap(Project project) {
+		assetService.dependencyCreateMap(project)
 		return [
 				assetClassOptions: AssetClass.classOptions,
 				dependencyStatus: getDependencyStatuses(),
@@ -3094,7 +2967,7 @@ class AssetEntityService implements ServiceMethods {
 			nonNetworkTypes  : nonNetworkTypes,
 			supportAssets    : getSupportingAssets(assetEntity),
 			dependentAssets  : getDependentAssets(assetEntity),
-			moveBundleList   : getMoveBundles(project)
+			moveBundleList   : assetService.getMoveBundleOptions(project)
 		]
 
 		return map

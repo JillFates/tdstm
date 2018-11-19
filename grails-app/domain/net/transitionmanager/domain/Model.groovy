@@ -1,18 +1,18 @@
 package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
 import com.tdsops.commons.lang.exception.PersistenceException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.ModelService
 import net.transitionmanager.service.SecurityService
 
 @Slf4j(value='logger')
 class Model {
 
-	transient SecurityService securityService
-	def modelService
+	SecurityService securityService
+	ModelService    modelService
 
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
 	String modelName
@@ -104,7 +104,7 @@ class Model {
 	}
 
 	static transients = ['aliases', 'assetsCount', 'manufacturerName',
-	                     'noOfConnectors', 'securityService', 'source', 'valid']
+	                     'noOfConnectors', 'securityService', 'modelService', 'source', 'valid']
 
 	static mapping = {
 		autoTimestamp false
@@ -177,10 +177,6 @@ class Model {
 			executeUpdate('update AssetEntity set model=null where model=?', [this])
 			executeUpdate('delete ModelAlias where model=?', [this])
 		}*/
-	}
-
-	private List<String> getAssetTypeList() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
 	}
 
 	int getNoOfConnectors() {

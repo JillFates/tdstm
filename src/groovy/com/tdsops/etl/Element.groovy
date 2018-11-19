@@ -118,7 +118,7 @@ class Element implements RangeChecker {
 		processor.validateStack()
 		if(processor.hasSelectedDomain()){
 			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			processor.addElementLoaded(this)
 			return this
 		} else{
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -187,7 +187,7 @@ class Element implements RangeChecker {
 
 			} catch (MissingMethodException e) {
 				logger.warn("Method Missing", e)
-				
+
 			}
 		}
 
@@ -324,7 +324,7 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Transform current value in this Element instance to a Long number
+	 * Transform current value in this Element instance to a Long number if convertable otherwise remains unchanged
 	 * <code>
 	 *      load ... transformation with toLong()
 	 * <code>
@@ -332,12 +332,19 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element toLong() {
-		value = NumberUtil.toLongNumber(value)
+		if (value != null) {
+			Object newValue = NumberUtil.toLong(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Long')
+			}
+		}
 		return this
 	}
 
 	/**
-	 * Transform current value in this Element instance to a Integer number
+	 * Transform current value in this Element instance to a Integer number if convertable otherwise remains unchanged
 	 * <code>
 	 *      load ... transformation with toInteger()
 	 * <code>
@@ -345,7 +352,14 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element toInteger() {
-		value = NumberUtil.toLongNumber(value)?.intValue()
+		if (value != null) {
+			Object newValue = NumberUtil.toInteger(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Integer')
+			}
+		}
 		return this
 	}
 
@@ -391,7 +405,6 @@ class Element implements RangeChecker {
 				simpleDateFormat.setLenient(false)
 				value = simpleDateFormat.parse(value)
 				formatted = true
-		println "toDate() originalValue=$ov, parsed date=$value, format=$pattern"
 				break
 			} catch (Exception e) {
 				// nothing to do
@@ -629,7 +642,6 @@ class Element implements RangeChecker {
 				  ! processor.binding.isValidETLVariableName(variableName)
 		) {
 			throw ETLProcessorException.invalidSetParameter()
-
 		}
 
 		processor.addLocalVariableInBinding(variableName, this.value)
@@ -797,7 +809,7 @@ class Element implements RangeChecker {
 	private void checkLoadedElement(){
 		if(loadedElement){
 			this.originalValue = this.value
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			processor.addElementLoaded(this)
 			loadedElement = false
 		}
 	}
@@ -817,7 +829,7 @@ class Element implements RangeChecker {
 	Element with(Object value) {
 		this.value = ETLValueHelper.valueOf(value)
 		this.originalValue = ETLValueHelper.valueOf(value)
-		processor.addElementLoaded(processor.selectedDomain.domain, this)
+		processor.addElementLoaded(this)
 		return this
 	}
 

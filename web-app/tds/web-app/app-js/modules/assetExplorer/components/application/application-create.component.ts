@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -58,6 +58,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 		ngOnInit() {
 			this.initModel();
+			this.focusControlByName('assetName');
 		}
 
 		/**
@@ -122,6 +123,12 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			modelRequest.asset.shutdownBy = modelRequest.asset.shutdownBy && modelRequest.asset.shutdownBy.id || '';
 			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
 			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
+
+			modelRequest.asset.environment  = modelRequest.asset.environment === this.defaultSelectOption ?
+				'' : modelRequest.asset.environment;
+
+			modelRequest.asset.criticality  = modelRequest.asset.criticality === this.defaultSelectOption ?
+				'' : modelRequest.asset.criticality;
 
 			// Custom Fields
 			Object.keys(modelRequest.asset)

@@ -137,7 +137,14 @@ class SearchQueryHelper {
 		// Flags that a search by ID failed which will result in an error so that duplicates are not created
 		boolean searchedById = false
 
-		Class domainClassOfProperty = (entityInstance ? entityInstance.getClass() : context.domainClass)
+		Class domainClassOfProperty
+		if (entityInstance) {
+			domainClassOfProperty = entityInstance.getClass()
+		} else {
+			// The context.domainClass seems to vary (bug) between the actual domain class and the ETLDomain
+			domainClassOfProperty = (context.domainClass in ETLDomain) ? context.domainClass.getClazz() : context.domainClass
+		}
+
 		Class domainClass
 		(domainClass, entity) = classOfDomainProperty(fieldName, fieldsInfo, domainClassOfProperty)
 		String domainShortName = domainClass ? GormUtil.domainShortName(domainClass) : null
@@ -167,7 +174,7 @@ class SearchQueryHelper {
 				//
 
 				// 1. See if this property based on ID is in the cache already
-				if (context.cache) {
+				if (context.cache && fieldsInfo.containsKey(fieldName)) {
 					md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
 					// log.debug 'fetchEntityByFieldMetaData() has cache key {}', md5
 					entity = context.cache.get(md5)

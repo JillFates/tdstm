@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil

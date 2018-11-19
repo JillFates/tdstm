@@ -6,7 +6,7 @@
  */
 
 import * as R from 'ramda';
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -30,7 +30,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		providers: [
 			{ provide: 'model', useValue: editModel }
 		]
-	}) class DeviceEditComponent extends DeviceCommonComponent {
+	}) class DeviceEditComponent extends DeviceCommonComponent implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -42,10 +42,12 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
 
+		ngOnInit() {
 			this.initModel();
 			this.toggleAssetTypeFields();
-
+			this.focusControlByName('assetName');
 		}
 
 		/**

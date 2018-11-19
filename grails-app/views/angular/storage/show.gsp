@@ -39,8 +39,7 @@
 								</td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</td>
-								<td class="valueNW ${standardFieldSpecs.scale.imp?:''}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
+								<tdsAngular:showLabelAndField field="${standardFieldSpecs.size}" value="${(filesInstance.size ? filesInstance.size : '') + ' ' + (filesInstance.scale ? filesInstance.scale : '')}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
