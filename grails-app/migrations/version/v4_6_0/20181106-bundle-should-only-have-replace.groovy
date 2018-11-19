@@ -1,7 +1,8 @@
+package version.v4_6_0
+
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.DatabaseMigrationService
-
 
 /**
  * Replacing move bundle actions with just remove, it shouldn't have replace.
