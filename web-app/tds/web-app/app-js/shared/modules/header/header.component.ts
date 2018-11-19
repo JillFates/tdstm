@@ -156,7 +156,7 @@ export class HeaderComponent {
 	 */
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
-			if(result) {
+			if (result) {
 				console.error(result);
 			}
 		});

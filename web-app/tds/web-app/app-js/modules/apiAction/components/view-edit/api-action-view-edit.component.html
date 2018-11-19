@@ -69,23 +69,24 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="apiActionAgent" class="col-sm-3 control-label">Dictionary:
+											<label for="apiActionDictionary" class="col-sm-3 control-label">Dictionary:
 												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #apiActionAgent
-																	id="apiActionAgent" name="apiActionAgent" class="form-control"
+												<kendo-dropdownlist id="apiActionDictionary"  name="apiActionDictionary" class="form-control"
                                                                     tabindex="4"
-																	[data]="agentList"
-																	(open)="onOpenAgent()"
-																	(valueChange)="onAgentValueChange($event)"
+																	[data]="dictionaryList"
+																	(open)="onOpenDictionary()"
+																	(valueChange)="onDictionaryValueChange($event)"
 																	[textField]="'name'"
 																	[valueField]="'id'"
-																	[(ngModel)]="apiActionModel.agentClass"
-																	required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentClass?.id == 0}"></kendo-dropdownlist>
+																	[(ngModel)]="apiActionModel.dictionary"
+																	required class="form-control"
+																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.dictionary?.id == 0}">
+												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.agentClass.name}}</label>
+												<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -93,8 +94,7 @@
 												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #apiActionAgentMethod
-																	id="apiActionMethod" name="apiActionMethod" class="form-control"
+												<kendo-dropdownlist id="apiActionMethod" name="apiActionMethod" class="form-control"
                                                                     tabindex="5"
 																	[data]="agentMethodList"
 																	[textField]="'name'"
@@ -102,7 +102,7 @@
 																	(open)="onOpenAgentMethod()"
 																	(valueChange)="onMethodValueChange($event)"
 																	[(ngModel)]="apiActionModel.agentMethod"
-																	[disabled]="!apiActionModel.agentClass.id"
+																	[disabled]="!apiActionModel.dictionary.id"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == '0'}">
 													<ng-template kendoDropDownListItemTemplate let-dataItem>
 														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
@@ -116,8 +116,7 @@
 										<div class="form-group">
 											<label for="apiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #apiActionCredential
-																	id="apiActionCredentials" name="apiActionCredentials" class="form-control"
+												<kendo-dropdownlist id="apiActionCredentials" name="apiActionCredentials" class="form-control"
                                                                     tabindex="6"
 																	[data]="providerCredentialList"
 																	[textField]="'name'"
