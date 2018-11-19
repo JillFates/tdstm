@@ -8,7 +8,7 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
-import {DependenciesListComponent} from './components/list/dependencies-list.component';
+import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
 
 /**
  * Top menu parent section class for all Dependencies module.
@@ -40,7 +40,7 @@ export const DependenciesRoute: Routes = [
 			},
 			requiresAuth: true,
 		},
-		component: DependenciesListComponent,
+		component: DependenciesViewGridComponent,
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
 		runGuardsAndResolvers: 'always'
 	}
