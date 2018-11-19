@@ -8,6 +8,7 @@ import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.bulk.change.BulkChangeNumber
 import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
@@ -29,15 +30,18 @@ class BulkAssetChangeService implements ServiceMethods {
 	//Maps field control types to services.
 	static Map bulkClassMapping = [
 		(ControlType.ASSET_TAG_SELECTOR.value()): BulkChangeTag.class,
-		(Date.class.name)                     : BulkChangeDate.class,
+		(Date.class.name)                       : BulkChangeDate.class,
 		(ControlType.STRING.value())            : BulkChangeString.class,
-		(Integer.class.name)                  : BulkChangeInteger.class,
+		(Integer.class.name)                    : BulkChangeInteger.class,
 		(ControlType.PERSON.value())            : BulkChangePerson.class,
 		(ControlType.YES_NO.value())            : BulkChangeYesNo.class,
 		(ControlType.LIST.value())              : BulkChangeList.class,
 		(ControlType.IN_LIST.value())           : BulkChangeList.class,
 		(ControlType.PLAN_STATUS.value())       : BulkChangeList.class,
-		(ControlType.REFERENCE.value())         : BulkChangeReference.class
+		(ControlType.REFERENCE.value())         : BulkChangeReference.class,
+		(ControlType.DATE.value())              : BulkChangeString.class,
+		(ControlType.DATETIME.value())          : BulkChangeString.class,
+		(ControlType.NUMBER.value())            : BulkChangeNumber.class
 	].asImmutable()
 
 	/**
