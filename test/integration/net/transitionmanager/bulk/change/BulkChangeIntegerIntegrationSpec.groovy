@@ -15,7 +15,7 @@ import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
+class BulkChangeIntegerIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
