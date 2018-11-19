@@ -10,13 +10,13 @@ import {map} from 'rxjs/operators';
 export interface DependenciesRequestParams {
 	page: number;
 	take: number;
-	sorting: any;
+	sort: any;
 	filters: any[];
 }
 
 @Injectable()
 export class DependenciesService {
-
+	private readonly BASE_URL = '/tdstm/ws/asset';
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
 	/**
@@ -25,15 +25,16 @@ export class DependenciesService {
 	 * @return {Observable<DependencyResults>)
 	 */
 	getDependencies(params: DependenciesRequestParams): Observable<DependencyResults> {
-		const {page, take, sorting, filters} = params;
-		let queryString = '';
+		const endpoint = `${this.BASE_URL}/listDependencies`;
+		const {page, take, sort, filters} = params;
 
-		queryString += `?rows=${take}&page=${page}&sidx=${sorting.field}&sord=${sorting.dir}`;
-		queryString += filters.map(filter => `&${filter.field}=${filter.value}`).join('');
-		queryString += `&_search=${filters.length ? 'true' : 'false'}`;
-		const url = `../ws/asset/listDependencies${queryString}`;
+		const pagination = `rows=${take}&page=${page}`;
+		const sorting = `&sidx=${sort.field}&sord=${sort.dir}`;
+		const filtering  = filters.map(filter => `&${filter.field}=${filter.value}`).join('') +
+			`&_search=${filters.length ? 'true' : 'false'}`;
 
-		return this.http.get(url)
+		const url = `${endpoint}?${pagination}${sorting}${filtering}`;
+		return this.http.get(`${url}`)
 			.pipe(
 				map((response: any) => {
 					const results = response.json();
