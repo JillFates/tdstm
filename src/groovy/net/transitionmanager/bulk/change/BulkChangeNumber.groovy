@@ -40,7 +40,7 @@ class BulkChangeNumber {
 	 * @param idsFilterQuery - additional assets query filter
 	 */
 	static void clear(Class type, Number value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
-		update(type,'', fieldName, ids, idsFilterQuery)
+		update(type, null, fieldName, ids, idsFilterQuery)
 	}
 
 	/**
