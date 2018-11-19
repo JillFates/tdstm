@@ -253,8 +253,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * TODO: I need to remove this specific type of custom field code, create a helper for each field type and put code in there.
-	 * TODO: Just like has been done on the Number Field Type.
+	 * TODO dontiveros: I need to remove this specific type of custom field code, create a helper for each field type and put code in there.
+	 * TODO dontiveros: Just like has been done on the Number Field Type.
 	 * @param dataItem
 	 */
 	protected onControlChange(dataItem: FieldSettingsModel): void {
