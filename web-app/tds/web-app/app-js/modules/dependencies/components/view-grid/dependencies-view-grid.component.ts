@@ -119,7 +119,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			page: (skip / take) + 1,
 			take,
 			filters: filter && filter.filters || [],
-			sorting: sort && sort[0] || this.defaultSorting
+			sort: sort && sort[0] || this.defaultSorting
 		};
 	}
 
@@ -138,7 +138,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Handle pageChange, filterChange, sortChange events
+	 * Handle all the grid events (pageChange, filterChange, sortChange, ...)
 	 * @param {DataStateChangeEvent} state
 	 */
 	protected dataStateChange(state: DataStateChangeEvent): void {

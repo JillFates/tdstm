@@ -243,7 +243,7 @@
                                     <g:img uri="/icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-comments-list assets-asset-explorer-child">
+                            <li class="menu-child-item menu-parent-assets-comments-list" onclick="hideMegaMenu('assetMegaMenu')">
                                 <g:link class="mmlink" controller="assetEntity" action="listComment">
                                     <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>

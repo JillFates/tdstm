@@ -32,11 +32,6 @@ export const DependenciesRoute: Routes = [
 				instruction: '',
 				menu: ['ASSETS.ASSETS', 'DEPENDENCIES.MENU_TITLE'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list', subMenu: true }
-				/*
-				title: 'DEPENDENCIES.LIST_TITLE',
-				instruction: '',
-				menu: []
-				*/
 			},
 			requiresAuth: true,
 		},

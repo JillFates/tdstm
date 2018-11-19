@@ -59,7 +59,7 @@ export class BulkChangeService {
 	}
 
 	/**
-	 * Execute a bulk assets deleted
+	 * Execute a bulk delete operation over assets or dependencies elements
 	 * @param {string[]} ids: array of ids to be deleted
 	 * @returns {Observable<any>}
 	 */

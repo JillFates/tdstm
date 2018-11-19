@@ -50,8 +50,7 @@ import {DependenciesService} from './service/dependencies.service';
 		DependenciesService
 	],
 	exports: [DependenciesViewGridComponent],
-	entryComponents: [
-	]
+	entryComponents: []
 })
 
 export class DependenciesModule {
