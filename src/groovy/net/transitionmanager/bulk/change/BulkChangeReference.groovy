@@ -4,9 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 
@@ -59,7 +57,7 @@ class BulkChangeReference implements ServiceMethods {
 		}
 
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 		params[field] = object
 
 		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)", params)
@@ -77,7 +75,7 @@ class BulkChangeReference implements ServiceMethods {
 	static void clear(Class type, Object object, String field, List<Long> ids = [], Map idsFilterQuery = null) {
 
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 		params[field] = null
 
 		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)", params)
