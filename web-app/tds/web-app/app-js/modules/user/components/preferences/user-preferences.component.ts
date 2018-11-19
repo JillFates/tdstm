@@ -69,8 +69,8 @@ export class UserPreferencesComponent implements OnInit {
 	public resetPreferences() {
 		this.userService.resetPreferences().subscribe(
 			(result: any) => {
-				location.reload();
 				this.cancelCloseDialog();
+				location.reload();
 			},
 			(err) => console.log(err));
 	}
