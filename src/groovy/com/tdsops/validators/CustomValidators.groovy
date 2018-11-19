@@ -12,6 +12,9 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
 
+import java.text.NumberFormat
+import java.text.ParseException
+
 @Slf4j
 class CustomValidators {
 
@@ -74,7 +77,7 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
-			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberMockValidator
+			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
 			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeMockValidator
 			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeMockValidator
@@ -86,7 +89,7 @@ class CustomValidators {
 
 				String control = fieldSpec.control
 
-				// TODO: don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
+				// don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
 				Closure validator = validatorHandlers[control]
 
 				if(!validator) {
@@ -139,7 +142,7 @@ class CustomValidators {
 				// value = StringUtils.defaultString(value)
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
 
-				if ( ! hasErrors() && StringUtils.isNotBlank(value) && ! yesNoList.contains(value) ) {
+				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -168,41 +171,62 @@ class CustomValidators {
 	}
 
 	/**
-	 * THIS IS JUST A MOCK VALIDATOR FOR DATE/DATETIME TO MAKE WORK THE FE LOGIC FOR
-	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
-	 * FOR TICKET TM-11723, AND WILL BE MERGED ONCE IT'S APPROVED.
-	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
-	 * TM-12545 IS MERGED.
-	 * See TM-11723
-	 *
-	 * @param value
-	 * @param fieldSpec
-	 * @return
-	 */
-	static  controlDateTimeMockValidator( String value, Map fieldSpec ) {
-		new Validator ( fieldSpec ) {
-			void validate() {
-
-			}
-		}
-	}
-
-	/**
-	 * THIS IS JUST A MOCK VALIDATOR FOR NUMBER TO MAKE WORK THE FE LOGIC FOR
-	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
-	 * FOR TICKET TM-8447, AND WILL BE MERGED ONCE IT'S APPROVED.
-	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
-	 * TM-12545 IS MERGED.
+	 * Number Validator that Checks the numeric type of the value and the
+	 * given constraints in the fieldSpec Map.
 	 * See TM-8447
 	 *
 	 * @param value
 	 * @param fieldSpec
 	 * @return
 	 */
-	static  controlNumberMockValidator ( String value, Map fieldSpec ) {
-		new Validator(fieldSpec) {
+	static  controlNumberValidator ( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
 			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('field.invalid.notEmpty', [value, getLabel()])
+					}
+					return // with or without error, as the value is empty, just return
+				}
+                // try to convert to numeric
+				Long number
+				try {
+					NumberFormat nf = NumberFormat.getInstance()
+					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). That is not a valid
+					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
+					if(value.charAt(value.size()-1) == '-') {
+						throw new ParseException('The number format is incorrect', 0)
+					}
+					number = nf.parse(value)
+				} catch (ParseException e) {
+					// If it's not a number there is not much to do, so return
+					addError ('typeMismatch.java.lang.Long', [getLabel()])
+					return
+				}
+			    // finally, validate the constraints in the fieldSpec
+				def minRange = fieldSpec.constraints?.minRange ?: null
+				def maxRange = fieldSpec.constraints?.maxRange ?: null
+				def precision = fieldSpec.constraints?.precision ?: null
+				def allowNegative = fieldSpec.constraints?.allowNegative
 
+				// if 'minRange' or 'maxRange' fields are present, validate the value range
+				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
+					addError ('default.invalid.range.message', [getLabel(), null, value, minRange, maxRange])
+				}
+				// if 'precision' field is present and the value has a fractional part, we should check
+				// that the count of fractional digits does not exceed the 'precision' value
+				if (precision && value.contains('.')){
+					def fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
+					if (!fractionalPart.size() > precision) {
+						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
+					}
+				}
+				// if 'allowNegative' field is not present and the number is negative, it should error
+				if (number < 0 && !allowNegative) {
+					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
+				}
 			}
 		}
 	}
@@ -220,7 +244,7 @@ class CustomValidators {
 				def maxSize = fieldSpec?.constraints?.maxSize ?: Integer.MAX_VALUE
 
 				int size = value?.length() ?: 0
-				if (size < minSize && size > maxSize) {
+				if (size < minSize || size > maxSize) {
 					addError( 'field.invalid.sizeOutOfBounds', [value, getLabel(), minSize, maxSize] )
 				}
 			}

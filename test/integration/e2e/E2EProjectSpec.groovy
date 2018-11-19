@@ -218,6 +218,10 @@ class E2EProjectSpec extends Specification {
 			String testEmail = 'sample@sampleEmail.com'
 			String testRequestNote = 'Test request note'
 			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
+			String targetHostName = System.getenv('com.tds.lm.targetHostname')
+			if (targetHostName){
+				licenseRequest.hostName = targetHostName
+			}
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 			licensedClient = licenseManagerService.loadRequest(encodedMessage)
 			licensedClient.type = License.Type.MULTI_PROJECT

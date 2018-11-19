@@ -1,6 +1,6 @@
 import {INTERVAL} from '../../../shared/model/constants';
 
-export class AgentModel {
+export class DictionaryModel {
 	id?: number;
 	name?: string;
 }

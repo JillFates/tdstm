@@ -10,7 +10,7 @@
 			<div class="modal-body">
 				<div class="modal-body-container full-height">
 					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment full-height">
-						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[affectedAssets] }}</label>
+						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected] }}</label>
 						<kendo-grid
 								*ngIf="gridSettings"
 								[data]="gridSettings.gridData"
@@ -18,8 +18,6 @@
 								[resizable]="true"
 								(add)="addHandler($event)"
 								(cancel)="cancelHandler($event)"
-								(edit)="editHandler($event)"
-								(save)="saveHandler($event)"
 								(remove)="removeHandler($event)">
 
 							 <!-- Toolbar Template-->
@@ -44,26 +42,12 @@
 								</ng-template>
 							</kendo-grid-command-column>
 
-                            <!-- Class -->
-                            <kendo-grid-column title="Class" [width]="80">
-                                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <kendo-dropdownlist
-                                            name="domain" class="form-control domain"
-                                            [data]="domains"
-                                            [value]="editRows.selectedValues[rowIndex].domain"
-                                            (valueChange)="onDomainValueChange($event, rowIndex)"
-                                            [valueField]="'id'"
-                                            [textField]="'text'">
-                                    </kendo-dropdownlist>
-                                </ng-template>
-                            </kendo-grid-column>
-
                             <!-- Field Name -->
                             <kendo-grid-column title="Field Name" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <kendo-dropdownlist
                                             name="field" class="form-control field"
-                                            [data]="editRows.fields[rowIndex].fields"
+                                            [data]="availableFields"
                                             [value]="editRows.selectedValues[rowIndex].field"
                                             (valueChange)="onFieldValueChange($event, rowIndex)"
                                             [valueField]="'id'"
@@ -75,13 +59,13 @@
                             <!-- Action -->
                             <kendo-grid-column title="Action" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <kendo-dropdownlist
-                                            name="action" class="form-control action"
-                                            [data]="editRows.fields[rowIndex].actions"
-                                            [value]="editRows.selectedValues[rowIndex].action"
-                                            (valueChange)="onActionValueChange($event, rowIndex)"
-                                            [valueField]="'id'"
-                                            [textField]="'text'">
+                                    <kendo-dropdownlist *ngIf="this.editRows.selectedValues[rowIndex].field"
+                                                        name="action" class="form-control action"
+                                                        [data]="fieldActionsMap[this.editRows.selectedValues[rowIndex].field.id]"
+                                                        [value]="editRows.selectedValues[rowIndex].action"
+                                                        (valueChange)="onActionValueChange($event, rowIndex)"
+                                                        [valueField]="'id'"
+                                                        [textField]="'text'">
                                     </kendo-dropdownlist>
                                 </ng-template>
                             </kendo-grid-column>
@@ -110,7 +94,7 @@
                                     <kendo-dropdownlist
                                             *ngIf="canShowControl('YesNo', rowIndex)"
                                             name="yeNoList"
-                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [(value)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
                                             [data]="yesNoList">
@@ -120,20 +104,20 @@
                                     <kendo-dropdownlist
                                             *ngIf="canShowControl('Options', rowIndex)"
                                             name="optionList"
-                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [(value)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
-                                            [data]="editRows.listOptions[rowIndex]">
+                                            [data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
                                     </kendo-dropdownlist>
 
                                     <!-- Custom Fields - List -->
                                     <kendo-dropdownlist
                                             *ngIf="canShowControl('List', rowIndex)"
                                             name="optionList"
-                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [(value)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
-                                            [data]="editRows.listOptions[rowIndex]">
+                                            [data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
                                     </kendo-dropdownlist>
 
                                     <!-- Asset Tag Fields -->
