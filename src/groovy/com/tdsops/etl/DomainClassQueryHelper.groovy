@@ -683,17 +683,21 @@ class DomainClassQueryHelper {
 			 */
 			return hqlManufacturerAlias('D', sentence, namedParameter)
 
-		} else if ( clazz in Model && property == "${DOMAIN_ALIAS}.modelName" ) {
-			/**
-			 * find Model by modelName eq '...' into '..'
-			 */
-			return hqlModelAlias('D', sentence, namedParameter)
+		} else if ( clazz in Model ) {
 
-		} else if ( clazz in Model && "${DOMAIN_ALIAS}.manufacturer.name" ) {
-			/**
-			 * find Model by manufacturer eq '...' into '..'
-			 */
-			return hqlManufacturerAlias('D.manufacturer', sentence, namedParameter)
+			if (property == "${DOMAIN_ALIAS}.modelName" ){
+				/**
+				 * find Model by modelName eq '...' into '..'
+				 */
+				return hqlModelAlias('D', sentence, namedParameter)
+			}
+
+			if ( "${DOMAIN_ALIAS}.manufacturer.name" ) {
+				/**
+				 * find Model by manufacturer eq '...' into '..'
+				 */
+				return hqlManufacturerAlias('D.manufacturer', sentence, namedParameter)
+			}
 		}
 
 		return sentence
