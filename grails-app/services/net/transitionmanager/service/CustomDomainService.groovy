@@ -14,14 +14,17 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
-    public static final String ALL_ASSET_CLASSES = 'ASSETS'
+    static final String ALL_ASSET_CLASSES = 'ASSETS'
 	// Common Domian name (used to gather common fields in Domains)
-    public static final String COMMON = 'COMMON'
-    public static final String CUSTOM_FIELD_NAME_PART = 'custom'
+    static final String COMMON = 'COMMON'
+    static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
-    public static final int CUSTOM_USER_FIELD = 1
-    public static final int STANDARD_FIELD = 0
-    public static final int ALL_FIELDS = 2
+    static final int CUSTOM_USER_FIELD = 1
+    static final int STANDARD_FIELD = 0
+    static final int ALL_FIELDS = 2
+
+    static final List<String> CUSTOM_REQUIRED_BULK_ACTIONS = ["replace"]
+    static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
     SettingService settingService
     def jdbcTemplate
@@ -198,7 +201,11 @@ class CustomDomainService implements ServiceMethods {
 
                 for (JSONObject field : customFieldSpec.fields) {
                     if (((String) field.field).startsWith('custom')) {
-                        field.bulkChangeActions = ["replace", "clear"] as JSONArray
+                        if(field?.constraints?.required){
+                            field.bulkChangeActions = CUSTOM_REQUIRED_BULK_ACTIONS as JSONArray
+                        }else {
+                            field.bulkChangeActions = CUSTOM_NON_REQUIRED_BULK_ACTIONS as JSONArray
+                        }
                     }
                 }
 
