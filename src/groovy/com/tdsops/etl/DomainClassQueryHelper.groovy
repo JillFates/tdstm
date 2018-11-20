@@ -6,6 +6,8 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import groovy.json.internal.LazyMap
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -31,6 +33,7 @@ import java.util.Map.Entry
  *  </pre>
  */
 @Slf4j
+@CompileStatic(TypeCheckingMode.SKIP)
 class DomainClassQueryHelper {
 
 	/**
@@ -72,6 +75,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of Entities returned by an HQL query
 	 */
+	@CompileStatic
 	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 		List<FindCondition> conditions = paramsMap.collect { Entry entry ->
 			new FindCondition(entry.key, entry.value)
@@ -88,6 +92,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
+	@CompileStatic
 	static List where(ETLDomain domain, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
 
 		List<Object> results = []
@@ -108,6 +113,7 @@ class DomainClassQueryHelper {
 	 * @param conditions a list of {@code FindCondition}
 	 * @return true if {@code FindCondition#value} contains a null value, otherwise return false
 	 */
+	@CompileStatic
 	private static boolean skipQuery(List<FindCondition> conditions) {
 		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
 		boolean skipQuery = false
@@ -253,6 +259,7 @@ class DomainClassQueryHelper {
 	 * @return a named parameter value for a HQL query.
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, com.tdsops.etl.FindCondition)
 	 */
+	@CompileStatic
 	static String getNamedParameterForField(ETLDomain domain, FindCondition condition) {
 		return getNamedParameterForField(domain.clazz, condition)
 	}
@@ -264,9 +271,11 @@ class DomainClassQueryHelper {
 	 * @return a property value for a HQL query.
 	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, com.tdsops.etl.FindCondition)
 	 */
+	@CompileStatic
 	static String getPropertyForField(ETLDomain domain, FindCondition condition) {
 		return getPropertyForField(domain.getClazz(), condition)
 	}
+
 	/**
 	 * Get a property name the hql where sentence.
 	 * First of all it checks if there is an option alternateKey in otherAlternateKeys map.
@@ -289,6 +298,7 @@ class DomainClassQueryHelper {
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
 	 */
+	@CompileStatic
 	static String getPropertyForField(Class clazz, FindCondition condition) {
 
 		if (otherAlternateKeys.containsKey(condition.propertyName)) {
@@ -313,6 +323,7 @@ class DomainClassQueryHelper {
 	 * @param condition
 	 * @return a property value for a HQL query.
 	 */
+	@CompileStatic
 	static String getPropertyForNonAssetClassAndField(Class clazz, FindCondition condition) {
 
 		if (GormUtil.isReferenceProperty(clazz, condition.propertyName)) {
@@ -340,6 +351,7 @@ class DomainClassQueryHelper {
 	 * @param condition
 	 * @return a property value for a HQL query.
 	 */
+	@CompileStatic
 	static String getPropertyForAssetClassAndField(Class clazz, FindCondition condition) {
 		Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 		if (Person.isAssignableFrom(propertyClazz)) {
@@ -376,6 +388,7 @@ class DomainClassQueryHelper {
 	 * @return a join content based on field name and clazz params
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 */
+	@CompileStatic
 	static String getJoinForField(Class clazz, String fieldName) {
 
 		if (otherAlternateKeys.containsKey(fieldName)) {
@@ -447,6 +460,7 @@ class DomainClassQueryHelper {
 	 * @param value - value to query with
 	 * @return true if should query using the ID
 	 */
+	@CompileStatic
 	static private boolean shouldQueryByReferenceId(clazz, field, value) {
 		boolean should = NumberUtil.isaNumber(value) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 		// log.debug 'shouldQueryByReferenceId() value={}, type={}, result={}', value, value.getClass().getName(), should
@@ -459,6 +473,7 @@ class DomainClassQueryHelper {
 	 * @param conditions a list of {@code FindCondition}
 	 * @return a string content with join clause for an HQL query
 	 */
+	@CompileStatic
 	static String hqlJoins(Class clazz, List<FindCondition> conditions) {
 		return conditions.collect { FindCondition condition ->
 			getJoinForField(clazz, condition.propertyName)
@@ -473,6 +488,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly boolean valu that define if select should return only IDs
 	 * @return a String with final HQL sentence content
 	 */
+	@CompileStatic
 	static String hqlSelect(Boolean returnIdOnly){
 
 		String select = DOMAIN_ALIAS
@@ -600,6 +616,7 @@ class DomainClassQueryHelper {
 	 * @param namedParameter
 	 * @return an HQL sentence improved with Manufacturer alias
 	 */
+	@CompileStatic
 	static String hqlManufacturerAlias(String field, String sentence, String namedParameter) {
 		return """
 			( ${sentence} or
@@ -623,6 +640,7 @@ class DomainClassQueryHelper {
 	 * @param namedParameter
 	 * @return an HQL sentence improved with Model alias
 	 */
+	@CompileStatic
 	static String hqlModelAlias(String field, String sentence, String namedParameter) {
 		return """
 			( ${sentence} or
@@ -659,10 +677,11 @@ class DomainClassQueryHelper {
 	 * @param sentence
 	 * @return a String with ModelAlias and ManufacturerAlias applied in an HQL sentence
 	 */
+	@CompileStatic
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
 		if (clazz == AssetEntity.class) {
-			
+
 			if ( property == "${DOMAIN_ALIAS}.manufacturer.name" ) {
 				/**
 				 * find Device by manufacturer eq '...' into '..'
@@ -677,11 +696,14 @@ class DomainClassQueryHelper {
 				return hqlModelAlias('D.model', sentence, namedParameter)
 			}
 
-		} else if ( clazz in Manufacturer && property == "${DOMAIN_ALIAS}.name" ) {
-			/**
-			 * find Manufacturer by name eq '...' into '..'
-			 */
-			return hqlManufacturerAlias('D', sentence, namedParameter)
+		} else if ( clazz in Manufacturer ) {
+
+			if ( property == "${DOMAIN_ALIAS}.name" ) {
+				/**
+				* find Manufacturer by name eq '...' into '..'
+				*/
+				return hqlManufacturerAlias('D', sentence, namedParameter)
+			}
 
 		} else if ( clazz in Model ) {
 
