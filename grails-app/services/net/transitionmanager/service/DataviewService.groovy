@@ -780,7 +780,7 @@ class DataviewService implements ServiceMethods {
 		FieldSpec fieldSpec = column.fieldSpec
 
 		if(fieldSpec?.isCustom()){
-			property = "cast($property as ${fieldSpec.getHibernateType()})"
+			property = fieldSpec.getHibernateCastSentence(property)
 		}
 
 		return property

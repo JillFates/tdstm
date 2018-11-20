@@ -1,10 +1,17 @@
 package net.transitionmanager.asset
 
+import org.hibernate.type.DateType
+import org.hibernate.type.LongType
+import org.hibernate.type.StringType
+import org.hibernate.type.TimestampType
+
 import java.sql.Timestamp
 
 /**
+ * Manage Field Spec definition using the following JSON structure saved in Database
  * <pre>
- *{*       "control": "String",
+ * {
+ * 	"control": "String",
  *       "default": "",
  *       "field": "custom10",
  *       "imp": "N",
@@ -14,19 +21,21 @@ import java.sql.Timestamp
  *       "show": 1,
  *       "tip": "",
  *       "udf": 1,
- *{* "constraint: {* "maxRange": 100,
- *         "minRange": 0,
- *         "precision": 2,
- *         "separator": true,
- *         "allowNegative": true
- *         "required": 0
- *}*}* </pre>
+ *			{ "constraint: {
+ * 		   		"maxRange": 100,
+ *         		"minRange": 0,
+ *         		"precision": 2,
+ *         		"separator": true,
+ *         		"allowNegative": true
+ *         		"required": 0
+ *		}
+ * }
+ * </pre>
  */
 class FieldSpec {
 
-	/**
-	 * Used for contro field
-	 */
+	public static final CAST_BIG_DECIMAL_FUNCTION = 'cast_big_decimal'
+
 	String type
 	Object defaultValue
 	String field
@@ -61,35 +70,52 @@ class FieldSpec {
 	Boolean isCustom() {
 		return this.field.startsWith('custom')
 	}
-
+	/**
+	 * A field spec is numeric when type == 'Number'
+	 * @return true if type == 'Number' otherwise it returns false
+	 */
 	Boolean isNumeric() {
-		// TODO: add logic to define all posible numeric value
-		return this.type in ['Long', 'Integer', 'Number', 'Decimal']
+		return this.type == 'Number'
 	}
 
 	/**
+	 * <p>Create hibernate type based on FieldSpec constraints definition</p>
 	 * <pre>
-	 * 	"constraints": {* 		"maxRange": 100,
+	 * 	"constraints": {
+	 * 		"maxRange": 100,
 	 *      "minRange": 0,
 	 *      "precision": 2,
 	 *      "separator": true,
 	 *      "allowNegative": true,
 	 *      "required": 0
-	 *},
-	 *  </pre>
-	 * @return
+	 *  } </pre>
+	 * @return a string with numeric hibernate type to be used in cast HQL sentence
 	 */
 	String buildNumericHibernateType() {
-		if (separator && precision) {
-			return 'float'
+		if (precision > 0) {
+			return CAST_BIG_DECIMAL_FUNCTION
 		} else {
-			return 'long'
+			return LongType.INSTANCE.name
 		}
 	}
 
+	/**
+	 * <p>Create Number class based on FieldSpec constraints definition</p>
+	 * <pre>
+	 * 	"constraints": {
+	 * 	"maxRange": 100,
+	 *      "minRange": 0,
+	 *      "precision": 2,
+	 *      "separator": true,
+	 *      "allowNegative": true,
+	 *      "required": 0
+	 *}* </pre>
+	 *
+	 * @return
+	 */
 	Class<?> buildNumericClass() {
-		if (separator && precision) {
-			return Float
+		if (precision > 0) {
+			return BigDecimal
 		} else {
 			return Long
 		}
@@ -244,32 +270,34 @@ class FieldSpec {
 
 		switch (type) {
 			case 'Number':
-			case 'Decimal':
-			case 'Integer':
-			case 'Long':
 				hibernateType = buildNumericHibernateType()
 				break
 			case 'Date':
-				hibernateType = 'date'
+				hibernateType = DateType.INSTANCE.name
 				break
 			case 'DateTime':
-				hibernateType = 'timestamp'
+				hibernateType = TimestampType.INSTANCE.name
 				break
-			case 'String':
-				hibernateType = ''
+			default:
+				hibernateType = StringType.INSTANCE.name
 				break
 		}
 
 		return hibernateType
 	}
 
+	/**
+	 * <p>Returns the correct groovy class for a field Spec to be used in filtering rows.</p>
+	 *
+	 * @see net.transitionmanager.search.FieldSearchData
+	 * @return a {@code Class < ? >} type instance
+	 */
 	Class<?> getClassType() {
 
 		Class<?> classType = null
 
 		switch (type) {
 			case 'Number':
-			case 'Decimal':
 				classType = buildNumericClass()
 				break
 			case 'Date':
@@ -278,11 +306,46 @@ class FieldSpec {
 			case 'DateTime':
 				classType = Timestamp
 				break
-			case 'String':
+			default:
 				classType = String
 				break
 		}
 
 		return classType
+	}
+
+	/**
+	 * <p>Creates the custom cast sentence for FieldSpecs to be used in HQL queries</p>
+	 * <p>It calculates Hibernate type, and prepares cast defintion using standard hibernate cast function + type
+	 * or a custom one using custom_big_decimal.</p>
+	 *
+	 * <pre>
+	 *
+	 * </pre>
+	 *
+	 * @param property
+	 * @return a HSQL cast sentence to be used in DataviewService
+	 * @see com.tdsops.common.sql.FieldSpecSQLFunction
+	 * @see net.transitionmanager.service.DataviewService#propertyFor(java.util.Map)
+	 */
+	String getHibernateCastSentence(String property){
+
+		String castSentence
+		String hibernateType = getHibernateType()
+
+		switch (type) {
+			case 'Number':
+				if(hibernateType == CAST_BIG_DECIMAL_FUNCTION){
+					castSentence = "$CAST_BIG_DECIMAL_FUNCTION($property, $precision)"
+				} else {
+					castSentence = "cast($property as $hibernateType)"
+				}
+				break
+			default:
+				castSentence = "cast($property as $hibernateType)"
+				break
+		}
+
+		return castSentence
 	}
 }

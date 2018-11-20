@@ -1,7 +1,13 @@
 package net.transitionmanager.asset
 
+import org.hibernate.type.DateType
+import org.hibernate.type.LongType
+import org.hibernate.type.StringType
+import org.hibernate.type.TimestampType
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.sql.Timestamp
 
 class FieldSpecSpec extends Specification {
 
@@ -67,11 +73,90 @@ class FieldSpecSpec extends Specification {
 
 		where:
 			control    | field       | label             | precision | separator | allowNegative || hibernateType
-			'String'   | 'assetName' | 'Name'            | null      | false     | false         || ''
-			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || 'big_decimal'
-			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || 'long'
-			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'long'
-			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'date'
-			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || 'timestamp'
+			'String'   | 'assetName' | 'Name'            | null      | false     | false         || StringType.INSTANCE.name
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || FieldSpec.CAST_BIG_DECIMAL_FUNCTION
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || LongType.INSTANCE.name
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || LongType.INSTANCE.name
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || DateType.INSTANCE.name
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || TimestampType.INSTANCE.name
 	}
+
+	@Unroll
+	void 'test can return class type for a custom field spec with control #control'() {
+
+		setup: 'a field spec definition from database'
+			Map fieldSpecMap = [
+				"bulkChangeActions": [],
+				"constraints"      : [
+					"maxRange"     : 100,
+					"minRange"     : 0,
+					"precision"    : precision,
+					"separator"    : separator,
+					"allowNegative": allowNegative,
+					"required"     : 0
+				],
+				"control"          : control,
+				"default"          : "",
+				"field"            : field,
+				"imp"              : "Y",
+				"label"            : label,
+				"order"            : 1,
+				"shared"           : 0,
+				"show"             : 1,
+				"tip"              : "",
+				"udf"              : 0
+			]
+
+		expect: 'can check if FieldSpec is custom or not'
+			new FieldSpec(fieldSpecMap).getClassType() == classType
+
+		where:
+			control    | field       | label             | precision | separator | allowNegative || classType
+			'String'   | 'assetName' | 'Name'            | null      | false     | false         || String
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || BigDecimal
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || Long
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || Long
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || Date
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || Timestamp
+	}
+
+	@Unroll
+	void 'test can return cast HQL sentence for a custom field spec with control #control'() {
+
+		setup: 'a field spec definition from database'
+			Map fieldSpecMap = [
+				"bulkChangeActions": [],
+				"constraints"      : [
+					"maxRange"     : 100,
+					"minRange"     : 0,
+					"precision"    : precision,
+					"separator"    : separator,
+					"allowNegative": allowNegative,
+					"required"     : 0
+				],
+				"control"          : control,
+				"default"          : "",
+				"field"            : field,
+				"imp"              : "Y",
+				"label"            : label,
+				"order"            : 1,
+				"shared"           : 0,
+				"show"             : 1,
+				"tip"              : "",
+				"udf"              : 0
+			]
+
+		expect: 'can check if FieldSpec is custom or not'
+			new FieldSpec(fieldSpecMap).getHibernateCastSentence('A.custom10') == castSentence
+
+		where:
+			control    | field       | label             | precision | separator | allowNegative || castSentence
+			'String'   | 'assetName' | 'Name'            | null      | false     | false         || "cast(A.custom10 as $StringType.INSTANCE.name)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || "$FieldSpec.CAST_BIG_DECIMAL_FUNCTION(A.custom10, 2)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || "cast(A.custom10 as $LongType.INSTANCE.name)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $LongType.INSTANCE.name)"
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $DateType.INSTANCE.name)"
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $TimestampType.INSTANCE.name)"
+	}
+
 }

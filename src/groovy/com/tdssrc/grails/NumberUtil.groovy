@@ -52,6 +52,22 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types into a BigDecimal value
+	 * @param value - the value to be converted to a BigDecimal
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the BigDecimal value if valid else null
+	 */
+	static BigDecimal toBigDecimal(value, BigDecimal defVal = null) {
+		if (value instanceof BigDecimal) {
+			value
+		} else if (value instanceof CharSequence) {
+			value.toBigDecimal()
+		} else {
+			defVal
+		}
+	}
+
+	/**
 	 * Convert various types into a Long value. If value param is a number with Decimal,
 	 * it also returns the Long-part of the decimal value
 	 * @param value - the value to be converted to a Long

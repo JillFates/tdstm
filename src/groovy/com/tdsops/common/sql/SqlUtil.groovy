@@ -540,7 +540,9 @@ class SqlUtil {
 				parsedNumber = NumberUtil.toInteger(filter)
 			} else if (type == Long) {
 				parsedNumber = NumberUtil.toLong(filter)
-			} else {
+			} else if (type == BigDecimal) {
+				parsedNumber = NumberUtil.toBigDecimal(filter)
+			}  else {
 				parsedNumber = filter.toFloat()
 			}
 		}
