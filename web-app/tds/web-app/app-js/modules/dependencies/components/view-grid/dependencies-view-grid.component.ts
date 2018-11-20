@@ -9,6 +9,7 @@ import {Observable, BehaviorSubject, Subject} from 'rxjs';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
 import {DependenciesService, DependenciesRequestParams} from '../../service/dependencies.service';
@@ -22,6 +23,7 @@ import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/t
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 
+declare var jQuery: any;
 @Component({
 	selector: 'tds-dependencies-view-grid',
 	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html',
@@ -46,6 +48,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
+		private notifier: NotifierService,
 		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService
@@ -69,7 +72,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private setupGridConfiguration() {
 		this.dependenciesColumnModel = new DependenciesColumnModel();
 
-		this.grid.selectable = true;
 		this.grid.filterable = true;
 		this.grid.sortable = <SortSettings>{ allowUnsort: false, mode: 'single'};
 		this.grid.resizable = true;
@@ -98,19 +100,31 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				// Call the endpoint to get new data
 				mergeMap(this.getDependencies),
 				// Map the endpoint results to the format used by the grid
-				map((results: DependencyResults) => ({data: results.dependencies, total: results.total}))
+				map((results: DependencyResults): GridDataResult => ({data: results.dependencies, total: results.total}))
 			)
-			.subscribe((results) => {
-				// With the results refresh the grid data
-				this.gridData = results;
-				// reset the state of the bulk items
-				this.bulkCheckboxService.initializeKeysBulkItems(results.data || []);
-			}, error => console.error(error.message || error));
+			.subscribe((results) => this.updateGridResults(results), error => console.error(error.message || error));
+	}
+
+	/**
+	 * Update the grid data with fresh results
+	 * @param {GridDataResult} results New results
+	 */
+	private updateGridResults(results: GridDataResult): void {
+		// With the results refresh the grid data
+		this.gridData = results;
+		// reset the state of the bulk items
+		this.bulkCheckboxService.initializeKeysBulkItems(results.data || []);
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	/**
 	 * Extract from the grid state the parameters required bye the endpoint
-	 * @param {state} State
+	 * @param {State} state
 	 * @returns {DependenciesRequestParams}
 	 */
 	private getParametersForEndpoint(state: State): DependenciesRequestParams {

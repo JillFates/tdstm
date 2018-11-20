@@ -1,5 +1,10 @@
+<tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
+
 <div class="dependencies-view-grid-component">
-	<kendo-grid #grid [data]="gridData" (dataStateChange)="dataStateChange($event)">
+	<kendo-grid #grid
+	            [data]="gridData"
+	            (dataStateChange)="dataStateChange($event)"
+	            class="tds-kendo-grid without-selectabe-rows">
 
 		<!-- Header Toolbar -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
@@ -21,7 +26,7 @@
 		</ng-template>
 
 		<!-- Select All column -->
-		<kendo-grid-column [width]="45" [locked]="false" [filterable]="false">
+		<kendo-grid-column [width]="45" [locked]="true" [filterable]="false">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="row">
 					<div class="col-md-12 text-center">
