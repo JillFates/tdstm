@@ -272,14 +272,14 @@ class ControlAngularTagLib {
 		Map fieldSpec = attrs.fieldSpec ?: [:]
 		AssetEntity assetEntity = attrs.asset ?: [:]
 		String fieldName = ( attrs.fieldName ?: '' )
-		String value = ( attrs.fieldValue ?: '' )
+		String value = attrs.fieldValue
 
 		if (!fieldSpec || !assetEntity || !fieldName) {
 			throw new InvalidParamException('<tdsAngular:highlightedField> tag requires fieldSpec=standardField Map and asset=assetEntity and fieldName')
 		}
 
 		// Get the value from the Model
-		if (value.isEmpty()) {
+		if (!value) {
 			value = assetEntity[fieldName]
 		}
 
