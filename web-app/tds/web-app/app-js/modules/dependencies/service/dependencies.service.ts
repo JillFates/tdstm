@@ -44,7 +44,4 @@ export class DependenciesService {
 				})
 			)
 	}
-
-	private mapDependenciesOutputResult(pageSize: number, legacyFormat: any): Observable<any> {
-	}
 }

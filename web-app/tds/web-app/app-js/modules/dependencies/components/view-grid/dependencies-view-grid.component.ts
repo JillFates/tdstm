@@ -1,5 +1,3 @@
-import {BehaviorSubject} from 'rxjs';
-import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {State} from '@progress/kendo-data-query';
 import {GridComponent, SortSettings} from '@progress/kendo-angular-grid';
@@ -167,56 +165,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private getInitialGridState(): State {
 		return {
 			sort: [this.defaultSorting],
-			filter: {
-				filters: [],
-				logic: 'and'
-			},
-			take: GRID_DEFAULT_PAGE_SIZE,
-			skip: 0
-		}
-	}
-
-
-	onEdit(dataItem: any) {
-	}
-
-	onDelete(dataItem: any) {
-	}
-
-	clearValue(dataItem: any) {
-	}
-
-	onFilter(dataItem: any) {
-	}
-
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		// this.gridData = process(this.assets, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		// this.gridData = process(this.assets, this.state);
-	}
-
-	/**
-	 * Handle pageChange, filterChange, sortChange events
-	 * @param {DataStateChangeEvent} state
-	 */
-	protected dataStateChange(state: DataStateChangeEvent): void {
-		this.gridStateSubject.next(state);
-	}
-
-	/**
-	 * Get the initial state of the grid
-	 * @returns {State} default grid state properties
-	 */
-	getInitialGridState(): State {
-		return {
-			sort: [{
-				dir: 'asc',
-				field: 'name'
-			}],
 			filter: {
 				filters: [],
 				logic: 'and'
