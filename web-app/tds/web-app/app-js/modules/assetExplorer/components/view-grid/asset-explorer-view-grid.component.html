@@ -51,7 +51,7 @@
 						</li>
 					</ul>
 				</div>
-				<tds-bulk-change-button [bulkData]="bulkData"
+				<tds-bulk-change-button #tdsBulkChangeButton
 				                        [enabled]="hasSelectedItems()"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
@@ -113,22 +113,22 @@
 						<span class="fa fa-fw fa-edit"></span>
 					</button>
 					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.issue"
-					        title="Create Task or Show Tasks"
+					        title="List existing Tasks"
 					        (click)="showTask(dataItem, rowIndex)">
 						<span class="fa fa-fw fa-list-alt"></span>
 					</button>
 					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
-					        title="Create Task or Show Tasks"
+					        title="Create a Task"
 					        (click)="createTask(dataItem, rowIndex)">
 						<span class="fa fa-fw fa-file-text-o"></span>
 					</button>
 					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
-					        title="Create Comment or Show Comments"
+					        title="List existing Comments"
 					        (click)="showComment(dataItem, rowIndex)">
 						<span class="fa fa-fw fa-comments"></span>
 					</button>
 					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.comment"
-					        title="Create Comment or Show Comments"
+					        title="Create a Comment"
 					        (click)="createComment(dataItem, rowIndex)">
 						<span class="fa fa-fw fa-comment"></span>
 					</button>
@@ -161,7 +161,7 @@
 			<!-- Default Generic Filter Template -->
 			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
 				<div class=" has-feedback" style="margin-bottom:0px;">
-					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
+					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value=""
 					       [(ngModel)]="column.filter" (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)" input-paste (onPaste)="onPaste(column)">
 					<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
 					      aria-hidden="true"></span>
@@ -192,7 +192,7 @@
 			<!-- Last Updated Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
 				<div>
-					{{dataItem[column.domain+'_'+column.property]| userDateTime : userTimeZone }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>

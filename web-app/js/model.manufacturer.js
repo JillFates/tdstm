@@ -105,8 +105,8 @@ var akaUtil = (function ($) {
         		});
         		// check if this AKA has previously been marked as invalid
 			} else if (akaRow.attr('js-is-unique') === 'false') {
-        		duplicateOf = 'other';
-        		// otherwise this AKA is not a duplicate
+				duplicateOf = 'other';
+				// otherwise this AKA is not a duplicate
       		}
 			akaList.push(akaName);
 			public.setAkaErrorStatus(akaErrorDivId, akaName, duplicateOf, forWhom);

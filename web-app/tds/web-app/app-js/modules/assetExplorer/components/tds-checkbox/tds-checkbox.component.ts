@@ -7,7 +7,11 @@ const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 
 @Component({
 	selector: 'tds-checkbox',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/tds-checkbox/tds-checkbox.component.html'
+	template: `
+        <div class="tds-checkbox-component">
+            <input class="component-action-change" type="checkbox" #tdsCheckbox (change)="onChange()" style="cursor: pointer" />
+        </div>
+	`
 })
 export class TDSCheckboxComponent implements OnInit {
 	@Input() hasThirdState: boolean;

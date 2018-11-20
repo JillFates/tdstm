@@ -405,48 +405,6 @@ class PersonController implements ControllerMethods {
 		}
 	}
 
-	/**
-	 * Used to clear out person's preferences. User can clear out own or requires permission
-	 */
-// TODO : JPM 8/31/2015 : Need to test
-	@HasPermission(Permission.UserGeneralAccess)
-	def resetPreferences() {
-		try {
-			Person person = personService.validatePersonAccess(params.user)
-			UserLogin userLogin = securityService.getPersonUserLogin(person)
-			if (!userLogin) {
-				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-				sendNotFound()
-				return
-			}
-
-			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
-			if (params.dateTimezoneOnly) {
-				userPreferenceService.removePreference(PREF.CURR_TZ)
-				userPreferenceService.removePreference(PREF.CURR_DT_FORMAT)
-
-			// else reset all preferences
-			} else {
-				// TODO : JPM 5/2015 : Change the way that the delete is occurring
-				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-				prePreference.each { preference ->
-					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-						// When clearing preference, the RefreshMyTasks should be the same.
-						if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
-							preferenceInstance.delete()
-						}
-				}
-
-				//userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
-			}
-
-			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
-			render person
-		} catch (e) {
-			renderErrorJson(e.message)
-		}
-	}
-
 	/*
 	 * The primary controller method to bootstrap the Project Staff administration screen which then
 	 * leverages the loadFilteredStaff method to populate list in an Ajax call
@@ -802,7 +760,7 @@ class PersonController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreferences() {
+	def saveDateAndTimePreferences() {
 		// Checks that timezone is valid
 		def timezone = TimeZone.getTimeZone(params.timezone)
 		userPreferenceService.setTimeZone timezone.getID()
@@ -822,81 +780,20 @@ class PersonController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def editPreference() {
+        UserLogin userLogin = currentPerson().userLogin
 
-		def prefMap = [:]
-		def labelMap = [CONSOLE_TEAM_TYPE: "Console Team Type", SUPER_CONSOLE_REFRESH: "Console Refresh Time",
-		                CART_TRACKING_REFRESH: "Cart tarcking Refresh Time", BULK_WARNING: "Bulk Warning",
-		                (PREF.DASHBOARD_REFRESH.value()): "Dashboard Refresh Time", (PREF.CURR_TZ.value()): "Time Zone",
-		                (PREF.CURR_POWER_TYPE.value()): "Power Type", (PREF.START_PAGE.value()): "Welcome Page",
-		                (PREF.STAFFING_ROLE.value()): "Default Project Staffing Role",
-		                (PREF.STAFFING_LOCATION.value()): "Default Project Staffing Location",
-		                (PREF.STAFFING_PHASES.value()): "Default Project Staffing Phase",
-		                (PREF.STAFFING_SCALE.value()): "Default Project Staffing Scale", preference: "Preference",
-		                (PREF.DRAGGABLE_RACK.value()): "Draggable Rack", PMO_COLUMN1: "PMO Column 1 Filter",
-		                PMO_COLUMN2: "PMO Column 2 Filter", PMO_COLUMN3: "PMO Column 3 Filter",
-		                PMO_COLUMN4: "PMO Column 4 Filter", (PREF.SHOW_ADD_ICONS.value()): "Rack Add Icons",
-		                MY_TASK: "My Task Refresh Time"]
-
-		String currTimeZone = TimeUtil.defaultTimeZone
-		String currDateTimeFormat = TimeUtil.getDefaultFormatType()
-
-		def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
-		for (pref in prefs) {
-			switch (pref.preferenceCode) {
-				case PREF.MOVE_EVENT.value():
-					prefMap[pref.preferenceCode] = "Event / " + MoveEvent.get(pref.value).name
-					break
-
-				case PREF.CURR_PROJ.value():
-					prefMap[pref.preferenceCode] = "Project / " + Project.get(pref.value).name
-					break
-
-				case PREF.CURR_BUNDLE.value():
-					prefMap[pref.preferenceCode] = "Bundle / " + MoveBundle.get(pref.value).name
-					break
-
-				case PREF.PARTY_GROUP.value():
-					prefMap[pref.preferenceCode] = "Company / " + (!pref.value.equalsIgnoreCase("All") ?
-							PartyGroup.get(pref.value).name : 'All')
-					break
-
-				case PREF.CURR_ROOM.value():
-					prefMap[pref.preferenceCode] = "Room / " + Room.get(pref.value).roomName
-					break
-
-				case PREF.STAFFING_ROLE.value():
-					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefMap[pref.preferenceCode] = "Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)
-					break
-
-				case PREF.AUDIT_VIEW.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefMap[pref.preferenceCode] = "Room Audit View / " + value
-					break
-
-				case PREF.JUST_REMAINING.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefMap[pref.preferenceCode] = "Just Remaining Check / " + value
-					break
-
-				case PREF.CURR_DT_FORMAT:
-					currDateTimeFormat = pref.value
-					break
-
-				case PREF.CURR_TZ:
-					currTimeZone = pref.value
-					break
-
-				default:
-					prefMap[pref.preferenceCode] = (labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value
-					break
-			}
-		}
-
-		render(template: "showPreference",
-		       model: [prefMap: prefMap.sort{it.value}, areas: userPreferenceService.timezonePickerAreas(),
-		               timezones: Timezone.findAll(), currTimeZone: currTimeZone,
-		               currDateTimeFormat: currDateTimeFormat, currentPersonId: securityService.currentPersonId])
+		render(
+			template: "showPreference",
+		    model: [
+				areas: userPreferenceService.timezonePickerAreas(),
+				currTimeZone: TimeUtil.defaultTimeZone,
+				currDateTimeFormat: TimeUtil.getDefaultFormatType(),
+				currentPersonId: securityService.currentPersonId,
+				fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
+				preferences: userPreferenceService.preferenceListForEdit(userLogin),
+				timezones: Timezone.findAll()
+			]
+		)
 	}
 
 	/**

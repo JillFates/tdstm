@@ -112,13 +112,15 @@
     </kendo-grid-column>
     <kendo-grid-column field="default" title="Default Value">
         <ng-template kendoGridCellTemplate let-dataItem *ngIf="isEditing">
-            <input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')" type="text" class="form-control"
-                [(ngModel)]="dataItem.default" name="default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
-            <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-            <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
-                <option value="">Select...</option>
-                <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
-            </select>
+            <div *ngIf="isAllowedDefaultValueForField(dataItem?.control)">
+                <input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')" type="text" class="form-control"
+                       [(ngModel)]="dataItem.default" name="default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
+                <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
+                <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
+                    <option value="">Select...</option>
+                    <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
+                </select>
+            </div>
         </ng-template>
     </kendo-grid-column>
     <kendo-grid-column field="control" title="Control" [width]="150">
@@ -128,7 +130,7 @@
                     id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem)" [ngModel]="dataItem.control">
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
-                <span *ngIf="!toBeDeleted(dataItem)">
+                <span *ngIf="!toBeDeleted(dataItem) && isAllowedConfigurationForField(dataItem.control)">
                     <div (click)="openFieldSettingsPopup(dataItem)" class="open-close-dropdown-container text-center">
                         <i class="open-close-dropdown-icon fa fa-gear"></i>
                     </div>

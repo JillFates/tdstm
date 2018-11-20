@@ -14,7 +14,34 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-combobox',
-	templateUrl: '../tds/web-app/app-js/shared/components/combo-box/combobox.component.html',
+	template: `
+        <kendo-combobox #innerComboBox
+                        [data]="datasource"
+                        [(ngModel)]="model"
+                        [textField]="'text'"
+                        [valueField]="'id'"
+                        [placeholder]="placeholder"
+                        [filterable]="true"
+                        (valueChange)="onValueChange($event)"
+                        (selectionChange)="onSelectionChange($event)"
+                        (filterChange)="onFilterChange($event)"
+                        (open)="onOpen()"
+                        (close)="onClose()"
+                        (focus)="onFocus()"
+                        (blur)="onBlur()"
+                        [suggest]="true"
+                        [disabled]="disabled"
+                        [required]="required"
+                        name="testName"
+                        style="width: 100%;">
+            <ng-template kendoComboBoxItemTemplate let-dataItem>
+                <span [innerHTML]="comboBoxInnerSearch(dataItem)"></span>
+            </ng-template>
+            <ng-template kendoComboBoxFooterTemplate>
+                <span #dropdownFooter></span>
+            </ng-template>
+        </kendo-combobox>
+	`,
 	styles: []
 })
 

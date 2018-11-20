@@ -9,7 +9,7 @@ export class FieldSettingsModel {
 	order?: number;
 	length?: number;
 	default?: any;
-	control?: 'List' | 'String' | 'YesNo' | '';
+	control?: CUSTOM_FIELD_CONTROL_TYPE;
 	constraints: ConstraintModel;
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -60,3 +60,12 @@ export class FieldImportance {
 export const FIELD_COLORS = ['Y', 'G', 'P', 'B', 'O', 'N', 'U'];
 
 export const FIELD_NOT_FOUND = 'Field Not Found';
+
+export enum CUSTOM_FIELD_CONTROL_TYPE {
+	List = 'List',
+	String = 'String',
+	YesNo = 'YesNo',
+	Date = 'Date',
+	DateTime = 'DateTime',
+	Number = 'Number'
+}

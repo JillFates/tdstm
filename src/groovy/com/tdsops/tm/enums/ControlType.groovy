@@ -20,7 +20,11 @@ enum ControlType {
     CHASSIS_T("Chassis.T"),
     CHASSIS_S("Chassis.S"),
     DATE("Date"),
-    DATETIME("Datetime")
+    DATETIME("DateTime"),
+    IN_LIST("InList"),
+    PLAN_STATUS("Options.PlanStatus"),
+    ASSET_TAG_SELECTOR("asset-tag-selector"),
+    REFERENCE('Reference')
 
     private String value
 

@@ -7,7 +7,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
 	selector: 'tds-url-viewer',
-	templateUrl: '../tds/web-app/app-js/shared/components/url-viewer/url-viewer.component.html'
+	template: `
+        <a *ngIf="model" [href]="trustedUrl" [attr.target]="target">{{label}}</a>
+	`
 })
 
 export class URLViewerComponent implements OnInit {

@@ -2,9 +2,9 @@ package specs.Assets.Application
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Assets.Application.ApplicationCreationPage
-import pages.Assets.Application.ApplicationDetailsPage
-import pages.Assets.Application.ApplicationListPage
+import pages.Assets.AssetViews.AssetCreatePage
+import pages.Assets.AssetViews.AssetDetailsPage
+import pages.Assets.AssetViews.ViewPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
@@ -48,72 +48,76 @@ class ApplicationCreationSpec extends GebReportingSpec {
             assetsModule.goToApplications()
 
         then: 'Application List should be displayed'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "2. The User gains access to the Application Creation Window"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User Clicks the "Create App" Button'
-            alCreateAppBtn.click()
+            createButton.click()
 
         then: 'Application Create Pop-up should be displayed'
-            at ApplicationCreationPage
+            at AssetCreatePage
     }
 
     def "3. A brand new Application is successfully created"() {
         given: 'The User is in the Application Create Pop-up'
-            at ApplicationCreationPage
+            at AssetCreatePage
         when: 'The User completes all the Random Information for Name and Description'
             acModalAppName = appName
             acModalDescription = appDesc
         and: 'The User Searches by SME1'
             acModalSME1Selector.click()
             waitFor { acModalSelectorValues.size() > 2 }
-            appSME1 = acModalSelectorValues[2].text()
-            waitFor { acModalSelectorValues.find("div", role:"option", text: appSME1).click() }
+            def selector = acModalSelectorValues[2]
+            appSME1 = selector.text()
+            waitFor { selector.click() }
         and: 'The User Searches by SME2'
             acModalSME2Selector.click()
             waitFor { acModalSelectorValues.size() > 2 }
-            appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-1,2)].text()
-            waitFor { acModalSelectorValues.find("div", role:"option", text: appSME2).click() }
+            selector = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-1,2)]
+            appSME2 = selector.text()
+            waitFor { selector.click() }
         and: 'The User Searches by App Owner'
             acModalAppOwnerSelector.click()
-            appOwner = acModalSelectorValues[acModalSelectorValues.size()-1].text()
+            selector = acModalSelectorValues[acModalSelectorValues.size()-1]
+            appOwner = selector.text()
             waitFor { acModalSelectorValues.size() > 2 }
-            waitFor { acModalSelectorValues.find("div", role:"option", text: appOwner).click() }
+            waitFor { selector.click() }
         and: 'The User chooses a Bundle'
-            acModalBundleSelector = appBundle
+            waitFor{ acModalBundleSelector.click()}
+            acModalSelectorValues.find(text: appBundle).click()
+            acModalBundleSelector.click() // close dropdown
         and: 'The User chooses a proper Status'
-            acModalPlanStatusSelector = appStatus
+            waitFor{ acModalPlanStatusSelector.click()}
+            acModalSelectorValues.find(text: appStatus).click()
         and: 'The User clicks the the "Save" Button'
-            waitFor { acModalSaveBtn.click() }
+            waitFor { createButton.click() }
 
         then: ' The User is redirected to the Application Details Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         and: 'The User closes the Application Details Page'
-            waitFor { adModalCloseBtn.click() }
+            waitFor { closeButton.click() }
         and: 'The User is redirected to the Application List Page'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "4. The User Filters out by Application Name Name that was recently created"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User Clicks the Application Name Filter Column'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appName
-            waitFor{alFirstAppName.text().trim() == appName}
+            filterByName(appName)
         and: 'The User searches for it'
-            waitFor{alFirstAppName.click()}
+            openFirstAssetDisplayed()
 
         then: 'The Application should be displayed'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
     }
 
     def "5. Validate Application Details"() {
         when: 'The User is on the Application List Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
 
         then: 'The User Searches by the AppName, SME1, SME2, AppOwner'
         // TODO some items cannot located due to missing ID's

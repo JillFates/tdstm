@@ -21,6 +21,6 @@ export class UserService {
 					throw new Error(result.errors.join(';'));
 				}
 			})
-			.catch( (error: any) => error.json());
+			.catch((error: any) => error.json());
 	}
 }

@@ -11,6 +11,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.asset.FieldSpec
 import net.transitionmanager.asset.FieldSpecCache
@@ -679,7 +680,7 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec.columns.each { Map column ->
 
 			// Check if the user provided a filter expression.
-			if (filterFor(column)) {
+			if (StringUtil.isNotBlank(filterFor(column))) {
 				String whereProperty = wherePropertyFor(column)
 
 				// Create a basic FieldSearchData with the info for filtering an individual field.

@@ -7,8 +7,10 @@ import com.tdssrc.grails.NumberUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -16,6 +18,8 @@ import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
 class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
+
+	CustomDomainService customDomainService
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
@@ -48,54 +52,101 @@ class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
 	 * a device in moveBundle(usedForPlanning = 1)
 	 */
 	@Shared
-	AssetEntity device
+	AssetEntity application
+
+	// Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
+	// After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
+	// as a resource for the application.
+	private static final String fieldSpecDefinitionJson = '/CustomDomainServiceTests_FieldSpec.json'
 
 	/**
-	 * a device in moveBundle(usedForPlanning = 1)
+	 * This will load the JSON file that accompanies this test suite and will return
+	 * it as a JSONObject.
 	 */
-	@Shared
-	AssetEntity device2
-
-	/**
-	 * a device in moveBundle2(usedForPlanning = 0)
-	 */
-	@Shared
-	AssetEntity device3
-
-	void setup() {
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
+	private JSONObject loadFieldSpecJson() {
+		// Determine where we can write the resource file for testing
+		// this.class.classLoader.rootLoader.URLs.each{ println it }
+		// We'll only load it the first time and cache it into fieldSpecJson
+		JSONObject fieldSpecJson
+		if (!fieldSpecJson) {
+			String jsonText = this.getClass().getResource(fieldSpecDefinitionJson).text
+			fieldSpecJson = new JSONObject(jsonText)
+			assert fieldSpecJson
+			// println "\n\n$fieldSpecJson\n\n"
+		}
+		return fieldSpecJson
 	}
 
-	@See('TM-12334')
+
+	void setup() {
+		application = assetEntityTestHelper.createAssetEntity(AssetClass.APPLICATION, project, moveBundle)
+	}
+
+
 	void 'Test clear'() {
+		given:
+			Project project = projectTestHelper.createProjectWithDefaultBundle()
+			JSONObject fieldSpec = loadFieldSpecJson()
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 		when: 'clear is called with a list of assets'
-			BulkChangeInteger.clear(Application.class, null, 'size', [device.id, device2.id, device3.id], null)
+			BulkChangeNumber.clear(Application.class, null, 'custom8', [application.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
-			[device, device2, device3].each {
+			[application].each {
 				it.refresh()
-				null == it.size
+				null == it.custom8
 			}
 	}
 
-	@See('TM-12334')
-	void 'Test replace'() {
-		setup:
-			Integer size = NumberUtil.toPositiveInteger(RandomStringUtils.randomNumeric(5))
 
-		when: 'replace is called with a list of assets'
-			BulkChangeInteger.replace(Application.class, size, 'size', [device.id, device2.id, device3.id], null)
+	void 'Test replace'() {
+		given:
+			Project project = projectTestHelper.createProjectWithDefaultBundle()
+			JSONObject fieldSpec = loadFieldSpecJson()
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+			Number testNumber
+
+		when: 'replace is called with a random integer, and a list of assets'
+			testNumber = NumberUtil.toPositiveInteger(RandomStringUtils.randomNumeric(5))
+			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
-			[device, device2, device3].each {
+			[application].each {
 				it.refresh()
-				size == it.size
+				testNumber == it.custom8
+			}
+		when: 'replace is called with an integer and, list of assets'
+			testNumber = 15644321
+			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+
+		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
+			[application].each {
+				it.refresh()
+				testNumber == it.custom8
+			}
+
+		when: 'replace is called with a decimal number and, list of assets'
+			testNumber = 1.59876864
+			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+
+		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
+			[application].each {
+				it.refresh()
+				testNumber == it.custom8
+			}
+
+		when: 'replace is called with a negative number, and a list of assets'
+			testNumber = -126.321
+			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+
+		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
+			[application].each {
+				it.refresh()
+				testNumber == it.custom8
 			}
 
 		when: 'replace is called with a null replacement value'
-			BulkChangeInteger.replace(Application.class, null, 'size', [device.id, device2.id, device3.id], null)
+			BulkChangeNumber.replace(Application.class, null, 'custom8', [application.id], null)
 
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException

@@ -254,7 +254,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected isValid(): boolean {
-		return this.isAssetSelected() && this.isColumnSelected();
+		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
 	protected isDirty(): boolean {
@@ -540,4 +540,24 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected onGridStateChange(state: State): void {
 		this.gridState = state;
 	}
+
+	/**
+	 -
+	 * Determine if exists at least one non locked column
+	 * or if the collection is empty
+	 * @returns {boolean}
+	 */
+	private hasAtLeastOneNonLockedColumnOrEmpty(): boolean {
+		const columns = this.model.schema && this.model.schema.columns || [];
+
+		if (columns.length === 0) {
+			return true;
+		}
+
+		const nonLocked =  columns
+			.filter((column: ViewColumn) => !column.locked);
+
+		return Boolean(nonLocked.length);
+	}
+
 }

@@ -6,7 +6,7 @@
  */
 
 import * as R from 'ramda';
-import {Component, Inject } from '@angular/core';
+import {Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -26,7 +26,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		providers: [
 			{ provide: 'model', useValue: model }
 		]
-	}) class DeviceCreateComponent extends DeviceCommonComponent {
+	}) class DeviceCreateComponent extends DeviceCommonComponent implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -39,9 +39,12 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 
+		}
+
+		ngOnInit() {
 			this.initModel();
 			this.toggleAssetTypeFields();
-
+			this.focusControlByName('assetName');
 		}
 
 		/**
@@ -52,8 +55,8 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
-			this.model.asset.planStatus = this.model.planStatusOptions[0];
-			this.model.asset.environment = this.model.environmentOptions[0];
+			this.model.asset.planStatus = this.defaultPlanStatus;
+			this.model.asset.validation = this.defaultValidation;
 		}
 
 		/**

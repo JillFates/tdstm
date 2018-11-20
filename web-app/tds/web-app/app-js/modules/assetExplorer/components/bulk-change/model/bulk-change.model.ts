@@ -21,7 +21,7 @@ export interface BulkActionResult {
 }
 
 export interface BulkEditAction {
-	// domains: IdTextItem[];
 	fields: IdTextItem[];
 	actions: IdTextItem[];
+	constraints: Array<any>;
 }

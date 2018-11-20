@@ -4,12 +4,13 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {HostListener, Inject, OnInit, ViewChild} from '@angular/core';
+import {OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
+import {AssetCommonHelper} from './asset-common-helper';
 
 declare var jQuery: any;
 
@@ -22,6 +23,10 @@ export class AssetCommonEdit implements OnInit {
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
 	protected isDependenciesValidForm = true;
+	protected defaultSelectOption = 'Please Select';
+	protected defaultPlanStatus = 'Unassigned';
+	protected defaultValidation = 'Discovery';
+	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
 	constructor(
@@ -195,5 +200,15 @@ export class AssetCommonEdit implements OnInit {
 
 	protected focusAssetModal(): void {
 		setTimeout(() => jQuery('.modal-content').focus(), 500);
+	}
+
+	/**
+	 * Focus a control matching by name
+	 */
+	protected focusControlByName(name): void {
+		// delay selection until bootstrap effects are done
+		setTimeout(() => {
+			jQuery(`form.asset-entry-form .tm-input-control[name='${name}']:first`).focus();
+		}, 600);
 	}
 }

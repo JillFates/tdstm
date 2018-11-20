@@ -190,7 +190,9 @@ class SettingService implements ServiceMethods {
      * @param jsonObject
      */
     private void removeVersionKeyIfPresent(JSONObject jsonObject) {
-        jsonObject.remove(VERSION_KEY)
+        if (jsonObject.containsKey(VERSION_KEY)) {
+            jsonObject.remove(VERSION_KEY)
+        }
     }
 
     /**
@@ -198,8 +200,10 @@ class SettingService implements ServiceMethods {
      * @param jsonObject
      */
     private void sanitizeFieldLabels(JSONObject jsonObject) {
-        jsonObject.get(FIELDS_KEY).each { Map<String, ?> field ->
-             field.put(LABEL_KEY, StringUtils.trim(field[LABEL_KEY] as String))
+        if (jsonObject.containsKey(FIELDS_KEY)) {
+            jsonObject.get(FIELDS_KEY).each { Map<String, ?> field ->
+                field.put(LABEL_KEY, StringUtils.trim(field[LABEL_KEY] as String))
+            }
         }
     }
 }

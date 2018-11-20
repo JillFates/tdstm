@@ -79,6 +79,40 @@ class LoginSpec extends GebReportingSpec {
         then: "We verify that the Unlock icon/legend is displayed"
             verifyUnlockButtonDisplayed()
     }
+
+    def "6. Verify that the info in the Unlock User Login matches the locked user"(){
+        given: "The User is on the User Details Page of the locked user"
+            at UserDetailsPage
+        when: "We click the Unlock icon"
+            unlockButtonID.click()
+        then: "The modal has the username info"
+            verifyUsernameLocked("login_e2e_test_user@dev.com")
+        and: "We click the Cancel button"
+            unlockUserLoginCancelBtn.click()
+    }
+
+    def "7. Unlock the login_e2e_test_user@dev.com user"(){
+        given: "The User is on the User Details Page of the locked user"
+            at UserDetailsPage
+        and: "We click the Unlock icon"
+            unlockButtonID.click()
+        when: "The confirm button is clicked"
+            unlockUserLoginConfirmBtn.click()
+        then: "The Not Locked Out legend is displayed on the User Details page"
+            at UserDetailsPage
+            driver.navigate().refresh()
+            verifyNotLockedOut()
+    }
+
+    def "8. Verify the previously-locked-user now can login again"(){
+        given: "The User goes to Login page"
+            to LoginPage
+        when: "The user tries to login with the valid username from above and the correct password"
+            //On the testDataFile.txt the 6th and 7th values are the login_e2e_test_user and its correct password
+            login(6,7)
+        then: "The user is successfully logged in"
+            at MenuPage
+    }
 }
 
 

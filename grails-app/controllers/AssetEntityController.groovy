@@ -30,6 +30,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import grails.util.Environment
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -819,8 +820,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.AssetEdit)
 	@Transactional(readOnly = true)
 	def edit() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
+		Project project = getProjectForWs()
 
 		def (device, Map model) = assetEntityService.getDeviceModelForEdit(project, params.id, params)
 
@@ -2615,7 +2615,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def rackId = params.rackId
-		def options = assetEntityService.getRackSelectOptions(project, roomId, true)
+		def options = DeviceUtils.getRackSelectOptions(project, roomId, true)
 		def sourceTarget = params.sourceTarget
 		def forWhom = params.forWhom
 		def tabindex = params.tabindex
@@ -2652,7 +2652,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def id = params.id
-		def options = assetEntityService.getChassisSelectOptions(project, roomId)
+		def options = DeviceUtils.getChassisSelectOptions(project, roomId)
 		def sourceTarget = params.sourceTarget
 		def forWhom = params.forWhom
 		def tabindex = params.tabindex

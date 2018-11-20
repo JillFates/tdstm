@@ -12,92 +12,92 @@
                            (onClose)="fieldReferencePopupHelper.popup.show = false">
     </field-reference-popup>
 
-    <kendo-grid [data]="gridData"
-                [pageSize]="25">
-        <ng-template kendoGridToolbarTemplate [position]="'top'">
-            <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
-            <div class="fieldsFilter col-sm-2">
-                <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
-                    [data]="fieldsFilter.options"
-                    [textField]="'text'"
-                    [valueField]="'value'"
-                    [(ngModel)]="fieldsFilter.selected"
-                    (valueChange)="onFieldsFilter($event)"
-                    placeholder="Filter"
-                    class="form-control input-sm">
-                </kendo-dropdownlist>
-            </div>
-            <div class="fieldsFilterText col-sm-3">
-                <input [(ngModel)]="fieldsFilter.nameFilter.value"
-                       type="text" class="form-control"
-                       name="fieldsFilterText" placeholder="Filter on field name"
-                       (keyup)="onTextFilter()">
-                <span *ngIf="fieldsFilter.nameFilter.value"
-                      class="fa fa-times form-control-feedback"
-                      (click)="clearTextFilter()"></span>
-            </div>
-        </ng-template>
-        <kendo-grid-column title="Name" field="name" [width]="100"></kendo-grid-column>
 
-        <!-- Current / Previous Column Label -->
-        <kendo-grid-column [width]="200"
-            [title]="currentPreviousColumnLabel"
-            field="currentPreviousValue"
-            [class]="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE ? '' : 'gray-background'"
-        >
-        </kendo-grid-column>
-
-        <!-- Imported Value Column Label -->
-        <kendo-grid-column [width]="200" title="Imported Value" [class]="'import-value'">
-            <ng-template kendoGridCellTemplate let-dataItem>
-                <div class="import-item-container">
-                    <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowValue"
-                        [style.font-weight]="dataItem.modified === true ? 'bold' : 'normal'">
-                        {{dataItem.importValue}}
-                    </div>
-                    <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowInit" class="has-init-value">
-                        {{dataItem.initValue}}
-                    </div>
-                    <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditValue"
-                        type="text"
-                        class="import-value-input form-control"
-                        [(ngModel)]="dataItem.importValue"
-                        [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
-                    />
-                    <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditInit"
-                        type="text"
-                        class="has-init-value import-value-input form-control"
-                        [(ngModel)]="dataItem.initValue"
-                    />
-                    <span *ngIf="(dataItem.currentValueAction === CurrentValueAction.ShowInit || dataItem.currentValueAction === CurrentValueAction.EditInit)">
-                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info has-init-value"></i>
-                    </span>
+        <kendo-grid [data]="gridData" [pageSize]="25">
+            <ng-template kendoGridToolbarTemplate [position]="'top'">
+                <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
+                <div class="fieldsFilter col-sm-2">
+                    <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
+                        [data]="fieldsFilter.options"
+                        [textField]="'text'"
+                        [valueField]="'value'"
+                        [(ngModel)]="fieldsFilter.selected"
+                        (valueChange)="onFieldsFilter($event)"
+                        placeholder="Filter"
+                        class="form-control input-sm">
+                    </kendo-dropdownlist>
+                </div>
+                <div class="fieldsFilterText col-sm-3">
+                    <input [(ngModel)]="fieldsFilter.nameFilter.value"
+                           type="text" class="form-control"
+                           name="fieldsFilterText" placeholder="Filter on field name"
+                           (keyup)="onTextFilter()">
+                    <span *ngIf="fieldsFilter.nameFilter.value"
+                          class="fa fa-times form-control-feedback"
+                          (click)="clearTextFilter()"></span>
                 </div>
             </ng-template>
-        </kendo-grid-column>
+            <kendo-grid-column title="Name" field="name" [width]="100"></kendo-grid-column>
 
-        <!-- Reference Icons Column -->
-        <kendo-grid-column title="Reference" [width]="80">
-            <ng-template kendoGridCellTemplate let-dataItem>
-                <i *ngIf="dataItem.create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem, importBatch.fieldLabelMap)"
-                   title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
-                <i *ngIf="dataItem.update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem, importBatch.fieldLabelMap)"
-                   title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
-                <i *ngIf="dataItem.find && dataItem.find.query.length > 0"
-                   (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem, importBatch.fieldLabelMap)"
-                   title="View Find Results" class="field-info-icon fa fa-search"></i>
-            </ng-template>
-        </kendo-grid-column>
+            <!-- Current / Previous Column Label -->
+            <kendo-grid-column [width]="200"
+                [title]="currentPreviousColumnLabel"
+                field="currentPreviousValue"
+                [class]="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE ? '' : 'gray-background'"
+            >
+            </kendo-grid-column>
 
-        <!-- Errors Column -->
-        <kendo-grid-column title="Error(s)">
-            <ng-template kendoGridCellTemplate let-dataItem >
-                <div *ngFor="let error of dataItem.errors" class="error">
-                    * {{error}}
-                </div>
-            </ng-template>
-        </kendo-grid-column>
-    </kendo-grid>
+            <!-- Imported Value Column Label -->
+            <kendo-grid-column [width]="200" title="Imported Value" [class]="'import-value'">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                    <div class="import-item-container">
+                        <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowValue"
+                            [style.font-weight]="dataItem.modified === true ? 'bold' : 'normal'">
+                            {{dataItem.importValue}}
+                        </div>
+                        <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowInit" class="has-init-value">
+                            {{dataItem.initValue}}
+                        </div>
+                        <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditValue"
+                            type="text"
+                            class="import-value-input form-control"
+                            [(ngModel)]="dataItem.importValue"
+                            [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
+                        />
+                        <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditInit"
+                            type="text"
+                            class="has-init-value import-value-input form-control"
+                            [(ngModel)]="dataItem.initValue"
+                        />
+                        <span *ngIf="(dataItem.currentValueAction === CurrentValueAction.ShowInit || dataItem.currentValueAction === CurrentValueAction.EditInit)">
+                            <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info has-init-value"></i>
+                        </span>
+                    </div>
+                </ng-template>
+            </kendo-grid-column>
+
+            <!-- Reference Icons Column -->
+            <kendo-grid-column title="Reference" [width]="80">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                    <i *ngIf="dataItem.create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem, importBatch.fieldLabelMap)"
+                       title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
+                    <i *ngIf="dataItem.update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem, importBatch.fieldLabelMap)"
+                       title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
+                    <i *ngIf="dataItem.find && dataItem.find.query.length > 0"
+                       (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem, importBatch.fieldLabelMap)"
+                       title="View Find Results" class="field-info-icon fa fa-search"></i>
+                </ng-template>
+            </kendo-grid-column>
+
+            <!-- Errors Column -->
+            <kendo-grid-column title="Error(s)">
+                <ng-template kendoGridCellTemplate let-dataItem >
+                    <div *ngFor="let error of dataItem.errors" class="error">
+                        * {{error}}
+                    </div>
+                </ng-template>
+            </kendo-grid-column>
+        </kendo-grid>
 
     <div class="row footer">
         <tds-check-action
@@ -136,4 +136,5 @@
             <span>{{showActionButtons() ? 'Cancel' : 'Close'}}</span>
         </button>
     </div>
+
 </div>
