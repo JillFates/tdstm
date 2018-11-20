@@ -63,7 +63,7 @@
                                 </tr>
                                 <tr>
                                     <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.manufacturer.imp}','${assetInstance.manufacturer}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="manufacturer" /> }"
                                         nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
                                             <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${assetInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
@@ -91,7 +91,7 @@
                                         </kendo-dropdownlist>
                                     </td>
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${assetInstance.roomSource}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="roomSource" /> }"
                                         nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
@@ -147,7 +147,7 @@
 
                                     <!-- Rack Source/Target Select & New Fields -->
                                     <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetInstance.rackSource}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="rackSource" /> }"
                                         nowrap="nowrap" id="rackId">
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover"  data-content="Rack/Cabinet">Rack/Cabinet</label>
                                     </td>
@@ -230,7 +230,7 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetInstance.shortName}" tabindex="16" ngmodel="model.asset.shortName"/>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetInstance.os}" tabindex="24" ngmodel="model.asset.os" />
                                     <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetInstance.sourceRackPosition}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="sourceRackPosition" /> }"
                                         nowrap="nowrap">
                                         <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
                                     </td>
