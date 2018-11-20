@@ -45,7 +45,7 @@
 
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.locationSource.imp}','${assetEntity.sourceLocationName}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.locationSource.imp}" value="${assetEntity.sourceLocationName}" />}"
                                         nowrap="nowrap">
                                         <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
                                     </td>
@@ -68,7 +68,7 @@
 
                                    <g:if test="${!(assetEntity.assetType in ['VM'])}">
                                         <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${roomSource?.roomName}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.roomSource.imp}" value="${roomSource?.roomName}" />}"
                                             nowrap="nowrap">
                                             <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
                                         </td>
@@ -84,7 +84,7 @@
                                     <%-- rackable --%>
 									<g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
                                         <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetEntity.rackSource?.tag}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.rackSource.imp}" value="${assetEntity.rackSource?.tag}" />}"
                                             nowrap="nowrap" id="rackId">
                                             <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
                                         </td>
@@ -107,7 +107,7 @@
 
                                     <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
                                         <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetEntity.sourceRackPosition}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.sourceRackPosition.imp}" value="${assetEntity.sourceRackPosition}" />}"
                                             nowrap="nowrap">
                                             <label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
                                                 Position
@@ -120,7 +120,7 @@
 
                                     <g:if test="${assetEntity.assetType in ['Blade']}">
                                         <td class="label positionLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceBladePosition.imp}','${assetEntity.sourceBladePosition}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.sourceBladePosition.imp}" value="${assetEntity.sourceBladePosition}" />}"
                                             nowrap="nowrap">Position</td>
                                         <td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}">${assetEntity.sourceBladePosition}</td>
                                         <td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}">${assetEntity.targetBladePosition}</td>
@@ -140,7 +140,7 @@
                                         <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
                                     </td>
                                     <td class="label ${standardFieldSpecs.size.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${assetEntity.size}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.size.imp}" value="${assetEntity.size}" /> }"
                                         nowrap="nowrap">
                                         <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
                                             Size/Scale
@@ -159,7 +159,7 @@
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}" />
                                     <g:if test="! assetEntity.isVM()">
                                         <td class="label ${standardFieldSpecs.truck.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.truck.imp}','${assetEntity.truck}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField importance="${standardFieldSpecs.truck.imp}" value="${assetEntity.truck}" />}"
                                             nowrap="nowrap">
                                             <label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
                                                 Truck/Cart/Shelf

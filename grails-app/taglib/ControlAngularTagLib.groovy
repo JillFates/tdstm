@@ -264,6 +264,22 @@ class ControlAngularTagLib {
 	}
 
 	/**
+	 * Used to determinate if the Field should be or not Highlighted
+	 */
+	def highlightedField = { Map attrs ->
+		String fieldImportance = attrs.importance ?: [:]
+		String value = ( attrs.value ?: '' )
+		if (!fieldImportance) {
+			throw new InvalidParamException('<tdsAngular:highlightedField> tag requires fieldImportance=importance')
+		}
+
+        def isImportantClass = 'YG'.indexOf(fieldImportance.toUpperCase()) != -1
+		boolean hasValue = value?.trim()
+
+        out << isImportantClass && hasValue == false;
+	}
+
+	/**
 	 * Generates a SELECT HTML control based on the field specification and the
 	 * parameters passed to the method.
 	 * @param fieldSpec - the map of field specifications
