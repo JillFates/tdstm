@@ -198,7 +198,7 @@
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
                                 <g:link class="mmlink" controller="module" action="asset" id="views">
-                                    <asset:image src="icons/cat.png" width="16" height="16" alt="Dependencies" style="font-size:20px; margin-right: 0px;" /> View Manager
+                                    <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> View Manager
                                 </g:link>
                             </li>
                             <li class="divider"></li>
