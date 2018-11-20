@@ -84,8 +84,11 @@ export class HeaderComponent {
 			}
 		);
 
-		// TODO : TM-13098 Jorge - what is going on with this?  This is null some times and blows up
-		jQuery('.menu-parent-tasks > a')[0].onclick = null;
+		// Helps to avoid a hardcoded event on the menu being used on the legacy pages 'showMegaMenu'
+		let showMegaMenu = jQuery('.menu-parent-tasks > a');
+		if (showMegaMenu && showMegaMenu[0]) {
+			showMegaMenu[0].onclick = null;
+		}
 
 		this.headerListeners();
 	}
