@@ -12,13 +12,16 @@ export class DependenciesColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				type: 'text',
-				width: 160
+				width: 160,
+				locked: true
+
 			},
 			{
 				label: 'Asset Type',
 				property: 'assetType',
 				type: 'text',
-				width: 120
+				width: 120,
+				locked: true
 			},
 			{
 				label: 'Bundle',
@@ -60,7 +63,7 @@ export class DependenciesColumnModel {
 				label: 'Comment',
 				property: 'comment',
 				type: 'text',
-				width: 100
+				width: 150
 			},
 			{
 				label: 'Frequency',
