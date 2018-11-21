@@ -31,7 +31,7 @@ abstract class AssetSaveUpdateStrategy {
 
 	protected static SecurityService securityService = Holders.grailsApplication.mainContext.getBean('securityService')
 
-	protected final static String DEFAULT_DATE_FORMAT = TimeUtil.FORMAT_DATE_TIME_6
+	protected final static String DEFAULT_DATE_FORMAT = TimeUtil.FORMAT_DATE_ISO8601
 
 
 	/**
