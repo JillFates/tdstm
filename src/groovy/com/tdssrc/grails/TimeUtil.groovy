@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
+import org.apache.xml.security.c14n.implementations.Canonicalizer11_OmitComments
 import org.springframework.util.Assert
 
 import javax.servlet.http.HttpSession
@@ -33,14 +34,14 @@ class TimeUtil {
 	static final String TIMEZONE_ATTR = 'CURR_TZ'
 	static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
 
-	// Valid date time formats
+	// Valid date and datetime formats
+	// These formats are use for display only
 	static final String FORMAT_DATE         = "MM/dd/yyyy"
 	static final String FORMAT_DATE_TIME    = "MM/dd/yyyy hh:mm a"
 	static final String FORMAT_DATE_TIME_2  = "MM-dd-yyyy hh:mm:ss a"
 	static final String FORMAT_DATE_TIME_3  = "E, d MMM 'at ' hh:mm a"
 	static final String FORMAT_DATE_TIME_4  = "MM/dd kk:mm"
 	static final String FORMAT_DATE_TIME_5  = "yyyyMMdd"
-	static final String FORMAT_DATE_TIME_6  = "yyyy-MM-dd"
 	static final String FORMAT_DATE_TIME_7  = "dd-MMM"
 	static final String FORMAT_DATE_TIME_8  = "MMM dd,yyyy hh:mm a"
 	static final String FORMAT_DATE_TIME_9  = "MM-dd-yyyy hh:mm a"
@@ -62,6 +63,8 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
 	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
 
+	// These formats are use for parsing
+	static final String FORMAT_DATE_ISO8601  = "yyyy-MM-dd"
 	static final String FORMAT_DATE_TIME_ISO8601   = "yyyy-MM-dd'T'HH:mm'Z'"    // Quoted "Z" to indicate UTC, no timezone offset
 	static final String FORMAT_DATE_TIME_ISO8601_2 = "yyyy-MM-dd'T'HH:mm:ss'Z'" // Quoted "Z" to indicate UTC, no timezone offset (with seconds)
 
@@ -251,7 +254,7 @@ class TimeUtil {
 	 * @return  the specified date in GMT in SQL format
 	 */
 	static String gmtDateSQLFormat(Date date) {
-		formatDateTimeWithTZ defaultTimeZone, date, new SimpleDateFormat(FORMAT_DATE_TIME_6)
+		formatDateTimeWithTZ defaultTimeZone, date, new SimpleDateFormat(FORMAT_DATE_ISO8601)
 	}
 
 	/**
@@ -482,23 +485,64 @@ class TimeUtil {
 	}
 
 	/**
+	 * Used to parse a date string value into a Date, based in the ISO8601 date formatType.
+	 * NOTE To parse datetime Strings {@code parseISO8601DateTime()} function should be used.
+	 *
+	 * @param dateString the date to format
+	 * @return The date if the parse was successful, null otherwise.
+	 */
+	@CompileStatic
+	static Date parseISO8601Date(String dateString) {
+		if (StringUtil.isBlank(dateString)) {
+			return null
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_ISO8601)
+		parseDate(dateString, sdf)
+	}
+
+	/**
+	 * Used to parse a datetime string value into a Date, based in the ISO8601 datetime formatType.
+	 * NOTE To parse just date Strings (with no time) {@code parseISO8601Date()} function should be used.
+	 *
+	 * @param dateTimeString the date time to format
+	 * @return The date if the parse was successful, null otherwise.
+	 */
+	@CompileStatic
+	static Date parseISO8601DateTime(String dateTimeString) {
+		if (StringUtil.isBlank(dateTimeString)) {
+			return null
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601)
+		Date date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
+		if (!date) {
+			// the date format is incorrect
+			sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601_2)
+			date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
+		}
+		return date
+	}
+
+	/**
 	 * Used to parse a string value into a Date using a knowed DateFormat class. If the parse fails the
 	 * method will return a null
 	 * @param dateString - the String value of the date to be parsed
 	 * @param formatter - the DateFormat object to use to parse the date
 	 * @return The date or null if unparseable
 	 */
+	@CompileStatic
 	static Date parseDate(String dateString, DateFormat formatter) {
-		if (StringUtil.isBlank(dateString)) return null
+		if (StringUtil.isBlank(dateString)) {
+			return null
+		}
 		try {
 			Date result = formatter.parse(dateString)
 			result.clearTime()
 			return result
 		}
 		catch (e) {
-			logger.debug "parseDate() encountered invalid date ({}) format '{}' : {}",
-					dateString, formatter?.toPattern(), e.message, e
+			logger.debug "parseDate() encountered invalid date ({}) ", dateString
 		}
+		return null
 	}
 
 	/**
@@ -507,11 +551,15 @@ class TimeUtil {
 	 * @param the formatterType defines the format to be used
 	 * @return the Date or null if there's a problem
 	 */
-	static Date parseDateTime(String dateString, String formatterType = FORMAT_DATE_TIME) {
+	@CompileStatic
+	static Date parseDateTime(String dateString, String formatterType = FORMAT_DATE_TIME, String timeZone = null) {
 		if (StringUtil.isBlank(dateString)) {
 			return null
 		}
-		parseDateTimeWithFormatter(userPreferenceService.timeZone, dateString, createFormatter(formatterType))
+		if (timeZone == null) {
+			timeZone = userPreferenceService.timeZone
+		}
+		parseDateTimeWithFormatter(timeZone, dateString, createFormatter(formatterType))
 	}
 
 	/**
@@ -521,6 +569,7 @@ class TimeUtil {
 	 * @param formatter - the string format that defines the layout of the datetime
 	 * @return the Date or null if there's a problem
 	 */
+	@CompileStatic
 	static Date parseDateTimeWithFormatter(String tzId, String dateString, DateFormat formatter) {
 		if (StringUtil.isBlank(dateString)) {
 			return null
@@ -529,7 +578,7 @@ class TimeUtil {
 		try {
 			return formatter.parse(dateString)
 		} catch (e) {
-			logger.debug 'Invalid DateTime: {}, {}, {}, {}', dateString, tzId, formatter.toPattern(), e.message
+			logger.debug "parseDateTimeWithFormatter() encountered invalid DateTime ({}) ", dateString
 		}
 	}
 
@@ -589,9 +638,6 @@ class TimeUtil {
 			case FORMAT_DATE_TIME_5:
 				format = FORMAT_DATE_TIME_5
 				break
-			case FORMAT_DATE_TIME_6:
-				format = FORMAT_DATE_TIME_6
-				break
 			case FORMAT_DATE_TIME_7:
 				format = isMiddleEndian ? "MMM-dd" : FORMAT_DATE_TIME_7
 				break
@@ -649,6 +695,7 @@ class TimeUtil {
 			case FORMAT_DATE_TIME_25:
 				format = isMiddleEndian ? FORMAT_DATE_TIME_25 : "dd/MM/yyyy hh:mm"
 				break
+			case FORMAT_DATE_ISO8601:
 			case FORMAT_DATE_TIME_26:
 			case FORMAT_DATE_TIME_ISO8601:
 			case FORMAT_DATE_TIME_ISO8601_2:
@@ -1025,24 +1072,28 @@ class TimeUtil {
 	}
 
 	/**
-	 * Parses a string value and validates that is in the specified format.
+	 * Parses a string value and validates that is in the ISO8601 Date format.
+	 * (ISO8601 Date format is "yyyy-MM-dd", and is referenced in the FORMAT_DATE_ISO8601 constant).
 	 *
 	 * @param dateString  The date to validate
 	 * @param format  The date format that will be used to validate the given dateString
 	 * @return  {@code true} if the dateString is in the specified format, {@code false} otherwise
 	 */
-	static boolean validateFormat(String dateString, String format) {
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat(format)
-			Date date = sdf.parse(dateString)
-			if (!dateString.equals(sdf.format(date))) {
-				// the date format is incorrect
-				return false
-			}
-		} catch (ParseException e) {
-			// the date format is invalid
-			return false
-		}
-		return true
+	@CompileStatic
+	static boolean canParseDate(String dateString) {
+		parseISO8601Date(dateString)
+	}
+
+	/**
+	 * Parses a string value and validates that is in the ISO8601 DateTime format.
+	 * (ISO8601 DateTime format is "yyyy-MM-dd'T'HH:mm'Z'" or "yyyy-MM-dd'T'HH:mm:ss'Z'",
+	 * and is referenced in the FORMAT_DATE_TIME_ISO8601 and FORMAT_DATE_TIME_ISO8601_2 constants respectively).
+	 *
+	 * @param dateString  The date to validate
+	 * @return  {@code true} if the dateString is in ISO8601 Date Time Format, {@code false} otherwise
+	 */
+	@CompileStatic
+	static boolean canParseDateTime(String dateString) {
+		parseISO8601DateTime(dateString)
 	}
 }
