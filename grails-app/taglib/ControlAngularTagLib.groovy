@@ -267,24 +267,25 @@ class ControlAngularTagLib {
 	/**
 	 * Used to determinate if the Field should be or not Highlighted
      * FE Equivalent: asset-common-helper.ts
+	 * @param fieldSpec - the field spec Map
+	 * @param asset - the domain object
+	 * @param fieldName - the field
+	 * @param domainField - the field on the domain Object (optional)
 	 */
 	def highlightedField = { Map attrs ->
 		Map fieldSpec = attrs.fieldSpec ?: [:]
-		AssetEntity assetEntity = attrs.asset ?: [:]
+		AssetEntity domainObject = attrs.asset ?: [:]
 		String fieldName = ( attrs.fieldName ?: '' )
-		String value = attrs.fieldValue
+		String domainField = attrs.domainField
 
-		if (!fieldSpec || !assetEntity || !fieldName) {
-			throw new InvalidParamException('<tdsAngular:highlightedField> tag requires fieldSpec=standardField Map and asset=assetEntity and fieldName')
+		if (!fieldSpec || !domainObject || !fieldName) {
+			throw new InvalidParamException('<tdsAngular:highlightedField> tag requires fieldSpec=standardField Map and asset=domainObject and fieldName')
 		}
 
-		// Get the value from the Model
-		if (!value) {
-			value = assetEntity[fieldName]
-		}
+		def value = domainField && domainField != null ? domainObject[domainField] : domainObject[fieldName]
 
         def isImportantClass = 'YG'.indexOf(fieldSpec[fieldName].imp.toUpperCase()) != -1
-		boolean hasValue = value?.trim()
+		boolean hasValue = (value != '' && value != null) || value?.trim()
 
         out << isImportantClass && hasValue == false;
 	}

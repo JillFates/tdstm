@@ -45,7 +45,7 @@
 
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}"
-                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="locationSource" fieldValue="${assetEntity.sourceLocationName}" />}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="locationSource" domainField="sourceLocationName" />}"
                                         nowrap="nowrap">
                                         <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
                                     </td>
@@ -68,7 +68,7 @@
 
                                    <g:if test="${!(assetEntity.assetType in ['VM'])}">
                                         <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="roomSource" fieldValue="${roomSource?.roomName}" />}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="roomSource" />}"
                                             nowrap="nowrap">
                                             <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
                                         </td>
@@ -84,7 +84,7 @@
                                     <%-- rackable --%>
 									<g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
                                         <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="rackSource" value="${assetEntity.rackSource?.tag}" />}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="rackSource" />}"
                                             nowrap="nowrap" id="rackId">
                                             <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
                                         </td>
