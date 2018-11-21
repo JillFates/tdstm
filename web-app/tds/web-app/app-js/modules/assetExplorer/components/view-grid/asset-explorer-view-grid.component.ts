@@ -56,7 +56,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
-	@Output() modelChange = new EventEmitter<boolean>();
+	@Output() modelChange = new EventEmitter<void>();
 	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Input() edit: boolean;
@@ -70,6 +70,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
+		this.gridStateChange.emit({...this.gridState, skip: 0});
+		this.modelChange.emit();
 	}
 
 	public currentFields = [];
