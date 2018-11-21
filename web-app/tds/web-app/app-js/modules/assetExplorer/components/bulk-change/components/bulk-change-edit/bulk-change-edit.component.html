@@ -123,7 +123,6 @@
                                     <!-- Asset Tag Fields -->
                                     <tds-asset-tag-selector *ngIf="canShowControl('asset-tag-selector', rowIndex)"
                                                             [tagList]="tagList"
-                                                            [showSwitch]="false"
                                                             (valueChange)="onTagFilterChange(column,rowIndex, $event)">
                                     </tds-asset-tag-selector>
 

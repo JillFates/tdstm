@@ -27,14 +27,14 @@ export class DependenciesColumnModel {
 				label: 'Tags Asset',
 				property: 'tagsAsset',
 				type: 'text',
-				width: 120,
+				width: 220,
 				locked: false
 			},
 			{
 				label: 'Tags Dependency',
 				property: 'tagsDependency',
 				type: 'text',
-				width: 120,
+				width: 220,
 				locked: false
 			},
 			{
