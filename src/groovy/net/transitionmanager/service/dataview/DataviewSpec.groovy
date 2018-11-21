@@ -1,7 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.asset.FieldSpecCache
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -123,7 +123,6 @@ class DataviewSpec {
 			fieldSpec: fieldSpecCache?.getFieldSpec(command.sortDomain, command.sortProperty)
 		]
 
-		//TODO: problems with this Ojbect when it is serialized from JSON data
 		this.spec.columns = this.spec.columns.collect {
 			Map map = it as Map
 			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))

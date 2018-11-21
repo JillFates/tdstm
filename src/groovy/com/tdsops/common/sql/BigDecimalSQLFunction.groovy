@@ -34,7 +34,7 @@ import org.hibernate.type.Type
  * </ul>
  *
  */
-class FieldSpecSQLFunction implements SQLFunction {
+class BigDecimalSQLFunction implements SQLFunction {
 
 	@Override
 	boolean hasArguments() {

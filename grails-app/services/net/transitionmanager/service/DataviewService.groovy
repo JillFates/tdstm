@@ -13,8 +13,8 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
-import net.transitionmanager.asset.FieldSpec
-import net.transitionmanager.asset.FieldSpecCache
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -337,7 +337,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	Map getAssetIdsHql(Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
 		Dataview dataview = get(Dataview, dataViewId, project)
-		// TODO: Ask John how to test this functionality
+
 		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
 		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview, fieldSpecCache)
 
@@ -681,7 +681,6 @@ class DataviewService implements ServiceMethods {
 
 			// Check if the user provided a filter expression.
 			if (StringUtil.isNotBlank(filterFor(column))) {
-				String whereProperty = wherePropertyFor(column)
 
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -690,7 +689,7 @@ class DataviewService implements ServiceMethods {
 						domain: domainFor(column),
 						filter: filterFor(column),
 						type: typeFor(column),
-						whereProperty: whereProperty,
+						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
 						fieldSpec: column.fieldSpec
 				])

@@ -1,5 +1,7 @@
-package net.transitionmanager.asset
+package net.transitionmanager.dataview
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.hibernate.type.DateType
 import org.hibernate.type.LongType
 import org.hibernate.type.StringType
@@ -10,8 +12,8 @@ import java.sql.Timestamp
 /**
  * Manage Field Spec definition using the following JSON structure saved in Database
  * <pre>
- * {
- * 	"control": "String",
+ *	{
+ *		"control": "String",
  *       "default": "",
  *       "field": "custom10",
  *       "imp": "N",
@@ -22,21 +24,22 @@ import java.sql.Timestamp
  *       "tip": "",
  *       "udf": 1,
  *			{ "constraint: {
- * 		   		"maxRange": 100,
+ *				"maxRange": 100,
  *         		"minRange": 0,
  *         		"precision": 2,
  *         		"separator": true,
  *         		"allowNegative": true
  *         		"required": 0
- *		}
- * }
- * </pre>
+ *			}
+ *	}
+ *</pre>
  */
+@CompileStatic
 class FieldSpec {
 
 	public static final CAST_BIG_DECIMAL_FUNCTION = 'cast_big_decimal'
 
-	String type
+	String control
 	Object defaultValue
 	String field
 	String label
@@ -49,8 +52,9 @@ class FieldSpec {
 	Boolean allowNegative
 	Integer required
 
+	@CompileStatic(TypeCheckingMode.SKIP)
 	FieldSpec(Map fieldSpecMap) {
-		this.type = fieldSpecMap.control
+		this.control = fieldSpecMap.control
 		this.defaultValue = fieldSpecMap."default"
 		this.field = fieldSpecMap.field
 		this.label = fieldSpecMap.label
@@ -71,54 +75,11 @@ class FieldSpec {
 		return this.field.startsWith('custom')
 	}
 	/**
-	 * A field spec is numeric when type == 'Number'
-	 * @return true if type == 'Number' otherwise it returns false
+	 * A field spec is numeric when control == 'Number'
+	 * @return true if control == 'Number' otherwise it returns false
 	 */
 	Boolean isNumeric() {
-		return this.type == 'Number'
-	}
-
-	/**
-	 * <p>Create hibernate type based on FieldSpec constraints definition</p>
-	 * <pre>
-	 * 	"constraints": {
-	 * 		"maxRange": 100,
-	 *      "minRange": 0,
-	 *      "precision": 2,
-	 *      "separator": true,
-	 *      "allowNegative": true,
-	 *      "required": 0
-	 *  } </pre>
-	 * @return a string with numeric hibernate type to be used in cast HQL sentence
-	 */
-	String buildNumericHibernateType() {
-		if (precision > 0) {
-			return CAST_BIG_DECIMAL_FUNCTION
-		} else {
-			return LongType.INSTANCE.name
-		}
-	}
-
-	/**
-	 * <p>Create Number class based on FieldSpec constraints definition</p>
-	 * <pre>
-	 * 	"constraints": {
-	 * 	"maxRange": 100,
-	 *      "minRange": 0,
-	 *      "precision": 2,
-	 *      "separator": true,
-	 *      "allowNegative": true,
-	 *      "required": 0
-	 *}* </pre>
-	 *
-	 * @return
-	 */
-	Class<?> buildNumericClass() {
-		if (precision > 0) {
-			return BigDecimal
-		} else {
-			return Long
-		}
+		return this.control == 'Number'
 	}
 
 	/**
@@ -265,25 +226,7 @@ class FieldSpec {
 	 * @see https://www.tutorialspoint.com/hibernate/hibernate_mapping_types.htm
 	 */
 	String getHibernateType() {
-
-		String hibernateType = ''
-
-		switch (type) {
-			case 'Number':
-				hibernateType = buildNumericHibernateType()
-				break
-			case 'Date':
-				hibernateType = DateType.INSTANCE.name
-				break
-			case 'DateTime':
-				hibernateType = TimestampType.INSTANCE.name
-				break
-			default:
-				hibernateType = StringType.INSTANCE.name
-				break
-		}
-
-		return hibernateType
+		return mapHibernateCastType[control](this)
 	}
 
 	/**
@@ -293,25 +236,7 @@ class FieldSpec {
 	 * @return a {@code Class < ? >} type instance
 	 */
 	Class<?> getClassType() {
-
-		Class<?> classType = null
-
-		switch (type) {
-			case 'Number':
-				classType = buildNumericClass()
-				break
-			case 'Date':
-				classType = Date
-				break
-			case 'DateTime':
-				classType = Timestamp
-				break
-			default:
-				classType = String
-				break
-		}
-
-		return classType
+		return mapClassType[control](this)
 	}
 
 	/**
@@ -319,23 +244,19 @@ class FieldSpec {
 	 * <p>It calculates Hibernate type, and prepares cast defintion using standard hibernate cast function + type
 	 * or a custom one using custom_big_decimal.</p>
 	 *
-	 * <pre>
-	 *
-	 * </pre>
-	 *
 	 * @param property
 	 * @return a HSQL cast sentence to be used in DataviewService
-	 * @see com.tdsops.common.sql.FieldSpecSQLFunction
+	 * @see com.tdsops.common.sql.BigDecimalSQLFunction
 	 * @see net.transitionmanager.service.DataviewService#propertyFor(java.util.Map)
 	 */
-	String getHibernateCastSentence(String property){
+	String getHibernateCastSentence(String property) {
 
 		String castSentence
 		String hibernateType = getHibernateType()
 
-		switch (type) {
+		switch (control) {
 			case 'Number':
-				if(hibernateType == CAST_BIG_DECIMAL_FUNCTION){
+				if (hibernateType == CAST_BIG_DECIMAL_FUNCTION) {
 					castSentence = "$CAST_BIG_DECIMAL_FUNCTION($property, $precision)"
 				} else {
 					castSentence = "cast($property as $hibernateType)"
@@ -348,4 +269,50 @@ class FieldSpec {
 
 		return castSentence
 	}
+
+	/**
+	 * <p>This Map determines the class type to be used in FieldSearchData.</p>
+	 * If key used in this Map is 'Number', it is necessary to define, by precision,
+	 * if field spec belongs to a Long or a Decimal number<br>
+	 * <p>It creates Number class based on FieldSpec constraints definition</p>
+	 * <pre>
+	 * 	"constraints": {
+	 * 		"maxRange": 100,
+	 *      "minRange": 0,
+	 *      "precision": 2,
+	 *      "separator": true,
+	 *      "allowNegative": true,
+	 *      "required": 0
+	 *  }
+	 * </pre>
+	 * Then It can returns this:
+	 * <pre>
+	 *     return mapClassType[control](new FieldSpec(control: 'Date')) == java.util.Date
+	 *     return mapClassType[control](new FieldSpec(control: 'DateTime')) == java.sql.Timestamp
+	 *     return mapClassType[control](new FieldSpec(control: 'Number', precision: 0)) == java.lang.Long
+	 *     return mapClassType[control](new FieldSpec(control: 'Number', precision: 2)) == java.math.BigDecimal
+	 * </pre>
+	 * * @see FieldSpec#getClassType()
+	 */
+	static Map<String, Closure<Object>> mapClassType = [
+		'Number'  : { FieldSpec fieldSpec -> fieldSpec.precision > 0 ? BigDecimal : Long },
+		'Date'    : { FieldSpec fieldSpec -> Date },
+		'DateTime': { FieldSpec fieldSpec -> Timestamp },
+	].withDefault { String key -> { FieldSpec fieldSpec -> String } }.asImmutable()
+
+	/**
+	 * <p>This Map determines hibernate cast type for FieldSearchData.</p>
+	 * If key used in this Map is Number, it is necessary to define, defined by precision,
+	 * if field spec is going to user a custom cast function ({@code CAST_BIG_DECIMAL_FUNCTION}) or a simple cast hibernate type
+	 *
+	 * @see FieldSpec#getHibernateType()
+	 * @see com.tdsops.common.sql.BigDecimalSQLFunction
+	 */
+	static Map<String, Closure<Object>> mapHibernateCastType = [
+		'Number'  : { FieldSpec fieldSpec -> fieldSpec.precision > 0 ? CAST_BIG_DECIMAL_FUNCTION : LongType.INSTANCE.name },
+		'Date'    : { FieldSpec fieldSpec -> DateType.INSTANCE.name },
+		'DateTime': { FieldSpec fieldSpec -> TimestampType.INSTANCE.name },
+	].withDefault { String key ->
+		{ FieldSpec fieldSpec -> StringType.INSTANCE.name }
+	}.asImmutable()
 }

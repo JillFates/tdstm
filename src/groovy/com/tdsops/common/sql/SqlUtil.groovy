@@ -3,7 +3,7 @@ package com.tdsops.common.sql
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.asset.FieldSpec
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
@@ -563,6 +563,9 @@ class SqlUtil {
 		if(fieldSpec?.isCustom()){
 			isNumeric = fieldSpec.isNumeric()
 		} else {
+
+
+
 			def properties = fsd.domain.metaClass.properties
 			// Look up the field type using the column.
 			Class fieldType = properties.find { it.name == fsd.column }?.type

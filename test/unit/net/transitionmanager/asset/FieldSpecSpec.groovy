@@ -1,5 +1,6 @@
 package net.transitionmanager.asset
 
+import net.transitionmanager.dataview.FieldSpec
 import org.hibernate.type.DateType
 import org.hibernate.type.LongType
 import org.hibernate.type.StringType

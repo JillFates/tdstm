@@ -1,4 +1,4 @@
-package net.transitionmanager.asset
+package net.transitionmanager.dataview
 
 import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.service.CustomDomainService
