@@ -99,7 +99,7 @@ class BulkChangeList implements ServiceMethods {
 	 */
 	static void bulkReplace(Class type, String value, String field, List<Long> ids = [], Map idsFilterQuery = null) {
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 		params.value = value
 
 		AssetEntity.executeUpdate("UPDATE ${type.simpleName} a SET $field = :value WHERE a.id in($queryForIds)", params)
