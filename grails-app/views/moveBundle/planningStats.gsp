@@ -269,7 +269,7 @@ $(document).ready(function() {
 								</g:link></td>
 							<td><g:link controller="application" action="list"
 									params="[filter:'application', toValidate:ValidationType.PLAN_READY]"
-									class="links">Ready</g:link></td>
+									class="links">Plan Ready</g:link></td>
 						</tr>
 					</table>
 					<br />
