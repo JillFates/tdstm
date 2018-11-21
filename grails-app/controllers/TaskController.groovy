@@ -1,17 +1,15 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.TaskDependency
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.DictionaryItem
@@ -28,7 +26,9 @@ import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.GraphvizService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.RunbookService
@@ -141,59 +141,24 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
-		Map requestParams = null
+		Map requestParams
 		if (request.format == 'json') {
 			requestParams = request.JSON
 		} else {
 			requestParams = params
 		}
 
-		def task = AssetComment.get(requestParams.id)
-		Project project = securityService.userCurrentProject
 		String errorMsg = ''
-		String assignedTo = ''
+		String assignedToName = ''
 
-		if (task) {
-			if (task.project.id != project.id) {
-				log.error "assignToMe - Task(#$task.taskNumber id:$task.id/$task.project) not associated with user($securityService.currentUsername) project ($project)"
-				errorMsg = "It appears that you do not have permission to change the specified task"
-			}
-			else {
-
-				// Double check to see if the status changed while the user was reassigning so that they
-				if (! errorMsg && requestParams.status) {
-					if (task.status != requestParams.status) {
-						log.warn "assignToMe - Task(#:$task.taskNumber id:$task.id) status changed around when $securityService.currentUsername was assigning to self"
-						def whoDidIt = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
-						switch (task.status) {
-							case STARTED: errorMsg = "The task was STARTED by $whoDidIt"; break
-							case COMPLETED:    errorMsg = "The task was COMPLETED by $whoDidIt"; break
-							default:      errorMsg = "The task status was changed to '$task.status'"
-						}
-					}
-				}
-
-				if (! errorMsg ) {
-					// If there were no errors then try reassign the Task
-					String belongedTo = task.assignedTo ?: 'Unassigned'
-					Person person = securityService.userLoginPerson
-					task.assignedTo = person
-					if (task.save(flush:true)) {
-						assignedTo = person.toString()
-						if (task.isRunbookTask()) taskService.addNote(task, person, "Assigned task to self, previously assigned to $belongedTo")
-					}
-					else {
-						log.error "assignToMe - Task(#:$task.taskNumber id:$task.id) failed while trying to reassign : $GormUtil.allErrorsString(task)"
-						errorMsg = "An unexpected error occured while assigning the task to you."
-					}
-				}
-			}
-		}
-		else {
-			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - $requestParams.id"
+		try {
+			Person assignedTo = taskService.assignToMe(requestParams.id as Long, requestParams.status)
+			assignedToName = assignedTo.toString()
+		} catch (EmptyResultException | ServiceException e) {
+			errorMsg = e.message
 		}
 
-		def map = [assignedToName: assignedTo, errorMsg: errorMsg]
+		def map = [assignedToName: assignedToName, errorMsg: errorMsg]
 		render map as JSON
 	}
 
@@ -945,53 +910,20 @@ digraph runbook {
 
 	/**
 	 * Used in Task Manager action bar to change estTime.
-	 * @param : day : 1,2 or 7days.
+	 * @param : day : 1, 2 or 7 days.
 	 * @param : commentId.
 	 * @return : retMap.
 	 */
 	@HasPermission(Permission.TaskManagerView)
-	def changeEstTime() {
-		String etext = ''
-		def comment
-		def commentId = NumberUtils.toInt(params.commentId)
-		if (commentId > 0) {
-			def day = NumberUtils.toInt(params.day)
-			Project project = securityService.userCurrentProject
-			comment = AssetComment.findByIdAndProject(commentId,project)
-			def estDay = [1,2,7].contains(day) ? day : 0
-			if (comment) {
-				comment.estStart = TimeUtil.nowGMT().plus(estDay)
-
-				if (comment.duration > 0 && comment.durationScale) {
-					def additional
-					use (TimeCategory) {
-						switch (comment.durationScale) {
-							case TimeScale.M: additional = comment.duration.minutes; break
-							case TimeScale.H: additional = comment.duration.hours; break
-							case TimeScale.D: additional = comment.duration; break
-							case TimeScale.W: additional = comment.duration.weeks; break
-							default:          additional = comment.duration
-						}
-						comment.estFinish = comment.estStart + additional
-					}
-				} else {
-					comment.duration = 1
-					comment.durationScale = "D"
-					comment.estFinish = comment.estStart.plus(1)
-				}
-
-				if (!comment.hasErrors() && !comment.save(flush:true)) {
-					etext = "unable to update estTime"+GormUtil.allErrorsString(comment)
-					log.error etext
-				}
-			} else {
-				etext = "Requested comment does not exist. "
-			}
-		} else {
-				etext = "Requested comment does not exist. "
+	def changeEstTime(Long commentId, Integer day) {
+		Map<String, String> retMap = [etext: '', estStart: '', estFinish: '']
+		try {
+			AssetComment comment = taskService.changeEstTime(commentId, day)
+			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
+			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
+		} catch (EmptyResultException | InvalidParamException e) {
+			retMap['etext'] = e.message
 		}
-		def retMap = [etext: etext, estStart: TimeUtil.formatDateTime(comment?.estStart),
-		              estFinish: TimeUtil.formatDateTime(comment?.estFinish)]
 		render retMap as JSON
 	}
 

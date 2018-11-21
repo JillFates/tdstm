@@ -409,9 +409,11 @@ $(document).ready(function() {
 							<div class="col-md-2" style="padding-left: 0px;">
 								<div>
 									<table id="eventHeaderTableId" class="dashboard_right_table" style="border: none;">
-										<thead>
-										<tr><th style="background-color: transparent; line-height: 100px;" class="">&nbsp;</th></tr>
-										</thead>
+										<g:if test="${moveEventList.size() > 0}">
+											<thead>
+											<tr><th style="background-color: transparent; line-height: 100px;" class="">&nbsp;</th></tr>
+											</thead>
+										</g:if>
 										<tbody>
 										<tr>
 											<td class="dashboard_stat_icon_td"><tds:svgIcon name="application_menu" width="17" height="17" /></td>
@@ -473,42 +475,44 @@ $(document).ready(function() {
 							<div class="col-md-10 col-xs-10" style="padding-left: 0px; padding-right: 0px;">
 								<div id="eventDataTableId" style="overflow-y: hidden;">
 									<table class="dashboard_right_table dashboard_stat_table" style="border-spacing: 5px 0px; border-collapse: separate;">
-										<thead>
-                                            <tr>
-                                                <th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
-                                                    <div style="padding-bottom: 5px; font-size: 10px; text-align: right;"><b>Unassigned</b></div>
-                                                </th>
+										<g:if test="${moveEventList.size() > 0}">
+											<thead>
+												<tr>
+													<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
+														<div style="padding-bottom: 5px; font-size: 10px; text-align: right;"><b>Unassigned</b></div>
+													</th>
 
-                                                <g:each in="${moveEventList}" var="event">
-                                                    <th class="dashboard_stat_exec_tdmc" style="text-align: right !important; padding-right: 0px !important;">
-                                                        <div class="dashboard_stat_exec_tdmc_title">
-                                                            <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
-                                                                ${event.toString().length() > 18 ? event.toString().substring(0,15) + '...' : event}
-                                                            </g:link>
-                                                        </div>
-                                                    </th>
-                                                </g:each>
-                                                <th class="dashboard_stat_exec_tdmc_title"></th>
-                                            </tr>
-                                            <tr>
-                                                <g:each in="${moveEventList}" var="event">
-                                                    <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;" nowrap>
-                                                        <b>${eventStartDate[event.id]}</b>
-                                                    </td>
-                                                </g:each>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <g:each in="${moveEventList}" var="event">
-                                                    <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right">
-                                                        <b> ${event.runbookStatus ?: ''}</b>
-                                                    </td>
-                                                </g:each>
-                                                <td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;">
-                                                    <b>Done</b>
-                                                </td>
-                                            </tr>
+													<g:each in="${moveEventList}" var="event">
+														<th class="dashboard_stat_exec_tdmc" style="text-align: right !important; padding-right: 0px !important;">
+															<div class="dashboard_stat_exec_tdmc_title">
+																<g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
+																	${event.toString().length() > 18 ? event.toString().substring(0,15) + '...' : event}
+																</g:link>
+															</div>
+														</th>
+													</g:each>
+													<th class="dashboard_stat_exec_tdmc_title"></th>
+												</tr>
+												<tr>
+													<g:each in="${moveEventList}" var="event">
+														<td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;" nowrap>
+															<b>${eventStartDate[event.id]}</b>
+														</td>
+													</g:each>
+													<td></td>
+												</tr>
+												<tr>
+													<g:each in="${moveEventList}" var="event">
+														<td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right">
+															<b> ${event.runbookStatus ?: ''}</b>
+														</td>
+													</g:each>
+													<td class="dashboard_stat_exec_tdmc" style="font-size: 10px; text-align: right;">
+														<b>Done</b>
+													</td>
+												</tr>
 										</thead>
+										</g:if>
 										<tbody>
 
                                             <%-- Applications --%>

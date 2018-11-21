@@ -2,6 +2,7 @@ package e2e
 
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Dataview
@@ -56,7 +57,7 @@ class E2EProjectSpec extends Specification {
 	private TagTestHelper tagHelper = new TagTestHelper()
 	private ApplicationTestHelper appHelper = new ApplicationTestHelper()
 	private RecipeTestHelper recipeHelper = new RecipeTestHelper()
-	private AssetCommentTestHelper taskHelper = new AssetCommentTestHelper()
+	private AssetCommentTestHelper assetCommentsHelper = new AssetCommentTestHelper()
 	private SettingTestHelper settingHelper = new SettingTestHelper()
 	private Project project
 	private List<Project> projectsToBeDeleted = []
@@ -80,6 +81,8 @@ class E2EProjectSpec extends Specification {
 	private static numberOfAllAssetsApplications = 50
 	private List<Application> applicationsToBeEdited = []
 	private List<Application> applicationsToBeDeleted = []
+	private List<Application> applicationCommentToArchive = []
+	private List<Application> applicationComment = []
 	private List<Recipe> recipesToBeEdited = []
 	private List<Recipe> recipesToBeDeleted = []
 	private List<Recipe> recipesTaskGeneration = []
@@ -109,7 +112,7 @@ class E2EProjectSpec extends Specification {
 		bundleHelper.createBundle(originalData.bundleName2, project, m1PhysicalEvent)
 		projectProvider = providerHelper.createProvider(project, originalData.projectProvider)
 		recipeHelper.createRecipe(originalData.recipePrincipal, project, userLogin1.person)
-		taskHelper.createTask(originalData.taskPrincipal, project, userLogin1.person, buildoutEvent)
+		assetCommentsHelper.createTask(originalData.taskPrincipal, project, userLogin1.person, buildoutEvent)
 
 		dataFile = getJsonObjectFromFile()
 		browsersInParallel.each { browser ->
@@ -129,6 +132,12 @@ class E2EProjectSpec extends Specification {
 			createApplications(dataFile.applications, project, buildoutBundle)
 			applicationsToBeEdited.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeEdited, browser), project, buildoutBundle))
 			applicationsToBeDeleted.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeDeleted, browser), project, buildoutBundle))
+			Application application = appHelper.createApplication(sanitizeJsonObjectNameWithoutBaseName(dataFile.applicationCommentToArchive, browser), project, buildoutBundle)
+			applicationCommentToArchive.add(application)
+			assetCommentsHelper.addCommentsToAsset(dataFile.applicationCommentToArchive.comments, application, project)
+			application = appHelper.createApplication(sanitizeJsonObjectNameWithoutBaseName(dataFile.applicationComment, browser), project, buildoutBundle)
+			applicationComment.add(application)
+			assetCommentsHelper.addCommentsToAsset(dataFile.applicationComment.comments, application, project)
 			createCustomViews(project, userLogin1.person, getSanitizedViewObject(dataFile.customViews, dataFile.commonViewSchema, browser))
 			etlToBeTransformedWithPastedData.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, sanitizeJsonObjectName(dataFile.etlToBeTransformedWithPastedData, browser), ""))
 			etlToBeEdited.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, sanitizeJsonObjectName(dataFile.etlToBeEdited, browser), ""))
@@ -144,8 +153,8 @@ class E2EProjectSpec extends Specification {
 			recipesTaskGeneration.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeTaskGeneration, browser, false), project, userLogin1.person, dataFile.commonRecipeSourceCode))
 			recipesToBeDeleted.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeToBeDeleted, browser, false), project, userLogin1.person))
 			recipesToBeEdited.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeToBeEdited, browser, false), project, userLogin1.person))
-			tasksToBeEdited.add(taskHelper.createTask(formatToRandomValue(dataFile.taskToBeEdited, browser, false), project, userLogin1.person, buildoutEvent))
-			tasksToBeDeleted.add(taskHelper.createTask(formatToRandomValue(dataFile.taskToBeDeleted, browser, false), project, userLogin1.person, buildoutEvent))
+			tasksToBeEdited.add(assetCommentsHelper.createTask(formatToRandomValue(dataFile.taskToBeEdited, browser, false), project, userLogin1.person, buildoutEvent))
+			tasksToBeDeleted.add(assetCommentsHelper.createTask(formatToRandomValue(dataFile.taskToBeDeleted, browser, false), project, userLogin1.person, buildoutEvent))
 			// create 2 application custom field setting to be deleted
 			JSONObject customField = sanitizeCustomField(dataFile.customFieldToBeDeleted1, browser)
 			customFieldToBeDeleted1.add(customField)
@@ -180,6 +189,20 @@ class E2EProjectSpec extends Specification {
 			Application.findAllWhere([project: project]).size() >= numberOfAllAssetsApplications
 			applicationsToBeEdited.each { application -> Application.findWhere([assetName: application.assetName, project: project]) != null }
 			applicationsToBeDeleted.each { application -> Application.findWhere([assetName: application.assetName, project: project]) != null }
+			applicationCommentToArchive.each { application ->
+				originalData.applicationCommentToArchive.comments.each{ comment ->
+					AssetComment.all.find{
+						it.comment.startsWith(comment) && it.assetEntity == application && it.commentType == AssetCommentType.COMMENT
+					} != null
+				}
+			}
+			applicationComment.each { application ->
+				originalData.applicationComment.comments.each{ comment ->
+					AssetComment.all.find{
+						it.comment.startsWith(comment) && it.assetEntity == application && it.commentType == AssetCommentType.COMMENT
+					} != null
+				}
+			}
 			Dataview.findAllWhere([project: project, isSystem: false]).size() >= numberOfViews
 			etlToBeTransformedWithPastedData.each { script -> DataScript.findWhere([name: script.name, project: project]) != null }
 			etlToBeEdited.each { script -> DataScript.findWhere([name: script.name, project: project]) != null }
@@ -368,6 +391,17 @@ class E2EProjectSpec extends Specification {
 		data.label = formatToRandomValue(data.label, browser)
 		data.default = data.label
 		data.tip = "Tooltip for ${data.label}"
+		return data
+	}
+
+	/**
+	 * Sanitize a name property of a object
+	 * @param: data in object containing name propery
+	 * @param: browser
+	 * @return: JSON object
+	 */
+	private Map sanitizeJsonObjectNameWithoutBaseName(JSONObject data, String browser = ""){
+		data.name = "${browser} ${data.name}"
 		return data
 	}
 }

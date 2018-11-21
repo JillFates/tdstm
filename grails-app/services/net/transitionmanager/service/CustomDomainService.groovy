@@ -14,14 +14,17 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
-    public static final String ALL_ASSET_CLASSES = 'ASSETS'
+    static final String ALL_ASSET_CLASSES = 'ASSETS'
 	// Common Domian name (used to gather common fields in Domains)
-    public static final String COMMON = 'COMMON'
-    public static final String CUSTOM_FIELD_NAME_PART = 'custom'
+    static final String COMMON = 'COMMON'
+    static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
-    public static final int CUSTOM_USER_FIELD = 1
-    public static final int STANDARD_FIELD = 0
-    public static final int ALL_FIELDS = 2
+    static final int CUSTOM_USER_FIELD = 1
+    static final int STANDARD_FIELD = 0
+    static final int ALL_FIELDS = 2
+
+    static final List<String> CUSTOM_REQUIRED_BULK_ACTIONS = ["replace"]
+    static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
     SettingService settingService
     def jdbcTemplate
@@ -159,20 +162,22 @@ class CustomDomainService implements ServiceMethods {
 
     /**
      * Return a map with the field specs for the asset export. This include all the standard fields marked
-     * to be displayed, plus all custom fields regardless of them being marked for display.
+     * to be displayed (and special cases such as lastUpdated), plus all custom fields regardless of them
+     * being marked for display. It also takes into consideration the list of headers in the export template,
+     * as these fields need to be included as well.
      *
      * @param project - user's current project
      * @param domain - used to filter the fields for a particular domain.
+     * @param templateHeaders
      * @return a map with the field settings.
      */
-    Map getFieldSpecsForAssetExport(Project project, String domain) {
+    Map getFieldSpecsForAssetExport(Project project, String domain, List<String> templateHeaders) {
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
-
         for (String assetClassType : assetClassTypes) {
             Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
             if (fieldSpecMap) {
-                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1})
+                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1 || field.label in templateHeaders})
                 fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
             } else {
                 throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
@@ -198,7 +203,11 @@ class CustomDomainService implements ServiceMethods {
 
                 for (JSONObject field : customFieldSpec.fields) {
                     if (((String) field.field).startsWith('custom')) {
-                        field.bulkChangeActions = ["replace", "clear"] as JSONArray
+                        if(field?.constraints?.required){
+                            field.bulkChangeActions = CUSTOM_REQUIRED_BULK_ACTIONS as JSONArray
+                        }else {
+                            field.bulkChangeActions = CUSTOM_NON_REQUIRED_BULK_ACTIONS as JSONArray
+                        }
                     }
                 }
 
