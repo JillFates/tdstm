@@ -42,7 +42,7 @@ export class AssetCommonEdit implements OnInit {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			if (this.dateFormat) {
+			if (this.dateFormat != null) {
 				this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 			}
 	}
