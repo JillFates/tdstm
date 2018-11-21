@@ -215,7 +215,7 @@ class SettingServiceTests extends Specification {
         then: 'Then the call should throw the InvalidParamException'
             final InvalidParamException exception = thrown()
         and:
-            "JSON is not valid" == exception.message
+            exception.message.startsWith('Invalid JSON')
     }
 
     void 'Scenario 1: Calling save to create a new globally scoped setting'() {

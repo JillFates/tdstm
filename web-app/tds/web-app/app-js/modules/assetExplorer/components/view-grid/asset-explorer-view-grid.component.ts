@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
@@ -38,6 +38,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -48,21 +49,29 @@ declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
-export class AssetExplorerViewGridComponent implements OnInit {
+export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
+	@Input() data: any;
 	@Input() model: ViewSpec;
-	@Output() modelChange = new EventEmitter<boolean>();
+	@Input() gridState: State;
+	@Output() modelChange = new EventEmitter<void>();
+	@Output() justPlanningChange = new EventEmitter<boolean>();
+	@Output() gridStateChange = new EventEmitter<State>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
+		this.gridStateChange.emit({...this.gridState, skip: 0});
+		this.modelChange.emit();
 	}
 
 	public currentFields = [];
@@ -81,12 +90,6 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
-
-	state: State = {
-		skip: 0,
-		take: this.maxDefault,
-		sort: []
-	};
 	gridData: GridDataResult;
 	selectAll = false;
 	private columnFiltersOldValues = [];
@@ -94,7 +97,6 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	public bulkItems: number[] = [];
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
-	private bulkData: any;
 	private currentUser: any;
 
 	constructor(
@@ -104,22 +106,25 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
 		private userService: UserService) {
+	}
+
+	ngOnInit(): void {
+		this.gridData = {
+			data: [],
+			total: 0
+		};
 
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
-			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-			this.bulkCheckboxService.setPageSize(this.state.take);
+			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
+
+			this.bulkCheckboxService.setPageSize(this.gridState.take);
 			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
+			this.justPlanningChange.emit(this.justPlanning);
 			this.onReload();
 		});
 
-		// Listen to any Changes outside the model, like Asset Edit Views
-		this.eventListeners();
-		this.getCurrentUser();
-	}
-
-	ngOnInit(): void {
 		// Iterate Fields to get reference for this context
 		this.currentFields = this.fields.reduce((p, c) => {
 			return p.concat(c.fields);
@@ -129,6 +134,21 @@ export class AssetExplorerViewGridComponent implements OnInit {
 				label: f.label
 			};
 		});
+
+		// Listen to any Changes outside the model, like Asset Edit Views
+		this.eventListeners();
+
+		this.getCurrentUser();
+
+	}
+
+	ngOnChanges(changes: SimpleChanges) {
+		const dataChange = changes['data'];
+
+		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
+			this.applyData(dataChange.currentValue)
+		}
+
 	}
 
 	private getPreferences(): Observable<any> {
@@ -182,7 +202,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		this.bulkCheckboxService.handleFiltering();
 		if (column.filter) {
 			column.filter = '';
-			this.state.skip = 0;
+			this.updateGridState({skip: 0});
 			if ( this.preventFilterSearch(column)) {
 				return; // prevent search
 			}
@@ -195,7 +215,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	}
 
 	onFilter(): void {
-		this.state.skip = 0;
+		this.updateGridState({skip: 0});
 		this.onReload();
 	}
 
@@ -234,16 +254,19 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}
 	}
 
-	apply(data: any): void {
-		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+	private applyData(data: any): void {
+		const {assets = null, pagination = null} = data || {};
+		const total = pagination && pagination.total || 0;
 
-		this.bulkCheckboxService.initializeKeysBulkItems(data.assets);
+		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+		this.bulkCheckboxService.initializeKeysBulkItems(assets || []);
 
 		this.gridData = {
-			data: data.assets,
-			total: data.pagination.total
+			data: assets || [],
+			total
 		};
-		this.showMessage = data.pagination.total === 0;
+
+		this.showMessage = total === 0;
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
@@ -251,21 +274,20 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
-	clear(): void {
+	private clear(): void {
 		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		this.state = {
+		this.updateGridState({
 			skip: 0,
-			take: this.state.take,
+			take: this.gridState.take,
 			sort: []
-		};
+		});
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
-		this.state = state;
 		if (state.sort[0]) {
 			// Invert the Order to remove the Natural/Default from the UI (no arrow)
 			if (!state.sort[0].dir) {
@@ -277,6 +299,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			this.model.sort.property = field[1];
 			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
 		}
+		this.updateGridState(state);
 		this.modelChange.emit();
 	}
 
@@ -345,7 +368,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
-		if (operationResult.success) {
+		if (operationResult && operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
@@ -594,6 +617,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	}
 
 	onChangeJustPlanning(isChecked = false): void {
+		this.justPlanningChange.emit(isChecked);
+
 		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString()).subscribe(() => {
 			this.onReload();
 		});
@@ -611,14 +636,15 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		this.onFilter();
 	}
 
-	onClickBulkButton(): void {
-		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: any) => {
-				this.bulkItems = [...results.selectedAssetsIds];
-				this.selectedAssetsForBulk = [...results.selectedAssets];
-				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
-			})
-			.catch ((err) => console.log('Error:', err))
+	/**
+	 * Gather the List of Selected Items for the Bulk Process
+	 */
+	public onClickBulkButton(): void {
+		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning).subscribe((results: any) => {
+			this.bulkItems = [...results.selectedAssetsIds];
+			this.selectedAssetsForBulk = [...results.selectedAssets];
+			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+		}, (err) => console.log('Error:', err));
 	}
 
 	hasSelectedItems(): boolean {
@@ -635,5 +661,13 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			.subscribe( (user: any) => {
 				this.currentUser = user;
 			}, (error: any) => console.log(error));
+	}
+
+	/**
+	 * Set the grid configuration and emit the event to the host component
+	 */
+	private updateGridState(state: State): void {
+		const newState = Object.assign({}, this.gridState, state) ;
+		this.gridStateChange.emit(newState);
 	}
 }

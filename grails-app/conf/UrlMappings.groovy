@@ -143,7 +143,7 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
-		"/ws/asset/defaultCreateModel/$assetClass" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
+		"/ws/asset/defaultCreateModel/$assetClass?" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
@@ -422,39 +422,37 @@ class UrlMappings {
 			action = [GET: "getUser"]
 		}
 
-		"/ws/user/mapAreas" {
+		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
-			action = [GET: "getMapAreas"]
+			action = [ GET: "modelForPreferenceManager" ]
 		}
 
-		"/ws/user/preferences/$id" {
+        "/ws/user/mapAreas" {
+            controller = "wsUser"
+            action = [GET: "getMapAreas"]
+        }
+
+		"/ws/user/resetPreferences" {
 			controller = "wsUser"
-			action = [GET:"preferences"]
+			action = [ DELETE: "resetPreferences" ]
 		}
 
-		"/ws/user/preference" {
+		"/ws/user/preferences/$id?" {
 			controller = "wsUser"
-			action = [POST:"savePreference"]
+			action = [	GET:"preferences",
+						DELETE: "removePreference"]
 		}
 
-		"/ws/user/preferences" {
+		"/ws/user/preference/$id?" {
 			controller = "wsUser"
-			action = [GET:"getPreferenceMap"]
+			action = [	GET:"preferences",
+						POST:"savePreference",
+						DELETE: "removePreference"]
 		}
 
 		"/ws/user/person" {
 			controller = "wsUser"
 			action = [GET:"getPerson"]
-		}
-
-        "/ws/user/removePreference/$prefCode" {
-            controller = "wsUser"
-            action = [POST:"removePreference"]
-        }
-
-		"/ws/user/resetPreferences" {
-			controller = "wsUser"
-			action = [POST:"resetPreferences"]
 		}
 
 		"/ws/progress" {

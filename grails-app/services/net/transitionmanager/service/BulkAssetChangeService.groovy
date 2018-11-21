@@ -1,13 +1,15 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.transaction.NotTransactional
 import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
-import net.transitionmanager.bulk.change.BulkChangeMoveBundle
+import net.transitionmanager.bulk.change.BulkChangeNumber
+import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
@@ -15,10 +17,7 @@ import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.TagAsset
 
 /**
  * This handles taking in a bulk change json and delegating the bulk change to the appropriate service.
@@ -28,65 +27,21 @@ class BulkAssetChangeService implements ServiceMethods {
 	TagAssetService tagAssetService
 	DataviewService dataviewService
 
-	/**
-	 * A list of valid field names
-	 */
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	static final List<String> fields = [
-		'tagAssets',
-		'purchaseDate', 'maintExpDate', 'retireDate',
-		'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'externalRefId',
-		'priority', 'purchasePrice', 'usize', 'sourceRackPosition', 'sourceBladePosition', 'targetRackPosition', 'targetBladePosition', 'dependencyBundle', 'size', 'rateOfChange',
-		'appOwner', 'modifiedBy',
-		'validation'
-	]
-
-	/**
-	 * A map of field control types to actions, and to the methods that support them.
-	 */
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	static final Map actions = [
-		'tagAssetService'   : [
-			add    : 'bulkAdd',
-			clear  : 'bulkClear',
-			replace: 'bulkReplace',
-			remove : 'bulkRemove'
-		],
-		'date-time-selector': [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'string-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'number-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'person-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'yes-no-selector'   : [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		]
-	]
-
 	//Maps field control types to services.
 	static Map bulkClassMapping = [
-		(TagAsset.class.name)  : BulkChangeTag.class,
-		(Date.class.name)      : BulkChangeDate.class,
-		'String'               : BulkChangeString.class,
-		(Integer.class.name)   : BulkChangeInteger.class,
-		(Person.class.name)    : BulkChangePerson.class,
-		'YesNo'                : BulkChangeYesNo.class,
-		'List'                 : BulkChangeList.class,
-		'InList'               : BulkChangeList.class,
-		(MoveBundle.class.name): BulkChangeMoveBundle.class
+		(ControlType.ASSET_TAG_SELECTOR.value()): BulkChangeTag.class,
+		(Date.class.name)                       : BulkChangeDate.class,
+		(ControlType.STRING.value())            : BulkChangeString.class,
+		(Integer.class.name)                    : BulkChangeInteger.class,
+		(ControlType.PERSON.value())            : BulkChangePerson.class,
+		(ControlType.YES_NO.value())            : BulkChangeYesNo.class,
+		(ControlType.LIST.value())              : BulkChangeList.class,
+		(ControlType.IN_LIST.value())           : BulkChangeList.class,
+		(ControlType.PLAN_STATUS.value())       : BulkChangeList.class,
+		(ControlType.REFERENCE.value())         : BulkChangeReference.class,
+		(ControlType.DATE.value())              : BulkChangeString.class,
+		(ControlType.DATETIME.value())          : BulkChangeString.class,
+		(ControlType.NUMBER.value())            : BulkChangeNumber.class
 	].asImmutable()
 
 	/**
@@ -101,6 +56,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		Map<String, Map> fieldMapping
 		List<String> validActions
 		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
+
 		// COMMON should default to DEVICE
 		if (assetClass == null) {
 			assetClass = AssetClass.safeValueOf(AssetClass.DEVICE.name())
@@ -180,10 +136,8 @@ class BulkAssetChangeService implements ServiceMethods {
 		def property = GormUtil.getDomainPropertyType(type, fieldName)
 		String dataType = property.typeName
 
-		if (dataType == String.class.name) {
+		if (dataType != Date.class.name && dataType != Integer.class.name) {
 			dataType = fieldMapping[assetClassName][fieldName]?.control
-		} else if (dataType == Collection.class.name && fieldName == 'tagAssets') {
-			dataType = TagAsset.class.name
 		}
 
 		Class service = bulkClassMapping[dataType]
@@ -217,7 +171,13 @@ class BulkAssetChangeService implements ServiceMethods {
 		List<String> fields = edits.collect { EditCommand edit ->
 			field = edit.fieldName
 			service = getBulkClass(type, assetClass.name(), field, fieldMapping, bulkClassMapping)
-			value = service.coerceBulkValue(currentProject, edit.value)
+
+			if (service == BulkChangeReference.class) {
+				value = service.coerceBulkValue(currentProject, edit.value, field, type)
+			} else {
+				value = service.coerceBulkValue(currentProject, edit.value)
+			}
+
 			typeInstance[field] = value
 
 			if (field.startsWith('custom')) {

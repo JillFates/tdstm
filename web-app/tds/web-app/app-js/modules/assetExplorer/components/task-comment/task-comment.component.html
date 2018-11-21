@@ -72,7 +72,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>
@@ -98,7 +98,7 @@
                     View All Comments
                 </label>
 
-                <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
+                <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button" title="Add Comment">
                     <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
                 </button>
             </ng-template>
@@ -138,7 +138,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>

@@ -25,7 +25,7 @@ class FieldSearchData {
      *
      *  Optional entries:
      *      - columnAlias (String): a handful string for building namedParameters.
-     *
+     *      - fieldSpec: (FieldSpec): an instance of {@code FieldSpec} used to calculate types or values
      * @param searchMap
      */
     FieldSearchData(Map searchMap) {
@@ -38,7 +38,8 @@ class FieldSearchData {
                     useWildcards : false,
                     type: type,
                     whereProperty: whereProperty,
-	                manyToManyQueries: manyToManyQueries
+	                manyToManyQueries: manyToManyQueries,
+                    fieldSpec: fieldSpec
             ]
         }
 

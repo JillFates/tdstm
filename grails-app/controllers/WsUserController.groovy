@@ -1,7 +1,9 @@
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
+import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
+import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -22,6 +24,7 @@ import com.tdsops.common.security.spring.HasPermission
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
+@GrailsCompileStatic
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
@@ -35,96 +38,41 @@ class WsUserController implements ControllerMethods {
 	 * @example GET ./ws/user/preferences/EVENT,BUNDLE
 	 * @return a MAP of the parameters (e.g. preferences:[EVENT:5, BUNDLE:30])
 	 */
+	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserGeneralAccess)
-	def preferences() {
-		def data = [:]
-		for (String preferenceCode in params.id?.toString()?.split(',')) {
-			data[preferenceCode] = userPreferenceService.getPreference(preferenceCode)
-		}
-
-		renderSuccessJson(preferences: data)
+	def preferences(String id) {
+        UserLogin userLogin = currentPerson().userLogin
+        Map preferences = userPreferenceService.getPreferences(userLogin, id)
+    	renderSuccessJson(preferences: preferences)
 	}
 
-	/**
-	 * Update currentUserPreferences from the server (Copied from PersonController)
-	 *
-	 * return: An array made up of objects containing a preference code and a value to display.
-	 */
-	@HasPermission(Permission.UserGeneralAccess)
-	def getPreferenceMap() {
+    /**
+     * Used by the User Preference Edit dialog. This will return a List<Map> where the map will
+     * consist of the following:
+     *    code - the Preference Code
+     *    label - the human readable name of the code
+     *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
+     * @return Success Structure with preferences property containing List<Map>
+     */
+    def modelForPreferenceManager() {
+        Person person = currentPerson()
+        UserLogin userLogin = person.userLogin
 
-		def prefArray = []
-		def labelMap = [CONSOLE_TEAM_TYPE: "Console Team Type", SUPER_CONSOLE_REFRESH: "Console Refresh Time",
-						CART_TRACKING_REFRESH: "Cart tarcking Refresh Time", BULK_WARNING: "Bulk Warning",
-						(PREF.DASHBOARD_REFRESH.value()): "Dashboard Refresh Time", (PREF.CURR_TZ.value()): "Time Zone",
-						(PREF.CURR_POWER_TYPE.value()): "Power Type", (PREF.START_PAGE.value()): "Welcome Page",
-						(PREF.STAFFING_ROLE.value()): "Default Project Staffing Role",
-						(PREF.STAFFING_LOCATION.value()): "Default Project Staffing Location",
-						(PREF.STAFFING_PHASES.value()): "Default Project Staffing Phase",
-						(PREF.STAFFING_SCALE.value()): "Default Project Staffing Scale", preference: "Preference",
-						(PREF.DRAGGABLE_RACK.value()): "Draggable Rack", PMO_COLUMN1: "PMO Column 1 Filter",
-						PMO_COLUMN2: "PMO Column 2 Filter", PMO_COLUMN3: "PMO Column 3 Filter",
-						PMO_COLUMN4: "PMO Column 4 Filter", (PREF.SHOW_ADD_ICONS.value()): "Rack Add Icons",
-						MY_TASK: "My Task Refresh Time"]
+        Map model = [
+            fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
+            person: [firstName: person.firstName],
+            preferences: userPreferenceService.preferenceListForEdit(userLogin)
+        ]
+    	renderSuccessJson(model)
+    }
 
-		String currTimeZone = TimeUtil.defaultTimeZone
-		String currDateTimeFormat = TimeUtil.getDefaultFormatType()
-
-		def prefs = UserPreference.findAllByUserLogin(securityService.loadCurrentUserLogin(), [sort:"preferenceCode"])
-		for (pref in prefs) {
-			switch (pref.preferenceCode) {
-				case PREF.MOVE_EVENT.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Event / " + MoveEvent.get(pref.value).name]
-					break
-
-				case PREF.CURR_PROJ.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Project / " + Project.get(pref.value).name]
-					break
-
-				case PREF.CURR_BUNDLE.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Bundle / " + MoveBundle.get(pref.value).name]
-					break
-
-				case PREF.PARTY_GROUP.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Company / " + (!pref.value.equalsIgnoreCase("All") ?
-							PartyGroup.get(pref.value).name : 'All')]
-					break
-
-				case PREF.CURR_ROOM.value():
-					prefArray << [prefCode:pref.preferenceCode, value:"Room / " + Room.get(pref.value).roomName]
-					break
-
-				case PREF.STAFFING_ROLE.value():
-					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefArray << [prefCode:pref.preferenceCode, value:"Default Project Staffing Role / " + role.substring(role.lastIndexOf(':') + 1)]
-					break
-
-				case PREF.AUDIT_VIEW.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefArray << [prefCode:pref.preferenceCode, value:"Room Audit View / " + value]
-					break
-
-				case PREF.JUST_REMAINING.value():
-					def value = pref.value == "0" ? "False" : "True"
-					prefArray << [prefCode:pref.preferenceCode, value:"Just Remaining Check / " + value]
-					break
-
-				case PREF.CURR_DT_FORMAT:
-					currDateTimeFormat = pref.value
-					break
-
-				case PREF.CURR_TZ:
-					currTimeZone = pref.value
-					break
-
-				default:
-					prefArray << [prefCode:pref.preferenceCode, value:(labelMap[pref.preferenceCode] ?: pref.preferenceCode) + " / " + pref.value]
-					break
-			}
-		}
-
-		renderSuccessJson(prefMap: prefArray)
-	}
+    /**
+     * Used to reset all preferences of a user
+     */
+    def resetPreferences() {
+        userPreferenceService.resetPreferences()
+        renderSuccessJson()
+    }
 
 	/**
 	 * Sets a user preference through an AJAX call
@@ -155,35 +103,8 @@ class WsUserController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
-	def removePreference() {
-		String prefCode = params.prefCode
-		userPreferenceService.removePreference(null, prefCode)
+	def removePreference(String id) {
+		userPreferenceService.removePreference(id)
 		renderSuccessJson()
-	}
-
-	//Copied from PersonController
-	@HasPermission(Permission.UserGeneralAccess)
-	def resetPreferences() {
-		try {
-			Person person = securityService.getUserLogin().person
-			UserLogin userLogin = securityService.getPersonUserLogin(person)
-			if (!userLogin) {
-				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-				sendNotFound()
-				return
-			}
-			// TODO : JPM 5/2015 : Change the way that the delete is occurring
-			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-			prePreference.each { preference ->
-				def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference, userLogin)
-				// When clearing preference, the RefreshMyTasks should be the same.
-				if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
-					preferenceInstance.delete()
-				}
-			}
-			renderSuccessJson()
-		} catch (e) {
-			renderErrorJson(e.message)
-		}
 	}
 }

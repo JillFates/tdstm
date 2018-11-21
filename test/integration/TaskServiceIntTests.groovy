@@ -1,9 +1,12 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import groovyx.gpars.GParsPool
 import net.transitionmanager.domain.ApiAction
@@ -13,14 +16,15 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
+import spock.lang.See
 import test.helper.ApiCatalogTestHelper
-import test.helper.AssetCommentTestHelper
-import test.helper.MoveEventTestHelper
 
 import java.util.concurrent.Future
 
@@ -209,5 +213,109 @@ class TaskServiceIntTests extends IntegrationSpec {
                 }
             }
             ['Ready', 'Ready'] == results
+    }
+
+    @See('TM-12307')
+    void 'test assign to me task'() {
+        setup: 'given a task'
+            Project project = projectTestHelper.getProject()
+            Person whom = personTestHelper.createPerson()
+            taskService.securityService = [
+                    getUserCurrentProject: { return project },
+                    getUserLoginPerson: { return whom },
+                    getCurrentUsername: { return 'someone' }
+            ] as SecurityService
+
+            AssetComment task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    duration: 1,
+                    durationScale: TimeScale.D,
+                    status: AssetCommentStatus.PENDING
+            ).save(failOnError: true)
+            final assetCommentId1 = task.id
+
+        when: 'assign task to me is call, task gets assigned to current logged in user'
+            Person personAssignedTo = taskService.assignToMe(assetCommentId1, AssetCommentStatus.PENDING)
+
+        then: 'current logged in user is returned as a result and the task assign to is updated'
+            personAssignedTo
+            personAssignedTo == whom
+            task.assignedTo
+            task.assignedTo == personAssignedTo
+
+        when: 'assign to me is call but task status is not the expected'
+            task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    duration: 1,
+                    durationScale: TimeScale.D,
+                    status: AssetCommentStatus.PENDING,
+                    assignedTo: whom
+            ).save(failOnError: true)
+            final assetCommentId2 = task.id
+            taskService.assignToMe(assetCommentId2, AssetCommentStatus.READY)
+        then: 'exception is thrown'
+            thrown(ServiceException)
+
+        when: 'assign to me is call but task does not exists'
+            taskService.assignToMe(-1, AssetCommentStatus.READY)
+
+        then: 'Exception is thrown'
+            thrown(EmptyResultException)
+    }
+
+    @See('TM-12307')
+    void 'test change start and finish estimated time'() {
+        setup: 'given a task'
+            Project project = projectTestHelper.getProject()
+
+            Date expectedStart = TimeUtil.nowGMT().plus(1)
+            Date expectedFinish = expectedStart.plus(1)
+            Date expectedStart2 = TimeUtil.nowGMT().plus(2)
+            Date expectedFinish2 = expectedStart2.plus(1)
+
+            AssetComment task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    duration: 1,
+                    durationScale: TimeScale.D,
+                    status: AssetCommentStatus.PENDING
+            ).save(failOnError: true)
+            final assetCommentId1 = task.id
+
+        when: 'updating estimated start and finish time'
+            AssetComment assetComment = taskService.changeEstTime(assetCommentId1, 1)
+
+        then: 'task is estimated start and finish time get updated in db and asset comment is returned'
+            assetComment
+            TimeUtil.formatDate(assetComment.estStart) == TimeUtil.formatDate(expectedStart)
+            TimeUtil.formatDate(assetComment.estFinish) == TimeUtil.formatDate(expectedFinish)
+
+        when: 'having a task without duration and duration scale and change estimation time is called with 2 days'
+            task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    status: AssetCommentStatus.PENDING
+            ).save(failOnError: true)
+            final assetCommentId2 = task.id
+            assetComment = taskService.changeEstTime(assetCommentId2, 2)
+
+        then: 'task duration and durationScale get updated to default values and task estimated start and finish times are set to 2 days ahead of current GMT time'
+            assetComment
+            assetComment.duration == 1
+            assetComment.durationScale == TimeScale.D
+            TimeUtil.formatDate(assetComment.estStart) == TimeUtil.formatDate(expectedStart2)
+            TimeUtil.formatDate(assetComment.estFinish) == TimeUtil.formatDate(expectedFinish2)
+
+        when: 'trying to update non existing task estimated start and finish times'
+            taskService.changeEstTime(-1, 2)
+
+        then: 'exception is thrown'
+            thrown(EmptyResultException)
     }
 }

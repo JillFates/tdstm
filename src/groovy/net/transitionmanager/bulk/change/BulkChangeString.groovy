@@ -1,7 +1,6 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
-import com.tdssrc.grails.StringUtil
+
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
@@ -70,7 +69,7 @@ class BulkChangeString {
 	private static void update(Class type, String value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 		String setFieldQueryPart
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 
 		if (value) {
 			params.value = value

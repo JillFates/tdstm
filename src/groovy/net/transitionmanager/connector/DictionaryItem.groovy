@@ -20,6 +20,7 @@ class DictionaryItem {
 	List<LinkedHashMap> params = []
 	// List<DictionaryItemParameter> params = []
 	Map results = [:]
+	Map<String, String> script = [:]
 
 }
 

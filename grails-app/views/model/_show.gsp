@@ -214,12 +214,6 @@
 									<g:else>
 										<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
 									</g:else>
-									<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
-									  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
-									</g:if>
-									<g:else>
-									  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
-									</g:else>
 							   </g:if>
 							   <g:else>
 									<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
@@ -229,12 +223,6 @@
 									</g:if>
 									<g:else>
 										<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
-									</g:else>
-									<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
-									  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
-									</g:if>
-									<g:else>
-									  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
 									</g:else>
 							   </g:else>
 							</span>
@@ -285,11 +273,6 @@ function updatePowerType(value,name){
 		$("#PowerDesignSpanId").html(preference.toFixed(1));
 	}
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
-}
-function validateModel(id){
-    if(confirm("All data in this model is reasonable and valid ?")){
-    	${remoteFunction(action:'validateModel', params:'\'id=\' + id ',onComplete="updatePage()")}
-    }
 }
 function updatePage(){
 	window.location.reload();

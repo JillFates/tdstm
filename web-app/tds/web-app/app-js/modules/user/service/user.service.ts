@@ -13,18 +13,40 @@ import {Response} from '@angular/http';
 export class UserService {
 
 	// private instance variable to hold base url
-	private userPreferenceUrl = '../ws/user';
+	private baseURL = '/tdstm';
+	private userPreferenceUrl = this.baseURL + '/ws/user';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
 	}
 
-	getUserPreferences() {
-		return this.http.get(`${this.userPreferenceUrl}/preferences`)
+	/**
+	 * Used to retrieve all of the model data that will be used by the component
+	 */
+	fetchComponentModel() {
+		return this.http.get(`${this.userPreferenceUrl}/modelForPreferenceManager`)
 			.map((res: Response) => {
 				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
-				return providerModels;
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	removePreference(prefCode) {
+		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	resetPreferences() {
+		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -35,34 +57,6 @@ export class UserService {
 				let result = res.json();
 				let mapAreas = result && result.status === 'success' && result.data;
 				return mapAreas;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getUserName() {
-		return this.http.get(`${this.userPreferenceUrl}/person`)
-			.map((res: Response) => {
-				let result = res.json();
-				let person = result && result.status === 'success' && result.data;
-				return person;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	removePreference(prefCode) {
-		return this.http.post(`${this.userPreferenceUrl}/removePreference/${prefCode}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	resetPreferences() {
-		return this.http.post(`${this.userPreferenceUrl}/resetPreferences`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
