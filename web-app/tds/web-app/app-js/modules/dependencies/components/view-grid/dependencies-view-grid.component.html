@@ -63,12 +63,23 @@
 			</ng-template>
 
 			<!-- Default Generic Filter Template -->
-			<ng-template kendoGridFilterCellTemplate let-filter let-column="column">
+			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
+			             *ngIf="!tagsFieldNames.includes(column.property)">
 				<kendo-grid-string-filter-cell
 						[showOperators]="false"
 						[column]="column"
 						[filter]="filter">
 				</kendo-grid-string-filter-cell>
+			</ng-template>
+
+			<!-- Asset Tags Filter Template -->
+			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
+			             *ngIf="tagsFieldNames.includes(column.property)">
+				<tds-asset-tag-selector #tagSelector
+				                        [tagList]="tagList"
+				                        [viewFilterModel]="column.filter"
+				                        (valueChange)="onTagFilterChange(column, $event)">
+				</tds-asset-tag-selector>
 			</ng-template>
 
 			<!-- Asset and Dependency Tags Cell Template -->
