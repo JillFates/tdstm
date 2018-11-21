@@ -60,7 +60,7 @@ class NumberUtil {
 	static BigDecimal toBigDecimal(value, BigDecimal defVal = null) {
 		if (value instanceof BigDecimal) {
 			value
-		} else if (value instanceof CharSequence) {
+		} else if (value instanceof CharSequence && value.isBigDecimal()) {
 			value.toBigDecimal()
 		} else {
 			defVal
