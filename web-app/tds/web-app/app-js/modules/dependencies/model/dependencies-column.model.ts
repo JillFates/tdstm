@@ -24,6 +24,20 @@ export class DependenciesColumnModel {
 				locked: true
 			},
 			{
+				label: 'Tags Asset',
+				property: 'tagsAsset',
+				type: 'text',
+				width: 120,
+				locked: false
+			},
+			{
+				label: 'Tags Dependency',
+				property: 'tagsDependency',
+				type: 'text',
+				width: 120,
+				locked: false
+			},
+			{
 				label: 'Bundle',
 				property: 'assetBundle',
 				type: 'text',
