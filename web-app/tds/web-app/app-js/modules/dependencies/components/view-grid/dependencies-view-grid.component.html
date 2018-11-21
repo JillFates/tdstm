@@ -49,16 +49,20 @@
 			</ng-template>
 		</kendo-grid-column>
 
+		<!-- Configured View Columns (*ngFor) -->
 		<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
 		                   format="{{column.format}}"
 		                   [locked]="column.locked"
 		                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+			<!-- Default Generic Filter Template -->
 			<ng-template kendoGridHeaderTemplate>
 				<div class="sortable-column">
 					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
 				</div>
 			</ng-template>
 
+			<!-- Default Generic Filter Template -->
 			<ng-template kendoGridFilterCellTemplate let-filter let-column="column">
 				<kendo-grid-string-filter-cell
 						[showOperators]="false"
@@ -66,10 +70,23 @@
 						[filter]="filter">
 				</kendo-grid-string-filter-cell>
 			</ng-template>
+
+			<!-- Asset and Dependency Tags Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem
+			             *ngIf="tagsFieldNames.includes(column.property)">
+				<div>
+				   <span *ngFor="let tag of dataItem[column.property]"
+						 class="label tag dependency-tag"
+						 [ngClass]="tag.css"> {{tag.name}}
+				   </span>
+				</div>
+			</ng-template>
+
 		</kendo-grid-column>
 
 		<!-- Pagination Footer -->
-		<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+		<!--<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">-->
+		<ng-template kendoPagerTemplate>
 			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 			<kendo-pager-next-buttons></kendo-pager-next-buttons>
 			<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>

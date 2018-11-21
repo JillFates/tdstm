@@ -31,16 +31,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
-	protected assets: any[];
-	protected skip = 0;
-	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
+	// protected pageSize = GRID_DEFAULT_PAGE_SIZE;
 	private gridStateSubject: BehaviorSubject<State>;
 	private destroySubject: Subject<any>;
-	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	private getDependencies: any;
-	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected gridData: GridDataResult;
+	protected readonly maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
+	protected readonly tagsFieldNames = ['tagsAsset', 'tagsDependency'];
 
 	constructor(
 		private route: ActivatedRoute,

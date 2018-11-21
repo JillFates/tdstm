@@ -1,3 +1,5 @@
+import {TagModel} from '../../assetTags/model/tag.model';
+
 export interface Dependency {
 	assetBundle: string;
 	assetId: number;
@@ -17,6 +19,8 @@ export interface Dependency {
 	id: number;
 	status: string;
 	type: string;
+	assetTags: TagModel[];
+	dependencyTags: TagModel[];
 }
 
 export interface DependencyResults {

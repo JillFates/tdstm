@@ -3,7 +3,7 @@ import {Observable} from 'rxjs';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 
 import {PermissionService} from '../../../shared/services/permission.service';
-import {DependencyResults} from '../model/dependencies.model';
+import {Dependency, DependencyResults} from '../model/dependencies.model';
 
 import {map} from 'rxjs/operators';
 
@@ -39,9 +39,57 @@ export class DependenciesService {
 			.pipe(
 				map((response: any) => {
 					const results = response.json();
-					const {dependencies = [], total = 0} = (results && results.data) || {};
+					let {dependencies = [], total = 0} = (results && results.data) || {};
+					// todo remove later
+					dependencies = this.addFakeTags(dependencies);
+
 					return {dependencies, total};
 				})
 			)
+	}
+
+	/* Todo remove when the endpoint changes are ready */
+	addFakeTags(dependencies: Dependency[]): Dependency[] {
+		const tagsAsset = [
+			{
+				'color': 'Yellow',
+				'css': 'tag-yellow',
+				'description': 'Sarbanes–Oxley Act Compliance',
+				'id': 659,
+				'name': 'SOX',
+				'tagId': 8
+			},
+			{
+				'color': 'Blue',
+				'css': 'tag-blue',
+				'description': 'Custom QAE2E acqVm Tag description',
+				'id': 276,
+				'name': 'QAE2E acqVm Tag',
+				'tagId': 184
+			}
+		];
+		const tagsDependency = [
+			{
+				'color': 'Yellow',
+				'css': 'tag-yellow',
+				'description': 'Sarbanes–Oxley Act Compliance',
+				'id': 659,
+				'name': 'SOX',
+				'tagId': 8
+			},
+			{
+				'color': 'Blue',
+				'css': 'tag-blue',
+				'description': 'Custom QAE2E acqVm Tag description',
+				'id': 276,
+				'name': 'QAE2E acqVm Tag',
+				'tagId': 184
+			}
+		];
+
+		dependencies = dependencies
+			.map((dependency: Dependency) => ({...dependency, tagsAsset: tagsAsset, tagsDependency: tagsDependency}));
+
+		return dependencies;
 	}
 }
