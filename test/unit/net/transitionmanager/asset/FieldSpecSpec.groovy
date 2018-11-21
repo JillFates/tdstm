@@ -12,6 +12,10 @@ import java.sql.Timestamp
 
 class FieldSpecSpec extends Specification {
 
+	private Integer setUdfProperty(String fieldName) {
+		return ( fieldName.startsWith('custom') ? 1 : 0 )
+	}
+
 	void 'test if a field spec is custom'() {
 
 		setup: 'a field spec definition from database'
@@ -29,7 +33,7 @@ class FieldSpecSpec extends Specification {
 				"shared"           : 0,
 				"show"             : 1,
 				"tip"              : "",
-				"udf"              : 0
+				"udf"              : setUdfProperty(field)
 			]
 
 		expect: 'can check if FieldSpec is custom or not'
@@ -66,7 +70,7 @@ class FieldSpecSpec extends Specification {
 				"shared"           : 0,
 				"show"             : 1,
 				"tip"              : "",
-				"udf"              : 0
+				"udf"              : setUdfProperty(field)
 			]
 
 		expect: 'can check if FieldSpec is custom or not'
@@ -144,7 +148,7 @@ class FieldSpecSpec extends Specification {
 				"shared"           : 0,
 				"show"             : 1,
 				"tip"              : "",
-				"udf"              : 0
+				"udf"              : setUdfProperty(field)
 			]
 
 		expect: 'can check if FieldSpec is custom or not'

@@ -43,6 +43,10 @@ class FieldSpec {
 	Object defaultValue
 	String field
 	String label
+	/*
+	 * Identifies if the field is a custom field
+	 */
+	Boolean isUserDefinedField
 
 	// Constraints field section
 	Integer max
@@ -58,7 +62,7 @@ class FieldSpec {
 		this.defaultValue = fieldSpecMap."default"
 		this.field = fieldSpecMap.field
 		this.label = fieldSpecMap.label
-
+		this.isUserDefinedField = fieldSpecMap.udf == 1
 		this.max = fieldSpecMap.constraints.max
 		this.min = fieldSpecMap.constraints.min
 		this.precision = fieldSpecMap.constraints.precision
@@ -72,7 +76,7 @@ class FieldSpec {
 	 * @return
 	 */
 	Boolean isCustom() {
-		return this.field.startsWith('custom')
+		return isUserDefinedField
 	}
 	/**
 	 * A field spec is numeric when control == 'Number'

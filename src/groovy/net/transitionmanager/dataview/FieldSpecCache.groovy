@@ -2,7 +2,8 @@ package net.transitionmanager.dataview
 
 import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.service.CustomDomainService
-
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 /**
  * This class converts {@code customDomainService.fieldSpecsWithCommon ( project )}
@@ -24,13 +25,11 @@ import net.transitionmanager.service.CustomDomainService
  */
 class FieldSpecCache {
 
-	Map<AssetClass, Map<String, FieldSpec>> fieldsSpecMap = [
-		(CustomDomainService.COMMON)   : [:],
-		(AssetClass.APPLICATION.name()): [:],
-		(AssetClass.DEVICE.name())     : [:],
-		(AssetClass.STORAGE.name())    : [:],
-		(AssetClass.DATABASE.name())   : [:]
-	]
+	/*
+	 * Contains each domains' individual set of fieldSpec objects where the Map key is the domain name.
+	 * The nested map is a the fieldname/FieldSpec
+	 */
+	Map<String, Map<String, FieldSpec>> fieldsSpecMap = [ : ]
 
 	/**
 	 * Creates an instance of FieldSpecMapper using results from
