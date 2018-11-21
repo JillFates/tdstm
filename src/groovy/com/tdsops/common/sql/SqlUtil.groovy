@@ -475,7 +475,7 @@ class SqlUtil {
 		}
 
 		// Calculate the expression only if there's a valid value to be added to the query.
-		if (paramValue) {
+		if (paramValue != null) {
 			String expression = getSingleValueExpression(searchColumn, fieldSearchData.columnAlias, operator)
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
