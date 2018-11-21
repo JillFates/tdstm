@@ -6,6 +6,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CustomDomainService
@@ -98,7 +99,7 @@ class CustomValidators {
 					throw new RuntimeException("No validator defined for '${control}' Custom Control")
 				}
 
-				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec).apply()
+				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec, domainName).apply()
 
 				for(ErrorHolder e : errorsHolders){
 					errors.rejectValue(
@@ -119,11 +120,11 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlNotEmptyValidator ( String value, Map fieldSpec ) {
+	static controlNotEmptyValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ( 'field.invalid.notEmpty', [value, getLabel()] )
+					addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 				}
 			}
 		}
@@ -135,13 +136,13 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlYesNoControlValidator ( String value, Map fieldSpec ) {
+	static controlYesNoControlValidator ( String value, Map fieldSpec, Object domain) {
 		final List<String> yesNoList = ['Yes', 'No']
 
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// value = StringUtils.defaultString(value)
-				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
+				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
 
 				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
@@ -157,10 +158,10 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlListValidator ( String value, Map fieldSpec ) {
+	static controlListValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
+				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
 
 				def optValues = fieldSpec.constraints?.values ?: []
 
@@ -181,23 +182,20 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static  controlDateTimeValidator ( String value, Map fieldSpec ) {
+	@CompileStatic
+	static  controlDateTimeValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// if the field is empty, validate the 'required' constraint
 				if (!value) {
 					def required = fieldSpec.constraints?.required ?: null
 					if (required) {
-						addError ('field.invalid.notEmpty', [value, getLabel()])
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 					}
-					return // with or without error, as the value is empty, just return
-				}
-				// Validate date value using yyyy-MM-dd'T'HH:mm:ss'Z' format
-				String format = TimeUtil.FORMAT_DATE_TIME_ISO8601_2
-				boolean result = TimeUtil.validateFormat(value, format)
-				if (!result) {
-					addError('field.incorrect.dateFormat', [value, getLabel(), format])
-
+				} else {
+					if (!TimeUtil.canParseDateTime(value)) {
+						addError('field.incorrect.dateFormat', [value, getLabel()])
+					}
 				}
 			}
 		}
@@ -212,23 +210,22 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static  controlDateValidator ( String value, Map fieldSpec ) {
+	@CompileStatic
+	static  controlDateValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// if the field is empty, validate the 'required' constraint
 				if (!value) {
 					def required = fieldSpec.constraints?.required ?: null
 					if (required) {
-						addError ('field.invalid.notEmpty', [value, getLabel()])
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 					}
-					return // with or without error, as the value is empty, just return
+				} else {
+					if (!TimeUtil.canParseDate(value)) {
+						addError('field.incorrect.dateFormat', [value, getLabel()])
+					}
 				}
-				// Validate date value using yyyy-MM-dd format
-				String format = TimeUtil.FORMAT_DATE_TIME_6
-				boolean result = TimeUtil.validateFormat(value, format)
-				if (!result) {
-					addError('field.incorrect.dateFormat', [value, getLabel(), format])
-				}
+
 			}
 		}
 	}
@@ -242,14 +239,14 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static  controlNumberValidator ( String value, Map fieldSpec ) {
+	static  controlNumberValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// if the field is empty, validate the 'required' constraint
 				if (!value) {
 					def required = fieldSpec.constraints?.required ?: null
 					if (required) {
-						addError ('field.invalid.notEmpty', [value, getLabel()])
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 					}
 					return // with or without error, as the value is empty, just return
 				}
@@ -300,7 +297,7 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlDefaultValidator( String value, Map fieldSpec ) {
+	static controlDefaultValidator( String value, Map fieldSpec, Object domain) {
 		new Validator( fieldSpec ) {
 			void validate() {
 				def minSize = fieldSpec?.constraints?.minSize ?: 0
