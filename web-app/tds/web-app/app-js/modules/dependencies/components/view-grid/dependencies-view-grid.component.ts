@@ -20,6 +20,8 @@ import {BulkActionResult, BulkChangeType} from '../../../assetExplorer/component
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
+import {TagModel} from '../../../assetTags/model/tag.model';
+import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
 
 declare var jQuery: any;
 @Component({
@@ -30,13 +32,13 @@ declare var jQuery: any;
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
-	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
-	// protected pageSize = GRID_DEFAULT_PAGE_SIZE;
 	private gridStateSubject: BehaviorSubject<State>;
 	private destroySubject: Subject<any>;
 	private getDependencies: any;
+	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected gridData: GridDataResult;
+	protected tagList: TagModel[];
 	protected readonly maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	protected readonly tagsFieldNames = ['tagsAsset', 'tagsDependency'];
@@ -49,7 +51,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService
-	) { }
+	) {
+		this.tagList = this.route.snapshot.data['tagList'];
+	}
 
 	ngOnInit() {
 		this.destroySubject = new Subject<any>();
@@ -226,5 +230,13 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	protected onClickBulkButton(): void {
 		this.getCurrentBulkSelectedItems()
 			.subscribe((results) => this.tdsBulkChangeButton.bulkData(results))
+	}
+
+	protected onTagFilterChange(column: ViewColumn, $event: any): void {
+		column.filter = '';
+		let operator = $event.operator && $event.operator === 'ALL' ? '&' : '|';
+		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
+		column.filter = selectedTagsFilter;
+		// this.onFilter();
 	}
 }
