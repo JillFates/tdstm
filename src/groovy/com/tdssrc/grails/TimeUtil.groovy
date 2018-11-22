@@ -557,7 +557,7 @@ class TimeUtil {
 			return null
 		}
 		if (timeZone == null) {
-			timeZone = userPreferenceService.timeZone
+			timeZone = userPreferenceService.getTimeZone()
 		}
 		parseDateTimeWithFormatter(timeZone, dateString, createFormatter(formatterType))
 	}
