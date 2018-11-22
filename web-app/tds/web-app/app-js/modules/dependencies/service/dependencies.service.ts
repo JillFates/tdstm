@@ -4,6 +4,7 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 
 import {PermissionService} from '../../../shared/services/permission.service';
 import {Dependency, DependencyResults} from '../model/dependencies.model';
+import {AssetTagSelectorComponent} from '../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 
 import {map} from 'rxjs/operators';
 
