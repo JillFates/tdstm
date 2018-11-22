@@ -99,7 +99,7 @@ class CustomValidators {
 					throw new RuntimeException("No validator defined for '${control}' Custom Control")
 				}
 
-				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec, domainName).apply()
+				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec, object).apply()
 
 				for(ErrorHolder e : errorsHolders){
 					errors.rejectValue(
