@@ -39,6 +39,7 @@ import org.apache.commons.lang.RandomStringUtils
 class E2EProjectSpec extends Specification {
 	// Set transactional false to persist at database when spec finishes
 	static transactional = false
+	static final String TARGET_HOSTNAME = 'TDS_TARGET_HOSTNAME'
 
 	// IOC
 	ProjectService projectService
@@ -241,7 +242,7 @@ class E2EProjectSpec extends Specification {
 			String testEmail = 'sample@sampleEmail.com'
 			String testRequestNote = 'Test request note'
 			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
-			String targetHostName = System.getenv('com.tds.lm.targetHostname')
+			String targetHostName = System.getenv(TARGET_HOSTNAME)
 			if (targetHostName){
 				licenseRequest.hostName = targetHostName
 			}
