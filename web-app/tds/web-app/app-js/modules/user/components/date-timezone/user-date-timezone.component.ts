@@ -13,7 +13,6 @@ export class UserDateTimezoneComponent {
 	constructor(
 		private userService: UserService,
 		public activeDialog: UIActiveDialogService) {
-		this.retrieveUserName();
 		this.retrieveMapAreas();
 	}
 
@@ -24,21 +23,13 @@ export class UserDateTimezoneComponent {
 		this.activeDialog.dismiss();
 	}
 
-	private retrieveUserName() {
-		this.userService.getUserName().subscribe(
-			(result: any) => {
-				this.currentUserName = result.person.firstName;
-			},
-			(err) => console.log(err));
-	}
-
 	private retrieveMapAreas() {
 		this.userService.getMapAreas().subscribe(
 			(result: any) => {
 				this.mapAreas = [];
 				for (let key in result.areas) {
 					if (result.areas.hasOwnProperty(key)) {
-						result.areas[key].name=key;
+						result.areas[key].name = key;
 						this.mapAreas.push(result.areas[key]);
 					}
 				}
