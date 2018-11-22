@@ -27,3 +27,8 @@ export interface DependencyResults {
 	dependencies: Dependency[];
 	total: number;
 }
+
+export interface TagState {
+	field: string;
+	tags: string;
+}

@@ -78,7 +78,7 @@
 				<tds-asset-tag-selector #tagSelector
 				                        [tagList]="tagList"
 				                        [viewFilterModel]="column.filter"
-				                        (valueChange)="onTagFilterChange(column, $event)">
+				                        (valueChange)="onTagFilterChange(column.field, $event)">
 				</tds-asset-tag-selector>
 			</ng-template>
 
