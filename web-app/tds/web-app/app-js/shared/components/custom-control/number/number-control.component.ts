@@ -8,7 +8,7 @@ import {NumberControlHelper} from './number-control.helper';
             <kendo-numerictextbox [format]="format"
 								  [(ngModel)]="numberValue"
                                   [min]="realMinRange" [max]="maxRange"
-                                  [autoCorrect]="false"
+                                  [autoCorrect]="true"
 								  (ngModelChange)="onValueChange($event)"
                                   class="form-control">
 			</kendo-numerictextbox>
@@ -36,7 +36,7 @@ export class NumberControlComponent implements OnInit {
 	 * On Init build the number format.
 	 */
 	ngOnInit(): void {
-		this.numberValue = +this.value;
+		this.numberValue = this.value ? +this.value : null;
 		if (this.allowNegative) {
 			this.realMinRange = this.maxRange * -1;
 		} else {
