@@ -8,7 +8,6 @@ import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
-import org.apache.xml.security.c14n.implementations.Canonicalizer11_OmitComments
 import org.springframework.util.Assert
 
 import javax.servlet.http.HttpSession
