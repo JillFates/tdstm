@@ -1,12 +1,14 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../service/user.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'date-timezone-modal',
 	templateUrl: '../tds/web-app/app-js/modules/user/components/date-timezone/user-date-timezone.component.html'
 })
-export class UserDateTimezoneComponent {
+export class UserDateTimezoneComponent implements OnInit {
 	public currentUserName;
 	public mapAreas;
 
@@ -14,6 +16,15 @@ export class UserDateTimezoneComponent {
 		private userService: UserService,
 		public activeDialog: UIActiveDialogService) {
 		this.retrieveMapAreas();
+	}
+
+	/**
+	 * Initialize the jQuery Time Picker
+	 */
+	ngOnInit(): void {
+		jQuery('#timezoneImage').timezonePicker({
+			target: '#dateTimezone'
+		});
 	}
 
 	/**
@@ -33,7 +44,6 @@ export class UserDateTimezoneComponent {
 						this.mapAreas.push(result.areas[key]);
 					}
 				}
-				console.log(this.mapAreas);
 			},
 			(err) => console.log(err));
 	}

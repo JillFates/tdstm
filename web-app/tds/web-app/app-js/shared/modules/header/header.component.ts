@@ -8,8 +8,8 @@ import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
 import {UserDateTimezoneComponent} from '../../../modules/user/components/date-timezone/user-date-timezone.component';
 import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
-import {UserService} from '../../../modules/user/service/user.service';
 import {UIDialogService} from '../../services/ui-dialog.service';
+import {DIALOG_SIZE} from '../../model/constants';
 
 declare var jQuery: any;
 
@@ -167,7 +167,7 @@ export class HeaderComponent {
 		});
 	}
 	public openDateTimezoneModal(): void {
-		this.dialogService.open(UserDateTimezoneComponent, []).catch(result => {
+		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
 			console.error(result);
 		});
 	}
