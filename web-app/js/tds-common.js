@@ -587,37 +587,41 @@ var UserPreference = function () {
 
 	// opens the edit user date and timezone dialog
 	var editDateAndTimezone = function () {
-		jQuery.ajax({
-			url: tdsCommon.createAppURL('/person/editTimezone'),
-			success: function (e) {
-				var prefDialog = $("#userTimezoneDivId")
-				prefDialog.html(e);
-				prefDialog.dialog('option', 'width', 'auto');
-				prefDialog.dialog('option', 'modal', true);
-				prefDialog.dialog("open");
+		var modalOpener = jQuery('.open-datetimezone-modal');
+		if(modalOpener.length) {
+			modalOpener.click();
+		} else {
+			jQuery.ajax({
+				url: tdsCommon.createAppURL('/person/editTimezone'),
+				success: function (e) {
+					var prefDialog = $("#userTimezoneDivId");
+					prefDialog.html(e);
+					prefDialog.dialog('option', 'width', 'auto');
+					prefDialog.dialog('option', 'modal', true);
+					prefDialog.dialog("open");
 
-                $('.ui-widget-overlay').addClass('old-legacy-content');
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while attempting to update task/comment")
-			}
-		})
+					$('.ui-widget-overlay').addClass('old-legacy-content');
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					alert("An unexpected error occurred while attempting to update task/comment")
+				}
+			})
+		}
 		return false;
 	}
 
 	// opens the edit user preferences dialog (Will open angular version or grails depending on the page).
 	var editPreference = function () {
-		modalOpener = jQuery('.open-pref-modal');
+		var modalOpener = jQuery('.open-pref-modal');
 		if(modalOpener.length) {
 			modalOpener.click();
-		}
-		else {
+		} else {
 			jQuery.ajax({
 				url: tdsCommon.createAppURL('/person/editPreference'),
 				success: function (e) {
-				var prefDialog = $("#userPrefDivId")
-					var pageHeight = Math.max($(window).outerHeight(), 200)
-					prefDialog.html(e)
+				var prefDialog = $("#userPrefDivId");
+					var pageHeight = Math.max($(window).outerHeight(), 200);
+					prefDialog.html(e);
 					prefDialog.dialog('option', 'width', 'auto');
 					prefDialog.dialog('option', 'maxHeight', pageHeight);
 					prefDialog.dialog('option', 'containment', 'body');

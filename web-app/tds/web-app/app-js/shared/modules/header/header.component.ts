@@ -21,6 +21,7 @@ declare var jQuery: any;
             <ng-container *ngIf="pageMetaData">
 	            <!-- Used for the user preferences until fully converted to angular -->
                 <span (click)="openPrefModal()" class="open-pref-modal"></span>
+                <span (click)="openDateTimezoneModal()" class="open-datetimezone-modal"></span>
                 <h1>
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
