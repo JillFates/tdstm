@@ -15,7 +15,7 @@ describe('Cabling Conflict Report',function(){
 
     it('should have Cabling Conflict as title', function(){
       var cablingConflictPage = new Reports();
-      expect(cablingConflictPage.getPageTitle()).toEqual('Cabling Conflict Report');
+      expect(cablingCoanflictPage.getPageTitle()).toEqual('Cabling Conflict Report');
     });
 
     describe('bundle dropdown',function(){
