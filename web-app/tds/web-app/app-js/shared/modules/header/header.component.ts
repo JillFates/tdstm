@@ -167,7 +167,7 @@ export class HeaderComponent {
 		});
 	}
 	public openDateTimezoneModal(): void {
-		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
+		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.MD).catch(result => {
 			console.error(result);
 		});
 	}
