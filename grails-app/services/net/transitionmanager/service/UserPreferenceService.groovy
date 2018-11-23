@@ -13,7 +13,6 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
@@ -258,7 +257,7 @@ class UserPreferenceService implements ServiceMethods {
 
 		// Convert the list to a List<Map>
 		for (pref in prefList) {
-			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfNameOrValue(pref[0]).toString() ]
+			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
 		}
 
 		// Sort into an alphabetical list by the Label
@@ -275,7 +274,7 @@ class UserPreferenceService implements ServiceMethods {
 		// Transform the value of the preferences that reference domains to display the name of the domain
 		// instead of the ID to improve the user experience.
 		for (pref in preferences) {
-			switch (PREF.valueOfNameOrValue(pref.code)) {
+			switch (PREF.valueOfName(pref.code)) {
 				case PREF.MOVE_EVENT:
 					setValueToReferenceName(MoveEvent.class, pref)
 					break
@@ -332,7 +331,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		userLogin = resolveUserLogin(userLogin)
-		PREF userPreferenceEnum = PREF.valueOfNameOrValue(preferenceCode)
+		PREF userPreferenceEnum = PREF.valueOfName(preferenceCode)
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
@@ -658,7 +657,9 @@ class UserPreferenceService implements ServiceMethods {
 		Map<String, String> valuesByCode = [:]
 		if (securityService.loggedIn && preferenceKeys) {
 			def userPreferences = UserPreference.findAllByUserLoginAndPreferenceCodeInList(
-					securityService.loadCurrentUserLogin(), preferenceKeys*.value())
+					securityService.loadCurrentUserLogin(),
+					preferenceKeys*.name()
+			)
 
 			for (preferenceCode in userPreferences) {
 				valuesByCode[preferenceCode.preferenceCode] = preferenceCode.value

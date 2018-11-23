@@ -122,8 +122,12 @@ enum UserPreferenceEnum {
 		value ?: name()
 	}
 
+	/**
+	 * return the key String representation of the Enum
+	 * @return
+	 */
 	String toString() {
-		value()
+		name()
 	}
 
 	/**
@@ -131,9 +135,9 @@ enum UserPreferenceEnum {
 	 * @param str - preference name or value
 	 * @return
 	 */
-	static UserPreferenceEnum valueOfNameOrValue(String str) {
+	static UserPreferenceEnum valueOfName(String str) {
 		UserPreferenceEnum userPreferenceEnum = values().find {
-			it.name() == str || it.value() == str
+			it.name() == str
 		}
 		if (userPreferenceEnum == null) {
 			throw new InvalidParamException('UserPreferenceEnum name or value invalid: ' + str)
