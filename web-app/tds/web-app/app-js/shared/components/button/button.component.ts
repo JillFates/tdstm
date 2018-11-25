@@ -5,35 +5,23 @@
 import {Component, Input, HostBinding} from '@angular/core';
 
 @Component({
-	selector: 'tds-button',
+	selector: '[tds-button]',
 	template: `
-		<div (click)="onClick($event)">
+		<div>
 			<i *ngIf="icon" [ngClass]='iconClasses'></i>
 			<ng-content></ng-content>
 		</div>
 	`
 })
 export class TDSButton {
-	@HostBinding('class.disabled') isDisabled = false;
+	@HostBinding('attr.type') type = 'button';
 	@Input() icon = '';
-	@Input() id = '';
-
-	@Input('disabled')
-	set disabled(value: boolean) {
-		this.isDisabled = value;
-	}
 
 	get iconClasses() {
 		return {
 			'fa': true,
 			'fa-fw': true,
 			[`fa-${this.icon}`]: true
-		}
-	}
-
-	onClick(event) {
-		if (this.isDisabled) {
-			event.stopPropagation();
 		}
 	}
 }

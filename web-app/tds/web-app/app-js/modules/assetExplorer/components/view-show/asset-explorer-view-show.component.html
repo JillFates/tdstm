@@ -3,12 +3,13 @@
         <div>
             <div class="btn-group"
                  *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
-                <tds-button icon="floppy-o"
+                <button tds-button
+                        icon="floppy-o"
                         (click)="save()"
                         [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
-                        [id]="getSaveButtonId()">
+                        [attr.id]="getSaveButtonId()">
                     {{ (model.isOwner ? 'GLOBAL.SAVE' : 'GLOBAL.SAVE_AS') | translate }}
-                </tds-button>
+                </button>
 
                 <button type="button" class="btn dropdown-toggle"
                         [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
@@ -42,10 +43,11 @@
                 <i style="font-size:20px;" [ngClass]="model.isFavorite? 'fa-star' : 'fa-star-o'" class="fa text-yellow"></i>
             </span>
 
-            <tds-button icon="download"
-                class="btn btn-default"
-                (click)="onExport()"
-                [id]="getSaveButtonId()">Export</tds-button>
+            <button tds-button
+                    icon="download"
+                    class="btn btn-default"
+                    (click)="onExport()"
+                    [attr.id]="getSaveButtonId()">Export</button>
 
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">

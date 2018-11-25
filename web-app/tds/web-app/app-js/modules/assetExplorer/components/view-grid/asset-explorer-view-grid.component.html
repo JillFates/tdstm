@@ -21,16 +21,15 @@
 			<div class="col-sm-6 bulkchange-section">
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
-					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
-					        data-toggle="dropdown"
-					        *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS">
+
+					<button tds-button
+					        [disabled]="!canCreateAssets()"
+					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
+					        class="btn btn-default dropdown-toggle"
+					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
 						{{ 'GLOBAL.CREATE' | translate }}
 					</button>
-					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
-					        *ngIf="_viewId !== ASSET_ENTITY_MENU.All_ASSETS"
-					        (click)="onCreateAsset(createButtonState)">
-						{{ 'GLOBAL.CREATE' | translate }}
-					</button>
+
 					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
 					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span>
@@ -54,7 +53,8 @@
 				<tds-bulk-change-button #tdsBulkChangeButton
 				                        [enabled]="hasSelectedItems()"
 				                        (clickBulk)="onClickBulkButton()"
-				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+				                        (operationResult)="onBulkOperationResult($event)">
+				</tds-bulk-change-button>
 				<div *ngIf="hasSelectedItems()" class="selected-assets">
 					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 				</div>
@@ -66,10 +66,14 @@
 			</div>
 			<div class="col-sm-6 filters-section">
 				<div>
-					<button type="button" class="btn btn-default component-action-clear-filters" id="btnClear"
+					<button tds-button
+					        icon="times"
+					        class="btn btn-default component-action-clear-filters"
+					        id="btnClear"
 					        [disabled]="!hasFilterApplied()"
 					        (click)="onClearFilters()">
-						<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+						{{'GLOBAL.CLEAR_FILTERS' | translate}}
+					</button>
 				</div>
 				<div (click)="onReload()" class="component-action-reload">
 					<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
