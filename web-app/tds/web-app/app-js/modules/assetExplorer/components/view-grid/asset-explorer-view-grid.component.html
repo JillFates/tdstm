@@ -103,7 +103,7 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="200" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="120" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -116,24 +116,28 @@
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="text-center">
 					<button tds-button
+					        class="tds-button-flat"
+					        (click)="showAssetEditView(dataItem, rowIndex)"
 					        icon="edit"
-					        title="Edit Asset"
-					        (click)="showAssetEditView(dataItem, rowIndex)">
+					        title="Edit Asset">
 					</button>
 					<button tds-button
+					        class="tds-button-flat"
+					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)"
 					        [icon]="isIssue ? 'list-alt' : 'file-text-o'"
-					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'"
-					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)">
+					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'">
 					</button>
 					<button tds-button
+					        class="tds-button-flat"
+					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)"
 					        [icon]="isComment ? 'comments' : 'comment'"
-					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'"
-					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)">
+					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'">
 					</button>
 					<button tds-button
+					        class="tds-button-flat"
+					        (click)="showAssetCloneView(dataItem, rowIndex)"
 					        icon="clone"
-					        title="Clone Asset"
-					        (click)="showAssetCloneView(dataItem, rowIndex)">
+					        title="Clone Asset">
 					</button>
 				</div>
 			</ng-template>

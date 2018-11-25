@@ -42,13 +42,11 @@
             <span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
                 <i style="font-size:20px;" [ngClass]="model.isFavorite? 'fa-star' : 'fa-star-o'" class="fa text-yellow"></i>
             </span>
-
             <button tds-button
                     icon="download"
                     class="btn btn-default"
                     (click)="onExport()"
                     [attr.id]="getSaveButtonId()">Export</button>
-
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
@@ -56,10 +54,7 @@
                 <i style="font-size:20px;" class="fa fa-cog"></i>
             </span>
         </div>
-        <br>
-        <div>
-            <!-- /.box-header -->
-            <div class="box-body">
+        <div class="box-body">
                 <asset-explorer-view-grid
                                           [data]=data
                                           (modelChange)="onQuery()"
@@ -72,8 +67,6 @@
                                           [viewId]="model.id"
                                           [metadata]="metadata">
                 </asset-explorer-view-grid>
-            </div>
-            <!-- /.box-body -->
         </div>
     </section>
 </div>

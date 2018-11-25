@@ -1,4 +1,15 @@
 .asset-explorer-view-grid-component
+  .k-grid-header
+    tr
+      height: unset!important
+      td
+        .has-feedback
+          input.form-control
+            padding: 2px 12px
+            height: unset
+          span.form-control-feedback
+            line-height: 28px
+
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
 
@@ -42,7 +53,11 @@
     border-right-color: #ebebeb
 
   .k-grid-header .k-header
-    vertical-align: top
+    top: 3px
+    padding: 0 12px
+    .k-link
+      margin: unset
+      padding: unset
 
   .sortable-column
     width: 90%
