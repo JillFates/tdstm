@@ -1,29 +1,22 @@
 <div class="content body">
     <section class="page-asset-explorer-config">
         <div>
-            <div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
+            <div class="btn-group"
+                 *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
+                <tds-button icon="floppy-o"
+                        (click)="save()"
+                        [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
+                        [id]="getSaveButtonId()">
+                    {{ (model.isOwner ? 'GLOBAL.SAVE' : 'GLOBAL.SAVE_AS') | translate }}
+                </tds-button>
 
-                <button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true)) "
-                        [disabled]="!isSaveAvailable()"
-                        class="btn"
-                        [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable(),'btn-success':isDirty() && isSaveAvailable()}"
-                        (click)="onSave()">
-                            <i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
-                </button>
-
-                <button type="button" id="btnSaveAs" *ngIf="!model.isOwner && !model.isSystem"
-                        [disabled]="!isSaveAsAvailable()"
-                        class="btn"
+                <button type="button" class="btn dropdown-toggle"
                         [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
-                        (click)="onSaveAs()">
-                            <i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
-                </button>
-
-                <button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
+
                 <ul class="dropdown-menu">
                     <li *ngIf="isSystemSaveAvailable(true)">
                         <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
@@ -34,6 +27,7 @@
                 </ul>
             </div>
             <ng-template #saveButton>
+	            <!--
                 <button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))" [disabled]="!isSaveAvailable()"
                     class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
                     (click)="onSave()">
@@ -42,12 +36,17 @@
                     [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
                     (click)="onSaveAs()">
                     <i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}</button>
+                -->
             </ng-template>
             <span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
                 <i style="font-size:20px;" [ngClass]="model.isFavorite? 'fa-star' : 'fa-star-o'" class="fa text-yellow"></i>
             </span>
-            <button type="button" class="btn btn-default" id="btnExport" (click)="onExport()">
-                <i class="fa fa-fw fa-download"></i> Export</button>
+
+            <tds-button icon="download"
+                class="btn btn-default"
+                (click)="onExport()"
+                [id]="getSaveButtonId()">Export</tds-button>
+
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
