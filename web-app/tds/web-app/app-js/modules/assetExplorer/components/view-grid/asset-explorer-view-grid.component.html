@@ -109,37 +109,31 @@
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
 				</div>
 			</ng-template>
-			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+			<ng-template kendoGridCellTemplate
+			             let-dataItem
+			             let-rowIndex="rowIndex"
+			             let-isComment="dataItem.taskAndCommentFlags.comment"
+			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="text-center">
-					<button class="btn btn-action btn-default"
+					<button tds-button
+					        icon="edit"
 					        title="Edit Asset"
 					        (click)="showAssetEditView(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-edit"></span>
 					</button>
-					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.issue"
-					        title="List existing Tasks"
-					        (click)="showTask(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-list-alt"></span>
+					<button tds-button
+					        [icon]="isIssue ? 'list-alt' : 'file-text-o'"
+					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'"
+					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)">
 					</button>
-					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
-					        title="Create a Task"
-					        (click)="createTask(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-file-text-o"></span>
+					<button tds-button
+					        [icon]="isComment ? 'comments' : 'comment'"
+					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'"
+					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)">
 					</button>
-					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
-					        title="List existing Comments"
-					        (click)="showComment(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-comments"></span>
-					</button>
-					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.comment"
-					        title="Create a Comment"
-					        (click)="createComment(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-comment"></span>
-					</button>
-					<button class="btn btn-action btn-default"
+					<button tds-button
+					        icon="clone"
 					        title="Clone Asset"
 					        (click)="showAssetCloneView(dataItem, rowIndex)">
-						<span class="fa fa-fw fa-clone"></span>
 					</button>
 				</div>
 			</ng-template>
