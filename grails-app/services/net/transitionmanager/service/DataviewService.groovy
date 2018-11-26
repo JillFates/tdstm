@@ -341,7 +341,7 @@ class DataviewService implements ServiceMethods {
 		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
 		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview, fieldSpecCache)
 
-		Map whereInfo = hqlWhere(dataviewSpec, project, fieldSpecCache)
+		Map whereInfo = hqlWhere(dataviewSpec, project)
 		String conditions = whereInfo.conditions
 		String hqlJoins = hqlJoins(dataviewSpec)
 
