@@ -87,7 +87,7 @@
                                                 name="priorityAssetEnvironment"
                                                 [(ngModel)]="model.asset.priority"
                                                 [defaultItem]="'Please Select'"
-                                                [data]="model.priorityOption">
+                                                [data]="${priorityOption}">
                                         </kendo-dropdownlist>
                                     </td>
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
