@@ -205,7 +205,7 @@ class AssetEntity {
 	String appSme = ''
 
 	// MoveBundleAsset fields
-	String validation
+	String validation = ValidationType.UNKNOWN
 
 	String externalRefId
 

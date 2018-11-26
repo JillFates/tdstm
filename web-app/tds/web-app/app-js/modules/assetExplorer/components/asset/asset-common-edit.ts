@@ -25,7 +25,7 @@ export class AssetCommonEdit implements OnInit {
 	protected isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
-	protected defaultValidation = 'Discovery';
+	protected defaultValidation = 'Unknown';
 	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
