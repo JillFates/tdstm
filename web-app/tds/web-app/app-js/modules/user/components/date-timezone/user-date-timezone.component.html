@@ -7,13 +7,20 @@
         <form id="userTimezoneForm">
             <div style="padding: 5px">
                 <b>Time Zone:</b>
-                <select id="dateTimezone" name="timezone"></select>
+                <kendo-dropdownlist
+                        id="dateTimezone"
+                        name="timezone"
+                        [(ngModel)]="dateTimezone"
+                        [data]="mapTimeZones">
+                </kendo-dropdownlist>
                 <b style="padding-left: 30px">Date Format:</b>
-                <select id="datetimeFormat" name="datetimeFormat"></select>
+                <kendo-dropdownlist
+                        id="dateTimeFormat"
+                        name="dateTimeFormat"
+                        [(ngModel)]="dateTimeFormat"
+                        [data]="dateTimeFormats">
+                </kendo-dropdownlist>
             </div>
-
-            <img id="timezoneImage" src="../images/world_map_800.jpg" width="800" height="400" usemap="#timezoneMap"/>
-            <img class="timezone-pin" src="../images/pin.png" style="padding-top: 4px;" />
 
             <map name="timezoneMap" id="timezoneMap">
                 <div *ngFor="let area of mapAreas">
@@ -35,6 +42,10 @@
                     />
                 </div>
             </map>
+
+            <img id="timezoneImage" src="../images/world_map_800.jpg" width="800" height="400" usemap="#timezoneMap"/>
+            <img class="timezone-pin" src="../images/pin.png" style="padding-top: 4px;" />
+
         </form>
 
         <div class="modal-footer form-group-center">
