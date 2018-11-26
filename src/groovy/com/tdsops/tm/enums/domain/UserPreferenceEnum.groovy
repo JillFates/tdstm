@@ -23,7 +23,7 @@ enum UserPreferenceEnum {
 	CURR_TZ ('Time Zone'),
 	DASHBOARD_REFRESH('Dashboard Refresh Timer'),
 	Database_Columns('Database List Size'),
-	DataScriptSize('ETL Designer Window Size'),
+	DATA_SCRIPT_SIZE('ETL Designer Window Size'),
 	Dep_Columns('Dependency List Custom Columns'),
 	DEP_CONSOLE_COMPACT('depConsoleCompact'),
 	DEP_GRAPH('Dependency Analyzer Settings'),
@@ -91,12 +91,12 @@ enum UserPreferenceEnum {
 	].asImmutable()
 
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
-	                                                              ImportStorage, ImportDependency, ImportCabling,
-	                                                              ImportComment, DataScriptSize].asImmutable()
+																  ImportStorage, ImportDependency, ImportCabling,
+																  ImportComment, DATA_SCRIPT_SIZE].asImmutable()
 
 	static final List<UserPreferenceEnum> exportPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
-	                                                              ImportStorage, ImportDependency, ImportRoom,
-	                                                              ImportRack, ImportCabling, ImportComment, DataScriptSize].asImmutable()
+																  ImportStorage, ImportDependency, ImportRoom,
+																  ImportRack, ImportCabling, ImportComment, DATA_SCRIPT_SIZE].asImmutable()
 
 	static final List<String> sessionOnlyPreferences = [
 		TASK_CREATE_EVENT.name(),
