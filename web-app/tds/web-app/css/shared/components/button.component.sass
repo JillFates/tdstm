@@ -1,6 +1,33 @@
-button.tds-button-flat
-  border: 0
-  background-color: transparent
-  margin: 0
-  padding: 0 2px
+$tds-button-icon-flat-color: #666
+
+@mixin tds-button-icon-mixin()
+  font-size: 16px
+
+.tds-button
+  i
+    @include tds-button-icon-mixin()
+
+.tds-button-set
+  align-items: center
+  display: flex
+  justify-content: center
+  position: relative
+  .tds-button-flat
+    border: 0
+    background-color: transparent
+    margin: 0
+    outline: 0
+    padding: 0 2px
+    i
+      @include tds-button-icon-mixin()
+      color: $tds-button-icon-flat-color
+      position: relative
+      top: 0
+      transition: top 0.2s linear
+      &:hover
+        top: 2px
+
+// Match the first tds-button with an icon set belonging to a btn-group
+.btn-group > [tds-button]:not([icon=""]):first-child()
+  padding-top: 5px
 

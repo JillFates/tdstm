@@ -23,6 +23,7 @@
 				     *ngIf="displayCreateButton()">
 
 					<button tds-button
+					        icon=""
 					        [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
 					        class="btn btn-default dropdown-toggle"
@@ -103,7 +104,7 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="120" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="105" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -114,7 +115,7 @@
 			             let-rowIndex="rowIndex"
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
-				<div class="text-center">
+				<div class="tds-button-set">
 					<button tds-button
 					        class="tds-button-flat"
 					        (click)="showAssetEditView(dataItem, rowIndex)"
