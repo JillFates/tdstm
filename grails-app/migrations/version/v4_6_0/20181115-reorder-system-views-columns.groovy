@@ -1,3 +1,5 @@
+package version.v4_6_0
+
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.service.DatabaseMigrationService
 
