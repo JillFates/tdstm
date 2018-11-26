@@ -19,15 +19,6 @@ describe('Reports Menu', function(){
           expect(list.length).toEqual(Links);
         });
       });
-      it('should have Cabling Conflict in the submenu', function(){
-        expect(menu.getCablingConflict().getText()).toEqual('Cabling Conflict');
-      });
-      it('should have Cabling Data in the submenu', function(){
-        expect(menu.getCablingData().getText()).toEqual('Cabling Data');
-      });
-      it('should have Power in the submenu', function(){
-        expect(menu.getPower().getText()).toEqual('Power');
-      });
       it('should have Application Profiles in the submenu', function(){
         expect(menu.getApplicationProfiles().getText()).toEqual('Application Profiles');
       });
@@ -52,20 +43,8 @@ describe('Reports Menu', function(){
       it('should have Login Badges in the submenu', function(){
         expect(menu.getLoginBadges().getText()).toEqual('Login Badges');
       });
-      it('should have Asset Tags in the submenu', function(){
-        expect(menu.getAssetTags().getText()).toEqual('Asset Tags');
-      });
-      it('should have Transport Worksheets in the submenu', function(){
-        expect(menu.getTransportWorksheets().getText()).toEqual('Transport Worksheets');
-      });
       it('should have Application Migration Results in the submenu', function(){
         expect(menu.getApplicationMigrationResults().getText()).toEqual('Application Migration Results');
-      });
-      it('should have Issue Report in the submenu', function(){
-        expect(menu.getIssueReport().getText()).toEqual('Issue Report');
-      });
-      it('should have Cabling QA in the submenu', function(){
-        expect(menu.getCablingQA().getText()).toEqual('Cabling QA');
       });
       it('should close Reports Menu',function(){
         menu.getReports().click();

@@ -488,16 +488,6 @@ var Menu = function(){
   this.getReportsSubmenu = function(){
     return browser.driver.findElements(by.css('#reportsMenuId a.mmlink'));
   };
-  this.getCablingConflict = function(){
-      return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict"]'));
-  };
-  this.getCablingData = function(){
-    return browser.driver.findElement
-      (by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData"]'));
-  };
-  this.getPower = function(){
-      return browser.driver.findElement(by.css('a[href="/tdstm/reports/powerReport"]'));
-  };
   this.getApplicationProfiles = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/applicationProfiles"]'));
   };
@@ -522,41 +512,20 @@ var Menu = function(){
   this.getLoginBadges = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges"]'));
   };
-  this.getAssetTags = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag"]'));
-  };
   this.getLogisticsTeamWorksheets = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset"]'));
-  };
-  this.getTransportWorksheets =function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List"]'));
   };
   this.getApplicationMigrationResults = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/applicationMigrationReport"]'));
   };
-  this.getIssueReport = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report"]'));
-  };
   this.getEventResults = function(){
-    // return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults"]'));
+    // return browser.driver.findElement(by.css('a[href="/    tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults"]'));
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults"]'));
-  };
-  this.getCablingQA = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA"]'));
   };
   this.goToReports= function(option){
     var that = this;
     this.getReports().click();
     var d = {
-      'cablingConflict':function(){
-          that.getCablingConflict().click();
-      },
-      'cablingData':function(){
-        that.getCablingData().click();
-      },
-      'power': function(){
-        that.getPower().click();
-      }, 
       'applicationProfiles': function(){
         that.getApplicationProfiles().click();
       },
@@ -581,26 +550,14 @@ var Menu = function(){
       'loginBadges':function(){
         that.getLoginBadges().click();
       },
-      'assetTags':function(){
-        that.getAssetTags().click();
-      },
       'logisticsTeamWorksheets':function(){
         that.getLogisticsTeamWorksheets().click();
-      },
-      'transportWorksheets':function(){
-        that.getTransportWorksheets().click();
       },
       'applicationMigrationResults':function(){
         that.getApplicationMigrationResults().click();
       },
-      'issueReport':function(){
-        that.getIssueReport().click();
-      },
       'eventResults':function(){
         that.getEventResults().click();
-      },
-      'cablingQA':function(){
-        that.getCablingQA().click();
       }
     };
     d[option]();

@@ -132,9 +132,6 @@ var Menu = function() {
 
 	this.reports = new function() {
 		that.parentObj.call(this, 'menu-parent-reports');
-		this.getCablingConflict = function() {return this.getItem('menu-reports-cabling-conflict');};
-		this.getCablingData = function() {return this.getItem('menu-reports-cabling-data');};
-		this.getPower = function() {return this.getItem('menu-reports-power');};
 		this.getApplicationProfiles = function() {return this.getItem('menu-reports-application-profiles');};
 		this.getApplicationConflicts = function() {return this.getItem('menu-reports-application-conflicts');};
 		this.getServerConflicts = function() {return this.getItem('menu-reports-server-conflicts');};
@@ -144,11 +141,7 @@ var Menu = function() {
 		this.getActivityMetrics = function() {return this.getItem('menu-reports-activity-metrics');};
 		this.getPreeventChecklist = function() {return this.getItem('menu-reports-pre-checklist');};
 		this.getLoginBadges = function() {return this.getItem('menu-reports-login-badges');};
-		this.getAssetTags = function() {return this.getItem('menu-reports-asset-tags');};
-		this.getTransportWorksheets = function() {return this.getItem('menu-reports-transport-worksheets');};
 		this.getApplicationMigrationResults = function() {return this.getItem('menu-reports-application-migration');};
-		this.getIssueReport = function() {return this.getItem('menu-reports-issue-report');};
-		this.getCablingQA = function() {return this.getParent().findElement(by.partialLinkText('Cabling QA')).findElement(by.xpath('..'));}; // assign class?
 	};
 
 };

@@ -91,13 +91,6 @@ class ReportsController implements ControllerMethods {
 				model.viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
 				model.remove 'moveBundleInstanceList'
 				break
-			case 'Transportation Asset List':
-				view = 'transportationAssetReport'
-				break
-			case 'Asset Tag':
-				view = 'assetTagLabel'
-				model.browserTest =  browserTest
-				break
 			default:
 				render 'An invalid report was specified'
 				return
@@ -120,8 +113,6 @@ class ReportsController implements ControllerMethods {
 			flash.message = " Please Select Bundles. "
 			if(reportName == 'cartAsset') {
 				redirect(action: 'retrieveBundleListForReportDialog', params: [reportId: 'cart Asset'])
-			} else {
-				redirect(action: 'retrieveBundleListForReportDialog', params: [reportId: 'Transportation Asset List'])
 			}
 		} else {
 			MoveBundle moveBundle = MoveBundle.get(params.moveBundle)
@@ -190,7 +181,7 @@ class ReportsController implements ControllerMethods {
 			if (!reportFields) {
 				flash.message = " No Assets Were found for  selected values  "
 				redirect(action:'retrieveBundleListForReportDialog',
-				         params: [reportId: reportName == 'cartAsset' ? 'cart Asset' : 'Transportation Asset List'])
+				         params: [reportId: reportName == 'cartAsset' ?: 'cart Asset'])
 			}else {
 				//sort reportFields by selected sort options
 				if ( sortOrder ) {
@@ -211,161 +202,6 @@ class ReportsController implements ControllerMethods {
 				chain(controller: 'jasper', action: 'index', model: [data: reportFields],
 						params: ["_format": "PDF", "_name": filename,"_file":params._file])
 			}
-		}
-	}
-
-	/*
-	 * Generate Issue Report
-	 */
-	def issueReport() {
-		Project project = controllerService.getProjectForPage(this, 'to view Reports')
-		if (!project) return
-
-		def partyGroupInstance = PartyGroup.get(project.id)
-		def bundleNames = ""
-		def reportFields = []
-		def resolvedInfoInclude
-		def sortBy = params.reportSort
-		def comment = params.commentInfo
-		def reportFormat = params._format
-
-		if( params.reportSort == "sourceLocation" ) {
-			sortBy = "roomSource.roomName,ac.assetEntity.rackSource.tag,ac.assetEntity.sourceRackPosition"
-		}else if( params.reportSort == "targetLocation" ){
-			sortBy = "roomTarget.roomName,ac.assetEntity.rackTarget.tag,ac.assetEntity.targetRackPosition"
-		}
-		if( params.reportResolveInfo == "false" ){
-			resolvedInfoInclude = "Resolved issues were not included"
-		}
-		String moveBundles = params.moveBundle
-		moveBundles = moveBundles.replace("[","('").replace(",]","')").replace(",","','")
-		if(params.moveBundle == "null") {
-			flash.message = " Please Select Bundles. "
-			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
-			return
-		}
-
-		String bundleName = "All Bundles"
-		def commentType = "('issue','comment')"
-		if(comment == "false"){
-			commentType = "('issue')"
-		}
-		def commentsQuery = new StringBuilder("from AssetComment ac where ac.commentType in $commentType ")
-
-		if( moveBundles.size() > 4 ){
-			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.$sortBy ")
-			bundleNames = MoveBundle.findAll("from MoveBundle where id in $moveBundles").name.toString()
-			bundleName = bundleNames
-		}else {
-			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $project.id ) order by ac.assetEntity.$sortBy ")
-			bundleNames = "All"
-		}
-
-		def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
-
-		String tzId = userPreferenceService.timeZone
-		def currDate = new Date()
-		DateFormat userDateFormatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
-		assetCommentList.each { ac ->
-			def sourceTargetRoom = (ac?.assetEntity?.sourceRoomName ?: "--")+
-								"/"+(ac?.assetEntity?.sourceRackName ?: "--")+
-								"/"+(ac?.assetEntity?.sourceRackPosition ?: "--")+"\n"+
-								(ac?.assetEntity?.targetRoomName ?: "--")+"/"+
-								(ac?.assetEntity?.targetRackName ?: "--")+"/"+
-								(ac?.assetEntity?.targetRackPosition ?: "--")
-			if( params.reportResolveInfo == "true" || !ac.isResolved() ) {
-				reportFields <<['assetName':ac?.assetEntity?.assetName,
-				                'assetTag':ac?.assetEntity?.assetTag,
-				                'moveBundle' :ac?.assetEntity?.moveBundle?.name,
-								'sourceTargetRoom':sourceTargetRoom,
-								'commentType':ac.commentType == 'issue' ? 'Task' : ac.commentType,
-								'model':(ac?.assetEntity?.manufacturer ? ac?.assetEntity?.manufacturer?.toString() : "") +
-										" " + (ac?.assetEntity?.model ? ac?.assetEntity?.model : "" ),
-								'occuredAt': ac.dateCreated,
-								'createdBy':ac?.createdBy?.firstName+" "+ac?.createdBy?.lastName,
-								'owner':ac?.assignedTo ? ac?.assignedTo?.firstName+" "+ac?.assignedTo?.lastName : '',
-								'issue':ac?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
-								'clientName':project?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
-								'previousNote':WebUtil.listAsMultiValueString(ac.notes) ]
-			}
-			if( params.reportResolveInfo == "true" && ac.isResolved() ) {
-				reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null,
-								'commentType':ac.commentType == 'issue' ? 'Task' : ac.commentType,
-								'occuredAt': ac.dateResolved,
-								'createdBy':ac?.resolvedBy?.firstName+" "+ac?.resolvedBy?.lastName,
-								'owner':ac?.assignedTo ? ac?.assignedTo?.firstName+" "+ac?.assignedTo?.lastName : '',
-								'issue':ac?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name,
-								'clientName':project?.client?.name,
-								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
-								'previousNote':WebUtil.listAsMultiValueString(ac.notes) ]
-			}
-		}
-		if( params.newsInfo == "true" ) {
-			def moveEvent = MoveEvent.findByProject(project)
-			def moveEventNewsList=MoveEventNews.findAllByMoveEvent(moveEvent)
-			moveEventNewsList.each { moveEventNews ->
-				moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
-				reportFields <<['assetName':'', 'assetTag':'', 'moveBundle' :'','sourceTargetRoom':'','model':'',
-							'commentType':"news",
-							'occuredAt': moveEventNews.dateCreated,
-							'createdBy':moveEventNews?.createdBy?.toString(),
-							'owner':'',
-							'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'',
-							'projectName':project?.name,
-							'clientName':project?.client?.name,
-							'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
-							'previousNote':'']
-			}
-
-		}
-
-		if (!reportFields) {
-			flash.message = " No Issues Were found for  selected values  "
-			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
-			return
-		}
-
-		String filename = ('IssueReport-' + project.name + '-' + bundleName).replace(" ", "_")
-		if (reportFormat == "PDF") {
-			chain(controller: 'jasper', action: 'index', model: [data: reportFields],
-					params: [_format: "PDF", _name: filename, _file: params._file])
-			return
-		}
-
-		// Generate XLS report
-		try {
-			File file = grailsApplication.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
-			//set MIME TYPE as Excel
-			response.setContentType( "application/vnd.ms-excel" )
-			response.setHeader( "Content-Disposition", 'attachment; filename="' + filename + '.xls"' )
-
-			def book = new HSSFWorkbook(new FileInputStream( file ))
-			def sheet = book.getSheet("issues")
-			WorkbookUtil.addCell(sheet, 1, 1, String.valueOf( project?.client?.name ))
-			WorkbookUtil.addCell(sheet, 1, 2, String.valueOf( partyGroupInstance?.name ))
-			WorkbookUtil.addCell(sheet, 1, 3, String.valueOf( bundleNames ))
-			for ( int r = 0; r < reportFields.size(); r++ ) {
-				WorkbookUtil.addCell(sheet, 0, r+6, String.valueOf(reportFields[r].assetName ?:''))
-				WorkbookUtil.addCell(sheet, 1, r+6, String.valueOf(reportFields[r].assetTag ?:''))
-				WorkbookUtil.addCell(sheet, 2, r+6, String.valueOf(reportFields[r].moveBundle ?:''))
-				WorkbookUtil.addCell(sheet, 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom ?:''))
-				WorkbookUtil.addCell(sheet, 4, r+6, String.valueOf(reportFields[r].model ?:''))
-				WorkbookUtil.addCell(sheet, 5, r+6, String.valueOf(reportFields[r].commentCode ?:''))
-				WorkbookUtil.addCell(sheet, 6, r+6, String.valueOf(reportFields[r].commentType ?:''))
-				WorkbookUtil.addCell(sheet, 7, r+6, TimeUtil.formatDateTime(reportFields[r].occuredAt))
-				WorkbookUtil.addCell(sheet, 8, r+6, String.valueOf(reportFields[r].createdBy ?:''))
-				WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
-				WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(reportFields[r].previousNote?:''))
-				WorkbookUtil.addCell(sheet, 11, r+6, String.valueOf(reportFields[r].issue ?:''))
-			}
-			WorkbookUtil.addCell(sheet, 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") )
-			book.write(response.getOutputStream())
-		}
-		catch (e) {
-			log.error e.message, e
-			flash.message = "Exception occurred while exporting data: $e.message"
-			redirect(action:"retrieveBundleListForReportDialog", params:[reportId:'Issue Report'] )
 		}
 	}
 
@@ -591,7 +427,7 @@ class ReportsController implements ControllerMethods {
 	}
 
 	/*
-	 * Generate Issue Report
+	 * Generate Task Report
 	 */
 	def tasksReport() {
 		def reqEvents = params.list("moveEvent").toList()

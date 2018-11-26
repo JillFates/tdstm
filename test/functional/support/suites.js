@@ -65,8 +65,6 @@ module.exports = {
   ],
   reports:[
     '../components/reports/applicationProfiles.spec.js',
-    '../components/reports/cablingConflict.spec.js',
-    '../components/reports/cablingData.spec.js',
     '../components/reports/applicationConflicts.spec.js',
     '../components/reports/serverConflicts.spec.js',
     '../components/reports/databaseConflicts.spec.js',
@@ -74,11 +72,7 @@ module.exports = {
     '../components/reports/reportSummary.spec.js',
     '../components/reports/preEventChecklist.spec.js',
     '../components/reports/loginBadges.spec.js',
-    '../components/reports/assetTags.spec.js',
-    '../components/reports/transportWorksheets.spec.js',
-    '../components/reports/applicationMigration.spec.js',
-    '../components/reports/issueReport.spec.js',
-    '../components/reports/cablingQA.spec.js'
+    '../components/reports/applicationMigration.spec.js'
   ],
   assets:[
     '../components/assets/applications/applicationList.spec.js',

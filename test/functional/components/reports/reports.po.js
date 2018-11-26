@@ -38,17 +38,11 @@ var Reports = function(){
   };
   //Report summary ends
 //Generate Reports  Buttons Starts
-  this.getGenerateCablingConflictBtn = function(){
-    return browser.driver.findElement(by.css('[onclick="return submit_CablingQAReport(this)"]'));
-  };
   this.generateApplicationConflictsBtn = function(){
     return browser.driver.findElement(by.id('applicationConflictsButton'));
   };
   this.generateServerConflictsBtn = function(){
     return browser.driver.findElement(by.id('serverConflictsButton'));
-  };
-  this.generateCablingDataBtn = function(){
-    return browser.driver.findElement(by.css('[onclick="return submit_CablingDataReport(this)"]'));
   };
   this.generateApplicationProfilesBtn = function(){
     return browser.driver.findElement(by.id('applicationProfilesButton'));
@@ -213,10 +207,6 @@ var Reports = function(){
   this.getPreEventCheckGeneratedReportHeader = function(){
     return browser.driver.findElement(by.css('.main_bottom div div b'));
   };
-  // transport worksheet
-  this.generateTransportWorksheetBtn = function(){
-    return browser.driver.findElement(by.css('[onclick="return submit_transportationAssetReport(this)"]'));
-  };
   // Application Migration Results
   this.generateApplicationMigrationBtn = function(){
     return browser.driver.findElement(by.id('applicationMigrationButton'));
@@ -224,7 +214,7 @@ var Reports = function(){
   this.getMoveBundleLabel = function(){
     return browser.driver.findElement(by.css('[for="moveBundle"]'));
   };
-  //Issue report
+
   this.getSortReportByLabel = function(){
     return browser.driver.findElement(by.css('.name[nowrap="nowrap"] label'));
   };
@@ -259,12 +249,6 @@ var Reports = function(){
   };
   this.getIncludeNewsInReportCheck = function(){
   return browser.driver.findElement(by.id('newsCheck'));
-  };
-  this.getIssueReportButtons = function(){
-    return browser.driver.findElements(by.css('.jasperButton'));
-  };
-  this.getIssueReportBtnImg = function(){
-    return browser.driver.findElements(by.css('.jasperButton img'));
   };
   //Event Results start
   this.getMoveEventLabel = function(){
