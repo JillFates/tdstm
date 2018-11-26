@@ -205,36 +205,36 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	@See('TM-10727')
 	void 'test gatherMetric for query mode filtering of Device'() {
-			setup: 'giving a metric definition for a query, that will have results'
-				String date = (new Date() - 1).format('yyyy-MM-dd')
-				JSONObject metricDefinition = [
-					"metricCode" : "DEV-COUNT",
-					"description": "Device counts metrics",
-					"enabled"    : true,
-					"mode"       : "query",
-					"query"      : [
-						"domain"     : "Device",
-						"aggregation": "count(*)"
-					]
-				] as JSONObject
-			when: 'running gatherMetrics using query mode definition'
-				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-			then: 'two map results with expect counts of JUST devices and no applications'
-				results[0] == [
-					projectId : project.id,
-					metricCode: 'DEV-COUNT',
-					date      : date,
-					label     : 'count',
-					value     : 2
+		setup: 'giving a metric definition for a query, that will have results'
+			String date = (new Date() - 1).format('yyyy-MM-dd')
+			JSONObject metricDefinition = [
+				"metricCode" : "DEV-COUNT",
+				"description": "Device counts metrics",
+				"enabled"    : true,
+				"mode"       : "query",
+				"query"      : [
+					"domain"     : "Device",
+					"aggregation": "count(*)"
 				]
+			] as JSONObject
+		when: 'running gatherMetrics using query mode definition'
+			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+		then: 'two map results with expect counts of JUST devices and no applications'
+			results[0] == [
+				projectId : project.id,
+				metricCode: 'DEV-COUNT',
+				date      : date,
+				label     : 'count',
+				value     : 2
+			]
 
-				results[1] == [
-					projectId : otherProject.id,
-					metricCode: 'DEV-COUNT',
-					date      : date,
-					label     : 'count',
-					value     : 1
-				]
+			results[1] == [
+				projectId : otherProject.id,
+				metricCode: 'DEV-COUNT',
+				date      : date,
+				label     : 'count',
+				value     : 1
+			]
 	}
 
 	@See('TM-10662')
@@ -351,8 +351,16 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			]
 		when: 'running gatherMetrics on sql query'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-		then: 'the results should have two expected map sets of values'
+		then: 'the results should have three expected map sets of values'
 			results[0] == [
+				projectId : project.id,
+				metricCode: 'APP-VPS',
+				date      : date,
+				label     : 'Unassigned:Application',
+				value     : 1
+			]
+
+			results[1] == [
 				projectId : project.id,
 				metricCode: 'APP-VPS',
 				date      : date,
@@ -360,7 +368,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				value     : 2
 			]
 
-			results[1] == [
+			results[2] == [
 				projectId : otherProject.id,
 				metricCode: 'APP-VPS',
 				date      : date,
@@ -385,7 +393,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 									count(*) as value
 							from asset_entity a
 							join move_bundle m on m.move_bundle_id=a.move_bundle_id
-							where a.project_id in (:projectIds) and a.validation in ('${ValidationType.UNKNOWN}', '${ValidationType.PLAN_READY}') and m.use_for_planning = true
+							where a.project_id in (:projectIds) and a.validation in ('${ValidationType.UNKNOWN}', '${
+					ValidationType.PLAN_READY
+				}') and m.use_for_planning = true
 							group by a.plan_status, a.asset_type, a.project_id;
 						""".stripIndent().toString()
 			]
