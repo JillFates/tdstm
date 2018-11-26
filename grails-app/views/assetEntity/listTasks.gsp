@@ -402,7 +402,7 @@
 	function toggleViewUnpublished (element) {
 		var checkedValue = $(element).is(':checked');
 		viewUnpublished = checkedValue;
-		setUserPreference('viewUnpublished', checkedValue, function () {
+		setUserPreference('VIEW_UNPUBLISHED', checkedValue, function () {
 			reloadGrid();
 		});
 	}
