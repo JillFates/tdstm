@@ -1649,7 +1649,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
 	var setViewUnpublishedPreference = function (viewUnpublished) {
 		var deferred = q.defer();
-		http.get(utils.url.applyRootPath('/assetEntity/setViewUnpublishedPreference?VIEW_UNPUBLISHED=' + viewUnpublished)).
+		http.get(utils.url.applyRootPath('/assetEntity/setViewUnpublishedPreference?viewUnpublished=' + viewUnpublished)).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
