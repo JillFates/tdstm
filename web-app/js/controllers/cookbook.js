@@ -139,22 +139,22 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	columnSel = {index: 0},
 	actionsTemplate = '<div class="gridIcon">'+
 			'<a href="" class="actions edit" title="Edit Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 0)">'+
-				'<img src="'+ utils.url.applyRootPath('/icons/script_edit.png') + '" alt="Edit">' +
+				'<img src="'+ utils.url.applyRootPath('/assets/icons/script_edit.png') + '" alt="Edit">' +
 			'</a>'+
 			'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
 				'title="Revert to other version" ng-click="gridActions(row, 1)">'+
-				'<img src="'+ utils.url.applyRootPath('/icons/arrow_undo.png') + '" alt="Revert">' +
+				'<img src="'+ utils.url.applyRootPath('/assets/icons/arrow_undo.png') + '" alt="Revert">' +
 			'</a>'+
 			'<a href="" class="actions archive" title="Archive Recipe" ng-click="gridActions(row, 2)"'+
 				'ng-hide="archived == \'y\'">'+
-				'<img src="'+ utils.url.applyRootPath('/icons/folder.png') + '" alt="Archive">' +
+				'<img src="'+ utils.url.applyRootPath('/assets/icons/folder.png') + '" alt="Archive">' +
 			'</a>'+
 			'<a href="" class="actions unarchive" title="Unarchive Recipe" ng-click="gridActions(row, 4)"'+
 				'ng-hide="archived == \'n\'">'+
-				'<img src="'+ utils.url.applyRootPath('/icons/folder_go.png') + '" alt="Archive">' +
+				'<img src="'+ utils.url.applyRootPath('/assets/icons/folder_go.png') + '" alt="Archive">' +
 			'</a>'+
 			'<a href="" class="actions remove" title="Delete Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 3)">'+
-			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
+			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
 			'</a>'+
 		'</div>';
 	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index +
@@ -1256,11 +1256,11 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	var	tasksActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" class="actions edit" title="Reset Tasks"'+
 			'ng-click="tasks.tasksGridActions(row, \'reset\')">'+
-			'<img src="'+ utils.url.applyRootPath('/icons/table_refresh.png') + '" alt="Reset">' +
+			'<img src="'+ utils.url.applyRootPath('/assets/icons/table_refresh.png') + '" alt="Reset">' +
 		'</a>'+
 		'<a href="" class="actions remove" title="Delete Task Batch"'+
 			'ng-click="tasks.tasksGridActions(row, \'remove\')">'+
-			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
+			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
 		'</a>'+
 		'</div>';
 	var checkboxTemplate = '<div class="gridIcon">'+
@@ -2083,7 +2083,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		'</a>'+
 		'<a href="" class="actions remove" title="Delete Version"'+
 			'ng-click="versions.versionsGridActions(row, \'remove\')">'+
-			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
+			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
 		'</a>'+
 		'</div>',
 		currentVersionTemplate = '<div class="gridIcon">'+
