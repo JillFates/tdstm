@@ -9,6 +9,7 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.MoveBundleTestHelper
@@ -25,52 +26,23 @@ class DeviceUtilsIntegrationSpec extends IntegrationSpec {
 	@Shared
 	MoveBundle moveBundle = bundleHelper.createBundle(project)
 
-	@Shared
-	Room room1
-	@Shared
-	Room room2
+	def setup() {
+		Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
+		Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
 
-	@Shared
-	Rack rack1
-	@Shared
-	Rack rack2
+		Manufacturer manufacturer1 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
+		Manufacturer manufacturer2 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
 
-	@Shared
-	Manufacturer manufacturer1
-	@Shared
-	Manufacturer manufacturer2
+		Model model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true, failOnError: true)
+		Model model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true, failOnError: true)
+		Model model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true, failOnError: true)
+		Model model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true, failOnError: true)
 
-	@Shared
-	Model model1
-	@Shared
-	Model model2
-	@Shared
-	Model model3
-	@Shared
-	Model model4
+		Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true, failOnError: true)
+		Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true, failOnError: true)
 
-	@Shared
-	AssetEntity assetEntity1
-	@Shared
-	AssetEntity assetEntity2
-
-	void setup() {
-		room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
-		room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
-
-		manufacturer1 = new Manufacturer(project: project, name: 'Manufacturer 1').save(flush: true, failOnError: true)
-		manufacturer2 = new Manufacturer(project: project, name: 'Manufacturer 2').save(flush: true, failOnError: true)
-
-		model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true, failOnError: true)
-		model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true, failOnError: true)
-		model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true, failOnError: true)
-		model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true, failOnError: true)
-
-		rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true, failOnError: true)
-		rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true, failOnError: true)
-
-		assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true, failOnError: true)
-		assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true, failOnError: true)
+		AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true, failOnError: true)
+		AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true, failOnError: true)
 
 		room1.addToRacks(rack1).save(flush: true, failOnError: true)
 		room2.addToRacks(rack2).save(flush: true, failOnError: true)
