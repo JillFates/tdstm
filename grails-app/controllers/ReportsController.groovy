@@ -918,7 +918,7 @@ class ReportsController implements ControllerMethods {
 	 */
 	private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, includeNonPlanning) {
 		File file = grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
-		String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_6)
+		String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_ISO8601)
 		String filename = 'ActivityMetrics-' + fileDate + '-Report'
 
 		//set MIME TYPE as Excel

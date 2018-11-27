@@ -26,6 +26,7 @@ import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
+import {clone} from 'ramda';
 
 declare var jQuery: any;
 @Component({
@@ -395,6 +396,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
 		this.data = null;
+		this.model.schema = clone(this.model.schema);
 		this.previewButtonClicked = false;
 	}
 

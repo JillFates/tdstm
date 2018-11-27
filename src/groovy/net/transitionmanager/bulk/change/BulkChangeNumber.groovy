@@ -69,7 +69,7 @@ class BulkChangeNumber {
 	private static void update(Class type, Number value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 		String setFieldQueryPart
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 
 		if (value) {
 			params.value = "$value"

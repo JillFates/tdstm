@@ -722,7 +722,7 @@ class PersonController implements ControllerMethods {
 					}
 				}
 				moveEventList << [project: moveEvent.project.name, name: moveEvent.name, startTime: bundleStartDate,
-				                  startDate: TimeUtil.formatDateTime(eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6),
+				                  startDate: TimeUtil.formatDateTime(eventTimes.start, TimeUtil.FORMAT_DATE_ISO8601),
 				                  id: moveEvent.id]
 			}
 		}

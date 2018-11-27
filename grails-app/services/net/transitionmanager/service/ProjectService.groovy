@@ -1769,11 +1769,11 @@ class ProjectService implements ServiceMethods {
 					projectCode          : project.projectCode,
 					clientName           : project.client.name,
 					description          : project.description ?: '',
-					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_TIME_6),
-					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_TIME_6),
+					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
+					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
-					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_TIME_6),
-					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_TIME_6)
+					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
+					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
 			]
 		}
 	}

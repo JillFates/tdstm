@@ -143,6 +143,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 
 	protected onFocusOut($event): void {
 		if (this.dropdown.isOpen) {
+			this.selectedItem = this.defaultItem.name;
 			this.onToggle();
 		}
 	}
