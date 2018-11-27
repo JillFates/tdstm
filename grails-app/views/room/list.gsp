@@ -280,7 +280,7 @@
 				url: contextPath+"/room/show",
 				data: {'id':roomId},
 				type:'POST',
-				success: function(data) {aler(JSON.stringify(data));
+				success: function(data) {alert(JSON.stringify(data));
 					$("#roomListView").hide()
 					$("#roomShowView").html(data)
 					$("#roomShowView").show()

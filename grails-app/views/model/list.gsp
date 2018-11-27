@@ -49,7 +49,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var modelPref= '${modelPref[key]}';
-					$("#modelIdGrid_"+modelPref).append('<asset:image src="images/select2Arrow.png" class='selectImage customizeSelect editSelectimage_${key}' onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')" />');
+				$("#modelIdGrid_"+modelPref).append('<img src=\'/tdstm/assets/images/select2Arrow.png\' class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')">');
 				</g:each>
 
 				$.jgrid.formatter.integer.thousandsSeparator='';
