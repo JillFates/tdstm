@@ -34,6 +34,7 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -43,14 +44,15 @@ class PersonController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	ControllerService controllerService
-	JdbcTemplate jdbcTemplate
+	ControllerService        controllerService
+	JdbcTemplate             jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProjectService projectService
-	TaskService taskService
-	UserPreferenceService userPreferenceService
-	UserService userService
+	PersonService            personService
+	ProjectService           projectService
+	TaskService              taskService
+	UserPreferenceService    userPreferenceService
+	UserService              userService
+	LinkGenerator            grailsLinkGenerator
 
 	/**
 	 * Generates a list view of persons related to company
@@ -174,7 +176,7 @@ class PersonController implements ControllerMethods {
 		boolean canEdit = securityService.hasPermission(Permission.UserEdit)
 		String userLoginCreateLink = createLink(controller: 'userLogin', action: 'create')
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
-		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
+		String userAddPng = "$grailsLinkGenerator.serverBaseURL/assets/icons/user_add.png"
 		def results = personInstanceList?.collect {
 			[cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
 			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
