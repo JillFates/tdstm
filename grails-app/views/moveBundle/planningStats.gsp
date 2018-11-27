@@ -90,7 +90,7 @@ $(document).ready(function() {
 									<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
 										<b> ${100 - percentageAppToValidate}%</b>
 										<g:link controller="application" action="list"
-                                                params="[filter:'application', toValidate:'Unknown']">
+                                                params="[filter:'application', toValidate:ValidationType.UNKNOWN]">
                                             Applications Validated
                                         </g:link>
 									</div>
