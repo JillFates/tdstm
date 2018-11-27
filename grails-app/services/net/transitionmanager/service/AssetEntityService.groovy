@@ -1524,8 +1524,7 @@ class AssetEntityService implements ServiceMethods {
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs,
-			priorityOption: getAssetPriorityOptions(),
+			standardFieldSpecs: standardFieldSpecs
 		]
 	}
 
