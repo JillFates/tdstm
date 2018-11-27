@@ -43,7 +43,7 @@
 .buttonR input {
 	background-color:#5F9FCF;
 	border:1px solid #328714;
-	background-image:url(../images/button_highlight.png);
+	background-image:url(../../../images/images/button_highlight.png);
 	background-repeat:repeat-x; 
 	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
@@ -56,7 +56,7 @@
 .buttonTodo {
 	background-color:#7FFF00;
 	border:1px solid #328714;
-	background-image:url(../images/button_highlight.png);
+	background-image:url(../../../images/images/button_highlight.png);
 	background-repeat:repeat-x; 
 	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
@@ -70,7 +70,7 @@
 .buttonBlank {
 	background-color:#808080;
 	border:1px solid #328714;
-	background-image:url(../images/button_highlight.png);
+	background-image:url(../../../images/images/button_highlight.png);
 	background-repeat:repeat-x; 
 	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
@@ -130,11 +130,11 @@
 	color:#ffffff;
 	padding:2px 6px;
 	border-right:1px solid #CCCCCC;
-	background:url(../images/menu_bg.jpg) repeat-x;
+	background:url(../../../images/images/menu_bg.jpg) repeat-x;
 }
 .menu1 li a:hover, .menu1 li.current a {
 	color:#cccccc;
-	background:url(../images/menu_bg_hover.jpg) repeat-x;
+	background:url(../../../images/images/menu_bg_hover.jpg) repeat-x;
 }
 
 .menu1 ul li a:visited {
@@ -329,7 +329,7 @@
 .dashboard_div {
 	margin-top: 10px;
 	margin-left: 5px;
-	background-image: url(../images/news_bg.jpg);
+	background-image: url(../../../images/images/news_bg.jpg);
 	background-size: contain;
 }
 .dashboardContainer {
@@ -620,15 +620,15 @@ div.scrollTable tbody td + td + td + td{
 }
 
 .rack_task_hold{
-	background :url(../images/task_hold.png) no-repeat scroll 0 0 transparent !important;
+	background :url(../../../images/images/task_hold.png) no-repeat scroll 0 0 transparent !important;
 	text-decoration: none!important;
 }
 .rack_task_ready {
-	background :url(../images/task_ready.png) no-repeat scroll 0 0 transparent !important;
+	background :url(../../../images/images/task_ready.png) no-repeat scroll 0 0 transparent !important;
 	text-decoration: none !important;
 }
 .rack_task_started {
-	background :url(../images/task_started.png) no-repeat scroll 0 0 transparent !important;
+	background :url(../../../images/images/task_started.png) no-repeat scroll 0 0 transparent !important;
 	text-decoration: none !important;
 }
 
@@ -736,7 +736,7 @@ div.tableContainer thead th a {
 .buttonClean input {
 	background-color:#5F9FCF;
 	border:1px solid #328714;
-	background-image:url(../images/button_highlight.png);
+	background-image:url(../../../images/images/button_highlight.png);
 	background-repeat:repeat-x; 
 	font-family: helvetica, arial, sans-serif;
 	font-size:12px;
@@ -1126,12 +1126,12 @@ dl dd {
 }
 
 .statusButtonBar {
-	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	background: #fff url(../../../images/images/skin/shadow.jpg) bottom repeat-x;
 	box-shadow: inset 0px 3px 3px #888;
 	height: 30px;
 }
 .statusButton {
-	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	background: #fff url(../../../images/images/skin/shadow.jpg) bottom repeat-x;
 	border: 1px solid #ccc;
 	border-radius:4px;
 	color: #666;
@@ -1145,7 +1145,7 @@ dl dd {
 	margin-left: 65px;
 }
 .detailButton {
-	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	background: #fff url(../../../images/images/skin/shadow.jpg) bottom repeat-x;
 	border: 1px solid #ccc;
 	border-radius:4px;
 	color: #666;
@@ -1159,7 +1159,7 @@ dl dd {
 	margin-left: 65px;
 }
 .statusButton_mobile {
-	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	background: #fff url(../../../images/images/skin/shadow.jpg) bottom repeat-x;
 	border: 1px solid #ccc;
 	border-radius:4px;
 	color: #666;
@@ -1466,7 +1466,7 @@ a.task_action span.task_button { float: left; height: 16px; line-height: 16px;  
 span.task_button_disabled { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:grey}
 
 span.task_icon_button_disabled {
-	background-image: url(../images/ui-icons_888888_256x240.png) !important;
+	background-image: url(../../../images/images/ui-icons_888888_256x240.png) !important;
 }
 a.button_task_disabled {
 	cursor: default;
@@ -1569,14 +1569,14 @@ a.button_task_disabled {
 	margin-top: 5px;
 }
 .icon-arrow-left {
-	background-image: url(../images/ui-icons_222222_256x240.png);
+	background-image: url(../../../images/images/ui-icons_222222_256x240.png);
 	width: 16px;
 	height: 16px;
 	display: block;	
 	background-position: -96px -16px;
 }
 .icon-arrow-right {
-	background-image: url(../images/ui-icons_222222_256x240.png);
+	background-image: url(../../../images/images/ui-icons_222222_256x240.png);
 	width: 16px;
 	height: 16px;
 	display: block;	
@@ -1597,12 +1597,12 @@ a.button_task_disabled {
 .loading-indicator-anim-center {
 	width:100%;
 	height:100%;
-	background:url(../images/processing.gif) center center no-repeat;
+	background:url(../../../images/images/processing.gif) center center no-repeat;
 }
 .loading-indicator-anim-left {
 	width:100%;
 	height:100%;
-	background:url(../images/processing.gif) left center no-repeat;
+	background:url(../../../images/images/processing.gif) left center no-repeat;
 	margin-left: 5px;
 }
 .headerWidth{
@@ -1622,7 +1622,7 @@ a.action-button span.task_button {
 	color: #2C61AA;
 }
 a.task_action span.tds-task-graph-icon {
-	background-image: url(../icons/tds_task_graph.png);
+	background-image: url(../../../images/icons/tds_task_graph.png);
 	background-position: 0px 0px;
 	background-size: 12px 12px;
 	top: 10px;

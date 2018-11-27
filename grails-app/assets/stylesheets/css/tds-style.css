@@ -1469,7 +1469,7 @@ div.ui-dialog {
       width: 16px;
       height: 16px;
       background-position: -97px -129px;
-      background-image: url(../assets/images/ui-icons_ffffff_256x240.png) !important;
+      background-image: url(../../../assets/images/ui-icons_ffffff_256x240.png) !important;
       background-color: initial !important; }
       div.ui-dialog div.ui-widget-header button.ui-dialog-titlebar-close span.ui-icon {
         display: none !important; }

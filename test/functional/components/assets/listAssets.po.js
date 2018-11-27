@@ -37,7 +37,7 @@ ListAssets.prototype.isAddTaskIconDisplayed = function(appId){
   var that = this;
   return browser.wait(function(){
     return that.getTaskIcon(appId).getAttribute('src').then(function(ico){
-      return ico === process.env.BASE_URL+'/tdstm/icons/table_add.png';
+      return ico === process.env.BASE_URL+'/tdstm/assets/icons/table_add.png';
     });
   }).then(function(){
     return true;
