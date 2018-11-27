@@ -54,6 +54,7 @@ import { AddPersonComponent } from './components/add-person/add-person.component
 import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
+import { PasswordChangeComponent } from './components/password-change/password-change.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
 // Dictionary
@@ -105,7 +106,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		InputPasteDirective,
 		AkaComponent,
 		ConnectorComponent,
-		FieldReferencePopupComponent
+		FieldReferencePopupComponent,
+		PasswordChangeComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -139,7 +141,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AkaComponent,
 		ConnectorComponent,
 		PopupModule,
-		FieldReferencePopupComponent
+		FieldReferencePopupComponent,
+		PasswordChangeComponent
 	],
 	entryComponents: [
 		DynamicComponent,

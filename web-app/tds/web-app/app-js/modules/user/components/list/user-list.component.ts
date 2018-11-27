@@ -3,6 +3,8 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 import {UserService} from '../../service/user.service';
 import {UserViewEditComponent} from '../view-edit/user-view-edit.component';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
+import {PasswordChangeModel} from '../../../../shared/components/password-change/model/password-change.model';
 
 @Component({
 	selector: 'user-list',
@@ -16,7 +18,10 @@ export class UserListComponent implements OnInit {
 	}
 
 	ngOnInit():void {
-		this.dialogService.open(UserViewEditComponent, []).catch(result => {
+		this.dialogService.open(UserViewEditComponent, [
+			{ provide: PersonModel, useValue: {} },
+			{ provide: PasswordChangeModel, useValue: {} }
+		]).catch(result => {
 			if(result) {
 				console.error(result);
 			}

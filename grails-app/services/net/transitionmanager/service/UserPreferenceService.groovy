@@ -298,6 +298,19 @@ class UserPreferenceService implements ServiceMethods {
 		return preferences
 	}
 
+    /**
+     * Set the user preference for the provided user account, or the currently authenticated user if null.
+     * Note that if it is setting CURR_PROJ to a new value it will automatically call
+     * removeProjectAssociatedPreferences to clear out project specific settings.
+     */
+    @Transactional
+    boolean setPreferences(UserLogin userLogin = null, Map preferences) {
+        preferences.each {
+            key, value ->
+                setPreference(userLogin, key, value)
+        }
+    }
+
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
 	 * Note that if it is setting CURR_PROJ to a new value it will automatically call

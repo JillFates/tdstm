@@ -64,7 +64,7 @@ class WsUserController implements ControllerMethods {
 
         Map model = [
             fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
-            person: [firstName: person.firstName],
+            person: person,
             preferences: userPreferenceService.preferenceListForEdit(userLogin)
         ]
     	renderSuccessJson(model)
@@ -122,33 +122,17 @@ class WsUserController implements ControllerMethods {
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 */
+	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserUpdateOwnAccount)
-	def updateAccount() {
-		String errMsg = ''
-		Map results = [:]
-		try {
-			//params.id = securityService.currentUserLoginId
-			Person person = personService.updatePerson(params, false)
-
-			if (params.tab) {
-				// Funky use-case that we should try to get rid of
-				forward(action:'loadGeneral', params:[tab: params.tab, personId:securityService.getUserLogin().person])
-				return
-			} else {
-				results = [ name:person.firstName ]
-			}
-
-		} catch (InvalidParamException | DomainUpdateException e) {
-			errMsg = e.message
-		} catch (e) {
-			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = 'An error occurred during the update process'
-		}
-
-		if (errMsg) {
-			renderErrorJson(errMsg)
-		} else {
-			renderSuccessJson(results)
-		}
-	}
+	def updateAccount(Map personInfo) {
+		Map settings = request.JSON
+        //params.id = securityService.currentUserLoginId
+        Person person = personService.updatePerson(settings, false)
+		Map preferences = [
+		        START_PAGE : settings.startPage,
+				CURR_POWER_TYPE : settings.powerType
+		]
+		userPreferenceService.setPreferences(null, preferences)
+		renderSuccessJson()
+    }
 }

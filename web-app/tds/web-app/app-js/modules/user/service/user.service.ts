@@ -42,6 +42,15 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
+	getPreferences(prefCodes) {
+		return this.http.get(`${this.userPreferenceUrl}/preferences/${prefCodes}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	removePreference(prefCode) {
 		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
 			.map((res: Response) => {
@@ -70,7 +79,7 @@ export class UserService {
 	}
 
 	updateAccount(params) {
-		return this.http.post(`${this.userPreferenceUrl}/updateAccount/${params}`, null)
+		return this.http.post(`${this.userPreferenceUrl}/updateAccount`, params)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

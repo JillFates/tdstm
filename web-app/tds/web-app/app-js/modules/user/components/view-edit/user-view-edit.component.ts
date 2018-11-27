@@ -1,37 +1,28 @@
 import {Component} from '@angular/core';
 import {UserService} from '../../service/user.service';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PasswordChangeModel} from '../../../../shared/components/password-change/model/password-change.model';
 
-class AccountPreferences {
-	id: number;
-	firstName: string;
-	middleName: string;
-	lastName: string;
-	nickName: string;
-	title: string;
-	email: string;
-	expiryDate: string;
-	powerType: string;
-	startPage: string;
-}
 @Component({
 	selector: 'user-preferences',
 	templateUrl: '../tds/web-app/app-js/modules/user/components/view-edit/user-view-edit.component.html'
 })
+
 export class UserViewEditComponent {
-	public currentUserInfo;
+	public currentPersonId;
 	public startPageOptions;
 	public editableUserPreferences;
 
 	constructor(
+		public personModel: PersonModel,
+		public passwordChangeModel: PasswordChangeModel,
 		private userService: UserService,
 		public activeDialog: UIActiveDialogService) {
-		this.currentUserInfo = [];
 		this.startPageOptions = [];
 		this.editableUserPreferences = [];
-		this.retrieveUserInfo();
 		this.retrieveStartPageOptions();
-		this.retrieveEditablePreferences();
+		this.loadComponentModel();
 	}
 
 	/**
@@ -42,21 +33,45 @@ export class UserViewEditComponent {
 
 	}
 
-	private retrieveEditablePreferences() {
-		let editablePrefCodes = ["START_PAGE","CURR_POWER_TYPE"];
-		this.userService.getPreference(editablePrefCodes).subscribe(
+	private loadComponentModel() {
+		this.userService.fetchComponentModel().subscribe(
 			(result: any) => {
-				this.editableUserPreferences = result.preferences;
-				console.log(this.editableUserPreferences);
-			},
-			(err) => console.log(err));
-	}
+				const defaultPerson = { firstName: '',
+					middleName: '',
+					lastName: '',
+					nickName: '',
+					title: '',
+					email: '',
+					department: '',
+					location: '',
+					workPhone: '',
+					mobilePhone: '',
+					active: 'Y',
+					staffTypeId: '',
+					company: '',
+					companies: [],
+					teams: [] ,
+					staffType: [],
+					selectedTeams: []
+				};
+				this.personModel = Object.assign({},  defaultPerson, this.personModel);
 
-	private retrieveUserInfo() {
-		this.userService.getUserName().subscribe(
-			(result: any) => {
-				this.currentUserInfo = result.person;
-				console.log(this.currentUserInfo);
+				// Get the preference list and get those that match the desired fields
+				let preferenceList = result.preferences;
+				let startPagePref = preferenceList.find(p => p.code === 'START_PAGE');
+				let powerTypePref = preferenceList.find(p => p.code === 'CURR_POWER_TYPE');
+				this.editableUserPreferences.START_PAGE = startPagePref ? startPagePref.value : 'Project Settings';
+				this.editableUserPreferences.CURR_POWER_TYPE = powerTypePref ? powerTypePref.value : 'Watts';
+				let currentPersonInfo = result.person;
+				let personModel = this.personModel;
+				// Fill the model based on the current person.
+				Object.keys(currentPersonInfo).forEach(function(key) {
+					if (key in personModel) {
+						personModel[key] = currentPersonInfo[key];
+					}
+				});
+				this.personModel = personModel;
+				this.currentPersonId = result.person.id;
 			},
 			(err) => console.log(err));
 	}
@@ -70,51 +85,37 @@ export class UserViewEditComponent {
 			(err) => console.log(err));
 	}
 
-	private savePreference(pref) {
-		this.userService.savePreference(pref).subscribe(
-			(result: any) => {
-				this.startPageOptions = result.pages;
-				console.log(this.startPageOptions);
-			},
-			(err) => console.log(err));
-	}
-
-	public submitPreferences(e) {
-		console.log(e);
-		let dateRegExpForExp = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-
+	public submitPreferences() {
 		let returnVal = true
-		let preferences = new AccountPreferences();
-		preferences.firstName = e.target.querySelector("#firstNameId").value;
-		preferences.middleName = e.target.querySelector("#middleNameId").value;
-		preferences.lastName = e.target.querySelector("#lastNameId").value;
-		preferences.nickName = e.target.querySelector("#nickNameId").value;
-		preferences.title = e.target.querySelector("#titleId").value;
-		preferences.email = e.target.querySelector("#emailId").value;
-		preferences.expiryDate = '06/24/2020 12:23 PM'
-		preferences.powerType = e.target.querySelector("#powerTypeId").value;
-		preferences.startPage = e.target.querySelector("#startPageId").value;
-
-		if (preferences.expiryDate + "" == "undefined") {
-			preferences.expiryDate = "null"
+		let preferences = {
+			'id' : undefined,
+			'firstName': this.personModel.firstName,
+			'middleName': this.personModel.middleName,
+			'lastName': this.personModel.lastName,
+			'nickName': this.personModel.nickName,
+			'title': this.personModel.title,
+			'email': this.personModel.email,
+			'oldPassword': this.passwordChangeModel.oldPassword,
+			'confirmPassword': this.passwordChangeModel.confirmPassword,
+			'newPassword': this.passwordChangeModel.newPassword,
+			'startPage': this.editableUserPreferences.START_PAGE,
+			'powerType': this.editableUserPreferences.CURR_POWER_TYPE
 		}
 		if (!preferences.firstName) {
-			alert("First Name should not be blank ")
+			alert('First Name should not be blank ')
 			returnVal = false
-		} else if (preferences.expiryDate != "null" && !preferences.expiryDate) {
-			alert("Expiry Date should not be blank ")
-			returnVal = false
-		} else if (preferences.expiryDate != "null" && !dateRegExpForExp.test(preferences.expiryDate)) {
-			alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
-			returnVal = false
+		} else if (this.passwordChangeModel.oldPassword + this.passwordChangeModel.newPassword != "") {
+			if (!this.passwordChangeModel.oldPassword) {
+				alert("Old Password should not be blank ")
+				returnVal = false
+			} else if (!this.passwordChangeModel.meetsCompositionRequirements || this.passwordChangeModel.containsUsername || !this.passwordChangeModel.atLeastMinimumLength) {
+				alert("New Password does not meet all the requirements ")
+				returnVal = false
+			}
 		}
 		if (returnVal) {
-			this.userService.getUserName().subscribe(
-				(result: any) => {
-						preferences.id = result.person.id;
-						this.userService.updateAccount(preferences).subscribe(
-						(err) => console.log(err));
-				},
+			preferences.id = this.currentPersonId;
+			this.userService.updateAccount(preferences).subscribe(
 				(err) => console.log(err));
 		}
 	}
