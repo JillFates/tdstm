@@ -3,8 +3,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'rackLayout.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'jquery.autocomplete.css')}"/>
+    <link type="text/css" rel="stylesheet" href="${assetPath(src: 'css/rackLayout.css')}"/>
+    <link type="text/css" rel="stylesheet" href="${assetPath(src: 'css/jquery.autocomplete.css')}"/>
     <g:javascript src="asset.tranman.js"/>
     <title>Power Report</title>
     <script type="text/javascript">

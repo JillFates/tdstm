@@ -4,16 +4,16 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'rackLayout.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'jquery.autocomplete.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'ui.datepicker.css')}"/>
+    <link type="text/css" rel="stylesheet" href="${assetPath(src: 'css/rackLayout.css')}"/>
+    <link type="text/css" rel="stylesheet" href="${assetPath(src: 'css/jquery.autocomplete.css')}"/>
+    <link type="text/css" rel="stylesheet" href="${assetPath(src: 'css/ui.datepicker.css')}"/>
 
     <g:javascript src="asset.tranman.js"/>
     <g:javascript src="room.rack.combined.js"/>
     <g:javascript src="entity.crud.js"/>
     <g:javascript src="model.manufacturer.js"/>
     <g:render template="../layouts/responsiveAngularResources"/>
-    <g:javascript src="select2.js"/>
+    <asset:javascript src="select2.js"/>
 
     <title>Rack View</title>
 
