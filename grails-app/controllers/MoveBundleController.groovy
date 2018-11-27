@@ -925,7 +925,7 @@ class MoveBundleController implements ControllerMethods {
 			percentagePlanReady           : percentagePlanReady,
 
 			percentagePSToValidate        : percentagePSToValidate,
-			percentagePlanReady           : percentageVMToValidate,
+			percentageVMToValidate        : percentageVMToValidate,
 			percentageDBToValidate        : percentageDBToValidate,
 			percentageStorToValidate      : percentageStorToValidate,
 			percentageOtherToValidate     : percentageOtherToValidate,
