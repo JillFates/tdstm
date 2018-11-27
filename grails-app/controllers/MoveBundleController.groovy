@@ -700,7 +700,7 @@ class MoveBundleController implements ControllerMethods {
 
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
-			(total > 0 ? Math.round(count/total*100)  : 0)
+			(total > 0 ? ((count/total*100)as double).trunc(2) : 0)
 		}
 
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
