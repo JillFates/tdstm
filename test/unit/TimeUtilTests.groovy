@@ -163,8 +163,6 @@ class TimeUtilTests extends AbstractUnitSpec {
 		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_4	| "05/10 14:15"
 		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_5	| "20171005"
 		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_5	| "20171005"
-		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_6	| "2017-10-05"
-		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_6	| "2017-10-05"
 		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_7	| "Oct-05"
 		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_7	| "05-Oct"
 		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_8	| "Oct 05,2017 02:15 PM"
@@ -205,6 +203,8 @@ class TimeUtilTests extends AbstractUnitSpec {
 		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_25	| "05/10/2017 02:15"
 		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_26	| "20171005_1415"
 		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_TIME_26	| "20171005_1415"
+		TimeUtil.MIDDLE_ENDIAN	| TimeUtil.FORMAT_DATE_ISO8601	| "2017-10-05"
+		TimeUtil.LITTLE_ENDIAN	| TimeUtil.FORMAT_DATE_ISO8601	| "2017-10-05"
 	}
 
 	//
@@ -445,4 +445,26 @@ class TimeUtilTests extends AbstractUnitSpec {
 			hence2 == label
 	}
 
+	void 'Test the canParseDate function with various date strings'() {
+		expect: "Using various date strings, validates if it's a parsable ISO8601 date returns the correct result"
+
+		TimeUtil.canParseDate(dateString) == validationResult
+
+		where:
+		dateString					| validationResult
+		'1979-08-02'				| true
+		'1979/08/02'				| false
+	}
+
+	void 'Test the canParseDateTime function with various date strings'() {
+		expect: "Using various datetime strings, validates if it's a parsable ISO8601 date time returns the correct result"
+
+		TimeUtil.canParseDateTime(dateTimeString) == validationResult
+
+		where:
+		dateTimeString			| validationResult
+		"1979-08-02T10:00:00Z" 	| true
+		"1979-08-02T10:00Z" 	| true
+		"1979/08/02T10:00:00Z"	| false
+	}
 }

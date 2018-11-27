@@ -65,7 +65,7 @@ class BulkChangeDate implements ServiceMethods {
 		}
 
 		if (!parsedValue) {
-			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
+			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_ISO8601)
 		}
 
 		if (!parsedValue) {

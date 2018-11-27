@@ -568,7 +568,7 @@ class ModelController implements ControllerMethods {
 		//get template Excel
 		try {
 			File file = grailsApplication.parentContext.getResource("/templates/Sync_model_template.xls").getFile()
-			String filename = ("TDS-Sync-Data-" + TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_6) + ".xls").replace(" ", "_")
+			String filename = ("TDS-Sync-Data-" + TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_ISO8601) + ".xls").replace(" ", "_")
 			ExportUtil.setContentType response, filename
 
 			def book = new HSSFWorkbook(new FileInputStream(file))
