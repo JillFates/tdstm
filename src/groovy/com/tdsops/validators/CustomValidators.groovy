@@ -254,7 +254,7 @@ class CustomValidators {
 				Long number
 				try {
 					NumberFormat nf = NumberFormat.getInstance()
-					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). That is not a valid
+					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). Anyway that is not a valid
 					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
 					if(value.charAt(value.size()-1) == '-') {
 						throw new ParseException('The number format is incorrect', 0)
@@ -275,6 +275,12 @@ class CustomValidators {
 				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
 					addError ('default.invalid.range.message', [getLabel(), null, value, minRange, maxRange])
 				}
+				// 'allowNegative' only makes sense if 'minRange' is NOT present,
+				// if a 'minRange' is present then that value is used for the lower limit and 'allowNegative' is ignored, otherwise:
+				if (!minRange && (number < 0 && !allowNegative)) {
+					// if 'allowNegative' field is not present and the number is negative, it should error
+					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
+				}
 				// if 'precision' field is present and the value has a fractional part, we should check
 				// that the count of fractional digits does not exceed the 'precision' value
 				if (precision && value.contains('.')){
@@ -282,10 +288,6 @@ class CustomValidators {
 					if (!fractionalPart.size() > precision) {
 						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
 					}
-				}
-				// if 'allowNegative' field is not present and the number is negative, it should error
-				if (number < 0 && !allowNegative) {
-					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
 				}
 			}
 		}

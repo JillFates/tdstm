@@ -47,7 +47,6 @@ class CustomValidatorsSpec extends Specification{
 							maxRange : 100,
 							minRange : 1,
 							precision:2,
-							allowNegative: true,
 							required: 0
 					]
 
@@ -102,11 +101,26 @@ class CustomValidatorsSpec extends Specification{
 				]
 
 		]
-		when: 'the number is negative'
+		when: 'the number is negative, inside of "minRange" lower limit'
 			def validator = CustomValidators.controlNumberValidator('-10', fieldSpec, mockDomain)
 			validator.apply()
 		then: 'no error should be reported'
 			!validator.hasErrors()
+		when: 'we restrict only to positive numbers and call again with a negative value'
+			fieldSpec.constraints.allowNegative = false
+			validator = CustomValidators.controlNumberValidator('-10', fieldSpec, mockDomain)
+			validator.apply()
+		then: 'as there is a "minRange" present (and the number fits in the range), the "allowNegative" constraint is ignored and no error is reported'
+			!validator.hasErrors()
+		when: 'we remove the "minRange" constraint so the "allowNegative" constraint is not ignored anymore'
+			fieldSpec.constraints.minRange = ''
+			validator = CustomValidators.controlNumberValidator('-10', fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'now as there is no "minRange" lower limit and "allowNegative = false", a negativeNotAllowed error is reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'field.invalid.negativeNotAllowed' == errors[0].i18nMessageId
+
 		when: 'the minus (-) sign is passed as a suffix and not a prefix'
 			validator = CustomValidators.controlNumberValidator('10-', fieldSpec, mockDomain)
 			errors = validator.apply()
@@ -114,14 +128,6 @@ class CustomValidatorsSpec extends Specification{
 			validator.hasErrors()
 			1 == errors.size()
 			'typeMismatch.java.lang.Long' == errors[0].i18nMessageId
-		when: 'we restrict only to positive numbers and call again with a negative value'
-			fieldSpec.constraints.allowNegative = false
-			validator = CustomValidators.controlNumberValidator('-10', fieldSpec, mockDomain)
-			errors = validator.apply()
-		then: 'a negativeNotAllowed error should be reported'
-			validator.hasErrors()
-			1 == errors.size()
-			'field.invalid.negativeNotAllowed' == errors[0].i18nMessageId
 	}
 
 	void '04. Test controlNumberValidator validator with a blank and null value and a required:0 (field not required) constraint'() {
