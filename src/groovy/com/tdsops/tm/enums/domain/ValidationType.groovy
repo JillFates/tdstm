@@ -4,15 +4,9 @@ import groovy.transform.CompileStatic
 
 @CompileStatic()
 class ValidationType {
-	public static final String DIS = 'Discovery'
-	public static final String VL  = 'Validated'
-	public static final String DR  = 'DependencyReview'
-	public static final String DS  = 'DependencyScan'
-	public static final String BR  = 'BundleReady'
+	static final String UNKNOWN    = 'Unknown'
+	static final String VALIDATED  = 'Validated'
+	static final String PLAN_READY = 'PlanReady'
 
-	static final List<String> list = [DIS, VL, DR, DS, BR].asImmutable()
-
-	static final Map<String, String> listAsMap = [D: DIS, V: VL, R: DR, S: DS, B: BR].asImmutable()
-
-	static final Map<String, String> valuesAsMap = [(DIS): 'D', (VL): 'V', (DR):'R', (DS): 'S', (BR): 'B'].asImmutable()
+	static final List<String> list = [UNKNOWN, VALIDATED, PLAN_READY].asImmutable()
 }
