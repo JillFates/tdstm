@@ -90,7 +90,7 @@ $(document).ready(function() {
 									<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
 										<b> ${100 - percentageAppToValidate}%</b>
 										<g:link controller="application" action="list"
-                                                params="[filter:'application', toValidate:ValidationType.UNKNOWN]">
+                                                params="[filter:'application', toValidate:ValidationType.VALIDATED]">
                                             Applications Validated
                                         </g:link>
 									</div>
@@ -102,14 +102,14 @@ $(document).ready(function() {
                             <td class="dashboard_bar_base">
                                 <g:if test="${percentagePlanReady == 0}">
                                     <div class="dashboard_bar_graph0">
-                                        <b>0% Applications Ready</b>
+                                        <b>0% Applications Plan Ready</b>
                                     </div>
 
                                 </g:if>
                                 <g:elseif test="${percentagePlanReady == 100}">
                                     <div class="task_completed"style="z-index: -1; height: 24px; width: 100%"></div>
                                     <div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
-                                        <b>100% Applications Ready</b>
+                                        <b>100% Applications Plan Ready</b>
                                     </div>
                                 </g:elseif>
                                 <g:else>
@@ -117,7 +117,7 @@ $(document).ready(function() {
                                     <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                                         <b> ${percentagePlanReady}%</b>
                                     <g:link controller="application" action="list"
-                                            params="[filter:'application', toValidate:ValidationType.PLAN_READY]">Applications Ready</g:link>
+                                            params="[filter:'application', toValidate:ValidationType.PLAN_READY]">Applications Plan Ready</g:link>
                                     </div>
                                 </g:else>
                             </td>

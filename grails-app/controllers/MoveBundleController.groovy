@@ -678,14 +678,14 @@ class MoveBundleController implements ControllerMethods {
 			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
 		}
 
-/*
+		/*
 		// TODO - this is unnecessary and could just load the map
 
 		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
 		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
 		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
-*/
+		*/
 
 		// ------------------------------------
 		// Calculate the Plan Status values
@@ -700,7 +700,7 @@ class MoveBundleController implements ControllerMethods {
 
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
-			(total > 0 ? ((count/total*100)as double).trunc(2) : 0)
+			(total > 0 ? ((count/total*100)as double).trunc(2).intValue() : 0)
 		}
 
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
@@ -817,7 +817,7 @@ class MoveBundleController implements ControllerMethods {
 				COUNT(ae) AS all,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END) AS allMoved
 			FROM AssetEntity ae
-			WHERE ae.project=:project 
+			WHERE ae.project=:project
 			AND ae.assetClass = :deviceAssetClass
 			AND ae.assetType IN (:allServers)
 			AND ae.moveBundle IN (:moveBundles)
@@ -915,7 +915,7 @@ class MoveBundleController implements ControllerMethods {
 			openTasks                     : openTasks,
 			generalOverDue                : generalOverDue,
 
-			validated                     : unknown,
+			validated                     : applicationCount - unknown,
 			planReady                     : planReady,
 			movedAppCount                 : movedAppCount,
 			assignedAppCount              : assignedAppCount,
