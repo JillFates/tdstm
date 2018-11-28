@@ -9,6 +9,12 @@
   form.asset-entry-form
     .ng-dirty.ng-invalid
       border: 1px solid $color-message-error--red
+    tds-number-control
+      .ng-invalid
+        border: inherit !important;
+        .k-numeric-wrap
+          color: inherit !important;
+          border-color: rgba(0, 0, 0, 0.08) !important;
   form.asset-entry-form.form-submitted
     .ng-invalid
       border: 1px solid $color-message-error--red
