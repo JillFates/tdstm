@@ -577,8 +577,9 @@ class StringUtil {
 	 * via {@link PolicyFactory#apply}.
 	 */
 	public static final PolicyFactory HTML_POLICY_DEFINITION = new HtmlPolicyBuilder()
-			  .allowCommonBlockElements()
-			  .allowCommonInlineFormattingElements()
-			  .toFactory()
+			.allowCommonBlockElements()
+			.allowCommonInlineFormattingElements()
+			.allowStyling()
+			.toFactory()
 
 }
