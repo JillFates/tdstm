@@ -571,13 +571,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * It was fixed by Kendo itself, this just prevent the double click
 	 * @param event:any
 	 */
 	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
+		event.preventDefault();
 	}
 
 	/**
