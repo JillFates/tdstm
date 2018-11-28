@@ -125,6 +125,22 @@
     "planStatus": "Confirmed",
     "environment": "Production"
   },
+  "applicationCommentToArchive": {
+    "name": "Asset With Comment To Archive",
+    "planStatus": "Confirmed",
+    "environment": "Production",
+    "comments": [
+      "Comment to Archive to edit"
+    ]
+  },
+  "applicationComment": {
+    "name": "Asset With Comment Without Archive",
+    "planStatus": "Confirmed",
+    "environment": "Production",
+    "comments": [
+      "Comment Without Archive to edit"
+    ]
+  },
   // Views
   "customViews":{ // will create bulk views to use by ViewManager specs
     "name": "View",

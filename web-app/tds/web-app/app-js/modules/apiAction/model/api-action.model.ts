@@ -133,7 +133,7 @@ export class APIActionModel {
 	description: string;
 	agentMethod?: AgentMethodModel;
 	httpMethod: string;
-	agentClass?: {
+	dictionary?: {
 		id?: number,
 		name?: string
 	};
@@ -181,7 +181,7 @@ export class APIActionModel {
 		this.name = '';
 		this.description = '';
 		this.provider = {id: null, name: ''};
-		this.agentClass = {id: null, name: ''};
+		this.dictionary = {id: null, name: ''};
 		this.agentMethod = new AgentMethodModel();
 		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;

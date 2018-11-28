@@ -209,7 +209,7 @@ $('#reportsMenu').hide();
 					<div id="newsAndIssuesList"></div>
 				</div>
 				<div id="showEditCommentDialog" title="Edit Issue Comment" style="display: none;" class="static-dialog">
-					<g:form action="updateNewsOrComment" method="post" name="editCommentForm">
+					<g:form action="updateNews" method="post" name="editCommentForm">
 						<div class="dialog" style="border: 1px solid #5F9FCF">
 							<input name="id" value="" id="commentId" type="hidden"/>
 							<input name="commentType" value="" id="commentTypeId" type="hidden"/>
@@ -251,13 +251,13 @@ $('#reportsMenu').hide();
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name"><label for="comment">Comment:</label></td>
-										<td valign="top" class="value" ><textarea cols="80" rows="5" id="commentTdId" name="comment" onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea> </td>
+										<td valign="top" class="value" ><textarea cols="80" rows="5" id="commentTdId" name="message" onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea> </td>
 									</tr>
 									<tr class="prop">
 										<td valign="top" class="name" nowrap="nowrap"><label for="isResolved" >Resolved / Archived:</label></td>
 										<td valign="top" class="value" id="resolveTdId">
 											<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')"/>
-											<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId"/>
+											<input type="hidden" name="isArchived" value="0" id="isResolvedHiddenId"/>
 										</td>
 									</tr>
 									<tr class="prop">
@@ -290,7 +290,7 @@ $('#reportsMenu').hide();
 						<input name="projectId" value="${projectId}" type="hidden"/>
 						<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
 						<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
-						<input name="moveEvent.id" value="${moveEventId}" type="hidden" id="moveEventId"/>
+						<input name="moveEventId" value="${moveEventId}" type="hidden" id="moveEventId"/>
 						<div class="dialog" style="border: 1px solid #5F9FCF">
 							<table id="createCommentTable" style="border: 0px">
 								<tr>

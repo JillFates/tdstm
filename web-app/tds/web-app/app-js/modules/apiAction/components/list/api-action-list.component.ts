@@ -114,7 +114,7 @@ export class APIActionListComponent implements OnInit {
 	protected onEdit(dataItem: any): void {
 		let apiAction: APIActionModel = dataItem as APIActionModel;
 		this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
-			this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+			this.openAPIActionDialogViewEdit(response, ActionType.EDIT, apiAction);
 		}, error => console.log(error));
 	}
 

@@ -32,7 +32,7 @@
                                     </tr>
                                     <tr class="prop">
                                         <td class="label ${standardFieldSpecs.size.imp?:''}"
-                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${asset.size}')}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="size" /> }"
                                             nowrap="nowrap">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
                                                 ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}

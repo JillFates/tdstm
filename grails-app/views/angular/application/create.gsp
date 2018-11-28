@@ -228,7 +228,7 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="17"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="26"/>
 											<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}"
-												[ngClass]="{'highField': isHighField('${standardFieldSpecs.shutdownBy.imp}','${assetInstance.shutdownBy}')}" nowrap="nowrap">
+												[ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="shutdownBy" /> }" nowrap="nowrap">
 												<label for="shutdownBy">
 													<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 														${standardFieldSpecs.shutdownBy.label}
