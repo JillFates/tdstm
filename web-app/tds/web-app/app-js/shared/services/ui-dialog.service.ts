@@ -4,7 +4,6 @@
  * its component
  */
 import {Injectable, ComponentRef, HostListener, OnDestroy} from '@angular/core';
-import {Observable} from 'rxjs';
 
 import { NotifierService } from './notifier.service';
 import {MODAL_SIZE, DEFAULT_DIALOG_SIZE, DEFAULT_ENABLE_ESC} from '../model/constants';
@@ -61,16 +60,6 @@ export class UIDialogService {
 				params: params
 			});
 		});
-	}
-
-	/**
-	 * Wrap up the open method, returns an observable instead a promise
-	 * @param {Array<any>} params Regular open method parameters
-	 * @returns {Observable<any>}
-	 */
-	openAsObservable(...params: any[]): Observable<any> {
-		const [component, param, size = DEFAULT_DIALOG_SIZE, enableEsc = DEFAULT_ENABLE_ESC] = params;
-		return Observable.from(this.open(component, param, size, enableEsc));
 	}
 }
 

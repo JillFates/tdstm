@@ -492,11 +492,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.openAsObservable(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
-			.pipe(
-				finalize(this.onReload.bind(this))
-			)
-			.subscribe((result) => console.log(result), (err) => console.log('Error:', err.message || err));
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.then(() => this.onReload())
+			.catch((err) => this.onReload() )
 	}
 
 	/**
