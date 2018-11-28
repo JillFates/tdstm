@@ -207,7 +207,9 @@
 
 		function displayFormatedDate(date){
 			if(date && moment(date).isValid()){
-				return moment(date).format(tdsCommon.defaultDateTimeFormat());
+				var momentObj = moment(date)
+				momentObj.tz(tdsCommon.timeZone());
+				return momentObj.format(tdsCommon.defaultDateTimeFormat());
 			} else {
 				return '';
 			}
