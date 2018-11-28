@@ -496,7 +496,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			.pipe(
 				finalize(this.onReload.bind(this))
 			)
-			.subscribe((result) => console.log(result), (err) => console.log(err));
+			.subscribe((result) => console.log(result), (err) => console.log('Error:', err.message || err));
 	}
 
 	/**
