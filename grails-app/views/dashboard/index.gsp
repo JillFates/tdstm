@@ -279,7 +279,7 @@
 <div id="createNews" title="Create News" style="display: none;" class="static-dialog">
 	<form id="createNewsForm">
 		<input type="hidden" name="mode" value="ajax">
-		<input type="hidden" name="moveEvent.id" value="${moveEvent?.id}" id="moveEventId">
+		<input type="hidden" name="moveEventId" value="${moveEvent?.id}" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 			<table id="createCommentTable" style="border: 0px">
 				<tr>

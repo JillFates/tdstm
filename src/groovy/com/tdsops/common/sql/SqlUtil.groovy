@@ -3,6 +3,7 @@ package com.tdsops.common.sql
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
@@ -474,7 +475,7 @@ class SqlUtil {
 		}
 
 		// Calculate the expression only if there's a valid value to be added to the query.
-		if (paramValue) {
+		if (paramValue != null) {
 			String expression = getSingleValueExpression(searchColumn, fieldSearchData.columnAlias, operator)
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
@@ -539,7 +540,9 @@ class SqlUtil {
 				parsedNumber = NumberUtil.toInteger(filter)
 			} else if (type == Long) {
 				parsedNumber = NumberUtil.toLong(filter)
-			} else {
+			} else if (type == BigDecimal) {
+				parsedNumber = NumberUtil.toBigDecimal(filter)
+			}  else {
 				parsedNumber = filter.toFloat()
 			}
 		}
@@ -554,18 +557,29 @@ class SqlUtil {
 	 */
 	private static boolean isNumericField(FieldSearchData fsd) {
 		boolean isNumeric = false
-		def properties = fsd.domain.metaClass.properties
-		// Look up the field type using the column.
-		Class fieldType = properties.find { it.name == fsd.column }?.type
-		// If it couldn't be found, try with the columnAlias
-		if (!fieldType) {
-			fieldType = properties.find { it.name == fsd.columnAlias }?.type
+
+		FieldSpec fieldSpec = fsd.searchInfo?.fieldSpec
+
+		if(fieldSpec?.isCustom()){
+			isNumeric = fieldSpec.isNumeric()
+		} else {
+
+
+
+			def properties = fsd.domain.metaClass.properties
+			// Look up the field type using the column.
+			Class fieldType = properties.find { it.name == fsd.column }?.type
+			// If it couldn't be found, try with the columnAlias
+			if (!fieldType) {
+				fieldType = properties.find { it.name == fsd.columnAlias }?.type
+			}
+
+			// If we could determine the class, check if it is a subclass of Number
+			if(fieldType) {
+				isNumeric = Number.isAssignableFrom(fieldType)
+			}
 		}
 
-		// If we could determine the class, check if it is a subclass of Number
-		if(fieldType) {
-			isNumeric = Number.isAssignableFrom(fieldType)
-		}
 
 		return isNumeric
 

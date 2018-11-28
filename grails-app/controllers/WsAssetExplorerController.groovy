@@ -215,9 +215,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
         if (userParams.validate()){
             Project project = securityService.userCurrentProject
 
-            DataviewSpec dataviewSpec = new DataviewSpec(userParams)
-
-            Map previewQuery = dataviewService.previewQuery(project, dataviewSpec)
+            Map previewQuery = dataviewService.previewQuery(project, userParams)
             renderSuccessJson(previewQuery)
         } else {
             renderErrorJson("Incorrect json data request")

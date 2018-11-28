@@ -18,7 +18,7 @@ class BulkChangeUtil {
 	 *
 	 * @return the query to use to get the ids for bulk update.
 	 */
-	static String getIdsquery(Class type, List<Long> ids = [], Map idsFilterQuery = null, Map params) {
+	static String getIdsQuery(Class type, List<Long> ids = [], Map idsFilterQuery = null, Map params) {
 		String queryForIds = ''
 
 		switch (type) {

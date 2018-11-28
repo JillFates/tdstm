@@ -59,10 +59,10 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = this.route.snapshot.data['report'];
 		this.dataSignature = JSON.stringify(this.model);
-		this.reloadStrategy();
 	}
 
 	ngOnInit(): void {
+		this.reloadStrategy();
 		this.initialiseComponent();
 	}
 

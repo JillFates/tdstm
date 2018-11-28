@@ -70,6 +70,7 @@ export class UserPreferencesComponent implements OnInit {
 		this.userService.resetPreferences().subscribe(
 			(result: any) => {
 				this.cancelCloseDialog();
+				location.reload();
 			},
 			(err) => console.log(err));
 	}
