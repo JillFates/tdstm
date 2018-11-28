@@ -5,6 +5,7 @@ import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {Observable} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -491,7 +492,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		this.dialog.openAsObservable(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.pipe(
+				finalize(this.onReload.bind(this))
+			)
+			.subscribe((result) => console.log(result), (err) => console.log(err));
 	}
 
 	/**
@@ -585,10 +590,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private  cellClick(e): void {
+	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.highlightGridRow(e.rowIndex);
-			this.onShow(e.dataItem);
+			this.showAssetEditView(e.dataItem, e.rowIndex);
 		}
 	}
 
