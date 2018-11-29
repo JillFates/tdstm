@@ -124,8 +124,8 @@ class AssetDetailsPage extends Page{
         commentRows[index].find("td", "aria-colindex":"3").find("div").text() == category
     }
 
-    def verifyCommentsCount(beforeCount){
-        getCommentsCount() == beforeCount + 1
+    def verifyCommentsCount(count){
+        getCommentsCount() == count
     }
 
     def closeDetailsModal(){

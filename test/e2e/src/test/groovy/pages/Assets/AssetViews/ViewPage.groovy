@@ -41,13 +41,13 @@ class ViewPage extends Page{
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
-        nameFilter {$('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetName")}
+        nameFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetName")}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
-        assetClassFilter {$('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
+        assetClassFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
-        descriptionFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
+        descriptionFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
-        environmentFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
+        environmentFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
         environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
         allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
         nameColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Name")).parent("a.k-link")}
@@ -85,7 +85,7 @@ class ViewPage extends Page{
      * @return
      */
     def openAssetByName(name){
-        nameFilter = name
+        filterByName(name)
         // verify exact match and no other was found with same name
         // otherwise we can click in other view than is required
         def links = assetNames.findAll { it.text() == name }
@@ -102,9 +102,11 @@ class ViewPage extends Page{
 
     def openRandomAssetDisplayed(){
         waitFor{ assetNames[0].displayed }
+        gridHeader.jquery.css("display", "none")
         def asset = CommonActions.getRandomOption(assetNames)
         commonsModule.goToElement asset
         asset.click()
+        gridHeader.jquery.css("display", "flex")
     }
 
     /**
@@ -358,9 +360,10 @@ class ViewPage extends Page{
     def clickOnAssetCheckbox(checkboxSelector){
         goToBulkChangeButton()
         commonsModule.goToElement checkboxSelector
-        gridHeader.jquery.removeClass("k-grid-dynamic-header") // set to top avoid getting inside the checkbox
+        gridHeader.jquery.css("display", "none") // set to top avoid getting inside the checkbox
         waitFor{checkboxSelector.click()}
         waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
+        gridHeader.jquery.css("display", "flex")
     }
 
     def getCheckedInputStatus(element){
