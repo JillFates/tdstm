@@ -1681,7 +1681,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 		return cleanScript
 	}
-/**
+  
+	/**
 	 * Logs metrics related with evaluation time and findCache hit ratio
 	 *
 	 * @param timeDuration
