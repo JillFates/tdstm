@@ -1676,7 +1676,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	private String preProcess(String script) {
 		String cleanScript = ''
-		script.normalize().eachLine {
+		script.eachLine {
 			cleanScript += it.replaceAll(/\s+$/,'') + '\n'
 		}
 		return cleanScript
