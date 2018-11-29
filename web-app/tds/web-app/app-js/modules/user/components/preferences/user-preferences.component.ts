@@ -28,7 +28,7 @@ export class UserPreferencesComponent implements OnInit {
 
 	@HostListener('window:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent) {
-		if(event.key === 'Escape') {
+		if (event.key === 'Escape') {
 			this.cancelCloseDialog();
 		}
 	}
