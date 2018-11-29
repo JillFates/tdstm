@@ -491,7 +491,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.then(() => this.onReload())
+			.catch((err) => this.onReload() )
 	}
 
 	/**
@@ -571,13 +573,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * It was fixed by Kendo itself, this just prevent the double click
 	 * @param event:any
 	 */
 	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
+		event.preventDefault();
 	}
 
 	/**
@@ -585,10 +585,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private  cellClick(e): void {
+	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.highlightGridRow(e.rowIndex);
-			this.onShow(e.dataItem);
+			this.showAssetEditView(e.dataItem, e.rowIndex);
 		}
 	}
 

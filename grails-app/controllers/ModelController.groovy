@@ -1,5 +1,6 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -113,6 +114,8 @@ class ModelController implements ControllerMethods {
 	def create(String modelId) {
 		List<ModelConnector> modelConnectors
 		Model modelTemplate
+
+
 		if (modelId) {
 			modelTemplate = Model.get(modelId)
 			modelConnectors = ModelConnector.findAllByModel(modelTemplate)
@@ -120,12 +123,19 @@ class ModelController implements ControllerMethods {
 
 		List<Integer> otherConnectors = []
 		int existingConnectors = modelConnectors ? modelConnectors.size() + 1 : 1
+
 		for (int i = existingConnectors; i < 51; i++) {
 			otherConnectors << i
 		}
 
-		[modelInstance: new Model(), modelConnectors: modelConnectors, otherConnectors: otherConnectors,
-		 modelTemplate: modelTemplate, powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)]
+		[
+			modelInstance  : new Model(),
+			modelConnectors: modelConnectors,
+			otherConnectors: otherConnectors,
+			modelTemplate  : modelTemplate,
+			powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
+			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+		]
 	}
 
 	private boolean isValidImage(MultipartFile file) {
@@ -257,28 +267,40 @@ class ModelController implements ControllerMethods {
 	@HasPermission(Permission.ModelEdit)
 	def edit() {
 		def modelId = params.id
+
 		if (modelId && modelId.isNumber()) {
 			def model = Model.get(params.id)
+
 			if (!model) {
 				flash.message = "Model not found with Id $params.id"
 				redirect(action: "list")
 			} else {
-				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
+				def modelConnectors = ModelConnector.findAllByModel(model, [sort: "id"])
 				def nextConnector = 0
-				try{
-					nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
-				} catch(NumberFormatException ex) {
-					nextConnector = modelConnectors.size()+1
+
+				try {
+					nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size() - 1]?.connector) : 0
+				} catch (NumberFormatException ex) {
+					nextConnector = modelConnectors.size() + 1
 				}
+
 				def otherConnectors = []
-				for(int i = nextConnector+1 ; i<51; i++) {
+
+				for (int i = nextConnector + 1; i < 51; i++) {
 					otherConnectors << i
 				}
-				def modelAliases = ModelAlias.findAllByModel(model)
-				def paramsMap = [modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors,
-				                 nextConnector:nextConnector, modelAliases:modelAliases, redirectTo:params.redirectTo]
 
-				def view = params.redirectTo== "modelDialog" ? "_edit" : "edit"
+				def modelAliases = ModelAlias.findAllByModel(model)
+				def paramsMap = [
+					modelInstance  : model,
+					modelConnectors: modelConnectors,
+					otherConnectors: otherConnectors,
+					nextConnector  : nextConnector,
+					modelAliases   : modelAliases, redirectTo: params.redirectTo,
+					assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+				]
+
+				def view = params.redirectTo == "modelDialog" ? "_edit" : "edit"
 				render(view: view, model: paramsMap)
 
 			}
