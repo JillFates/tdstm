@@ -124,7 +124,7 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 			dataview.reportSchema = '{"key":"value"}'
 
 			DataviewUserParamsCommand dataviewUserParamsCommand = [
-				sortDomain  : 'device',
+				sortDomain  : 'common',
 				sortProperty: 'id',
 				filters     : ['domains': ['device']]
 			] as DataviewUserParamsCommand

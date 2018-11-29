@@ -90,16 +90,26 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 				}
 			}
 
-			if (type in [EventType.sessionCreated, EventType.sessionDestroyed]) {
-				log.debug "\n***********\n*********** $type ${jsonData.sessionId}\n***********"
+			/*
+			// TODO: TM-13134: Commented should we remove it? right now we can enable it and it will log in Debug node only
+			if (
+				logger.debugEnabled &&
+						type in [EventType.sessionCreated, EventType.sessionDestroyed]
+			) {
+				logger.debug """
+					***********
+					*********** $type ${jsonData.sessionId}
+					***********
+				""".stripIndent()
 				try {
 					// Create a stacktrace to puposefully log where in the application that the session was created
 					throw new RuntimeException("$type")
-				} 
-				catch (e) {
-					log.debug ExceptionUtil.stackTraceToString(e, 80)
+
+				} catch (e) {
+					logger.debug ExceptionUtil.stackTraceToString(e, 80)
 				}
 			}
+			*/
 
 			try {
 				if (type == EventType.sessionCreated) {

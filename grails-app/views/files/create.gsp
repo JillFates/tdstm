@@ -1,3 +1,4 @@
+<%@ page import="com.tdsops.tm.enums.domain.ValidationType" %>
 <script type="text/javascript">
 	$("#file_assetName").val($('#gs_assetName').val())
 	$("#file_fileFormat").val($('#gs_fileFormat').val())
@@ -88,7 +89,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery" tabindex="44"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}" tabindex="44"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>

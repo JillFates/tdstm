@@ -28,6 +28,7 @@ export const ETL_SCRIPT_FILE_UPLOAD_TYPE = 'ETLScript';
 export const ASSET_IMPORT_FILE_UPLOAD_TYPE = 'assetImport';
 
 export const NULL_OBJECT_LABEL = '(null)';
+export const DEFAULT_ENABLE_ESC = false;
 
 // Intervals
 export enum INTERVAL {
@@ -53,6 +54,7 @@ export enum DIALOG_SIZE {
 	XLG = 'xlg',
 	XXL = 'xxl'
 };
+
 export const ACTIVE_INACTIVE = ['Active', 'Inactive'];
 
 export const ERROR_STATUS = 'error';
@@ -71,3 +73,6 @@ export enum ModalType {
 	CREATE,
 	EDIT
 };
+
+export const DEFAULT_DIALOG_SIZE = DIALOG_SIZE.MD;
+export type MODAL_SIZE = DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL;
