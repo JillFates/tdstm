@@ -102,11 +102,10 @@ class ViewPage extends Page{
 
     def openRandomAssetDisplayed(){
         waitFor{ assetNames[0].displayed }
-        gridHeader.jquery.css("display", "none")
+        gridHeader.jquery.removeClass("k-grid-dynamic-header")
         def asset = CommonActions.getRandomOption(assetNames)
         commonsModule.goToElement asset
         asset.click()
-        gridHeader.jquery.css("display", "flex")
     }
 
     /**
@@ -363,7 +362,6 @@ class ViewPage extends Page{
         gridHeader.jquery.css("display", "none") // set to top avoid getting inside the checkbox
         waitFor{checkboxSelector.click()}
         waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
-        gridHeader.jquery.css("display", "flex")
     }
 
     def getCheckedInputStatus(element){
