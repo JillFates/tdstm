@@ -521,9 +521,12 @@ class PersonController implements ControllerMethods {
 		// Save the user preferences from the filter if the preference has changed
 		String prefValue
 		Map<String, String> prefMap = [
-			StaffingRole: role,
-			ShowClientStaff: onlyClientStaff,
-			ShowAssignedStaff: assigned
+			// StaffingRole: role,
+			(UserPreferenceEnum.STAFFING_ROLE.name()): role,
+			// ShowClientStaff: onlyClientStaff,
+			(UserPreferenceEnum.SHOW_CLIENT_STAFF.name()): onlyClientStaff,
+			// ShowAssignedStaff: assigned
+			(UserPreferenceEnum.SHOW_ASSIGNED_STAFF.name()): assigned
 		]
 		prefMap.each { String k, String v ->
 			prefValue = userPreferenceService.getPreference(k)

@@ -285,4 +285,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_0/20181115-reorder-system-views-columns.groovy'
 	include file: 'version/v4_6_0/20181123-update-system-views-list-titles.groovy'
 	include file: 'version/v4_6_0/20181123-add-tags-column-to-all-assets-view.groovy'
+	include file: 'version/v4_6_0/20181128-fix-unasigned-people-created-during-import-process.groovy'
 }
