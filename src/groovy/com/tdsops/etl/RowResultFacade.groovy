@@ -64,9 +64,7 @@ class RowResultFacade {
 	 * @return an Object instance from from {code FieldResult#value}
 	 */
 	Object getProperty(String fieldNameOrLabel) {
-
-		String fieldName = labelFieldMap.containsKey(fieldNameOrLabel)? labelFieldMap[fieldNameOrLabel]: fieldNameOrLabel
-		return rowResult.fields[fieldName]?.value
+		return rowResult.getField(fieldNameOrLabel)?.value
 	}
 
 }

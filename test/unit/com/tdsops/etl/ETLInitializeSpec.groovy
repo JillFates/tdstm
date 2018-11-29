@@ -434,7 +434,7 @@ class ETLInitializeSpec extends ETLBaseSpec {
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
-						init 'appVendor' with DOMAIN.appVendor
+						init 'appVendor' with DOMAIN.'Vendor'
 					}
 				""".stripIndent())
 
