@@ -324,12 +324,15 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, false).then(x => {
-				if (x) {
-					this.createDependencyPromise(x.assetClass, x.id);
+			DIALOG_SIZE.LG, false)
+			.then(asset => {
+				if (asset) {
+					this.createDependencyPromise(asset.assetClass, asset.id);
 				}
-			}).catch(x => {
-				console.log(x);
+				this.onReload();
+			}).catch(error => {
+				console.log('Error:', error);
+				this.onReload();
 			});
 	}
 
@@ -589,7 +592,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 */
 	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.showAssetEditView(e.dataItem, e.rowIndex);
+			this.onShow(e.dataItem);
 		}
 	}
 
