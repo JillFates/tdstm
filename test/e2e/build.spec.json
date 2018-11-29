@@ -11,6 +11,7 @@
     "specs.Admin.Staff.StaffSearchAndFilteringSpec",
     "specs.Admin.User.UserSearchAndFilteringSpec",
 	"specs.Assets.AllAssets.AddCommentsToAssetSpec",
+    "specs.Assets.AllAssets.EditCommentsToAssetSpec",
     "specs.Assets.AllAssets.AddTagsToAssetSpec",
     "specs.Assets.AllAssets.AllAssetsListSelectAllSpec",
     "specs.Assets.AllAssets.AllAssetsListSelectIndeterminateSpec",

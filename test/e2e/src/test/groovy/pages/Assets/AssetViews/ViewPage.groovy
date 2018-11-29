@@ -102,9 +102,9 @@ class ViewPage extends Page{
 
     def openRandomAssetDisplayed(){
         waitFor{ assetNames[0].displayed }
-        gridHeader.jquery.removeClass("k-grid-dynamic-header")
         def asset = CommonActions.getRandomOption(assetNames)
         commonsModule.goToElement asset
+        gridHeader.jquery.removeClass("k-grid-dynamic-header")
         asset.click()
     }
 
