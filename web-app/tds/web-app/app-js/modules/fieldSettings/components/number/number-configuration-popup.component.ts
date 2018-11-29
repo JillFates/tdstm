@@ -11,33 +11,66 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 
 export class NumberConfigurationPopupComponent {
 
+	private readonly MIN_EXAMPLE_VALUE = -10000;
+	private readonly MAX_EXAMPLE_VALUE = 10000;
 	protected model: NumberConfigurationConstraintsModel;
+	protected localMinRange: number;
+	protected exampleValue: number;
 
 	constructor(
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
 		private activeDialog: UIActiveDialogService) {
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
+			this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
+			this.buildExampleValue();
 	}
 
 	/**
-	 * On AllowNegatives change.
+	 * On Min range value changes.
 	 */
-	protected onAllowNegativesChange(): void {
-		// work in progress
+	protected onMinRangeChange($event): void {
+		this.model.minRange = ($event === null) ? 0 : $event;
+		this.onFormatChange();
 	}
 
 	/**
-	 * On thousandsSeparator, decimalPlaces change recalculate the number format.
+	 * On Allow Negatives changes.
+	 * @param $event
+	 */
+	protected onAllowNegativesChange($event): void {
+		this.onFormatChange();
+	}
+
+	/**
+	 * When any configuration changes, recalculate the number format.
 	 */
 	protected onFormatChange(): void {
+		if (this.localMinRange !== null || this.model.maxRange !== null) {
+			this.model.allowNegative = false;
+		}
+		if (this.model.allowNegative) {
+			this.model.minRange = null;
+		}
 		this.model.format = NumberControlHelper.buildFormat(this.model);
+		this.buildExampleValue();
+	}
+
+	private buildExampleValue(): void {
+		if (this.model.allowNegative) {
+			this.exampleValue = this.MIN_EXAMPLE_VALUE;
+		} else if (this.model.maxRange !== null) {
+			this.exampleValue = this.model.maxRange;
+		} else {
+			this.exampleValue = this.MAX_EXAMPLE_VALUE;
+		}
 	}
 
 	/**
 	 * On button save click
 	 */
 	protected onSave(): void {
+		delete this.model.isDefaultConfig;
 		this.field.constraints = { ...this.model } as any;
 		this.activeDialog.dismiss();
 	}
