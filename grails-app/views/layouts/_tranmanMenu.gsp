@@ -239,12 +239,12 @@
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
-                                <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
+                                <g:link class="mmlink" controller="module" action="dependencies" id="list"  elementId="list">
                                     <g:img uri="/icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-comments-list">
-                                <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
+                            <li class="menu-child-item menu-parent-assets-comments-list" onclick="hideMegaMenu('assetMegaMenu')">
+                                <g:link class="mmlink" controller="assetEntity" action="listComment">
                                     <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>
                             </li>

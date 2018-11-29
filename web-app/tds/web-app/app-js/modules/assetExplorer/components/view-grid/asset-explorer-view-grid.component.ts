@@ -20,7 +20,7 @@ import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult, BulkChangeType} from '../bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
@@ -56,7 +56,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
-	@Output() modelChange = new EventEmitter<boolean>();
+	@Output() modelChange = new EventEmitter<void>();
 	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Input() edit: boolean;
@@ -70,6 +70,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
+		this.gridStateChange.emit({...this.gridState, skip: 0});
+		this.modelChange.emit();
 	}
 
 	public currentFields = [];
@@ -96,6 +98,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 	private currentUser: any;
+	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -366,7 +369,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
-		if (operationResult.success) {
+		if (operationResult && operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}

@@ -585,7 +585,10 @@ class ProjectController implements ControllerMethods {
 
 		def pl = ProjectLogo.findByProject(project)
 		if (pl) {
-			pl.delete(flush:true)
+			ProjectLogo.withTransaction {
+				pl.delete(flush: true)
+			}
+
 			flash.message = "Project logo was deleted"
 		} else {
 			flash.message = "Project logo was not found"

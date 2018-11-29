@@ -53,9 +53,12 @@
 				</div>
 				<tds-bulk-change-button #tdsBulkChangeButton
 				                        [enabled]="hasSelectedItems()"
+				                        [showDelete]="true"
+				                        [showEdit]="true"
+				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="hasSelectedItems()" class="selected-assets">
+				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
 					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 				</div>
 				<div class="checkbox just-planning">
@@ -192,7 +195,7 @@
 			<!-- Last Updated Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
 				<div>
-					{{dataItem[column.domain+'_'+column.property]| userDateTime : userTimeZone }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>

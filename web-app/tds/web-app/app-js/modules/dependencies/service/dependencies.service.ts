@@ -1,59 +1,96 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response, Headers} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PermissionService} from '../../../shared/services/permission.service';
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import {switchMap} from 'rxjs/operators';
+import {PermissionService} from '../../../shared/services/permission.service';
+import {Dependency, DependencyResults} from '../model/dependencies.model';
+import {AssetTagSelectorComponent} from '../../../shared/components/asset-tag-selector/asset-tag-selector.component';
+
+import {map} from 'rxjs/operators';
+
+export interface DependenciesRequestParams {
+	page: number;
+	take: number;
+	sort: any;
+	filters: any[];
+}
 
 @Injectable()
 export class DependenciesService {
-
+	private readonly BASE_URL = '/tdstm/ws/asset';
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
-	getDependencies(params: any): Observable<any> {
-		const page: number = (params.skip / params.take) + 1;
-		const queryString = `?_search=false&nd=1542120332047&rows=${params.take}&page=${page}&sidx=assetName&sord=asc`;
-		const url = `../assetEntity/listDepJson${queryString}`
+	/**
+	 * Get the dependencies matched by the reques parameters
+	 * @param {DependenciesRequestParams} params paremeters to filter and sorting
+	 * @return {Observable<DependencyResults>)
+	 */
+	getDependencies(params: DependenciesRequestParams): Observable<DependencyResults> {
+		const endpoint = `${this.BASE_URL}/listDependencies`;
+		const {page, take, sort, filters} = params;
 
-		return this.http.get(url)
+		const pagination = `rows=${take}&page=${page}`;
+		const sorting = `&sidx=${sort.field}&sord=${sort.dir}`;
+		const filtering  = filters
+				.map(filter => `&${filter.field}=${filter.value}`).join('') +
+				`&_search=${filters.length > 0 ? 'true' : 'false'}`;
+
+		const url = `${endpoint}?${pagination}${sorting}${filtering}`;
+		return this.http.get(`${url}`)
 			.pipe(
-				switchMap((res: Response) => this.mapDependenciesOutputResult(params.take, res.json()))
+				map((response: any) => {
+					const results = response.json();
+					let {dependencies = [], total = 0} = (results && results.data) || {};
+					// todo remove later
+					dependencies = this.addFakeTags(dependencies);
+
+					return {dependencies, total};
+				})
 			)
-			/*
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
-			*/
 	}
 
-	private mapDependenciesOutputResult(pageSize: number, legacyFormat: any): Observable<any> {
-		return Observable.create((observer) => {
-			const result = {
-					assets: legacyFormat.rows.map((row) => {
-						const [
-							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status, sourceDependencyId, targetDependencyId
-						] = row.cell;
+	/* Todo remove when the endpoint changes are ready */
+	addFakeTags(dependencies: Dependency[]): Dependency[] {
+		const tagsAsset = [
+			{
+				'color': 'Yellow',
+				'css': 'tag-yellow',
+				'description': 'Sarbanes–Oxley Act Compliance',
+				'id': 659,
+				'name': 'SOX',
+				'tagId': 8
+			},
+			{
+				'color': 'Blue',
+				'css': 'tag-blue',
+				'description': 'Custom QAE2E acqVm Tag description',
+				'id': 276,
+				'name': 'QAE2E acqVm Tag',
+				'tagId': 184
+			}
+		];
+		const tagsDependency = [
+			{
+				'color': 'Yellow',
+				'css': 'tag-yellow',
+				'description': 'Sarbanes–Oxley Act Compliance',
+				'id': 659,
+				'name': 'SOX',
+				'tagId': 8
+			},
+			{
+				'color': 'Blue',
+				'css': 'tag-blue',
+				'description': 'Custom QAE2E acqVm Tag description',
+				'id': 276,
+				'name': 'QAE2E acqVm Tag',
+				'tagId': 184
+			}
+		];
 
-						return {
-							assetName, assetType, dependentBundle, type, dependentName, dependentType,
-							assetBundle, multiField1, multiField2, status, sourceDependencyId, targetDependencyId,
-							dependencyId: row.id
-						}
-					})
-					.filter((item, index) => index <= pageSize - 1),
-					pagination: {
-						max: pageSize,
-						offset: pageSize * (legacyFormat.page - 1),
-						total: legacyFormat.records
-					},
-					status: 'success'
-			};
+		dependencies = dependencies
+			.map((dependency: Dependency) => ({...dependency, tagsAsset: tagsAsset, tagsDependency: tagsDependency}));
 
-			observer.next(result);
-			observer.complete();
-		});
+		return dependencies;
 	}
 }

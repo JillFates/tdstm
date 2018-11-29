@@ -85,10 +85,13 @@ export const en_DICTIONARY: Object = {
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
 				'EFFECTED_ASSETS': 'This action will affect {param1} Asset(s)',
-				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
+				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel',
+				'EFFECTED_DEPENDENCIES': 'This action will affect {param1} Dependency(s)',
+				'CONFIRM_UPDATE_DEPENDENCIES': 'You are about to update {param1} Dependency(s). There is no undo for this action. Click confirm to update the dependencies, otherwise click Cancel'
 			},
 			'DELETE': {
-				'CONFIRM_DELETE': 'You are about to delete {param1} Asset(s). There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
+				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} Asset(s). There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel',
+				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} Dependency(s). There is no undo for this action. Click confirm to delete the dependencies, otherwise click Cancel'
 			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
@@ -99,6 +102,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'DEPENDENCIES': {
+		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List'
 	},
 	'API_ACTION': {

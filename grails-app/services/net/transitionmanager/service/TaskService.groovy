@@ -10,6 +10,7 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.exceptions.RecipeException
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
@@ -50,11 +51,9 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
-import net.transitionmanager.search.AssetCommentQueryBuilder
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-// import org.codehaus.groovy.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -66,6 +65,8 @@ import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
@@ -5556,4 +5557,106 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return newMethodParams
 	}
 
+	/**
+	 * Find asset comment (task) by id
+	 * @param id - move event id
+	 * @param throwException  - whether to throw an exception if asset comment is not found
+	 * @return
+	 */
+	AssetComment findById(Long id, boolean throwException = false) {
+		Project currentProject = securityService.getUserCurrentProject()
+		return GormUtil.findInProject(currentProject, AssetComment, id, throwException)
+	}
+
+	/**
+	 * Perform assign to me task, it assigns given task by id to current logged in user
+	 * @param assetCommentId - asset comment id
+	 * @param taskStatus - expected task status, if not the same as in database it throws an exception
+	 * @return person who the task gets assigned
+	 */
+	Person assignToMe(Long assetCommentId, String taskStatus) {
+		Project currentProject = securityService.getUserCurrentProject()
+		AssetComment task = findById(assetCommentId, true)
+
+		// Double check to see if the status changed while the user was reassigning so that they
+		if (taskStatus) {
+			if (task.status != taskStatus) {
+				log.warn('assignToMe - Task(#:{} id:{}) status changed around when {} was assigning to self', task.taskNumber, task.id, securityService.currentUsername)
+				def whoDidIt = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
+				switch (task.status) {
+					case STARTED:
+						throw new ServiceException('The task was STARTED by ' + whoDidIt)
+						break
+					case COMPLETED:
+						throw new ServiceException('The task was COMPLETED by ' + whoDidIt)
+						break
+					default:
+						throw new ServiceException('The task status was changed to ' + task.status)
+				}
+			}
+		}
+
+		// If there were no errors then try reassign the Task
+		String belongedTo = task.assignedTo ?: 'Unassigned'
+		Person person = securityService.userLoginPerson
+		task.assignedTo = person
+		if (task.save(flush: true)) {
+			if (task.isRunbookTask()) {
+				addNote(task, person, 'Assigned task to self, previously assigned to ' + belongedTo)
+			}
+		} else {
+			log.error('assignToMe - Task(#:{} id:{}) failed while trying to reassign : {}', task.taskNumber, task.id, GormUtil.allErrorsString(task))
+			throw new ServiceException('An unexpected error occured while assigning the task to you.')
+		}
+		return person
+	}
+
+	/**
+	 * Change or update task estimated start and finish time
+	 * @param assetCommentId - asset comment id
+	 * @param day - number of days to update estimated start and finish time ahead of current GMT time
+	 * @return updated asset comment
+	 */
+	AssetComment changeEstTime(Long assetCommentId, Integer day) {
+		String etext = ''
+		AssetComment comment = findById(assetCommentId, true)
+
+		int estDay = [1,2,7].contains(day) ? day : 0
+		comment.estStart = TimeUtil.nowGMT().plus(estDay)
+
+		// if task has an assigned duration and durationScale already, if not then use 1 and day accordingly
+		if (comment.duration > 0 && comment.durationScale) {
+			def additional
+			use (TimeCategory) {
+				switch (comment.durationScale) {
+					case TimeScale.M:
+						additional = comment.duration.minutes
+						break
+					case TimeScale.H:
+						additional = comment.duration.hours
+						break
+					case TimeScale.D:
+						additional = comment.duration
+						break
+					case TimeScale.W:
+						additional = comment.duration.weeks
+						break
+					default:
+						additional = comment.duration
+				}
+				comment.estFinish = comment.estStart + additional
+			}
+		} else {
+			comment.duration = 1
+			comment.durationScale = "D"
+			comment.estFinish = comment.estStart.plus(1)
+		}
+
+		if (!comment.hasErrors() && !comment.save(flush: true)) {
+			String errors = 'Unable to update estTime ' + GormUtil.allErrorsString(comment)
+			log.error errors
+			throw InvalidParamException(errors)
+		}
+		return comment
+	}
 }

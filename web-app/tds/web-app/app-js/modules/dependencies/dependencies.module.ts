@@ -13,9 +13,11 @@ import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
-import {DependenciesListComponent} from './components/list/dependencies-list.component';
+import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -32,22 +34,23 @@ import {DependenciesService} from './service/dependencies.service';
 		DropDownsModule,
 		GridModule,
 		PopupModule,
+		SortableModule,
+		IntlModule,
 		InputsModule,
 		DateInputsModule,
 		// Route
 		DependenciesRouteModule
 	],
 	declarations: [
-		DependenciesListComponent
+		DependenciesViewGridComponent
 	],
 	providers: [
 		// Resolve
 		ModuleResolveService,
 		DependenciesService
 	],
-	exports: [DependenciesListComponent],
-	entryComponents: [
-	]
+	exports: [DependenciesViewGridComponent],
+	entryComponents: []
 })
 
 export class DependenciesModule {

@@ -201,13 +201,13 @@ var EntityCrud = (function ($) {
 		return $('#currentAssetType').val();
 	};
 
-	// Get the initial rack id for S)ource or T)arget 
+	// Get the initial rack id for S)ource or T)arget
 	pub.getRackId = function (sourceTarget) {
 		var id = $('#deviceRackId' + sourceTarget).val();
 		return id;
 	}
 
-	// Get the initial chassis id for S)ource or T)arget 
+	// Get the initial chassis id for S)ource or T)arget
 	pub.getChassisId = function (sourceTarget) {
 		var id = $('#deviceChassisId' + sourceTarget).val();
 		return id;
@@ -594,7 +594,7 @@ var EntityCrud = (function ($) {
 	var assetCreateInvoked = false;
 
 	/**
-	 * Used to save newly created assets from the Create forms. After validating that the fields are 
+	 * Used to save newly created assets from the Create forms. After validating that the fields are
 	 * okay it will make an Ajax call to create the asset.
 	 *
 	 * @param me - the form that is being processed
@@ -1108,7 +1108,7 @@ var EntityCrud = (function ($) {
 			return false;
 		}
 	}
-	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
+	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
 	var fetchAssetEditView = function (controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback) {
 		var url = tdsCommon.createAppURL('/' + controller + '/edit/' + assetId);
@@ -1237,7 +1237,7 @@ var EntityCrud = (function ($) {
     };
 
 
-	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
+	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
 	var fetchAssetShowView = function (controller, fieldHelpType, assetId) {
 		var url = tdsCommon.createAppURL('/' + controller + '/show/' + assetId);
@@ -1536,7 +1536,7 @@ var EntityCrud = (function ($) {
 
 	/**
 	 * Used to update the selection of the move bundle when the user selects a new asset
-	 * @param assetId - the id of the asset the user selected 
+	 * @param assetId - the id of the asset the user selected
 	 * @param depId
 	 */
 	pub.updateDependentBundle = function (assetId, assetDomId, assetBundleId) {
@@ -2446,7 +2446,7 @@ function toggleJustPlanning($me) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/ws/user/preference'),
-		data: { 'value': isChecked, 'code': 'assetJustPlanning' },
+		data: { 'value': isChecked, 'code': 'ASSET_JUST_PLANNING' },
 		type: 'POST',
 		success: function (data) {
 			window.location.reload()
@@ -2563,7 +2563,7 @@ function matchStart (userInput, dropdownElement) {
 		// If the user's input is empty, all elements in the dropdown are still valid.
 		return true
 	}
-		
-        
+
+
 }
 

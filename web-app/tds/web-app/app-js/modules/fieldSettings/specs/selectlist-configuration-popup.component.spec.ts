@@ -16,7 +16,7 @@ import {DialogModule} from '@progress/kendo-angular-dialog';
 
 import {SelectListConfigurationPopupComponent} from '../components/select-list/selectlist-configuration-popup.component';
 import {SharedModule} from '../../../shared/shared.module';
-import {FieldSettingsModel} from '../model/field-settings.model';
+import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
 import {CustomDomainService} from '../service/custom-domain.service';
 
 describe('SelectListConfigurationPopupComponent:', () => {
@@ -34,7 +34,7 @@ describe('SelectListConfigurationPopupComponent:', () => {
 			values: []
 		},
 		show: true,
-		control: 'List'
+		control: CUSTOM_FIELD_CONTROL_TYPE.List
 	};
 
 	let spy: jasmine.Spy;

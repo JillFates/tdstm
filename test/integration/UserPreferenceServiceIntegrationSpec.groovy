@@ -26,9 +26,9 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 	private UserLogin userLogin
 	private Person person
 	private UserPreferenceEnum pref = UserPreferenceEnum.CURR_TZ
-	private String prefCode = pref.toString()
+	private String prefCode = pref.name()
 	UserPreferenceEnum soPref = UserPreferenceEnum.sessionOnlyPreferences[0]
-	String soPrefCode = soPref.toString()
+	String soPrefCode = soPref.name()
 	String result
 
 	void setup() {
@@ -143,14 +143,14 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 		when: 'setting the preference for the first time'
 			userPreferenceService.setPreference(userLogin, preferenceCode, preferenceValue)
 		then: 'the session has the correct value'
-			userPreferenceService.session.getAttribute(preferenceCode.value()) == preferenceValue
+			userPreferenceService.session.getAttribute(preferenceCode.name()) == preferenceValue
 		and: 'getPreference returns the correct value'
 			userPreferenceService.getPreference(userLogin, preferenceCode) == preferenceValue
 
 		when: 'updating an existing preference'
 			userPreferenceService.setPreference(userLogin, preferenceCode, anotherValue)
 		then: 'the session is updated correctly'
-			userPreferenceService.session.getAttribute(preferenceCode.value()) == anotherValue
+			userPreferenceService.session.getAttribute(preferenceCode.name()) == anotherValue
 		and: 'the new value is retrieved when getting the preference'
 			userPreferenceService.getPreference(userLogin, preferenceCode) == anotherValue
 
