@@ -461,7 +461,7 @@ class StringUtilTests extends Specification {
 			 List<String> result = StringUtil.checkHTML(maliciousHTML)
 
 		then: 'we get a list of items with forbidden code'
-			['div', 'a', 'img', 'div', 'a', 'script', 'span', 'p', 'p', 'img'] == result
+			['a', 'img', 'a', 'script', 'img'] == result
 	}
 
 }
