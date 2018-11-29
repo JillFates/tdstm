@@ -115,8 +115,8 @@
                                             *ngIf="canShowControl('List', rowIndex)"
                                             name="optionList"
                                             [(value)]="editRows.selectedValues[rowIndex].value"
-                                            [valueField]="'id'"
-                                            [textField]="'text'"
+                                            [valueField]=""
+                                            [textField]=""
                                             [data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
                                     </kendo-dropdownlist>
 
