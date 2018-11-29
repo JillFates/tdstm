@@ -7,7 +7,6 @@ import pages.Login.MenuPage
 import pages.Assets.*
 import pages.Assets.AssetViewManager.*
 import pages.Assets.AssetViews.*
-import pages.Assets.Application.*
 import spock.lang.Stepwise
 
 /**
@@ -20,7 +19,7 @@ import spock.lang.Stepwise
 class AssetsLandingPageSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static assetPagesLinks = 24
+    static assetPagesLinks = 18
 
     def setupSpec() {
         testCount = 0
@@ -56,12 +55,19 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             at SummaryTablePage
     }
 
+    /*
+    The All Assets, Applications, Devices, Databases, Storage Devices and Storage Logical pages
+    will be checked at the ViewPage because we eliminated all the individual pages for code reusability.
+    Inside the View Page we check the title to verify that we're inside the one we need to be in.
+     */
+
     def "3. Verify the All Assets Landing Page"() {
         when: 'The user goes to the All Assets page'
             assetsModule.goToAllAssets()
 
         then: 'The All Assets Page is loaded successfully'
             at ViewPage
+            verifyViewTitle("All Assets")
     }
 
     def "4. Verify the Applications Landing Page"() {
@@ -69,7 +75,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToApplications()
 
         then: 'The Applications Page is loaded successfully'
-            at ApplicationListPage
+            at ViewPage
+            verifyViewTitle("All Applications")
     }
 
     def "5. Verify the Devices Landing Page"() {
@@ -77,7 +84,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToDevices()
 
         then: 'The Devices Page is loaded successfully'
-            at DevicesPage
+            at ViewPage
+            verifyViewTitle("All Devices")
     }
 
     def "6. Verify the Servers Landing Page"() {
@@ -85,7 +93,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToServers()
 
         then: 'The Servers Page is loaded successfully'
-            at ServersPage
+            at ViewPage
+            verifyViewTitle("All Servers")
     }
 
     def "7. Verify the Databases Landing Page"() {
@@ -93,7 +102,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToDatabases()
 
         then: 'The Databases Page is loaded successfully'
-            at DatabasesPage
+            at ViewPage
+            verifyViewTitle("All Databases")
     }
 
     def "8. Verify the Storage Devices Landing Page"() {
@@ -101,7 +111,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToStorageDevices()
 
         then: 'The Storage Devices Page is loaded successfully'
-            at StorageDevicesPage
+            at ViewPage
+            verifyViewTitle("All Storage - Physical")
     }
 
     def "9. Verify the Storage Logical Landing Page"() {
@@ -109,7 +120,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToStorageLogical()
 
         then: 'The Storage Logical Page is loaded successfully'
-            at StorageLogicalPage
+            at ViewPage
+            verifyViewTitle("All Storage - Virtual")
     }
 
     def "10. Verify the Dependencies Landing Page"() {

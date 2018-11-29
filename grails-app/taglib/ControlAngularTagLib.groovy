@@ -287,7 +287,7 @@ class ControlAngularTagLib {
         def isImportantClass = 'YG'.indexOf(fieldSpec[fieldName].imp.toUpperCase()) != -1
 		boolean hasValue = (value != '' && value != null) || value?.trim()
 
-        out << isImportantClass && hasValue == false;
+        out << (isImportantClass && !hasValue)
 	}
 
 	/**

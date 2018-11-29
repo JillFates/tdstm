@@ -6,4 +6,5 @@ export class NumberConfigurationConstraintsModel {
 	separator: boolean;
 	allowNegative: boolean;
 	format: string;
+	isDefaultConfig?: boolean;
 }

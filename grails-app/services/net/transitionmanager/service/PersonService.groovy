@@ -415,8 +415,7 @@ class PersonService implements ServiceMethods {
 				save(person, true)
 				if (person.hasErrors()) {
 					results.error = "Unable to create person $nameMap${GormUtil.allErrorsString(person)}"
-				}
-				else {
+				} else {
 					if (!partyRelationshipService.addCompanyStaff(project.client, person)) {
 						results.error = "Unable to assign person $results.person as staff"
 						// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
@@ -424,14 +423,15 @@ class PersonService implements ServiceMethods {
 					results.person = person
 					results.isNew = true
 				}
-			}
-			else {
+
+				// Associate a person to a project as staff
+				addToProject(securityService.getUserLogin(), project.id as String, person.id as String)
+			} else {
 				results.isNew = false
 			}
 
 			return results
-		}
-		catch (e) {
+		} catch (e) {
 			String exMsg = e.message
 			logger.error 'findOrCreatePerson() received exception for nameMap={} : {}\n{}',
 					nameMap, e.message, ExceptionUtil.stackTraceToString(e)

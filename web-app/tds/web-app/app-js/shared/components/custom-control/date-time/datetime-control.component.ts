@@ -21,11 +21,9 @@ import {DateUtils} from '../../../utils/date.utils';
  */
 export class DateTimeControlComponent extends DateControlCommons {
 
-	private readonly DISPLAY_FORMAT = 'yyyy-MM-dd hh:mm:ss';
-
 	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
 		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATETIME_FORMAT);
-		this.displayFormat = this.DISPLAY_FORMAT;
+		this.displayFormat = `${DateUtils.TDS_OUTPUT_DATE_FORMAT} ${DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT}`;
 	}
 
 	/**
@@ -33,7 +31,11 @@ export class DateTimeControlComponent extends DateControlCommons {
 	 * @param {Date} $event
 	 */
 	onValueChange($event: Date): void {
-		this.value = this.intl.formatDate($event, this.outputFormat);
+		if ($event && $event !== null) {
+			this.value = DateUtils.convertAndFormatDateToGMT($event, this.outputFormat) + 'Z';
+		} else {
+			this.value = null;
+		}
 		this.valueChange.emit(this.value);
 	}
 }

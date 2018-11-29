@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit, HostListener} from '@angular/core';
 import {UserService} from '../../service/user.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
@@ -23,6 +23,13 @@ export class UserPreferencesComponent implements OnInit {
 
 		if (modal.length !== 0) {
 			modal[0].style.width = 'fit-content';
+		}
+	}
+
+	@HostListener('window:keydown', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			this.cancelCloseDialog();
 		}
 	}
 
