@@ -26,6 +26,7 @@ class EditCommentPage extends Page{
         textArea { commentsModal.find("#singleComment")}
         categoryDropdownArrow { commentsModal.find("kendo-dropdownlist span.k-select")}
         categories { $("kendo-list li.k-item")}
+        archiveCheckbox { commentsModal.find("#singleCommentArchive")}
         commonsModule { module CommonsModule}
     }
 
@@ -59,5 +60,9 @@ class EditCommentPage extends Page{
         def category = option.text()
         option.click()
         category
+    }
+
+    def clickOnArchive(){
+        waitFor {archiveCheckbox.click()}
     }
 }
