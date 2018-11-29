@@ -5,12 +5,17 @@ import com.tds.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
+
+import java.text.NumberFormat
+import java.text.ParseException
 
 @Slf4j
 class CustomValidators {
@@ -74,7 +79,10 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
+			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
+			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateValidator
+			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeValidator
 
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
@@ -83,7 +91,7 @@ class CustomValidators {
 
 				String control = fieldSpec.control
 
-				// TODO: don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
+				// don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
 				Closure validator = validatorHandlers[control]
 
 				if(!validator) {
@@ -91,7 +99,7 @@ class CustomValidators {
 					throw new RuntimeException("No validator defined for '${control}' Custom Control")
 				}
 
-				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec).apply()
+				Collection<ErrorHolder> errorsHolders = validator(value, fieldSpec, object).apply()
 
 				for(ErrorHolder e : errorsHolders){
 					errors.rejectValue(
@@ -112,11 +120,11 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlNotEmptyValidator ( String value, Map fieldSpec ) {
+	static controlNotEmptyValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ( 'field.invalid.notEmpty', [value, getLabel()] )
+					addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 				}
 			}
 		}
@@ -128,15 +136,15 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlYesNoControlValidator ( String value, Map fieldSpec ) {
+	static controlYesNoControlValidator ( String value, Map fieldSpec, Object domain) {
 		final List<String> yesNoList = ['Yes', 'No']
 
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// value = StringUtils.defaultString(value)
-				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
+				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
 
-				if ( ! hasErrors() && StringUtils.isNotBlank(value) && ! yesNoList.contains(value) ) {
+				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -150,10 +158,10 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlListValidator ( String value, Map fieldSpec ) {
+	static controlListValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
+				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
 
 				def optValues = fieldSpec.constraints?.values ?: []
 
@@ -165,19 +173,138 @@ class CustomValidators {
 	}
 
 	/**
+	 * Date Time Validator that Checks that the given <code>String</code> value
+	 * represents a date, and its format is the same date/time format that
+	 * the one in the constraints contained in the fieldSpec Map.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	@CompileStatic
+	static  controlDateTimeValidator ( String value, Map fieldSpec, Object domain) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					}
+				} else {
+					if (!TimeUtil.canParseDateTime(value)) {
+						addError('field.incorrect.dateFormat', [value, getLabel()])
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Date Validator that Checks that the given <code>String</code> value
+	 * represents a date, and its format is the ISO 8601 format.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	@CompileStatic
+	static  controlDateValidator ( String value, Map fieldSpec, Object domain) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					}
+				} else {
+					if (!TimeUtil.canParseDate(value)) {
+						addError('field.incorrect.dateFormat', [value, getLabel()])
+					}
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * Number Validator that Checks the numeric type of the value and the
+	 * given constraints in the fieldSpec Map.
+	 * See TM-8447
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlNumberValidator ( String value, Map fieldSpec, Object domain) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					}
+					return // with or without error, as the value is empty, just return
+				}
+                // try to convert to numeric
+				Long number
+				try {
+					NumberFormat nf = NumberFormat.getInstance()
+					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). That is not a valid
+					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
+					if(value.charAt(value.size()-1) == '-') {
+						throw new ParseException('The number format is incorrect', 0)
+					}
+					number = nf.parse(value)
+				} catch (ParseException e) {
+					// If it's not a number there is not much to do, so return
+					addError ('typeMismatch.java.lang.Long', [getLabel()])
+					return
+				}
+			    // finally, validate the constraints in the fieldSpec
+				def minRange = fieldSpec.constraints?.minRange ?: null
+				def maxRange = fieldSpec.constraints?.maxRange ?: null
+				def precision = fieldSpec.constraints?.precision ?: null
+				def allowNegative = fieldSpec.constraints?.allowNegative
+
+				// if 'minRange' or 'maxRange' fields are present, validate the value range
+				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
+					addError ('default.invalid.range.message', [getLabel(), null, value, minRange, maxRange])
+				}
+				// if 'precision' field is present and the value has a fractional part, we should check
+				// that the count of fractional digits does not exceed the 'precision' value
+				if (precision && value.contains('.')){
+					def fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
+					if (!fractionalPart.size() > precision) {
+						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
+					}
+				}
+				// if 'allowNegative' field is not present and the number is negative, it should error
+				if (number < 0 && !allowNegative) {
+					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
+				}
+			}
+		}
+	}
+
+	/**
 	 * default validator that checks for min, max size
 	 * @param value
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlDefaultValidator( String value, Map fieldSpec ) {
+	static controlDefaultValidator( String value, Map fieldSpec, Object domain) {
 		new Validator( fieldSpec ) {
 			void validate() {
 				def minSize = fieldSpec?.constraints?.minSize ?: 0
 				def maxSize = fieldSpec?.constraints?.maxSize ?: Integer.MAX_VALUE
 
 				int size = value?.length() ?: 0
-				if (size < minSize && size > maxSize) {
+				if (size < minSize || size > maxSize) {
 					addError( 'field.invalid.sizeOutOfBounds', [value, getLabel(), minSize, maxSize] )
 				}
 			}

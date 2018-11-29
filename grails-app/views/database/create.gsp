@@ -1,3 +1,4 @@
+<%@ page import="com.tdsops.tm.enums.domain.ValidationType" %>
 <script type="text/javascript">
 	$("#db_assetName").val($('#gs_assetName').val())
 	$("#db_dbFormat").val($('#gs_dbFormat').val())
@@ -106,7 +107,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"/>
+									<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>

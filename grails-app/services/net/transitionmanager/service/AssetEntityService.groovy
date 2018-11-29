@@ -2626,7 +2626,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (params.type && params.type == 'toValidate') {
-			query.append(whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
+			query.append(whereAnd() + " assets.validation='${ValidationType.UNKNOWN}' ") //eq ('validation','Discovery')
 		}
 
 		// Allow filtering on the Validate
@@ -2898,12 +2898,12 @@ class AssetEntityService implements ServiceMethods {
 
 		return [
 			assetClassOptions: AssetClass.classOptions,
-			dependentAssets: getDependentsOrSupporting(asset, true),
+			dependentAssets: getDependentsOrSupporting(asset.id ? asset : null, true),
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			moveBundleList: getMoveBundles(project),
 			nonNetworkTypes: AssetType.nonNetworkTypes,
-			supportAssets: getDependentsOrSupporting(asset, false)
+			supportAssets: getDependentsOrSupporting(asset.id ? asset : null, false)
 		]
 	}
 
@@ -2990,7 +2990,7 @@ class AssetEntityService implements ServiceMethods {
 			} else{
 				Map defaultValues = [
 					assetName : command.name,
-					validation: ValidationType.DIS,
+					validation: ValidationType.UNKNOWN,
 					environment: ''
 				]
 				if (assetToClone.isaDevice()) {

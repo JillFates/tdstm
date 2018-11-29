@@ -655,6 +655,7 @@ var UserPreference = function () {
 				if (json && json.status == 'success') {
 					// Close the Dialog
 					$("#userPrefDivId").html('').dialog('close');
+					location.reload();
 				} else if (json.status == 'error') {
 					alert("Resetting Preferences Failed: \n\n" + json.errors);
 				} else {

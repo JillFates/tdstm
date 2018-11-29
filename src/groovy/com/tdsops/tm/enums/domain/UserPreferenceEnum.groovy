@@ -98,10 +98,10 @@ enum UserPreferenceEnum {
 	                                                              ImportStorage, ImportDependency, ImportRoom,
 	                                                              ImportRack, ImportCabling, ImportComment, DataScriptSize].asImmutable()
 
-	static final List<UserPreferenceEnum> sessionOnlyPreferences = [
-		TASK_CREATE_EVENT,
-		TASK_CREATE_CATEGORY,
-		TASK_CREATE_STATUS
+	static final List<String> sessionOnlyPreferences = [
+		TASK_CREATE_EVENT.name(),
+		TASK_CREATE_CATEGORY.name(),
+		TASK_CREATE_STATUS.name()
 	].asImmutable()
 
 	private final String value
@@ -148,7 +148,7 @@ enum UserPreferenceEnum {
 	 */
 	static boolean isSessionOnlyPreference(String preferenceString){
 		sessionOnlyPreferences.find {
-			preferenceString == it.toString()
+			preferenceString == it
 		}
 	}
 }

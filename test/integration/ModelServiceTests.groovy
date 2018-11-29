@@ -1,17 +1,40 @@
-import net.transitionmanager.domain.Model
+import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.tm.enums.domain.SecurityRole
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.ManufacturerAlias
-import com.tdsops.metaclass.CustomMethods
-import grails.test.mixin.TestFor
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ModelService
-import spock.lang.Specification
+import net.transitionmanager.service.SecurityService
 
-
-
-class ModelServiceTests extends Specification {
+class ModelServiceTests extends IntegrationSpec {
 	
 	ModelService modelService
+	private Project project
+	private Person adminPerson
+	UserLogin adminUser
+	SecurityService securityService
+	private PersonTestHelper personHelper = new PersonTestHelper()
+	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+
+	def setup() {
+		projectHelper = new ProjectTestHelper()
+		project = projectHelper.createProject()
+
+		adminPerson = personHelper.createStaff(project.owner)
+		assert adminPerson
+
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+
+		assert adminUser
+		assert adminUser.username
+		securityService.assumeUserIdentity(adminUser.username, false)
+		println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+		assert securityService.isLoggedIn()
+	}
 	
 	def '1. Test the isValidAlias method in many different situations' () {
 		setup:
@@ -57,7 +80,5 @@ class ModelServiceTests extends Specification {
 		
 		// test the model name parameter
 		assert modelService.isValidAlias('frisbee', modRoundFrisbee, false, null, 'ultimate frisbee') : 'VALID: model alias matches own name, using different name'
-		
-		
 	}
 }

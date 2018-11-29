@@ -38,6 +38,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -55,19 +56,22 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
-	@Output() modelChange = new EventEmitter<boolean>();
+	@Output() modelChange = new EventEmitter<void>();
 	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
+		this.gridStateChange.emit({...this.gridState, skip: 0});
+		this.modelChange.emit();
 	}
 
 	public currentFields = [];
@@ -93,7 +97,6 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	public bulkItems: number[] = [];
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
-	private bulkData: any;
 	private currentUser: any;
 
 	constructor(
@@ -365,7 +368,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
-		if (operationResult.success) {
+		if (operationResult && operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
@@ -488,7 +491,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.then(() => this.onReload())
+			.catch((err) => this.onReload() )
 	}
 
 	/**
@@ -568,13 +573,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * It was fixed by Kendo itself, this just prevent the double click
 	 * @param event:any
 	 */
 	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
+		event.preventDefault();
 	}
 
 	/**
@@ -582,10 +585,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private  cellClick(e): void {
+	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.highlightGridRow(e.rowIndex);
-			this.onShow(e.dataItem);
+			this.showAssetEditView(e.dataItem, e.rowIndex);
 		}
 	}
 
@@ -633,14 +635,15 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.onFilter();
 	}
 
-	onClickBulkButton(): void {
-		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: any) => {
-				this.bulkItems = [...results.selectedAssetsIds];
-				this.selectedAssetsForBulk = [...results.selectedAssets];
-				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
-			})
-			.catch ((err) => console.log('Error:', err))
+	/**
+	 * Gather the List of Selected Items for the Bulk Process
+	 */
+	public onClickBulkButton(): void {
+		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning).subscribe((results: any) => {
+			this.bulkItems = [...results.selectedAssetsIds];
+			this.selectedAssetsForBulk = [...results.selectedAssets];
+			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+		}, (err) => console.log('Error:', err));
 	}
 
 	hasSelectedItems(): boolean {

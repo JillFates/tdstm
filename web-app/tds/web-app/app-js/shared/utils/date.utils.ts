@@ -18,6 +18,8 @@ export class DateUtils {
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
+	public static readonly TDS_OUTPUT_DATE_FORMAT = 'yyyy-MM-dd';
+	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'yyyy-MM-ddThh:mm:ssZ';
 
 	/**
 	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
@@ -34,7 +36,7 @@ export class DateUtils {
 	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
 	 */
 	public static formatUserDateTime(userTimeZone: string, iso8601Value: string) {
-		if (iso8601Value === undefined) {
+		if (iso8601Value === undefined || !iso8601Value) {
 			return '';
 		}
 		return moment.tz(iso8601Value, userTimeZone).format('YYYY-MM-DD HH:mm:ss');
@@ -303,6 +305,16 @@ export class DateUtils {
 	public static formatDate(date: any, format: string): string {
 		return moment(date)
 			.format(format);
+	}
+
+	/**
+	 * Converts a string source value to a Date object, following a format pattern.
+	 * @param {string} value
+	 * @param {string} format
+	 * @returns {Date}
+	 */
+	public static toDate(value: string): Date {
+		return moment(value).toDate()
 	}
 
 }

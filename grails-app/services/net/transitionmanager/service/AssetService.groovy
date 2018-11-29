@@ -45,6 +45,7 @@ class AssetService {
 			case "DATABASE":
 				assetModel = databaseService.getModelForCreate()
 				break
+			case "COMMON":
 			case "DEVICE":
 				assetModel = deviceService.getModelForCreate()
                 model << DeviceUtils.deviceModelOptions(project)

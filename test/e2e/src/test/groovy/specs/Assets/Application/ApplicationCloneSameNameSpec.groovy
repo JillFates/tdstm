@@ -2,10 +2,10 @@ package specs.Assets.Application
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Assets.Application.AssetClonePage
-import pages.Assets.Application.ApplicationCreationPage
-import pages.Assets.Application.ApplicationDetailsPage
-import pages.Assets.Application.ApplicationListPage
+import pages.Assets.AssetViews.AssetClonePage
+import pages.Assets.AssetViews.AssetCreatePage
+import pages.Assets.AssetViews.AssetDetailsPage
+import pages.Assets.AssetViews.ViewPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
@@ -34,11 +34,11 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         login()
         at MenuPage
         waitFor { assetsModule.goToApplications() }
-        at ApplicationListPage
+        at ViewPage
         clickOnCreateButton()
-        at ApplicationCreationPage
+        at AssetCreatePage
         createApplication appDataMap
-        at ApplicationDetailsPage
+        at AssetDetailsPage
     }
 
     def setup() {
@@ -52,12 +52,12 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
 
     def "1. User Opens Clone Application Modal"() {
         given: 'The User is on the Application Details Modal'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The user clicks on Clone Button'
             clickOnCloneButton()
         then: 'Asset Clone Pop-Up should be displayed'
             at AssetClonePage
-            getModalTitle() == "Clone " + appName
+            getModalTitle() == "Clone Asset"
         and: 'Asset name did not change'
             getModalInputNameValue() == appName
         and: 'Legend to change the Name should be displayed'
@@ -71,38 +71,37 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         when: 'The User Clicks the "Clone Button"'
             clickOnCloneButton()
         then: 'Legends to existing Name and a Question should be displayed'
-            getConfirmationDialogTitle() == "Asset already exists"
-            getConfirmationDialogBodyText() == "The Asset Name you want to create already exists, do you want to proceed?"
+            commonsModule.getConfirmationTitleText() == "Asset already exists"
+            commonsModule.getConfirmationAlertMessageText() == "The Asset Name you want to create already exists, do you want to proceed?"
     }
 
     def "3. User cancels the Asset Clone process and verifies the Asset is not cloned"() {
         given: 'The User is on the Clone Pop-Up'
             at AssetClonePage
         when: 'The User clicks the "Cancel" button'
-            clickOnCloseInConfirmationDialog()
+            commonsModule.clickOnButtonPromptModalByText("Cancel")
         and: 'The user clicks on Close Clone Modal Button'
             closeModal()
         then: 'The User should be redirected to the Application Detail Modal'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The user clicks on Close Details Modal Button'
-            closeDetailsModal()
+            clickOnCloseButton()
         then: 'The User should be redirected to the Application List Section'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User searches by that App Name'
             filterByName appName
-            commonsModule.waitForLoadingMessage()
         then: 'App Name should be displayed'
-            getFirstAssetRowName() == appName
+            getFirstElementNameText() == appName
             getRowsSize() == 1
     }
 
     def "4. User clones the App with the Same Name"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User clicks the asset name'
-            clickOnFirstAppName()
+            openFirstAssetDisplayed()
         then: 'The User should be redirected to the Application Details Modal'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The User clicks the "Clone" Button'
             clickOnCloneButton()
         then: 'The User is on the Clone Pop-Up'
@@ -110,37 +109,36 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         when: 'The User Clicks the Clone Button'
             clickOnCloneButton()
         and: 'The User clicks on Confirm button'
-            clickOnConfirmInConfirmationDialog()
+            commonsModule.clickOnButtonPromptModalByText("Confirm")
         then: 'The User should be redirected to the Application Details modal'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
             getApplicationName() == appName
     }
 
     def "5. Validates duplicate application with same name"() {
         given: 'The User is in the Application Details modal'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         and: 'The user closes details modal'
-            closeDetailsModal()
+            clickOnCloseButton()
         and: 'The User is in the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The user filters by app name'
             filterByName appName
-            commonsModule.waitForLoadingMessage()
         then: 'App Name should be displayed'
-            getFirstAssetRowName() == appName
+            getFirstElementNameText() == appName
         and: 'App is displayed two times'
             getRowsSize() == 2
     }
 
     def "6. User opens the Clone Application Modal Window By using the Clone Icon"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User clicks the "Clone" Button'
-            clickOnFirstAppCloneActionButton()
+            clickOnFirstAssetCloneActionButton()
         then: 'The User is on the Clone Pop-Up Modal'
             at AssetClonePage
         and: 'The User certifies that the proper App Name should be displayed'
-            getModalTitle() == "Clone " + appName
+            getModalTitle() == "Clone Asset"
         and: 'Asset name did not change'
             getModalInputNameValue() == appName
         and: 'Legend to change the Name should be displayed'
@@ -153,19 +151,18 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         when: 'The User Clicks the "Clone Button"'
             clickOnCloneButton()
         and: 'The User clicks on Confirm button'
-            clickOnConfirmInConfirmationDialog()
+            commonsModule.clickOnButtonPromptModalByText("Confirm")
         then: 'The User should be redirected to the Application List page'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "8. Validates triplicate application with same name"() {
         given: 'The User is in the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The user filters by app name'
             filterByName appName
-            commonsModule.waitForLoadingMessage()
         then: 'App Name should be displayed'
-            getFirstAssetRowName() == appName
+            getFirstElementNameText() == appName
         and: 'App is displayed three times'
             getRowsSize() == 3
     }

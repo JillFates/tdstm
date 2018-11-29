@@ -59,6 +59,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.model.asset.validation = this.defaultValidation;
 		}
 
 		/**

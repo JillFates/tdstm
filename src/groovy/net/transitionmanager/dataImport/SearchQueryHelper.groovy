@@ -702,9 +702,9 @@ class SearchQueryHelper {
 	 *		entities: List of reference domain entities that were found
 	 * 		error: A String set if an error was encountered
 	 */
-	private static List fetchReferenceOfEntityField(Object entity, String fieldName, Map fieldsValueMap, Map context) {
+	private static List fetchReferenceOfEntityField(Object entity, String fieldName, Map fieldsValueMap, Map context, String parentFieldName = '') {
 		List<Object> entities = []
-		String searchValue = fieldsValueMap[fieldName]
+		Object searchValue = fieldsValueMap[fieldName]
 		Manufacturer mfg
 		String errorMsg
 
@@ -714,7 +714,7 @@ class SearchQueryHelper {
 			errorMsg = "Field $fieldName must be defined"
 		}
 
-		if (! errorMsg && searchValue?.size() > 0) {
+		if (! errorMsg && searchValue) {
 			Class refDomainClass = GormUtil.getDomainPropertyType(entity, fieldName)
 			String refDomainName = GormUtil.domainShortName(refDomainClass)
 
@@ -766,15 +766,19 @@ class SearchQueryHelper {
 
 				case 'Room':
 					// Add criteria to indicate source or target Room
-					boolean isSource = (fieldName == 'roomSource')
+					boolean isSource = parentFieldName.endsWith('Source')
+					String locationName = 'location' + isSource ? 'Source' : 'Target'
 					extraCriteria.put('source', (isSource ? 1 : 0))
 
-					// String locationFieldName = (isSource ? 'locationSource' : 'locationTarget')
-					// if (fieldsValueMap[locationFieldName]) {
-					// 	extraCriteria.put('location', fieldsValueMap[locationFieldName])
-					// } else {
-					// 	errorMsg = 'Location is require for Room lookup'
-					// }
+					if ( fieldsValueMap[locationName] ) {
+						extraCriteria.put('location', fieldsValueMap[locationName])
+					} else if (searchValue.contains('/')){
+						String[] values = searchValue.split('/')
+						extraCriteria.put('location', values[0].trim())
+						searchValue = values[1].trim()
+					} else {
+						errorMsg = 'Room location was not defined'
+					}
 					break
 
 				case 'Rack':
@@ -795,7 +799,7 @@ class SearchQueryHelper {
 						if ( ! entity[roomFieldName] || entity[roomFieldName].roomName != fieldsValueMap[roomFieldName] ) {
 							List<Object> roomEntities
 							String roomErrorMsg
-							(roomEntities, roomErrorMsg) = fetchReferenceOfEntityField(entity, roomFieldName, fieldsValueMap, context)
+							(roomEntities, roomErrorMsg) = fetchReferenceOfEntityField(entity, roomFieldName, fieldsValueMap, context, fieldName)
 							if ( roomErrorMsg) {
 								errorMsg = roomErrorMsg
 							} else {
@@ -829,13 +833,19 @@ class SearchQueryHelper {
 			}
 
 			if (! errorMsg) {
-				// Make sure that the domain has an alternateLookup defined on the class
-				if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
-					errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
-					return [entities, errorMsg]
-				}
 
-				entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
+				// First try to find the Domain by its ID
+				if(NumberUtil.isaNumber(searchValue)){
+					entities = [refDomainClass.get(NumberUtil.toLong(searchValue))]
+				} else {
+
+					// Make sure that the domain has an alternateLookup defined on the class
+					if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
+						errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
+						return [entities, errorMsg]
+					}
+					entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
+				}
 
 				// If not found and the domain has an alias (mfg/model) then try looking up that way
 				if ( ! entities ) {

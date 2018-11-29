@@ -774,7 +774,7 @@ class AssetExportService {
 							case ~/retireDate|maintExpDate/:
 								colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
 								break
-							case ~/modifiedDate/:
+							case ~/lastUpdated/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
 							case ~/tagAssets/:
@@ -1367,11 +1367,12 @@ class AssetExportService {
 
 	/**
 	 * Get field specs for a given AssetClass and current user project
-	 * @param assetClass
+	 * @param assetClass - the asset class being exported
+	 * @param project
 	 * @return
 	 */
-	private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass, Project project) {
-		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString())
+	private List<Map<String, ?>> getFieldSpecsForExportingAssetClass(AssetClass assetClass, Project project, List<String> templateHeaders) {
+		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString(), templateHeaders)
 		return fieldSpecs[assetClass.toString()]["fields"]
 	}
 
@@ -1382,10 +1383,10 @@ class AssetExportService {
 	 * @return
 	 */
 	private SpreadsheetColumnMapper mapSheetColumnsToFields(AssetClass assetClass, Sheet sheet, Project project) {
-		List<String> templateHaders = WorkbookUtil.getSheetHeadersAsList(sheet)
-		List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass, project)
+		List<String> templateHeaders = WorkbookUtil.getSheetHeadersAsList(sheet)
+		List<Map<String, ?>> fieldSpecs = getFieldSpecsForExportingAssetClass(assetClass, project, templateHeaders)
 
-		SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHaders, fieldSpecs)
+		SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHeaders, fieldSpecs)
 		return spreadsheetColumnMapper
 	}
 

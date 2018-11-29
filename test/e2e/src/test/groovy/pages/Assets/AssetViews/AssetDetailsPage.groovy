@@ -14,12 +14,14 @@ class AssetDetailsPage extends Page{
         modalTitle.text().contains("Detail")
         editButton.present
         closeButton.present
+        cloneButton.present
     }
     static content = {
         assetDetailModal { $("div.tds-angular-component-content")}
         modalTitle { assetDetailModal.find(".modal-title")}
         editButton { assetDetailModal.find(".modal-footer button span.glyphicon-pencil")}
         closeButton { assetDetailModal.find(".modal-header .close")}
+        cloneButton { assetDetailModal.find(".modal-footer button span.glyphicon-duplicate")}
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
@@ -131,7 +133,8 @@ class AssetDetailsPage extends Page{
     }
 
     def clickOnCloneButton(){
-        waitFor { adModalCloneBtn.click() }
+        commonsModule.goToElement(cloneButton)
+        waitFor { cloneButton.click() }
     }
 
     def getApplicationName(){

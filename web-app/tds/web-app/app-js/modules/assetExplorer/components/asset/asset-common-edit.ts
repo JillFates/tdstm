@@ -4,10 +4,10 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {HostListener, Inject, OnInit, ViewChild} from '@angular/core';
+import {OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 import {AssetCommonHelper} from './asset-common-helper';
@@ -25,7 +25,7 @@ export class AssetCommonEdit implements OnInit {
 	protected isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
-	protected defaultValidation = 'Discovery';
+	protected defaultValidation = 'Unknown';
 	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
@@ -42,7 +42,9 @@ export class AssetCommonEdit implements OnInit {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			if (this.dateFormat && this.dateFormat !== null) {
+				this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			}
 	}
 	/**
 	 * Initiates The Injected Component
