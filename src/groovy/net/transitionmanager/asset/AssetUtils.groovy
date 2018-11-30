@@ -12,7 +12,7 @@ class AssetUtils {
 	static List<AssetOptions> getAssetOptions(AssetOptions.AssetOptionsType assetOptionsType) {
 		return AssetOptions.where {
 			type == assetOptionsType
-		}.order("value").list()
+		}.order("value").readOnly(true).list()
 	}
 
 	/**
@@ -28,4 +28,37 @@ class AssetUtils {
 		}
 		return assetOptionsValues
 	}
+
+	/**
+	 * Return a list with all the possible values for the environment field.
+	 * @return a list of string corresponding to the values for the environment field for assets.
+	 */
+	static List<String> getEnvironmentOptions() {
+		return getAssetOptionsValues(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+	}
+
+	/**
+	 * Return a list with all the plan status options.
+	 * @return a list of the plan status options available.
+	 */
+	static List<String> getPlanStatusOptions() {
+		return getAssetOptionsValues(AssetOptions.AssetOptionsType.STATUS_OPTION)
+	}
+
+	/**
+	 * Retrieve and return a list of dependency type options.
+	 * @return the list of dependency type options.
+	 */
+	List<String> getDependencyTypeOptions() {
+		return getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+	}
+
+	/**
+	 * Retrieve and return a list of dependency status options.
+	 * @return the list of dependency status options.
+	 */
+	List<String> getDependencyStatusOptions() {
+		return getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+	}
+
 }
