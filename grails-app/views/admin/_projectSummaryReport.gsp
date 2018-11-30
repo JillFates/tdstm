@@ -35,7 +35,7 @@
 					<td><tds:convertDate  date="${project.completionDate}" /></td>
 					<td>${project.staffCount?:''}</td>
 					<td>${project.eventCount?:''}</td>
-					<td>${project.assetCount?:''}</td>
+					<td>${project.deviceCount?:''}</td>
 					<td>${project.appCount?:''}</td>
 					<td>${project.dbCount?:''}</td>
 					<td>${project.filesCount?:''}</td>

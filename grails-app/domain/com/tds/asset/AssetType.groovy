@@ -69,7 +69,7 @@ enum AssetType {
 	 * Storage
 	 */
 	static final List<String> storageTypes = ['Array', 'Disk', 'NAS', 'SAN', 'SAN Switch', 'Storage',
-	                                          'Tape', 'Tape Library', 'Virtual Tape Library'].asImmutable()
+	                                          'Tape', 'Tape Library', 'Virtual Tape Library', 'Logical Storage'].asImmutable()
 
 	/**
 	 * Storage as a quote comma delimited string

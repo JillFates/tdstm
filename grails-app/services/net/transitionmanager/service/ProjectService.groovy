@@ -6,6 +6,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
@@ -308,11 +309,12 @@ class ProjectService implements ServiceMethods {
 			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
-					COUNT(IF(ae.asset_class = 'STORAGE',1,NULL)) AS filesCount,
-					COUNT(IF(ae.asset_class = 'DATABASE',1,NULL)) AS dbCount,
-					COUNT(IF(ae.asset_class = 'APPLICATION',1,NULL)) AS appCount,
-					COUNT(IF(ae.asset_class = 'DEVICE', 1, NULL)) AS totalServCount,
-					COUNT(IF(ae.asset_class = 'DEVICE' and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
+					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.storageTypes)}) AND ae.asset_class = '${AssetClass.STORAGE.toString()}',1,NULL)) AS filesCount,
+					COUNT(IF(ae.asset_type = '${AssetType.DATABASE.name()}',1,NULL)) AS dbCount,
+					COUNT(IF(ae.asset_type = '${AssetType.APPLICATION.name()}',1,NULL)) AS appCount,
+					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}), 1, NULL)) AS totalServCount,
+					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}) and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.DEVICE.toString()}' AND NOT(COALESCE(ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.virtualServerTypes)})),1,NULL)) AS deviceCount,
 					COUNT(*) AS totalAssetCount,
 					DATE(p.start_date) AS startDate,
 					DATE(p.completion_date) AS completionDate,
