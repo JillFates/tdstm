@@ -432,6 +432,11 @@ class UrlMappings {
             action = [GET: "getMapAreas"]
         }
 
+		"/ws/user/timezones" {
+			controller = "wsUser"
+			action = [GET: "getTimezones"]
+		}
+
 		"/ws/user/resetPreferences" {
 			controller = "wsUser"
 			action = [ DELETE: "resetPreferences" ]

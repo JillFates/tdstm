@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
@@ -93,7 +94,12 @@ class WsUserController implements ControllerMethods {
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def getMapAreas() {
-		renderSuccessJson([areas: userPreferenceService.timezonePickerAreas()])
+		renderSuccessJson(userPreferenceService.timezonePickerAreas())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def getTimezones() {
+		renderSuccessJson(Timezone.findAll())
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)

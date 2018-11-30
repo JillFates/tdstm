@@ -10,20 +10,20 @@
                 <kendo-dropdownlist
                         id="dateTimezone"
                         name="timezone"
-                        [(ngModel)]="dateTimezone"
-                        [data]="mapTimeZones">
+                        [(ngModel)]="selectedTimezone"
+                        [data]="timezonesList">
                 </kendo-dropdownlist>
                 <b style="padding-left: 30px">Date Format:</b>
                 <kendo-dropdownlist
                         id="dateTimeFormat"
                         name="dateTimeFormat"
-                        [(ngModel)]="dateTimeFormat"
-                        [data]="dateTimeFormats">
+                        [(ngModel)]="selectedTimeFormat"
+                        [data]="timeFormatList">
                 </kendo-dropdownlist>
             </div>
 
             <map name="timezoneMap" id="timezoneMap">
-                <div *ngFor="let area of mapAreas">
+                <div *ngFor="let area of mapAreaList">
                     <area *ngFor="let poly of area.polys"
                           [attr.data-timezone]="area['name']"
                           [attr.data-country]="area['country']"

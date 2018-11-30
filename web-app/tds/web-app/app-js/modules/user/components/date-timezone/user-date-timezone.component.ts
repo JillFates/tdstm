@@ -8,6 +8,9 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 // Utils
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {forkJoin} from 'rxjs/observable/forkJoin';
+import {Observable} from 'rxjs';
 
 declare var jQuery: any;
 
@@ -18,22 +21,31 @@ declare var jQuery: any;
 export class UserDateTimezoneComponent implements OnInit {
 	public currentUserName;
 	// List of elements to show on the Map
-	public mapAreas  = [];
-	// List of time zone only, taken directly from the list above
-	public mapTimeZones  = [];
+	public mapAreaList  = [];
+	// List of timezones
+	public timezonesList  = [];
 	// List of possible date time formats
-	public dateTimeFormats = [DateUtils.PREFERENCE_MIDDLE_ENDIAN, DateUtils.PREFERENCE_LITTLE_ENDIAN];
-	// Current Selected Time zone
-	public dateTimezone;
-	// Current Selected Date Time Format
-	public dateTimeFormat;
+	public timeFormatList = [DateUtils.PREFERENCE_MIDDLE_ENDIAN, DateUtils.PREFERENCE_LITTLE_ENDIAN];
+	public selectedTimezone;
+	public selectedTimeFormat;
 
 	constructor(
 		private userService: UserService,
 		public activeDialog: UIActiveDialogService,
 		private preferenceService: PreferenceService) {
-		this.retrieveMapAreas();
+		this.getUserData();
+	}
 
+	private getUserData(): void {
+		let data = [
+			this.retrieveMapAreas(),
+			this.retrieveTimezones()
+		];
+
+		forkJoin(data).subscribe( (result: any) => {
+			this.mapAreaList = result[0];
+			this.timezonesList = result[1];
+		});
 	}
 
 	/**
@@ -46,10 +58,14 @@ export class UserDateTimezoneComponent implements OnInit {
 			});
 			// Get the Selected area
 			jQuery('#timezoneMap').find('area').click( (element: any) => {
-				this.dateTimezone = jQuery(element.currentTarget).attr('data-timezone');
+				this.selectedTimezone = jQuery(element.currentTarget).attr('data-timezone');
 			});
-		// Delay time to allow the Picker to be initialized
+			// Delay time to allow the Picker to be initialized
 		}, 600);
+
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe( (res) => {
+			console.log(res);
+		});
 	}
 
 	/**
@@ -59,17 +75,42 @@ export class UserDateTimezoneComponent implements OnInit {
 		this.activeDialog.dismiss();
 	}
 
-	private retrieveMapAreas() {
-		this.userService.getMapAreas().subscribe(
-			(result: any) => {
-				for (let key in result.areas) {
-					if (result.areas.hasOwnProperty(key)) {
-						result.areas[key].name = key;
-						this.mapTimeZones.push(result.areas[key].name);
-						this.mapAreas.push(result.areas[key]);
+	/**
+	 * Get the List of Map Areas
+	 */
+	private retrieveMapAreas(): Observable<any> {
+		return new Observable((observer: any) => {
+			this.userService.getMapAreas().subscribe(
+				(result: any) => {
+					let mapAreas = [];
+					for (let key in result) {
+						if (result.hasOwnProperty(key)) {
+							result[key].name = key;
+							mapAreas.push(result[key]);
+						}
 					}
-				}
-			},
-			(err) => console.log(err));
+					observer.next(mapAreas.sort((a, b) => SortUtils.compareByProperty(a, b, 'name')));
+					observer.complete();
+				},
+				(err) => console.log(err));
+		});
+	}
+
+	/**
+	 * Get the List of TimeZones
+	 */
+	private retrieveTimezones(): Observable<any> {
+		return new Observable((observer: any) => {
+			this.userService.getTimezones().subscribe(
+				(result: any) => {
+					let timezones = [];
+					result.forEach((timezone: any) => {
+						timezones.push(timezone.code);
+					});
+					observer.next(timezones);
+					observer.complete();
+				},
+				(err) => console.log(err));
+		});
 	}
 }

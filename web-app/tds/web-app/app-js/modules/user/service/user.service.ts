@@ -55,8 +55,16 @@ export class UserService {
 		return this.http.get(`${this.userPreferenceUrl}/mapAreas`)
 			.map((res: Response) => {
 				let result = res.json();
-				let mapAreas = result && result.status === 'success' && result.data;
-				return mapAreas;
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getTimezones() {
+		return this.http.get(`${this.userPreferenceUrl}/timezones`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
