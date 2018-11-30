@@ -80,7 +80,11 @@
 
                                     <!-- Number Fields -->
                                     <tds-number-control *ngIf="canShowControl('Number', rowIndex)"
-                                                    [(value)]="editRows.selectedValues[rowIndex].value"></tds-number-control>
+                                                        [(value)]="editRows.selectedValues[rowIndex].value"
+                                                        [format]="editRows.selectedValues[rowIndex].field.constraints?.format"
+                                                        [minRange]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
+                                                        [maxRange]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
+                                    </tds-number-control>
 
                                     <!-- Date Fields -->
                                     <tds-date-control *ngIf="canShowControl('Date', rowIndex)"

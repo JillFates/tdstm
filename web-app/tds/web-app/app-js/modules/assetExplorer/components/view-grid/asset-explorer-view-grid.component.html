@@ -177,22 +177,35 @@
 			</ng-template>
 
 			<!-- Default Generic Cell Template -->
-			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && column.property !== 'lastUpdated'">
-           <span [ngClass]="getCellClass(column)">
-               {{dataItem[column.domain+'_'+column.property]}}
-           </span>
+			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && !fieldPipeMap.pipe[column.domain+'_'+column.property]">
+               <span [ngClass]="getCellClass(column)">
+                   {{fieldPipeMap[column.domain+'_'+column.property]}}
+                   {{dataItem[column.domain+'_'+column.property]}}
+               </span>
 			</ng-template>
+            <!-- DateTime Fields Template -->
+            <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'DateTime'">
+                <div>
+                    {{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
+                </div>
+            </ng-template>
+            <!-- Date Fields Template -->
+            <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Date'">
+                <div>
+                    {{dataItem[column.domain+'_'+column.property]| tdsDate : userDateFormat }}
+                </div>
+            </ng-template>
+            <!-- Number Fields Template -->
+            <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Number'">
+                <div>
+                    {{dataItem[column.domain+'_'+column.property]| tdsNumber : fieldPipeMap.metadata[column.domain+'_'+column.property] }}
+                </div>
+            </ng-template>
 			<!-- Asset Tags Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
 				<div>
                <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
                      [ngClass]="tag.css">{{tag.name}}</span>
-				</div>
-			</ng-template>
-			<!-- Last Updated Cell Template -->
-			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
-				<div>
-					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>
