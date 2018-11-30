@@ -76,9 +76,11 @@
 						{{'GLOBAL.CLEAR_FILTERS' | translate}}
 					</button>
 				</div>
-				<div (click)="onReload()" class="component-action-reload">
-					<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-				</div>
+				<button tds-button
+				        icon="refresh"
+				        class="tds-button-icon component-action-reload pull-right"
+				        (click)="onReload()">
+				</button>
 			</div>
 		</ng-template>
 
@@ -104,7 +106,7 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="110" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="115" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -117,25 +119,25 @@
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="tds-button-set">
 					<button tds-button
-					        class="tds-button-flat"
+					        class="tds-button-in-row"
 					        (click)="showAssetEditView(dataItem, rowIndex)"
 					        icon="edit"
 					        title="Edit Asset">
 					</button>
 					<button tds-button
-					        class="tds-button-flat"
+					        class="tds-button-in-row"
 					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)"
 					        [icon]="isIssue ? 'list-alt' : 'file-text-o'"
 					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'">
 					</button>
 					<button tds-button
-					        class="tds-button-flat"
+					        class="tds-button-in-row"
 					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)"
 					        [icon]="isComment ? 'comments' : 'comment'"
 					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'">
 					</button>
 					<button tds-button
-					        class="tds-button-flat"
+					        class="tds-button-in-row"
 					        (click)="showAssetCloneView(dataItem, rowIndex)"
 					        icon="clone"
 					        title="Clone Asset">

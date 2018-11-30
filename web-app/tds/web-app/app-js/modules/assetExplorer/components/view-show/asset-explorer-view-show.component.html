@@ -28,20 +28,31 @@
                 </ul>
             </div>
             <ng-template #saveButton>
-	            <!--
-                <button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))" [disabled]="!isSaveAvailable()"
-                    class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
+                <button tds-button
+                    icon="floppy-o"
+                    id="btnSave"
+                    *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+                    [disabled]="!isSaveAvailable()"
+                    [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
                     (click)="onSave()">
-                    <i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}</button>
-                <button type="button" id="btnSaveAs" *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
-                    [disabled]="!isSaveAsAvailable()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
+                    {{ 'GLOBAL.SAVE' | translate }}
+                </button>
+
+                <button tds-button
+                    icon="floppy-o"
+                    id="btnSaveAs"
+                    *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+                    [disabled]="!isSaveAsAvailable()"
+                    [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
                     (click)="onSaveAs()">
-                    <i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}</button>
-                -->
+                    {{ 'GLOBAL.SAVE_AS' | translate }}
+                </button>
             </ng-template>
-            <span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
-                <i style="font-size:20px;" [ngClass]="model.isFavorite? 'fa-star' : 'fa-star-o'" class="fa text-yellow"></i>
-            </span>
+            <button tds-button
+                    [icon]="model.isFavorite? 'star' : 'star-o'"
+                    class="text-yellow tds-button-icon"
+                    (click)="onFavorite()">
+            </button>
             <button tds-button
                     icon="download"
                     class="btn btn-default"
@@ -50,9 +61,12 @@
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
-            <span class="btn" (click)="onEdit()" *ngIf="isEditAvailable()" style="margin:0 10px;padding:5px 10px;float:right;">
-                <i style="font-size:20px;" class="fa fa-cog"></i>
-            </span>
+            <button tds-button
+                    icon="cog"
+                    class="tds-button-icon pull-right"
+                    *ngIf="isEditAvailable()"
+                    (click)="onEdit()">
+            </button>
         </div>
         <div class="box-body">
                 <asset-explorer-view-grid

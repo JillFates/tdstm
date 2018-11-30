@@ -1,6 +1,5 @@
 /*
-	Control that wrap up a button and a font awesome icon
-    This relay on the btn suit bootstrap classes
+	Wrap up a button and a font awesome icon
 */
 import {Component, Input, HostBinding, ChangeDetectionStrategy} from '@angular/core';
 
