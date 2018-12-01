@@ -283,9 +283,10 @@ class CustomValidators {
 				}
 				// if 'precision' field is present and the value has a fractional part, we should check
 				// that the count of fractional digits does not exceed the 'precision' value
-				if (precision && value.contains('.')){
-					def fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
-					if (!fractionalPart.size() > precision) {
+				if (precision > 0 && value.contains('.')){
+					String fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
+					println "fractionalPart=[$fractionalPart] size=${fractionalPart?.size()}, precision=$precision"
+					if (fractionalPart.size() > precision) {
 						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
 					}
 				}
