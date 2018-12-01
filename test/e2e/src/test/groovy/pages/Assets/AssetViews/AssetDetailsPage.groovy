@@ -27,6 +27,7 @@ class AssetDetailsPage extends Page{
         tags { assetDetailModal.find("span.tag")}
         commonsModule { module CommonsModule}
         commentsContent { assetDetailModal.find('.comment-content')}
+        viewAllComments { commentsContent.find('#showAllComments')}
         addCommentsButton(wait: true) { commentsContent.find('button.btn-add')}
         commentsSectionTitle(wait: true) { commentsContent.find('label.task')}
         commentRows(wait: true) { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
@@ -124,8 +125,8 @@ class AssetDetailsPage extends Page{
         commentRows[index].find("td", "aria-colindex":"3").find("div").text() == category
     }
 
-    def verifyCommentsCount(beforeCount){
-        getCommentsCount() == beforeCount + 1
+    def verifyCommentsCount(count){
+        getCommentsCount() == count
     }
 
     def closeDetailsModal(){
@@ -139,5 +140,10 @@ class AssetDetailsPage extends Page{
 
     def getApplicationName(){
         adModalAppName.text().trim()
+    }
+
+    def clickOnViewAllComments(){
+        commonsModule.goToElement(viewAllComments)
+        viewAllComments.click()
     }
 }
