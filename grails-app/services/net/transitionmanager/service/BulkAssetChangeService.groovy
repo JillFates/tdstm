@@ -181,7 +181,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			typeInstance[field] = value
 			typeInstance.project = currentProject
 
-			if (field.startsWith('custom')) {
+			if (field.udf == 1) {
 				hasCustomFields = true
 			}
 
