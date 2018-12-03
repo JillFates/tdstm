@@ -25,7 +25,6 @@ import com.tdsops.common.security.spring.HasPermission
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-@GrailsCompileStatic
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
