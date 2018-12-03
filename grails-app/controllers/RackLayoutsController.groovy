@@ -13,6 +13,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
@@ -1094,14 +1095,14 @@ class RackLayoutsController implements ControllerMethods {
 	 * @return -  flash message
 	 */
 	@HasPermission(Permission.RackEdit)
+	@Transactional
 	def assignPowers() {
-		def rack
+		Rack rack
 		if (params.roomId) {
 			Rack.findAllByRoom(Room.load(params.roomId), [sort: "tag"]).each { r ->
 				rack = rackService.assignPowerForRack(r.id)
 			}
-		}
-		else {
+		} else {
 			rack = rackService.assignPowerForRack(params.rackId)
 		}
 		render "Rack ${rack.tag} wired"

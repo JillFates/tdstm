@@ -157,12 +157,19 @@ class RackService implements ServiceMethods {
 	 * @return -  rack
 	 */
 	@Transactional
-	def assignPowerForRack(rackId) {
-		def rack = Rack.read(rackId)
-		def toPowers = ["A", "B", "C"]
+	def assignPowerForRack(Long rackId) {
+		Integer portsCabled = 0
+
+		// TODO : JPM 11/2018 : Should be validating rack against the project
+		Rack rack = Rack.read(rackId)
+		List<String> toPowers = ["A", "B", "C"]
+
 		rack.assets.each { asset ->
-			def assetCablePowerList = AssetCableMap.findAllByAssetFrom(asset).findAll { it.assetFromPort.type == "Power" }
+			List<AssetCableMap> assetCablePowerList = AssetCableMap.findAllByAssetFrom(asset).findAll { it.assetFromPort?.type == "Power" }
+
+			// Guessing that this is dealing with A/B/C power feeds?
 			assetCablePowerList = assetCablePowerList.size() > 3 ? assetCablePowerList[0..2] : assetCablePowerList
+
 			assetCablePowerList.eachWithIndex { assetCablePower, i ->
 				if (!assetCablePower.toPower) {
 					assetCablePower.assetTo = assetCablePower.assetFrom
@@ -174,9 +181,11 @@ class RackService implements ServiceMethods {
 					if (!assetCablePower.save(flush: true)) {
 						assetCablePower.errors.allErrors.each { println it }
 					}
+					portsCabled++
 				}
 			}
 		}
+		log.debug "assignPowerForRack() cabled ${portsCabled} power ports on rack $rack"
 		return rack
 	}
 }
