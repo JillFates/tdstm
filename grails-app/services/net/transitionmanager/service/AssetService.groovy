@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveBundle
@@ -133,7 +134,7 @@ class AssetService {
 	 */
 	@Transactional(readOnly = true)
 	List<String> getAssetEnvironmentOptions() {
-		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		return AssetUtils.getEnvironmentOptions()
 	}
 
 	/**
@@ -142,7 +143,7 @@ class AssetService {
 	 */
 	@Transactional(readOnly = true)
 	List<String> getAssetPlanStatusOptions() {
-		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		return AssetUtils.getPlanStatusOptions()
 	}
 
 	/**
@@ -151,7 +152,7 @@ class AssetService {
 	 */
 	@Transactional(readOnly = true)
 	List<String> getDependencyTypeOptions() {
-		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		return AssetUtils.getDependencyTypeOptions()
 	}
 
 	/**
@@ -160,7 +161,7 @@ class AssetService {
 	 */
 	@Transactional(readOnly = true)
 	List<String> getAssetPriorityOptions() {
-		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+		return DeviceUtils.getPriorityOptions()
 	}
 
 	/**
@@ -169,7 +170,7 @@ class AssetService {
 	 */
 	@Transactional(readOnly = true)
 	List<String> getDependencyStatusOptions() {
-		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		return AssetUtils.getDependencyStatusOptions()
 	}
 
     /**

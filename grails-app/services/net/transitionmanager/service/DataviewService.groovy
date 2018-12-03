@@ -13,11 +13,11 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
-import net.transitionmanager.dataview.FieldSpec
-import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
@@ -1087,6 +1087,8 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: ""],
 		'sourceBladePosition': [property: "AE.sourceBladePosition", type: Integer, namedParameter: 'sourceBladePosition', join: ""],
 		'targetBladePosition': [property: "AE.targetBladePosition", type: Integer, namedParameter: 'targetBladePosition', join: ""],
+		'size': [property: "AE.size", type: Integer, namedParameter: 'size', join: ""],
+		'rateOfChange': [property: "AE.rateOfChange", type: Integer, namedParameter: 'rateOfChange', join: ""],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
 		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
 		'lastUpdated': [property: "AE.lastUpdated", type: Date, namedParameter: 'lastUpdated', join: ''],

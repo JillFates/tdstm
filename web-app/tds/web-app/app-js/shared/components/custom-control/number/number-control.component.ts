@@ -3,15 +3,16 @@ import {NumberControlHelper} from './number-control.helper';
 
 @Component({
 	selector: 'tds-number-control',
+	styles: [``],
 	template: `
 		<div>
             <kendo-numerictextbox [format]="format"
-								  [(ngModel)]="numberValue"
+                                  [(ngModel)]="numberValue"
                                   [min]="realMinRange" [max]="maxRange"
-                                  [autoCorrect]="false"
-								  (ngModelChange)="onValueChange($event)"
+                                  [autoCorrect]="true"
+                                  (ngModelChange)="onValueChange($event)"
                                   class="form-control">
-			</kendo-numerictextbox>
+            </kendo-numerictextbox>
 		</div>
 	`
 })
@@ -36,12 +37,10 @@ export class NumberControlComponent implements OnInit {
 	 * On Init build the number format.
 	 */
 	ngOnInit(): void {
-		this.numberValue = +this.value;
-		if (this.allowNegative) {
-			this.realMinRange = this.maxRange * -1;
-		} else {
-			this.realMinRange = this.minRange;
-		}
+		this.numberValue = this.value ? +this.value : 0;
+		// double check
+		this.numberValue = Number.isNaN(this.numberValue) ? 0 : this.numberValue;
+		this.realMinRange = this.minRange;
 	}
 
 	/**
