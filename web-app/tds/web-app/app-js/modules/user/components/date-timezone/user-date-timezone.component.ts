@@ -51,6 +51,13 @@ export class UserDateTimezoneComponent implements OnInit {
 	 * Initialize the jQuery Time Picker
 	 */
 	ngOnInit(): void {
+		// Resize modal window to fit content
+		let modal = document.getElementsByClassName('modal-dialog') as HTMLCollectionOf<HTMLElement>;
+		// TODO: Revisit Dialog Size
+		if (modal.length !== 0) {
+			modal[0].style.width = 'fit-content';
+		}
+
 		this.getUserData();
 		setTimeout( () => {
 			jQuery('#timezoneImage').timezonePicker({
