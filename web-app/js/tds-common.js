@@ -612,7 +612,7 @@ var UserPreference = function () {
         } else {
             jQuery.ajax({
                 type: 'POST',
-                url: '/tdstm/person/retrievePersonDetails/5662',
+                url: '/tdstm/person/retrievePersonDetails',
                 success: function (data, textStatus) {},
                 error: function (XMLHttpRequest, textStatus, errorThrown) {},
                 complete: function (XMLHttpRequest) {

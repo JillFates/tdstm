@@ -42,25 +42,6 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
-	getUser() {
-		return this.http.get(`${this.userPreferenceUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
-				return data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getPreferences(prefCodes) {
-		return this.http.get(`${this.userPreferenceUrl}/preferences/${prefCodes}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	removePreference(prefCode) {
 		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
 			.map((res: Response) => {
@@ -72,15 +53,6 @@ export class UserService {
 
 	resetPreferences() {
 		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	savePreference(pref) {
-		return this.http.post(`${this.userPreferenceUrl}/preference/${pref.code}&${pref.value}`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

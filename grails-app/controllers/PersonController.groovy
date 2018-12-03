@@ -358,7 +358,12 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.PersonView)
 	def retrievePersonDetails() {
 		try {
-			Person person = personService.validatePersonAccess(params.id)
+			Person person
+			if(params.id) {
+				person = personService.validatePersonAccess(params.id)
+			} else {
+				person = personService.validatePersonAccess(currentPerson().id)
+			}
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
 			def expiryDate = TimeUtil.formatDateTime(userLogin.expiryDate)
 
