@@ -124,7 +124,7 @@ class UrlMappings {
 		'/ws/asset/listDependencies' {
 			controller = 'wsAsset'
 			action = [
-			    GET: 'listDependencies'
+			    POST: 'listDependencies'
 			]
 		}
 

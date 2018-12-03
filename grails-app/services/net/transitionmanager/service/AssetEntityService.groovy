@@ -45,6 +45,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
@@ -3094,60 +3095,11 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	Map listDependencies(Project project, Map filterParams, Map sortingParams, Map paginationParams) {
 
-		Map<String, String> depProjectionFields = [
-			id: 'id',
-			assetName: 'ae.assetName',
-			assetClass: 'ae.assetClass',
-			assetType: 'ae.assetType',
-			assetBundle: 'amb.name',
-			type: 'type',
-			dependentName: 'ad.assetName',
-			dependentClass: 'ad.assetClass',
-			dependentType: 'ad.assetType',
-			dependentBundle: 'dmb.name',
-			status: 'status',
-			comment: 'comment',
-			frequency: 'dataFlowFreq',
-			assetId: 'ae.id',
-			dependentId: 'ad.id',
-			c1: 'c1',
-			c2: 'c2',
-			c3: 'c3',
-			c4: 'c4',
-			direction: 'dataFlowDirection'
-		]
-
-
-		List dependencies = AssetDependency.createCriteria().list(max: paginationParams['max'], offset: paginationParams['offset']) {
-			createAlias('asset', 'ae')
-			createAlias('dependent', 'ad')
-			createAlias('asset.moveBundle', 'amb')
-			createAlias('dependent.moveBundle', 'dmb')
-
-			and {
-				eq("ae.project", project)
-
-				depProjectionFields.each { key, value ->
-					if (filterParams[key] != null) {
-						like(value, "%${filterParams[key]}%")
-					}
-				}
-			}
-
-			projections {
-				depProjectionFields.each { key, value ->
-					property(value, key)
-				}
-			}
-
-			order(sortingParams['index'], sortingParams['order'])
-			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-			readOnly true
-		}
-
+		AssetDependencyQueryBuilder queryBuilder = new AssetDependencyQueryBuilder(project, filterParams, sortingParams, paginationParams)
+		Map results = queryBuilder.queryDomain()
 		return [
-		    dependencies: dependencies,
-			total: dependencies.totalCount
+		    dependencies: results['domains'],
+			total: results['total']
 		]
 	}
 
