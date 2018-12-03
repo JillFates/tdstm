@@ -1,8 +1,13 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<div class="dependencies-view-grid-component">
+<div class="dependencies-view-grid-component" *ngIf="state && state.gridConfig">
+	{{config | json}}
 	<kendo-grid #grid
 	            [data]="gridData"
+	            [filterable]="state.gridConfig.filterable"
+	            [sortable]="state.gridConfig.sortable"
+	            [resizable]="state.gridConfig.resizable"
+	            [pageable]="state.gridConfig.pageable"
 	            (dataStateChange)="dataStateChange($event)"
 	            class="tds-kendo-grid without-selectabe-rows">
 
@@ -76,7 +81,7 @@
 			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
 			             *ngIf="tagsFieldNames.includes(column.property)">
 				<tds-asset-tag-selector #tagSelector
-				                        [tagList]="tagList"
+				                        [tagList]="state.tagList"
 				                        [viewFilterModel]="column.filter"
 				                        (valueChange)="onTagFilterChange(column.field, $event)">
 				</tds-asset-tag-selector>
@@ -100,11 +105,11 @@
 		<ng-template kendoPagerTemplate>
 			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 			<kendo-pager-next-buttons></kendo-pager-next-buttons>
-			<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
+			<kendo-pager-page-sizes [pageSizes]="state.gridConfig.pageable.pageSizes"></kendo-pager-page-sizes>
 			<kendo-pager-info></kendo-pager-info>
 		</ng-template>
-
 	</kendo-grid>
+	{{state.gridConfig | json}}
 </div>
 
 

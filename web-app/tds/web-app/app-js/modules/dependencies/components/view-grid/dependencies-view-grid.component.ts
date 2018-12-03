@@ -1,9 +1,10 @@
 import {Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Observable, BehaviorSubject, Subject} from 'rxjs';
-import {tap, map, mergeMap, takeUntil, withLatestFrom} from 'rxjs/operators';
+import {tap, map, mergeMap, takeUntil, withLatestFrom, scan} from 'rxjs/operators';
+import {pathOr, compose} from 'ramda';
 
-import {State} from '@progress/kendo-data-query';
+import {State as GridState} from '@progress/kendo-data-query';
 import {GridComponent, SortSettings} from '@progress/kendo-angular-grid';
 import {GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
 
@@ -25,6 +26,13 @@ import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
+interface ComponentState {
+	tagList: any[];
+	gridState: GridState;
+	gridData: GridDataResult;
+	gridConfig: any;
+}
+
 @Component({
 	selector: 'tds-dependencies-view-grid',
 	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html',
@@ -33,17 +41,18 @@ declare var jQuery: any;
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
-	private gridStateSubject: BehaviorSubject<State>;
+	private gridStateSubject: BehaviorSubject<GridState>;
 	private tagsStateSubject: Subject<TagState>;
 	private destroySubject: Subject<any>;
 	private getDependencies: any;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected gridData: GridDataResult;
-	protected tagList: TagModel[];
 	protected readonly maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	protected readonly tagsFieldNames = ['tagsAsset', 'tagsDependency'];
+	protected state: ComponentState; //  = this.getInitialComponentState();
+	private componentState: BehaviorSubject<any>;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -54,7 +63,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService
 	) {
-		this.tagList = this.route.snapshot.data['tagList'];
 	}
 
 	ngOnInit() {
@@ -62,18 +70,68 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
 		this.tagsStateSubject = new Subject<TagState>();
 		this.gridData = { data: [], total: 0 };
+
+		this.dependenciesColumnModel = new DependenciesColumnModel();
+
 		this.getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
 
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
-		this.setupGridConfiguration();
-
+		//this.setupGridConfiguration();
 		this.setupGridStateChanges();
 		this.setupTagsFilterStateChanges();
+
+		this.setupComponentStateObservable();
+	}
+
+	private getDataFromEndpoint(): any {
+		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
+		return compose(getDependencies, this.getParametersForEndpoint2);
+	}
+
+	private setupComponentStateObservable() {
+		const initialState = this.getInitialComponentState();
+		const getData = this.getDataFromEndpoint();
+
+		this.componentState = new BehaviorSubject<any>(initialState);
+		this.componentState
+			.pipe(
+				// take events until destroy subject emits
+				takeUntil(this.destroySubject),
+				scan(this.accumulateToComponentState, initialState),
+				mergeMap((state: ComponentState) => getData(state))
+			)
+			.subscribe((state: ComponentState) => {
+				console.log('The new state is:');
+				console.log(this.state);
+				this.state = state;
+			})
+	}
+
+	// todo rename it to component state
+	private accumulateToComponentState(accumulator: ComponentState, current: any): ComponentState {
+		return <ComponentState>{...accumulator, ...current};
+	}
+
+	private updateComponentState(partialState: any): void {
+		this.componentState.next(partialState);
 	}
 
 	/**
-	 * Emit the destroy event to complete all current streams
+	 * Get the initial state of the component
+	 */
+	private getInitialComponentState(): ComponentState {
+		return {
+			tagList: pathOr([], ['snapshot', 'data', 'tagList'], this.route),
+			gridState: this.getInitialGridState(),
+			gridConfig: this.getInitialGridConfiguration(),
+			gridData: { data: [], total: 0 },
+		}
+	}
+
+
+	/**
+	 * Emit the destroy event to complete and close all current observables
 	 */
 	ngOnDestroy() {
 		this.destroySubject.next();
@@ -82,6 +140,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	/**
 	 * Set the grid fixed settings, this configuration doesn't change over time
 	 */
+	/*
 	private setupGridConfiguration() {
 		this.dependenciesColumnModel = new DependenciesColumnModel();
 
@@ -89,6 +148,16 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.grid.sortable = <SortSettings>{ allowUnsort: false, mode: 'single'};
 		this.grid.resizable = true;
 		this.grid.pageable = { pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true};
+	}
+	*/
+
+	private getInitialGridConfiguration(): any {
+		return {
+			filterable: true,
+			sortable: <SortSettings>{ allowUnsort: false, mode: 'single'},
+			resizable: true,
+			pageable: { pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}
+		}
 	}
 
 	/**
@@ -120,7 +189,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				withLatestFrom(this.gridStateSubject),
 				map(([tagsState, gridState]) => this.mergeTagsFilterIntoGridState(tagsState, gridState))
 			)
-			.subscribe((gridState: State) => {
+			.subscribe((gridState: GridState) => {
 				this.gridStateSubject.next(gridState);
 			});
 	}
@@ -144,9 +213,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Get the initial state of the grid
-	 * @returns {State} default grid state properties
+	 * @returns {GridState} default grid state properties
 	 */
-	private getInitialGridState(): State {
+	private getInitialGridState(): GridState {
 		return {
 			sort: [this.defaultSorting],
 			filter: {
@@ -160,9 +229,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Get the current grid state
-	 * @returns {State} grid state properties
+	 * @returns {GridState} grid state properties
 	 */
-	private getCurrentGridState(): State {
+	private getCurrentGridState(): GridState {
 		const {sort, pageSize: take, skip, filter} = this.grid;
 
 		return {sort, take, skip, filter};
@@ -170,11 +239,22 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Extract from the grid state the parameters required bye the endpoint
-	 * @param {State} state
+	 * @param {GridState} state
 	 * @returns {DependenciesRequestParams}
 	 */
-	private getParametersForEndpoint(state: State): DependenciesRequestParams {
+	private getParametersForEndpoint(state: GridState): DependenciesRequestParams {
 		const {skip, take, sort, filter} = state;
+
+		return {
+			page: (skip / take) + 1,
+			take,
+			filters: filter && filter.filters || [],
+			sort: sort && sort[0] || this.defaultSorting
+		};
+	}
+
+	private getParametersForEndpoint2(state: ComponentState): DependenciesRequestParams {
+		const {skip, take, sort, filter} = state.gridState;
 
 		return {
 			page: (skip / take) + 1,
@@ -186,15 +266,18 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Set the new grid state
-	 * @param {State} state
+	 * @param {GridState} state
 	 */
-	private setGridState(state: State): void {
+	private setGridState(state: GridState): void {
 		const {sort, filter, skip, take} = state;
 
+		/*
 		this.grid.sort = sort;
 		this.grid.filter = filter;
 		this.grid.skip = skip;
 		this.grid.pageSize = take;
+		*/
+
 		this.bulkCheckboxService.setPageSize(take);
 	}
 
@@ -204,6 +287,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.gridStateSubject.next({...state});
+		this.updateComponentState({gridState: state});
 	}
 
 	/**
@@ -268,9 +352,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	/**
 	 * Take the current tags filter state and merge it into the current gridState filters
 	 * @param {TagState} tagsState
-	 * @param {State} gridState
+	 * @param {GridState} gridState
 	 */
-	private mergeTagsFilterIntoGridState(tagsState: TagState, gridState: State): State {
+	private mergeTagsFilterIntoGridState(tagsState: TagState, gridState: GridState): GridState {
 		const currentFilters = gridState.filter && gridState.filter.filters || [];
 		const filters = (currentFilters.filter((item: any) => item.field !== tagsState.field));
 
