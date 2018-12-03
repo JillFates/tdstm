@@ -1314,7 +1314,8 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to clear out the errors recorded at the field level and row level and the record level count
+	 * Used to clear out the errors recorded at the field level and row level and the record level count.
+	 * It also remove previousValue key from fieldInfo when it exist to previous value data shown is more accurate.
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
 	 */
@@ -1324,6 +1325,9 @@ class DataImportService implements ServiceMethods {
 		record.resetErrors()
 		for (field in fieldsInfo) {
 			field.value.errors = []
+			if (field.value.containsKey('previousValue')) {
+				field.value.remove('previousValue')
+			}
 		}
 	}
 
