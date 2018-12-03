@@ -22,15 +22,6 @@
                                 </td>
                             </tr>
 
-                            <tr class="prop" style="display:none;">
-                                <td valign="top" class="name">
-                                    <label for="prefUsernameId"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
-                                </td>
-                                <td valign="top" class="value">
-                                    <input type="text" maxlength="64" id="prefUsernameId" name="username"/>
-                                </td>
-                            </tr>
-
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="middleNameId">Middle Name:</label>
@@ -104,10 +95,16 @@
                     <tds-password-change [passwordChangeModel]="passwordChangeModel"></tds-password-change>
                 </div>
             </div>
-            <div class="buttons">
-                <span class="button"><input type="submit" class="edit" value="Update"/></span>
-                <span class="button"><input type="button" class="cancel" (click)="cancelCloseDialog()" value="Cancel" /></span>
-            </div>
         </form>
+        <div class="buttons">
+            <button (click)="submitPreferences()" type="button" class="btn btn-primary pull-left">
+                <span class="fa fa-fw fa-floppy-o"></span>
+                <span>Update</span>
+            </button>
+            <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+                <span class="glyphicon glyphicon-ban-circle"></span>
+                <span>Cancel</span>
+            </button>
+        </div>
     </div>
 </div>
