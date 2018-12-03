@@ -33,7 +33,6 @@ export class UserDateTimezoneComponent implements OnInit {
 		private userService: UserService,
 		public activeDialog: UIActiveDialogService,
 		private preferenceService: PreferenceService) {
-		this.getUserData();
 	}
 
 	private getUserData(): void {
@@ -52,6 +51,7 @@ export class UserDateTimezoneComponent implements OnInit {
 	 * Initialize the jQuery Time Picker
 	 */
 	ngOnInit(): void {
+		this.getUserData();
 		setTimeout( () => {
 			jQuery('#timezoneImage').timezonePicker({
 				target: '#dateTimezone'
@@ -63,8 +63,9 @@ export class UserDateTimezoneComponent implements OnInit {
 			// Delay time to allow the Picker to be initialized
 		}, 600);
 
-		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe( (res) => {
-			console.log(res);
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe( (res: any) => {
+			this.selectedTimeFormat = res[PREFERENCES_LIST.CURR_DT_FORMAT];
+			this.selectedTimezone = res[PREFERENCES_LIST.CURR_TZ];
 		});
 	}
 
