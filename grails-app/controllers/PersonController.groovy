@@ -518,19 +518,10 @@ class PersonController implements ControllerMethods {
 		// log.debug "loadFilteredStaff() phase 3 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-		// Save the user preferences from the filter if the preference has changed
-		String prefValue
-		Map<String, String> prefMap = [
-			StaffingRole: role,
-			ShowClientStaff: onlyClientStaff,
-			ShowAssignedStaff: assigned
-		]
-		prefMap.each { String k, String v ->
-			prefValue = userPreferenceService.getPreference(k)
-			if (prefValue != v) {
-				userPreferenceService.setPreference(k, v)
-			}
-		}
+		// Save the user preferences from the filter (internally it only saves it if the preference has changed)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.STAFFING_ROLE, role)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.SHOW_CLIENT_STAFF, onlyClientStaff)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.SHOW_ASSIGNED_STAFF, assigned)
 
 		// log.debug "loadFilteredStaff() phase 4 took ${TimeUtil.elapsed(start)} (user preferences)"
 		// start = new Date()
@@ -722,7 +713,7 @@ class PersonController implements ControllerMethods {
 					}
 				}
 				moveEventList << [project: moveEvent.project.name, name: moveEvent.name, startTime: bundleStartDate,
-				                  startDate: TimeUtil.formatDateTime(eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6),
+				                  startDate: TimeUtil.formatDateTime(eventTimes.start, TimeUtil.FORMAT_DATE_ISO8601),
 				                  id: moveEvent.id]
 			}
 		}

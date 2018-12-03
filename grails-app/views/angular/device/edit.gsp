@@ -63,7 +63,7 @@
                                 </tr>
                                 <tr>
                                     <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.manufacturer.imp}','${asset.manufacturer}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="manufacturer" />}"
                                         nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
                                             <label>Manufacturer</label>
@@ -90,7 +90,7 @@
                                         </kendo-dropdownlist>
                                     </td>
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${asset.roomSource}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="roomSource" /> }"
                                         nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
@@ -146,7 +146,7 @@
 
                                     <!-- Rack Source/Target Select & New Fields -->
                                     <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${asset.rackSource}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="rackSource" /> }"
                                         nowrap="nowrap" id="rackId">
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover"  data-content="Rack/Cabinet">Rack/Cabinet</label>
                                     </td>
@@ -229,7 +229,7 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${asset.shortName}" tabindex="16" ngmodel="model.asset.shortName"/>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${asset.os}" tabindex="24" ngmodel="model.asset.os" />
                                     <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}"
-                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${asset.sourceRackPosition}')}"
+                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="sourceRackPosition" /> }"
                                         nowrap="nowrap">
                                         <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
                                     </td>
@@ -288,13 +288,11 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="18" ngmodel="model.asset.assetTag"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-                                        <kendo-datepicker
-                                                [tabIndex]="26"
-                                                class="tm-input-control"
-                                                name="modelAssetRetireDate"
-                                                [format]="dateFormat"
-                                                [(value)]="model.asset.retireDate">
-                                        </kendo-datepicker>
+                                        <tds-datetime-control [tabIndex]="26"
+                                                              class="tm-input-control"
+                                                              name="modelAssetRetireDate"
+                                                              [(value)]="model.asset.retireDate">
+                                        </tds-datetime-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
                                     <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
@@ -333,13 +331,11 @@
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-                                        <kendo-datepicker
-                                                [tabIndex]="27"
-                                                class="tm-input-control"
-                                                name="modelAssetMaintExpDate"
-                                                [format]="dateFormat"
-                                                [(value)]="model.asset.maintExpDate">
-                                        </kendo-datepicker>
+                                        <tds-datetime-control [tabIndex]="27"
+                                                              class="tm-input-control"
+                                                              name="modelAssetMaintExpDate"
+                                                              [(value)]="model.asset.maintExpDate">
+                                        </tds-datetime-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
                                     <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">

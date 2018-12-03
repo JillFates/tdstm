@@ -4,8 +4,9 @@
  * its component
  */
 import {Injectable, ComponentRef, HostListener, OnDestroy} from '@angular/core';
+
 import { NotifierService } from './notifier.service';
-import {DIALOG_SIZE} from '../model/constants';
+import {MODAL_SIZE, DEFAULT_DIALOG_SIZE, DEFAULT_ENABLE_ESC} from '../model/constants';
 
 @Injectable()
 export class UIDialogService {
@@ -17,13 +18,12 @@ export class UIDialogService {
 	 * Method to open a dialog, returns a Promise that gonna be resolved ou rejected based on the UIActiveDialog Action
 	 * @param component
 	 * @param {Array<any>} params
-	 * @param {DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL} size
+	 * @param {MODAL_SIZE} size
 	 * @param {boolean} enableEsc
 	 * @returns {Promise<any>}
 	 */
 	open(
-		component: any, params: Array<any>,
-		size: DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL = DIALOG_SIZE.MD, enableEsc = false): Promise<any> {
+		component: any, params: Array<any>, size: MODAL_SIZE = DEFAULT_DIALOG_SIZE, enableEsc = DEFAULT_ENABLE_ESC): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.open',
@@ -37,7 +37,7 @@ export class UIDialogService {
 		});
 	}
 
-	extra(component: any, params: Array<any>, enableEsc = false, draggable = false): Promise<any> {
+	extra(component: any, params: Array<any>, enableEsc = DEFAULT_ENABLE_ESC, draggable = false): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.extra',
@@ -51,7 +51,7 @@ export class UIDialogService {
 		});
 	}
 
-	replace(component: any, params: Array<any>, size: 'sm' | 'md' | 'xlg' | 'lg' = 'md'): Promise<any> {
+	replace(component: any, params: Array<any>, size: MODAL_SIZE = DEFAULT_DIALOG_SIZE): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.replace',

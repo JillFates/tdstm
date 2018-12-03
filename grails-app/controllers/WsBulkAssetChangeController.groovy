@@ -22,16 +22,4 @@ class WsBulkAssetChangeController implements ControllerMethods {
 
 		renderSuccessJson()
 	}
-
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	def fields() {
-		renderSuccessJson(BulkAssetChangeService.fields)
-	}
-
-	//TODO Should be removed, once changes are made to the ui
-	@Deprecated
-	def actions() {
-		renderSuccessJson(BulkAssetChangeService.actions)
-	}
 }

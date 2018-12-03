@@ -253,36 +253,30 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * TODO: I need to remove this specific type of custom field code, create a helper for each field type and put code in there.
-	 * TODO: Just like has been done on the Number Field Type.
+	 * TODO dontiveros: I need to remove this specific type of custom field code, create a helper for each field type and put code in there.
+	 * TODO dontiveros: Just like has been done on the Number Field Type.
 	 * @param dataItem
 	 */
-	protected onControlChange(dataItem: FieldSettingsModel): void {
+	protected onControlChange(previousControl: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel): void {
 		switch (dataItem.control) {
 			case CUSTOM_FIELD_CONTROL_TYPE.List:
-
+				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				// Removes String constraints
+				delete dataItem.constraints.maxSize
+				delete dataItem.constraints.minSize
 				if (dataItem.constraints.values &&
 					dataItem.constraints.values.indexOf('Yes') !== -1 &&
 					dataItem.constraints.values.indexOf('No') !== -1) {
 					dataItem.constraints.values = [];
 				}
-				if (!dataItem.constraints.values ||
-					dataItem.constraints.values.length === 0) {
-					// selectList.onToggle();
-				} else {
-					this.selectList.show = false;
-				}
 				break;
 			case CUSTOM_FIELD_CONTROL_TYPE.String:
-				dataItem.constraints.values = [];
-				if (!dataItem.constraints.minSize ||
-					!dataItem.constraints.maxSize) {
-					// minMax.onToggle();
-				} else {
-					this.minMax.show = false;
-				}
+				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				// Remove List & YesNo constraints
+				delete dataItem.constraints.values;
 				break;
 			case CUSTOM_FIELD_CONTROL_TYPE.YesNo:
+				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
 				dataItem.constraints.values = ['Yes', 'No'];
 				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
 					dataItem.default = null;
@@ -292,14 +286,26 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				break;
 			case CUSTOM_FIELD_CONTROL_TYPE.Number:
+				// Remove List & YesNo constraints
+				delete dataItem.constraints.values;
+				// Removes String constraints
+				delete dataItem.constraints.maxSize
+				delete dataItem.constraints.minSize
 				NumberControlHelper.initConfiguration(dataItem.constraints as NumberConfigurationConstraintsModel);
 				break;
 			default:
+				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				// Remove List & YesNo constraints
+				delete dataItem.constraints.values;
+				// Removes String constraints
+				delete dataItem.constraints.maxSize
+				delete dataItem.constraints.minSize
 				break;
 		}
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
+		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.prompt.open(
 				'Confirmation Required',
@@ -307,7 +313,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				'Ok', 'Cancel').then(result => {
 					if (result) {
 						dataItem.control = newValue;
-						this.onControlChange(dataItem);
+						this.onControlChange(previousControl, dataItem);
 					} else {
 						setTimeout(() => {
 							jQuery('#control' + dataItem.field).val('List');
@@ -316,7 +322,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				});
 		} else {
 			dataItem.control = newValue;
-			this.onControlChange(dataItem);
+			this.onControlChange(previousControl, dataItem);
 		}
 	}
 

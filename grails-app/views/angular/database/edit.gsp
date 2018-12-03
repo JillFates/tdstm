@@ -52,7 +52,7 @@
 										</tr>
 										<tr>
 											<td class="label ${standardFieldSpecs.size.imp?:''}"
-												[ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${asset.size}')}"
+												[ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="size" /> }"
 												nowrap="nowrap">
 												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
 													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
@@ -74,13 +74,11 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="18"
-														class="tm-input-control"
-														name="modelAssetRetireDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+                                                <tds-datetime-control [tabIndex]="18"
+                                                                      class="tm-input-control"
+                                                                      name="modelAssetRetireDate"
+                                                                      [(value)]="model.asset.retireDate">
+                                                </tds-datetime-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.dependencyBundle?.value}"/>
@@ -104,13 +102,11 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="19"
-														class="tm-input-control"
-														name="modelAssetMainExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker> <!--  -->
+                                                <tds-datetime-control [tabIndex]="19"
+                                                                      class="tm-input-control"
+                                                                      name="modelAssetMainExpDate"
+                                                                      [(value)]="model.asset.maintExpDate">
+                                                </tds-datetime-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>

@@ -170,7 +170,6 @@ interface Permission {
 			RecipeRelease				  = 'RecipeRelease',
 			RecipeView                    = 'RecipeView',
 			ReportMenuView                = 'ReportMenuView',
-			ReportViewDiscovery           = 'ReportViewDiscovery',
 			ReportViewEventDay            = 'ReportViewEventDay',
 			ReportViewEventPrep           = 'ReportViewEventPrep',
 			ReportViewPlanning            = 'ReportViewPlanning',

@@ -25,7 +25,7 @@ export class AssetCommonEdit implements OnInit {
 	protected isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
-	protected defaultValidation = 'Discovery';
+	protected defaultValidation = 'Unknown';
 	protected isHighField = AssetCommonHelper.isHighField;
 	private initialModel: any = null;
 
@@ -42,7 +42,9 @@ export class AssetCommonEdit implements OnInit {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			if (this.dateFormat && this.dateFormat !== null) {
+				this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			}
 	}
 	/**
 	 * Initiates The Injected Component

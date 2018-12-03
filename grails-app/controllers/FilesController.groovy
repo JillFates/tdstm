@@ -4,6 +4,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -236,7 +237,7 @@ class FilesController implements ControllerMethods {
 			}
 		}
 		if (params.toValidate) {
-			query.append(" WHERE files.validation='Discovery'")
+			query.append(" WHERE files.validation='${ValidationType.UNKNOWN}'")
 		}
 		if (params.plannedStatus) {
 			query.append(" WHERE files.planStatus='$params.plannedStatus'")

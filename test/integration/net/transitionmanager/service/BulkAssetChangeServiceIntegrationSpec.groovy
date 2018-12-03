@@ -2,13 +2,15 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.bulk.change.BulkChangeList
-import net.transitionmanager.bulk.change.BulkChangeMoveBundle
+import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
@@ -23,6 +25,7 @@ import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeYesNo
+import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -138,14 +141,14 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		] as DataviewService
 
 		bulkAssetChangeService.bulkClassMapping = [
-			(TagAsset.class.name)  : GroovySpy(BulkChangeTag, global: true).class,
-			(Date.class.name)      : GroovySpy(BulkChangeDate, global: true).class,
-			'String'               : GroovySpy(BulkChangeString, global: true).class,
-			(Integer.class.name)   : GroovySpy(BulkChangeInteger, global: true).class,
-			(Person.class.name)    : GroovySpy(BulkChangePerson, global: true).class,
-			'YesNo'                : GroovySpy(BulkChangeYesNo, global: true).class,
-			'List'                 : GroovySpy(BulkChangeList, global: true).class,
-			(MoveBundle.class.name): GroovySpy(BulkChangeMoveBundle, global: true).class
+			(ControlType.ASSET_TAG_SELECTOR.value()): GroovySpy(BulkChangeTag, global: true).class,
+			(Date.class.name)                       : GroovySpy(BulkChangeDate, global: true).class,
+			(ControlType.STRING.value())            : GroovySpy(BulkChangeString, global: true).class,
+			(Integer.class.name)                    : GroovySpy(BulkChangeInteger, global: true).class,
+			(ControlType.PERSON.value())            : GroovySpy(BulkChangePerson, global: true).class,
+			(ControlType.YES_NO.value())            : GroovySpy(BulkChangeYesNo, global: true).class,
+			(ControlType.LIST.value())              : GroovySpy(BulkChangeList, global: true).class,
+			(ControlType.REFERENCE.value())         : GroovySpy(BulkChangeReference, global: true).class
 		]
 
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
@@ -193,8 +196,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkAdd function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].add(AssetClass.domainClassFor(AssetClass.APPLICATION), [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].add(AssetClass.domainClassFor(AssetClass.APPLICATION), [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange add all assets in filter'() {
@@ -209,8 +212,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkAdd is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].add(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].add(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange clear'() {
@@ -223,8 +226,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkRemove function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].clear(Application.class, [], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].clear(Application.class, [], 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange clear, all assets in filter'() {
@@ -239,8 +242,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkRemove is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].clear(Application.class, [], 'tagAssets', [], [query: query, params: params])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].clear(Application.class, [], 'tagAssets', [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange replace'() {
@@ -253,8 +256,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace, all assets in filter'() {
@@ -269,8 +272,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkReplace is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange remove'() {
@@ -283,8 +286,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkRemove function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange remove, all assets in filter'() {
@@ -299,8 +302,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkRemove is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(TagAsset.class.name)].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange invalid field'() {
@@ -470,8 +473,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(Person.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(Person.class.name)].replace(Application.class, person, 'appOwner', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.PERSON.value()].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.PERSON.value()].replace(Application.class, person, 'appOwner', [device.id, device2.id], [:])
 	}
 
 	@See('TM-12334')
@@ -485,8 +488,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[(Person.class.name)].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(Person.class.name)].clear(Application.class, null, 'appOwner', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.PERSON.value()].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.PERSON.value()].clear(Application.class, null, 'appOwner', [device.id, device2.id], [:])
 	}
 
 	@See('TM-12334')
@@ -529,8 +532,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping[MoveBundle.class.name].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[MoveBundle.class.name].replace(Application, moveBundle, 'moveBundle', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.REFERENCE.value()].coerceBulkValue(project, editCommand.value, 'moveBundle', Application.class)
+			1 * bulkAssetChangeService.bulkClassMapping[ControlType.REFERENCE.value()].replace(Application, moveBundle, 'moveBundle', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace list'() {
@@ -636,7 +639,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange replace inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Discovery")
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: ValidationType.UNKNOWN)
 			bulkChangeCommand.edits = [editCommand]
 			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
 
@@ -649,7 +652,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkClassMapping['InList'].replace(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
 	}
 
-
+	@Ignore //TODO we don't currently have a list field that we support clear for. When we add one we should update this test to test that field.
 	void 'Test bulkChange clear inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: null)

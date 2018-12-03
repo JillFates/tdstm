@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "51f7e4ba-62aa-4378-ada7-966ed037502e",
+		"_postman_id": "63dda9d3-8abc-4768-b83a-7e3b33385b29",
 		"name": "DataBaseDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,7 +12,6 @@
 					"listen": "test",
 					"script": {
 						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
@@ -29,7 +28,8 @@
 							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
 							"    ",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -82,15 +82,18 @@
 					"listen": "test",
 					"script": {
 						"id": "6b04a083-d728-426f-9e3a-f52b97374cfe",
-						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Set the 2 assetIDs for later\", function () {",
+							"pm.test(\"Save DB Info\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
 							"    var dbID = jsonObject.rows[0].id; ",
-							"    postman.setGlobalVariable(\"dataBaseID\", dbID);",
-							"    ",
+							"    var dbName = jsonObject.rows[0].escapedName; ",
+							"    var dbPlanStatus = jsonObject.rows[0].cell[5];",
+							"    pm.environment.set(\"dbPlanStatus\", dbPlanStatus);",
+							"    pm.environment.set(\"dataBaseID\", dbID);",
+							"    pm.environment.set(\"dataBaseName\", dbName);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -116,13 +119,114 @@
 			"response": []
 		},
 		{
+			"name": "List Bundles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Save bundle id\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var bundleId = jsonObject[0].bundleId;",
+							"    pm.environment.set(\"bundleId\", bundleId);",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"moveBundle",
+						"retrieveBundleList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dependency List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d94d0fd8-f6e4-4585-af7a-4a9612aaef63",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Save Asset info\", function () {",
+							"//We get the attributes of an Asset to use them as another asset's dependency and support",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var assetName = jsonObject.rows[0].cell[0]; ",
+							"var type = jsonObject.rows[0].cell[3]; ",
+							"var assetStatus = jsonObject.rows[0].cell[9]; ",
+							"var assetId = jsonObject.rows[0].cell[10]; ",
+							"var assetClass = jsonObject.rows[0].cell[12]; ",
+							"",
+							"pm.environment.set(\"assetName\", assetName);",
+							"pm.environment.set(\"type\", type);",
+							"pm.environment.set(\"assetStatus\", assetStatus);",
+							"pm.environment.set(\"assetId\", assetId);",
+							"pm.environment.set(\"assetClass\", assetClass);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/assetEntity/listDepJson?sidx=assetName",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"assetEntity",
+						"listDepJson"
+					],
+					"query": [
+						{
+							"key": "sidx",
+							"value": "assetName"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Database Clear Dependencies",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "776fe4ff-7475-42f2-a054-b55d8b0af008",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -137,7 +241,8 @@
 							"    pm.expect(data).to.eql(\"Success!\");",
 							"    ",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -151,7 +256,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"assetClass\": \"DATABASE\",\n  \"asset\": {\n    \"class\": \"com.tds.asset.Database\",\n    \"id\": {{dataBaseID}},\n    \"appOwner\": null,\n    \"appSme\": \"\",\n    \"application\": \"\",\n    \"assetClass\": {\n      \"enumType\": \"com.tdsops.tm.enums.domain.AssetClass\",\n      \"name\": \"DATABASE\"\n    },\n    \"assetName\": \"Bugzilla\",\n    \"assetTag\": null,\n    \"assetType\": \"Database\",\n    \"cart\": null,\n    \"comments\": [],\n    \"costCenter\": null,\n    \"custom1\": \"interfaces!\",\n    \"custom10\": \"Yes\",\n    \"custom11\": \"Ice Cream man\",\n    \"custom12\": \"\",\n    \"custom13\": \"\",\n    \"custom14\": \"\",\n    \"custom15\": \"\",\n    \"custom16\": \"\",\n    \"custom17\": \"\",\n    \"custom18\": \"\",\n    \"custom19\": \"\",\n    \"custom2\": \"a custom value 2\",\n    \"custom20\": \"\",\n    \"custom21\": \"\",\n    \"custom22\": \"\",\n    \"custom23\": \"\",\n    \"custom24\": \"\",\n    \"custom25\": null,\n    \"custom26\": null,\n    \"custom27\": null,\n    \"custom28\": null,\n    \"custom29\": null,\n    \"custom3\": \"a cost basis value\",\n    \"custom30\": null,\n    \"custom31\": null,\n    \"custom32\": null,\n    \"custom33\": null,\n    \"custom34\": null,\n    \"custom35\": null,\n    \"custom36\": null,\n    \"custom37\": null,\n    \"custom38\": null,\n    \"custom39\": null,\n    \"custom4\": \"ddddd\",\n    \"custom40\": null,\n    \"custom41\": null,\n    \"custom42\": null,\n    \"custom43\": null,\n    \"custom44\": null,\n    \"custom45\": null,\n    \"custom46\": null,\n    \"custom47\": null,\n    \"custom48\": null,\n    \"custom49\": null,\n    \"custom5\": \"a custom value 5\",\n    \"custom50\": null,\n    \"custom51\": null,\n    \"custom52\": null,\n    \"custom53\": null,\n    \"custom54\": null,\n    \"custom55\": null,\n    \"custom56\": null,\n    \"custom57\": null,\n    \"custom58\": null,\n    \"custom59\": null,\n    \"custom6\": \"a custom value 6\",\n    \"custom60\": null,\n    \"custom61\": null,\n    \"custom62\": null,\n    \"custom63\": null,\n    \"custom64\": null,\n    \"custom65\": null,\n    \"custom66\": null,\n    \"custom67\": null,\n    \"custom68\": null,\n    \"custom69\": null,\n    \"custom7\": \"a custom value 7\",\n    \"custom70\": null,\n    \"custom71\": null,\n    \"custom72\": null,\n    \"custom73\": null,\n    \"custom74\": null,\n    \"custom75\": null,\n    \"custom76\": null,\n    \"custom77\": null,\n    \"custom78\": null,\n    \"custom79\": null,\n    \"custom8\": \"a custom value 8\",\n    \"custom80\": null,\n    \"custom81\": null,\n    \"custom82\": null,\n    \"custom83\": null,\n    \"custom84\": null,\n    \"custom85\": null,\n    \"custom86\": null,\n    \"custom87\": null,\n    \"custom88\": null,\n    \"custom89\": null,\n    \"custom9\": \"\",\n    \"custom90\": null,\n    \"custom91\": null,\n    \"custom92\": null,\n    \"custom93\": null,\n    \"custom94\": null,\n    \"custom95\": \"master\",\n    \"custom96\": null,\n    \"dateCreated\": \"2013-09-27T23:41:55Z\",\n    \"dbFormat\": \"MySQL\",\n    \"department\": null,\n    \"dependencyBundle\": null,\n    \"description\": \"YEEEY!\",\n    \"environment\": \"Development\",\n    \"externalRefId\": \"123563\",\n    \"ipAddress\": \"localhost\",\n    \"lastUpdated\": \"2018-07-12T12:34:25Z\",\n    \"maintContract\": null,\n    \"maintExpDate\": \"2019-03-24T04:00:00.000Z\",\n    \"manufacturer\": null,\n    \"model\": null,\n    \"modifiedBy\": {\n      \"class\": \"net.transitionmanager.domain.Person\",\n      \"id\": 5662\n    },\n    \"os\": null,\n    \"owner\": null,\n    \"planStatus\": \"Confirmed\",\n    \"priority\": null,\n    \"project\": {\n      \"class\": \"net.transitionmanager.domain.Project\",\n      \"id\": 2445\n    },\n    \"purchaseDate\": null,\n    \"purchasePrice\": null,\n    \"rackSource\": null,\n    \"rackTarget\": null,\n    \"railType\": null,\n    \"rateOfChange\": 1,\n    \"retireDate\": \"2019-03-14T04:00:00.000Z\",\n    \"roomSource\": null,\n    \"roomTarget\": null,\n    \"scale\": \"PB\",\n    \"serialNumber\": null,\n    \"shelf\": null,\n    \"shortName\": null,\n    \"size\": 500,\n    \"sourceBladePosition\": null,\n    \"sourceChassis\": null,\n    \"sourceRackPosition\": null,\n    \"supportType\": \"A Support value\",\n    \"tagAssets\": [],\n    \"targetBladePosition\": null,\n    \"targetChassis\": null,\n    \"targetRackPosition\": null,\n    \"truck\": null,\n    \"usize\": null,\n    \"validation\": \"DependencyReview\",\n    \"virtualHost\": null,\n    \"moveBundleId\": 3174\n    \n  },\n  \"dependencyMap\": {\n    \"supportAssets\": [],\n    \"dependentAssets\": []\n  }\n}"
+					"raw": "{\r\n  \"assetClass\": \"DATABASE\",\r\n  \"asset\": {\r\n    \"class\": \"com.tds.asset.Database\",\r\n    \"id\": {{dataBaseID}},\r\n    \"appOwner\": null,\r\n    \"appSme\": \"\",\r\n    \"application\": \"\",\r\n    \"assetClass\": {\r\n      \"enumType\": \"com.tdsops.tm.enums.domain.AssetClass\",\r\n      \"name\": \"DATABASE\"\r\n    },\r\n    \"assetName\": {{dataBaseName}},\r\n    \"assetTag\": \"\",\r\n    \"assetType\": \"Database\",\r\n    \"cart\": null,\r\n    \"comments\": [],\r\n    \"costCenter\": null,\r\n\t\"custom1\": \"\",\r\n    \"custom10\": \"\",\r\n    \"custom11\": \"\",\r\n    \"custom12\": \"\",\r\n    \"custom13\": \"\",\r\n    \"custom14\": \"\",\r\n    \"custom15\": \"\",\r\n    \"custom16\": \"\",\r\n    \"custom17\": \"\",\r\n    \"custom18\": \"\",\r\n    \"custom19\": \"\",\r\n    \"custom2\": \"\",\r\n    \"custom20\": \"\",\r\n    \"custom21\": \"\",\r\n    \"custom22\": \"\",\r\n    \"custom23\": \"\",\r\n    \"custom24\": \"\",\r\n    \"custom25\": null,\r\n    \"custom26\": null,\r\n    \"custom27\": null,\r\n    \"custom28\": null,\r\n    \"custom29\": null,\r\n    \"custom3\": \"\",\r\n    \"custom30\": null,\r\n    \"custom31\": null,\r\n    \"custom32\": null,\r\n    \"custom33\": null,\r\n    \"custom34\": null,\r\n    \"custom35\": null,\r\n    \"custom36\": null,\r\n    \"custom37\": null,\r\n    \"custom38\": null,\r\n    \"custom39\": null,\r\n    \"custom4\": \"\",\r\n    \"custom40\": null,\r\n    \"custom41\": null,\r\n    \"custom42\": null,\r\n    \"custom43\": null,\r\n    \"custom44\": null,\r\n    \"custom45\": null,\r\n    \"custom46\": null,\r\n    \"custom47\": null,\r\n    \"custom48\": null,\r\n    \"custom49\": null,\r\n    \"custom5\": \"\",\r\n    \"custom50\": null,\r\n    \"custom51\": null,\r\n    \"custom52\": null,\r\n    \"custom53\": null,\r\n    \"custom54\": null,\r\n    \"custom55\": null,\r\n    \"custom56\": null,\r\n    \"custom57\": null,\r\n    \"custom58\": null,\r\n    \"custom59\": null,\r\n    \"custom6\": \"\",\r\n    \"custom60\": null,\r\n    \"custom61\": null,\r\n    \"custom62\": null,\r\n    \"custom63\": null,\r\n    \"custom64\": null,\r\n    \"custom65\": null,\r\n    \"custom66\": null,\r\n    \"custom67\": null,\r\n    \"custom68\": null,\r\n    \"custom69\": null,\r\n    \"custom7\": \"\",\r\n    \"custom70\": null,\r\n    \"custom71\": null,\r\n    \"custom72\": null,\r\n    \"custom73\": null,\r\n    \"custom74\": null,\r\n    \"custom75\": null,\r\n    \"custom76\": null,\r\n    \"custom77\": null,\r\n    \"custom78\": null,\r\n    \"custom79\": null,\r\n    \"custom8\": \"\",\r\n    \"custom80\": null,\r\n    \"custom81\": null,\r\n    \"custom82\": null,\r\n    \"custom83\": null,\r\n    \"custom84\": null,\r\n    \"custom85\": null,\r\n    \"custom86\": null,\r\n    \"custom87\": null,\r\n    \"custom88\": null,\r\n    \"custom89\": null,\r\n    \"custom9\": \"\",\r\n    \"custom90\": null,\r\n    \"custom91\": null,\r\n    \"custom92\": null,\r\n    \"custom93\": null,\r\n    \"custom94\": null,\r\n    \"custom95\": \"\",\r\n    \"custom96\": null,\r\n    \"dateCreated\": \"2013-09-27T23:41:55Z\",\r\n    \"dbFormat\": \"\",\r\n    \"department\": null,\r\n    \"dependencyBundle\": null,\r\n    \"description\": \"\",\r\n    \"environment\": \"\",\r\n    \"externalRefId\": \"\",\r\n    \"ipAddress\": \"\",\r\n    \"lastUpdated\": \"2018-07-12T12:34:25Z\",\r\n    \"maintContract\": null,\r\n    \"maintExpDate\": \"2019-03-24T04:00:00.000Z\",\r\n    \"manufacturer\": null,\r\n    \"model\": null,\r\n    \"modifiedBy\": null,\r\n    \"os\": null,\r\n    \"owner\": null,\r\n    \"planStatus\": {{dbPlanStatus}},\r\n    \"priority\": null,\r\n    \"project\": {\r\n      \"class\": \"net.transitionmanager.domain.Project\",\r\n      \"id\": 2445\r\n    },\r\n    \"purchaseDate\": null,\r\n    \"purchasePrice\": null,\r\n    \"rackSource\": null,\r\n    \"rackTarget\": null,\r\n    \"railType\": null,\r\n    \"rateOfChange\": \"\",\r\n    \"retireDate\": \"2019-03-14T04:00:00.000Z\",\r\n    \"roomSource\": null,\r\n    \"roomTarget\": null,\r\n    \"scale\": \"\",\r\n    \"serialNumber\": null,\r\n    \"shelf\": null,\r\n    \"shortName\": null,\r\n    \"size\": \"\",\r\n    \"sourceBladePosition\": null,\r\n    \"sourceChassis\": null,\r\n    \"sourceRackPosition\": null,\r\n    \"supportType\": \"\",\r\n    \"tagAssets\": [],\r\n    \"targetBladePosition\": null,\r\n    \"targetChassis\": null,\r\n    \"targetRackPosition\": null,\r\n    \"truck\": null,\r\n    \"usize\": null,\r\n    \"validation\": \"\",\r\n    \"virtualHost\": null,\r\n    \"moveBundleId\": {{bundleId}}\r\n    \r\n  },\r\n  \"dependencyMap\": {\r\n    \"supportAssets\": [],\r\n    \"dependentAssets\": []\r\n  }\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{dataBaseID}}",
@@ -175,7 +280,6 @@
 					"listen": "test",
 					"script": {
 						"id": "19859309-9922-4741-b37a-f2dd55dde7e5",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -192,8 +296,17 @@
 							"});",
 							"",
 							"//This code cleans up the global variables created through code that should live only in this collection ",
-							"pm.globals.unset(\"dataBaseID\");"
-						]
+							"pm.environment.unset(\"dataBaseID\");",
+							"pm.environment.unset(\"dbPlanStatus\");",
+							"pm.environment.unset(\"dataBaseName\");",
+							"pm.environment.unset(\"bundleId\");",
+							"pm.environment.unset(\"assetName\");",
+							"pm.environment.unset(\"type\");",
+							"pm.environment.unset(\"assetStatus\");",
+							"pm.environment.unset(\"assetId\");",
+							"pm.environment.unset(\"assetClass\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -207,7 +320,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"assetClass\": \"DATABASE\",\n  \"asset\": {\n    \"class\": \"com.tds.asset.Database\",\n    \"id\": {{dataBaseID}},\n    \"appOwner\": null,\n    \"appSme\": \"\",\n    \"application\": \"\",\n    \"assetClass\": {\n      \"enumType\": \"com.tdsops.tm.enums.domain.AssetClass\",\n      \"name\": \"DATABASE\"\n    },\n    \"assetName\": \"Bugzilla\",\n    \"assetTag\": null,\n    \"assetType\": \"Database\",\n    \"cart\": null,\n    \"comments\": [],\n    \"costCenter\": null,\n    \"custom1\": \"interfaces!\",\n    \"custom10\": \"Yes\",\n    \"custom11\": \"Ice Cream man\",\n    \"custom12\": \"\",\n    \"custom13\": \"\",\n    \"custom14\": \"\",\n    \"custom15\": \"\",\n    \"custom16\": \"\",\n    \"custom17\": \"\",\n    \"custom18\": \"\",\n    \"custom19\": \"\",\n    \"custom2\": \"a custom value 2\",\n    \"custom20\": \"\",\n    \"custom21\": \"\",\n    \"custom22\": \"\",\n    \"custom23\": \"\",\n    \"custom24\": \"\",\n    \"custom25\": null,\n    \"custom26\": null,\n    \"custom27\": null,\n    \"custom28\": null,\n    \"custom29\": null,\n    \"custom3\": \"a cost basis value\",\n    \"custom30\": null,\n    \"custom31\": null,\n    \"custom32\": null,\n    \"custom33\": null,\n    \"custom34\": null,\n    \"custom35\": null,\n    \"custom36\": null,\n    \"custom37\": null,\n    \"custom38\": null,\n    \"custom39\": null,\n    \"custom4\": \"ddddd\",\n    \"custom40\": null,\n    \"custom41\": null,\n    \"custom42\": null,\n    \"custom43\": null,\n    \"custom44\": null,\n    \"custom45\": null,\n    \"custom46\": null,\n    \"custom47\": null,\n    \"custom48\": null,\n    \"custom49\": null,\n    \"custom5\": \"a custom value 5\",\n    \"custom50\": null,\n    \"custom51\": null,\n    \"custom52\": null,\n    \"custom53\": null,\n    \"custom54\": null,\n    \"custom55\": null,\n    \"custom56\": null,\n    \"custom57\": null,\n    \"custom58\": null,\n    \"custom59\": null,\n    \"custom6\": \"a custom value 6\",\n    \"custom60\": null,\n    \"custom61\": null,\n    \"custom62\": null,\n    \"custom63\": null,\n    \"custom64\": null,\n    \"custom65\": null,\n    \"custom66\": null,\n    \"custom67\": null,\n    \"custom68\": null,\n    \"custom69\": null,\n    \"custom7\": \"a custom value 7\",\n    \"custom70\": null,\n    \"custom71\": null,\n    \"custom72\": null,\n    \"custom73\": null,\n    \"custom74\": null,\n    \"custom75\": null,\n    \"custom76\": null,\n    \"custom77\": null,\n    \"custom78\": null,\n    \"custom79\": null,\n    \"custom8\": \"a custom value 8\",\n    \"custom80\": null,\n    \"custom81\": null,\n    \"custom82\": null,\n    \"custom83\": null,\n    \"custom84\": null,\n    \"custom85\": null,\n    \"custom86\": null,\n    \"custom87\": null,\n    \"custom88\": null,\n    \"custom89\": null,\n    \"custom9\": \"\",\n    \"custom90\": null,\n    \"custom91\": null,\n    \"custom92\": null,\n    \"custom93\": null,\n    \"custom94\": null,\n    \"custom95\": \"master\",\n    \"custom96\": null,\n    \"dateCreated\": \"2013-09-27T23:41:55Z\",\n    \"dbFormat\": \"MySQL\",\n    \"department\": null,\n    \"dependencyBundle\": null,\n    \"description\": \"YEEEY!\",\n    \"environment\": \"Development\",\n    \"externalRefId\": \"123563\",\n    \"ipAddress\": \"localhost\",\n    \"lastUpdated\": \"2018-07-12T12:34:25Z\",\n    \"maintContract\": null,\n    \"maintExpDate\": \"2019-03-24T04:00:00.000Z\",\n    \"manufacturer\": null,\n    \"model\": null,\n    \"modifiedBy\": {\n      \"class\": \"net.transitionmanager.domain.Person\",\n      \"id\": 5662\n    },\n    \"os\": null,\n    \"owner\": null,\n    \"planStatus\": \"Confirmed\",\n    \"priority\": null,\n    \"project\": {\n      \"class\": \"net.transitionmanager.domain.Project\",\n      \"id\": 2445\n    },\n    \"purchaseDate\": null,\n    \"purchasePrice\": null,\n    \"rackSource\": null,\n    \"rackTarget\": null,\n    \"railType\": null,\n    \"rateOfChange\": 1,\n    \"retireDate\": \"2019-03-14T04:00:00.000Z\",\n    \"roomSource\": null,\n    \"roomTarget\": null,\n    \"scale\": \"PB\",\n    \"serialNumber\": null,\n    \"shelf\": null,\n    \"shortName\": null,\n    \"size\": 500,\n    \"sourceBladePosition\": null,\n    \"sourceChassis\": null,\n    \"sourceRackPosition\": null,\n    \"supportType\": \"A Support value\",\n    \"tagAssets\": [],\n    \"targetBladePosition\": null,\n    \"targetChassis\": null,\n    \"targetRackPosition\": null,\n    \"truck\": null,\n    \"usize\": null,\n    \"validation\": \"DependencyReview\",\n    \"virtualHost\": null,\n    \"moveBundleId\": 3174\n    \n  },\n  \"dependencyMap\": {\n    \"supportAssets\": [\n    \t{\n        \"dataFlowFreq\": \"hourly\",\n        \"assetClass\": \"SERVER-DEVICE\",\n        \"type\": \"Unknown\",\n        \"status\": \"Future\",\n        \"comment\": \"\",\n        \"moveBundleId\": 5657,\n        \"targetAsset\": {\n          \"id\": 144817,\n          \"name\": \"Adam\"\n        }\n      }\n     ],\n    \"dependentAssets\": [\n    \t{\n        \"dataFlowFreq\": \"weekly\",\n        \"assetClass\": \"APPLICATION\",\n        \"type\": \"File\",\n        \"status\": \"Future\",\n        \"comment\": \"\",\n        \"moveBundleId\": 5773,\n        \"targetAsset\": {\n          \"id\": 114053,\n          \"name\": \"AGPM\"\n        }\n      }\n    ]\n  }\n}"
+					"raw": "{\r\n  \"assetClass\": \"DATABASE\",\r\n  \"asset\": {\r\n    \"class\": \"com.tds.asset.Database\",\r\n    \"id\": {{dataBaseID}},\r\n    \"appOwner\": null,\r\n    \"appSme\": \"\",\r\n    \"application\": \"\",\r\n    \"assetClass\": {\r\n      \"enumType\": \"com.tdsops.tm.enums.domain.AssetClass\",\r\n      \"name\": \"DATABASE\"\r\n    },\r\n    \"assetName\": {{dataBaseName}},\r\n    \"assetTag\": \"\",\r\n    \"assetType\": \"Database\",\r\n    \"cart\": null,\r\n    \"comments\": [],\r\n    \"costCenter\": null,\r\n\t\"custom1\": \"\",\r\n    \"custom10\": \"\",\r\n    \"custom11\": \"\",\r\n    \"custom12\": \"\",\r\n    \"custom13\": \"\",\r\n    \"custom14\": \"\",\r\n    \"custom15\": \"\",\r\n    \"custom16\": \"\",\r\n    \"custom17\": \"\",\r\n    \"custom18\": \"\",\r\n    \"custom19\": \"\",\r\n    \"custom2\": \"\",\r\n    \"custom20\": \"\",\r\n    \"custom21\": \"\",\r\n    \"custom22\": \"\",\r\n    \"custom23\": \"\",\r\n    \"custom24\": \"\",\r\n    \"custom25\": null,\r\n    \"custom26\": null,\r\n    \"custom27\": null,\r\n    \"custom28\": null,\r\n    \"custom29\": null,\r\n    \"custom3\": \"\",\r\n    \"custom30\": null,\r\n    \"custom31\": null,\r\n    \"custom32\": null,\r\n    \"custom33\": null,\r\n    \"custom34\": null,\r\n    \"custom35\": null,\r\n    \"custom36\": null,\r\n    \"custom37\": null,\r\n    \"custom38\": null,\r\n    \"custom39\": null,\r\n    \"custom4\": \"\",\r\n    \"custom40\": null,\r\n    \"custom41\": null,\r\n    \"custom42\": null,\r\n    \"custom43\": null,\r\n    \"custom44\": null,\r\n    \"custom45\": null,\r\n    \"custom46\": null,\r\n    \"custom47\": null,\r\n    \"custom48\": null,\r\n    \"custom49\": null,\r\n    \"custom5\": \"\",\r\n    \"custom50\": null,\r\n    \"custom51\": null,\r\n    \"custom52\": null,\r\n    \"custom53\": null,\r\n    \"custom54\": null,\r\n    \"custom55\": null,\r\n    \"custom56\": null,\r\n    \"custom57\": null,\r\n    \"custom58\": null,\r\n    \"custom59\": null,\r\n    \"custom6\": \"\",\r\n    \"custom60\": null,\r\n    \"custom61\": null,\r\n    \"custom62\": null,\r\n    \"custom63\": null,\r\n    \"custom64\": null,\r\n    \"custom65\": null,\r\n    \"custom66\": null,\r\n    \"custom67\": null,\r\n    \"custom68\": null,\r\n    \"custom69\": null,\r\n    \"custom7\": \"\",\r\n    \"custom70\": null,\r\n    \"custom71\": null,\r\n    \"custom72\": null,\r\n    \"custom73\": null,\r\n    \"custom74\": null,\r\n    \"custom75\": null,\r\n    \"custom76\": null,\r\n    \"custom77\": null,\r\n    \"custom78\": null,\r\n    \"custom79\": null,\r\n    \"custom8\": \"\",\r\n    \"custom80\": null,\r\n    \"custom81\": null,\r\n    \"custom82\": null,\r\n    \"custom83\": null,\r\n    \"custom84\": null,\r\n    \"custom85\": null,\r\n    \"custom86\": null,\r\n    \"custom87\": null,\r\n    \"custom88\": null,\r\n    \"custom89\": null,\r\n    \"custom9\": \"\",\r\n    \"custom90\": null,\r\n    \"custom91\": null,\r\n    \"custom92\": null,\r\n    \"custom93\": null,\r\n    \"custom94\": null,\r\n    \"custom95\": \"\",\r\n    \"custom96\": null,\r\n    \"dateCreated\": \"2013-09-27T23:41:55Z\",\r\n    \"dbFormat\": \"\",\r\n    \"department\": null,\r\n    \"dependencyBundle\": null,\r\n    \"description\": \"\",\r\n    \"environment\": \"\",\r\n    \"externalRefId\": \"\",\r\n    \"ipAddress\": \"\",\r\n    \"lastUpdated\": \"2018-07-12T12:34:25Z\",\r\n    \"maintContract\": null,\r\n    \"maintExpDate\": \"2019-03-24T04:00:00.000Z\",\r\n    \"manufacturer\": null,\r\n    \"model\": null,\r\n    \"modifiedBy\": null,\r\n    \"os\": null,\r\n    \"owner\": null,\r\n    \"planStatus\": {{dbPlanStatus}},\r\n    \"priority\": null,\r\n    \"project\": {\r\n      \"class\": \"net.transitionmanager.domain.Project\",\r\n      \"id\": 2445\r\n    },\r\n    \"purchaseDate\": null,\r\n    \"purchasePrice\": null,\r\n    \"rackSource\": null,\r\n    \"rackTarget\": null,\r\n    \"railType\": null,\r\n    \"rateOfChange\": \"\",\r\n    \"retireDate\": \"2019-03-14T04:00:00.000Z\",\r\n    \"roomSource\": null,\r\n    \"roomTarget\": null,\r\n    \"scale\": \"\",\r\n    \"serialNumber\": null,\r\n    \"shelf\": null,\r\n    \"shortName\": null,\r\n    \"size\": \"\",\r\n    \"sourceBladePosition\": null,\r\n    \"sourceChassis\": null,\r\n    \"sourceRackPosition\": null,\r\n    \"supportType\": \"\",\r\n    \"tagAssets\": [],\r\n    \"targetBladePosition\": null,\r\n    \"targetChassis\": null,\r\n    \"targetRackPosition\": null,\r\n    \"truck\": null,\r\n    \"usize\": null,\r\n    \"validation\": \"\",\r\n    \"virtualHost\": null,\r\n    \"moveBundleId\": {{bundleId}}\r\n    \r\n  },\r\n  \"dependencyMap\": {\r\n\t\"supportAssets\": [\r\n      {\r\n        \"dataFlowFreq\": \"hourly\",\r\n        \"assetClass\": {{assetClass}},\r\n        \"type\": {{type}},\r\n        \"status\": {{assetStatus}},\r\n        \"comment\": \"\",\r\n        \"moveBundleId\": {{bundleId}},\r\n        \"targetAsset\": {\r\n          \"id\": {{assetId}},\r\n          \"name\": {{assetName}}\r\n        }\r\n      }\r\n    ],\r\n        \"dependentAssets\": [\r\n      {\r\n        \"dataFlowFreq\": \"monthly\",\r\n        \"assetClass\": {{assetClass}},\r\n        \"type\": {{type}},\r\n        \"status\": {{assetStatus}},\r\n        \"comment\": \"\",\r\n        \"moveBundleId\": {{bundleId}},\r\n        \"targetAsset\": {\r\n          \"id\": {{assetId}},\r\n          \"name\": {{assetName}}\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{dataBaseID}}",

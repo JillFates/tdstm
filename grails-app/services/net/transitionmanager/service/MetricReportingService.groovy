@@ -300,7 +300,7 @@ class MetricReportingService {
 	 * Generates the hql for the where section of the query.
 	 *
 	 * @param wheres the JSON that represents the wheres, e.g.:
-	 * [column: 'validation', expression: "in ('BundleReady', 'Confirmed')"]
+	 * [column: 'validation', expression: "in ('PlanReady', 'Confirmed')"]
 	 *
 	 * @return the wheres, if there are any joined by an AND, and proceeded by an AND
 	 */

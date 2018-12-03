@@ -1,6 +1,6 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
+
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
@@ -65,7 +65,7 @@ class BulkChangeDate implements ServiceMethods {
 		}
 
 		if (!parsedValue) {
-			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
+			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_ISO8601)
 		}
 
 		if (!parsedValue) {
@@ -87,7 +87,7 @@ class BulkChangeDate implements ServiceMethods {
 	private static void update(Class type, Date value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 		String setFieldQueryPart
 		Map params = [:]
-		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
+		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 
 		if (value) {
 			params.value = value

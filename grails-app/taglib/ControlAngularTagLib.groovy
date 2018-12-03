@@ -1,3 +1,4 @@
+import com.tds.asset.AssetEntity
 import grails.converters.JSON
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
@@ -261,6 +262,32 @@ class ControlAngularTagLib {
 		out << '<td>'
 		out << inputControl(attrs)
 		out << '</td>'
+	}
+
+	/**
+	 * Used to determinate if the Field should be or not Highlighted
+     * FE Equivalent: asset-common-helper.ts
+	 * @param fieldSpec - the field spec Map
+	 * @param asset - the domain object
+	 * @param fieldName - the field
+	 * @param domainField - the field on the domain Object (optional)
+	 */
+	def highlightedField = { Map attrs ->
+		Map fieldSpec = attrs.fieldSpec ?: [:]
+		AssetEntity domainObject = attrs.asset ?: [:]
+		String fieldName = ( attrs.fieldName ?: '' )
+		String domainField = attrs.domainField
+
+		if (!fieldSpec || !domainObject || !fieldName) {
+			throw new InvalidParamException('<tdsAngular:highlightedField> tag requires fieldSpec=standardField Map and asset=domainObject and fieldName')
+		}
+
+		def value = domainField && domainField != null ? domainObject[domainField] : domainObject[fieldName]
+
+        def isImportantClass = 'YG'.contains(fieldSpec[fieldName].imp.toUpperCase())
+		boolean hasValue = (value != '' && value != null) || value?.trim()
+
+        out << (isImportantClass && !hasValue)
 	}
 
 	/**

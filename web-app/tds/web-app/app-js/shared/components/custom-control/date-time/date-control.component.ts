@@ -10,7 +10,8 @@ import {DateUtils} from '../../../utils/date.utils';
 		<div>
             <kendo-datepicker [(value)]="dateValue"
 							  [format]="displayFormat"
-                              (valueChange)="onValueChange($event)">
+                              (valueChange)="onValueChange($event)"
+							  class="form-control">
 			</kendo-datepicker>
 		</div>
 	`
@@ -31,7 +32,11 @@ export class DateControlComponent extends DateControlCommons {
 	 * @param {Date} $event
 	 */
 	onValueChange($event: Date): void {
-		this.value = this.intl.formatDate($event, this.outputFormat);
+		if ($event && $event !== null) {
+			this.value = this.intl.formatDate($event, this.outputFormat);
+		} else {
+			this.value = null;
+		}
 		this.valueChange.emit(this.value);
 	}
 }

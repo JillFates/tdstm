@@ -4,6 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.ValidationType
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MetricResult
@@ -132,11 +133,11 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		context.record = new ImportBatchRecord(sourceRowId: 1)
 
 		device.assetType = 'Server'
-		device.validation = 'BundleReady'
+		device.validation = ValidationType.PLAN_READY
 		device.save(flush: true, failOnError: true)
 
 		device2.assetType = 'Server'
-		device2.validation = 'Discovery'
+		device2.validation = ValidationType.UNKNOWN
 		device2.save(flush: true, failOnError: true)
 
 		moveBundle2.useForPlanning = 0
@@ -145,7 +146,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		// Create a second project with a device with the same name and type as device above
 		otherProjectDevice.assetName = device.assetName
 		otherProjectDevice.assetType = device.assetType
-		otherProjectDevice.validation = 'Discovery'
+		otherProjectDevice.validation = ValidationType.UNKNOWN
 		otherProjectDevice.save(flush: true, failOnError: true)
 
 		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
@@ -177,7 +178,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 					"where"      : [
 						[
 							"column"    : "validation",
-							"expression": "in ('Discovery', 'BundleReady')"
+							"expression": "in ('${ValidationType.UNKNOWN}', '${ValidationType.PLAN_READY}')"
 						]
 					]
 				]
@@ -204,36 +205,36 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	@See('TM-10727')
 	void 'test gatherMetric for query mode filtering of Device'() {
-			setup: 'giving a metric definition for a query, that will have results'
-				String date = (new Date() - 1).format('yyyy-MM-dd')
-				JSONObject metricDefinition = [
-					"metricCode" : "DEV-COUNT",
-					"description": "Device counts metrics",
-					"enabled"    : true,
-					"mode"       : "query",
-					"query"      : [
-						"domain"     : "Device",
-						"aggregation": "count(*)"
-					]
-				] as JSONObject
-			when: 'running gatherMetrics using query mode definition'
-				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-			then: 'two map results with expect counts of JUST devices and no applications'
-				results[0] == [
-					projectId : project.id,
-					metricCode: 'DEV-COUNT',
-					date      : date,
-					label     : 'count',
-					value     : 2
+		setup: 'giving a metric definition for a query, that will have results'
+			String date = (new Date() - 1).format('yyyy-MM-dd')
+			JSONObject metricDefinition = [
+				"metricCode" : "DEV-COUNT",
+				"description": "Device counts metrics",
+				"enabled"    : true,
+				"mode"       : "query",
+				"query"      : [
+					"domain"     : "Device",
+					"aggregation": "count(*)"
 				]
+			] as JSONObject
+		when: 'running gatherMetrics using query mode definition'
+			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+		then: 'two map results with expect counts of JUST devices and no applications'
+			results[0] == [
+				projectId : project.id,
+				metricCode: 'DEV-COUNT',
+				date      : date,
+				label     : 'count',
+				value     : 2
+			]
 
-				results[1] == [
-					projectId : otherProject.id,
-					metricCode: 'DEV-COUNT',
-					date      : date,
-					label     : 'count',
-					value     : 1
-				]
+			results[1] == [
+				projectId : otherProject.id,
+				metricCode: 'DEV-COUNT',
+				date      : date,
+				label     : 'count',
+				value     : 1
+			]
 	}
 
 	@See('TM-10662')
@@ -343,15 +344,23 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 						count(*) as value
 					from asset_entity a
 					join move_bundle m on m.move_bundle_id=a.move_bundle_id
-					where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+					where a.project_id in (:projectIds) and a.validation in ('${ValidationType.UNKNOWN}', '${ValidationType.PLAN_READY}') and m.use_for_planning = true
 					group by a.plan_status, a.asset_type, a.project_id
 					order by a.project_id, a.plan_status, a.asset_type;
 					""".stripIndent().toString()
 			]
 		when: 'running gatherMetrics on sql query'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-		then: 'the results should have two expected map sets of values'
+		then: 'the results should have three expected map sets of values'
 			results[0] == [
+				projectId : project.id,
+				metricCode: 'APP-VPS',
+				date      : date,
+				label     : 'Unassigned:Application',
+				value     : 1
+			]
+
+			results[1] == [
 				projectId : project.id,
 				metricCode: 'APP-VPS',
 				date      : date,
@@ -359,7 +368,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				value     : 2
 			]
 
-			results[1] == [
+			results[2] == [
 				projectId : otherProject.id,
 				metricCode: 'APP-VPS',
 				date      : date,
@@ -384,7 +393,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 									count(*) as value
 							from asset_entity a
 							join move_bundle m on m.move_bundle_id=a.move_bundle_id
-							where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+							where a.project_id in (:projectIds) and a.validation in ('${ValidationType.UNKNOWN}', '${
+					ValidationType.PLAN_READY
+				}') and m.use_for_planning = true
 							group by a.plan_status, a.asset_type, a.project_id;
 						""".stripIndent().toString()
 			]

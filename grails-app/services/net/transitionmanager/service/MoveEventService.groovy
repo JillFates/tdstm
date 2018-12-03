@@ -372,7 +372,7 @@ class MoveEventService implements ServiceMethods {
 		}
 
 		def bundles = moveEvent.moveBundles
-		def today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_6)
+		def today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_ISO8601)
 		def applications = []
 		def assets = []
 		def databases = []

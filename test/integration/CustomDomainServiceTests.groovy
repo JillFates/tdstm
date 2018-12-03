@@ -236,7 +236,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProject()
             String domain = AssetClass.APPLICATION.toString()
         when: 'retrieving the fields to be exported and all available fields for the project'
-            Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             Map allFields = customDomainService.allFieldSpecs(project, domain)
             Map assetClassField = allFields[domain].fields.find {it.field == 'assetClass'}
             Map custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
@@ -261,11 +261,15 @@ class CustomDomainServiceTests extends Specification {
                 (fieldSpecJson.fields.find{it.field == 'custom1'}).show = 0
             }
             customDomainTestHelper.updateFieldSpec(project, domain, updateClosure)
-            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
         then: 'the custom field is present in the fields to be exported even though is not marked as displayed'
             custom1Field != null
-
+        when: 'using the template headers to ask for a field that would not be included otherwise'
+            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, ['Asset Class'])
+            Map assetClassFieldMap = exportFields[domain].fields.find {it.field == 'assetClass'}
+        then: 'the assetClass field is included in the result'
+            assetClassField != null
     }
 
 }

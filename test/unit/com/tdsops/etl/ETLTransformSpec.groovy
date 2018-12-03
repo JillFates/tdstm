@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdsops.tm.enums.domain.ValidationType
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -1623,7 +1624,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM03,Production,C,,BundleReady,Confirmed
+				NGM03,Production,C,,${ValidationType.PLAN_READY},Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
 
@@ -1693,7 +1694,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM03,Production,C,,BundleReady,Confirmed
+				NGM03,Production,C,,${ValidationType.PLAN_READY},Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
 

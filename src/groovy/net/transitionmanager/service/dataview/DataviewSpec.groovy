@@ -1,6 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -94,14 +95,13 @@ class DataviewSpec {
 		}
 	}
 
-	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
+	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null, FieldSpecCache fieldSpecCache = null) {
 		spec = command.filters
 		justPlanning = command.justPlanning
 		args = [offset: command.offset]
 		if(command.limit != 0){
 			args.max = command.limit
 		}
-		order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 
 		if(dataview) {
 			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
@@ -111,9 +111,22 @@ class DataviewSpec {
 				dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
 				Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
 				if(!specColumn){
-					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
+					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter, fieldSpecCache)
 				}
 			}
+		}
+
+		order = [
+			domain: command.sortDomain,
+			property: command.sortProperty,
+			sort: command.sortOrder == ASCENDING ? 'asc' : 'desc',
+			fieldSpec: fieldSpecCache?.getFieldSpec(command.sortDomain, command.sortProperty)
+		]
+
+		this.spec.columns = this.spec.columns.collect {
+			Map map = it as Map
+			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))
+			map
 		}
 	}
 
