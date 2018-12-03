@@ -284,7 +284,7 @@ class ControlAngularTagLib {
 
 		def value = domainField && domainField != null ? domainObject[domainField] : domainObject[fieldName]
 
-        def isImportantClass = 'YG'.indexOf(fieldSpec[fieldName].imp.toUpperCase()) != -1
+        def isImportantClass = 'YG'.contains(fieldSpec[fieldName].imp.toUpperCase())
 		boolean hasValue = (value != '' && value != null) || value?.trim()
 
         out << (isImportantClass && !hasValue)
