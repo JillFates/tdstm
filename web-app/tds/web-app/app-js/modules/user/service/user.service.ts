@@ -42,6 +42,16 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
+	getUser() {
+		return this.http.get(`${this.userPreferenceUrl}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	getPreferences(prefCodes) {
 		return this.http.get(`${this.userPreferenceUrl}/preferences/${prefCodes}`, null)
 			.map((res: Response) => {

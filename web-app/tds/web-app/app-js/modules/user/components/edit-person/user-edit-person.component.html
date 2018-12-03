@@ -1,12 +1,12 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content user-view-edit-component">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content user-edit-person-component">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 *ngIf="currentUserInfo" class="modal-title">{{currentUserInfo.firstName}} Preferences</h4>
+        <h4 class="modal-title">Edit Person</h4>
     </div>
-    <div class="modal-body">
+    <div class="modal-body old-legacy-content">
         <form (ngSubmit)="submitPreferences($event)">
             <div id="personDialog" title="Edit Person" class="static-dialog">
-                <div class="dialog" style="border: 1px solid #63a242">
+                <div class="dialog">
                     <table>
                         <tbody>
                             <tr>
@@ -78,9 +78,11 @@
                                     <label>Start Page:</label>
                                 </td>
                                 <td valign="top" class="value">
-                                    <select name="startPage" [(ngModel)]="editableUserPreferences.START_PAGE" id="startPageId">
-                                        <option *ngFor="let option of startPageOptions" value="{{option}}">{{option}}</option>
-                                    </select>
+                                    <kendo-dropdownlist
+                                            name="startPage"
+                                            [(ngModel)]="editableUserPreferences.START_PAGE"
+                                            [data]="startPageOptions">
+                                    </kendo-dropdownlist>
                                 </td>
                             </tr>
 
@@ -89,10 +91,12 @@
                                     <label for="powerTypeId">Power In:</label>
                                 </td>
                                 <td valign="top" class="value">
-                                    <select name="powerType" [(ngModel)]="editableUserPreferences.CURR_POWER_TYPE" id="powerTypeId">
-                                        <option value="Watts">Watts</option>
-                                        <option value="Amps">Amps</option>
-                                    </select>
+                                    <kendo-dropdownlist
+                                        name="powerType"
+                                        id="powerTypeId"
+                                        [(ngModel)]="editableUserPreferences.CURR_POWER_TYPE"
+                                        [data]="['Watts','Amps']">
+                                    </kendo-dropdownlist>
                                 </td>
                             </tr>
                         </tbody>
@@ -102,7 +106,7 @@
             </div>
             <div class="buttons">
                 <span class="button"><input type="submit" class="edit" value="Update"/></span>
-                <span class="button"><input type="button" class="delete" (click)="cancelCloseDialog()" value="Cancel" /></span>
+                <span class="button"><input type="button" class="cancel" (click)="cancelCloseDialog()" value="Cancel" /></span>
             </div>
         </form>
     </div>

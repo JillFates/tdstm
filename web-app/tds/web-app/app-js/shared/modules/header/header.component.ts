@@ -7,8 +7,10 @@ import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
 import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
-import {UserService} from '../../../modules/user/service/user.service';
 import {UIDialogService} from '../../services/ui-dialog.service';
+import {UserEditPersonComponent} from '../../../modules/user/components/edit-person/user-edit-person.component';
+import {PersonModel} from '../../components/add-person/model/person.model';
+import {PasswordChangeModel} from '../../components/password-change/model/password-change.model';
 
 declare var jQuery: any;
 
@@ -20,6 +22,7 @@ declare var jQuery: any;
             <ng-container *ngIf="pageMetaData">
 	            <!-- Used for the user preferences until fully converted to angular -->
                 <span (click)="openPrefModal()" class="open-pref-modal"></span>
+                <span (click)="openEditPersonModal()" class="open-edit-person-modal"></span>
                 <h1>
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
@@ -159,6 +162,17 @@ export class HeaderComponent {
 	 */
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			if (result) {
+				console.error(result);
+			}
+		});
+	}
+
+	public openEditPersonModal(): void {
+		this.dialogService.open(UserEditPersonComponent, [
+			{ provide: PersonModel, useValue: {} },
+			{ provide: PasswordChangeModel, useValue: {} }
+			]).catch(result => {
 			if (result) {
 				console.error(result);
 			}
