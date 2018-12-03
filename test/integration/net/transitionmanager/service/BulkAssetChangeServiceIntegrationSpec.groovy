@@ -25,6 +25,7 @@ import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeYesNo
+import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -651,7 +652,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkClassMapping['InList'].replace(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
 	}
 
-
+	@Ignore //TODO we don't currently have a list field that we support clear for. When we add one we should update this test to test that field.
 	void 'Test bulkChange clear inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: null)

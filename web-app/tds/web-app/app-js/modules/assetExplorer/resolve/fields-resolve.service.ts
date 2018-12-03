@@ -24,7 +24,9 @@ export class FieldsResolveService implements Resolve<any> {
 			}
 			domains.forEach(d => {
 				d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-				d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
+				d.fields.forEach(f => {
+					f['domain'] = d.domain.toLowerCase();
+				});
 			});
 			return domains;
 		}).catch((err) => {
