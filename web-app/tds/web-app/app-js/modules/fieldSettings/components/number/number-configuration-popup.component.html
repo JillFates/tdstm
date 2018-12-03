@@ -6,7 +6,7 @@
 <div class="modal-content selectlist-configuration-popup">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">String Configuration - {{field.field}}</h4>
+        <h4 class="modal-title">Number Configuration - {{field.field}}</h4>
     </div>
     <div class="modal-body">
         <form #templateForm="ngForm">
@@ -18,14 +18,16 @@
                             <kendo-numerictextbox style="width: 100px;"
                                                   name="minRange"
                                                   [format]="'n'"
-                                                  [(ngModel)]="model.minRange"
-                                                  [min]="0" [max]="model.maxRange">
+                                                  [(value)]="localMinRange"
+                                                  [max]="model.maxRange"
+                                                  (valueChange)="onMinRangeChange($event)">
                             </kendo-numerictextbox> To
                             <kendo-numerictextbox style="width: 100px;"
                                                   name="maxRange"
                                                   [format]="'n'"
                                                   [(ngModel)]="model.maxRange"
-                                                  [min]="model.minRange">
+                                                  [min]="model.minRange"
+                                                  (ngModelChange)="onFormatChange()">
                             </kendo-numerictextbox>
                         </div>
                     </div>
@@ -53,20 +55,29 @@
                         <label class="col-sm-5">Allow Negative Integers</label>
                         <div class="col-sm-5 text-left">
                             <input name="allowNegatives" type="checkbox"
+                                   [disabled]="localMinRange !== null || model.maxRange !== null"
                                    [(ngModel)]="model.allowNegative"
-                                   (change)="onAllowNegativesChange()"/>
+                                   (change)="onAllowNegativesChange($event)"/>
                         </div>
                     </div>
                     <div class="row">
                         <label class="col-sm-5">Example</label>
                         <div class="col-sm-5 text-left">
+                            <!--<kendo-numerictextbox style="width: 100px;"-->
+                                                  <!--name="example"-->
+                                                  <!--[autoCorrect]="true"-->
+                                                  <!--[spinners]="true"-->
+                                                  <!--[format]="model.format"-->
+                                                  <!--[min]="model.minRange"-->
+                                                  <!--[max]="model.maxRange">-->
+                            <!--</kendo-numerictextbox>-->
                             <kendo-numerictextbox style="width: 100px;"
                                                   name="example"
                                                   [autoCorrect]="true"
                                                   [spinners]="false"
                                                   [readonly]="true"
                                                   [format]="model.format"
-                                                  [value]="model.allowNegative ? -model.maxRange : model.maxRange"
+                                                  [value]="exampleValue"
                                                   [max]="model.maxRange">
                             </kendo-numerictextbox>
                         </div>

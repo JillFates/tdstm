@@ -90,7 +90,7 @@ class AddCommentsToAssetSpec extends GebReportingSpec {
         when: 'The user is in Asset details page'
             at AssetDetailsPage
         then: 'The comment count was incremented'
-            verifyCommentsCount(beforeCommentsCount)
+            verifyCommentsCount(beforeCommentsCount + 1)
         and: 'The comment is the same was saved'
             verifyAddedCommentText(comment, beforeCommentsCount)
         and: 'The category is the same was saved'

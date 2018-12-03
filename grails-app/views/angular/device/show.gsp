@@ -129,7 +129,9 @@
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}" />
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}" />
-                                    <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${assetEntity?.retireDate}" endian="${dateFormat}"/></td>
+                                    <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
+                                        {{ '${assetEntity?.retireDate}' | tdsDateTime: userTimeZone }}
+                                    </td>
                                     <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
                                         <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
                                             ${standardFieldSpecs.moveBundle.label} : Dep. Group
@@ -151,7 +153,9 @@
                                 <tr class="prop">
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.railType}" value="${assetEntity.railType}" />
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}" />
-                                    <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}"><tds:convertDate date="${assetEntity?.maintExpDate}" endian="${dateFormat}" /></td>
+                                    <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
+                                        {{ '${assetEntity?.maintExpDate}' | tdsDateTime: userTimeZone }}
+                                    </td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}" />
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}" />
                                 </tr>

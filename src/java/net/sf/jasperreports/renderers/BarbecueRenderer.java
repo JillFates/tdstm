@@ -50,7 +50,6 @@ import net.sourceforge.barbecue.output.OutputException;
  *
  * FILES USING THIS CLASS:
  *    cartReport.jrxml,
- *    transportationAssetReport.jrxml,
  *    workSheetsReport.jrxml
  *
  * @author Teodor Danciu (teodord@users.sourceforge.net)
