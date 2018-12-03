@@ -27,6 +27,10 @@ class CommentDetailsPage extends Page{
         commonsModule { module CommonsModule}
     }
 
+    def clickOnEditButton(){
+        waitFor {editButton.click()}
+    }
+
     def clickOnCancelButton(){
         waitFor {cancelButton.click()}
     }

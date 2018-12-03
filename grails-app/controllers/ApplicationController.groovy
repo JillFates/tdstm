@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -253,15 +254,32 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
+		// Filter on validation
 		if (params.toValidate) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
+			String validationWhere = ''
+			switch (params.toValidate) {
+				case ValidationType.UNKNOWN:
+					validationWhere = "apps.validation = '${ValidationType.UNKNOWN}'"
+					break
+				case ValidationType.VALIDATED:
+					validationWhere = "apps.validation != '${ValidationType.UNKNOWN}'"
+					break
+				case ValidationType.PLAN_READY:
+					validationWhere = "apps.validation = '${ValidationType.PLAN_READY}'"
+					break
+				default:
+					log.warn "listJson called with invalid toValidate parameter {}", params.toValidate
 			}
-			else {
-				query.append(' AND ')
+
+			if (validationWhere) {
+				if (firstWhere) {
+					query.append(' WHERE ')
+					firstWhere = false
+				} else {
+					query.append(' AND ')
+				}
+				query.append(validationWhere)
 			}
-			query.append("apps.validation='$params.toValidate'")
 		}
 
 		if (params.plannedStatus) {

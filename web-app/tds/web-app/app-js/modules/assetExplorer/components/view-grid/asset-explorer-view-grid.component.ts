@@ -16,7 +16,11 @@ import {
 	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../asset/asset-show.component';
-import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
+import {
+	CUSTOM_FIELD_CONTROL_TYPE,
+	FIELD_NOT_FOUND,
+	FieldSettingsModel
+} from '../../../fieldSettings/model/field-settings.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
@@ -39,6 +43,7 @@ import {TaskCreateComponent} from '../../../taskManager/components/create/task-c
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -82,7 +87,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	public typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
-	public userTimeZone: string;
+	protected userTimeZone: string;
+	protected userDateFormat: string;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -98,6 +104,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 	private currentUser: any;
+	protected fieldPipeMap: {pipe: any, metadata: any};
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 
 	constructor(
@@ -107,6 +114,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
 		private userService: UserService) {
+			this.fieldPipeMap = {pipe: {}, metadata: {}};
+			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 	}
 
 	ngOnInit(): void {
@@ -130,15 +139,22 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.currentFields = this.fields.reduce((p, c) => {
 			return p.concat(c.fields);
 		}, []).map((f: FieldSettingsModel) => {
+			if (f.control === CUSTOM_FIELD_CONTROL_TYPE.DateTime
+				|| f.control === CUSTOM_FIELD_CONTROL_TYPE.Date
+				|| f.control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
+					this.fieldPipeMap.pipe[`${f['domain']}_${f.field}`] = f.control;
+					if (f.control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
+						let format = (f.constraints as NumberConfigurationConstraintsModel).format || '0';
+						this.fieldPipeMap.metadata[`${f['domain']}_${f.field}`] = format;
+					}
+			}
 			return {
 				key: `${f['domain']}_${f.field}`,
 				label: f.label
 			};
 		});
-
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
-
 		this.getCurrentUser();
 
 	}
@@ -325,12 +341,15 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, false).then(x => {
-				if (x) {
-					this.createDependencyPromise(x.assetClass, x.id);
+			DIALOG_SIZE.LG, false)
+			.then(asset => {
+				if (asset) {
+					this.createDependencyPromise(asset.assetClass, asset.id);
 				}
-			}).catch(x => {
-				console.log(x);
+				this.onReload();
+			}).catch(error => {
+				console.log('Error:', error);
+				this.onReload();
 			});
 	}
 
@@ -492,7 +511,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.then(() => this.onReload())
+			.catch((err) => this.onReload() )
 	}
 
 	/**
@@ -572,13 +593,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * It was fixed by Kendo itself, this just prevent the double click
 	 * @param event:any
 	 */
 	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
+		event.preventDefault();
 	}
 
 	/**
@@ -586,9 +605,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private  cellClick(e): void {
+	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.highlightGridRow(e.rowIndex);
 			this.onShow(e.dataItem);
 		}
 	}

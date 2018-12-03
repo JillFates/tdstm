@@ -5,18 +5,19 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.command.DataviewApiParamsCommand
-import grails.transaction.Transactional
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
@@ -26,8 +27,6 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
-import groovy.transform.CompileStatic
-import java.text.DateFormat
 
 /**
  * Service class with main database operations for Dataview.
@@ -37,6 +36,8 @@ class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
 	UserPreferenceService userPreferenceService
+	@Lazy
+	private static CustomDomainService customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
 
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
@@ -308,9 +309,7 @@ class DataviewService implements ServiceMethods {
      */
     // TODO : Annotate READONLY
     Map query(Project project, Dataview dataview, DataviewUserParamsCommand userParams) {
-
-        DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
-        return previewQuery(project, dataviewSpec)
+        return previewQuery(project, userParams)
     }
 
 	/**
@@ -323,7 +322,6 @@ class DataviewService implements ServiceMethods {
 	 */
 	// TODO : Annotate READONLY
 	Map query(Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand) {
-
 		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview)
 		return previewQuery(project, dataviewSpec)
 	}
@@ -339,7 +337,10 @@ class DataviewService implements ServiceMethods {
 	 */
 	Map getAssetIdsHql(Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
 		Dataview dataview = get(Dataview, dataViewId, project)
-		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
+
+		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview, fieldSpecCache)
+
 		Map whereInfo = hqlWhere(dataviewSpec, project)
 		String conditions = whereInfo.conditions
 		String hqlJoins = hqlJoins(dataviewSpec)
@@ -391,7 +392,10 @@ class DataviewService implements ServiceMethods {
      * 		]
      */
     // TODO : Annotate READONLY
-    Map previewQuery(Project project, DataviewSpec dataviewSpec) {
+    Map previewQuery(Project project, DataviewUserParamsCommand dataviewUserParamsCommand) {
+
+		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(dataviewUserParamsCommand, null, fieldSpecCache)
 
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 
@@ -620,7 +624,7 @@ class DataviewService implements ServiceMethods {
      * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
-        dataviewSpec.columns.collect { Map column ->
+		return dataviewSpec.columns.collect { Map column ->
             "${joinFor(column)}"
         }.join(" ")
     }
@@ -628,11 +632,11 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Creates a String with all the columns correctly set for select clause
-	 * @param dataviewSpec
+	 * @param dataviewSpec an instance of {@code DataviewSpec}
 	 * @return
 	 */
 	private String hqlColumns(DataviewSpec dataviewSpec){
-		dataviewSpec.columns.collect { Map column ->
+		return dataviewSpec.columns.collect { Map column ->
 			"${projectionPropertyFor(column)}"
 		}.join(", ")
 	}
@@ -670,7 +674,6 @@ class DataviewService implements ServiceMethods {
 		// The keys for all the declared mixed fields.
 		Set mixedKeys = mixedFields.keySet()
 
-
 		Map additionalInfo = [:]
 
 		// Iterate over each column
@@ -678,6 +681,7 @@ class DataviewService implements ServiceMethods {
 
 			// Check if the user provided a filter expression.
 			if (StringUtil.isNotBlank(filterFor(column))) {
+
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
 						column: propertyFor(column),
@@ -687,6 +691,7 @@ class DataviewService implements ServiceMethods {
 						type: typeFor(column),
 						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
+						fieldSpec: column.fieldSpec
 				])
 
 				String property = propertyFor(column)
@@ -734,14 +739,11 @@ class DataviewService implements ServiceMethods {
 					// Keep a copy of this results for later use.
 					mixedFieldsInfo[property] = additionalResults
 				}
-
 			}
-
 		}
 
 		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: mixedFieldsInfo]
 	}
-
 
     /**
      * Columnn filters value could be split by '|' separator
@@ -751,7 +753,7 @@ class DataviewService implements ServiceMethods {
      * 		{ "domain": "common", "property": "environment", "filter": "production|development" }
      */
 	private String[] splitColumnFilter(Map column) {
-        column.filter.split("\\|")
+        return column.filter.split("\\|")
     }
 
     /**
@@ -760,23 +762,36 @@ class DataviewService implements ServiceMethods {
      * @return a String HQL order sentence
      */
 	private String hqlOrder(DataviewSpec dataviewSpec){
-        "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
+		return "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
     private static String namedParameterFor(Map column) {
-        transformations[column.property].namedParameter
+		return transformations[column.property].namedParameter
     }
 
-    private static String propertyFor(Map column) {
-		transformations[column.property].property
-    }
+	/**
+	 * https://docs.jboss.org/hibernate/orm/3.5/reference/en/html/queryhql.html#queryhql-expressions
+	 * @param column
+	 * @return
+	 */
+	private static String propertyFor(Map column) {
+
+		String property = transformations[column.property].property
+		FieldSpec fieldSpec = column.fieldSpec
+
+		if(fieldSpec?.isCustom()){
+			property = fieldSpec.getHibernateCastSentence(property)
+		}
+
+		return property
+	}
 
     private static String joinFor(Map column) {
-        transformations[column.property].join
+		return transformations[column.property].join
     }
 
 	private static String orderFor(Map column) {
-		transformations[column.property].alias ?: propertyFor(column)
+		return transformations[column.property].alias ?: propertyFor(column)
 	}
 
 	/**
@@ -785,7 +800,15 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	private static Class typeFor(Map column) {
-		transformations[column.property].type
+
+		Class type = transformations[column.property].type
+		FieldSpec fieldSpec = column.fieldSpec
+
+		if(fieldSpec?.isCustom()){
+			type = fieldSpec.getClassType()
+		}
+
+		return type
 	}
 
 	/**
@@ -800,7 +823,7 @@ class DataviewService implements ServiceMethods {
 	/**
 	 * Build the projection for the given column.
 	 *
-	 * @param column
+	 * @param column a Map with column definitions
 	 * @return
 	 */
 	private static String projectionPropertyFor(Map column) {
@@ -1064,6 +1087,8 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: ""],
 		'sourceBladePosition': [property: "AE.sourceBladePosition", type: Integer, namedParameter: 'sourceBladePosition', join: ""],
 		'targetBladePosition': [property: "AE.targetBladePosition", type: Integer, namedParameter: 'targetBladePosition', join: ""],
+		'size': [property: "AE.size", type: Integer, namedParameter: 'size', join: ""],
+		'rateOfChange': [property: "AE.rateOfChange", type: Integer, namedParameter: 'rateOfChange', join: ""],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
 		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
 		'lastUpdated': [property: "AE.lastUpdated", type: Date, namedParameter: 'lastUpdated', join: ''],
