@@ -113,4 +113,17 @@ class WsUserController implements ControllerMethods {
 		userPreferenceService.removePreference(id)
 		renderSuccessJson()
 	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def saveDateAndTimePreferences() {
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(params?.timezone.toString())
+		userPreferenceService.setTimeZone timezone.getID()
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(params?.datetimeFormat.toString())
+		userPreferenceService.setDateFormat datetimeFormat
+
+		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
+	}
 }

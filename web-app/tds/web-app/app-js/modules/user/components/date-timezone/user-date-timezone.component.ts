@@ -121,4 +121,22 @@ export class UserDateTimezoneComponent implements OnInit {
 				(err) => console.log(err));
 		});
 	}
+
+	/**
+	 * Save the selected time zone and format
+	 */
+	public onSave(): void {
+
+		const params = {
+			timezone: this.selectedTimezone,
+			datetimeFormat: this.selectedTimeFormat
+		};
+
+		this.userService.saveDateAndTimePreferences(params).subscribe(
+			(result: any) => {
+				this.cancelCloseDialog();
+				location.reload();
+			},
+			(err) => console.log(err));
+	}
 }

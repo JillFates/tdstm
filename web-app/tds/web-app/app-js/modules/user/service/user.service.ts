@@ -68,4 +68,11 @@ export class UserService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	saveDateAndTimePreferences(params: any): Observable<any> {
+		return this.http.post(`${this.userPreferenceUrl}/saveDateAndTimePreferences`, params)
+			.map((res: Response) => {
+				return res.json();
+			}).catch((error: any) => error.json());
+	}
 }

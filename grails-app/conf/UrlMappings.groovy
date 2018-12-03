@@ -437,6 +437,11 @@ class UrlMappings {
 			action = [GET: "getTimezones"]
 		}
 
+		"/ws/user/saveDateAndTimePreferences" {
+			controller = "wsUser"
+			action = [POST:"saveDateAndTimePreferences"]
+		}
+
 		"/ws/user/resetPreferences" {
 			controller = "wsUser"
 			action = [ DELETE: "resetPreferences" ]
