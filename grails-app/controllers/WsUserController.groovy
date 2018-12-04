@@ -1,6 +1,3 @@
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
 import grails.compiler.GrailsCompileStatic
@@ -8,18 +5,10 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
@@ -28,7 +17,6 @@ import com.tdsops.common.security.spring.HasPermission
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-@GrailsCompileStatic
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
@@ -106,6 +94,16 @@ class WsUserController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
+	def getMapAreas() {
+		renderSuccessJson(userPreferenceService.timezonePickerAreas())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def getTimezones() {
+		renderSuccessJson(Timezone.findAll())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
 	def getPerson() {
 		Person person = securityService.getUserLogin().person
 		renderSuccessJson([person:person])
@@ -135,4 +133,18 @@ class WsUserController implements ControllerMethods {
 		userPreferenceService.setPreferences(null, preferences)
 		renderSuccessJson()
     }
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def saveDateAndTimePreferences() {
+		Map requestParams = request.JSON
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(requestParams?.timezone.toString())
+		userPreferenceService.setTimeZone timezone.getID()
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(requestParams?.datetimeFormat.toString())
+		userPreferenceService.setDateFormat datetimeFormat
+
+		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
+	}
 }

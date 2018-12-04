@@ -504,7 +504,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].replace(Application, 'Y', 'latency', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].replace(Application, 'Yes', 'latency', [device.id, device2.id], [:])
 	}
 
 	@See('TM-12334')

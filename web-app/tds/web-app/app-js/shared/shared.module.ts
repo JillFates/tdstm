@@ -35,12 +35,12 @@ import { UIAutoCenterDirective } from './directives/autocenter-directive';
 import { InputPasteDirective } from './directives/input-paste.directive';
 
 // Shared Pipes
-import { DateTimePipe } from './pipes/datetime.pipe';
-import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
-import { TranslatePipe } from './pipes/translate.pipe';
-import { FilterPipe } from './pipes/filter.pipe';
-import { UtilsPipe } from './pipes/utils.pipe';
-import { DatePipe } from './pipes/date.pipe';
+import {DateTimePipe} from './pipes/datetime.pipe';
+import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
+import {TranslatePipe} from './pipes/translate.pipe';
+import {FilterPipe} from './pipes/filter.pipe';
+import {UtilsPipe} from './pipes/utils.pipe';
+import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 
 // Shared Components

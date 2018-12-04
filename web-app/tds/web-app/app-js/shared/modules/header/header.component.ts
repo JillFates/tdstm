@@ -6,11 +6,13 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
+import {UserDateTimezoneComponent} from '../../../modules/user/components/date-timezone/user-date-timezone.component';
 import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
 import {UIDialogService} from '../../services/ui-dialog.service';
 import {UserEditPersonComponent} from '../../../modules/user/components/edit-person/user-edit-person.component';
 import {PersonModel} from '../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../components/password-change/model/password-change.model';
+import {DIALOG_SIZE} from '../../model/constants';
 
 declare var jQuery: any;
 
@@ -23,6 +25,7 @@ declare var jQuery: any;
 	            <!-- Used for the user preferences until fully converted to angular -->
                 <span (click)="openPrefModal()" class="open-pref-modal"></span>
                 <span (click)="openEditPersonModal()" class="open-edit-person-modal"></span>
+                <span (click)="openDateTimezoneModal()" class="open-datetimezone-modal"></span>
                 <h1>
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
@@ -170,12 +173,18 @@ export class HeaderComponent {
 
 	public openEditPersonModal(): void {
 		this.dialogService.open(UserEditPersonComponent, [
-			{ provide: PersonModel, useValue: {} },
-			{ provide: PasswordChangeModel, useValue: {} }
-			]).catch(result => {
+			{provide: PersonModel, useValue: {}},
+			{provide: PasswordChangeModel, useValue: {}}
+		]).catch(result => {
 			if (result) {
 				console.error(result);
 			}
+		});
+	}
+
+	public openDateTimezoneModal(): void {
+		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
+			console.error(result);
 		});
 	}
 }

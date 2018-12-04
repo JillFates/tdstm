@@ -89,7 +89,16 @@ class BulkChangeYesNoIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
 			[device, device2, device3].each {
 				it.refresh()
-				'Y' == it.validation
+				'Yes' == it.validation
+			}
+		when: 'replace is called with a list of assets'
+			validation = BulkChangeYesNo.coerceBulkValue(project, 'No')
+			BulkChangeYesNo.replace(Application.class, validation, 'validation', [device.id, device2.id, device3.id], null)
+
+		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
+			[device, device2, device3].each {
+				it.refresh()
+				'No' == it.validation
 			}
 
 		when: 'replace is called with a null replacement value'

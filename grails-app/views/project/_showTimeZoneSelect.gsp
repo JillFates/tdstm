@@ -20,9 +20,6 @@
 		</g:if>
 	</div>
 
-
-
-
 	<img id="timezoneImage" src="${resource(dir:'images',file:'world_map_800.jpg')}" width="800" height="400" usemap="#timezoneMap"/>
 	<img class="timezone-pin" src="${resource(dir:'images',file:'pin.png')}" style="padding-top: 4px;" />
 
