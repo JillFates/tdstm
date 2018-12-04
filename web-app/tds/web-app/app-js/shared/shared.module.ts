@@ -64,6 +64,7 @@ import { FieldReferencePopupComponent } from './components/field-reference-popup
 import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
+import { TDSButton } from './components/button/button.component';
 
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
@@ -120,7 +121,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
-		DateControlComponent
+		DateControlComponent,
+		TDSButton
 	],
 	exports: [
 		UILoaderDirective,
@@ -160,7 +162,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
-		DateControlComponent
+		DateControlComponent,
+		TDSButton
 	],
 	entryComponents: [
 		DynamicComponent,
