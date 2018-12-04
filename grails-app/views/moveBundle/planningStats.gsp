@@ -38,6 +38,9 @@ $(document).ready(function() {
 	var percentageStorToValidate = 100 - "${percentageStorToValidate}";
 	$("#filebar").animate({width: percentageStorToValidate + "%"}, 1000);
 
+	var percentageFilesCount = 100 - "${percentageFilesCount}";
+	$("#logicalFilebar").animate({width: percentageFilesCount + "%"}, 1000);
+
 	var percentageOtherToValidate = 100 - "${percentageOtherToValidate}";
 	$("#assetbar").animate({
 		width: percentageOtherToValidate + "%"
@@ -151,7 +154,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<g:render template="discoveryGraph"
-								model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logical Storage',validate:fileToValidate,barId:'filebar',iconName:'storageLogical']"></g:render>
+								model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logical Storage',validate:fileToValidate,barId:'logicalFilebar',iconName:'storageLogical']"></g:render>
 						</tr>
 						<tr>
 							<g:render template="discoveryGraph"
