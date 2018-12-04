@@ -1,36 +1,36 @@
 import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
 	Component,
 	OnInit,
 	OnDestroy,
 	ViewChild,
-	ChangeDetectionStrategy,
-	ChangeDetectorRef
 } from '@angular/core';
 
 import {
-	Observable,
 	BehaviorSubject,
+	Observable,
 	Subject
 } from 'rxjs';
 
 import {
+	catchError,
 	map,
 	mergeMap,
+	scan,
 	takeUntil,
 	withLatestFrom,
-	scan
 } from 'rxjs/operators';
 
 import {
 	clone,
+	compose,
 	pathOr,
-	compose
 } from 'ramda';
 
 import {ActivatedRoute} from '@angular/router';
 import {State as GridState} from '@progress/kendo-data-query';
 import {GridComponent} from '@progress/kendo-angular-grid';
-
 import {
 	GridDataResult,
 	DataStateChangeEvent
@@ -99,10 +99,20 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.state = this.getInitialComponentState();
 	}
 
+	/**
+	 * Setup the state observables
+	 */
 	ngOnInit() {
 		this.setupBulkCheckboxService();
 		this.setupComponentStateObservable();
 		this.setupTagsFilterStateObservable();
+	}
+
+	/**
+	 * Emit the destroy event to complete and close all current observables
+	 */
+	ngOnDestroy() {
+		this.destroySubject.next();
 	}
 
 	/**
@@ -111,14 +121,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private setupBulkCheckboxService() {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
-	}
-
-	/**
-	 * Query the service to get the dependencies
-	 */
-	private getDataFromEndpoint(): any {
-		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
-		return compose(getDependencies, this.getParametersForEndpoint.bind(this));
 	}
 
 	/**
@@ -143,7 +145,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				this.state = state;
 				this.updateGridState(state.gridState);
 				this.notifyChangedState(state.gridData.data)
-			})
+			}, this.logError('setupComponentStateObservable'))
 	}
 
 	/**
@@ -178,13 +180,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Emit the destroy event to complete and close all current observables
-	 */
-	ngOnDestroy() {
-		this.destroySubject.next();
-	}
-
-	/**
 	 * Define the chain of operations that are executed every time some tags filter has changed
 	 */
 	private setupTagsFilterStateObservable(): void {
@@ -201,7 +196,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			.subscribe((componentState: ComponentState) => {
 				// notify changes on the state
 				this.changeState(componentState);
-			});
+			}, this.logError('setupTagsFilterStateObservable'));
 	}
 
 	/**
@@ -218,6 +213,14 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			take: GRID_DEFAULT_PAGE_SIZE,
 			skip: 0
 		}
+	}
+
+	/**
+	 * Query the service to get the dependencies
+	 */
+	private getDataFromEndpoint(): any {
+		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
+		return compose(getDependencies, this.getParametersForEndpoint.bind(this));
 	}
 
 	/**
@@ -265,6 +268,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onTagFilterChange(field: string, filter: any): void {
 		let operator = filter.operator && filter.operator === 'ALL' ? '&' : '|';
+
 		const tags = (filter.tags || [])
 			.filter((tag) => !isNaN(tag.id))
 			.map((tag) => tag.id).join(operator);
@@ -317,7 +321,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onClickBulkButton(): void {
 		this.getCurrentBulkSelectedItems()
-			.subscribe((results) => this.tdsBulkChangeButton.bulkData(results))
+			.subscribe((results) => this.tdsBulkChangeButton.bulkData(results), this.logError('onClickBulkButton'))
 	}
 
 	/**
@@ -338,4 +342,13 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 		return clonedState;
 	}
+
+	/**
+	 * Log an error to the console along with the function name called
+	 */
+	private logError(functionName: string): any {
+		return (error) => console.log(`Error, function:${functionName} message:${error.message || error}`)
+
+	}
+
 }
