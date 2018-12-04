@@ -58,6 +58,7 @@ import { AddPersonComponent } from './components/add-person/add-person.component
 import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
+import { PasswordChangeComponent } from './components/password-change/password-change.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
 import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
@@ -116,9 +117,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AkaComponent,
 		ConnectorComponent,
 		FieldReferencePopupComponent,
+		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
-		DateControlComponent,
+		DateControlComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -155,9 +157,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		ConnectorComponent,
 		PopupModule,
 		FieldReferencePopupComponent,
+		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
-		DateControlComponent,
+		DateControlComponent
 	],
 	entryComponents: [
 		DynamicComponent,

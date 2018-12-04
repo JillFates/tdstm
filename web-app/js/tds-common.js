@@ -610,6 +610,24 @@ var UserPreference = function () {
 		return false;
 	}
 
+	var editPerson = function () {
+        modalOpener = jQuery('.open-edit-person-modal');
+        if(modalOpener.length) {
+            modalOpener.click();
+        } else {
+            jQuery.ajax({
+                type: 'POST',
+                url: '/tdstm/person/retrievePersonDetails',
+                success: function (data, textStatus) {},
+                error: function (XMLHttpRequest, textStatus, errorThrown) {},
+                complete: function (XMLHttpRequest) {
+                    updatePersonDetails(XMLHttpRequest);
+                }
+            });
+        }
+        return false;
+	}
+
 	// opens the edit user preferences dialog (Will open angular version or grails depending on the page).
 	var editPreference = function () {
 		var modalOpener = jQuery('.open-pref-modal');
@@ -693,6 +711,7 @@ var UserPreference = function () {
 	// The following methods are to be exported
 	return {
 		editDateAndTimezone: editDateAndTimezone,
+		editPerson: editPerson,
 		editPreference: editPreference,
 		savePreferences: savePreferences,
 		resetPreferences: resetPreferences,

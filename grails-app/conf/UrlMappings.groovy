@@ -460,9 +460,19 @@ class UrlMappings {
 						DELETE: "removePreference"]
 		}
 
+		"/ws/user/startPageOptions" {
+			controller = "wsUser"
+			action = [GET:"getStartPageOptions"]
+		}
+
 		"/ws/user/person" {
 			controller = "wsUser"
 			action = [GET:"getPerson"]
+		}
+
+		"/ws/user/updateAccount" {
+			controller = "wsUser"
+			action = [POST:"updateAccount"]
 		}
 
 		"/ws/progress" {

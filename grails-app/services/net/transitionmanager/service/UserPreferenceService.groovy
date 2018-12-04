@@ -297,6 +297,19 @@ class UserPreferenceService implements ServiceMethods {
 		return preferences
 	}
 
+    /**
+     * Sets a list of user preferences defined via map.
+	 * @param userLogin - the user to set the preference for
+	 * @param preferences - a map containing the preference code and values
+     */
+    @Transactional
+    boolean setPreferences(UserLogin userLogin = null, Map preferences) {
+        preferences.each {
+            key, value ->
+                setPreference(userLogin, key, value)
+        }
+    }
+
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
 	 * Note that if it is setting CURR_PROJ to a new value it will automatically call
