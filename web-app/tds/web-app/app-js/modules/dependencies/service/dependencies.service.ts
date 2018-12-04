@@ -35,16 +35,23 @@ export class DependenciesService {
 				.map(filter => `&${filter.field}=${filter.value}`).join('') +
 				`&_search=${filters.length > 0 ? 'true' : 'false'}`;
 
+		const payload = {
+			rows: take,
+			page,
+			sidx: sort.field,
+			sord: sort.dir,
+		};
+
 		const url = `${endpoint}?${pagination}${sorting}${filtering}`;
-		return this.http.get(`${url}`)
+		return this.http.post(endpoint, JSON.stringify(payload))
 			.pipe(
 				map((response: any) => {
 					const results = response.json();
 					let {dependencies = [], total = 0} = (results && results.data) || {};
 					// todo remove later
-					const data = this.addFakeTags(dependencies);
+					// const data = this.addFakeTags(dependencies);
 
-					return {data, total};
+					return {data: dependencies, total};
 				})
 			)
 	}
