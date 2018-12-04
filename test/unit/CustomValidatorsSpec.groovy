@@ -133,7 +133,7 @@ class CustomValidatorsSpec extends Specification{
 			1 == errors.size()
 			'field.invalid.precisionExceeded' == errors[0].i18nMessageId
 		when: 'we remove the "precision" constraint, and we use any number with a fractional part'
-			fieldSpec.constraints.precision = ''
+			fieldSpec.constraints.precision = 0
 			validator = CustomValidators.controlNumberValidator('2.55', fieldSpec, mockDomain)
 			errors = validator.apply()
 		then: 'a precisionExceeded error is reported'
