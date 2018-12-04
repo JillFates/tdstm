@@ -1,13 +1,12 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<div class="dependencies-view-grid-component" *ngIf="state && state.gridConfig">
-	{{config | json}}
+<div class="dependencies-view-grid-component">
 	<kendo-grid #grid
-	            [data]="gridData"
-	            [filterable]="state.gridConfig.filterable"
-	            [sortable]="state.gridConfig.sortable"
-	            [resizable]="state.gridConfig.resizable"
-	            [pageable]="state.gridConfig.pageable"
+	            [data]="state.gridData"
+	            [filterable]="true"
+	            [sortable]="{'allowUnsort': false, 'mode': 'single'}"
+	            [resizable]="true"
+	            [pageable]="{'pageSizes': GRID_PAGE_SIZES, 'info': true}"
 	            (dataStateChange)="dataStateChange($event)"
 	            class="tds-kendo-grid without-selectabe-rows">
 
@@ -101,11 +100,10 @@
 		</kendo-grid-column>
 
 		<!-- Pagination Footer -->
-		<!--<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">-->
 		<ng-template kendoPagerTemplate>
 			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 			<kendo-pager-next-buttons></kendo-pager-next-buttons>
-			<kendo-pager-page-sizes [pageSizes]="state.gridConfig.pageable.pageSizes"></kendo-pager-page-sizes>
+			<kendo-pager-page-sizes [pageSizes]="GRID_PAGE_SIZES"></kendo-pager-page-sizes>
 			<kendo-pager-info></kendo-pager-info>
 		</ng-template>
 	</kendo-grid>

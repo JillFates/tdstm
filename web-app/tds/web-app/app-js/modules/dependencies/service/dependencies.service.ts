@@ -42,9 +42,9 @@ export class DependenciesService {
 					const results = response.json();
 					let {dependencies = [], total = 0} = (results && results.data) || {};
 					// todo remove later
-					dependencies = this.addFakeTags(dependencies);
+					const data = this.addFakeTags(dependencies);
 
-					return {dependencies, total};
+					return {data, total};
 				})
 			)
 	}

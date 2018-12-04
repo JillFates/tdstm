@@ -24,7 +24,7 @@ export interface Dependency {
 }
 
 export interface DependencyResults {
-	dependencies: Dependency[];
+	data: Dependency[];
 	total: number;
 }
 

@@ -1,28 +1,64 @@
-import {Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Observable, BehaviorSubject, Subject} from 'rxjs';
-import {tap, map, mergeMap, takeUntil, withLatestFrom, scan} from 'rxjs/operators';
-import {pathOr, compose} from 'ramda';
+import {
+	Component,
+	OnInit,
+	OnDestroy,
+	ViewChild,
+	ChangeDetectionStrategy,
+	ChangeDetectorRef
+} from '@angular/core';
 
+import {
+	Observable,
+	BehaviorSubject,
+	Subject
+} from 'rxjs';
+
+import {
+	map,
+	mergeMap,
+	takeUntil,
+	withLatestFrom,
+	scan
+} from 'rxjs/operators';
+
+import {
+	clone,
+	pathOr,
+	compose
+} from 'ramda';
+
+import {ActivatedRoute} from '@angular/router';
 import {State as GridState} from '@progress/kendo-data-query';
-import {GridComponent, SortSettings} from '@progress/kendo-angular-grid';
-import {GridDataResult, DataStateChangeEvent} from '@progress/kendo-angular-grid';
+import {GridComponent} from '@progress/kendo-angular-grid';
+
+import {
+	GridDataResult,
+	DataStateChangeEvent
+} from '@progress/kendo-angular-grid';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DependenciesService, DependenciesRequestParams} from '../../service/dependencies.service';
+import {
+	DependenciesService,
+	DependenciesRequestParams
+} from '../../service/dependencies.service';
 import {DependenciesColumnModel} from '../../model/dependencies-column.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGE_SIZE
+} from '../../../../shared/model/constants';
 import {TagState} from '../../model/dependencies.model';
 import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
-import {BulkActionResult, BulkChangeType} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
+import {
+	BulkActionResult,
+	BulkChangeType
+} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
-import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
@@ -30,7 +66,6 @@ interface ComponentState {
 	tagList: any[];
 	gridState: GridState;
 	gridData: GridDataResult;
-	gridConfig: any;
 }
 
 @Component({
@@ -41,80 +76,94 @@ interface ComponentState {
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
-	private gridStateSubject: BehaviorSubject<GridState>;
-	private tagsStateSubject: Subject<TagState>;
-	private destroySubject: Subject<any>;
-	private getDependencies: any;
+	private destroySubject: Subject<any> = new Subject<any>();
+	private tagsStateSubject: Subject<TagState> = new Subject<TagState>();
+	protected readonly dependenciesColumnModel: DependenciesColumnModel = new DependenciesColumnModel();
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
-	protected dependenciesColumnModel: DependenciesColumnModel;
-	protected gridData: GridDataResult;
-	protected readonly maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	protected readonly GRID_PAGE_SIZES = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	protected readonly tagsFieldNames = ['tagsAsset', 'tagsDependency'];
-	protected state: ComponentState; //  = this.getInitialComponentState();
+	protected state: ComponentState;
 	private componentState: BehaviorSubject<any>;
 
 	constructor(
 		private route: ActivatedRoute,
+		private changeDetectorRef: ChangeDetectorRef,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService,
 		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
-		private dependenciesService: DependenciesService
-	) {
+		private dependenciesService: DependenciesService) {
+		// set the initial component state
+		this.state = this.getInitialComponentState();
 	}
 
 	ngOnInit() {
-		this.destroySubject = new Subject<any>();
-		this.gridStateSubject = new BehaviorSubject(this.getInitialGridState());
-		this.tagsStateSubject = new Subject<TagState>();
-		this.gridData = { data: [], total: 0 };
+		this.setupBulkCheckboxService();
+		this.setupComponentStateObservable();
+		this.setupTagsFilterStateObservable();
+	}
 
-		this.dependenciesColumnModel = new DependenciesColumnModel();
-
-		this.getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
-
+	/**
+	 *	Set up the configuration for the bulk checkbox service
+	 */
+	private setupBulkCheckboxService() {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
-		//this.setupGridConfiguration();
-		this.setupGridStateChanges();
-		this.setupTagsFilterStateChanges();
-
-		this.setupComponentStateObservable();
 	}
 
+	/**
+	 * Query the service to get the dependencies
+	 */
 	private getDataFromEndpoint(): any {
 		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
-		return compose(getDependencies, this.getParametersForEndpoint2);
+		return compose(getDependencies, this.getParametersForEndpoint.bind(this));
 	}
 
-	private setupComponentStateObservable() {
+	/**
+	 * Define the chain of operations that are executed every time the component state has suffered changes
+	 */
+	private setupComponentStateObservable(): void {
 		const initialState = this.getInitialComponentState();
 		const getData = this.getDataFromEndpoint();
-
 		this.componentState = new BehaviorSubject<any>(initialState);
+
 		this.componentState
 			.pipe(
 				// take events until destroy subject emits
 				takeUntil(this.destroySubject),
-				scan(this.accumulateToComponentState, initialState),
-				mergeMap((state: ComponentState) => getData(state))
+				// accumulate the partial state change into the component state
+				scan((accumulator, current) => ({...accumulator, ...current}), initialState),
+				// query the endpoint
+				mergeMap((state: ComponentState) => getData(state)
+					.pipe(map((results: DependencyResults) => ({...state, gridData: results}) )))
 			)
 			.subscribe((state: ComponentState) => {
-				console.log('The new state is:');
-				console.log(this.state);
 				this.state = state;
+				this.updateGridState(state.gridState);
+				this.notifyChangedState(state.gridData.data)
 			})
 	}
 
-	// todo rename it to component state
-	private accumulateToComponentState(accumulator: ComponentState, current: any): ComponentState {
-		return <ComponentState>{...accumulator, ...current};
+	/**
+	 * Notify an action to change the state
+	 */
+	private changeState(partialState = {}): void {
+		this.componentState.next(partialState);
 	}
 
-	private updateComponentState(partialState: any): void {
-		this.componentState.next(partialState);
+	/**
+	 * Notify to the external components that we have changes in the state
+	 */
+	private notifyChangedState(dependencies: any[]): void {
+		// reset the state of the bulk items
+		this.bulkCheckboxService.initializeKeysBulkItems(dependencies);
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	/**
@@ -124,11 +173,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		return {
 			tagList: pathOr([], ['snapshot', 'data', 'tagList'], this.route),
 			gridState: this.getInitialGridState(),
-			gridConfig: this.getInitialGridConfiguration(),
 			gridData: { data: [], total: 0 },
 		}
 	}
-
 
 	/**
 	 * Emit the destroy event to complete and close all current observables
@@ -138,77 +185,23 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Set the grid fixed settings, this configuration doesn't change over time
+	 * Define the chain of operations that are executed every time some tags filter has changed
 	 */
-	/*
-	private setupGridConfiguration() {
-		this.dependenciesColumnModel = new DependenciesColumnModel();
-
-		this.grid.filterable = true;
-		this.grid.sortable = <SortSettings>{ allowUnsort: false, mode: 'single'};
-		this.grid.resizable = true;
-		this.grid.pageable = { pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true};
-	}
-	*/
-
-	private getInitialGridConfiguration(): any {
-		return {
-			filterable: true,
-			sortable: <SortSettings>{ allowUnsort: false, mode: 'single'},
-			resizable: true,
-			pageable: { pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}
-		}
-	}
-
-	/**
-	 * Define the chain of operations that are executed every time the grid state has suffered changes
-	 */
-	private setupGridStateChanges(): void {
-		this.gridStateSubject
+	private setupTagsFilterStateObservable(): void {
+		this.tagsStateSubject
 			.pipe(
 				// take events until destroy subject emits
 				takeUntil(this.destroySubject),
-				// Grab the reference to the new grid state
-				tap(this.setGridState.bind(this)),
-				// Extract from the state the parameters required by the endpoint
-				map(this.getParametersForEndpoint),
-				// Call the endpoint to get new data
-				mergeMap(this.getDependencies),
-				// Map the endpoint results to the format used by the grid
-				map((results: DependencyResults): GridDataResult => ({data: results.dependencies, total: results.total}))
+				// with the latest state
+				withLatestFrom(this.componentState),
+				// merge the tags filters into the filters property
+				map(([tagsState, componentState]) =>
+					this.mergeTagsFilterIntoGridState(tagsState, componentState))
 			)
-			.subscribe((results) => this.updateGridResults(results), error => console.error(error.message || error));
-	}
-
-	/**
-	 * Define the chain of operations that are executed every time some tags filter has changed
-	 */
-	private setupTagsFilterStateChanges(): void {
-		this.tagsStateSubject
-			.pipe(
-				withLatestFrom(this.gridStateSubject),
-				map(([tagsState, gridState]) => this.mergeTagsFilterIntoGridState(tagsState, gridState))
-			)
-			.subscribe((gridState: GridState) => {
-				this.gridStateSubject.next(gridState);
+			.subscribe((componentState: ComponentState) => {
+				// notify changes on the state
+				this.changeState(componentState);
 			});
-	}
-
-	/**
-	 * Update the grid data with fresh results
-	 * @param {GridDataResult} results New results
-	 */
-	private updateGridResults(results: GridDataResult): void {
-		// With the results refresh the grid data
-		this.gridData = results;
-		// reset the state of the bulk items
-		this.bulkCheckboxService.initializeKeysBulkItems(results.data || []);
-		this.notifier.broadcast({
-			name: 'grid.header.position.change'
-		});
-
-		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	/**
@@ -228,32 +221,11 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Get the current grid state
-	 * @returns {GridState} grid state properties
-	 */
-	private getCurrentGridState(): GridState {
-		const {sort, pageSize: take, skip, filter} = this.grid;
-
-		return {sort, take, skip, filter};
-	}
-
-	/**
 	 * Extract from the grid state the parameters required bye the endpoint
 	 * @param {GridState} state
 	 * @returns {DependenciesRequestParams}
 	 */
-	private getParametersForEndpoint(state: GridState): DependenciesRequestParams {
-		const {skip, take, sort, filter} = state;
-
-		return {
-			page: (skip / take) + 1,
-			take,
-			filters: filter && filter.filters || [],
-			sort: sort && sort[0] || this.defaultSorting
-		};
-	}
-
-	private getParametersForEndpoint2(state: ComponentState): DependenciesRequestParams {
+	private getParametersForEndpoint(state: ComponentState): DependenciesRequestParams {
 		const {skip, take, sort, filter} = state.gridState;
 
 		return {
@@ -268,16 +240,13 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Set the new grid state
 	 * @param {GridState} state
 	 */
-	private setGridState(state: GridState): void {
+	private updateGridState(state: GridState): void {
 		const {sort, filter, skip, take} = state;
 
-		/*
 		this.grid.sort = sort;
 		this.grid.filter = filter;
 		this.grid.skip = skip;
 		this.grid.pageSize = take;
-		*/
-
 		this.bulkCheckboxService.setPageSize(take);
 	}
 
@@ -286,8 +255,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * @param {DataStateChangeEvent} state
 	 */
 	protected dataStateChange(state: DataStateChangeEvent): void {
-		this.gridStateSubject.next({...state});
-		this.updateComponentState({gridState: state});
+		this.changeState({gridState: state});
 	}
 
 	/**
@@ -309,8 +277,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * @returns {number}
 	 */
 	protected getSelectedItemsCount(): number {
-		const allCounter = (this.gridData && this.gridData.total) || 0;
-		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
+		return this.bulkCheckboxService.getSelectedItemsCount(this.state.gridData.total)
 	}
 
 	/**
@@ -321,7 +288,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	protected onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
 			this.bulkCheckboxService.uncheckItems();
-			this.gridStateSubject.next(this.getCurrentGridState());
+			this.changeState();
 		}
 	}
 
@@ -330,12 +297,16 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * @returns {Observable<any>} bulkItems selected
 	 */
 	private getCurrentBulkSelectedItems(): Observable<any> {
+		const getDependencies = this.dependenciesService.getDependencies.bind(this.dependenciesService);
+		const gridState = { ...this.state.gridState, ...{skip: 0, take: this.state.gridData.total}};
+		const state = {...this.state, gridState};
+
 		return this.bulkCheckboxService
-			.getBulkSelectedItems(
-				this.getParametersForEndpoint( {...this.getCurrentGridState(), skip: 0, take: this.gridData.total}),
-				this.getDependencies)
+			.getBulkSelectedItems(this.getParametersForEndpoint(state), getDependencies)
 			.pipe(
+				// take events until destroy subject emits
 				takeUntil(this.destroySubject),
+				// map the results to the format required by the bulkcheckbox service
 				map(results =>
 					({ bulkItems: [...results.selectedAssetsIds], assetsSelectedForBulk: [...results.selectedAssets] }))
 			)
@@ -352,17 +323,19 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	/**
 	 * Take the current tags filter state and merge it into the current gridState filters
 	 * @param {TagState} tagsState
-	 * @param {GridState} gridState
+	 * @param {ComponentState} componentState
 	 */
-	private mergeTagsFilterIntoGridState(tagsState: TagState, gridState: GridState): GridState {
-		const currentFilters = gridState.filter && gridState.filter.filters || [];
-		const filters = (currentFilters.filter((item: any) => item.field !== tagsState.field));
+	private mergeTagsFilterIntoGridState(tagsState: TagState, componentState: ComponentState): ComponentState {
+		const filters = pathOr([], ['gridState', 'filter', 'filters'], componentState)
+			.filter((item: any) => item.field !== tagsState.field);
 
 		if (tagsState.tags) {
 			filters.push({field: tagsState.field, value: tagsState.tags,  operator: null});
 		}
-		gridState.filter.filters = filters;
 
-		return gridState;
+		const clonedState = clone(componentState);
+		clonedState.gridState.filter.filters = filters;
+
+		return clonedState;
 	}
 }
