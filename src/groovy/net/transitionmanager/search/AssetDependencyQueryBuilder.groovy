@@ -7,21 +7,40 @@ import net.transitionmanager.domain.Project
 
 class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 
+	/**
+	 * Constructor for the builder for AssetDependencies.
+	 * @param project
+	 * @param filterParams
+	 * @param sortingParams
+	 * @param paginationParams
+	 */
 	AssetDependencyQueryBuilder(Project project, Map filterParams, Map sortingParams, Map paginationParams) {
 		super(project, filterParams, sortingParams, paginationParams)
 	}
 
 
+	/**
+	 * Return the AssetDependency class, as it's the domain being queried.
+	 * @return
+	 */
 	@Override
-	 Class getDomain() {
+	 Class getDomainClass() {
 		return AssetDependency
 	}
 
+	/**
+	 * Return the alias that is going to be used for the main domain.
+	 * @return
+	 */
 	@Override
 	String getDomainAlias() {
-		return null
+		return 'dep'
 	}
 
+	/**
+	 * Return the default condition for the query, which is the project of the asset.
+	 * @return
+	 */
 	@Override
 	protected List<String> getDefaultWhereConditions() {
 		List<String> conditions = super.getDefaultWhereConditions()
@@ -29,12 +48,21 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 		return conditions
 	}
 
+	/**
+	 * Return the parameters for the default condition, which is the user's current project.
+	 * @return
+	 */
 	@Override
 	Map getDefaultWhereParameters(){
 		Map whereParameters = super.getDefaultWhereParameters()
 		whereParameters['project'] = project
+		return whereParameters
 	}
 
+	/**
+	 * This map contains all the fields that can be filtered and selected in the query.
+	 * @return
+	 */
 	@Override
 	Map<String, Map> getDomainFieldsMap() {
 		return [
@@ -43,20 +71,20 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 			assetId: [property: 'ae.id', type: Long],
 			assetName: [property: 'ae.assetName', type: String],
 			assetType: [property: 'ae.assetType', type: String],
-			c1: [property: 'c1', type: String],
-			c2: [property: 'c2', type: String],
-			c3: [property: 'c3', type: String],
-			c4: [property: 'c4', type: String],
-			comment: [property: 'comment', type: String],
+			c1: [property: 'dep.c1', type: String],
+			c2: [property: 'dep.c2', type: String],
+			c3: [property: 'dep.c3', type: String],
+			c4: [property: 'dep.c4', type: String],
+			comment: [property: 'dep.comment', type: String],
 			dependentClass: [property: 'str(ad.assetClass)', type: String],
 			dependentBundle: [property: 'dmb.name', type: String],
 			dependentId: [property: 'ad.id', type: Long],
 			dependentName: [property: 'ad.assetName', type: String],
 			dependentType: [property: 'ad.assetType', type: String],
-			direction: [property: 'dataFlowDirection', type: String],
-			frequency: [property: 'dataFlowFreq', type: String],
-			id: [property: 'id', type: Long],
-			status: [property: 'status', type: String],
+			direction: [property: 'dep.dataFlowDirection', type: String],
+			frequency: [property: 'dep.dataFlowFreq', type: String],
+			id: [property: 'dep.id', type: Long],
+			status: [property: 'dep.status', type: String],
 			tag_asset: [
 				property: """
 				CONCAT(
@@ -133,7 +161,7 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 					}
 				]
 			],
-			type: [property: 'type']
+			type: [property: 'dep.type']
 		]
 	}
 
@@ -141,11 +169,11 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 	List<Map<String, String>> getJoinsList() {
 		return [
 			[
-			    property: 'asset',
+			    property: 'dep.asset',
 				alias: 'ae'
 			],
 			[
-				property: 'dependent',
+				property: 'dep.dependent',
 				alias: 'ad'
 			],
 			[
@@ -173,5 +201,35 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 				alias: 'T_D'
 			]
 		]
+	}
+
+	/**
+	 * Return the default sorting criteria, which is the asset's name.
+	 * @return
+	 */
+	@Override
+	Map<String, String> getDefaultSorting() {
+		return [
+		    sortIndex: 'ae.assetName',
+			sortOrder: 'asc'
+		]
+	}
+
+	/**
+	 * Return the 'dep.id' as the property that is going to be used for the count query.
+	 * @return
+	 */
+	@Override
+	protected String getCountProperty() {
+		return "distinct dep.id"
+	}
+
+	/**
+	 * Return the 'dep.id' as the property for the group by.
+	 * @return
+	 */
+	@Override
+	protected String getGroupByProperty() {
+		return "dep.id"
 	}
 }
