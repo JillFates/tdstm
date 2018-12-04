@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
@@ -24,7 +25,6 @@ import com.tdsops.common.security.spring.HasPermission
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-@GrailsCompileStatic
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
@@ -92,6 +92,16 @@ class WsUserController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
+	def getMapAreas() {
+		renderSuccessJson(userPreferenceService.timezonePickerAreas())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def getTimezones() {
+		renderSuccessJson(Timezone.findAll())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
 	def getPerson() {
 		Person person = securityService.getUserLogin().person
 		renderSuccessJson([person:person])
@@ -101,5 +111,19 @@ class WsUserController implements ControllerMethods {
 	def removePreference(String id) {
 		userPreferenceService.removePreference(id)
 		renderSuccessJson()
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def saveDateAndTimePreferences() {
+		Map requestParams = request.JSON
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(requestParams?.timezone.toString())
+		userPreferenceService.setTimeZone timezone.getID()
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(requestParams?.datetimeFormat.toString())
+		userPreferenceService.setDateFormat datetimeFormat
+
+		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
 	}
 }

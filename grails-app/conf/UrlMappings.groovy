@@ -427,6 +427,21 @@ class UrlMappings {
 			action = [ GET: "modelForPreferenceManager" ]
 		}
 
+        "/ws/user/mapAreas" {
+            controller = "wsUser"
+            action = [GET: "getMapAreas"]
+        }
+
+		"/ws/user/timezones" {
+			controller = "wsUser"
+			action = [GET: "getTimezones"]
+		}
+
+		"/ws/user/saveDateAndTimePreferences" {
+			controller = "wsUser"
+			action = [POST:"saveDateAndTimePreferences"]
+		}
+
 		"/ws/user/resetPreferences" {
 			controller = "wsUser"
 			action = [ DELETE: "resetPreferences" ]
