@@ -22,9 +22,11 @@ import {DateUtils} from '../../../utils/date.utils';
  */
 export class DateTimeControlComponent extends DateControlCommons {
 
+	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+
 	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
 		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATETIME_FORMAT);
-		this.displayFormat = `${DateUtils.TDS_OUTPUT_DATE_FORMAT} ${DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT}`;
+		this.displayFormat = this.KENDO_DATETIME_DISPLAY_FORMAT;
 	}
 
 	/**
@@ -33,7 +35,7 @@ export class DateTimeControlComponent extends DateControlCommons {
 	 */
 	onValueChange($event: Date): void {
 		if ($event && $event !== null) {
-			this.value = DateUtils.convertAndFormatDateToGMT($event, this.outputFormat) + 'Z';
+			this.value = DateUtils.convertAndFormatDateToGMT($event, this.outputFormat);
 		} else {
 			this.value = null;
 		}

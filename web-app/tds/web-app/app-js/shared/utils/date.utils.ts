@@ -45,28 +45,18 @@ export class DateUtils {
 
 	/**
 	 * Converts and Formats a Date into GMT time with an output result format.
+	 * Code conversion extracted from tds-commons.js -> getISOString();
 	 */
-	public static convertAndFormatDateToGMT(date: Date, format: string) {
+	public static convertAndFormatDateToGMT(date: Date, format: string): string {
 		if (!date || date === undefined || date === null) {
 			return null;
 		}
-		// let noTZ = moment(date).format(format);
-		return moment.tz(date, 'GMT').format(format);
-	}
-
-	/**
-	 * Create a Date Object
-	 * @param destination
-	 * @returns {Date}
-	 */
-	public static compose(destination: any): Date {
-		// TODO: MomentJS? User Preference?
-		let compose = destination;
-		if (destination !== '' && destination !== null && destination !== 'undefined') {
-			compose = new Date(destination);
-		}
-		return compose;
-
+		// remove timezone just getting the datetime
+		let noTZ = moment(date).format(format);
+		// convert to local GMT timezone
+		let dateTZ = moment.tz(noTZ, 'GMT');
+		// Return in ISO String
+		return dateTZ.toISOString();
 	}
 
 	public static getTimestamp(): String {
