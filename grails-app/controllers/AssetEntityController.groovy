@@ -2008,7 +2008,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	// removes the user's dependency analyzer map related preferences
 	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.value())
+		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.name())
 		render true
 	}
 

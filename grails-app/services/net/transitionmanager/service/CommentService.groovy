@@ -742,7 +742,7 @@ class CommentService implements ServiceMethods {
 			}
 			String defaultVal = String.valueOf(ref)
 
-			[(pref.toString()): userPreferenceService.getPreference(null, pref, defaultVal)]
+			[(pref.name()): userPreferenceService.getPreference(null, pref, defaultVal)]
 		}
 	}
 

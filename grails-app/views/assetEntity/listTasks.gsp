@@ -5,6 +5,7 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentType"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="page com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -402,7 +403,7 @@
 	function toggleViewUnpublished (element) {
 		var checkedValue = $(element).is(':checked');
 		viewUnpublished = checkedValue;
-		setUserPreference('viewUnpublished', checkedValue, function () {
+		setUserPreference('${UserPreferenceEnum.VIEW_UNPUBLISHED.name()}', checkedValue, function () {
 			reloadGrid();
 		});
 	}
