@@ -41,7 +41,7 @@
                                         <td class="valueNW ${standardFieldSpecs.size.imp?:''}">${asset?.size}&nbsp;${asset.scale?.value()}</td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-                                            {{ '${asset?.retireDate}' | tdsDateTime: userTimeZone }}
+                                            {{ '${asset?.retireDate}' | tdsDate: userDateFormat }}
                                         </td>
                                         <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
                                             <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
@@ -56,7 +56,7 @@
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-                                            {{ '${asset?.maintExpDate}' | tdsDateTime: userTimeZone }}
+                                            {{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
                                         <td class="valueNW ${standardFieldSpecs.planStatus.imp?:''}" colspan="3">${asset.planStatus}</td>

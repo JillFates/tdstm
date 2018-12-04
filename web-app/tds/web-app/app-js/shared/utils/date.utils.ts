@@ -20,7 +20,7 @@ export class DateUtils {
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
 	public static readonly TDS_OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
 	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'YYYY-MM-DDT' + DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT;
-	public static readonly TDS_OUTPUT_DATE_FORMAT = 'yyyy-MM-dd';
+	public static readonly TDS_OUTPUT_DATE_FORMAT = 'YYYY-MM-DD';
 
 	/**
 	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
@@ -50,6 +50,7 @@ export class DateUtils {
 		if (!date || date === undefined || date === null) {
 			return null;
 		}
+		// let noTZ = moment(date).format(format);
 		return moment.tz(date, 'GMT').format(format);
 	}
 
@@ -324,8 +325,12 @@ export class DateUtils {
 	 * @param {string} format
 	 * @returns {Date}
 	 */
-	public static toDate(value: string): Date {
-		return moment(value).toDate()
+	public static toDateUsingFormat(value: string, format: string): Date {
+		let momentObject: moment.Moment = moment(value, format);
+		if (momentObject.isValid()) {
+			return momentObject.toDate();
+		}
+		return null;
 	}
 
 }

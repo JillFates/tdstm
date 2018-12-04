@@ -33,7 +33,8 @@ export class DateControlComponent extends DateControlCommons {
 	 */
 	onValueChange($event: Date): void {
 		if ($event && $event !== null) {
-			this.value = this.intl.formatDate($event, this.outputFormat);
+			// this.value = this.intl.formatDate($event, this.outputFormat);
+			this.value = DateUtils.formatDate($event, this.outputFormat)
 		} else {
 			this.value = null;
 		}

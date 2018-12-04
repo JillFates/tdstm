@@ -153,13 +153,11 @@
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
-												<kendo-datepicker
-													[tabIndex]="24"
-													class="tm-input-control"
-													name="modelAssetRetireDate"
-													[format]="dateFormat"
-													[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+                                                <tds-date-control [tabIndex]="24"
+                                                                  class="tm-input-control"
+                                                                  name="modelAssetRetireDate"
+                                                                  [(value)]="model.asset.retireDate">
+                                                </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"  />
 											<td data-for="validation" class="${standardFieldSpecs.validation.imp?:''}">
@@ -191,13 +189,11 @@
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}  ${standardFieldSpecs.maintExpDate.imp?:''} ">
-												<kendo-datepicker
-														[tabIndex]="25"
-														class="tm-input-control"
-														name="modelAssetMaintExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker>
+                                                <tds-date-control [tabIndex]="25"
+                                                                  class="tm-input-control"
+                                                                  name="modelAssetMaintExpDate"
+                                                                  [(value)]="model.asset.maintExpDate">
+                                                </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${assetInstance.latency}"/>
 											<td data-for="latency" class="${standardFieldSpecs.latency.imp?:''}">

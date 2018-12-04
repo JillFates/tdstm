@@ -11,6 +11,7 @@ export abstract class DateControlCommons implements OnInit {
 	protected outputFormat: string;
 	protected displayFormat: string;
 	protected dateValue: Date;
+	private stringDate: string;
 
 	constructor(
 				protected userPreferenceService: PreferenceService,
@@ -23,7 +24,8 @@ export abstract class DateControlCommons implements OnInit {
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
-		this.dateValue = this.value ? DateUtils.toDate(this.value) : null;
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(this.value, this.outputFormat) : null;
+		// this.dateValue = this.stringDate ? DateUtils.toDate(this.stringDate) : null;
 		setTimeout( () => {
 			this.onValueChange(this.dateValue);
 			}, 200);
