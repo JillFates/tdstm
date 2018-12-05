@@ -36,39 +36,42 @@ import {UserService} from '../../../modules/user/service/user.service';
 		                    <label for="requirements">Requirements:</label>
 		                </td>
 		                <td valign="top" class="value">
-		                    <div class="passwordRequirement" [ngClass]="{'passRequirement' : !passwordChangeModel.containsUsername, 'failRequirement' : passwordChangeModel.containsUsername}">
+		                    <div class="passwordRequirement" [ngClass]="{'passRequirement' : !passwordChangeModel.containsUsername && passwordChangeModel.newPassword,
+		                    'failRequirement' : passwordChangeModel.containsUsername && passwordChangeModel.newPassword}">
 			                    <span>Password must not contain the username</span>
-	                            <b *ngIf="passwordChangeModel.containsUsername">OK</b>
+	                            <b *ngIf="passwordChangeModel.containsUsername && passwordChangeModel.newPassword">OK</b>
 		                    </div>
-			                <div class="passwordRequirement" [ngClass]="{'passRequirement' : passwordChangeModel.atLeastMinimumLength, 'failRequirement' : !passwordChangeModel.atLeastMinimumLength}">
+			                <div class="passwordRequirement" [ngClass]="{'passRequirement' : passwordChangeModel.atLeastMinimumLength && passwordChangeModel.newPassword,
+			                'failRequirement' : !passwordChangeModel.atLeastMinimumLength && passwordChangeModel.newPassword}">
 			                    <span>Password must be at least 8 characters long</span>
-	                            <b *ngIf="passwordChangeModel.atLeastMinimumLength">OK</b>
+	                            <b *ngIf="passwordChangeModel.atLeastMinimumLength && passwordChangeModel.newPassword">OK</b>
 			                </div>
-			                <div class="passwordRequirementGroup" [ngClass]="{'passRequirement' : passwordChangeModel.meetsCompositionRequirements, 'failRequirement' : !passwordChangeModel.meetsCompositionRequirements}">
+			                <div class="passwordRequirementGroup" [ngClass]="{'passRequirement' : passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword,
+			                 'failRequirement' : !passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword}">
 				                <span>Password must contain at least 3 of these requirements:</span>
-	                            <b *ngIf="passwordChangeModel.meetsCompositionRequirements">OK</b>
+	                            <b *ngIf="passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword">OK</b>
 			                </div>
 			                <div>
 				                <ul class="passwordRequirement">
-					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasUppercaseChars,
-					                                'failRequirement' : !passwordChangeModel.hasUppercaseChars && !passwordChangeModel.meetsCompositionRequirements}">
+					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasUppercaseChars  && passwordChangeModel.newPassword,
+					                                'failRequirement' : !passwordChangeModel.hasUppercaseChars && !passwordChangeModel.meetsCompositionRequirements  && passwordChangeModel.newPassword}">
 						                <span>Uppercase Characters</span>
-						                <b *ngIf="passwordChangeModel.hasUppercaseChars">OK</b>
+						                <b *ngIf="passwordChangeModel.hasUppercaseChars && passwordChangeModel.newPassword">OK</b>
 					                </li>
-					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasLowercaseChars,
-					                                'failRequirement' : !passwordChangeModel.hasLowercaseChars && !passwordChangeModel.meetsCompositionRequirements}">
+					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasLowercaseChars && passwordChangeModel.newPassword,
+					                                'failRequirement' : !passwordChangeModel.hasLowercaseChars && !passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword}">
 						                <span>Lowercase Characters</span>
-						                <b *ngIf="passwordChangeModel.hasLowercaseChars">OK</b>
+						                <b *ngIf="passwordChangeModel.hasLowercaseChars && passwordChangeModel.newPassword">OK</b>
 					                </li>
-					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasNumericChars,
-					                                'failRequirement' : !passwordChangeModel.hasNumericChars && !passwordChangeModel.meetsCompositionRequirements}">
+					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasNumericChars  && passwordChangeModel.newPassword,
+					                                'failRequirement' : !passwordChangeModel.hasNumericChars && !passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword}">
 						                <span>Numeric Characters</span>
-						                <b *ngIf="passwordChangeModel.hasNumericChars">OK</b>
+						                <b *ngIf="passwordChangeModel.hasNumericChars && passwordChangeModel.newPassword">OK</b>
 					                </li>
-					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasNonAlphanumericChars,
-					                                'failRequirement' : !passwordChangeModel.hasNonAlphanumericChars && !passwordChangeModel.meetsCompositionRequirements}">
+					                <li [ngClass]="{'passRequirement' : passwordChangeModel.hasNonAlphanumericChars && passwordChangeModel.newPassword,
+					                                'failRequirement' : !passwordChangeModel.hasNonAlphanumericChars && !passwordChangeModel.meetsCompositionRequirements && passwordChangeModel.newPassword}">
 						                <span>Nonalphanumeric Characters</span>
-						                <b *ngIf="passwordChangeModel.hasNonAlphanumericChars">OK</b>
+						                <b *ngIf="passwordChangeModel.hasNonAlphanumericChars && passwordChangeModel.newPassword">OK</b>
 					                </li>
 				                </ul>
 			                </div>
