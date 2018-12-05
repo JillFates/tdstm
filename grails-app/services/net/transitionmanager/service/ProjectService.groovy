@@ -303,12 +303,18 @@ class ProjectService implements ServiceMethods {
 		}
 	}
 
-	def getProjectReportSummary(Map params) {
+	/**
+	 * Generates a list of projects and the details including assets and staff counts
+	 * @param active - flag to include active projects
+	 * @param inactive - flag to include inactive projects
+	 * @return A list of projects and their details as a Map
+	 */
+	List<Map> getProjectReportSummary(Map params) {
 
-		def projects = []
+		List projects = []
 
 		// check if either of the active/inactive checkboxes are checked
-		if(params.active || params.inactive) {
+		if (params.active || params.inactive) {
 			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
@@ -324,11 +330,11 @@ class ProjectService implements ServiceMethods {
 					pg.name AS clientName,
 					p.description AS description,
 					(SELECT GROUP_CONCAT(pg2.name)
-						FROM party_relationship pr 
+						FROM party_relationship pr
 						LEFT JOIN party_group pg2 ON pg2.party_group_id = pr.party_id_to_id
-                        WHERE (pr.party_relationship_type_id = 'PROJ_PARTNER' 
-							AND pr.party_id_from_id = p.project_id 
-							AND pr.role_type_code_from_id = 'PROJECT' 
+                        WHERE (pr.party_relationship_type_id = 'PROJ_PARTNER'
+							AND pr.party_id_from_id = p.project_id
+							AND pr.role_type_code_from_id = 'PROJECT'
                             AND pr.role_type_code_to_id = 'PARTNER')
 					) AS partnerNames
 					FROM asset_entity ae
@@ -346,9 +352,10 @@ class ProjectService implements ServiceMethods {
 			query.append(""" GROUP BY ae.project_id
 					) inside
 				ORDER BY inside.projName """)
+
 			projects = jdbcTemplate.queryForList(query.toString())
 
-			// add the staff count to each project
+			// Add the staff count to each project
 			projects.each {
 				it["staffCount"] = partyRelationshipService.getCompanyStaff(it["clientId"]).size()
 			}
