@@ -142,7 +142,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 					.pipe(map((results: DependencyResults) => ({...state, gridData: results}) )))
 			)
 			.subscribe((state: ComponentState) => {
+				// with the results update the state
 				this.state = state;
+				// Notify changes on the state
 				this.updateGridState(state.gridState);
 				this.notifyChangedState(state.gridData.data)
 			}, this.logError('setupComponentStateObservable'))
@@ -348,7 +350,5 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	private logError(functionName: string): any {
 		return (error) => console.log(`Error, function:${functionName} message:${error.message || error}`)
-
 	}
-
 }
