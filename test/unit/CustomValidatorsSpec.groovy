@@ -132,6 +132,14 @@ class CustomValidatorsSpec extends Specification{
 			validator.hasErrors()
 			1 == errors.size()
 			'field.invalid.precisionExceeded' == errors[0].i18nMessageId
+		when: 'we remove the "precision" constraint, and we use any number with a fractional part'
+			fieldSpec.constraints.precision = 0
+			validator = CustomValidators.controlNumberValidator('2.55', fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'a precisionExceeded error is reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'field.invalid.precisionExceeded' == errors[0].i18nMessageId
 		when: 'the minus (-) sign is passed as a suffix and not a prefix'
 			validator = CustomValidators.controlNumberValidator('10-', fieldSpec, mockDomain)
 			errors = validator.apply()

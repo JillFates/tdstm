@@ -103,7 +103,7 @@ var minHorizontalSpace = 15;
 var minVerticalSpace = 30;
 var nodeOffsetIncrements = 2;
 var graphPadding = 30
-var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}';
+var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}';
 
 // color constants
 var defaultColor = '#0000ff';

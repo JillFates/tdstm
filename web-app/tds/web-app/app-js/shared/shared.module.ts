@@ -35,12 +35,12 @@ import { UIAutoCenterDirective } from './directives/autocenter-directive';
 import { InputPasteDirective } from './directives/input-paste.directive';
 
 // Shared Pipes
-import { DateTimePipe } from './pipes/datetime.pipe';
-import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
-import { TranslatePipe } from './pipes/translate.pipe';
-import { FilterPipe } from './pipes/filter.pipe';
-import { UtilsPipe } from './pipes/utils.pipe';
-import { DatePipe } from './pipes/date.pipe';
+import {DateTimePipe} from './pipes/datetime.pipe';
+import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
+import {TranslatePipe} from './pipes/translate.pipe';
+import {FilterPipe} from './pipes/filter.pipe';
+import {UtilsPipe} from './pipes/utils.pipe';
+import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 
 // Shared Components
@@ -58,11 +58,13 @@ import { AddPersonComponent } from './components/add-person/add-person.component
 import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
+import { PasswordChangeComponent } from './components/password-change/password-change.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
 import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
+import { TDSButton } from './components/button/button.component';
 
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
@@ -116,9 +118,11 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AkaComponent,
 		ConnectorComponent,
 		FieldReferencePopupComponent,
+		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
+		TDSButton
 	],
 	exports: [
 		UILoaderDirective,
@@ -155,9 +159,11 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		ConnectorComponent,
 		PopupModule,
 		FieldReferencePopupComponent,
+		PasswordChangeComponent,
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
+		TDSButton
 	],
 	entryComponents: [
 		DynamicComponent,

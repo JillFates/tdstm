@@ -133,7 +133,7 @@ var floatMode = false
 var maxWeight
 var maxFamilyWeights = []
 var groupCount = 0
-var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}'
+var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}'
 var isIE = GraphUtil.isIE()
 
 var selectedNodes = []
