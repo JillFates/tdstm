@@ -81,7 +81,6 @@
 			             *ngIf="tagsFieldNames.includes(column.property)">
 				<tds-asset-tag-selector #tagSelector
 				                        [tagList]="state.tagList"
-				                        [viewFilterModel]="column.filter"
 				                        (valueChange)="onTagFilterChange(column.field, $event)">
 				</tds-asset-tag-selector>
 			</ng-template>
