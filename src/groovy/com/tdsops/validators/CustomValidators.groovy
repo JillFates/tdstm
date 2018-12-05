@@ -20,6 +20,19 @@ import java.text.ParseException
 @Slf4j
 class CustomValidators {
 
+	static private Map<String, Closure> VALIDATOR_HANDLERS
+
+	static {
+		VALIDATOR_HANDLERS = [
+				  (ControlType.YES_NO.toString())    : CustomValidators.&controlYesNoControlValidator,
+				  (ControlType.LIST.toString())      : CustomValidators.&controlListValidator,
+				  (ControlType.NUMBER.toString())    : CustomValidators.&controlNumberValidator,
+				  (ControlType.STRING.toString())    : CustomValidators.&controlDefaultValidator,
+				  (ControlType.DATE.toString())      : CustomValidators.&controlDateValidator,
+				  (ControlType.DATETIME.toString())  : CustomValidators.&controlDateTimeValidator,
+		].asImmutable()
+	}
+
 	/**
 	 * Creates a custom validator for a inList that is lazy computed
 	 *
@@ -75,15 +88,6 @@ class CustomValidators {
 			CustomDomainService customDomainService = ApplicationContextHolder.getBean('customDomainService', CustomDomainService)
 			List<Map> customFieldSpecs = customDomainService.customFieldsList(object.project, object.assetClass.toString())
 
-			// Initializing Validators list
-			Map<String, Closure> validatorHandlers = [:]
-			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
-			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
-			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberValidator
-			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
-			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateValidator
-			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeValidator
-
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
 				String field = fieldSpec.field
@@ -92,7 +96,7 @@ class CustomValidators {
 				String control = fieldSpec.control
 
 				// don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
-				Closure validator = validatorHandlers[control]
+				Closure validator = VALIDATOR_HANDLERS[control]
 
 				if(!validator) {
 					log.error("No validator defined for '{}' Custom Control", control)
