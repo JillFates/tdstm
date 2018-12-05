@@ -5,6 +5,17 @@
     width: unset
 
   .asset-tag-selector-component
+    .k-switch + .k-multiselect
+      div.k-multiselect-wrap
+        kendo-taglist
+          ul
+            li:first-child()
+              display: flex
+    .k-switch.asset-tag
+      display: block
+      position: unset
+      float: unset
+      top: 0
     .k-multiselect-wrap
       border: 0
     .k-widget
@@ -13,7 +24,6 @@
           ul
             li:first-child()
               display: none
-
   .bulkchange-section
     padding-left: 8px
     display: flex;

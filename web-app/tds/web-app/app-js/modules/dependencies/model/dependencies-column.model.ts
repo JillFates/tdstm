@@ -33,7 +33,7 @@ export class DependenciesColumnModel {
 				label: 'Tags Asset',
 				property: 'tagsAsset',
 				type: 'tags',
-				width: 200,
+				width: 220,
 				locked: false
 			},
 			{
@@ -64,7 +64,7 @@ export class DependenciesColumnModel {
 				label: 'Tags Dependency',
 				property: 'tagsDependent',
 				type: 'tags',
-				width: 200,
+				width: 220,
 				locked: false
 			},
 			{
