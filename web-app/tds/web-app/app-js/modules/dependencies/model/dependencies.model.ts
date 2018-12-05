@@ -19,8 +19,8 @@ export interface Dependency {
 	id: number;
 	status: string;
 	type: string;
-	tag_asset: TagModel[];
-	tag_dependent: TagModel[];
+	tagAsset: TagModel[];
+	tagsDependent: TagModel[];
 }
 
 export interface DependencyResults {

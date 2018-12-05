@@ -49,14 +49,6 @@ export class DependenciesService {
 				map((response: any) => {
 					const results = response.json();
 					let {dependencies = [], total = 0} = (results && results.data) || {};
-
-					dependencies = dependencies.map((dependency: Dependency) => {
-						return {
-							...dependency,
-							tag_asset: JSON.parse(dependency.tag_asset.toString()),
-							tag_dependent: JSON.parse(dependency.tag_dependent.toString())
-						}
-					});
 					return {data: dependencies, total};
 				})
 			)

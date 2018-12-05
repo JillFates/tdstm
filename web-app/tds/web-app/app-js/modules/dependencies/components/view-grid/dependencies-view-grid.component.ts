@@ -14,7 +14,6 @@ import {
 } from 'rxjs';
 
 import {
-	catchError,
 	map,
 	mergeMap,
 	scan,
@@ -158,19 +157,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	private changeState(partialState = {}): void {
 		this.componentState.next(partialState);
-	}
-
-	/**
-	 * Notify to the external components that we have changes in place
-	 */
-	private notifyChangedState(dependencies: any[]): void {
-		// reset the state of the bulk items
-		this.bulkCheckboxService.initializeKeysBulkItems(dependencies);
-		this.notifier.broadcast({
-			name: 'grid.header.position.change'
-		});
-		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	/**
@@ -367,5 +353,18 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			.reduce((accumulator: string[], current: GridColumnModel) => {
 				return current.type === 'tags' ? [...accumulator, current.property]  : accumulator;
 			}, []);
+	}
+
+	/**
+	 * Notify to the external components that we have changes in place
+	 */
+	private notifyChangedState(dependencies: any[]): void {
+		// reset the state of the bulk items
+		this.bulkCheckboxService.initializeKeysBulkItems(dependencies);
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
