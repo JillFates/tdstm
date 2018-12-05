@@ -33,7 +33,7 @@ abstract class DomainQueryBuilder {
 
 	/**
 	 * A map with the parameters for sorting the results.
-	 * Example: [sortIndex: 'c1', sortOrder: 'desc']
+	 * Example: [index: 'c1', order: 'desc']
 	 */
 	protected Map sortingParams
 
@@ -79,7 +79,7 @@ abstract class DomainQueryBuilder {
 		this.paginationParams = paginationParams
 		domainClass = getDomainClass()
 		fieldsMap = getDomainFieldsMap()
-		if (!sortingParams || !sortingParams['sortIndex']) {
+		if (!sortingParams || !sortingParams['index']) {
 			sortingParams = getDefaultSorting()
 		}
 		this.sortingParams = sortingParams
@@ -199,7 +199,7 @@ abstract class DomainQueryBuilder {
 							FROM ${hqlFrom}
 							WHERE ${hqlWhereConditions}
 							${groupBy}
-							ORDER BY ${sortingParams['sortIndex']} ${sortingParams['sortOrder']}		
+							ORDER BY ${sortingParams['index']} ${sortingParams['order']}		
 						"""
 		Query query = session.createQuery(hqlQuery)
 			.setFirstResult(paginationParams['offset'])

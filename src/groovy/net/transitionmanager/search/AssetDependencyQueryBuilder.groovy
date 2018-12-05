@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Project
 
-class AssetDependencyQueryBuilder extends DomainQueryBuilder{
+class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearchMethods{
 
 	/**
 	 * Constructor for the builder for AssetDependencies.
@@ -85,7 +85,7 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 			frequency: [property: 'dep.dataFlowFreq', type: String],
 			id: [property: 'dep.id', type: Long],
 			status: [property: 'dep.status', type: String],
-			tag_asset: [
+			tagsAsset: [
 				property: """
 				CONCAT(
 					'[',
@@ -123,7 +123,7 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 					}
 				]
 			],
-			tag_dependent: [
+			tagsDependent: [
 				property: """
 				CONCAT(
 					'[',
@@ -210,8 +210,8 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 	@Override
 	Map<String, String> getDefaultSorting() {
 		return [
-		    sortIndex: 'ae.assetName',
-			sortOrder: 'asc'
+		    index: 'ae.assetName',
+			order: 'asc'
 		]
 	}
 
@@ -231,5 +231,21 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder{
 	@Override
 	protected String getGroupByProperty() {
 		return "dep.id"
+	}
+
+	/**
+	 * Return the list of dependencies matching the filters. In addition to the basic fetching
+	 * from the database, the tag fields for the asset and dependent need to be converted into
+	 * actual list of tag maps.
+	 * @return
+	 */
+	@Override
+	protected List getDomains() {
+		List dependencies = super.getDomains()
+		dependencies.collect { dependency ->
+			dependency['tagsAsset'] = handleTags(dependency['tagsAsset'])
+			dependency['tagsDependent'] = handleTags(dependency['tagsDependent'])
+		}
+		return dependencies
 	}
 }
