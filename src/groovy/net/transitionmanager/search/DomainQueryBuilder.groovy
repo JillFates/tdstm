@@ -159,7 +159,7 @@ abstract class DomainQueryBuilder {
 		hqlWhereParameters = getDefaultWhereParameters()
 		filterParams.each { fieldName, filterValue ->
 			if (fieldsMap.containsKey(fieldName)) {
-				FieldSearchData fieldSearchData = createFieldSearchData(fieldName, fieldsMap)
+				FieldSearchData fieldSearchData = createFieldSearchData(fieldName)
 				SqlUtil.parseParameter(fieldSearchData)
 				whereConditions << fieldSearchData.sqlSearchExpression
 				hqlWhereParameters += fieldSearchData.sqlSearchParameters
@@ -216,10 +216,10 @@ abstract class DomainQueryBuilder {
 	 * Subclasses can reimplement this if additional processing is required, such is the case
 	 * for assets, where additional information needs to be set.
 	 * @param fieldName
-	 * @param fieldMap
 	 * @return
 	 */
-	protected FieldSearchData createFieldSearchData(String fieldName, Map fieldMap) {
+	protected FieldSearchData createFieldSearchData(String fieldName) {
+		Map fieldMap = fieldsMap[fieldName]
 		return new FieldSearchData([
 			column: propertyFor(fieldName, fieldMap),
 			columnAlias: namedParameterFor(fieldName, fieldMap),
@@ -257,7 +257,7 @@ abstract class DomainQueryBuilder {
 	 * @return
 	 */
 	protected String filterFor(String fieldName) {
-		return filterParams['filter']
+		return filterParams[fieldName]
 	}
 
 	/**
@@ -287,7 +287,7 @@ abstract class DomainQueryBuilder {
 	 * @return
 	 */
 	protected Class domainFor(String fieldName, Map fieldMap) {
-		return fieldMap['domain']
+		return fieldMap['domain'] ?: domainClass
 	}
 
 	/**

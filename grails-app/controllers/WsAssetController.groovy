@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
@@ -541,12 +542,13 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetView)
 	def listDependencies() {
 		Project project = getProjectForWs()
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
+		Map jsonParams = request.JSON
+		int maxRows = NumberUtil.toPositiveInteger(jsonParams['rows'], 25)
+		int currentPage =NumberUtil.toPositiveInteger(jsonParams['page'], 1)
 		int rowOffset = (currentPage - 1) * maxRows
-		Map paginationParams = [max: params.int('rows', 25), offset: rowOffset]
-		Map sortingParams = [index: params.sidx ?: 'asset', order: params.sord ?: 'asc']
-		renderSuccessJson(assetEntityService.listDependencies(project, params, sortingParams, paginationParams))
+		Map paginationParams = [max: maxRows, offset: rowOffset]
+		Map sortingParams = [index: jsonParams['sidx'] ?: 'asset', order: jsonParams['sord'] ?: 'asc']
+		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
 	}
 
 }
