@@ -266,7 +266,7 @@ abstract class DomainQueryBuilder {
 	 * @param fieldMap
 	 * @return
 	 */
-	protected String manyToManyQueriesFor(String fieldName, Map fieldMap) {
+	protected Map manyToManyQueriesFor(String fieldName, Map fieldMap) {
 		return fieldMap['manyToManyQueries']
 	}
 
