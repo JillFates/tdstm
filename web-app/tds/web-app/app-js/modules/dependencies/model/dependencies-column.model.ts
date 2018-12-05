@@ -24,24 +24,17 @@ export class DependenciesColumnModel {
 				locked: true
 			},
 			{
-				label: 'Tags Asset',
-				property: 'tag_asset',
-				type: 'tags',
-				width: 220,
-				locked: false
-			},
-			{
-				label: 'Tags Dependency',
-				property: 'tag_dependent',
-				type: 'tags',
-				width: 220,
-				locked: false
-			},
-			{
 				label: 'Bundle',
 				property: 'assetBundle',
 				type: 'text',
 				width: 120
+			},
+			{
+				label: 'Tags Asset',
+				property: 'tagsAsset',
+				type: 'tags',
+				width: 200,
+				locked: false
 			},
 			{
 				label: 'Type',
@@ -66,6 +59,13 @@ export class DependenciesColumnModel {
 				property: 'dependentBundle',
 				type: 'text',
 				width: 140
+			},
+			{
+				label: 'Tags Dependency',
+				property: 'tagsDependent',
+				type: 'tags',
+				width: 200,
+				locked: false
 			},
 			{
 				label: 'Status',

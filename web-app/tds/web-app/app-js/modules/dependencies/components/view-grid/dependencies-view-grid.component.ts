@@ -6,22 +6,18 @@ import {
 	OnDestroy,
 	ViewChild,
 } from '@angular/core';
-
 import {
 	BehaviorSubject,
 	Observable,
 	Subject
 } from 'rxjs';
-
 import {
-	catchError,
 	map,
 	mergeMap,
 	scan,
 	takeUntil,
 	withLatestFrom,
 } from 'rxjs/operators';
-
 import {
 	clone,
 	compose,
@@ -35,12 +31,7 @@ import {
 	GridDataResult,
 	DataStateChangeEvent
 } from '@progress/kendo-angular-grid';
-
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {
 	DependenciesService,
 	DependenciesRequestParams
@@ -90,10 +81,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	constructor(
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
-		private dialogService: UIDialogService,
-		private permissionService: PermissionService,
 		private notifier: NotifierService,
-		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService) {
 	}
@@ -150,6 +138,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				this.updateGridState(state.gridState);
 				// Notify changes on the state to third components
 				this.notifyChangedState(state.gridData.data)
+				// notify to angular a change in the component state to update the view
+				this.changeDetectorRef.detectChanges();
 			}, this.logError('setupComponentStateObservable'))
 	}
 
@@ -158,19 +148,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 */
 	private changeState(partialState = {}): void {
 		this.componentState.next(partialState);
-	}
-
-	/**
-	 * Notify to the external components that we have changes in place
-	 */
-	private notifyChangedState(dependencies: any[]): void {
-		// reset the state of the bulk items
-		this.bulkCheckboxService.initializeKeysBulkItems(dependencies);
-		this.notifier.broadcast({
-			name: 'grid.header.position.change'
-		});
-		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	/**
@@ -200,7 +177,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 					this.mergeTagsFilterIntoGridState(tagsState, componentState))
 			)
 			.subscribe((componentState: ComponentState) => {
-				// notify changes on the state
 				this.changeState(componentState);
 			}, this.logError('setupTagsFilterStateObservable'));
 	}
@@ -367,5 +343,18 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			.reduce((accumulator: string[], current: GridColumnModel) => {
 				return current.type === 'tags' ? [...accumulator, current.property]  : accumulator;
 			}, []);
+	}
+
+	/**
+	 * Notify to the external components that we have changes in place
+	 */
+	private notifyChangedState(dependencies: any[]): void {
+		// reset the state of the bulk items
+		this.bulkCheckboxService.initializeKeysBulkItems(dependencies);
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
