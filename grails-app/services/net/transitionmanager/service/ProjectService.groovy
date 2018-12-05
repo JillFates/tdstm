@@ -81,6 +81,9 @@ class ProjectService implements ServiceMethods {
 	ApiCatalogService apiCatalogService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	ApiActionService apiActionService
+	ProviderService providerService
+	CredentialService credentialService
+	DataScriptService dataScriptService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -543,7 +546,16 @@ class ProjectService implements ServiceMethods {
 		// Clone the Default Project Tags (if it has any) and add them to the new project
 		tagService.cloneProjectTags(defProject, project)
 
-		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
+		// Clone the Default Project Providers (if it has any) and add them to the new project
+		providerService.cloneProjectProviders(defProject, project)
+
+		// Clone the Default Project Credentials (if it has any) and add them to the new project
+		credentialService.cloneProjectCredentials(defProject, project)
+
+		// Clone the Default Project Data Scripts (if it has any) and add them to the new project
+		dataScriptService.cloneProjectDataScripts(defProject, project)
+
+		// Clone the Default Project Api Catalogs (if it has any) and add them to the new project
 		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
 
 		// Clone the Default Project Api Actions (if it has any) and add them to the new project
@@ -570,10 +582,10 @@ class ProjectService implements ServiceMethods {
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
 		String eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
 		String roomQuery = " select ro.id from Room ro where ro.project = $projectInstance.id"
-		List projectCodes = [UserPreferenceEnum.CURR_PROJ.value()]
-		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.value(), UserPreferenceEnum.CURR_BUNDLE.value()]
-		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.value(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.value()]
-		String roomCode = UserPreferenceEnum.CURR_ROOM.value()
+		List projectCodes = [UserPreferenceEnum.CURR_PROJ.name()]
+		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
+		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
+		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
 		String prefDelSql = '''
 			delete from UserPreference up where
 			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
@@ -1758,11 +1770,11 @@ class ProjectService implements ServiceMethods {
 					projectCode          : project.projectCode,
 					clientName           : project.client.name,
 					description          : project.description ?: '',
-					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_TIME_6),
-					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_TIME_6),
+					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
+					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
-					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_TIME_6),
-					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_TIME_6)
+					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
+					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
 			]
 		}
 	}

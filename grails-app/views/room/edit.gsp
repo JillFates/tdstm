@@ -65,7 +65,7 @@
 										name="showRoomObjects"
 										${draggableRack == 'on'? 'checked' :'checked' }
 										onclick="enableDraggableRack()" />&nbsp;
-										<button type="button" value="Power Connect" class="btn btn-default" onclick="assignPowersForRoom(${roomInstance.id})"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Power Connect</button>
+										<button type="button" value="Power Connect" class="btn btn-default" onclick="assignPowersForRoom(${roomInstance.id})"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Connect all Power</button>
 								</span> <span> <b>Add to Room:</b>&nbsp;
 										<button type="button" value="Rack" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Rack</button>
 										<button type="button" value="UPS" class="btn btn-default" onclick="createRack(this.value)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> UPS</button>

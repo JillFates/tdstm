@@ -1,10 +1,10 @@
 package specs.Assets.Application
 
 import geb.spock.GebReportingSpec
-import pages.Assets.Application.ApplicationDetailsPage
-import pages.Assets.Application.ApplicationEditionPage
-import pages.Assets.Application.ApplicationListPage
-import pages.Assets.Application.ApplicationCreationPage
+import pages.Assets.AssetViews.AssetCreatePage
+import pages.Assets.AssetViews.AssetEditPage
+import pages.Assets.AssetViews.AssetDetailsPage
+import pages.Assets.AssetViews.ViewPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
@@ -34,11 +34,11 @@ class ApplicationDeletionSpec extends GebReportingSpec {
         login()
         at MenuPage
         waitFor { assetsModule.goToApplications() }
-        at ApplicationListPage
+        at ViewPage
         clickOnCreateButton()
-        at ApplicationCreationPage
+        at AssetCreatePage
         createApplication appDataMap
-        at ApplicationDetailsPage
+        at AssetDetailsPage
         closeDetailsModal()
     }
 
@@ -58,23 +58,19 @@ class ApplicationDeletionSpec extends GebReportingSpec {
             assetsModule.goToApplications()
 
         then: 'Application List should be displayed'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "2. Filters out by Applications and gets the First occurrence"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
-        when: 'The User Click in The Filter Name Column'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appName
-        and: 'Adds the AppName in the Filter'
-            waitFor{alFirstAppName.text().trim().contains(appName)}
-            appName = alFirstAppName.text().trim()
-        and: 'Clicks to Filter out'
-            waitFor{alFirstAppName.click()}
+            at ViewPage
+        when: 'The User searches by the App Name already created'
+            filterByName(appName)
+        and: 'The User clicks on that Application'
+            openFirstAssetDisplayed()
 
         then: 'Application should be filtered out'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
             // TODO The Following item fetched by data-content cannot be located as itself (Label and Value have the same properties)
         and: 'The appName should be shown'
             adModalAppName.text().trim() == appName
@@ -82,62 +78,61 @@ class ApplicationDeletionSpec extends GebReportingSpec {
 
     def "3. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
         given: 'The User is on the Application Details Page'
-            at ApplicationDetailsPage
+            at AssetDetailsPage
         when: 'The User clicks the "Edit" Button'
-            waitFor {adModalEditBtn.click()}
+            waitFor {editButton.click()}
         then: 'The Option to edit every Option should be displayed'
-            at ApplicationEditionPage
+            at AssetEditPage
             waitFor {aeModalAppName.value() ==  appName}
         when: 'The User clicks the "Cancel" Button'
-            waitFor {aeModalCancelBtn.click()}
+            commonsModule.goToElement(cancelButton)
+            waitFor {cancelButton.click()}
 
         then: 'The User should be redirected to the ApplicationListPage'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "4. Filter Applications on the List by using the App name"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User searches by the App Name'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appName
-            waitFor{alFirstAppName.text().trim() == appName}
+            filterByName(appName)
+            waitFor{assetNames[0].text().trim() == appName}
 
         then: 'That App should be shown'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "5. Opens up The Edit Application Modal Window By using the Edit Icon"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User clicks on the "Edit" Button right on the left'
-            waitFor {alFirstAppEdit.click()}
+            clickOnEditButtonForFirstAssetDisplayed()
 
         then: 'The Option to edit every Option should be displayed'
-            at ApplicationEditionPage
+            at AssetEditPage
         and: 'The appName should be displayed'
             aeModalAppName.value() ==  appName
     }
 
     def "6. Delete the Application already displayed "() {
         given: 'The User is on the Application Edition Section'
-            at ApplicationEditionPage
+            at AssetEditPage
         when: 'The User Deletes the Application'
-            withConfirm(true){waitFor {aeModalDeleteBtn.click() }}
+            deleteAsset()
 
         then: 'The user should be redirected to the Application List Section'
-            at ApplicationListPage
+            at ViewPage
     }
 
     def "7. Validating the Application is not on the List"() {
         given: 'The User is on the Application List Page'
-            at ApplicationListPage
+            at ViewPage
         when: 'The User searches by the App already deleted'
-            waitFor {alNameFilter.click()}
-            alNameFilter = appName
+            filterByName(appName)
 
         then: 'App should not be visible and Count should be equal to Zero'
-            at ApplicationListPage
-            waitFor{alGridRows.size() == 0}
+            at ViewPage
+            !verifyRowsDisplayed()
     }
 }

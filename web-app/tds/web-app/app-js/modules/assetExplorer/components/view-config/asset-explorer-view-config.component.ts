@@ -1,14 +1,14 @@
 import { Component, Inject, ViewChild, OnInit } from '@angular/core';
+import {State} from '@progress/kendo-data-query';
+
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
-import { StateService } from '@uirouter/angular';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
+import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ViewModel } from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
@@ -24,6 +24,9 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
+import {ActivatedRoute, Router} from '@angular/router';
+import {clone} from 'ramda';
 
 declare var jQuery: any;
 @Component({
@@ -31,10 +34,16 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html'
 })
 export class AssetExplorerViewConfigComponent implements OnInit {
-	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
+	protected data: any;
 	private dataSignature: string;
+	protected justPlanning: boolean;
+	protected gridState: State = {
+		skip: 0,
+		take: GRID_DEFAULT_PAGE_SIZE,
+		sort: []
+	};
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
@@ -59,39 +68,42 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
+	allFields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	currentTab = 0;
 	previewButtonClicked = false;
 	protected metadata: any = {};
 
 	constructor(
-		@Inject('report') report: Observable<ViewModel>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private state: StateService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
-		private dictionary: DictionaryService,
-		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
-			tagList.subscribe( result => this.metadata.tagList = result);
-			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-				this.domains = result[0];
-				this.model = { ...result[1] };
-				this.dataSignature = JSON.stringify(this.model);
-				if (this.model.id) {
-					this.updateFilterbyModel();
-					this.currentTab = 1;
-					this.state.$current.data.page.title = this.model.name;
-					document.title = this.model.name;
-					this.draggableColumns = this.model.schema.columns.slice();
-				}
-			}, (err) => console.log(err));
+		private dictionary: DictionaryService) {
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
+		this.allFields = this.route.snapshot.data['fields'];
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = {...this.route.snapshot.data['report']};
+		this.dataSignature = JSON.stringify(this.model);
+		this.draggableColumns = [];
+		if (this.model.id) {
+			this.updateFilterbyModel();
+			this.currentTab = 1;
+			this.draggableColumns = this.model.schema.columns.slice();
+		}
 	}
 
 	ngOnInit(): void {
+		this.justPlanning = false;
 		if (this.model.id) {
+			this.notifier.broadcast({
+				name: 'notificationHeaderTitleChange',
+				title: this.model.name
+			});
 			this.previewButtonClicked = true;
 			this.onPreview();
 		}
@@ -122,7 +134,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
-		this.grid.clear();
+		this.data = null;
 		this.previewButtonClicked = false;
 	}
 
@@ -217,14 +229,15 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected openSaveDialog(): void {
+		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetExplorerViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
+			{ provide: ViewGroupModel, useValue: selectedData }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
 			setTimeout(() => {
-				this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 			});
 		}).catch(result => {
 			console.log('error');
@@ -234,7 +247,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		return this.model.schema.domains.filter(x => x !== 'common').length > 0;
+		return this.model && this.model.schema && this.model.schema.domains.filter(x => x !== 'common').length > 0;
 	}
 
 	protected isColumnSelected(): boolean {
@@ -242,14 +255,15 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected isValid(): boolean {
-		return this.isAssetSelected() && this.isColumnSelected();
+		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		}
+		// TODO: hasPendingChanges
+		// if (this.state && this.state.$current && this.state.$current.data) {
+		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
+		// }
 		return result;
 	}
 
@@ -301,11 +315,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected onCancel() {
-		const routeState = this.dictionary.get(LAST_VISITED_PAGE);
-		if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
-			this.state.go(routeState, { id: this.model.id });
+		if (this.model && this.model.id) {
+			this.router.navigate(['asset', 'views', this.model.id, 'show']);
 		} else {
-			this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
+			this.router.navigate(['asset', 'views']);
 		}
 	}
 
@@ -356,7 +369,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 					property: field.field,
 					order: 'a'
 				};
-				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }];
+				this.gridState = Object.assign({}, this.gridState,
+					{
+						sort: [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }]
+					});
 			}
 		} else {
 			let index = this.model.schema.columns
@@ -365,10 +381,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			if (index !== -1) {
 				this.model.schema.columns.splice(index, 1);
 			}
-			if (this.grid.state.sort.length > 0
-				&& this.grid.state.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
+			if (this.gridState.sort.length > 0
+				&& this.gridState.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
 				&& this.model.schema.columns.length > 0) {
-				this.grid.state.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
+				this.gridState.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
 				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
@@ -379,7 +395,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
-		this.grid.clear();
+		this.data = null;
+		this.model.schema = clone(this.model.schema);
 		this.previewButtonClicked = false;
 	}
 
@@ -433,11 +450,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			let params = this.getQueryParams();
 			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
-					this.grid.apply(result);
+					this.data = result;
 					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
-			this.grid.gridData = null;
+			this.data = null;
 		}
 	}
 
@@ -460,8 +477,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	 */
 	private getQueryParams(): AssetQueryParams {
 		let assetQueryParams = {
-			offset: this.grid.state.skip,
-			limit: this.grid.state.take,
+			offset: this.gridState.skip,
+			limit: this.gridState.take,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
@@ -471,8 +488,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
-			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		if (this.justPlanning) {
+			assetQueryParams['justPlanning'] = this.justPlanning;
 		}
 		return assetQueryParams;
 	}
@@ -504,7 +521,45 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	private clearSorting() {
-		this.grid.state.sort = [];
+		this.gridState.sort = [];
 		delete this.model.schema.sort;
 	}
+
+	/**
+	 -
+	 * Whenever the just planning change, grab the new value
+	 * @param justPlanning New value
+	 */
+	protected onJustPlanningChange(justPlanning: boolean): void {
+		this.justPlanning = justPlanning;
+	}
+
+	/**
+	 -
+	 * Whenever the grid state change, grab the new value
+	 * @param state New state
+	 */
+	protected onGridStateChange(state: State): void {
+		this.gridState = state;
+	}
+
+	/**
+	 -
+	 * Determine if exists at least one non locked column
+	 * or if the collection is empty
+	 * @returns {boolean}
+	 */
+	private hasAtLeastOneNonLockedColumnOrEmpty(): boolean {
+		const columns = this.model.schema && this.model.schema.columns || [];
+
+		if (columns.length === 0) {
+			return true;
+		}
+
+		const nonLocked =  columns
+			.filter((column: ViewColumn) => !column.locked);
+
+		return Boolean(nonLocked.length);
+	}
+
 }

@@ -1,24 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Response, RequestOptions, Headers } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import {BehaviorSubject, Observable} from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import {catchError, map} from 'rxjs/operators';
+
 import {DateUtils} from '../utils/date.utils';
 import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';
 
 // add constants as needed
 export const PREFERENCES_LIST = {
-	ASSET_JUST_PLANNING: 'assetJustPlanning',
-	ASSET_LIST_SIZE : 'assetListSize',
-	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
+	ASSET_JUST_PLANNING: 'ASSET_JUST_PLANNING',
+	ASSET_LIST_SIZE: 'ASSET_LIST_SIZE',
+	VIEW_MANAGER_DEFAULT_SORT: 'VIEW_MANAGER_DEFAULT_SORT',
 	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
 	CURR_TZ: 'CURR_TZ',
-	DATA_SCRIPT_SIZE: 'DataScriptSize',
-	VIEW_UNPUBLISHED: 'viewUnpublished',
-	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize',
-	IMPORT_BATCH_RECORDS_FILTER: 'ImportBatchRecordsFilter'
+	DATA_SCRIPT_SIZE: 'DATA_SCRIPT_SIZE',
+	VIEW_UNPUBLISHED: 'VIEW_UNPUBLISHED',
+	IMPORT_BATCH_LIST_SIZE: 'IMPORT_BATCH_LIST_SIZE',
+	IMPORT_BATCH_RECORDS_FILTER: 'IMPORT_BATCH_RECORDS_FILTER',
+	CURR_DT_FORMAT: 'CURR_DT_FORMAT'
 };
 
 @Injectable()
@@ -27,7 +28,15 @@ export class PreferenceService {
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
 
-	preferences: any = {};
+	// TODO: No one should have access to the the preferences outside
+	public preferences: any = {};
+
+	/**
+	 * This is going to be the new structure, if the Preference exist it will return the value
+	 * if not it will got it from the endpoint and persist the value for next request
+	 */
+	private preferencesList = new BehaviorSubject([]);
+	private currentPreferences = this.preferencesList.asObservable();
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -39,25 +48,30 @@ export class PreferenceService {
 
 	getPreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.map((res: Response) => {
+			.pipe(map((res: Response) => {
 				let response = res.json();
 				Object.keys(response.data.preferences).forEach((key) => {
 					this.preferences[key] = response.data.preferences[key];
 				});
 				return this.preferences;
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			}))
+			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
 	getSinglePreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.map((res: Response) => {
+			.pipe(map((res: Response) => {
 				let response = res.json();
 				return response.data.preferences[preferenceCode];
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			}))
+			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
+	/**
+	 * Save value of the preference
+	 * @param preferenceCode
+	 * @param value
+	 */
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -76,6 +90,16 @@ export class PreferenceService {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
+	}
+
+	getUserDateFormatForMomentJS(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return currentUserDateFormat
+	}
+
+	getUserDateFormatForKendo(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return DateUtils.translateDateFormatToKendoFormat(currentUserDateFormat);
 	}
 
 	/**
@@ -99,8 +123,8 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE )
-			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
+			.pipe(map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE ))
+			.pipe(map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat)));
 	}
 
 	/**
@@ -121,23 +145,24 @@ export class PreferenceService {
 		const defaultHeight = 680;
 
 		return this.getPreference(PREFERENCES_LIST.DATA_SCRIPT_SIZE)
-			.map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || '')
-			.map((size: string) => {
+			.pipe(map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || ''))
+			.pipe(map((size: string) => {
 				let measure: string[] = (size || '').split(unitSizeSeparator);
 				let	width = Number(measure.length &&  measure.shift()) || defaultWidth;
 				let height = Number(measure.length &&  measure.shift()) || defaultHeight;
 				return { width, height };
-			})
+			}))
 			.filter((size: any) =>  size.width !== null && size.height !== null);
 	}
 
 	getImportBatchListSizePreference(): Observable<number> {
-		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE).map( result => {
-			if (!result || isNaN(result)) {
-				return GRID_DEFAULT_PAGE_SIZE;
-			}
-			return parseInt(result, 0);
-		});
+		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE)
+			.pipe(map(result => {
+				if (!result || isNaN(result)) {
+					return GRID_DEFAULT_PAGE_SIZE;
+				}
+				return parseInt(result, 0);
+			}));
 	}
 
 	/**

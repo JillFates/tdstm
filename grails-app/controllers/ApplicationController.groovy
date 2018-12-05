@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -15,6 +16,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
@@ -47,6 +49,7 @@ class ApplicationController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AssetService assetService
+	AssetOptionsService assetOptionsService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -251,15 +254,32 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
+		// Filter on validation
 		if (params.toValidate) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
+			String validationWhere = ''
+			switch (params.toValidate) {
+				case ValidationType.UNKNOWN:
+					validationWhere = "apps.validation = '${ValidationType.UNKNOWN}'"
+					break
+				case ValidationType.VALIDATED:
+					validationWhere = "apps.validation != '${ValidationType.UNKNOWN}'"
+					break
+				case ValidationType.PLAN_READY:
+					validationWhere = "apps.validation = '${ValidationType.PLAN_READY}'"
+					break
+				default:
+					log.warn "listJson called with invalid toValidate parameter {}", params.toValidate
 			}
-			else {
-				query.append(' AND ')
+
+			if (validationWhere) {
+				if (firstWhere) {
+					query.append(' WHERE ')
+					firstWhere = false
+				} else {
+					query.append(' AND ')
+				}
+				query.append(validationWhere)
 			}
-			query.append("apps.validation='$params.toValidate'")
 		}
 
 		if (params.plannedStatus) {
@@ -353,8 +373,8 @@ class ApplicationController implements ControllerMethods {
 		assetService.setCustomDefaultValues(application)
 
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		List<AssetOptions> environmentOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort: 'name'])
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)

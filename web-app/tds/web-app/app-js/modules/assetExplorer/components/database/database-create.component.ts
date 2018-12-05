@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -25,8 +25,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 		providers: [
 			{ provide: 'model', useValue: model }
 		]
-	}) class DatabaseCreateComponent extends AssetCommonEdit {
-
+	}) class DatabaseCreateComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -38,15 +37,15 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
 
+		ngOnInit() {
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
-			this.model.asset.scale = {
-				name: ''
-			};
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.focusControlByName('assetName')
 		}
 
 		/**
@@ -56,7 +55,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			let modelRequest = R.clone(this.model);
 
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ? modelRequest.asset.scale.value : modelRequest.asset.scale;
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
@@ -66,6 +65,9 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 				name: ASSET_ENTITY_DIALOG_TYPES.DATABASE
 			};
 			this.model.asset.assetClass = modelRequest.asset.assetClass;
+
+			modelRequest.asset.environment = modelRequest.asset.environment === this.defaultSelectOption ?
+				''	 : modelRequest.asset.environment;
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({

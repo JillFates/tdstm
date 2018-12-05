@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Response, RequestOptions, Headers} from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';

@@ -1,13 +1,20 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.validation.ConstraintsValidator
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
+import groovy.transform.TypeCheckingMode
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 
@@ -21,8 +28,14 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_EVENT
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferences
 
 @Slf4j
+@GrailsCompileStatic(TypeCheckingMode.SKIP)
+// @GrailsCompileStatic
 class UserPreferenceService implements ServiceMethods {
 
+	/*
+	 * Preferences that are unremovable
+	 */
+	public static final List<String> FIXED_PREFERENCE_CODES = [ CURR_PROJ.name() ]
 	private static final List<String> depGraphCheckboxLabels = [
 		'bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	private static final List<String> depGraphColorBy = [
@@ -32,17 +45,17 @@ class UserPreferenceService implements ServiceMethods {
 	// ac:Asset Classes, de: Dependencies, hb: Highlight By
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb']
 
-	private static final EnumMap<UserPreferenceEnum, Map> prefCodeConstraints = [
-			(UserPreferenceEnum.VIEW_UNPUBLISHED): 		[type: 'boolean'],
-			(UserPreferenceEnum.ASSET_JUST_PLANNING): 	[type: 'boolean'],
-			(UserPreferenceEnum.EVENTDB_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
-			(UserPreferenceEnum.TASKMGR_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-			(UserPreferenceEnum.MYTASKS_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
-			(UserPreferenceEnum.TASKGRAPH_REFRESH): 	[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-			(UserPreferenceEnum.TIMELINE_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-			(UserPreferenceEnum.DEP_GRAPH):         	[type: 'string', validator: { String value -> depGraphValidator(value)}],
-			(UserPreferenceEnum.ARCH_GRAPH): 			[type: 'string', validator: { String value -> archGraphValidator(value)}],
-			(UserPreferenceEnum.LEGEND_TWISTIE_STATE): 	[type: 'string', validator: { String value -> legendTwistieStateValidator(value)}]
+	private static final EnumMap<PREF, Map> prefCodeConstraints = [
+			(PREF.VIEW_UNPUBLISHED): 		[type: 'boolean'],
+			(PREF.ASSET_JUST_PLANNING): 	[type: 'boolean'],
+			(PREF.EVENTDB_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
+			(PREF.TASKMGR_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(PREF.MYTASKS_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
+			(PREF.TASKGRAPH_REFRESH): 	[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(PREF.TIMELINE_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(PREF.DEP_GRAPH):         	[type: 'string', validator: { String value -> depGraphValidator(value)}],
+			(PREF.ARCH_GRAPH): 			[type: 'string', validator: { String value -> archGraphValidator(value)}],
+			(PREF.LEGEND_TWISTIE_STATE): 	[type: 'string', validator: { String value -> legendTwistieStateValidator(value)}]
 	]
 
 	/**
@@ -122,8 +135,8 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param defaultIfNotSet - the default value to return if the preference is not set for the user
 	 * @return the found preference value or the default value if not found
 	 */
-	String getPreference(UserLogin userLogin = null, UserPreferenceEnum preference, String defaultIfNotSet = null) {
-		getPreference(userLogin, preference.value(), defaultIfNotSet)
+	String getPreference(UserLogin userLogin = null, PREF preference, String defaultIfNotSet = null) {
+		getPreference(userLogin, preference.name(), defaultIfNotSet)
 	}
 
 	/**
@@ -132,12 +145,13 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin			User with the requested preference
 	 * @param preferenceCode	requested preference code
 	 * @param defaultIfNotSet	default value in case that is not set
-	 * @return
+	 * @return the value of a preference if found or the defaultIfNotSet value
 	 */
+	@GrailsCompileStatic
 	String getPreference(UserLogin userLogin = null, String preferenceCode, String defaultIfNotSet = null) {
 		def userPrefValue
 
-		userLogin = resolve(userLogin)
+		userLogin = resolveUserLogin(userLogin)
 
 		boolean isCurrent = (userLogin != null && userLogin.id == securityService.currentUserLoginId)
 
@@ -147,7 +161,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		// Skip out if the preference is only maintained in the Session
-		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
+		if (PREF.isSessionOnlyPreference(preferenceCode)) {
 			// return the current value from session or the default
 			return (userPrefValue != null ? userPrefValue : defaultIfNotSet)
 		}
@@ -178,13 +192,132 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to retrieve a specific list or all preference code/values for a user
+	 * @param userLogin - the user for which to fetch the data for
+	 * @param preferenceCodes - a String of preference codes (comma delimited) to return or blank to fetch all preferences for the user
+	 * @return the Map of preference codes and values
+	 */
+	@GrailsCompileStatic
+	@Transactional(readOnly=true)
+	Map getPreferences(UserLogin userLogin = null, String preferenceCodes = "") {
+		userLogin = resolveUserLogin(userLogin)
+
+		// Split potential preferenceCodes into a List
+		List prefCodeList
+		if (preferenceCodes) {
+			prefCodeList = preferenceCodes.split(',')
+		}
+
+		// Query for the user preferences
+		List prefList= UserPreference.where {
+			userLogin == userLogin
+			if (prefCodeList) {
+				preferenceCode in prefCodeList
+			}
+		}.projections {
+				property 'preferenceCode'
+				property 'value'
+		}.list(sort: 'preferenceCode', order: 'asc')
+
+		// Convert to a Map
+		Map prefMap = [:]
+		prefList.each { prefMap << [ (it[0]) : it[1] ] }
+
+		if (prefCodeList) {
+			for (code in prefCodeList) {
+				if ( !prefMap.containsKey(code) ) {
+					prefMap << [ (code): null ]
+				}
+			}
+		}
+
+		return prefMap
+	}
+
+    /**
+     * Used by the User Preference Edit dialog. This will return a List<Map> where the map will
+     * consist of the following:
+     *    code - the Preference Code
+     *    label - the human readable name of the code
+     *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
+	 * @param userLogin - the user for which to retrieve their preferences
+     * @return Success Structure with preferences property containing List<Map>
+     */
+	@GrailsCompileStatic
+	@Transactional(readOnly=true)
+    List<Map> preferenceListForEdit(UserLogin userLogin) {
+		List<Map> preferences = []
+
+		List prefList = UserPreference.where {
+			userLogin == userLogin
+		}.projections {
+			property 'preferenceCode'
+			property 'value'
+		}.list()
+
+		// Convert the list to a List<Map>
+		for (pref in prefList) {
+			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
+		}
+
+		// Sort into an alphabetical list by the Label
+		preferences = preferences.sort { a, b -> a.label.toLowerCase() <=> b.label.toLowerCase() }
+
+		// Closure that will be reused in the following for loop
+		Closure setValueToReferenceName = { Class domainClass, Map preferenceArg ->
+			Object record = domainClass.read(preferenceArg.value)
+			if (record) {
+				preferenceArg.value = record.toString() + " (${preferenceArg.value})"
+			}
+		}
+
+		// Transform the value of the preferences that reference domains to display the name of the domain
+		// instead of the ID to improve the user experience.
+		for (pref in preferences) {
+			switch (PREF.valueOfName(pref.code)) {
+				case PREF.MOVE_EVENT:
+					setValueToReferenceName(MoveEvent.class, pref)
+					break
+				case PREF.MOVE_BUNDLE:
+				case PREF.CURR_BUNDLE:
+					setValueToReferenceName(MoveBundle.class, pref)
+					break
+				case PREF.CURR_PROJ:
+					setValueToReferenceName(Project.class, pref)
+					break
+				case PREF.PARTY_GROUP:
+					setValueToReferenceName(PartyGroup.class, pref)
+					break
+				case PREF.CURR_ROOM:
+					setValueToReferenceName(Room.class, pref)
+					break
+			}
+		}
+
+		return preferences
+	}
+
+    /**
+     * Sets a list of user preferences defined via map.
+	 * @param userLogin - the user to set the preference for
+	 * @param preferences - a map containing the preference code and values
+     */
+    @Transactional
+    boolean setPreferences(UserLogin userLogin = null, Map preferences) {
+        preferences.each {
+            key, value ->
+                setPreference(userLogin, key, value)
+        }
+    }
+
+	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
 	 * Note that if it is setting CURR_PROJ to a new value it will automatically call
 	 * removeProjectAssociatedPreferences to clear out project specific settings.
 	 */
 	@Transactional
-	boolean setPreference(UserLogin userLogin = null, UserPreferenceEnum preferenceCode, value) {
-		setPreference(userLogin, preferenceCode.value(), value)
+	boolean setPreference(UserLogin userLogin = null, PREF preferenceCode, value) {
+		setPreference(userLogin, preferenceCode.name(), value)
 	}
 
 	/**
@@ -200,7 +333,7 @@ class UserPreferenceService implements ServiceMethods {
 	@Transactional
 	boolean setPreference(UserLogin userLogin = null, String preferenceCode, Object value) {
 		// If is session only preference just store in the Session and we are done
-		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
+		if (PREF.isSessionOnlyPreference(preferenceCode)) {
 			if (session) {
 				def previousValue = session.getAttribute(preferenceCode)
 				if (previousValue == null || previousValue != value) {
@@ -210,17 +343,17 @@ class UserPreferenceService implements ServiceMethods {
 			return true
 		}
 
-		userLogin = resolve(userLogin)
-		UserPreferenceEnum userPreferenceEnum = UserPreferenceEnum.valueOfNameOrValue(preferenceCode)
+		userLogin = resolveUserLogin(userLogin)
+		PREF userPreferenceEnum = PREF.valueOfName(preferenceCode)
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
 			// we use the 'value' part of the Enum
-			preferenceCode = userPreferenceEnum.value()
+			preferenceCode = userPreferenceEnum.name()
 
 			// Note that session does not exist for Quartz jobs so we should check for a session object
 			if (session) {
-				// Set or update the session with the new value 
+				// Set or update the session with the new value
 				def previousValue = session.getAttribute(preferenceCode)
 				if (previousValue == null || previousValue != userPreference.value) {
 					session.setAttribute(preferenceCode, userPreference.value)
@@ -234,14 +367,14 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to store a user preference into database only and will NOT set the value in to the session.  It will validate preference value 
+	 * Used to store a user preference into database only and will NOT set the value in to the session.  It will validate preference value
 	 * is not null and constraints passes before persisting.
 	 * @param userLogin
 	 * @param preferenceCode
 	 * @param value
 	 */
 	@Transactional
-	UserPreference storePreference(UserLogin userLogin, UserPreferenceEnum preferenceCode, Object value) {
+	UserPreference storePreference(UserLogin userLogin, PREF preferenceCode, Object value) {
 		if (!userLogin) return null
 
 		value = value?.toString()
@@ -256,7 +389,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		UserPreference userPreference = UserPreference.where {
-			userLogin == userLogin && preferenceCode == preferenceCode.value()
+			userLogin == userLogin && preferenceCode == preferenceCode.name()
 		}.get()
 
 		boolean isNew = false
@@ -266,7 +399,7 @@ class UserPreferenceService implements ServiceMethods {
 				removeProjectAssociatedPreferences(userLogin)
 			}
 		} else {
-			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
+			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.name())
 			isNew = true
 		}
 
@@ -285,8 +418,20 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	boolean removePreference(UserLogin userLogin = null, UserPreferenceEnum preference) {
-		removePreference(userLogin, preference.value())
+	@GrailsCompileStatic
+	boolean removePreference(UserLogin userLogin = null, PREF preference) {
+		removePreference(userLogin, preference.name())
+	}
+
+	/*
+	 * Removes an user preference from database and user http session if present
+	 * @param prefCode
+	 * @return
+	 */
+	@Transactional
+	@GrailsCompileStatic
+	boolean removePreference(String preferenceCode) {
+		return removePreference(null, preferenceCode)
 	}
 
 	/**
@@ -296,22 +441,45 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	boolean removePreference(UserLogin user = null, String prefCode) {
-		user = resolve(user)
-		if (!user) return false
-
-		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
-		if (updateCount) {
-			log.debug 'Removed {} preference', prefCode
-
-			//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
-			if (prefCode == CURR_PROJ.value()) {
-				removeProjectAssociatedPreferences(user)
+	@GrailsCompileStatic
+	boolean removePreference(UserLogin userLogin, String prefCode) {
+		if (prefCode && ! (prefCode in FIXED_PREFERENCE_CODES) ) {
+			userLogin = resolveUserLogin()
+			if (! userLogin) {
+				throw new UnauthorizedException('User must be logged in to remove preferences')
 			}
+
+			int updateCount = UserPreference.where { userLogin == userLogin && preferenceCode == prefCode }.deleteAll()
+			if (updateCount) {
+				log.debug 'Removed {} preference for user {}', prefCode, userLogin
+
+				//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
+				// if ( prefCode == CURR_PROJ.name() ) {
+				// 	removeProjectAssociatedPreferences(userLogin)
+				// }
+			}
+
+			session?.removeAttribute(prefCode)
+		}
+		return true
+	}
+
+	/**
+	 * Used to remove all preferences of a UserLogin other than those specified in FIXED_PREFERENCE_CODES list
+	 * @param userLogin - the UserLogin to remove preferences for (default current logged in user)
+	 * @return void
+	 */
+	@GrailsCompileStatic
+	void resetPreferences(UserLogin userLogin=null) {
+		userLogin = resolveUserLogin()
+		if (! userLogin) {
+			throw InvalidParamException('Must be logged in to reset preferences')
 		}
 
-		session?.removeAttribute(prefCode)
-		return true
+		Map preferences = getPreferences(userLogin)
+		for (String prefCode in preferences.keySet()) {
+			removePreference(userLogin, prefCode)
+		}
 	}
 
 	/**
@@ -319,9 +487,9 @@ class UserPreferenceService implements ServiceMethods {
 	 */
 	@Transactional
 	private void removeProjectAssociatedPreferences(UserLogin userLogin) {
-		removeProjectAssociatedPreference userLogin, MOVE_EVENT
-		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
-		removeProjectAssociatedPreference userLogin, CURR_ROOM
+		removeProjectAssociatedPreference(userLogin, MOVE_EVENT)
+		removeProjectAssociatedPreference(userLogin, CURR_BUNDLE)
+		removeProjectAssociatedPreference(userLogin, CURR_ROOM)
 	}
 
 	/**
@@ -329,8 +497,8 @@ class UserPreferenceService implements ServiceMethods {
 	 */
 	@Transactional
 	void removeBundleAssociatedPreferences(UserLogin userLogin) {
-		removeProjectAssociatedPreference userLogin, MOVE_BUNDLE
-		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
+		removeProjectAssociatedPreference(userLogin, MOVE_BUNDLE)
+		removeProjectAssociatedPreference(userLogin, CURR_BUNDLE)
 	}
 
 	/**
@@ -441,7 +609,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return
 	 */
 	Map<String, String> getImportPreferences() {
-		getPreferencesMap(UserPreferenceEnum.importPreferenceKeys)
+		getPreferencesMap(PREF.importPreferenceKeys)
 	}
 
 	/**
@@ -449,7 +617,7 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return
 	 */
 	Map<String, String> getExportPreferences() {
-		getPreferencesMap(UserPreferenceEnum.exportPreferenceKeys)
+		getPreferencesMap(PREF.exportPreferenceKeys)
 	}
 
 	/**
@@ -476,11 +644,11 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin - the reference to the UserLogin object that can be null
 	 * @return the passed in userLogin if already assigned otherwise looks up the current thread's UserLogin object
 	 */
-	private UserLogin resolve(UserLogin userLogin) {
+	private UserLogin resolveUserLogin(UserLogin userLogin=null) {
 		if (!userLogin && securityService.loggedIn) {
-			securityService.loadCurrentUserLogin()
+			return securityService.loadCurrentUserLogin()
 		} else {
-			userLogin
+			return userLogin
 		}
 	}
 
@@ -498,11 +666,13 @@ class UserPreferenceService implements ServiceMethods {
 	 * Get Preference Map by default User by preferenceKeys
 	 * @author @tavo_luna
 	 */
-	private Map<String, String> getPreferencesMap(Collection<UserPreferenceEnum> preferenceKeys) {
+	private Map<String, String> getPreferencesMap(Collection<PREF> preferenceKeys) {
 		Map<String, String> valuesByCode = [:]
 		if (securityService.loggedIn && preferenceKeys) {
 			def userPreferences = UserPreference.findAllByUserLoginAndPreferenceCodeInList(
-					securityService.loadCurrentUserLogin(), preferenceKeys*.value())
+					securityService.loadCurrentUserLogin(),
+					preferenceKeys*.name()
+			)
 
 			for (preferenceCode in userPreferences) {
 				valuesByCode[preferenceCode.preferenceCode] = preferenceCode.value
@@ -517,10 +687,12 @@ class UserPreferenceService implements ServiceMethods {
 	 * @param userLogin
 	 * @param pref
 	 */
-	private void removeProjectAssociatedPreference(UserLogin userLogin, UserPreferenceEnum pref) {
+	private void removeProjectAssociatedPreference(UserLogin userLogin, PREF pref) {
 		if (removePreference(userLogin, pref)) {
 			log.debug 'Removed {} preference as user switched to other project', pref
+			// Load the default preference value into the session?
 			getPreference(userLogin, pref)
 		}
 	}
+
 }

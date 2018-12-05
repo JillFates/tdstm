@@ -143,7 +143,7 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
-		"/ws/asset/defaultCreateModel/$assetClass" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
+		"/ws/asset/defaultCreateModel/$assetClass?" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
@@ -417,14 +417,62 @@ class UrlMappings {
 			action = [GET:"demoFailed"]
 		}
 
-		"/ws/user/preferences/$id" {
+		"/ws/user" {
 			controller = "wsUser"
-			action = [GET:"preferences"]
+			action = [GET: "getUser"]
 		}
 
-		"/ws/user/preference" {
+		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
-			action = [POST:"savePreference"]
+			action = [ GET: "modelForPreferenceManager" ]
+		}
+
+        "/ws/user/mapAreas" {
+            controller = "wsUser"
+            action = [GET: "getMapAreas"]
+        }
+
+		"/ws/user/timezones" {
+			controller = "wsUser"
+			action = [GET: "getTimezones"]
+		}
+
+		"/ws/user/saveDateAndTimePreferences" {
+			controller = "wsUser"
+			action = [POST:"saveDateAndTimePreferences"]
+		}
+
+		"/ws/user/resetPreferences" {
+			controller = "wsUser"
+			action = [ DELETE: "resetPreferences" ]
+		}
+
+		"/ws/user/preferences/$id?" {
+			controller = "wsUser"
+			action = [	GET:"preferences",
+						DELETE: "removePreference"]
+		}
+
+		"/ws/user/preference/$id?" {
+			controller = "wsUser"
+			action = [	GET:"preferences",
+						POST:"savePreference",
+						DELETE: "removePreference"]
+		}
+
+		"/ws/user/startPageOptions" {
+			controller = "wsUser"
+			action = [GET:"getStartPageOptions"]
+		}
+
+		"/ws/user/person" {
+			controller = "wsUser"
+			action = [GET:"getPerson"]
+		}
+
+		"/ws/user/updateAccount" {
+			controller = "wsUser"
+			action = [POST:"updateAccount"]
 		}
 
 		"/ws/progress" {
@@ -1090,8 +1138,9 @@ class UrlMappings {
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
-		// Angular 2 and future latest version
+		// Angular 6 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
+		"/module/**" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
 		// Angular Single Page App Named mappings

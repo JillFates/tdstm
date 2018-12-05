@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { DomainModel } from '../model/domain.model';
-import { FieldSettingsModel } from '../model/field-settings.model';
+import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
@@ -27,7 +27,7 @@ export class FieldSettingsService {
 				if (domains.length > 0) {
 					let sharedFields = domains[0].fields.filter(x => x.shared);
 					domains.forEach(d => {
-						d.fields.filter(s => s.control === 'YesNo')
+						d.fields.filter(s => s.control === CUSTOM_FIELD_CONTROL_TYPE.YesNo)
 							.forEach(s => {
 								s.constraints.values = ['Yes', 'No'];
 								if (!s.constraints.required) {

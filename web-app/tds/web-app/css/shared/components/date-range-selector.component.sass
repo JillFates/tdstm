@@ -1,4 +1,6 @@
 .date-range-selector-component
+  $start-color: #29a36f
+  $end-color: #5f9fcf
   .modal-dialog
     width: 630px
     .modal-content
@@ -26,5 +28,20 @@
             text-align: center
           .label-part
             font-weight: normal
+    .k-calendar.k-calendar-range
+      .k-calendar-view
+        .k-range-start
+          .k-link
+            background-color: $start-color
+        .k-range-end
+          .k-link
+            background-color: $end-color
+    .k-calendar.k-calendar-range
+      .k-calendar-view
+        td.k-range-start.k-range-end
+          .k-link
+            background: linear-gradient(to right, $start-color 0%,$start-color 50%,$start-color 50%,$end-color 50%,$end-color 100%)
+
+
   .k-calendar.k-calendar-range table > tbody + tbody
     margin-left: 1px !important

@@ -47,6 +47,7 @@ class AssetExportService {
 	ProjectService projectService
 	PartyRelationshipService partyRelationshipService
 	CustomDomainService customDomainService
+	AssetOptionsService assetOptionsService
 
 	/**
 	 * This is the actual method that will generate the Excel export which it typically called by a Quartz
@@ -773,7 +774,7 @@ class AssetExportService {
 							case ~/retireDate|maintExpDate/:
 								colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
 								break
-							case ~/modifiedDate/:
+							case ~/lastUpdated/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
 							case ~/tagAssets/:
@@ -1366,11 +1367,12 @@ class AssetExportService {
 
 	/**
 	 * Get field specs for a given AssetClass and current user project
-	 * @param assetClass
+	 * @param assetClass - the asset class being exported
+	 * @param project
 	 * @return
 	 */
-	private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass, Project project) {
-		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString())
+	private List<Map<String, ?>> getFieldSpecsForExportingAssetClass(AssetClass assetClass, Project project, List<String> templateHeaders) {
+		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString(), templateHeaders)
 		return fieldSpecs[assetClass.toString()]["fields"]
 	}
 
@@ -1381,10 +1383,10 @@ class AssetExportService {
 	 * @return
 	 */
 	private SpreadsheetColumnMapper mapSheetColumnsToFields(AssetClass assetClass, Sheet sheet, Project project) {
-		List<String> templateHaders = WorkbookUtil.getSheetHeadersAsList(sheet)
-		List<Map<String, ?>> fieldSpecs = getFieldSpecsForAssetClass(assetClass, project)
+		List<String> templateHeaders = WorkbookUtil.getSheetHeadersAsList(sheet)
+		List<Map<String, ?>> fieldSpecs = getFieldSpecsForExportingAssetClass(assetClass, project, templateHeaders)
 
-		SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHaders, fieldSpecs)
+		SpreadsheetColumnMapper spreadsheetColumnMapper = new SpreadsheetColumnMapper(sheet.getSheetName(), templateHeaders, fieldSpecs)
 		return spreadsheetColumnMapper
 	}
 
@@ -1392,40 +1394,40 @@ class AssetExportService {
 	 * Used to get the list of Type used to assign to AssetDependency.type
 	 * @return List of the types
 	 */
-	def getDependencyTypes() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)?.value
+	List<String> getDependencyTypes() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 	}
 
 	/**
 	 * Used to get the list of Status used to assign to AssetDependency.status
 	 * @return List of the types
 	 */
-	def getDependencyStatuses() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)?.value
+	List<String> getDependencyStatuses() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 	}
 
 	/**
 	 * Use to get the list of Asset Environment options
 	 * @return List of options
 	 */
-	def getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)?.value
+	List<String> getAssetEnvironmentOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 	}
 
 	/**
 	 * Use to get the list of Asset Environment options
 	 * @return List of options
 	 */
-	def getAssetPlanStatusOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)?.value
+	List<String> getAssetPlanStatusOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 	}
 
 	/**
 	 * Use to get the list of Priority Options
 	 * @return List of Priority values
 	 */
-	def getAssetPriorityOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)?.value
+	List<String> getAssetPriorityOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 	}
 
 	/**

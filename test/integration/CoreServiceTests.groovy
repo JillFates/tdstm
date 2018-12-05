@@ -67,6 +67,6 @@ class CoreServiceTests extends Specification {
 
 	void "getEnvironment"() {
 		expect:
-		coreService.getEnvironment() == 'TEST'
+		coreService.getEnvironment() ==~ /(?i)TEST/
 	}
 }

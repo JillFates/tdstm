@@ -822,6 +822,7 @@ class DataImportService implements ServiceMethods {
 							record.status = ImportBatchStatusEnum.COMPLETED
 						} else {
 							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
+							record.addError(GormUtil.allErrorsString(entity))
 							entity.discard()
 							entity = null
 						}
@@ -987,7 +988,16 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// Take the complete list of field names in fieldsInfo and remove 'id' plus any passed to the method
-		Set<String> fieldNames = fieldsInfo.keySet()
+		List<String> fieldNames
+		if (fieldsInfo.values().first()?.containsKey('fieldOrder')) {
+			// When we have the field order we'll sort them so that the fields are processed in a logical order that solves issues
+			// with hierarchical fields (Manufacturer/Model or Room/Rack). Without the sorting the first past of import processing sometimes
+			// processes Model before Mfg a not found error occurs.
+			fieldNames = fieldsInfo.sort{ it.value.fieldOrder }.collect{ it.key }
+		} else {
+			fieldNames = fieldsInfo.keySet() as List
+		}
+
 		log.debug 'bindFieldsInfoValuesToEntity() starting with fields to update of: {}', fieldNames.join(', ')
 		if (fieldsToIgnore == null) {
 			fieldsToIngnore = []
@@ -1178,7 +1188,7 @@ class DataImportService implements ServiceMethods {
 						try {
 							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
 							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_ISO8601, valueToSet, TimeUtil.FORMAT_DATE_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
 								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
@@ -1429,7 +1439,7 @@ class DataImportService implements ServiceMethods {
 					// Create the domain and set any of the require properties that are required
 					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
 					fieldsValueMap.each { fieldName, value ->
-						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context, referenceFieldName)
 						if (errMsg) {
 							errorMsgs << errMsg
 						}
@@ -1512,7 +1522,7 @@ class DataImportService implements ServiceMethods {
 	 * @return null if successful otherwise a string containing the error message that occurred
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context) {
+	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context, String referenceFieldName = '') {
 		String errorMsg = null
 		log.debug 'setDomainPropertyWithValue() called with {}.{}',
 			entity.getClass().getName(), fieldName
@@ -1532,7 +1542,7 @@ class DataImportService implements ServiceMethods {
 					List<Object> entities
 
 					// Attempt to find the reference object
-					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context)
+					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context, referenceFieldName)
 					if (! errorMsg) {
 						if (entities == null) {
 							errorMsg = "Reference field $fieldName does not support alternate key lookup"

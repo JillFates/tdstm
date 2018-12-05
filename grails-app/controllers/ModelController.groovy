@@ -1,5 +1,6 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -113,6 +114,8 @@ class ModelController implements ControllerMethods {
 	def create(String modelId) {
 		List<ModelConnector> modelConnectors
 		Model modelTemplate
+
+
 		if (modelId) {
 			modelTemplate = Model.get(modelId)
 			modelConnectors = ModelConnector.findAllByModel(modelTemplate)
@@ -120,12 +123,19 @@ class ModelController implements ControllerMethods {
 
 		List<Integer> otherConnectors = []
 		int existingConnectors = modelConnectors ? modelConnectors.size() + 1 : 1
+
 		for (int i = existingConnectors; i < 51; i++) {
 			otherConnectors << i
 		}
 
-		[modelInstance: new Model(), modelConnectors: modelConnectors, otherConnectors: otherConnectors,
-		 modelTemplate: modelTemplate, powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)]
+		[
+			modelInstance  : new Model(),
+			modelConnectors: modelConnectors,
+			otherConnectors: otherConnectors,
+			modelTemplate  : modelTemplate,
+			powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
+			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+		]
 	}
 
 	private boolean isValidImage(MultipartFile file) {
@@ -257,28 +267,40 @@ class ModelController implements ControllerMethods {
 	@HasPermission(Permission.ModelEdit)
 	def edit() {
 		def modelId = params.id
+
 		if (modelId && modelId.isNumber()) {
 			def model = Model.get(params.id)
+
 			if (!model) {
 				flash.message = "Model not found with Id $params.id"
 				redirect(action: "list")
 			} else {
-				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
+				def modelConnectors = ModelConnector.findAllByModel(model, [sort: "id"])
 				def nextConnector = 0
-				try{
-					nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
-				} catch(NumberFormatException ex) {
-					nextConnector = modelConnectors.size()+1
+
+				try {
+					nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size() - 1]?.connector) : 0
+				} catch (NumberFormatException ex) {
+					nextConnector = modelConnectors.size() + 1
 				}
+
 				def otherConnectors = []
-				for(int i = nextConnector+1 ; i<51; i++) {
+
+				for (int i = nextConnector + 1; i < 51; i++) {
 					otherConnectors << i
 				}
-				def modelAliases = ModelAlias.findAllByModel(model)
-				def paramsMap = [modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors,
-				                 nextConnector:nextConnector, modelAliases:modelAliases, redirectTo:params.redirectTo]
 
-				def view = params.redirectTo== "modelDialog" ? "_edit" : "edit"
+				def modelAliases = ModelAlias.findAllByModel(model)
+				def paramsMap = [
+					modelInstance  : model,
+					modelConnectors: modelConnectors,
+					otherConnectors: otherConnectors,
+					nextConnector  : nextConnector,
+					modelAliases   : modelAliases, redirectTo: params.redirectTo,
+					assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+				]
+
+				def view = params.redirectTo == "modelDialog" ? "_edit" : "edit"
 				render(view: view, model: paramsMap)
 
 			}
@@ -388,45 +410,6 @@ class ModelController implements ControllerMethods {
 			//log.error(rte.message, rte)
 			flash.message = rte.message
 			redirect(controller:'model', action: 'list')
-		}
-	}
-
-	@HasPermission(Permission.ModelDelete)
-	def delete_old() {
-		def model = Model.get(params.id)
-		def modelRef = AssetEntity.findByModel(model)
-		if (!modelRef) {
-			UserLogin user = securityService.userLogin
-			Person person = user?.person
-			if (model) {
-				try {
-					model.delete(flush: true)
-					if (user) {
-						int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
-						person.modelScoreBonus = bonusScore+1
-						int score = person.modelScore ?: 0
-						person.modelScore = score+bonusScore
-					}
-					if (!person.save(flush:true)) {
-						person.errors.allErrors.each {
-							println it
-							}
-					}
-
-					flash.message = "$model deleted"
-					redirect(action: "list")
-				} catch (DataIntegrityViolationException e) {
-					flash.message = "$model not deleted"
-					redirect(action: "show", id: params.id)
-				}
-			}
-			else {
-				flash.message = "Model not found with Id $params.id"
-				redirect(action: "list")
-			}
-		} else{
-			flash.message = "Model $model.modelName can not be deleted, it is referenced ."
-			redirect(action: "list")
 		}
 	}
 
@@ -552,42 +535,41 @@ class ModelController implements ControllerMethods {
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
 
-		def assetUpdated = modelService.mergeModel(fromModel, toModel)
+		def assetUpdated = modelService.merge(fromModel, toModel)
 
 		flash.message = "Merge Completed, $assetUpdated assets updated"
 		redirect(action:"list")
 	}
 
 	/**
-	* @param : toId id of target model
-	* @param : fromId[] id of model that is being merged
-	* @return : message
-	*/
+	 * Merges a list of Models into a target Model.
+	 *
+	 * @param : toId  id of target Model
+	 * @param : fromId[]  ids of Models that will be merged into the target Model
+	 * @return : message
+	 */
 	@HasPermission(Permission.ModelMerge)
 	def mergeModels() {
-
-		Model toModel = Model.get(params.toId)
+		if (!params.toId) {
+			throw new InvalidParamException("ModelController.mergeModels() - id cannot be null.")
+		}
+		Long toId = NumberUtil.toLong(params.toId)
 		List fromModelsId = params.list("fromId[]")
-		List mergedModel = []
-		String msg = ""
-		int assetUpdated = 0
 		//Saving toModel before merge
 		if (params.endOfLifeDate) {
 			params.endOfLifeDate = TimeUtil.formatDate(params.endOfLifeDate)
 		} else {
 			params.endOfLifeDate=null
 		}
-		toModel.properties = params
-		if (!toModel.save(flush:true)) {
-			toModel.errors.allErrors.each {println it }
+		Map results = modelService.mergeModels(fromModelsId, toId, params)
+		if (results.mergedModels) {
+			render results.mergedModels.size() + " models were merged to $results.toModel.modelName. $results.assetsUpdated assets were updated. "
+		} else {
+			render "No models were merged. "
 		}
-		fromModelsId.each {
-			def fromModel = Model.get(it)
-			assetUpdated += modelService.mergeModel(fromModel, toModel)
-			mergedModel << fromModel
+		if (results.toModel.hasErrors()) {
+			render "There were errors saving $results.toModel.modelName : ${results.toModel.errors.allErrors.each { println it}}"
 		}
-
-		render msg + mergedModel.size() + " models were merged to $toModel.modelName . $assetUpdated assets were updated."
 	}
 
 	@HasPermission(Permission.ModelExport)
@@ -608,7 +590,7 @@ class ModelController implements ControllerMethods {
 		//get template Excel
 		try {
 			File file = grailsApplication.parentContext.getResource("/templates/Sync_model_template.xls").getFile()
-			String filename = ("TDS-Sync-Data-" + TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_6) + ".xls").replace(" ", "_")
+			String filename = ("TDS-Sync-Data-" + TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_ISO8601) + ".xls").replace(" ", "_")
 			ExportUtil.setContentType response, filename
 
 			def book = new HSSFWorkbook(new FileInputStream(file))
@@ -692,328 +674,6 @@ class ModelController implements ControllerMethods {
 		}
 	}
 
-	/*
-	*1. On upload the system should put the data into temporary tables and then perform validation to make sure the data is proper and ready.
-	*2. Step through each imported model:
-	*2a if it's SourceTDSVersion is higher than the one in the database, update the database with the new model and connector data.
-	*2b If it is lower, skip it.
-	*3. Report the number of Model records updated.
-	*/
-	@HasPermission(Permission.ModelImport)
-	def upload() {
-		DataTransferBatch.withTransaction { status ->
-			UserLogin userLogin = securityService.userLogin
-			MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request
-			CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
-			def date = new Date()
-			def modelSyncBatch = new ModelSyncBatch(changesSince:date,createdBy:userLogin,source:"TDS")
-			if (modelSyncBatch.hasErrors() || !modelSyncBatch.save()) {
-				log.error "Unable to create ModelSyncBatch for $modelSyncBatch : ${GormUtil.allErrorsString(modelSyncBatch)}"
-			}
-			// create workbook
-			def workbook
-			def sheetNameMap = [:]
-			//get column name and sheets
-			sheetNameMap.manufacturer = ["manufacturer_id", "name", "aka", "description"]
-			sheetNameMap.model = ["model_id", "name","aka", "description", "manufacturer_id", "manufacturer_name",
-			                      "asset_type", "blade_count", "blade_label_count", "blade_rows", "sourcetds",
-			                      "power_nameplate", "power_design", "power_use", "sourcetdsversion", "use_image",
-			                      "usize", "height", "weight", "depth", "width", "layout_style", "product_line",
-			                      "model_family", "end_of_life_date", "end_of_life_status", "created_by", "updated_by",
-			                      "validated_by", "sourceurl", "model_status", "model_scope"]
-			sheetNameMap.connector = ["model_connector_id", "connector", "connector_posx", "connector_posy", "label",
-			                          "label_position", "model_id", "model_name", "connector_option", "status", "type"]
-			try {
-				workbook = new HSSFWorkbook(file.inputStream)
-				def sheetNames = WorkbookUtil.getSheetNames(workbook)
-				def sheets = sheetNameMap.keySet()
-				def missingSheets = []
-				def flag = 1
-				def sheetsLength = sheets.size()
-
-				sheets.each {
-					if (!sheetNames.contains(it)) {
-						flag = 0
-						missingSheets<< it
-					}
-				}
-				if (flag == 0) {
-					flash.message = "$missingSheets sheets not found, Please check it."
-					redirect(action:"importExport", params:[message:flash.message])
-					return
-				} else {
-					def manuAdded = 0
-					def manuSkipped = []
-					def sheetColumnNames = [:]
-					//check for column
-					def manuSheet = workbook.getSheet("manufacturer")
-					def manuCol = WorkbookUtil.getColumnsCount(manuSheet)
-					for (int c = 0; c < manuCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(manuSheet, c, 0)
-						sheetColumnNames.put(cellContent, c)
-					}
-					def missingHeader = checkHeader(sheetNameMap.get("manufacturer"), sheetColumnNames)
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action: "importExport", params:[message:flash.message])
-						return
-					} else {
-						def sheetrows = manuSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuilder("(")
-							for(int cols = 0; cols < manuCol; cols++) {
-								valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r, "").replace("'","\\'")+"',")
-							}
-							try{
-								jdbcTemplate.update("insert into manufacturer_sync(manufacturer_temp_id, name,aka, description, batch_id) values " +
-									valueList + modelSyncBatch.id + ')')
-								manuAdded = r
-							} catch (e) {
-								log.error "Can't insert into manufacturer_sync: $e.message"
-								manuSkipped += r + 1
-							}
-						}
-					}
-
-					/*
-					 * Import Model Information
-					 */
-					def modelSheetColumnNames = [:]
-					def modelAdded = 0
-					def modelSkipped = []
-					//check for column
-					def modelSheet = workbook.getSheet("model")
-					def modelCol = WorkbookUtil.getColumnsCount(modelSheet)
-					//def colContain = modelCol.
-					for (int c = 0; c < modelCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(modelSheet, c, 0)
-						modelSheetColumnNames.put(cellContent, c)
-					}
-					missingHeader = checkHeader(sheetNameMap.get("model"), modelSheetColumnNames)
-					def onlyTds
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action:"importExport", params:[ message:flash.message])
-						return
-					} else {
-						def sheetrows = modelSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							onlyTds = false
-							def valueList = new StringBuilder("(")
-							def manuId
-							def createdPersonId
-							def updatedPersonId
-							def validatedPersonId
-							def projectId
-							for(int cols = 0; cols < modelCol; cols++) {
-								switch(WorkbookUtil.getStringCellValue(modelSheet, cols, 0)) {
-								case "manufacturer_name" :
-									def manuName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								case "blade_count" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "blade_label_count" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "blade_rows" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "use_image" :
-									int useImage = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() != "no") {
-										useImage = 1
-									}
-									valueList.append(useImage+",")
-									break
-								case "power_nameplate" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "power_design" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "power_use" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "usize" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "sourcetds" :
-									int isTDS = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() == "tds") {
-										isTDS = 1
-										onlyTds = true
-									}
-									valueList.append(isTDS+",")
-									break
-								case "sourcetdsversion" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "height" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "weight" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "depth" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "width" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "model_scope" :
-									def modelScope = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									projectId = Project.findByProjectCode(modelScope)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "end_of_life_date" :
-									def endOfLifeDate = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									if (endOfLifeDate) {
-									valueList.append("'"+(WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+"',")
-									}else{
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									}
-									break
-								/*case "end_of_life_status" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break;*/
-								case "created_by" :
-									def createdByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									createdPersonId = Person.findByFirstName(createdByName)?.id
-									break
-								case "updated_by" :
-									def updatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									updatedPersonId = Person.findByFirstName(updatedByName)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "validated_by" :
-									def validatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									validatedPersonId = Person.findByFirstName(validatedByName)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "room_object" :
-									int roomObject = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() != "False") {
-										roomObject = 1
-									}
-									valueList.append(roomObject+",")
-									break
-								case "date_created":
-								case "last_modified":
-									break
-								default :
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								}
-
-							}
-							try{
-								if (manuId) {
-									if (params.importCheckbox) {
-										if (onlyTds == true) {
-											jdbcTemplate.update("insert into model_sync(model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id) values " + valueList + "$modelSyncBatch.id, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
-											modelAdded = r
-										} else {
-										// TODO : getting ArrayIndexOutOfbound exception, need to fix
-											//modelSkipped += r + 1
-										}
-									} else {
-										jdbcTemplate.update("insert into model_sync(model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id) values " + valueList + "$modelSyncBatch.id, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
-										modelAdded = r
-									}
-								} else {
-									//modelSkipped += r + 1
-								}
-							} catch (Exception e) {
-								log.error "Can't insert into model_sync: $e.message"
-								e.printStackTrace()
-								modelSkipped += r + 1
-							}
-						}
-					}
-					/*
-					 * Import Model Information
-					 */
-					def connectorSheetColumnNames = [:]
-					def connectorAdded = 0
-					def connectorSkipped = []
-					//check for column
-					def connectorSheet = workbook.getSheet("connector")
-					def connectorCol = WorkbookUtil.getColumnsCount(connectorSheet)
-					for (int c = 0; c < connectorCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(connectorSheet, c, 0)
-						connectorSheetColumnNames.put(cellContent, c)
-					}
-					missingHeader = checkHeader(sheetNameMap.get("connector"), connectorSheetColumnNames)
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action:"importExport", params:[message:flash.message])
-						return
-					} else {
-						def sheetrows = connectorSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuilder("(")
-							def modelId
-							for(int cols = 0; cols < connectorCol; cols++) {
-								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0)) {
-								case "model_name" :
-									def modelName = WorkbookUtil.getStringCellValue(connectorSheet, cols, r)
-									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								case "connector_posx" :
-									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r) : null)+",")
-									break
-								case "connector_posy" :
-									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r) : null)+",")
-									break
-								default :
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								}
-
-							}
-							try{
-								if (modelId) {
-									jdbcTemplate.update("insert into model_connector_sync(connector_temp_id,connector,connector_posx,connector_posy,label,label_position,model_temp_id,model_name,connector_option,status,type,batch_id,model_id) values " + valueList + "$modelSyncBatch.id, $modelId)")
-									connectorAdded = r
-								} else {
-									connectorSkipped += r + 1
-								}
-							} catch (Exception e) {
-								log.error "Can't insert into model_connector_sync: $e.message"
-								connectorSkipped += r + 1
-							}
-						}
-					}
-					if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
-						flash.message = " File Uploaded Successfully with Manufactures:$manuAdded,Model:$modelAdded,Connectors:$connectorAdded records. and Manufactures:$manuSkipped,Model:$modelSkipped,Connectors:$connectorSkipped Records skipped Please click the Manage Batches to review and post these changes."
-					} else {
-						flash.message = " File uploaded successfully with Manufactures:$manuAdded,Model:$modelAdded,Connectors:$connectorAdded records. Please click the Manage Batches to review and post these changes."
-					}
-					redirect(action:"importExport", params:[message:flash.message])
-					return
-				}
-			} catch(NumberFormatException ex) {
-				flash.message = ex
-				status.setRollbackOnly()
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-			} catch(Exception ex) {
-				ex.printStackTrace()
-				status.setRollbackOnly()
-				flash.message = ex
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-			}
-		}
-	}
-
 	private String checkHeader(List<String> list, sheetColumnNames) {
 		String missingHeader = ""
 		int listSize = list.size()
@@ -1070,20 +730,6 @@ class ModelController implements ControllerMethods {
 		render modelMap as JSON
 	}
 	
-	@HasPermission(Permission.ModelValidate)
-	def validateModel() {
-		def modelInstance = Model.get(params.id)
-		if (securityService.loggedIn) {
-			modelInstance.validatedBy = securityService.loadCurrentPerson()
-			modelInstance.modelStatus = "valid"
-			if (!modelInstance.save(flush:true)) {
-				modelInstance.errors.allErrors.each { println it }
-			}
-		}
-		flash.message = "$modelInstance.modelName Validated"
-		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
-	}
-	
 	/**
 	* Validate whether requested alias already exist in DB or not
 	* @param: alias, the new alias to be validated
@@ -1107,27 +753,6 @@ class ModelController implements ControllerMethods {
 			render 'valid'
 		else
 			render 'invalid'
-	}
-	
-	/**
-	 * Updates a model for audit view , not using update method as there have a lot of code in update action might degrade performance.
-	 * @param id : id of model for update
-	 */
-	@HasPermission(Permission.ModelEdit)
-	def updateModel() {
-		def modelId = params.id
-		if (modelId && modelId.isNumber()) {
-			def model = Model.get(params.id)
-			model.properties = params
-			if (!model.save(flush:true)) {
-				model.errors.allErrors.each {
-					log.error it
-				}
-			}
-			render(template: "modelAuditView", model: [modelInstance:model])
-		} else {
-			render "<b> No Model found for id: $params.id</b>"
-		}
 	}
 
 	/**

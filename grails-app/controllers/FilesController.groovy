@@ -4,6 +4,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -14,6 +15,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
@@ -42,6 +44,7 @@ class FilesController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
 	AssetService assetService
+	AssetOptionsService assetOptionsService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -234,7 +237,7 @@ class FilesController implements ControllerMethods {
 			}
 		}
 		if (params.toValidate) {
-			query.append(" WHERE files.validation='Discovery'")
+			query.append(" WHERE files.validation='${ValidationType.UNKNOWN}'")
 		}
 		if (params.plannedStatus) {
 			query.append(" WHERE files.planStatus='$params.plannedStatus'")
@@ -291,8 +294,8 @@ class FilesController implements ControllerMethods {
 		[
 			fileInstance      : files,
 			moveBundleList    : MoveBundle.findAllByProject(project, [sort: 'name']),
-			planStatusOptions : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
-			environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
+			planStatusOptions : assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION),
+			environmentOptions: assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION),
 			standardFieldSpecs: standardFieldSpecs,
 			project           : project,
 			customs           : customFields

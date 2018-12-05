@@ -1,0 +1,45 @@
+<div tds-autofocus class="modal-content user-preferences-component">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">{{personName}} Preferences</h4>
+    </div>
+    <div class="modal-body">
+        <table class="table table-striped" style="width:100%;">
+            <colgroup>
+                <col class="col-md-2">
+                <col class="col-md-8">
+                <col class="col-md-2">
+            </colgroup>
+            <tr>
+                <th>Preference</th>
+                <th>Value</th>
+                <th style="text-align: center;">Remove</th>
+            </tr>
+            <tr *ngIf="preferenceList?.length === 0">
+                <td colspan="3">No preferences</td>
+            </tr>
+            <ng-template [ngIf]="preferenceList && preferenceList.length > 0">
+                <tr *ngFor="let preference of preferenceList">
+                    <td nowrap="nowrap">{{preference.label}}</td>
+                    <td>{{preference.value}}</td>
+                    <td style="text-align:center">
+                        <button *ngIf="fixedPreferenceCodes.indexOf(preference.code) === -1" (click)="removePreference(preference.code)" type="button" class="">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+        </table>
+
+        <div class="buttons">
+            <button (click)="resetPreferences()" type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-erase"></span>
+                <span>Reset All</span>
+            </button>
+            <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+                <span class="glyphicon glyphicon-ban-circle"></span>
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+</div>

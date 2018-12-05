@@ -1,15 +1,16 @@
-import { Component, Inject, ViewChild, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { StateService } from '@uirouter/angular';
-import { AssetExplorerStates } from '../../asset-explorer-routing.states';
+import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
+import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
+import { Observable } from 'rxjs';
+import {State} from '@progress/kendo-data-query';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel } from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
 
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
@@ -25,48 +26,103 @@ declare var jQuery: any;
 	selector: 'asset-explorer-view-show',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
 })
-export class AssetExplorerViewShowComponent implements OnInit {
-	private dataSignature: string;
-	model: ViewModel;
-	domains: DomainModel[] = [];
-	protected metadata: any = {};
+export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 
-	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
+	private currentId;
+	private dataSignature: string;
+	public fields: DomainModel[] = [];
+	protected model: ViewModel = new ViewModel();
+	protected domains: DomainModel[] = [];
+	protected metadata: any = {};
+	private lastSnapshot;
+	protected navigationSubscription;
+	protected justPlanning: boolean;
+	protected data: any;
+	protected gridState: State = {
+		skip: 0,
+		take: GRID_DEFAULT_PAGE_SIZE,
+		sort: []
+	};
+
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	constructor(
-		@Inject('report') report: Observable<ViewModel>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private stateService: StateService,
-		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
-		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
-			tagList.subscribe( result => this.metadata.tagList = result);
-			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-				this.domains = result[0];
-				this.model = result[1];
-				this.dataSignature = JSON.stringify(this.model);
-				this.stateService.$current.data.page.title = this.model.name;
-				document.title = this.model.name;
-			}, (err) => console.log(err));
+		private notifier: NotifierService) {
+
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = this.route.snapshot.data['report'];
+		this.dataSignature = JSON.stringify(this.model);
 	}
 
 	ngOnInit(): void {
-		this.grid.state.sort = [
-			{
-				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
-				dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+		this.reloadStrategy();
+		this.initialiseComponent();
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
+	}
+
+	/**
+	 * Reload Strategy keep listen To change to the route so we can reload whatever is inside the component
+	 * Increase dramatically the Performance
+	 */
+	private reloadStrategy(): void {
+		// The following code Listen to any change made on the rout to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event.snapshot && event.snapshot.data && event.snapshot.data.fields) {
+				this.lastSnapshot = event.snapshot;
 			}
-		];
-		this.onQuery();
+			// If it is a NavigationEnd event re-initalise the component
+			if (event instanceof NavigationEnd) {
+				console.log(event);
+				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
+					this.metadata.tagList = this.lastSnapshot.data['tagList'];
+					this.fields = this.lastSnapshot.data['fields'];
+					this.domains = this.lastSnapshot.data['fields'];
+					this.model = this.lastSnapshot.data['report'];
+					this.dataSignature = JSON.stringify(this.model);
+					this.initialiseComponent();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Calls every time the Component is recreated by calling same URL
+	 */
+	private initialiseComponent(): void {
+		this.justPlanning = false;
+		this.currentId = this.model.id;
+		this.notifier.broadcast({
+			name: 'notificationHeaderTitleChange',
+			title: this.model.name
+		});
+
+		this.gridState = Object.assign({}, this.gridState, {sort: [
+				{
+					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
+					dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+				}
+			]});
 	}
 
 	protected onQuery(): void {
 		let params = {
-			offset: this.grid.state.skip,
-			limit: this.grid.state.take,
+			offset: this.gridState.skip,
+			limit: this.gridState.take,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
@@ -75,18 +131,18 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
+		if (this.justPlanning) {
 			params['justPlanning'] = true;
 		}
 		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
-			this.grid.apply(result);
+			this.data = result;
 			jQuery('[data-toggle="popover"]').popover();
 		}, err => console.log(err));
 	}
 
 	protected onEdit(): void {
 		if (this.isEditAvailable()) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 		}
 	}
 
@@ -100,15 +156,16 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	}
 
 	protected onSaveAs(): void {
+		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		if (this.isSaveAsAvailable()) {
 			this.dialogService.open(AssetExplorerViewSaveComponent, [
 				{ provide: ViewModel, useValue: this.model },
-				{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
+				{ provide: ViewGroupModel, useValue: selectedData }
 			]).then(result => {
 				this.model = result;
 				this.dataSignature = JSON.stringify(this.model);
 				setTimeout(() => {
-					this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 				});
 			}).catch(result => {
 				console.log('error');
@@ -169,8 +226,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	 */
 	private getQueryParamsForExport(): AssetQueryParams {
 		let assetQueryParams: AssetQueryParams = {
-			offset: this.grid.gridData ? 0 : this.grid.state.skip,
-			limit: this.grid.gridData ? this.grid.gridData.total : this.grid.state.take,
+			offset: this.data ? 0 : this.gridState.skip,
+			limit: this.data ? this.data.pagination.total : this.gridState.take,
 			forExport: true,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
@@ -180,8 +237,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
-			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		if (this.justPlanning) {
+			assetQueryParams['justPlanning'] = this.justPlanning;
 		}
 
 		return assetQueryParams;
@@ -209,4 +266,36 @@ export class AssetExplorerViewShowComponent implements OnInit {
 			this.permissionService.hasPermission(Permission.AssetExplorerEdit);
 	}
 
+	/**
+	 * Whenever the just planning change, grab the new value
+	 * @param justPlanning
+	 */
+	protected onJustPlanningChange(justPlanning: boolean): void {
+		this.justPlanning = justPlanning;
+	}
+
+	/**
+	 -
+	 * Whenever the grid state change, grab the new value
+	 * @param state New state
+	 */
+	protected onGridStateChange(state: State): void {
+		this.gridState = state;
+	}
+
+	/**
+	 -
+	 * Based on isOwner property determines which save function call
+	 */
+	protected save() {
+		this.model.isOwner ? this.onSave() : this.onSaveAs()
+	}
+
+	/**
+	 -
+	 * Based on isOwner property determines the id of the button save
+	 */
+	protected getSaveButtonId(): string {
+		return this.model.isOwner ? 'btnSave' : 'btnSaveAs'
+	}
 }

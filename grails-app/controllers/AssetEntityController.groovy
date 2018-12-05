@@ -30,6 +30,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import grails.util.Environment
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.DeviceUtils
+import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
@@ -51,6 +53,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
@@ -138,6 +141,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	UserService userService
 	LicenseAdminService licenseAdminService
 	ImportService importService
+	AssetOptionsService assetOptionsService
 
 	/**
 	 * To Filter the Data on AssetEntityList Page
@@ -816,8 +820,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.AssetEdit)
 	@Transactional(readOnly = true)
 	def edit() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
+		Project project = getProjectForWs()
 
 		def (device, Map model) = assetEntityService.getDeviceModelForEdit(project, params.id, params)
 
@@ -1342,12 +1345,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def assetOptions() {
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])
-		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: "value", order: "asc"])
+		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		List<AssetOptions> priorityOption = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+		List<AssetOptions> dependencyType = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		List<AssetOptions> dependencyStatus = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		List<AssetOptions> environment = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		List<AssetOptions> assetTypes = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 
 		def assetType = assetTypes.collect{ AssetOptions option ->
 			[id: option.id, type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
@@ -1362,38 +1365,35 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def saveAssetoptions() {
-		AssetOptions assetOption = new AssetOptions()
+		AssetOptionsCommand command = new AssetOptionsCommand()
 		switch(params.assetOptionType) {
 			case 'planStatus':
-				assetOption.type = AssetOptions.AssetOptionsType.STATUS_OPTION
-				assetOption.value = params.planStatus
+				command.type = AssetOptions.AssetOptionsType.STATUS_OPTION
+				command.value = params.planStatus
 				break
 			case 'Priority':
-				assetOption.type = AssetOptions.AssetOptionsType.PRIORITY_OPTION
-				assetOption.value = params.priorityOption
+				command.type = AssetOptions.AssetOptionsType.PRIORITY_OPTION
+				command.value = params.priorityOption
 				break
 			case 'dependency':
-				assetOption.type = AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
-				assetOption.value = params.dependencyType
+				command.type = AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
+				command.value = params.dependencyType
 				break
 			case 'environment':
-				assetOption.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
-				assetOption.value = params.environment
+				command.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
+				command.value = params.environment
 				break
 			case 'assetType':
-				assetOption.type = AssetOptions.AssetOptionsType.ASSET_TYPE
-				assetOption.value = params.assetType
+				command.type = AssetOptions.AssetOptionsType.ASSET_TYPE
+				command.value = params.assetType
 				break
 			default:
-				assetOption.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
-				assetOption.value = params.dependencyStatus
+				command.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
+				command.value = params.dependencyStatus
 		}
 
-		if (!assetOption.save(flush:true)) {
-			assetOption.errors.allErrors.each { log.error  it }
-		}
-
-		renderAsJson(id: assetOption.id)
+		AssetOptions assetOptions = assetOptionsService.saveAssetOptions(command)
+		renderAsJson(id: assetOptions.id)
 	}
 
 	/**
@@ -1413,14 +1413,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			default:            idParamName = 'dependecyId'; break
 		}
 
-		AssetOptions assetOption = AssetOptions.get(params[idParamName])
+		AssetOptions assetOption = assetOptionsService.findById(params[idParamName] as Long)
 
-		if(optionType == 'assetType' && assetEntityService.assetTypesOf(null, assetOption.value)){
+		if(optionType == 'assetType' && assetEntityService.assetTypesOf(null, assetOption?.value)){
 			throw new InvalidRequestException('You cannot delete an assetType, that is being used, by a model.')
 		}
 
-		assetOption.delete(flush: true)
-		render assetOption.id
+		assetOptionsService.deleteById(assetOption?.id)
+		render assetOption?.id
 	}
 
 	/**
@@ -2008,7 +2008,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	// removes the user's dependency analyzer map related preferences
 	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.value())
+		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.name())
 		render true
 	}
 
@@ -2615,7 +2615,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def rackId = params.rackId
-		def options = assetEntityService.getRackSelectOptions(project, roomId, true)
+		def options = DeviceUtils.getRackSelectOptions(project, roomId, true)
 		def sourceTarget = params.sourceTarget
 		def forWhom = params.forWhom
 		def tabindex = params.tabindex
@@ -2652,7 +2652,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Project project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def id = params.id
-		def options = assetEntityService.getChassisSelectOptions(project, roomId)
+		def options = DeviceUtils.getChassisSelectOptions(project, roomId)
 		def sourceTarget = params.sourceTarget
 		def forWhom = params.forWhom
 		def tabindex = params.tabindex
@@ -2865,7 +2865,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					results = qm.domain.executeQuery(rquery, qparams, [max:max, offset:offset, sort:'assetName' ])
 
 					// Convert the columns into a map that Select2 requires
-					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJavaScript(r[1])) ]}
+					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJava(r[1])) ]}
 				}
 			} else {
 				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
@@ -3060,10 +3060,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 			graphNodes << [
 				id:it.id,
-				name: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				name: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				type:type, assetClass:it.assetClass.toString(),
 				shape:shape, size:size,
-				title: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				title: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				color: it == asset ? 'red' : 'grey',
 				parents:[], children:[], checked:false, siblings:[]
 			]

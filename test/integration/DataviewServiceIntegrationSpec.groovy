@@ -124,7 +124,7 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 			dataview.reportSchema = '{"key":"value"}'
 
 			DataviewUserParamsCommand dataviewUserParamsCommand = [
-				sortDomain  : 'device',
+				sortDomain  : 'common',
 				sortProperty: 'id',
 				filters     : ['domains': ['device']]
 			] as DataviewUserParamsCommand
@@ -138,6 +138,7 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 				FROM AssetEntity AE
 
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
+				group by AE.id
 			'''.stripIndent()
 
 			hql.params == [project: project, assetClasses: [AssetClass.DEVICE]]

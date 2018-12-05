@@ -66,18 +66,22 @@
 			<td></td>
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}" />
-			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${asset?.retireDate}" endian="${dateFormat}"/></td>
+			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
+                {{ '${asset?.retireDate}' | tdsDateTime: userTimeZone }}
+            </td>
 
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc == '?' ? '' : asset.testProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}" />
-			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}"><tds:convertDate date="${asset?.maintExpDate}" endian="${dateFormat}" /></td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tooltipDataPlacement="bottom"/>
+			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
+                {{ '${asset?.maintExpDate}' | tdsDateTime: userTimeZone }}
+            </td>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency == '?' ? '' : asset.latency}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc == '?' ? '' : asset.startupProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
 			<tds:inputLabel field="${standardFieldSpecs.url}" value="${asset.url}" />

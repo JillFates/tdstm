@@ -1,3 +1,5 @@
+import version.*
+
 databaseChangeLog = {
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
@@ -274,5 +276,16 @@ databaseChangeLog = {
 	include file: '20180829-rename-agent-to-connector.groovy'
 	include file: '20180815-date-columns-to-have-date-controls-for-common-fields.groovy'
 	include file: '20180917-move-bulk-specification-to-field-specs.groovy'
+    include file: '20181024-person-table-drop-column-model-score-bonus.groovy'
 	include file: '20181012-add-bulk-actions-for-standard-custom-and-other.groovy'
+	include file: '20181105-move-bundle-should-have-list-control.groovy'
+	include file: 'version/v4_6_0/20181030-update-validation.groovy'
+	include file: 'version/v4_6_0/20181106-bundle-should-only-have-replace.groovy'
+	include file: 'version/v4_6_0/20181115-delete-bogus-user-preferences.groovy'
+	include file: 'version/v4_6_0/20181115-reorder-system-views-columns.groovy'
+	include file: 'version/v4_6_0/20181123-update-system-views-list-titles.groovy'
+	include file: 'version/v4_6_0/20181123-add-tags-column-to-all-assets-view.groovy'
+	include file: '20181127-delete-ReportViewDiscovery-permission.groovy'
+	include file: 'version/v4_6_0/20181128-fix-unasigned-people-created-during-import-process.groovy'
+	include file: 'version/v4_6_0/20181130-validated-should-only-have-replace.groovy'
 }

@@ -415,8 +415,7 @@ class PersonService implements ServiceMethods {
 				save(person, true)
 				if (person.hasErrors()) {
 					results.error = "Unable to create person $nameMap${GormUtil.allErrorsString(person)}"
-				}
-				else {
+				} else {
 					if (!partyRelationshipService.addCompanyStaff(project.client, person)) {
 						results.error = "Unable to assign person $results.person as staff"
 						// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
@@ -424,14 +423,15 @@ class PersonService implements ServiceMethods {
 					results.person = person
 					results.isNew = true
 				}
-			}
-			else {
+
+				// Associate a person to a project as staff
+				addToProject(securityService.getUserLogin(), project.id as String, person.id as String)
+			} else {
 				results.isNew = false
 			}
 
 			return results
-		}
-		catch (e) {
+		} catch (e) {
 			String exMsg = e.message
 			logger.error 'findOrCreatePerson() received exception for nameMap={} : {}\n{}',
 					nameMap, e.message, ExceptionUtil.stackTraceToString(e)
@@ -647,30 +647,6 @@ class PersonService implements ServiceMethods {
 
 		return deletePersonSecure(person, deleteIfUserLogin, deleteIfAssocWithAssets)
 	}
-
-	/**
-	 * This method deletes a person and other entities related to the instance such as partyRelationships,
-	 * UserLogin, etc.  This version of the method is only for legacy migration scripts and should NOT be used
-	 * and will throw an exception if used in the context of a user.
-	 * @param person - Person Instance to be deleted
-	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
-	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
-	 * 		be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
-	 * @return A map containing the following:
-	 *		messages: String[] containing errors and other messages
-	 *		cleared: the number of assets cleared
-	 *		deleted: a boolean indicating if the person was deleted
-	 * @deprecated This method is only to support legacy migration scripts. Please see other deletePerson methods.
-	 */
-	@Deprecated
-	@Transactional
-	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
-		if (securityService.isLoggedIn()) {
-			throw new UnauthorizedException('This deletePerson is not supported')
-		}
-		return deletePersonSecure(person, deleteIfUserLogin, deleteIfAssocWithAssets)
-	}
-
 
 	/**
 	 * This method deletes a person and other entities related to the instance such as partyRelationships,

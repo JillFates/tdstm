@@ -31,14 +31,18 @@
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                     </tr>
                                     <tr class="prop">
-                                        <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+                                        <td class="label ${standardFieldSpecs.size.imp?:''}"
+                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="size" /> }"
+                                            nowrap="nowrap">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
                                                 ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
                                             </label>
                                         </td>
                                         <td class="valueNW ${standardFieldSpecs.size.imp?:''}">${asset?.size}&nbsp;${asset.scale?.value()}</td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
-                                        <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${asset?.retireDate}" endian = "${dateFormat}" /></td>
+                                        <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
+                                            {{ '${asset?.retireDate}' | tdsDateTime: userTimeZone }}
+                                        </td>
                                         <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
                                             <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
                                                 ${standardFieldSpecs.moveBundle.label} : Dep. Group
@@ -51,7 +55,9 @@
                                     <tr class="prop">
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
-                                        <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}"><tds:convertDate date="${asset?.maintExpDate}" endian = "${dateFormat}" /></td>
+                                        <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
+                                            {{ '${asset?.maintExpDate}' | tdsDateTime: userTimeZone }}
+                                        </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
                                         <td class="valueNW ${standardFieldSpecs.planStatus.imp?:''}" colspan="3">${asset.planStatus}</td>
                                     </tr>
@@ -91,12 +97,12 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
-        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
-        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
-        <a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
+        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
+        <a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
     </div>
 </div>

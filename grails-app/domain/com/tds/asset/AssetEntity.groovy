@@ -205,7 +205,7 @@ class AssetEntity {
 	String appSme = ''
 
 	// MoveBundleAsset fields
-	String validation
+	String validation = ValidationType.UNKNOWN
 
 	String externalRefId
 
@@ -281,7 +281,7 @@ class AssetEntity {
 		appSme nullable: true
 
 		// MoveBundleAsset fields
-		validation nullable: true, size: 0..20, inList: ValidationType.list
+		validation size: 0..20, inList: ValidationType.list
 		dependencyBundle nullable: true
 		externalRefId nullable: true
 

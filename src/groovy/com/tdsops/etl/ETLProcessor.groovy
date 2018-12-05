@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import com.tdssrc.grails.FilenameUtil
+import com.tdsops.AssetDependencyTypesCache
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -25,8 +25,8 @@ import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
 import static org.codehaus.groovy.syntax.Types.KEYWORD_IN
 import static org.codehaus.groovy.syntax.Types.KEYWORD_INSTANCEOF
-import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -154,6 +154,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	StopWatch stopWatch
 
 	/**
+	 * <p>This cache contains all the valid {@code AssetDependency} types that could be used in an Dependency ETL script</p>.
+	 * When an ETL Script contains a line like this:
+	 * <pre>
+	 *	domain Dependency with assetVar 'Runs On' dependentVar
+	 * </pre>
+	 * It is necessary to validate if 'Runs On' is a valid relation for an {@code AssetDepoendency}
+	 * AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
+	 */
+	AssetDependencyTypesCache assetDependencyTypesCache
+	
+	/**
 	 * List of command that needs to be completed.
 	 */
 	private Stack<ETLStackableCommand> commandStack = []
@@ -228,6 +239,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
+
 		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
@@ -242,9 +254,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *  domain Application
 	 * </pre>
 	 * @param domain a domain String value
-	 * @return the current instance of {@code ETLProcessor} class
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 */
-	ETLProcessor domain (ETLDomain domain) {
+	DomainBuilder domain(ETLDomain domain) {
 		validateStack()
 		if (selectedDomain?.domain == domain) {
 			selectedDomain.addNewRow = true
@@ -254,17 +266,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		cleanUpBindingAndReleaseLookup()
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
-		return this
+
+		assetDependencyTypeCacheLazyLoading()
+		return DomainBuilder.create(selectedDomain.domain, this)
 	}
 
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param element an instance of {@code Element} class
-	 * @return the current instance of {@code ETLProcessor} class
-	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 */
-	ETLProcessor domain(Element element) {
+	DomainBuilder domain(Element element) {
 		return domain(element.value)
 	}
 
@@ -273,10 +286,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
 	 * @param domainName
-	 * @return the current instance of {@code ETLProcessor} class
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain(String domainName) {
+	DomainBuilder domain(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
 		if (domain) {
 			return domain(domain)
@@ -669,7 +682,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		return [
 			with: { value ->
-				Object localVariable = ETLValueHelper.valueOf(value)
+
+				Object localVariable = calculateLocalVariable(value)
+
 				if (iterateIndex) {
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
@@ -1170,12 +1185,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * Adds a loaded element with the current domain in results.
 	 * It also removes CE (currentElement) from script context.
-	 * @param domain
 	 * @param element
 	 */
-	void addElementLoaded (ETLDomain domain, Element element) {
+	void addElementLoaded (Element element) {
 		result.loadElement(element)
-		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
+		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${selectedDomain.domain} results"
 	}
 
 	/**
@@ -1295,6 +1309,45 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	private void bindVariable(String name, Object value) {
 		binding.addDynamicVariable(name, value)
+	}
+
+	/**
+	 * <p>Local variable is calculated using {@code ETLValueHelper#valueOf}</p>
+	 * <p>To build these variables, It is necessary some parameters</p>
+	 * <ul>
+	 *	<li>
+	 *	    value: this parameter is taken from the command configuration.
+	 *	    <pre>
+	 *	        set myVar with 'FooBar'
+	 *	    </pre>
+	 *	</li>
+	 *  <li>
+	 *      labelFieldMap: this parameters contains {@code ETLFieldsValidator#labelFieldMap} Map content.
+	 *	    <pre>
+	 *	        set myVar with DOMAIN
+	 *	    </pre>
+	 *  </li>
+	 * </ul>
+	 * @param value
+	 * @return
+	 */
+	Object calculateLocalVariable(Object value){
+		if (selectedDomain?.domain) {
+			return ETLValueHelper.valueOf(value, fieldsValidator.labelFieldMap[selectedDomain.domain.name()])
+		} else {
+			return ETLValueHelper.valueOf(value)
+		}
+	}
+
+	/**
+	 * Initialize AssetDependency Type cache only when it is necessary.
+	 * It is necessary to populate {@code ETLProcessor#assetDependencyTypesCache}
+	 * when users use 'domain Dependency with ...' command
+	 */
+	private void assetDependencyTypeCacheLazyLoading() {
+		if (selectedDomain.domain == ETLDomain.Dependency && !this.assetDependencyTypesCache) {
+			this.assetDependencyTypesCache = new AssetDependencyTypesCache()
+		}
 	}
 
 	/**
@@ -1509,12 +1562,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @return
 	 */
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object evaluate(String script, ProgressCallback progressCallback = null) {
 		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object execute(String script) {
 		Object result = new GroovyShell(
 				this.class.classLoader,
@@ -1597,7 +1650,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @see TimedInterrupt
 	 */
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
 		setUpProgressIndicator(script, progressCallback)
 

@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.DependencyAnalyzerTabs
 import com.tdsops.tm.enums.domain.AssetClass
@@ -13,12 +14,15 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DependencyConsoleCommand
+import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -32,6 +36,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
@@ -193,89 +199,86 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.BundleEdit)
-	def update() {
-
-		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
-
-		def moveBundle = MoveBundle.get(params.id)
-		if (!moveBundle) {
-			flash.message = "MoveBundle not found with id $params.id"
-			redirect(action: 'edit', id: params.id)
-			return
-		}
+	def update(Long id) {
+		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
+		// implement the way dates are sent to backend
+		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
 
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
 
-		moveBundle.name = params.name
-		moveBundle.description = params.description
-		moveBundle.workflowCode = params.workflowCode
-		moveBundle.useForPlanning = params.useForPlanning==null? false: params.useForPlanning as Boolean
-		if (params.moveEvent.id) {
-			moveBundle.moveEvent = MoveEvent.get(params.moveEvent.id)
-		} else {
-			moveBundle.moveEvent = null
+		Project currentUserProject = controllerService.getProjectForPage(this)
+		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
+		command.useForPlanning = params.getBoolean('useForPlanning', false)
+		if (params?.moveEvent?.id) {
+			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
 		}
-		moveBundle.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
-		def completionTime = params.completionTime
+		command.operationalOrder = params.getInt('operationalOrder', 1)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
 
-		moveBundle.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		if (command.validate()) {
+			try {
+				MoveBundle moveBundle = moveBundleService.update(id, command)
 
-		moveBundle.completionTime = TimeUtil.parseDateTime(completionTime)
-
-		// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
-		// validating that the rooms even exist.
-		moveBundle.sourceRoom = Room.read(params.sourceRoom)
-		moveBundle.targetRoom = Room.read(params.targetRoom)
-
-		if (moveBundle.save()) {
-			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
-			boolean errorInSteps = false
-			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
-				def checkbox = params["checkbox_" + it.id]
-				if (checkbox == 'on') {
-					MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
-					if (step.hasErrors()) {
-						errorInSteps = true
-						return
-					}
-				} else {
-					def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
-					if (moveBundleStep) {
-						moveBundleService.deleteMoveBundleStep(moveBundleStep)
+				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
+				boolean errorInSteps = false
+				stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
+					def checkbox = params["checkbox_" + it.id]
+					if (checkbox == 'on') {
+						MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
+						if (step.hasErrors()) {
+							errorInSteps = true
+							return
+						}
+					} else {
+						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
+						if (moveBundleStep) {
+							moveBundleService.deleteMoveBundleStep(moveBundleStep)
+						}
 					}
 				}
-			}
 
-			if(errorInSteps){
-				flash.message = "Validation error while adding steps."
+				if (errorInSteps) {
+					flash.message = "Validation error while adding steps."
+					redirect(action: "show", id: moveBundle.id)
+					return
+				}
+
+				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
+				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
+
+				flash.message = "MoveBundle $moveBundle updated"
 				redirect(action: "show", id: moveBundle.id)
 				return
-			}
 
-			//def projectManeger = Party.get(projectManagerId)
-			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
-			partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
-			flash.message = "MoveBundle $moveBundle updated"
-			//redirect(action:"show",params:[id:moveBundle.id, projectId:projectId])
-			redirect(action: "show", id: moveBundle.id)
-			return
+			} catch (EmptyResultException e) {
+				flash.message = "MoveBundle not found with id $params.id"
+				redirect(action: 'edit', id: params.id)
+			} catch (DomainUpdateException e) {
+				flash.message = "Error updating MoveBundle with id $params.id"
+			}
+		} else {
+			flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.allErrorsString(command)
 		}
 
+		// in case of error updating move bundle
 		//	get the all Dashboard Steps that are associated to moveBundle.project
-		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
+		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundleService.findById(id))
 		def remainingSteps = allDashboardSteps.remainingSteps
 
-		moveBundle.discard()
-
-		String projectId = securityService.userCurrentProjectId
-
 		render(view: 'edit',
-		       model: [moveBundleInstance: moveBundle, projectId: projectId, projectManager: projectManagerId,
-		               managers: partyRelationshipService.getProjectStaff(projectId),
-		               moveManager: moveManagerId, rooms: Room.findAllByProject(Project.load(projectId)),
-		               dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps: remainingSteps,
-		               workflowCodes: stateEngineService.getWorkflowCode()])
+				model: [moveBundleInstance: command,
+						projectId: currentUserProject.id,
+						projectManager: projectManagerId,
+						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
+						moveManager: moveManagerId,
+						rooms: Room.findAllByProject(currentUserProject),
+						dashboardSteps: allDashboardSteps.dashboardSteps,
+						remainingSteps: remainingSteps,
+						workflowCodes: stateEngineService.getWorkflowCode()
+				])
 	}
 
 	@HasPermission(Permission.BundleCreate)
@@ -287,45 +290,57 @@ class MoveBundleController implements ControllerMethods {
 
 	@HasPermission(Permission.BundleCreate)
 	def save() {
+		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
+		// implement the way dates are sent to backend
+		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
 
-		def startTime = params.startTime
-		def completionTime = params.completionTime
-		if (startTime){
-			params.startTime = TimeUtil.parseDateTime(startTime)
+		def projectManagerId = params.projectManager
+		def moveManagerId = params.moveManager
+
+		Project currentUserProject = controllerService.getProjectForPage(this)
+		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
+		command.useForPlanning = params.getBoolean('useForPlanning', false)
+		if (params?.moveEvent?.id) {
+			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
 		}
-		if (completionTime){
-			params.completionTime = TimeUtil.parseDateTime(completionTime)
-		}
+		command.operationalOrder = params.getInt('operationalOrder', 1)
+		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
+		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
 
-		params.sourceRoom = Room.read(params.sourceRoom)
-		params.targetRoom = Room.read(params.targetRoom)
+		if (command.validate()) {
+			try {
+				MoveBundle moveBundle = moveBundleService.save(command)
 
-		MoveBundle moveBundle = new MoveBundle(params)
-		Project project = securityService.userCurrentProject
-		def projectManager = params.projectManager
-		def moveManager = params.moveManager
+				if (projectManagerId) {
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+							Party.load(projectManager), "PROJ_MGR")
+				}
+				if (moveManagerId) {
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+							Party.load(moveManager), "MOVE_MGR")
+				}
 
-		moveBundle.useForPlanning = params.useForPlanning == 'true'
+				flash.message = "MoveBundle $moveBundle created"
+				redirect(action: "show", params: [id: moveBundle.id])
+				return
 
-		if (!moveBundle.hasErrors() && moveBundle.save()) {
-			if (projectManager){
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(projectManager), "PROJ_MGR")
+			} catch (ServiceException e) {
+				flash.message = e.message
 			}
-			if (moveManager) {
-				partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-						Party.load(moveManager), "MOVE_MGR")
-			}
-
-			flash.message = "MoveBundle $moveBundle created"
-			redirect(action: "show", params: [id: moveBundle.id])
-			return
+		} else {
+			flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.allErrorsString(command)
 		}
 
+		// in case of error saving new move bundle
 		render(view: 'create',
-		       model: [moveBundleInstance: moveBundle, moveManager: moveManager, projectManager: projectManager,
-		               managers: partyRelationshipService.getProjectStaff(project.id), rooms: Room.findAllByProject(project),
-		               workflowCodes: stateEngineService.getWorkflowCode()])
+				model: [moveBundleInstance: command,
+						moveManager: moveManagerId,
+						projectManager: projectManagerId,
+						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
+						rooms: Room.findAllByProject(currentUserProject),
+						workflowCodes: stateEngineService.getWorkflowCode()
+				])
 	}
 
 	/**
@@ -663,14 +678,14 @@ class MoveBundleController implements ControllerMethods {
 			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
 		}
 
-/*
+		/*
 		// TODO - this is unnecessary and could just load the map
 
 		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
 		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
 		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
-*/
+		*/
 
 		// ------------------------------------
 		// Calculate the Plan Status values
@@ -685,7 +700,7 @@ class MoveBundleController implements ControllerMethods {
 
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
-			(total > 0 ? Math.round(count/total*100)  : 0)
+			(total > 0 ? ((count/total*100)as double).trunc(2).intValue() : 0)
 		}
 
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
@@ -704,9 +719,6 @@ class MoveBundleController implements ControllerMethods {
 			countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.storageTypes])[0] : 0
 
 		percentagePhyStorageCount = percOfCount(percentagePhyStorageCount, phyStorageCount)
-
-		int percentageFilesCount = moveBundleList ? Files.executeQuery(filesCountQuery + planStatusMovedQuery, countArgs)[0] : 0
-		percentageFilesCount = percOfCount(percentageFilesCount, fileCount)
 
 		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.allServerTypes])[0] : 0
@@ -773,12 +785,10 @@ class MoveBundleController implements ControllerMethods {
 		def filesValidateCountQuery = filesCountQuery + validationQuery
 
 		// This section could be consolidated to a simple query instead of a bunch
-		def dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'])[0]
-		def validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
-		def dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
-		def bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
+		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.UNKNOWN])[0]
+		def planReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.PLAN_READY])[0]
 
-		countArgs.validation = 'Discovery'
+		countArgs.validation = ValidationType.UNKNOWN
 		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
 		def dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
 		def fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]
@@ -790,11 +800,12 @@ class MoveBundleController implements ControllerMethods {
 		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes])[0]
 
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
-		def percentageBundleReady = applicationCount ? percOfCount(bundleReady, applicationCount) : 0
+		def percentagePlanReady = applicationCount ? percOfCount(planReady, applicationCount) : 0
 		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100
 		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
 		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
-		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
+		def percentageStorToValidate=phyStorageCount ? percOfCount(phyStorageToValidate, phyStorageCount) :100
+		int percentageFilesCount = percOfCount(fileToValidate, fileCount)
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 
@@ -804,7 +815,7 @@ class MoveBundleController implements ControllerMethods {
 				COUNT(ae) AS all,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END) AS allMoved
 			FROM AssetEntity ae
-			WHERE ae.project=:project 
+			WHERE ae.project=:project
 			AND ae.assetClass = :deviceAssetClass
 			AND ae.assetType IN (:allServers)
 			AND ae.moveBundle IN (:moveBundles)
@@ -830,85 +841,95 @@ class MoveBundleController implements ControllerMethods {
 		}
 
 		return [
-			appList:appList,
-			applicationCount:applicationCount,
-			unassignedAppCount:unassignedAppCount,
-			assignedAppPerc: assignedAppPerc,
-			confirmedAppPerc: confirmedAppPerc,
-			movedAppPerc: movedAppPerc,
-			movedServersPerc: serversCompletedPercentage,
-			appToValidate:appToValidate,
-			unassignedServerCount: unassignedServerCount,
-			unassignedPhysicalServerCount:unassignedPhysicalServerCount,
-			percentagePhysicalServerCount:percentagePhysicalServerCount,
-			psToValidate:psToValidate,
-			unassignedVirtualServerCount:unassignedVirtualServerCount,
-			percVirtualServerCount:percVirtualServerCount,
-			vsToValidate:vsToValidate,
-			dbList:dbList, dbCount:databaseCount,
-			unassignedDbCount:unassignedDbCount,
-			percentageDBCount:percentageDBCount,
-			dbToValidate:dbToValidate,
+			appList                       : appList,
+			applicationCount              : applicationCount,
+			unassignedAppCount            : unassignedAppCount,
+			assignedAppPerc               : assignedAppPerc,
+			confirmedAppPerc              : confirmedAppPerc,
+			movedAppPerc                  : movedAppPerc,
+			movedServersPerc              : serversCompletedPercentage,
+			appToValidate                 : appToValidate,
+			unassignedServerCount         : unassignedServerCount,
+			unassignedPhysicalServerCount : unassignedPhysicalServerCount,
+			percentagePhysicalServerCount : percentagePhysicalServerCount,
+			psToValidate                  : psToValidate,
+			unassignedVirtualServerCount  : unassignedVirtualServerCount,
+			percVirtualServerCount        : percVirtualServerCount,
+			vsToValidate                  : vsToValidate,
+			dbList                        : dbList,
+			dbCount                       : databaseCount,
+			unassignedDbCount             : unassignedDbCount,
+			percentageDBCount             : percentageDBCount,
+			dbToValidate                  : dbToValidate,
 			// Files (aka Storage)
-			filesList:filesList, fileCount:fileCount,
-			unassignedFilesCount:unassignedFilesCount,
-			percentageFilesCount:percentageFilesCount,
-			fileToValidate:fileToValidate,
-			unAssignedPhyStorageCount:unAssignedPhyStorageCount,
-			phyStorageCount:phyStorageCount,
-			phyStorageList:phyStorageList,
-			phyStorageToValidate:phyStorageToValidate,
-			percentagePhyStorageCount:percentagePhyStorageCount,
+			filesList                     : filesList,
+			fileCount                     : fileCount,
+			unassignedFilesCount          : unassignedFilesCount,
+			percentageFilesCount          : percentageFilesCount,
+			fileToValidate                : fileToValidate,
+			unAssignedPhyStorageCount     : unAssignedPhyStorageCount,
+			phyStorageCount               : phyStorageCount,
+			phyStorageList                : phyStorageList,
+			phyStorageToValidate          : phyStorageToValidate,
+			percentagePhyStorageCount     : percentagePhyStorageCount,
 			// Other
-			otherTypeList:otherTypeList,
-			otherAssetCount:otherAssetCount,
-			unassignedOtherCount:unassignedOtherCount,
-			percentageOtherCount:percentageOtherCount,
-			otherToValidate:otherToValidate,
+			otherTypeList                 : otherTypeList,
+			otherAssetCount               : otherAssetCount,
+			unassignedOtherCount          : unassignedOtherCount,
+			percentageOtherCount          : percentageOtherCount,
+			otherToValidate               : otherToValidate,
 
 			// assetList:assetList, assetCount:assetCount,
-			totalServerCount: totalServerCount,
-			allServerList: allServerList,
-			phyServerCount:totalPhysicalServerCount,
-			phyServerList: phyServerList,
-			virtServerCount:totalVirtualServerCount,
-			virtServerList: virtServerList,
+			totalServerCount              : totalServerCount,
+			allServerList                 : allServerList,
+			phyServerCount                : totalPhysicalServerCount,
+			phyServerList                 : phyServerList,
+			virtServerCount               : totalVirtualServerCount,
+			virtServerList                : virtServerList,
 
-			unassignedAssetCount:unassignedAssetCount,
+			unassignedAssetCount          : unassignedAssetCount,
 /*
 			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount,
 			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount,
 			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount,
 */
-			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
-			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount,
+			appDependenciesCount          : appDependenciesCount,
+			pendingAppDependenciesCount   : pendingAppDependenciesCount,
+			serverDependenciesCount       : serverDependenciesCount,
+			pendingServerDependenciesCount: pendingServerDependenciesCount,
 
-			project:project,
-			moveEventList:moveEventList,
-			moveBundleList:moveBundleList,
-			dependencyConsoleList:dependencyConsoleList,
-			dependencyBundleCount:dependencyBundleCount,
-			planningDashboard:'planningDashboard',
-			eventStartDate:eventStartDate,
-			date:time,
+			project                       : project,
+			moveEventList                 : moveEventList,
+			moveBundleList                : moveBundleList,
+			dependencyConsoleList         : dependencyConsoleList,
+			dependencyBundleCount         : dependencyBundleCount,
+			planningDashboard             : 'planningDashboard',
+			eventStartDate                : eventStartDate,
+			date                          : time,
 
-			issuesCount:issues.size(),
-			openIssue:openIssue, dueOpenIssue:dueOpenIssue,
-			openTasks:openTasks, generalOverDue:generalOverDue,
+			issuesCount                   : issues.size(),
+			openIssue                     : openIssue,
+			dueOpenIssue                  : dueOpenIssue,
+			openTasks                     : openTasks,
+			generalOverDue                : generalOverDue,
 
-			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
-			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount,
-			percAppDoneCount:percAppDoneCount, percentageAppToValidate:percentageAppToValidate,
-			percentageBundleReady:percentageBundleReady,
+			validated                     : applicationCount - unknown,
+			planReady                     : planReady,
+			movedAppCount                 : movedAppCount,
+			assignedAppCount              : assignedAppCount,
+			confirmedAppCount             : confirmedAppCount,
+			percAppDoneCount              : percAppDoneCount,
+			percentageAppToValidate       : percentageAppToValidate,
+			percentagePlanReady           : percentagePlanReady,
 
-			percentagePSToValidate:percentagePSToValidate,
-			percentageVMToValidate:percentageVMToValidate,
-			percentageDBToValidate:percentageDBToValidate,
-			percentageStorToValidate:percentageStorToValidate,
-			percentageOtherToValidate:percentageOtherToValidate,
-			percentageUnassignedAppCount:percentageUnassignedAppCount,
+			percentagePSToValidate        : percentagePSToValidate,
+			percentageVMToValidate        : percentageVMToValidate,
+			percentageDBToValidate        : percentageDBToValidate,
+			percentageStorToValidate      : percentageStorToValidate,
+			percentageOtherToValidate     : percentageOtherToValidate,
+			percentageUnassignedAppCount  : percentageUnassignedAppCount,
 
-			groupPlanMethodologyCount: groupPlanMethodologyCount
+			groupPlanMethodologyCount     : groupPlanMethodologyCount
 		]
 	}
 

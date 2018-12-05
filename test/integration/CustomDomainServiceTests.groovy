@@ -1,13 +1,16 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.BooleanUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
@@ -143,6 +146,7 @@ class CustomDomainServiceTests extends Specification {
     void 'Scenario 6: Test fieldNamesAsMap for expected values'() {
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
 
@@ -161,6 +165,7 @@ class CustomDomainServiceTests extends Specification {
     void 'Scenario 7: Test distinctValues returns expected values'() {
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
         and: 'the project has assets with existing data values'
@@ -188,6 +193,7 @@ class CustomDomainServiceTests extends Specification {
 
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
         and: 'the project has assets with existing data values'
@@ -230,7 +236,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProject()
             String domain = AssetClass.APPLICATION.toString()
         when: 'retrieving the fields to be exported and all available fields for the project'
-            Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             Map allFields = customDomainService.allFieldSpecs(project, domain)
             Map assetClassField = allFields[domain].fields.find {it.field == 'assetClass'}
             Map custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
@@ -255,11 +261,15 @@ class CustomDomainServiceTests extends Specification {
                 (fieldSpecJson.fields.find{it.field == 'custom1'}).show = 0
             }
             customDomainTestHelper.updateFieldSpec(project, domain, updateClosure)
-            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
         then: 'the custom field is present in the fields to be exported even though is not marked as displayed'
             custom1Field != null
-
+        when: 'using the template headers to ask for a field that would not be included otherwise'
+            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, ['Asset Class'])
+            Map assetClassFieldMap = exportFields[domain].fields.find {it.field == 'assetClass'}
+        then: 'the assetClass field is included in the result'
+            assetClassField != null
     }
 
 }

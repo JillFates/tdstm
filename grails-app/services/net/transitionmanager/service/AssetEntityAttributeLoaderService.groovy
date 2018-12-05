@@ -7,6 +7,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -34,6 +35,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	MoveBundleService moveBundleService
+	AssetOptionsService assetOptionsService
 
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'
 	private static final String UNKNOWN_MFG_MODEL = 'Unknown'
@@ -280,7 +282,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  NumberUtil.toInteger(createUsize), userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
-					AssetOptions.findOrSaveWhere(type: AssetOptions.AssetOptionsType.ASSET_TYPE, value: createDeviceType)
+					assetOptionsService.findOrCreate(AssetOptions.AssetOptionsType.ASSET_TYPE, createDeviceType)
 					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
 				} catch (e) {
 					errorMsg = e.message
@@ -996,7 +998,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				}
 				break
 			case "validation":
-				setValueOrDefault(asset, property, value, 'Discovery')
+				setValueOrDefault(asset, property, value, ValidationType.UNKNOWN)
 				break
 			case 'version':
 			case 'modifiedBy':

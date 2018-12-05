@@ -16,8 +16,15 @@ export interface IncrementDateArgument {
 
 export class DateUtils {
 
+	// As managed by the server, due the difference on the Lowercase and Upercase
+	public static readonly PREFERENCE_MIDDLE_ENDIAN = 'MM/DD/YYYY';
+	public static readonly PREFERENCE_LITTLE_ENDIAN = 'DD/MM/YYYY';
+
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
+	public static readonly TDS_OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
+	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'YYYY-MM-DDT' + DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT;
+	public static readonly TDS_OUTPUT_DATE_FORMAT = 'yyyy-MM-dd';
 
 	/**
 	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
@@ -34,10 +41,20 @@ export class DateUtils {
 	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
 	 */
 	public static formatUserDateTime(userTimeZone: string, iso8601Value: string) {
-		if (iso8601Value === undefined) {
+		if (iso8601Value === undefined || !iso8601Value) {
 			return '';
 		}
-		return moment.tz(iso8601Value, userTimeZone).format('YYYY-MM-DD HH:mm:ss');
+		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.TDS_OUTPUT_PIPE_TIME_FORMAT}`);
+	}
+
+	/**
+	 * Converts and Formats a Date into GMT time with an output result format.
+	 */
+	public static convertAndFormatDateToGMT(date: Date, format: string) {
+		if (!date || date === undefined || date === null) {
+			return null;
+		}
+		return moment.tz(date, 'GMT').format(format);
 	}
 
 	/**
@@ -303,6 +320,16 @@ export class DateUtils {
 	public static formatDate(date: any, format: string): string {
 		return moment(date)
 			.format(format);
+	}
+
+	/**
+	 * Converts a string source value to a Date object, following a format pattern.
+	 * @param {string} value
+	 * @param {string} format
+	 * @returns {Date}
+	 */
+	public static toDate(value: string): Date {
+		return moment(value).toDate()
 	}
 
 }

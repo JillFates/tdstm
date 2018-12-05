@@ -25,10 +25,15 @@ class UserListPage extends Page{
 
         gridRows {$("#userLoginIdGrid").find("role":"row")}
         gridSize {gridRows.size()}
+        lockedIconFirstRow {$("tr", class:"ui-widget-content jqgrow ui-row-ltr")[0].find("img",src:"/tdstm/static/icons/lock_delete.png")}
     }
 
     def rowsDisplayed(){
         gridRows.displayed
+    }
+
+    def lockedIconDisplayed(){
+        lockedIconFirstRow.displayed
     }
 
     def filterByUsername(username){

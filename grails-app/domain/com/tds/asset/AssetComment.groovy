@@ -128,13 +128,13 @@ class AssetComment {
 		commentKey nullable: true
 		commentType blank: false, size: 0..11, inList: ['issue', 'instruction', 'comment']
 		constraintTime nullable: true
-		constraintType nullable: true, size: 0..4
+		constraintType nullable: true
 		createdBy nullable: true
 		dateCreated nullable: true
 		dateResolved nullable: true
 		displayOption blank: false, size: 0..1, inList: ['G', 'U']  // Generic or User
 		dueDate nullable: true
-		durationScale size: 0..1, inList: TimeScale.keys     // TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
+		durationScale inList: TimeScale.keys     // TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
 		estFinish nullable: true
 		estStart nullable: true
 		hardAssigned nullable: true

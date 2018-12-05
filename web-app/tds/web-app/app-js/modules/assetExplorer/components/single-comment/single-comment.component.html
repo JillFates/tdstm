@@ -1,4 +1,4 @@
-<div class="single-comment-component modal fade in" id="single-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
+<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="single-comment-component modal fade in" id="single-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
 		<div class="modal-content resizable" [style.width.px]="500">
 			<div class="modal-header">
@@ -30,7 +30,7 @@
 											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.category}}</label>
+											<label class="control-label label-detail">{{singleCommentModel.category}}</label>
 										</div>
 									</div>
 								</div>

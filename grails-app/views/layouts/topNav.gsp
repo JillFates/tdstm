@@ -148,7 +148,7 @@
                                         <ul class="list-group">
                                             <tds:hasPermission permission="${Permission.PersonView}">
                                                 <li class="list-group-item">
-                                                    <g:remoteLink controller="person" action="retrievePersonDetails" id="${person?.id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink>
+                                                    <a href="#" style="cursor: pointer;" id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a>
                                                 </li>
                                             </tds:hasPermission>
                                             <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>

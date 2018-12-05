@@ -715,7 +715,27 @@
                 "constraints": {
                     "required": 0
                 }
-            }
+            },
+            {
+                "bulkChangeActions" : [ "replace", "clear" ],
+                "constraints" : {
+                  "allowNegative" : false,
+                  "format" : "0",
+                  "maxRange" : 1000,
+                  "minRange" : 0,
+                  "precision" : 0,
+                  "required" : 0,
+                  "separator" : false
+                },
+                "control" : "Number",
+                "field" : "custom8",
+                "imp" : "N",
+                "label" : "Number test",
+                "order" : 124,
+                "shared" : null,
+                "show" : 1,
+                "udf" : 1
+              }
         ]
     },
     "DEVICE": {

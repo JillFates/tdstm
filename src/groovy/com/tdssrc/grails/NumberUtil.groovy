@@ -42,14 +42,27 @@ class NumberUtil {
 	static Long toLong(value, Long defVal = null) {
 		if (value instanceof Long) {
 			value
-		}
-		else if (value instanceof Integer) {
+		} else if (value instanceof Integer) {
 			value.longValue()
-		}
-		else if (value instanceof CharSequence) {
+		} else if (value instanceof CharSequence) {
 			value.isLong() ? value.toLong() : defVal
+		} else {
+			defVal
 		}
-		else {
+	}
+
+	/**
+	 * Convert various types into a BigDecimal value
+	 * @param value - the value to be converted to a BigDecimal
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the BigDecimal value if valid else null
+	 */
+	static BigDecimal toBigDecimal(value, BigDecimal defVal = null) {
+		if (value instanceof BigDecimal) {
+			value
+		} else if (value instanceof CharSequence && value.isBigDecimal()) {
+			value.toBigDecimal()
+		} else {
 			defVal
 		}
 	}

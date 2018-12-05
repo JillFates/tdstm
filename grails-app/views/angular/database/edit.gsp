@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
 	 class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
@@ -13,7 +13,10 @@
 	</div>
 	<div class="modal-body">
 		<div>
-			<form name="databaseEditForm">
+			<form name="form" (ngSubmit)="form.form.valid && onUpdate()"
+				  class="asset-entry-form"
+				  [ngClass]="{'form-submitted': form && form.submitted}"
+				  role="form" #form="ngForm" novalidate>
 				<table style="border: 0">
 					<tr>
 						<td colspan="2" class="dialog-container">
@@ -33,11 +36,12 @@
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" tabindex="13" ngmodel="model.asset.dbFormat"/>
 
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType" tabindex="17" />
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset?.environment}"/>
 											<td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
 												<kendo-dropdownlist
+														[tabIndex]="21"
 														class="tm-input-control"
 														name="modelAssetEnvironment"
 														[(ngModel)]="model.asset.environment"
@@ -47,7 +51,9 @@
 											</td>
 										</tr>
 										<tr>
-											<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+											<td class="label ${standardFieldSpecs.size.imp?:''}"
+												[ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="size" /> }"
+												nowrap="nowrap">
 												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
 													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 												</label>
@@ -55,10 +61,11 @@
 											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
 												<kendo-dropdownlist
+														[tabIndex]="15"
 														class="tm-input-control"
 														name="modelAssetScaleName"
 														[data]="${SizeScale.getAsJsonList() as JSON}"
-														[(ngModel)]="model.asset.scale.name"
+														[(ngModel)]="model.asset.scale"
 														[defaultItem]="''"
 														[textField]="'text'"
 														[valueField]="'value'">
@@ -67,17 +74,17 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-												<kendo-datepicker
-														class="tm-input-control"
-														name="modelAssetRetireDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+                                                <tds-datetime-control [tabIndex]="18"
+                                                                      class="tm-input-control"
+                                                                      name="modelAssetRetireDate"
+                                                                      [(value)]="model.asset.retireDate">
+                                                </tds-datetime-control>
 											</td>
 
-											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.dependencyBundle?.value}"/>
 											<td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
 												<kendo-dropdownlist
+														[tabIndex]="22"
 														class="tm-input-control"
 														name="modelAssetMoveBundle"
 														[data]="model.moveBundleList"
@@ -90,22 +97,22 @@
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset?.rateOfChange}"/>
 											<td>
-												<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="17" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
+												<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="16" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-												<kendo-datepicker
-														class="tm-input-control"
-														name="modelAssetMainExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker> <!--  -->
+                                                <tds-datetime-control [tabIndex]="19"
+                                                                      class="tm-input-control"
+                                                                      name="modelAssetMainExpDate"
+                                                                      [(value)]="model.asset.maintExpDate">
+                                                </tds-datetime-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
 											<td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
 												<kendo-dropdownlist
+														[tabIndex]="23"
 														class="tm-input-control"
 														name="modelAssetPlanStatus"
 														[data]="model.planStatusOptions"
@@ -117,11 +124,12 @@
 											<td></td>
 											<td></td>
 
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="22"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="20"/>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
 											<td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
 												<kendo-dropdownlist
+														[tabIndex]="24"
 														class="tm-input-control"
 														name="modelAssetValidation"
 														[data]="${asset.constraints.validation.inList as JSON}"
@@ -150,10 +158,10 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left component-action-update" tabindex="501" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger component-action-delete" tabindex="502" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+		<button class="btn btn-default pull-right component-action-cancel" tabindex="503" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </div>
