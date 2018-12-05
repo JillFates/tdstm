@@ -41,9 +41,6 @@ export class DependenciesService {
 			return acc;
 		}, payload);
 
-		console.log('Payload');
-		console.log(payload);
-
 		return this.http.post(endpoint, JSON.stringify(payload))
 			.pipe(
 				map((response: any) => {

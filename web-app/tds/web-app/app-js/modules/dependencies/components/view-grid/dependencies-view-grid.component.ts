@@ -6,13 +6,11 @@ import {
 	OnDestroy,
 	ViewChild,
 } from '@angular/core';
-
 import {
 	BehaviorSubject,
 	Observable,
 	Subject
 } from 'rxjs';
-
 import {
 	map,
 	mergeMap,
@@ -20,7 +18,6 @@ import {
 	takeUntil,
 	withLatestFrom,
 } from 'rxjs/operators';
-
 import {
 	clone,
 	compose,
@@ -34,12 +31,7 @@ import {
 	GridDataResult,
 	DataStateChangeEvent
 } from '@progress/kendo-angular-grid';
-
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {
 	DependenciesService,
 	DependenciesRequestParams
@@ -89,10 +81,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	constructor(
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
-		private dialogService: UIDialogService,
-		private permissionService: PermissionService,
 		private notifier: NotifierService,
-		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService) {
 	}
@@ -149,6 +138,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				this.updateGridState(state.gridState);
 				// Notify changes on the state to third components
 				this.notifyChangedState(state.gridData.data)
+				// notify to angular a change in the state to update the view
+				this.changeDetectorRef.detectChanges();
 			}, this.logError('setupComponentStateObservable'))
 	}
 
@@ -186,7 +177,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 					this.mergeTagsFilterIntoGridState(tagsState, componentState))
 			)
 			.subscribe((componentState: ComponentState) => {
-				// notify changes on the state
 				this.changeState(componentState);
 			}, this.logError('setupTagsFilterStateObservable'));
 	}
