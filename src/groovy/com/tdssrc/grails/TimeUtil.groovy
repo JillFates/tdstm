@@ -515,7 +515,7 @@ class TimeUtil {
 		Date date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
 		if (!date) {
 			// the date format is incorrect
-			sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601_2)
+			sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601)
 			date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
 		}
 		return date
