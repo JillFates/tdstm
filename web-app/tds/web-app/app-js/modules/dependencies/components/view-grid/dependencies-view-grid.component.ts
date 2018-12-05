@@ -138,7 +138,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				this.updateGridState(state.gridState);
 				// Notify changes on the state to third components
 				this.notifyChangedState(state.gridData.data)
-				// notify to angular a change in the state to update the view
+				// notify to angular a change in the component state to update the view
 				this.changeDetectorRef.detectChanges();
 			}, this.logError('setupComponentStateObservable'))
 	}
