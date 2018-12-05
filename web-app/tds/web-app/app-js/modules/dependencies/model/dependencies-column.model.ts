@@ -25,15 +25,15 @@ export class DependenciesColumnModel {
 			},
 			{
 				label: 'Tags Asset',
-				property: 'tagsAsset',
-				type: 'text',
+				property: 'tag_asset',
+				type: 'tags',
 				width: 220,
 				locked: false
 			},
 			{
 				label: 'Tags Dependency',
-				property: 'tagsDependency',
-				type: 'text',
+				property: 'tag_dependent',
+				type: 'tags',
 				width: 220,
 				locked: false
 			},

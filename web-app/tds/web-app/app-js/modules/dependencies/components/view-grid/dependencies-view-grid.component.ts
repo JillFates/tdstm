@@ -59,13 +59,14 @@ import {
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 declare var jQuery: any;
 
 interface ComponentState {
-	tagList: any[];
-	gridState: GridState;
-	gridData: GridDataResult;
+	tagList?: any[];
+	gridState?: GridState;
+	gridData?: GridDataResult;
 }
 
 @Component({
@@ -76,15 +77,15 @@ interface ComponentState {
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
-	private destroySubject: Subject<any> = new Subject<any>();
-	private tagsStateSubject: Subject<TagState> = new Subject<TagState>();
-	protected readonly dependenciesColumnModel: DependenciesColumnModel = new DependenciesColumnModel();
+	protected dependenciesColumnModel: DependenciesColumnModel;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	protected readonly GRID_PAGE_SIZES = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
-	protected readonly tagsFieldNames = ['tagsAsset', 'tagsDependency'];
+	protected tagsFieldNames = [];
+	private destroySubject: Subject<any>;
+	private tagsStateSubject: Subject<TagState>;
 	protected state: ComponentState;
-	private componentState: BehaviorSubject<any>;
+	private componentState: BehaviorSubject<ComponentState>;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -95,15 +96,20 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService) {
-		// set the initial component state
-		this.state = this.getInitialComponentState();
 	}
 
-	/**
-	 * Setup the state observables
-	 */
 	ngOnInit() {
+		// set the initial component state
+		this.state = this.getInitialComponentState();
+
+		this.destroySubject = new Subject<any>();
+		this.componentState = new BehaviorSubject<any>(this.state);
+		this.tagsStateSubject = new Subject<TagState>();
+
+		this.setupGridColumns();
 		this.setupBulkCheckboxService();
+
+		// Setup state observables
 		this.setupComponentStateObservable();
 		this.setupTagsFilterStateObservable();
 	}
@@ -127,25 +133,22 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Define the chain of operations that are executed every time the component state has suffered changes
 	 */
 	private setupComponentStateObservable(): void {
-		const initialState = this.getInitialComponentState();
-		const getData = this.getDataFromEndpoint();
-		this.componentState = new BehaviorSubject<any>(initialState);
-
 		this.componentState
 			.pipe(
 				// take events until destroy subject emits
 				takeUntil(this.destroySubject),
 				// accumulate the partial state change into the component state
-				scan((accumulator, current) => ({...accumulator, ...current}), initialState),
+				scan((accumulator, current) => ({...accumulator, ...current}), {}),
 				// query the endpoint
-				mergeMap((state: ComponentState) => getData(state)
+				mergeMap((state: ComponentState) => this.getDataFromEndpoint()(state)
 					.pipe(map((results: DependencyResults) => ({...state, gridData: results}) )))
 			)
 			.subscribe((state: ComponentState) => {
-				// with the results update the state
+				// with the results update the component state
 				this.state = state;
-				// Notify changes on the state
+				// update grid state
 				this.updateGridState(state.gridState);
+				// Notify changes on the state to third components
 				this.notifyChangedState(state.gridData.data)
 			}, this.logError('setupComponentStateObservable'))
 	}
@@ -158,7 +161,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Notify to the external components that we have changes in the state
+	 * Notify to the external components that we have changes in place
 	 */
 	private notifyChangedState(dependencies: any[]): void {
 		// reset the state of the bulk items
@@ -182,7 +185,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Define the chain of operations that are executed every time some tags filter has changed
+	 * Define the chain of operations that are executed whenever some tag filter has changed
+	 * We handle tags filtering outside Kendo default filtering
 	 */
 	private setupTagsFilterStateObservable(): void {
 		this.tagsStateSubject
@@ -191,7 +195,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 				takeUntil(this.destroySubject),
 				// with the latest state
 				withLatestFrom(this.componentState),
-				// merge the tags filters into the filters property
+				// merge the tags filters into the kendo grid filters property
 				map(([tagsState, componentState]) =>
 					this.mergeTagsFilterIntoGridState(tagsState, componentState))
 			)
@@ -349,6 +353,19 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Log an error to the console along with the function name called
 	 */
 	private logError(functionName: string): any {
-		return (error) => console.log(`Error, function:${functionName} message:${error.message || error}`)
+		return (error) => console.error(`Error, function:${functionName} message:${error.message || error}`)
+	}
+
+	/**
+	 * From columns model set up the grid columns
+	 * Gets the names of the tags fields
+	 */
+	private setupGridColumns(): void {
+		this.dependenciesColumnModel = new DependenciesColumnModel();
+
+		this.tagsFieldNames = this.dependenciesColumnModel.columns
+			.reduce((accumulator: string[], current: GridColumnModel) => {
+				return current.type === 'tags' ? [...accumulator, current.property]  : accumulator;
+			}, []);
 	}
 }
