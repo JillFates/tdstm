@@ -434,6 +434,21 @@ class UrlMappings {
 			action = [ GET: "modelForPreferenceManager" ]
 		}
 
+        "/ws/user/mapAreas" {
+            controller = "wsUser"
+            action = [GET: "getMapAreas"]
+        }
+
+		"/ws/user/timezones" {
+			controller = "wsUser"
+			action = [GET: "getTimezones"]
+		}
+
+		"/ws/user/saveDateAndTimePreferences" {
+			controller = "wsUser"
+			action = [POST:"saveDateAndTimePreferences"]
+		}
+
 		"/ws/user/resetPreferences" {
 			controller = "wsUser"
 			action = [ DELETE: "resetPreferences" ]
@@ -452,9 +467,19 @@ class UrlMappings {
 						DELETE: "removePreference"]
 		}
 
+		"/ws/user/startPageOptions" {
+			controller = "wsUser"
+			action = [GET:"getStartPageOptions"]
+		}
+
 		"/ws/user/person" {
 			controller = "wsUser"
 			action = [GET:"getPerson"]
+		}
+
+		"/ws/user/updateAccount" {
+			controller = "wsUser"
+			action = [POST:"updateAccount"]
 		}
 
 		"/ws/progress" {

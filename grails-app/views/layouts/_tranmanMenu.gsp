@@ -323,7 +323,7 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                <li class="menu-child-item">
+                                <li class="menu-child-item menu-planning-pre-checklist">
                                     <g:link controller="reports" action="preMoveCheckList">Pre-event Checklist</g:link>
                                 </li>
                             </tds:hasPermission>
@@ -463,20 +463,6 @@
                                 <li class="menu-child-item menu-reports-activity-metrics">
                                     <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
                                 </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                <li class="divider"></li>
-                                <li class="menu-parent-item">Event Prep</li>
-                                <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                    <li class="menu-child-item menu-reports-pre-checklist">
-                                        <a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a>
-                                    </li>
-                                </tds:hasPermission>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">
                                 <li class="divider"></li>

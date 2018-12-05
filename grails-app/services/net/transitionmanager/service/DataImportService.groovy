@@ -1188,7 +1188,7 @@ class DataImportService implements ServiceMethods {
 						try {
 							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
 							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_ISO8601, valueToSet, TimeUtil.FORMAT_DATE_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
 								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {

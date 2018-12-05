@@ -206,47 +206,6 @@ function openActionDiv( id ){
 	$("#actionDiv").show()
 	
 }
-function submitAction(form, cableId){
-	var actionId = $("#actionTypeId").val()
-	var isValid = true
-	if(actionId == "assignId"){
-		
-		if($("#connectType_"+cableId).val() != 'Power'){
-
-			var assetFrom = $("#assetFromId_"+cableId).val()
-			var modelConnectorId = $("#modelConnectorId_"+cableId).val()
-			if($("#status_"+cableId).val() == 'Cabled' || $("#status_"+cableId).val() == 'Empty'){
-				if( assetFrom!='null' && modelConnectorId=='null' ){
-					isValid = false
-					alert("Please enter the target connector details")
-				} 
-			}
-		} 
-	}
-	var actionType=''
-	switch($("#status_"+cableId).val()){
-		case "Cabled" : actionType = 'assignId' ; break;
-		case "Empty" : actionType = 'assignId' ; break;
-	}
-	if(isValid){
-		jQuery.ajax({
-			url:contextPath+'/rackLayouts/updateCablingDetails',
-			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':actionType,
-				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
-				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
-				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val()},
-			type:'POST',
-			success: function(data) {
-				openCablingDiv( data.assetId )
-			}
-		});
-		//${remoteFunction(action:'updateCablingDetails', params:'\'assetCableId=\' + cabledId+\'&status=\'+status' )};
-		
-		$("#assignFieldDiv").hide()
-		$("#actionButtonsDiv").hide()
-		$("#actionDiv").hide()
-	}
-}
 function cancelAction(){
 	var color = $("#previousColor").val()
 	var connectorId = $("#cabledTypeId").val()

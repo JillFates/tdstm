@@ -1,20 +1,13 @@
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
@@ -24,7 +17,6 @@ import com.tdsops.common.security.spring.HasPermission
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-@GrailsCompileStatic
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
@@ -60,7 +52,7 @@ class WsUserController implements ControllerMethods {
 
         Map model = [
             fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
-            person: [firstName: person.firstName],
+            person: person,
             preferences: userPreferenceService.preferenceListForEdit(userLogin)
         ]
     	renderSuccessJson(model)
@@ -74,11 +66,21 @@ class WsUserController implements ControllerMethods {
         renderSuccessJson()
     }
 
+    @HasPermission(Permission.UserGeneralAccess)
+    def getStartPageOptions() {
+        def pageList = [STARTPAGE.PROJECT_SETTINGS.value,
+            STARTPAGE.PLANNING_DASHBOARD.value,
+            STARTPAGE.ADMIN_PORTAL.value,
+            STARTPAGE.USER_DASHBOARD.value]
+
+        renderSuccessJson(pages: pageList)
+    }
+
 	/**
-	 * Sets a user preference through an AJAX call
-	 * @param code - the preference code for the preference that is being set
-	 * @param value - the value to set the preference to
-	 */
+	* Sets a user preference through an AJAX call
+	* @param code - the preference code for the preference that is being set
+	* @param value - the value to set the preference to
+	*/
 	@HasPermission(Permission.UserGeneralAccess)
 	def savePreference() {
 		userPreferenceService.setPreference(params.code?.toString() ?: '', params.value ?: '')
@@ -92,6 +94,16 @@ class WsUserController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
+	def getMapAreas() {
+		renderSuccessJson(userPreferenceService.timezonePickerAreas())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def getTimezones() {
+		renderSuccessJson(Timezone.findAll())
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
 	def getPerson() {
 		Person person = securityService.getUserLogin().person
 		renderSuccessJson([person:person])
@@ -101,5 +113,38 @@ class WsUserController implements ControllerMethods {
 	def removePreference(String id) {
 		userPreferenceService.removePreference(id)
 		renderSuccessJson()
+	}
+
+	/**
+	 * Update the person account that is invoked by the user himself
+	 * @param  : person id and input password
+	 * @return : pass:"no" or the return of the update method
+	 */
+	@GrailsCompileStatic(TypeCheckingMode.SKIP)
+	@HasPermission(Permission.UserUpdateOwnAccount)
+	def updateAccount(Map personInfo) {
+		Map settings = request.JSON
+        //params.id = securityService.currentUserLoginId
+        Person person = personService.updatePerson(settings, false)
+		Map preferences = [
+		        START_PAGE : settings.startPage,
+				CURR_POWER_TYPE : settings.powerType
+		]
+		userPreferenceService.setPreferences(null, preferences)
+		renderSuccessJson()
+    }
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def saveDateAndTimePreferences() {
+		Map requestParams = request.JSON
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(requestParams?.timezone.toString())
+		userPreferenceService.setTimeZone timezone.getID()
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(requestParams?.datetimeFormat.toString())
+		userPreferenceService.setDateFormat datetimeFormat
+
+		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
 	}
 }

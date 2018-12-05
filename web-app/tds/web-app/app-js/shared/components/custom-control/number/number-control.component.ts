@@ -48,6 +48,7 @@ export class NumberControlComponent implements OnInit {
 	 * @param $event
 	 */
 	onValueChange($event: any): void {
+		this.numberValue = Math.trunc($event);
 		this.valueChange.emit(this.numberValue);
 	}
 }

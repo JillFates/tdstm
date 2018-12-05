@@ -239,7 +239,7 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static  controlNumberValidator ( String value, Map fieldSpec, Object domain) {
+	static controlNumberValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				// if the field is empty, validate the 'required' constraint
@@ -281,12 +281,11 @@ class CustomValidators {
 					// if 'allowNegative' field is not present and the number is negative, it should error
 					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
 				}
-				// if 'precision' field is present and the value has a fractional part, we should check
+				// if the value has a fractional part, we should check
 				// that the count of fractional digits does not exceed the 'precision' value
-				if (precision > 0 && value.contains('.')){
-					String fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
-					println "fractionalPart=[$fractionalPart] size=${fractionalPart?.size()}, precision=$precision"
-					if (fractionalPart.size() > precision) {
+				List<String> numberParts = value?.split(/\./)
+				if (numberParts.size() > 1) {
+					if (numberParts[1].size() > precision) {
 						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
 					}
 				}

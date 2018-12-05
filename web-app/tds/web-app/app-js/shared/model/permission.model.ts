@@ -144,7 +144,6 @@ export class Permission {
 	static RecipeRelease = 'RecipeRelease';
 	static RecipeView = 'RecipeView';
 	static ReportMenuView = 'ReportMenuView';
-	static ReportViewDiscovery = 'ReportViewDiscovery';
 	static ReportViewEventDay = 'ReportViewEventDay';
 	static ReportViewEventPrep = 'ReportViewEventPrep';
 	static ReportViewPlanning = 'ReportViewPlanning';

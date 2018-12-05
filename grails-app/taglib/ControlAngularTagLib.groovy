@@ -178,7 +178,7 @@ class ControlAngularTagLib {
 						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
 						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
 						" [required]=\"$isRequired\" " +
-						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0}'\">" +
+						" [format]=\"'${transformNumberFormat(fieldSpec)}'\">" +
 						"</tds-number-control>"
 				break
 			case ControlType.DATE.toString():
@@ -192,6 +192,14 @@ class ControlAngularTagLib {
 				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
 		}
 	}
+
+    private String transformNumberFormat(Map fieldSpec) {
+        String outputFormat = fieldSpec.constraints.format
+        if (fieldSpec.constraints.precision > 0) {
+            outputFormat = outputFormat.replace("\'","\\'")
+        }
+        outputFormat
+    }
 
 	/**
 	 * Used to render the value for any of the supported custom fields in the Asset Show Views.
@@ -237,7 +245,7 @@ class ControlAngularTagLib {
 				out << "{{ '$value' | tdsDateTime: userTimeZone }}"
 				break
 			case ControlType.NUMBER.toString():
-				out << "{{ ${value ? value : '0'} | tdsNumber: '${fieldSpec.constraints.format}' }}"
+				out << "{{ ${value ? value : '0'} | tdsNumber: '${transformNumberFormat(fieldSpec)}' }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink
@@ -284,7 +292,7 @@ class ControlAngularTagLib {
 
 		def value = domainField && domainField != null ? domainObject[domainField] : domainObject[fieldName]
 
-        def isImportantClass = 'YG'.indexOf(fieldSpec[fieldName].imp.toUpperCase()) != -1
+        def isImportantClass = 'YG'.contains(fieldSpec[fieldName].imp.toUpperCase())
 		boolean hasValue = (value != '' && value != null) || value?.trim()
 
         out << (isImportantClass && !hasValue)
