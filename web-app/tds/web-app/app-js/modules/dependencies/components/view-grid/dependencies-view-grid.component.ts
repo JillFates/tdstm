@@ -42,13 +42,13 @@ import {
 	GRID_DEFAULT_PAGE_SIZE
 } from '../../../../shared/model/constants';
 import {TagState} from '../../model/dependencies.model';
-import {BulkCheckboxService} from '../../../assetExplorer/service/bulk-checkbox.service';
+import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {
 	BulkActionResult,
 	BulkChangeType
-} from '../../../assetExplorer/components/bulk-change/model/bulk-change.model';
+} from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
-import {BulkChangeButtonComponent} from '../../../assetExplorer/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 

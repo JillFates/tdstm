@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
-import {CheckboxState, CheckboxStates} from '../../../shared/components/tds-checkbox/model/tds-checkbox.model';
-import { AssetExplorerService } from './asset-explorer.service';
-import { ViewSpec } from '../model/view-spec.model';
+import {CheckboxState, CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.model';
 
 @Injectable()
 export class BulkCheckboxService {
@@ -16,7 +14,7 @@ export class BulkCheckboxService {
 	private availableAssets: Array<any>;
 	private idFieldName = 'common_id';
 
-	constructor(private assetExplorerService: AssetExplorerService) {
+	constructor() {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
 		this.availableAssets = [];
@@ -94,12 +92,7 @@ export class BulkCheckboxService {
 	getBulkSelectedItems(params: any, getBulkIds: any = null): Observable<any> {
 		return new Observable((observer: any) => {
 			if (this.isIndeterminateState()) {
-				let bulkIds = null; // getAllIds;
-				if (getBulkIds) {
-					bulkIds = getBulkIds;
-				} else {
-					bulkIds = this.getBulkAssetIdsFromView.bind(this);
-				}
+				let bulkIds = getBulkIds;
 				return bulkIds(params)
 					.subscribe((result: any) => {
 						const assets = result && (result.assets || result.dependencies) || [];
@@ -177,29 +170,6 @@ export class BulkCheckboxService {
 			this.currentState =  this.hasSelectedAllItems() ? CheckboxStates.checked : CheckboxStates.unchecked;
 			this.setStateSubject.next({current: this.currentState, affectItems: false});
 		}
-	}
-
-	private getBulkAssetIdsFromView(params): Observable<any> {
-		const {viewId, model, justPlanning} = params;
-
-		let payload = {
-				forExport: true,
-				offset: 0,
-				limit: 0,
-				sortDomain: model.sort.domain,
-				sortProperty: model.sort.property,
-				sortOrder: model.sort.order,
-				filters: {
-					domains: model.domains,
-					columns: model.columns
-				}
-		};
-
-		if (justPlanning) {
-			payload['justPlanning'] = true;
-		}
-
-		return this.assetExplorerService.query(viewId, payload);
 	}
 }
 

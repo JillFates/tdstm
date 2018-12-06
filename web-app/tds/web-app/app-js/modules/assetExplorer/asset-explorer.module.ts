@@ -24,8 +24,6 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
-import { BulkChangeService } from './service/bulk-change.service';
-import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
@@ -45,9 +43,6 @@ import {AssetDependencyComponent} from './components/asset-dependency/asset-depe
 import {SingleCommentComponent} from './components/single-comment/single-comment.component';
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
-import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
-import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
-import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
 import {ManufacturerShowComponent} from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ManufacturerEditComponent} from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import {ModelDeviceShowComponent} from './components/device/model-device/components/model-device-show/model-device-show.component';
@@ -87,9 +82,6 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		BulkChangeButtonComponent,
-		BulkChangeActionsComponent,
-		BulkChangeEditComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
@@ -114,17 +106,12 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		TaskCommentService,
 		DependecyService,
 		TagService,
-		BulkChangeService,
-		BulkCheckboxService,
 		ManufacturerService,
 		ModelService
 	],
 	exports: [
 		AssetExplorerIndexComponent,
-		TaskCommentComponent,
-		BulkChangeButtonComponent,
-		BulkChangeEditComponent,
-		BulkChangeActionsComponent],
+		TaskCommentComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
@@ -133,9 +120,6 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		BulkChangeButtonComponent,
-		BulkChangeActionsComponent,
-		BulkChangeEditComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,

@@ -4,8 +4,6 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
-// Asset explorer
-import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
 import {DependenciesRouteModule} from './dependencies-routing.states';
 // Kendo
@@ -20,15 +18,16 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service';
 // Services
 import {DependenciesService} from './service/dependencies.service';
+import { TagService } from '../assetTags/service/tag.service';
 
 @NgModule({
 	imports: [
 		// Angular
 		CommonModule,
 		SharedModule,
-		AssetExplorerModule,
 		FormsModule,
 		// Kendo
 		DropDownsModule,
@@ -46,8 +45,11 @@ import {DependenciesService} from './service/dependencies.service';
 	],
 	providers: [
 		// Resolve
+		TagsResolveService,
 		ModuleResolveService,
-		DependenciesService
+		DependenciesService,
+		// Services
+		TagService
 	],
 	exports: [DependenciesViewGridComponent],
 	entryComponents: []

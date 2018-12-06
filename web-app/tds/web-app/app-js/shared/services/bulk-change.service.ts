@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpInterceptor} from '../providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

@@ -24,9 +24,9 @@ import {
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult, BulkChangeType} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
-import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
+import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -42,8 +42,9 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -113,6 +114,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
+		private assetExplorerService: AssetExplorerService,
 		private userService: UserService) {
 			this.fieldPipeMap = {pipe: {}, metadata: {}};
 			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
@@ -663,7 +665,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			viewId: this._viewId,
 			model: this.model,
 			justPlanning: this.justPlanning
-		})
+		}, this.getBulkAssetIdsFromView.bind(this))
 		.subscribe((results: any) => {
 			this.bulkItems = [...results.selectedAssetsIds];
 			this.selectedAssetsForBulk = [...results.selectedAssets];
@@ -693,5 +695,31 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	private updateGridState(state: State): void {
 		const newState = Object.assign({}, this.gridState, state) ;
 		this.gridStateChange.emit(newState);
+	}
+
+	/**
+	 *  Get the bulk list of asset ids
+	 */
+	private getBulkAssetIdsFromView(params): Observable<any> {
+		const {viewId, model, justPlanning} = params;
+
+		let payload = {
+			forExport: true,
+			offset: 0,
+			limit: 0,
+			sortDomain: model.sort.domain,
+			sortProperty: model.sort.property,
+			sortOrder: model.sort.order,
+			filters: {
+				domains: model.domains,
+				columns: model.columns
+			}
+		};
+
+		if (justPlanning) {
+			payload['justPlanning'] = true;
+		}
+
+		return this.assetExplorerService.query(viewId, payload);
 	}
 }

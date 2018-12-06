@@ -1,19 +1,19 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
-import { TranslatePipe } from '../../../../../../shared/pipes/translate.pipe';
+import {UIExtraDialog} from '../../../../services/ui-dialog.service';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 import {BulkChangeModel, BulkChangeType} from '../../model/bulk-change.model';
-import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
-import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
+import {UIPromptService} from '../../../../directives/ui-prompt.directive';
+import {UIDialogService} from '../../../../services/ui-dialog.service';
 import {BulkActions, BulkActionResult} from '../../model/bulk-change.model';
-import {BulkChangeService} from '../../../../service/bulk-change.service';
-import {Permission} from '../../../../../../shared/model/permission.model';
-import {PermissionService} from '../../../../../../shared/services/permission.service';
+import {BulkChangeService} from '../../../../services/bulk-change.service';
+import {Permission} from '../../../../model/permission.model';
+import {PermissionService} from '../../../../services/permission.service';
 import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.component';
 
 @Component({
 	selector: 'tds-bulk-change-actions',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/bulk-change/components/bulk-change-actions/bulk-change-actions.component.html',
+	templateUrl: '../tds/web-app/app-js/shared/components/bulk-change/components/bulk-change-actions/bulk-change-actions.component.html',
 	providers: [TranslatePipe]
 })
 export class BulkChangeActionsComponent extends UIExtraDialog {

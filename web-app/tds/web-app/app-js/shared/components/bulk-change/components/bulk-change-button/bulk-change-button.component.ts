@@ -1,7 +1,7 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
-import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
+import {UIDialogService} from '../../../../services/ui-dialog.service';
 import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bulk-change.model';
 
 @Component({
