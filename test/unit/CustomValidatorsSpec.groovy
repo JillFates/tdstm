@@ -186,19 +186,19 @@ class CustomValidatorsSpec extends Specification{
 
 		]
 		when: 'a blank is passed'
-		def validator = CustomValidators.controlNumberValidator('', fieldSpec, mockDomain)
-		errors = validator.apply()
+			def validator = CustomValidators.controlNumberValidator('', fieldSpec, mockDomain)
+			errors = validator.apply()
 		then: 'a default.blank.message error should be reported'
-		validator.hasErrors()
-		1 == errors.size()
+			validator.hasErrors()
+			1 == errors.size()
 		'default.blank.message' == errors[0].i18nMessageId
-		when: 'a null is passed'
-		validator = CustomValidators.controlNumberValidator(null, fieldSpec, mockDomain)
-		errors = validator.apply()
+			when: 'a null is passed'
+			validator = CustomValidators.controlNumberValidator(null, fieldSpec, mockDomain)
+			errors = validator.apply()
 		then: 'a default.blank.message error should be reported'
-		validator.hasErrors()
-		1 == errors.size()
-		'default.blank.message' == errors[0].i18nMessageId
+			validator.hasErrors()
+			1 == errors.size()
+			'default.blank.message' == errors[0].i18nMessageId
 	}
 
 	void '07. Test controlDateValidator validator'() {

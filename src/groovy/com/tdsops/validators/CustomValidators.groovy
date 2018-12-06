@@ -239,6 +239,7 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
+	@CompileStatic
 	static controlNumberValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
@@ -250,26 +251,21 @@ class CustomValidators {
 					}
 					return // with or without error, as the value is empty, just return
 				}
-                // try to convert to numeric
-				Long number
-				try {
-					NumberFormat nf = NumberFormat.getInstance()
-					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). Anyway that is not a valid
-					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
-					if(value.charAt(value.size()-1) == '-') {
-						throw new ParseException('The number format is incorrect', 0)
-					}
-					number = nf.parse(value)
-				} catch (ParseException e) {
-					// If it's not a number there is not much to do, so return
+
+				if ( !(value ==~ /^(\+|-)?[0-9]\d*(\.\d+)?$/)) {
+					// If it's not a valid number format there is not much to do, so return
 					addError ('typeMismatch.java.lang.Long', [getLabel()])
 					return
 				}
+				// Now parsing is safe, convert to numeric
+				NumberFormat nf = NumberFormat.getInstance()
+				Long number = nf.parse(value)
+
 			    // finally, validate the constraints in the fieldSpec
-				def minRange = fieldSpec.constraints?.minRange ?: null
-				def maxRange = fieldSpec.constraints?.maxRange ?: null
-				def precision = fieldSpec.constraints?.precision ?: null
-				def allowNegative = fieldSpec.constraints?.allowNegative
+				Integer minRange = fieldSpec.constraints?.minRange ?: null
+				Integer maxRange = fieldSpec.constraints?.maxRange ?: null
+				Integer precision = fieldSpec.constraints?.precision ?: null
+				boolean allowNegative = fieldSpec.constraints?.allowNegative
 
 				// if 'minRange' or 'maxRange' fields are present, validate the value range
 				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
