@@ -74,11 +74,11 @@ class CreateBundlePage extends Page {
     }
 
     def validateNameMessage(){
-        errorMessages.find("li", text:"Property name of class net.transitionmanager.domain.MoveBundle cannot be blank").displayed
+        errorMessages.find("li", text:"Name cannot be blank").displayed
     }
 
     def validateWorkFlowMessage(){
-        errorMessages.find("li", text:"Property workflowCode of class net.transitionmanager.domain.MoveBundle cannot be blank").displayed
+        errorMessages.find("li", text:"Please select WorkflowCode").displayed
     }
 
     def isPlanning(){
