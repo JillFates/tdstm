@@ -1833,45 +1833,6 @@ class AssetEntityService implements ServiceMethods {
 		}*/
 	}
 
-	/*
-	 * export cabling data.
-	 */
-	def cablingReportData(assetCablesList, cablingSheet, progressCount=0, progressTotal=0, updateOnPercent=0, key=null) {
-
-		assetCablesList.eachWithIndex { cabling, int idx ->
-			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
-			if(key){
-				progressCount++
-				updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
-			}
-			addCell(cablingSheet, idx + 2, 0, String.valueOf(currentCabling.assetFromPort?.type ?: ''))
-			addCell(cablingSheet, idx + 2, 1, currentCabling.assetFrom?.id ?: '', Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, idx + 2, 2, String.valueOf(currentCabling.assetFrom?.assetName ?: ''))
-			addCell(cablingSheet, idx + 2, 3, String.valueOf(currentCabling.assetFromPort?.label ?: ''))
-			addCell(cablingSheet, idx + 2, 4, currentCabling.assetTo?.id ?: '', Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, idx + 2, 5, String.valueOf(currentCabling.assetTo?.assetName ?: ''))
-			if (currentCabling.assetFromPort?.type && currentCabling.assetFromPort.type !='Power') {
-				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.assetToPort?.label ?: ''))
-			} else {
-				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.toPower ?: ''))
-			}
-			addCell(cablingSheet, idx + 2, 7, String.valueOf(currentCabling.cableComment ?: ''))
-			addCell(cablingSheet, idx + 2, 8, String.valueOf(currentCabling.cableColor ?: ''))
-			if (currentCabling.assetFrom?.getSourceRoomName()) {
-				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackSource?.location + "/" +
-						currentCabling.assetFrom.getSourceRoomName() + "/" + currentCabling.assetFrom.getSourceRackName()))
-			} else if (currentCabling.assetFrom?.getTargetRoomName()) {
-				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackTarget?.location + "/" +
-						currentCabling.assetFrom.getTargetRoomName() + "/" + currentCabling.assetFrom.getTargetRackName()))
-			} else {
-				addCell(cablingSheet, idx + 2, 9, '')
-			}
-			addCell(cablingSheet, idx + 2, 10, String.valueOf(currentCabling.cableStatus ?: ''))
-			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc ?: ''))
-			//GormUtil.flushAndClearSession(progressCount)
-		}
-	}
-
 	/**
 	 * Get the customised query based on the application preference
 	 * @param appPref(List of key value column preferences)

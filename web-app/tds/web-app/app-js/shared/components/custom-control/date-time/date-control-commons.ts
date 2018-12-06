@@ -24,9 +24,6 @@ export abstract class DateControlCommons implements OnInit {
 	 */
 	ngOnInit(): void {
 		this.dateValue = this.value ? DateUtils.toDate(this.value) : null;
-		setTimeout( () => {
-			this.onValueChange(this.dateValue);
-			}, 200);
 	}
 
 	abstract onValueChange($event: Date);

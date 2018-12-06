@@ -366,7 +366,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				if (action === this.CLEAR_ACTION) {
 					return null;
 				}
-				return originalValue.id;
+				// this handles the Control 'List' values for custom fields.
+				return originalValue.id ? originalValue.id : originalValue;
 			} else if (fieldName === 'tagAssets') {
 				if (action === this.CLEAR_ACTION) {
 					return '[]';

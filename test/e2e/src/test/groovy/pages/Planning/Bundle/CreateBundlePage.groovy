@@ -18,17 +18,17 @@ class CreateBundlePage extends Page {
     static content = {
         createBundlesPageTitle { $("section", class:"content-header").find("h1")}
         bundleCreateForm {$("[name='bundleCreateForm']")}
-        nameField {bundleCreateForm.find("#name")}
-        descriptionField {bundleCreateForm.find("#description")}
-        fromDropDown {bundleCreateForm.find("#sourceRoomId")}
-        toDropDown {bundleCreateForm.find("#targetRoomId")}
-        startTimeDatePicker {bundleCreateForm.find("input#startTime")}
-        comptimeDatePicker {bundleCreateForm.find("input#completionTime")}
-        projectMgrDropDown {bundleCreateForm.find("#projectManagerId")}
-        eventMgrDropdown {bundleCreateForm.find("#moveManagerId")}
-        orderDropDown {bundleCreateForm.find("#operationalOrder")}
-        workFlowDropDown {bundleCreateForm.find("#workflowCode")}
-        usePlanningCheck {bundleCreateForm.find("#useForPlanning")}
+        nameField {$("#name")}
+        descriptionField {$("#description")}
+        fromDropDown {$("#sourceRoomId")}
+        toDropDown {$("#targetRoomId")}
+        startTimeDatePicker {$("input#startTime")}
+        comptimeDatePicker {$("input#completionTime")}
+        projectMgrDropDown {$("#projectManagerId")}
+        eventMgrDropdown {$("#moveManagerId")}
+        orderDropDown {$("#operationalOrder")}
+        workFlowDropDown {$("#workflowCode")}
+        usePlanningCheck {$("#useForPlanning")}
         saveButton {$("input.save")}
         errorMessages {$("div.errors")}
 

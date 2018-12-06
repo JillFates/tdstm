@@ -720,9 +720,6 @@ class MoveBundleController implements ControllerMethods {
 
 		percentagePhyStorageCount = percOfCount(percentagePhyStorageCount, phyStorageCount)
 
-		int percentageFilesCount = moveBundleList ? Files.executeQuery(filesCountQuery + planStatusMovedQuery, countArgs)[0] : 0
-		percentageFilesCount = percOfCount(percentageFilesCount, fileCount)
-
 		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.allServerTypes])[0] : 0
 		percentageOtherCount = percOfCount(percentageOtherCount, otherAssetCount)
@@ -807,7 +804,8 @@ class MoveBundleController implements ControllerMethods {
 		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100
 		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
 		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
-		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
+		def percentageStorToValidate=phyStorageCount ? percOfCount(phyStorageToValidate, phyStorageCount) :100
+		int percentageFilesCount = percOfCount(fileToValidate, fileCount)
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 

@@ -511,18 +511,18 @@ class TimeUtil {
 		if (StringUtil.isBlank(dateTimeString)) {
 			return null
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601)
+		SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601_2)
 		Date date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
 		if (!date) {
 			// the date format is incorrect
-			sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601_2)
+			sdf = new SimpleDateFormat(FORMAT_DATE_TIME_ISO8601)
 			date = parseDateTimeWithFormatter(defaultTimeZone, dateTimeString, sdf)
 		}
 		return date
 	}
 
 	/**
-	 * Used to parse a string value into a Date using a knowed DateFormat class. If the parse fails the
+	 * Used to parse a string value into a Date using a known DateFormat class. If the parse fails the
 	 * method will return a null
 	 * @param dateString - the String value of the date to be parsed
 	 * @param formatter - the DateFormat object to use to parse the date

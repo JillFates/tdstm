@@ -385,7 +385,7 @@ var GraphUtil = (function ($) {
         var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
         if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
             var prefValue = public.serializeLegendTwistiePrefs();
-            setUserPreference('legendTwistieState', prefValue);
+            setUserPreference('LEGEND_TWISTIE_STATE', prefValue);
         }
 
         if (twistieSpan.hasClass('closed')) {

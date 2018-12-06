@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Response, RequestOptions, Headers } from '@angular/http';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
 import {catchError, map} from 'rxjs/operators';
@@ -18,7 +18,8 @@ export const PREFERENCES_LIST = {
 	DATA_SCRIPT_SIZE: 'DATA_SCRIPT_SIZE',
 	VIEW_UNPUBLISHED: 'VIEW_UNPUBLISHED',
 	IMPORT_BATCH_LIST_SIZE: 'IMPORT_BATCH_LIST_SIZE',
-	IMPORT_BATCH_RECORDS_FILTER: 'IMPORT_BATCH_RECORDS_FILTER'
+	IMPORT_BATCH_RECORDS_FILTER: 'IMPORT_BATCH_RECORDS_FILTER',
+	CURR_DT_FORMAT: 'CURR_DT_FORMAT'
 };
 
 @Injectable()
@@ -27,8 +28,15 @@ export class PreferenceService {
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
 
-	// TODO: Refactor to be an Observable rather than a public map
+	// TODO: No one should have access to the the preferences outside
 	public preferences: any = {};
+
+	/**
+	 * This is going to be the new structure, if the Preference exist it will return the value
+	 * if not it will got it from the endpoint and persist the value for next request
+	 */
+	private preferencesList = new BehaviorSubject([]);
+	private currentPreferences = this.preferencesList.asObservable();
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -59,6 +67,11 @@ export class PreferenceService {
 			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
+	/**
+	 * Save value of the preference
+	 * @param preferenceCode
+	 * @param value
+	 */
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -78,10 +91,12 @@ export class PreferenceService {
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
+
 	getUserDateFormatForMomentJS(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		return currentUserDateFormat
 	}
+
 	getUserDateFormatForKendo(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		return DateUtils.translateDateFormatToKendoFormat(currentUserDateFormat);
