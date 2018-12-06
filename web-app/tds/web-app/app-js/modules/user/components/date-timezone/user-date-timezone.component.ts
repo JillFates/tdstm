@@ -28,6 +28,8 @@ export class UserDateTimezoneComponent implements OnInit {
 	public timeFormatList = [DateUtils.PREFERENCE_MIDDLE_ENDIAN, DateUtils.PREFERENCE_LITTLE_ENDIAN];
 	public selectedTimezone;
 	public selectedTimeFormat;
+	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
+	public timezonePinShow = false;
 
 	constructor(
 		private userService: UserService,
@@ -65,10 +67,16 @@ export class UserDateTimezoneComponent implements OnInit {
 			});
 			// Get the Selected area
 			jQuery('#timezoneMap').find('area').click( (element: any) => {
+				this.timezonePinShow = true;
 				this.selectedTimezone = jQuery(element.currentTarget).attr('data-timezone');
 			});
+
+			if (this.selectedTimezone && this.selectedTimezone !== null && this.selectedTimezone !== '') {
+				// Preselect the timezone (this feature was not available in the original implementation)
+				this.onTimezoneSelected(this.selectedTimezone);
+			}
 			// Delay time to allow the Picker to be initialized
-		}, 600);
+		}, 800);
 
 		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe( (res: any) => {
 			this.selectedTimeFormat = res[PREFERENCES_LIST.CURR_DT_FORMAT];
@@ -119,6 +127,26 @@ export class UserDateTimezoneComponent implements OnInit {
 					observer.complete();
 				},
 				(err) => console.log(err));
+		});
+	}
+
+	/**
+	 * After the timezone has been selected from the dropdown it should auto-select
+	 * the proper value on the Map
+	 * @param timezone
+	 */
+	public onTimezoneSelected(timezone: string): void {
+		// we ensure it is hide by default for elements like GMT that does not exist in the map
+		this.timezonePinShow = false;
+		jQuery('#timezoneMap').find('area').each( (m, areaElement) => {
+			// Find the timezone attribute from the map itself
+			if (areaElement.getAttribute('data-timezone') === timezone) {
+				// Emulate the click to get the PIN in place
+				this.timezonePinShow = true;
+				setTimeout(()=> {
+					jQuery(areaElement).triggerHandler('click');
+				});
+			}
 		});
 	}
 
