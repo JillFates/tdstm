@@ -547,7 +547,7 @@ class WsAssetController implements ControllerMethods {
 		int currentPage =NumberUtil.toPositiveInteger(jsonParams['page'], 1)
 		int rowOffset = (currentPage - 1) * maxRows
 		Map paginationParams = [max: maxRows, offset: rowOffset]
-		Map sortingParams = [index: jsonParams['sidx'] ?: 'asset', order: jsonParams['sord'] ?: 'asc']
+		Map sortingParams = [index: jsonParams['sidx'] , order: jsonParams['sord']]
 		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
 	}
 
