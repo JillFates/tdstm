@@ -343,7 +343,7 @@ export class SupportsDependsComponent implements OnInit {
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
 		let unknownIndex = this.statusList.indexOf("Unknown");
-		if (unknownIndex == -1) {
+		if (unknownIndex === -1) {
 			unknownIndex = 0
 		}
 		let dependencySupportModel: DependencySupportModel = {
