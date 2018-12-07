@@ -24,7 +24,8 @@ enum ControlType {
     IN_LIST("InList"),
     PLAN_STATUS("Options.PlanStatus"),
     ASSET_TAG_SELECTOR("asset-tag-selector"),
-    REFERENCE('Reference')
+    REFERENCE('Reference'),
+    OPTIONS_ENVIRONMENT("Options.Environment")
 
     private String value
 

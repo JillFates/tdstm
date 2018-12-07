@@ -111,6 +111,11 @@ class ApplicationService implements ServiceMethods {
 		List personList = partyRelationshipService.getProjectApplicationStaff(project)
 		List availableRoles = partyRelationshipService.getStaffingRoles()
 		List partyGroupList = partyRelationshipService.getCompaniesList()
+		def commonModel = assetEntityService.getCommonModelForCreate('Application', project, application)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
 
 		return [
 			assetInstance: application,
@@ -119,7 +124,7 @@ class ApplicationService implements ServiceMethods {
 			partyGroupList: partyGroupList,
 			staffTypes: Person.constraints.staffType.inList,
 			personList: personList
-		] + assetEntityService.getCommonModelForCreate('Application', project, application)
+		] + commonModel
 	}
 
 	/**

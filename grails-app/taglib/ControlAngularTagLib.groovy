@@ -165,6 +165,8 @@ class ControlAngularTagLib {
 		boolean isRequired = fieldSpec.constraints?.required
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
+			case ControlType.IN_LIST.toString():
+			case ControlType.OPTIONS_ENVIRONMENT.toString():
 				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 			case ControlType.YES_NO.toString():
