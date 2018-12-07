@@ -156,6 +156,7 @@ class ApiActionService implements ServiceMethods {
 				Map optionalRequestParams = [
 						actionId: action.id,
 						taskId: context.id,
+						projectId: action.project.id,
 						producesData: action.producesData,
 						credentials: action.credential?.toMap(),
 						apiAction: apiActionToMap(action)
