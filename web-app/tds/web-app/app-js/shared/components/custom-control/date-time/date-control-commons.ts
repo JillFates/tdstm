@@ -24,8 +24,8 @@ export abstract class DateControlCommons implements OnInit {
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
-		this.dateValue = this.value ? DateUtils.toDateUsingFormat(this.value, this.outputFormat) : null;
-		// this.dateValue = this.stringDate ? DateUtils.toDate(this.stringDate) : null;
+		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, this.outputFormat) : null;
 		setTimeout( () => {
 			this.onValueChange(this.dateValue);
 			}, 200);

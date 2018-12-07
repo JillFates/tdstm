@@ -30,12 +30,12 @@ export class DateTimeControlComponent extends DateControlCommons {
 	}
 
 	/**
-	 * Emit value changed.
-	 * @param {Date} $event
+	 * On value Change on the component, emits the value to the listeners.
+	 * @param {value} Date
 	 */
-	onValueChange($event: Date): void {
-		if ($event && $event !== null) {
-			this.value = DateUtils.convertAndFormatDateToGMT($event, this.outputFormat);
+	onValueChange(value: Date): void {
+		if (value && value !== null) {
+			this.value = DateUtils.convertToGMT(value, this.userPreferenceService.getUserTimeZone());
 		} else {
 			this.value = null;
 		}
