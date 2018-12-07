@@ -288,4 +288,5 @@ databaseChangeLog = {
 	include file: '20181127-delete-ReportViewDiscovery-permission.groovy'
 	include file: 'version/v4_6_0/20181128-fix-unasigned-people-created-during-import-process.groovy'
 	include file: 'version/v4_6_0/20181130-validated-should-only-have-replace.groovy'
+	include file: 'version/v4_6_0/20181205-validation-should-only-have-replace.groovy'
 }
