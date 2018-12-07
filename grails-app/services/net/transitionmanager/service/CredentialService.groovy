@@ -376,14 +376,23 @@ class CredentialService implements ServiceMethods {
 
     /**
      * Find a credential by Id
-     * @param id
+     * @param id - credential id to retrieve
+     * @param projectId - when passed, retrieve project from db assuming we are going to invoke an automated task
+     * if it is not passed, system get current user project.
      * @return
      */
-    Credential findById(Long id) {
+    Credential findById(Long id, Long projectId = null) {
         if (id == null) {
             throw new InvalidParamException('Invalid id param.')
         }
-        Project project = securityService.getUserCurrentProject()
+        Project project
+        if (projectId == null) {
+            project = securityService.getUserCurrentProject()
+        } else {
+            // SL - 12/2018 : TM-13449 : find project assuming we are going to invoke an automated task
+            project = Project.get(projectId)
+        }
+
         return GormUtil.findInProject(project, Credential.class, id, true)
     }
 
