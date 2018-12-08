@@ -139,6 +139,7 @@ class ControlAngularTagLib {
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
 	 * @param min - used to specify minimum allowed value (used by the number fields)
+	 * @param blankOptionListText - Text used to represent a blank option list text (optional)
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
@@ -160,6 +161,7 @@ class ControlAngularTagLib {
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 		String min = (attrs.min ?: (attrs.min ?: "" ))
+		String blankOptionListText = (attrs.blankOptionListText ?: (attrs.blankOptionListText ?: null ))
 
 		String placeholder = attrs.placeholder ?: ''
 		boolean isRequired = fieldSpec.constraints?.required
@@ -167,10 +169,10 @@ class ControlAngularTagLib {
 			case ControlType.LIST.toString():
 			case ControlType.IN_LIST.toString():
 			case ControlType.OPTIONS_ENVIRONMENT.toString():
-				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
+				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.YES_NO.toString():
-				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
+				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.NUMBER.toString():
 				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
@@ -268,8 +270,9 @@ class ControlAngularTagLib {
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
+		def tdAttr = " data-for='" + attrs.field.field + "' class='" + attrs.field.imp + "' "
 		out << inputLabel(attrs)
-		out << '<td>'
+		out << "<td" + tdAttr + ">"
 		out << inputControl(attrs)
 		out << '</td>'
 	}
@@ -307,9 +310,10 @@ class ControlAngularTagLib {
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @param blankOptionListText - Text used to represent a blank text (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
@@ -328,7 +332,7 @@ class ControlAngularTagLib {
 			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
 		} else {
 			// Add a blank option so users can unset a value
-			stringList.add(selectOption('', value))
+			stringList.add(selectOption('', value, StringUtil.isBlank(blankOptionListText) ? null : blankOptionListText))
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -404,9 +408,10 @@ class ControlAngularTagLib {
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @param blankOptionListText - Text used to represent a blank option list text (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderYesNoInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
 		List options = []
 		List valid = ['Yes', 'No']
 
@@ -425,7 +430,7 @@ class ControlAngularTagLib {
 			stringList.add([ 'value' : '', 'text': SELECT_REQUIRED_PROMPT])
 		} else {
 			// Put a blank entry in to allow the user to unset a field
-			stringList.add([ 'value' : '', 'text': ''])
+			stringList.add([ 'value' : '', 'text': StringUtil.isBlank(blankOptionListText) ? '' : blankOptionListText])
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.

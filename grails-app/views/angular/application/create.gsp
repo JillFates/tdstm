@@ -55,7 +55,7 @@
 														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="29"  ngmodel="model.asset.environment" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="29" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${assetInstance.userLocations}" ngmodel="model.asset.userLocations" tabindex="38" tooltipDataPlacement="bottom"/>
 										</tr>
 
@@ -76,7 +76,7 @@
 																		 [data]="getPersonList(${personList as JSON})">
 													</kendo-dropdownlist>
 											</td>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="30"  ngmodel="model.asset.criticality" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="30"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${assetInstance.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="39" tooltipDataPlacement="bottom"/>
 										</tr>
 										<tr>
@@ -151,7 +151,7 @@
 														[(ngModel)]="model.asset.validation">
 												</kendo-dropdownlist>
 											</td>
-										<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="42"  ngmodel="model.asset.testProc" />
+										<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="42"  ngmodel="model.asset.testProc" blankOptionListText="?" />
 										</tr>
 										<tr>
 											<td></td>
@@ -166,8 +166,8 @@
 														[(value)]="model.asset.maintExpDate">
 												</kendo-datepicker>
 											</td>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${assetInstance.latency}" tabindex="34"  ngmodel="model.asset.latency" />
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}" tabindex="43"  ngmodel="model.asset.startupProc" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${assetInstance.latency}" tabindex="34"  ngmodel="model.asset.latency" blankOptionListText="?" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}" tabindex="43" ngmodel="model.asset.startupProc" blankOptionListText="?" />
 										</tr>
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="17"/>
