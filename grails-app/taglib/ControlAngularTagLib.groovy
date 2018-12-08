@@ -342,7 +342,7 @@ class ControlAngularTagLib {
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
 		boolean isBlankValue = StringUtil.isBlank(value);
-		if (( ! isBlankValue && ! options.contains(value)) ) {
+		if (( ! isBlankValue && options && !options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			stringList.add(selectOption(value, value, warning))
 		}
