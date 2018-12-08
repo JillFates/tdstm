@@ -102,6 +102,8 @@ class DeviceService implements ServiceMethods {
 					[sc: assetEntity, tc: assetEntity])[0]
 			deleteChassisWarning = count > 0
 		}
+		def commonModel = assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
 
 		def model = [
 			assetEntity: assetEntity,
@@ -109,7 +111,7 @@ class DeviceService implements ServiceMethods {
 			canEdit: securityService.hasPermission(Permission.AssetEdit),
 			deleteChassisWarning: deleteChassisWarning,
 			currentUserId: securityService.currentPersonId
-		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		] + commonModel
 
 		model.roomSource = null
 		model.roomTarget = null
@@ -158,6 +160,12 @@ class DeviceService implements ServiceMethods {
 		Project project = securityService.getUserCurrentProject()
 		AssetEntity assetEntity = new AssetEntity(project: project)
 		Map model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		model.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		model.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
+		// model.standardFieldSpecs.scale.constraints.put('values', SizeScale.getAsJsonList())
+
 		model.assetInstance = assetEntity
 		model.roomSource = null
 		model.roomTarget = null

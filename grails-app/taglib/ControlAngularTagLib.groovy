@@ -169,6 +169,7 @@ class ControlAngularTagLib {
 			case ControlType.LIST.toString():
 			case ControlType.IN_LIST.toString():
 			case ControlType.OPTIONS_ENVIRONMENT.toString():
+			case ControlType.OPTIONS_PRIORITY.toString():
 				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.YES_NO.toString():

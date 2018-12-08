@@ -25,7 +25,8 @@ enum ControlType {
     PLAN_STATUS("Options.PlanStatus"),
     ASSET_TAG_SELECTOR("asset-tag-selector"),
     REFERENCE('Reference'),
-    OPTIONS_ENVIRONMENT("Options.Environment")
+    OPTIONS_ENVIRONMENT("Options.Environment"),
+    OPTIONS_PRIORITY("Options.Priority")
 
     private String value
 

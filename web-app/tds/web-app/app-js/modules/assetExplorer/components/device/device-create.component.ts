@@ -51,12 +51,20 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
+			this.model.sourceRoomSelect = [this.defaultRoom, ...this.model.sourceRoomSelect];
+			this.model.targetRoomSelect = [this.defaultRoom, ...this.model.targetRoomSelect];
+
 			this.model.asset.assetTypeSelectValue = {id: null};
 			this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.defaultPlanStatus;
 			this.model.asset.validation = this.defaultValidation;
+			this.model.asset.environment = '';
+			this.model.asset.priority = '';
+			this.model.asset.roomSource = this.defaultRoom;
+			this.model.asset.roomTarget = this.defaultRoom;
+			this.model.asset.scale = null;
 		}
 
 		/**

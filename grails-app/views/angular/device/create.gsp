@@ -46,17 +46,7 @@
                                                 (valueChange)="onAssetTypeValueChange($event)">
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance.environment}"/>
-                                    <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
-                                        <kendo-dropdownlist
-                                                [tabIndex]="21"
-                                                class="tm-input-control"
-                                                name="modelAssetEnvironment"
-                                                [(ngModel)]="model.asset.environment"
-                                                [defaultItem]="'Please Select'"
-                                                [data]="model.environmentOptions">
-                                        </kendo-dropdownlist>
-                                    </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                                     <td colspan="1"></td>
                                     <td class="label_sm">Source</td>
                                     <td class="label_sm">Target</td>
@@ -79,17 +69,7 @@
                                                 (valueChange)="onManufacturerValueChange($event)" >
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.priority}" value="${assetInstance.priority}"/>
-                                    <td class="${standardFieldSpecs.priority.imp ?: ''}" data-for="priority">
-                                        <kendo-dropdownlist
-											    [tabIndex]="22"
-                                                class="tm-input-control"
-                                                name="priorityAssetEnvironment"
-                                                [(ngModel)]="model.asset.priority"
-                                                [defaultItem]="'Please Select'"
-                                                [data]="model.priorityOption">
-                                        </kendo-dropdownlist>
-                                    </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.priority}" value="${assetInstance.priority}" tabindex="22" blankOptionListText="Please Select..." ngmodel="model.asset.priority" />
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
                                         [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="roomSource" /> }"
                                         nowrap="nowrap">
@@ -101,7 +81,6 @@
                                                 class="tm-input-control"
                                                 name="roomSourceId"
                                                 [(ngModel)]="model.asset.roomSource"
-                                                [defaultItem]="{id: -2, value: 'Please Select'}"
                                                 [data]="model.sourceRoomSelect"
                                                 [textField]="'value'"
                                                 [valueField]="'id'"
@@ -119,7 +98,6 @@
                                                 class="tm-input-control"
                                                 name="roomTargetId"
                                                 [(ngModel)]="model.asset.roomTarget"
-                                                [defaultItem]="{id: -2, value: 'Please Select'}"
                                                 [data]="model.targetRoomSelect"
                                                 [textField]="'value'"
                                                 [valueField]="'id'"
@@ -315,7 +293,6 @@
                                                 name="modelAssetScaleName"
                                                 [data]="${SizeScale.getAsJsonList() as JSON}"
                                                 [(ngModel)]="model.asset.scale"
-                                                [defaultItem]="''"
                                                 [textField]="'text'"
                                                 [valueField]="'value'">
                                         </kendo-dropdownlist>
