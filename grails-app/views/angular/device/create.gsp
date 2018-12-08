@@ -136,7 +136,6 @@
                                                     class="tm-input-control useRackS"
                                                     name="modelAssetRackSource"
                                                     [(ngModel)]="model.asset.rackSource"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="rackSourceOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -156,7 +155,6 @@
                                                     class="tm-input-control useRackT"
                                                     name="modelAssetRackTarget"
                                                     [(ngModel)]="model.asset.rackTarget"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="rackTargetOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -183,7 +181,6 @@
                                                     class="tm-input-control"
                                                     name="modelAssetBladeSource"
                                                     [(ngModel)]="model.asset.sourceChassis"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="bladeSourceOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -196,7 +193,6 @@
                                                     class="tm-input-control"
                                                     name="modelAssetBladeTarget"
                                                     [(ngModel)]="model.asset.targetChassis"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="bladeTargetOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
