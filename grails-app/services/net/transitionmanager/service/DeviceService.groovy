@@ -103,7 +103,11 @@ class DeviceService implements ServiceMethods {
 			deleteChassisWarning = count > 0
 		}
 		def commonModel = assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
 		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
+
 
 		def model = [
 			assetEntity: assetEntity,
