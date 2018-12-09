@@ -29,7 +29,12 @@ class StorageService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		Files file = new Files(project: project);
-		return [assetInstance: file] + assetEntityService.getCommonModelForCreate('Files', project, file)
+		def commonModel = assetEntityService.getCommonModelForCreate('Files', project, file)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+
+		return [assetInstance: file] + commonModel
 	}
 
 	/**
