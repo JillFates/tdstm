@@ -21,7 +21,12 @@ class DatabaseService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
-		[databaseInstance: db, currentUserId: securityService.currentPersonId] + assetEntityService.getCommonModelForShows('Database', project, params)
+		def commonModel = assetEntityService.getCommonModelForShows('Database', project, params)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+
+		[databaseInstance: db, currentUserId: securityService.currentPersonId] + commonModel
 	}
 
 	/**
@@ -32,7 +37,12 @@ class DatabaseService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		Database database = new Database(project: project)
-		return [assetInstance: database] + assetEntityService.getCommonModelForCreate('Database', project, database)
+		def commonModel = assetEntityService.getCommonModelForCreate('Database', project, database)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+
+		return [assetInstance: database] + commonModel
 	}
 
 	/**
