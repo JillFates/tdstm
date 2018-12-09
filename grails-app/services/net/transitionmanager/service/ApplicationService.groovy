@@ -88,11 +88,7 @@ class ApplicationService implements ServiceMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
-		def commonModel = assetEntityService.getCommonModelForShows('Application', project, params, app)
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
+		Map commonModel = this.getCommonModel(false, project, app, params)
 
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
@@ -117,11 +113,7 @@ class ApplicationService implements ServiceMethods {
 		List personList = partyRelationshipService.getProjectApplicationStaff(project)
 		List availableRoles = partyRelationshipService.getStaffingRoles()
 		List partyGroupList = partyRelationshipService.getCompaniesList()
-		def commonModel = assetEntityService.getCommonModelForCreate('Application', project, application)
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
+		Map commonModel = this.getCommonModel(true, project, application, params)
 
 		return [
 			assetInstance: application,
@@ -223,5 +215,29 @@ class ApplicationService implements ServiceMethods {
 	 */
 	void deleteApplication(Application application) {
 		assetEntityService.deleteAsset(application)
+	}
+
+	/**
+	 * Used to get the model map used to render the create view of an Application domain asset
+	 * @param forCreate - is model for create or show/edit
+	 * @param project - the project of the user
+	 * @param application - current application
+	 * @param params - request parameters
+	 * @return a map of the properties containing the list values to populate the list controls
+	 */
+	private Map getCommonModel(Boolean forCreate, Project project, Application application, Map params) {
+		Map commonModel
+
+		if (forCreate) {
+			commonModel = assetEntityService.getCommonModelForCreate('Application', project, application)
+		} else {
+			commonModel = assetEntityService.getCommonModelForShows('Application', project, params, application)
+		}
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
+
+		return commonModel;
 	}
 }

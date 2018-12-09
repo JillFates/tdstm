@@ -102,14 +102,8 @@ class DeviceService implements ServiceMethods {
 					[sc: assetEntity, tc: assetEntity])[0]
 			deleteChassisWarning = count > 0
 		}
-		def commonModel = assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
-
-
-		def model = [
+		Map commonModel = this.getCommonModel(false, project, assetEntity, params)
+		Map model = [
 			assetEntity: assetEntity,
 			/*label: frontEndLabel,*/
 			canEdit: securityService.hasPermission(Permission.AssetEdit),
@@ -163,12 +157,7 @@ class DeviceService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		AssetEntity assetEntity = new AssetEntity(project: project)
-		Map model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		model.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-		model.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
-		// model.standardFieldSpecs.scale.constraints.put('values', SizeScale.getAsJsonList())
+		Map model = this.getCommonModel(true, project, assetEntity, params)
 
 		model.assetInstance = assetEntity
 		model.roomSource = null
@@ -342,5 +331,29 @@ class DeviceService implements ServiceMethods {
 		if (device.model) {
 			userPreferenceService.setPreference(PREF.LAST_TYPE, device.model.assetType)
 		}
+	}
+
+	/**
+	 * Used to get the model map used to render the create view of an Device domain asset
+	 * @param forCreate - is model for create or show/edit
+	 * @param project - the project of the user
+	 * @param assetEntity - current assetEntity
+	 * @param params - request parameters
+	 * @return a map of the properties containing the list values to populate the list controls
+	 */
+	private Map getCommonModel(Boolean forCreate, Project project, assetEntity , Map params) {
+		Map commonModel
+
+		if (forCreate) {
+			commonModel = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
+		} else {
+			commonModel = assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		}
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
+
+		return commonModel;
 	}
 }
