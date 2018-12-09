@@ -18,7 +18,11 @@ class StorageService implements ServiceMethods {
 	 * @param params - parameters coming from the request
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
-		[filesInstance: storage, currentUserId: securityService.currentPersonId] + assetEntityService.getCommonModelForShows('Files', project, params)
+		def commonModel = assetEntityService.getCommonModelForShows('Files', project, params)
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		[filesInstance: storage, currentUserId: securityService.currentPersonId] + commonModel
 	}
 
 	/**

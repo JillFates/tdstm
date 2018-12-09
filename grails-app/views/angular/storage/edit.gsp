@@ -62,17 +62,7 @@
                                             <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
                                         </td>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="17" ngmodel="model.asset.externalRefId"/>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
-                                        <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-                                            <kendo-dropdownlist
-												    [tabIndex]="20"
-                                                    class="tm-input-control"
-                                                    name="modelAssetEnvironment"
-                                                    [(ngModel)]="model.asset.environment"
-                                                    [defaultItem]="'Please Select'"
-                                                    [data]="model.environmentOptions">
-                                            </kendo-dropdownlist>
-                                        </td>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="19" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
                                         <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                             <kendo-dropdownlist
