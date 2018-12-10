@@ -5,6 +5,7 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentType"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -75,7 +76,7 @@
 
 		$(document).ready(function() {
 
-            progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.TASKMGR_REFRESH}', function () {
+            progressTimer = new ProgressTimer(0, '${UserPreferenceEnum.TASKMGR_REFRESH}', function () {
                 reloadGrid();
 				progressTimer.resetTimer();
 			});
@@ -371,7 +372,7 @@
 					<g:each var="attribute" in="${assetCommentFields}">
 						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
 							${taskPref[key]==attribute.key ? 'checked' : '' }
-							onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Task_Columns}')"
+							onchange="setColumnAssetPref(this.value,'${key}','${UserPreferenceEnum.Task_Columns}')"
 							/>
 							${attribute.value}
 						</label>
@@ -402,7 +403,7 @@
 	function toggleViewUnpublished (element) {
 		var checkedValue = $(element).is(':checked');
 		viewUnpublished = checkedValue;
-		setUserPreference('viewUnpublished', checkedValue, function () {
+		setUserPreference('${UserPreferenceEnum.VIEW_UNPUBLISHED.name()}', checkedValue, function () {
 			reloadGrid();
 		});
 	}

@@ -120,7 +120,7 @@
                                     <!-- Menu Body -->
                                     <li class="user-body">
                                         <ul class="list-group">
-                                            <li class="list-group-item"><g:remoteLink controller="person" action="retrievePersonDetails" id="${person?.id}" onComplete="updatePersonDetails(XMLHttpRequest)"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</g:remoteLink></li>
+                                            <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a></li>
                                             <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
                                             <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
                                             <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->

@@ -342,6 +342,10 @@ export class SupportsDependsComponent implements OnInit {
 	 * Add a new Dependency
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
+		let unknownIndex = this.statusList.indexOf('Unknown');
+		if (unknownIndex === -1) {
+			unknownIndex = 0
+		}
 		let dependencySupportModel: DependencySupportModel = {
 			id: 0,
 			dataFlowFreq: this.dataFlowFreqList[0],
@@ -355,10 +359,11 @@ export class SupportsDependsComponent implements OnInit {
 				}
 			},
 			type: this.typeList[0],
-			status: this.statusList[0],
+			status: this.statusList[unknownIndex],
 			dependencyType: dependencyType,
 			comment: ''
 		};
+
 		dataGrid.addDataItem(dependencySupportModel);
 		this.onChangeInternalModel();
 	}

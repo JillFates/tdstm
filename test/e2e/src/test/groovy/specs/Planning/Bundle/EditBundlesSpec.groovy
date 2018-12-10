@@ -10,6 +10,7 @@ import pages.Login.MenuPage
 import pages.Planning.Bundle.ListBundlesPage
 import pages.Planning.Bundle.EditBundlePage
 import pages.Planning.Bundle.BundleDetailPage
+import pages.Planning.Bundle.CreateBundlePage
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
@@ -31,6 +32,14 @@ class EditBundlesSpec extends GebReportingSpec {
         login()
         at MenuPage
         planningModule.goToListBundles()
+        at ListBundlesPage
+        clickCreate()
+        at CreateBundlePage
+        enterBundleData bundleData
+        clickSave()
+        at BundleDetailPage
+        at MenuPage
+        planningModule.goToListBundles()
     }
 
     def setup() {
@@ -45,7 +54,7 @@ class EditBundlesSpec extends GebReportingSpec {
     def "1. The user has access to Bundle List"() {
         given: 'The User has clickes on Bundle detail'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData[0]
             selectFilter()
         when: 'The user clciks on Bundle list'
             clickOnBundle()
@@ -57,7 +66,7 @@ class EditBundlesSpec extends GebReportingSpec {
         given: 'The user goes back to list bundles and clicks ona bundle'
             goToListbundles()
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData[0]
             selectFilter()
             clickOnBundle()
             at BundleDetailPage

@@ -8,6 +8,7 @@ package specs.Planning.Bundle
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import pages.Planning.Bundle.ListBundlesPage
+import pages.Planning.Bundle.CreateBundlePage
 import pages.Planning.Bundle.BundleDetailPage
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
@@ -20,8 +21,10 @@ class BundleDeleteSpec extends GebReportingSpec {
     static testCount
     static baseName = "QAE2E"
     static randStr = CommonActions.getRandomString()
-    static bundleData = [baseName + " " + randStr + " Planning", baseName + " bundle created by automated test",
-                         "STD_PROCESS", "on"]
+    static bundleData1 = [baseName + " " + randStr + " Planning", baseName + " bundle created by automated test",
+                          "STD_PROCESS", "on"]
+    static bundleData2 = [baseName+" "+randStr+" NON-Planning", baseName+" bundle created by automated test",
+                         "STD_PROCESS",false]
     static bundleName = ""
     static proceed = true
     static maxNumberOfBundles = 2
@@ -33,6 +36,24 @@ class BundleDeleteSpec extends GebReportingSpec {
         at MenuPage
         planningModule.goToListBundles()
         at ListBundlesPage
+        // create a planning bundle to be deleted
+        clickCreate()
+        at CreateBundlePage
+        enterBundleData bundleData1
+        clickSave()
+        at BundleDetailPage
+        at MenuPage
+        planningModule.goToListBundles()
+        // create a non planning bundle to be deleted
+        at ListBundlesPage
+        clickCreate()
+        at CreateBundlePage
+        enterBundleData bundleData2
+        clickPlanning() // make it non planning
+        clickSave()
+        at BundleDetailPage
+        at MenuPage
+        planningModule.goToListBundles()
     }
 
     def setup() {
@@ -48,7 +69,7 @@ class BundleDeleteSpec extends GebReportingSpec {
     def "1. Test planning bundles cancelled deletion attempt"() {
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData1[0]
             selectFilter()
             clickPlanningFilter()
             clickOnBundle()
@@ -65,7 +86,7 @@ class BundleDeleteSpec extends GebReportingSpec {
     def "2. Bundle deletion is confirmed"(){
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData1[0]
             selectFilter()
             clickPlanningFilter()//if i get at least two rows i can proceed
             clickOnBundle()
@@ -74,7 +95,7 @@ class BundleDeleteSpec extends GebReportingSpec {
             confirmDeletion()
         then: 'The bundle is not deleted'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData1[0]
             selectFilter()
             clickPlanningFilter()
             !validateBundleIsListed(bundleName)
@@ -83,7 +104,7 @@ class BundleDeleteSpec extends GebReportingSpec {
     def "3. The user filters non-planning bundles"() {
         given: 'The user is in a non-planning bundle detail page'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData2[0]
             selectFilter()
             clickNonPlanningFilter()
             clickOnBundle()
@@ -100,7 +121,7 @@ class BundleDeleteSpec extends GebReportingSpec {
     def "4. Bundle deletion is confirmed"(){
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData2[0]
             selectFilter()
             clickNonPlanningFilter()
             clickOnBundle()
@@ -109,7 +130,7 @@ class BundleDeleteSpec extends GebReportingSpec {
             confirmDeletion()
         then: 'The bundle is not deleted'
             at ListBundlesPage
-            filterByName baseName
+            filterByName bundleData2[0]
             selectFilter()
             clickPlanningFilter()
             !validateBundleIsListed(bundleName)

@@ -475,7 +475,7 @@ int minPasswordLength = tds.minPasswordLength()
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${tds.currentPersonName()}</span><br />
 				<ul>
-					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${tds.currentPersonId()}" onComplete="updatePersonDetails(XMLHttpRequest)">Account Details...</g:remoteLink></li>
+					<li><a href="#" style="cursor: pointer;" id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson()">Account Details...</a></li>
 					<li><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()">Date and Timezone</a></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>

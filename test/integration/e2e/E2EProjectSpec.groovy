@@ -40,6 +40,7 @@ class E2EProjectSpec extends Specification {
 	// Set transactional false to persist at database when spec finishes
 	static transactional = false
 	static final String TARGET_HOSTNAME = 'TDS_TARGET_HOSTNAME'
+	static final String TARGET_WEBSITENAME = 'TDS_TARGET_WEBSITENAME'
 
 	// IOC
 	ProjectService projectService
@@ -242,10 +243,17 @@ class E2EProjectSpec extends Specification {
 			String testEmail = 'sample@sampleEmail.com'
 			String testRequestNote = 'Test request note'
 			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
+
 			String targetHostName = System.getenv(TARGET_HOSTNAME)
 			if (targetHostName){
 				licenseRequest.hostName = targetHostName
 			}
+
+			String targetWebsiteName = System.getenv(TARGET_WEBSITENAME)
+			if (targetWebsiteName){
+				licenseRequest.websitename = targetWebsiteName
+			}
+
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 			licensedClient = licenseManagerService.loadRequest(encodedMessage)
 			licensedClient.type = License.Type.MULTI_PROJECT

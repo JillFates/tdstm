@@ -1,0 +1,66 @@
+.dependencies-view-grid-component
+  .dependency-tag
+    display: inline-block
+    margin: 2px
+    width: unset
+
+  .asset-tag-selector-component
+    .k-switch.asset-tag
+      display: block
+      position: unset
+      float: unset
+      top: 0
+      right: 0
+    .k-multiselect-wrap
+      border: 0
+  .bulkchange-section
+    padding-left: 8px
+    display: flex;
+    justify-content: start;
+    align-items: center;
+
+  .k-grid
+    margin-top: 10px
+    min-height: 100%
+    position: relative
+    .k-filter-row
+      td
+        vertical-align: top
+
+    td
+      height: 30px
+    .sortable-column
+      display: inline
+      cursor: pointer
+      label
+        cursor: pointer
+
+    .k-filtercell-wrapper
+      position: relative
+      .k-textbox
+        padding: 6px 22px 6px 6px
+        height: 31px
+        border-width: 0
+      .k-filtercell-operator
+        position: absolute
+        right: -5px
+        margin-top: 3px
+        .k-button
+          background: transparent
+          border: none
+          margin-right: 4px
+          span
+            font-size: 14px
+            font-weight: bold
+
+    .k-i-filter-clear::before
+      content: "\e11b"
+
+    .k-grid-toolbar
+      padding: 5px 8px
+    .check-row
+      display: flex
+      justify-content: center
+      align-items: center
+      input
+        cursor: pointer

@@ -80,6 +80,7 @@
   .k-switch.k-state-focused
     box-shadow: unset
 /* Global, but protected by the scope */
+$asset-tag-selector-default-label-color: #656565
 .asset-tag-selector-single-container
   margin-left: 21px
   margin-top: -6px
@@ -95,6 +96,7 @@
 
 .asset-tag-selector-item-selected
   background-color: unset !important
+  color: $asset-tag-selector-default-label-color!important
   .asset-tag-selector-single-container
     .asset-tag-selector-single-item
       i.fa-check
@@ -103,6 +105,7 @@
         margin-right: 16px
 .asset-tag-selector-item-selected.k-state-focused
   background-color: $color--grey2 !important
+  color: $asset-tag-selector-default-label-color!important
   box-shadow: unset !important
 
 .label.tag
@@ -112,7 +115,7 @@
   margin: 0 auto 0 auto
   padding-top: 8px
   font-size: 11px
-  color: #656565 !important
+  color: $asset-tag-selector-default-label-color!important
 .tag-black
   background-color: black !important
 .tag-grey
