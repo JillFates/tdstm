@@ -3,6 +3,11 @@ export enum BulkActions {
 	Delete
 }
 
+export enum BulkChangeType {
+	Assets,
+	Dependencies
+}
+
 export interface IdTextItem {
 	id: string;
 	text: string;
@@ -11,6 +16,9 @@ export interface IdTextItem {
 export class BulkChangeModel {
 	public selectedItems: number[];
 	public affected: number;
+	public showEdit?: boolean;
+	public showDelete?: boolean;
+	public bulkChangeType?: BulkChangeType;
 	selectedAssets: Array<any>;
 }
 

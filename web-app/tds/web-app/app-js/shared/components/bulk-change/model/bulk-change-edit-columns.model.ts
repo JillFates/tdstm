@@ -1,4 +1,4 @@
-import {GridColumnModel} from '../../../../../shared/model/data-list-grid.model';
+import {GridColumnModel} from '../../../model/data-list-grid.model';
 
 export class BulkChangeEditColumnsModel {
 
