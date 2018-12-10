@@ -116,7 +116,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private onTestScript(): void {
 		this.clearLogVariables('test');
-		this.codeMirrorComponent.clearSyntaxErrors();
+		this.clearSyntaxErrors();
 		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
@@ -150,12 +150,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.data.message;
-					this.codeMirrorComponent.addSyntaxErrors([response.data.data.startLine - 1]);
+					this.addSyntaxErrors([response.data.data.startLine - 1]);
 
 					// On Success
 				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
-						this.codeMirrorComponent.clearSyntaxErrors();
+						this.clearSyntaxErrors();
 						let scripTestFilename = response.data.detail;
 						this.operationStatus.test.state = CHECK_ACTION.VALID;
 						this.scriptTestResult = new ScriptTestResultModel();
@@ -188,7 +188,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * On Check Script Syntax button.
 	 */
 	private onCheckScriptSyntax(): void {
-		this.codeMirrorComponent.clearSyntaxErrors();
+		this.clearSyntaxErrors();
 		this.clearLogVariables('syntax');
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
 			this.scriptValidSyntaxResult = result.data;
@@ -198,9 +198,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				return error.startLine - 1;
 			});
 			if (errorLines.length > 0) {
-				this.codeMirrorComponent.addSyntaxErrors(errorLines);
+				this.addSyntaxErrors(errorLines);
 			} else {
-				this.codeMirrorComponent.clearSyntaxErrors();
+				this.clearSyntaxErrors();
 			}
 		});
 	}
@@ -397,6 +397,27 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			return dataItem.value;
 		} else {
 			return (dataItem.init || '');
+		}
+	}
+
+	/**
+	 * Clears out ALL the Syntax Error class of the given line numbers stored in currentErrorLines.
+	 * If the codeMirrorComponent object is empty, it does nothing.
+	 */
+	private clearSyntaxErrors(): void {
+		if (this.codeMirrorComponent) {
+			this.codeMirrorComponent.clearSyntaxErrors();
+		}
+	}
+
+	/**
+	 * Adds Syntax Error class to the given line numbers (lines index starts at 0)
+	 * If the codeMirrorComponent object is empty, it does nothing.
+	 * @param {Array<number>} lineNumbers
+	 */
+	private addSyntaxErrors(lineNumbers: Array<number>) {
+		if (this.codeMirrorComponent) {
+			this.codeMirrorComponent.addSyntaxErrors(lineNumbers);
 		}
 	}
 }
