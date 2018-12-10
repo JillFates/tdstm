@@ -15,6 +15,7 @@ import {
 	map,
 	mergeMap,
 	scan,
+	switchMap,
 	takeUntil,
 	withLatestFrom,
 } from 'rxjs/operators';
@@ -39,7 +40,7 @@ import {
 import {DependenciesColumnModel} from '../../model/dependencies-column.model';
 import {
 	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE
+	GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE
 } from '../../../../shared/model/constants';
 import {TagState} from '../../model/dependencies.model';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
@@ -51,6 +52,10 @@ import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/t
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {AssetDependencyComponent} from '../../../assetExplorer/components/asset-dependency/asset-dependency.component';
+import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
 
 declare var jQuery: any;
 
@@ -77,13 +82,16 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private tagsStateSubject: Subject<TagState>;
 	protected state: ComponentState;
 	private componentState: BehaviorSubject<ComponentState>;
+	protected readonly actionableAssets = ['assetName', 'dependentName', 'type'];
 
 	constructor(
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
+		private dialog: UIDialogService,
 		private notifier: NotifierService,
 		private bulkCheckboxService: BulkCheckboxService,
-		private dependenciesService: DependenciesService) {
+		private dependenciesService: DependenciesService,
+		protected assetService: DependecyService) {
 	}
 
 	ngOnInit() {
@@ -356,5 +364,77 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * On cell click event.
+	 * Determines if cell clicked property is either asset/dependent asset/dependency detail and opens detail popup.
+	 * @param gridCell Reference to the current grid cell clicked
+	 */
+	protected  onClickActionableColumn(gridCell: any): void {
+		const fieldName = gridCell.column.field;
+		const assetRelationship = {
+			id: gridCell.dataItem['assetId'],
+			class: gridCell.dataItem['assetClass'],
+			dependentId: gridCell.dataItem['dependentId'],
+			dependentClass: gridCell.dataItem['dependentClass']
+		};
+
+		const asset = this.assetViewFactory(fieldName, assetRelationship);
+		if (asset) {
+			asset.params
+				.subscribe((results) => {
+					asset.openWindowService(asset.component, results, ...asset.extra)
+						.then(() => this.changeState())
+						.catch(error => {
+							console.log('Error:', error);
+							this.changeState();
+						});
+				})
+		}
+
+	}
+
+	/**
+	 * Based upon the fieldName selected, get the object that represents an asset along with the parameters
+	 * required to open it in a view
+	 * @param fieldName  Asset field name
+	 * @param asset Asset id and corresponding asset dependency id
+	 */
+	private assetViewFactory(fieldName: string, asset: {id: number, class: string, dependentId: number, dependentClass: string}): any {
+		const [assetName, dependentName, type] = this.actionableAssets;
+
+		const assetParameters = {
+			[assetName]: {
+				component: AssetShowComponent,
+				params: Observable.of([
+					{ provide: 'ID', useValue: asset.id },
+					{ provide: 'ASSET', useValue: asset.class }
+				]),
+				extra: [DIALOG_SIZE.LG],
+				openWindowService: this.dialog.open.bind(this.dialog)
+			},
+			[dependentName]: {
+				component: AssetShowComponent,
+				params: Observable.of([
+					{ provide: 'ID', useValue: asset.dependentId },
+					{ provide: 'ASSET', useValue: asset.dependentClass }
+				]),
+				extra: [DIALOG_SIZE.LG],
+				openWindowService: this.dialog.open.bind(this.dialog)
+			},
+			[type]: {
+				component: AssetDependencyComponent,
+				params: this.assetService
+							.getDependencies(asset.id, asset.dependentId)
+							.pipe(
+								switchMap((result: any) => Observable.of([{provide: 'ASSET_DEP_MODEL', useValue: result}]))
+							),
+				extra: [],
+				openWindowService: this.dialog.extra.bind(this.dialog)
+			}
+		};
+
+		return assetParameters[fieldName] || null;
 	}
 }
