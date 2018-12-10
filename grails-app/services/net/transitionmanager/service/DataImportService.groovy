@@ -1325,8 +1325,8 @@ class DataImportService implements ServiceMethods {
 		record.resetErrors()
 		for (field in fieldsInfo) {
 			field.value.errors = []
-			if (field.value.containsKey('previousValue')) {
-				field.value.remove('previousValue')
+			if (field.value.containsKey(PREVIOUS_VALUE_PROPERTY)) {
+				field.value.remove(PREVIOUS_VALUE_PROPERTY)
 			}
 		}
 	}
