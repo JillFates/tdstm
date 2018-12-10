@@ -39,9 +39,7 @@ export class DateTimeControlComponent implements OnInit {
 	ngOnInit(): void {
 		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
 		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.TDS_OUTPUT_DATETIME_FORMAT) : null;
-		setTimeout( () => {
-			this.onValueChange(this.dateValue);
-		}, 200);
+		this.onValueChange(this.dateValue);
 	}
 
 	/**
