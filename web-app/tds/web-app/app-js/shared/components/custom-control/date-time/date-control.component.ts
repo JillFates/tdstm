@@ -23,7 +23,6 @@ export class DateControlComponent implements OnInit  {
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
 	@Input('required') required = false;
-	protected outputFormat: string;
 	protected displayFormat: string;
 	protected dateValue: Date;
 
@@ -35,8 +34,8 @@ export class DateControlComponent implements OnInit  {
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
-		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
-		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, this.outputFormat) : null;
+		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.TDS_OUTPUT_DATE_FORMAT) : null;
 		setTimeout( () => {
 			this.onValueChange(this.dateValue);
 		}, 200);
