@@ -1,7 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
-import {IntlService} from '@progress/kendo-angular-intl';
-import {DateControlCommons} from './date-control-commons';
 import {DateUtils} from '../../../utils/date.utils';
 
 @Component({
@@ -20,11 +18,28 @@ import {DateUtils} from '../../../utils/date.utils';
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent extends DateControlCommons {
+export class DateControlComponent implements OnInit  {
 
-	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
-		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATE_FORMAT);
-		this.displayFormat = this.userPreferenceService.getUserDateFormatForKendo();
+	@Input('value') value: any;
+	@Output() valueChange = new EventEmitter<any>();
+	@Input('required') required = false;
+	protected outputFormat: string;
+	protected displayFormat: string;
+	protected dateValue: Date;
+
+	constructor(private userPreferenceService: PreferenceService) {
+		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
+	}
+
+	/**
+	 * OnInit set a date value.
+	 */
+	ngOnInit(): void {
+		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, this.outputFormat) : null;
+		setTimeout( () => {
+			this.onValueChange(this.dateValue);
+		}, 200);
 	}
 
 	/**
@@ -33,7 +48,7 @@ export class DateControlComponent extends DateControlCommons {
 	 */
 	onValueChange(value: Date): void {
 		if (value && value !== null) {
-			this.value = DateUtils.formatDate(value, this.outputFormat)
+			this.value = DateUtils.formatDate(value, DateUtils.TDS_OUTPUT_DATE_FORMAT)
 		} else {
 			this.value = null;
 		}

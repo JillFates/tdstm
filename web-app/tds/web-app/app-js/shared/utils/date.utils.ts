@@ -21,7 +21,7 @@ export class DateUtils {
 	public static readonly TDS_OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
 	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'YYYY-MM-DDT' + DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT;
 	public static readonly TDS_OUTPUT_DATE_FORMAT = 'YYYY-MM-DD';
-	public static readonly TDS_DATABASE_TIMEZONE = 'GMT';
+	public static readonly TIMEZONE_GMT = 'GMT';
 
 	/**
 	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
@@ -45,18 +45,17 @@ export class DateUtils {
 	}
 
 	/**
-	 * Converts and Formats a Date into GMT time with an output result format.
+	 * Converts and Formats a Date into GMT
 	 * GMT is being used on the server and should always consider the User Timezone preference
 	 * @param {sourceLocalTime} date
 	 * @param {userTimeZone} string i.e America/Monterrey
 	 */
 	public static convertToGMT(sourceLocalTime: Date, userTimeZone: string): string {
 		// We stripped any reference to a Time zone
-		const sourceWithNoTZ  = moment(sourceLocalTime).format('YYYY-MM-DDTHH:mm:ss');
-		// We Add back Timezone
-		const sourceZonedTime = moment.tz(sourceWithNoTZ, userTimeZone);
-		const targetZonedTime = sourceZonedTime.clone().tz(this.TDS_DATABASE_TIMEZONE);
-		return targetZonedTime.format();
+		const datetimeStringWithNoTZ  = moment(sourceLocalTime).format('YYYY-MM-DDTHH:mm:ss');
+		const momentObjectWithUserTimezone = moment.tz(datetimeStringWithNoTZ, userTimeZone);
+		const momentObjectWithGMT = momentObjectWithUserTimezone.clone().tz(this.TIMEZONE_GMT);
+		return momentObjectWithGMT.format();
 	}
 
 	/**
@@ -65,7 +64,7 @@ export class DateUtils {
 	 * @param {userTimeZone} string i.e America/Monterrey
 	 */
 	public static convertFromGMT(sourceTime: Date | string, userTimeZone: string): string {
-		const sourceZonedTime = moment.tz(sourceTime, this.TDS_DATABASE_TIMEZONE);
+		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
 		const targetZonedTime = sourceZonedTime.clone().tz(userTimeZone);
 		return targetZonedTime.format();
 	}

@@ -1,5 +1,4 @@
 import {EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {IntlService} from '@progress/kendo-angular-intl';
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
 
@@ -11,12 +10,8 @@ export abstract class DateControlCommons implements OnInit {
 	protected outputFormat: string;
 	protected displayFormat: string;
 	protected dateValue: Date;
-	private stringDate: string;
 
-	constructor(
-				protected userPreferenceService: PreferenceService,
-				protected intl: IntlService,
-				outputFormat: string) {
+	constructor(protected userPreferenceService: PreferenceService, outputFormat: string) {
 		this.outputFormat = outputFormat;
 	}
 
