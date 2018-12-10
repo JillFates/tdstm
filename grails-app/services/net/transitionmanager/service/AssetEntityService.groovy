@@ -2953,7 +2953,7 @@ class AssetEntityService implements ServiceMethods {
 			} else{
 				Map defaultValues = [
 					assetName : command.name,
-					validation: ValidationType.DIS,
+					validation: ValidationType.UNKNOWN,
 					environment: ''
 				]
 				if (assetToClone.isaDevice()) {
