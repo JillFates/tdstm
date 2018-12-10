@@ -435,7 +435,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 							.pipe(
 								switchMap((result: any) => Observable.of([{provide: 'ASSET_DEP_MODEL', useValue: result}]))
 							),
-				extra: [],
+				extra: [true],
 				openWindowService: this.dialog.extra.bind(this.dialog)
 			}
 		};
