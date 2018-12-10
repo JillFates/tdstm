@@ -2589,7 +2589,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (params.type && params.type == 'toValidate') {
-			query.append(whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
+			query.append(whereAnd() + " assets.validation= '${ValidationType.UNKNOWN}' ") //eq ('validation','Unknown')
 		}
 
 		// Allow filtering on the Validate
@@ -2953,7 +2953,7 @@ class AssetEntityService implements ServiceMethods {
 			} else{
 				Map defaultValues = [
 					assetName : command.name,
-					validation: ValidationType.DIS,
+					validation: ValidationType.UNKNOWN,
 					environment: ''
 				]
 				if (assetToClone.isaDevice()) {
