@@ -34,8 +34,8 @@ class ListBundlesPage extends Page {
         nameFilter {filterRow.find("[data-text-field='name']")}
         descriptionFilter {filterRow.find("[data-text-field='description']")}
         planningFilterWrapper {$(".k-operator-hidden")}
-        isPlanningRadio {filterRow.find(("label>input"))[0]}
-        isNonPlanningRadio {filterRow.find(("label>input"))[1]}
+        isPlanningRadio {filterRow.find("label", text: contains("is true"))}
+        isNonPlanningRadio {filterRow.find("label", text: contains("is false"))}
         clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
         nameFilterWrapper {$("span.k-filtercell")[1]}
         clearName {nameFilterWrapper.find("button.k-button")}
@@ -280,7 +280,7 @@ class ListBundlesPage extends Page {
     def validateStartDate(dte){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find(("[role='gridcell']")[5]).contains(dte)) {
+            if(!rows[i].find("[role='gridcell']")[5].text().contains(dte)) {
                 validation=false
                 break;
             }
@@ -291,7 +291,7 @@ class ListBundlesPage extends Page {
     def validateCompletionDate(dte){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find(("[role='gridcell']")[6]).contains(dte)) {
+            if(!rows[i].find("[role='gridcell']")[6].text().contains(dte)) {
                 validation=false
                 break;
             }

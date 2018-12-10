@@ -1086,7 +1086,7 @@ class PartyRelationshipService implements ServiceMethods {
 				${project ? 'and pr.partyIdFrom = :project' : ''}
 			)"""
 
-		List projects = PartyRelationship.executeQuery(query, args)
+		Set projects = PartyRelationship.executeQuery(query, args)
 		logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
 		// Add to the list those that for clients
 		if (project && ! projects.contains(project) && project.client == company) {
@@ -1103,7 +1103,7 @@ class PartyRelationshipService implements ServiceMethods {
 			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
 		}
 
-		return projects
+		return projects as List
 	}
 
 	/**

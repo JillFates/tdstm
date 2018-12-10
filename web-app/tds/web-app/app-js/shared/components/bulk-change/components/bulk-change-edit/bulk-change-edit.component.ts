@@ -1,28 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
+import {UIExtraDialog} from '../../../../services/ui-dialog.service';
 import {Observable} from 'rxjs';
 
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
-import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
+import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {BulkActionResult} from '../../model/bulk-change.model';
-import {AssetExplorerService} from '../../../../service/asset-explorer.service';
-import {CustomDomainService} from '../../../../../fieldSettings/service/custom-domain.service';
-import {Permission} from '../../../../../../shared/model/permission.model';
-import {PermissionService} from '../../../../../../shared/services/permission.service';
-import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
+import {CustomDomainService} from '../../../../../modules/fieldSettings/service/custom-domain.service';
+import {Permission} from '../../../../model/permission.model';
+import {PermissionService} from '../../../../services/permission.service';
+import {DataGridOperationsHelper} from '../../../../utils/data-grid-operations.helper';
 import {BulkEditAction, IdTextItem} from '../../model/bulk-change.model';
-import {SortUtils} from '../../../../../../shared/utils/sort.utils';
-import {StringUtils} from '../../../../../../shared/utils/string.utils';
-import {BulkChangeService} from '../../../../service/bulk-change.service';
-import {TagService} from '../../../../../assetTags/service/tag.service';
-import {TagModel} from '../../../../../assetTags/model/tag.model';
-import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel';
-import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
-import {PreferenceService} from '../../../../../../shared/services/preference.service';
+import {SortUtils} from '../../../../utils/sort.utils';
+import {StringUtils} from '../../../../utils/string.utils';
+import {BulkChangeService} from '../../../../services/bulk-change.service';
+import {TagService} from '../../../../../modules/assetTags/service/tag.service';
+import {TagModel} from '../../../../../modules/assetTags/model/tag.model';
+import {ApiResponseModel} from '../../../../model/ApiResponseModel';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {PreferenceService} from '../../../../services/preference.service';
 
 @Component({
 	selector: 'tds-bulk-change-edit',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/bulk-change/components/bulk-change-edit/bulk-change-edit.component.html'
+	templateUrl: '../tds/web-app/app-js/shared/components/bulk-change/components/bulk-change-edit/bulk-change-edit.component.html'
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	private readonly CLEAR_ACTION = 'clear';
@@ -48,7 +47,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	constructor(
 		protected bulkChangeModel: BulkChangeModel,
 		private promptService: UIPromptService,
-		private assetExplorerService: AssetExplorerService,
 		private permissionService: PermissionService,
 		private customDomainService: CustomDomainService,
 		private bulkChangeService: BulkChangeService,

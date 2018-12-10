@@ -87,12 +87,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			const sourceId = this.model.asset && this.model.asset[source] && this.model.asset[source].id || null;
 			const targetId = this.model.asset && this.model.asset[target] && this.model.asset[target].id || null;
 
-			if (sourceId && targetId) {
-				const backSource = sourceId;
-				this.model.asset[source].id = targetId;
-				this.model.asset[target].id = backSource;
-				this.updatePersonReferences();
-			}
+			this.model.asset[source].id = targetId;
+			this.model.asset[target].id = sourceId;
+
+			this.updatePersonReferences();
 		}
 
 		/**
