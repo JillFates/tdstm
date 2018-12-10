@@ -4162,19 +4162,34 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
              * @param String[] - list of the properties FROM fieldSpecs of project asset domain to examine
              */
             def addWhereConditionsForFieldSpecs = { fieldSpecs ->
-                fieldSpecs.each { customField ->
-                    if (filter?.asset?.containsKey(customField.field)) {
-                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.field], customField.field)
-                        if (sm) {
-                            where = SqlUtil.appendToWhere(where, sm.sql)
-                            if (sm.param) {
-                                map[customField.field] = sm.param
-                            }
-                        } else {
-                            log.error "SqlUtil.whereExpression unable to resolve $customField.field expression [${filter.asset[customField.field]}]"
-                        }
-                    }
-                }
+	            // Avoid going through the field specs if there's not filter.asset.
+	            if (filter?.asset) {
+		            Map assetFilter = filter.asset
+		            fieldSpecs.each { fieldSpec ->
+			            String matched = null
+			            // Look for a fieldSpec with the field matching the filter's key.
+			            if (assetFilter.containsKey(fieldSpec.field)) {
+				            matched = fieldSpec.field
+				        // Look for a fieldSpec with the label matching the filter's key.
+			            } else if (assetFilter.containsKey(fieldSpec.label)) {
+				            matched = fieldSpec.label
+			            }
+			            // Proceed to construct the where expression only if a fieldSpec was found.
+			            if (matched) {
+				            // The value provided by the user can be of any type.
+				            def filterValue = assetFilter[matched]
+				            sm = SqlUtil.whereExpression('a.' + fieldSpec.field, filterValue, fieldSpec.field)
+				            if (sm) {
+					            where = SqlUtil.appendToWhere(where, sm.sql)
+					            if (sm.param) {
+						            map[fieldSpec.field] = sm.param
+					            }
+				            } else {
+					            log.error "SqlUtil.whereExpression unable to resolve $fieldSpec.field expression [${filterValue}]"
+				            }
+			            }
+		            }
+	            }
             }
 
 			/**
