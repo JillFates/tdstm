@@ -262,7 +262,7 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="18" ngmodel="model.asset.assetTag"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-                                        <tds-datetime-control [tabIndex]="26"
+                                        <tds-datetime-control [tabindex]="26"
                                                               class="tm-input-control"
                                                               name="modelAssetRetireDate"
                                                               [(value)]="model.asset.retireDate">
@@ -304,7 +304,7 @@
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-                                        <tds-datetime-control [tabIndex]="27"
+                                        <tds-datetime-control [tabindex]="27"
                                                               class="tm-input-control"
                                                               name="modelAssetMaintExpDate"
                                                               [(value)]="model.asset.maintExpDate">

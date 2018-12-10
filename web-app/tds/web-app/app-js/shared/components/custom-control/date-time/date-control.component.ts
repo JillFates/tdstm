@@ -10,6 +10,7 @@ import {DateUtils} from '../../../utils/date.utils';
 		<div>
             <kendo-datepicker [(value)]="dateValue"
 							  [format]="displayFormat"
+							  [tabindex]="tabindex"
                               (valueChange)="onValueChange($event)"
 							  class="form-control">
 			</kendo-datepicker>

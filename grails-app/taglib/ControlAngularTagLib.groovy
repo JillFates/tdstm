@@ -162,6 +162,7 @@ class ControlAngularTagLib {
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 		String min = (attrs.min ?: (attrs.min ?: "" ))
 		String blankOptionListText = (attrs.blankOptionListText ?: (attrs.blankOptionListText ?: null ))
+		String tabIndexInput = tabIndex ? tabIndex : calculateTabIndexNumber(fieldSpec, tabIndex, tabOffset)
 
 		String placeholder = attrs.placeholder ?: ''
 		boolean isRequired = fieldSpec.constraints?.required
@@ -183,14 +184,15 @@ class ControlAngularTagLib {
 						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
 						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
 						" [required]=\"$isRequired\" " +
+						" [tabindex]=\"$tabIndexInput\" " +
 						" [format]=\"'${transformNumberFormat(fieldSpec)}'\">" +
 						"</tds-number-control>"
 				break
 			case ControlType.DATE.toString():
-				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				out << "<tds-date-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
 				break
 			case ControlType.DATETIME.toString():
-				out << "<tds-datetime-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
+				out << "<tds-datetime-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
 				break
 			case ControlType.STRING.toString():
 			default:
@@ -598,7 +600,20 @@ class ControlAngularTagLib {
 	 * @param tabOffset - a value that if supplied is added to the tabindex (used by Custom Fields presently)
 	 * @return The tabIndex attribute HTML for controls
 	 */
-	private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
+		private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
+		def ti = calculateTabIndexNumber(fieldSpec, tabIndex, tabOffset)
+		return " tabindex=\"$ti\""
+	}
+
+	/**
+	 * Returns the  tabIndex number attribute based on the field specification
+	 * @param field - the Field specification object
+	 * @param tabIndex - the tabindex of the field that if supplied overrides the setting in field spec order property
+	 * @param tabOffset - a value that if supplied is added to the tabindex (used by Custom Fields presently)
+	 * @param attributeName - The name of the tabindex property (default: tabindex)
+	 * @return The tabIndex number
+	 */
+	private String calculateTabIndexNumber(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
 		Integer ti = NumberUtil.toInteger(tabIndex, -1)
 		if (ti < 1) {
 			ti = fieldSpec.order
@@ -614,7 +629,7 @@ class ControlAngularTagLib {
 		}
 
 		if (ti > 0) {
-			return " tabindex=\"$ti\""
+			return ti
 		}
 		return ''
 	}
