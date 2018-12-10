@@ -12,5 +12,7 @@ class CustomMySQLDialect extends MySQL5InnoDBDialect {
 		registerFunction("concat_ws", new StandardSQLFunction("concat_ws", StringType.INSTANCE))
 		registerFunction("json_object", new StandardSQLFunction("json_object", StringType.INSTANCE))
 		registerFunction(FieldSpec.CAST_BIG_DECIMAL_FUNCTION, new BigDecimalSQLFunction())
+		registerFunction(FieldSpec.CAST_DATE_TIME_FUNCTION, new DateTimeSQLFunction())
+		registerFunction(FieldSpec.CAST_LONG_FUNCTION, new LongSQLFunction())
 	}
 }
