@@ -18,14 +18,13 @@
 					Active Projects
 				</td>
 				<td>
-					<input type="checkbox" name="inactive"/> InActive Projects
+					<input type="checkbox" name="inactive"/> Inactive Projects
 				</td>
 			</tr>
 			<tr>
 			<td colspan="2" class="buttonR" style="text-align: center;">
 				<button type="button" class="btn btn-default" onclick="generateProjectSummary()" value="Generate Web">
-					Generate Web
-					<span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span>
+					Generate
 				</button>
 			</td>
 		</tr>
@@ -55,7 +54,7 @@
 				$("#processDiv").hide();
 				$("#projectReportDiv").show();
 				$("#projectReportDiv").html(data);
-			}, 
+			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while generating Project report Summary.")
 			}
