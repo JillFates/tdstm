@@ -369,10 +369,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	/**
 	 * On cell click event.
 	 * Determines if cell clicked property is either asset/dependent asset/dependency detail and opens detail popup.
+	 * gridCell field must be an actionable item
 	 * @param gridCell Reference to the current grid cell clicked
 	 */
 	protected  onClickActionableColumn(gridCell: any): void {
 		const fieldName = gridCell.column.field;
+		if (!this.actionableAssets.includes(fieldName)) {
+			return;
+		}
+
 		const assetRelationship = {
 			id: gridCell.dataItem['assetId'],
 			class: gridCell.dataItem['assetClass'],
