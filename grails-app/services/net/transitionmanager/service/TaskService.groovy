@@ -4163,8 +4163,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
              */
             def addWhereConditionsForFieldSpecs = { fieldSpecs ->
                 fieldSpecs.each { customField ->
-                    if (filter?.asset?.containsKey(customField.label)) {
-                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.label], customField.field)
+                    if (filter?.asset?.containsKey(customField.field)) {
+                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.field], customField.field)
                         if (sm) {
                             where = SqlUtil.appendToWhere(where, sm.sql)
                             if (sm.param) {
