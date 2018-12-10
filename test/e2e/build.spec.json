@@ -43,6 +43,7 @@
     "specs.Planning.Bundle.EditBundlesSpec",
     "specs.Planning.Bundle.BundleDeleteSpec",
     "specs.Planning.Bundle.BundleCleanUpSpec",
+    "specs.Planning.Events.CreateEventNoBundleSpec",
     "specs.Projects.AssetFields.ApplicationNonDisplayedFieldCreationSpec",
     "specs.Projects.AssetFields.ApplicationFieldCleanUpSpec",
     "specs.Projects.ETLScripts.ETLScriptsCreationSpec",
