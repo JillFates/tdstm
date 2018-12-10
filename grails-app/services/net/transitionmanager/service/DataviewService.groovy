@@ -28,6 +28,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+import java.sql.Timestamp
+
 /**
  * Service class with main database operations for Dataview.
  * @see net.transitionmanager.domain.Dataview
@@ -679,8 +681,10 @@ class DataviewService implements ServiceMethods {
 		// Iterate over each column
 		dataviewSpec.columns.each { Map column ->
 
+			Class type = typeFor(column)
 			// Check if the user provided a filter expression.
-			if (StringUtil.isNotBlank(filterFor(column))) {
+			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
+			if (StringUtil.isNotBlank(filterFor(column)) && !(type in [Date, Timestamp])) {
 
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -688,7 +692,7 @@ class DataviewService implements ServiceMethods {
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
 						filter: filterFor(column),
-						type: typeFor(column),
+						type: type,
 						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
 						fieldSpec: column.fieldSpec
