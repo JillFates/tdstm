@@ -18,7 +18,7 @@
 									</div>
 
 									<div class="form-group" *ngIf="bulkChangeAction === ACTION_TYPE.Dependencies">
-										{{'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_DEPENDENCIES' | translate:[affected]}}
+										{{'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_DEPENDENCIES' | translate:[affected, getSinglePluralDependenceName()]}}
 									</div>
 								</div>
 								<div class="col-md-12">
