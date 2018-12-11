@@ -153,20 +153,21 @@
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
-                                                <tds-date-control [tabIndex]="24"
-                                                                  class="tm-input-control"
-                                                                  name="modelAssetRetireDate"
-                                                                  [(value)]="model.asset.retireDate">
+                                                <tds-date-control
+													[tabIndex]="24"
+                                                    class="tm-input-control"
+                                                    name="modelAssetRetireDate"
+                                                    [(value)]="model.asset.retireDate">
                                                 </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"  />
 											<td data-for="validation" class="${standardFieldSpecs.validation.imp?:''}">
 												<kendo-dropdownlist
-														[tabIndex]="33"
-														class="tm-input-control"
-														name="modelAssetValidation"
-														[data]="${assetInstance.constraints.validation.inList as JSON}"
-														[(ngModel)]="model.asset.validation">
+													[tabIndex]="33"
+													class="tm-input-control"
+													name="modelAssetValidation"
+													[data]="${assetInstance.constraints.validation.inList as JSON}"
+													[(ngModel)]="model.asset.validation">
 												</kendo-dropdownlist>
 											</td>
 
@@ -174,12 +175,12 @@
 											<td data-for="testProc" class="${standardFieldSpecs.testProc.imp?:''}">
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.testProc}">
 												<kendo-dropdownlist
-														[tabIndex]="42"
-														class="tm-input-control"
-														name="modelAssetTestProc"
-														[(ngModel)]="model.asset.testProc"
-														[defaultItem]="'?'"
-														[data]="yesNoList">
+													[tabIndex]="42"
+													class="tm-input-control"
+													name="modelAssetTestProc"
+													[(ngModel)]="model.asset.testProc"
+													[defaultItem]="'?'"
+													[data]="yesNoList">
 												</kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 											</td>
@@ -190,32 +191,32 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}  ${standardFieldSpecs.maintExpDate.imp?:''} ">
                                                 <tds-date-control [tabIndex]="25"
-                                                                  class="tm-input-control"
-                                                                  name="modelAssetMaintExpDate"
-                                                                  [(value)]="model.asset.maintExpDate">
+                                                	class="tm-input-control"
+                                                    name="modelAssetMaintExpDate"
+                                                    [(value)]="model.asset.maintExpDate">
                                                 </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${assetInstance.latency}"/>
 											<td data-for="latency" class="${standardFieldSpecs.latency.imp?:''}">
 												<kendo-dropdownlist
-														[tabIndex]="34"
-														class="tm-input-control"
-														name="modelAssetLatency"
-														[(ngModel)]="model.asset.latency"
-														[defaultItem]="'?'"
-														[data]="yesNoList">
+													[tabIndex]="34"
+													class="tm-input-control"
+													name="modelAssetLatency"
+													[(ngModel)]="model.asset.latency"
+													[defaultItem]="'?'"
+													[data]="yesNoList">
 												</kendo-dropdownlist>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}"/>
 											<td data-for="startupProc" class="${standardFieldSpecs.startupProc.imp?:''}" >
 												<kendo-dropdownlist
-														[tabIndex]="43"
-														class="tm-input-control"
-														name="modelAssetStartupProc"
-														[(ngModel)]="model.asset.startupProc"
-														[defaultItem]="'?'"
-														[data]="yesNoList">
+													[tabIndex]="43"
+													class="tm-input-control"
+													name="modelAssetStartupProc"
+													[(ngModel)]="model.asset.startupProc"
+													[defaultItem]="'?'"
+													[data]="yesNoList">
 												</kendo-dropdownlist>
 											</td>
 

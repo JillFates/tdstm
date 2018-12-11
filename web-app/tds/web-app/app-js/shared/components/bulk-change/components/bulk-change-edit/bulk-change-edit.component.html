@@ -87,8 +87,10 @@
                                     </tds-number-control>
 
                                     <!-- Date Fields -->
-                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
-                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>
+                                    <tds-date-control
+										*ngIf="canShowControl('Date', rowIndex)"
+                                        [(value)]="editRows.selectedValues[rowIndex].value">
+									</tds-date-control>
 
                                     <!-- Datetime Fields -->
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
