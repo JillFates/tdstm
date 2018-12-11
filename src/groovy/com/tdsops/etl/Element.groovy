@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 @Slf4j(value='logger')
-class Element implements RangeChecker {
+class Element implements RangeChecker, ETLCommand {
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
 
@@ -114,13 +114,17 @@ class Element implements RangeChecker {
 	 * @param fieldName
 	 * @return the element instance that received this command
 	 */
-	Element load(String fieldName) {
+	ETLCommand load(String fieldName) {
 		processor.validateStack()
-		if(processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
-			processor.addElementLoaded(this)
-			return this
-		} else{
+		if (processor.hasSelectedDomain()) {
+			if (isCommentsCommand(fieldName)) {
+				return new CommentElement(this.processor, this.processor.selectedDomain.domain).with(this.value)
+			} else {
+				this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
+				processor.addElementLoaded(this)
+				return this
+			}
+		} else {
 			throw ETLProcessorException.domainMustBeSpecified()
 		}
 	}
