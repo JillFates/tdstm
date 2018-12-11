@@ -3043,4 +3043,27 @@ class AssetEntityService implements ServiceMethods {
 		}
 	}
 
+	/**
+	 * Used to get the model map used to render the create/edit view of any type of asset class.
+	 * @param forCreate - is model for create or show/edit
+	 * @param project - the project of the user
+	 * @param assetEntity - current asset
+	 * @param params - request parameters
+	 * @return a map of the properties containing the list values to populate the list controls
+	 */
+	Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity, String domain , Map params) {
+		Map commonModel
+
+		if (forCreate) {
+			commonModel = assetEntityService.getCommonModelForCreate(domain, project, assetEntity)
+		} else {
+			commonModel = assetEntityService.getCommonModelForShows(domain, project, params)
+		}
+
+		// add the list values needed to render this controls as regular control from ControlAngularTab lib
+		commonModel.standardFieldSpecs.environment.constraints.put('values', getAssetEnvironmentOptions())
+
+		return commonModel
+	}
+
 }

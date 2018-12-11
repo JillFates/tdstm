@@ -226,18 +226,8 @@ class ApplicationService implements ServiceMethods {
 	 * @return a map of the properties containing the list values to populate the list controls
 	 */
 	private Map getCommonModel(Boolean forCreate, Project project, Application application, Map params) {
-		Map commonModel
-
-		if (forCreate) {
-			commonModel = assetEntityService.getCommonModelForCreate('Application', project, application)
-		} else {
-			commonModel = assetEntityService.getCommonModelForShows('Application', project, params, application)
-		}
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, application, 'Application', params)
 		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
-
-		return commonModel;
+		return commonModel
 	}
 }

@@ -341,17 +341,8 @@ class DeviceService implements ServiceMethods {
 	 * @param params - request parameters
 	 * @return a map of the properties containing the list values to populate the list controls
 	 */
-	private Map getCommonModel(Boolean forCreate, Project project, assetEntity , Map params) {
-		Map commonModel
-
-		if (forCreate) {
-			commonModel = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
-		} else {
-			commonModel = assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
-		}
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
+	private Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity , Map params) {
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, assetEntity, 'AssetEntity', params)
 		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
 
 		return commonModel;

@@ -30,7 +30,7 @@ class StorageService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		Files file = new Files(project: project);
-		Map commonModel = this.getCommonModel(true, project, file, params)
+		Map commonModel = assetEntityService.getCommonModel(true, project, file, 'Files', params)
 
 		return [assetInstance: file] + commonModel
 	}
@@ -97,28 +97,5 @@ class StorageService implements ServiceMethods {
 		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, asset, params)
 
 		return asset
-	}
-
-	/**
-	 * Used to get the model map used to render the create view of an Storage domain asset
-	 * @param forCreate - is model for create or show/edit
-	 * @param project - the project of the user
-	 * @param file - current file
-	 * @param params - request parameters
-	 * @return a map of the properties containing the list values to populate the list controls
-	 */
-	private Map getCommonModel(Boolean forCreate, Project project, file , Map params) {
-		Map commonModel
-
-		if (forCreate) {
-			commonModel = assetEntityService.getCommonModelForCreate('Files', project, file)
-		} else {
-			commonModel = assetEntityService.getCommonModelForShows('Files', project, params)
-		}
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-
-		return commonModel;
 	}
 }

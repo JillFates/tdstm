@@ -21,7 +21,7 @@ class DatabaseService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
-		Map commonModel = this.getCommonModel(false, project, db, params)
+		Map commonModel = assetEntityService.getCommonModel(false, project, db, 'Database', params)
 
 		[databaseInstance: db, currentUserId: securityService.currentPersonId] + commonModel
 	}
@@ -103,28 +103,5 @@ class DatabaseService implements ServiceMethods {
 		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, asset, params)
 
 		return asset
-	}
-
-	/**
-	 * Used to get the model map used to render the create view of an Database domain asset
-	 * @param forCreate - is model for create or show/edit
-	 * @param project - the project of the user
-	 * @param database - current database
-	 * @param params - request parameters
-	 * @return a map of the properties containing the list values to populate the list controls
-	 */
-	private Map getCommonModel(Boolean forCreate, Project project, database , Map params) {
-		Map commonModel
-
-		if (forCreate) {
-			commonModel = assetEntityService.getCommonModelForCreate('Database', project, database)
-		} else {
-			commonModel = assetEntityService.getCommonModelForShows('Database', project, params)
-		}
-
-		// add the list values needed to render this controls as regular control from ControlAngularTab lib
-		commonModel.standardFieldSpecs.environment.constraints.put('values', assetEntityService.getAssetEnvironmentOptions())
-
-		return commonModel;
 	}
 }
