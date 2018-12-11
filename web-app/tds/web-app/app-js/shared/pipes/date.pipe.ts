@@ -13,7 +13,7 @@ import {DateUtils} from '../utils/date.utils';
 export class DatePipe implements PipeTransform {
 
 	transform(value: string, args?: any): any {
-		let dateValue = DateUtils.toDateUsingFormat(value, DateUtils.TDS_OUTPUT_DATE_FORMAT);
+		let dateValue = DateUtils.toDateUsingFormat(value, DateUtils.SERVER_FORMAT_DATE);
 		if (!dateValue) {
 			return '';
 		}

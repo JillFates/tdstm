@@ -22,9 +22,9 @@ export class DateUtils {
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
-	public static readonly TDS_OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
-	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'YYYY-MM-DDT' + DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT;
-	public static readonly TDS_OUTPUT_DATE_FORMAT = 'YYYY-MM-DD';
+	public static readonly OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
+	public static readonly SERVER_FORMAT_DATETIME = 'YYYY-MM-DDT' + DateUtils.OUTPUT_PIPE_TIME_FORMAT;
+	public static readonly SERVER_FORMAT_DATE = 'YYYY-MM-DD';
 	public static readonly TIMEZONE_GMT = 'GMT';
 
 	/**
@@ -45,7 +45,7 @@ export class DateUtils {
 		if (iso8601Value === undefined || !iso8601Value) {
 			return '';
 		}
-		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.TDS_OUTPUT_PIPE_TIME_FORMAT}`);
+		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.OUTPUT_PIPE_TIME_FORMAT}`);
 	}
 
 	/**
