@@ -18,7 +18,7 @@ class StorageService implements ServiceMethods {
 	 * @param params - parameters coming from the request
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
-		Map commonModel = this.getCommonModel(false, project, storage, params)
+		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params)
 		[filesInstance: storage, currentUserId: securityService.currentPersonId] + commonModel
 	}
 

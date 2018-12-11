@@ -34,7 +34,7 @@ class DatabaseService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		Database database = new Database(project: project)
-		Map commonModel = this.getCommonModel(true, project, database, params)
+		Map commonModel = assetEntityService.getCommonModel(true, project, database, 'Database', params)
 
 		return [assetInstance: database] + commonModel
 	}

@@ -3076,9 +3076,9 @@ class AssetEntityService implements ServiceMethods {
 		Map commonModel
 
 		if (forCreate) {
-			commonModel = assetEntityService.getCommonModelForCreate(domain, project, assetEntity)
+			commonModel = getCommonModelForCreate(domain, project, assetEntity)
 		} else {
-			commonModel = assetEntityService.getCommonModelForShows(domain, project, params)
+			commonModel = getCommonModelForShows(domain, project, params)
 		}
 
 		// add the list values needed to render this controls as regular control from ControlAngularTab lib
