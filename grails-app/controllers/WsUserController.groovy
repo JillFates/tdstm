@@ -6,9 +6,12 @@ import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
@@ -23,6 +26,7 @@ class WsUserController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
 	PersonService personService
+	PartyRelationshipService partyRelationshipService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -57,6 +61,22 @@ class WsUserController implements ControllerMethods {
         ]
     	renderSuccessJson(model)
     }
+
+	/**
+	 * Used by the User Preference Edit dialog. This will return a List<Map> where the map will
+	 * consist of the following:
+	 *    code - the Preference Code
+	 *    label - the human readable name of the code
+	 *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
+	 * @return Success Structure with preferences property containing List<Map>
+	 */
+	def modelForStaffViewEdit() {
+		Project project = getProjectForWs()
+		Person person = currentPerson()
+		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
+
+		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
+	}
 
     /**
      * Used to reset all preferences of a user
@@ -122,16 +142,18 @@ class WsUserController implements ControllerMethods {
 	 */
 	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserUpdateOwnAccount)
-	def updateAccount(Map personInfo) {
+	def updateAccount() {
 		Map settings = request.JSON
-        //params.id = securityService.currentUserLoginId
-        Person person = personService.updatePerson(settings, false)
-		Map preferences = [
-		        START_PAGE : settings.startPage,
-				CURR_POWER_TYPE : settings.powerType
-		]
-		userPreferenceService.setPreferences(null, preferences)
-		renderSuccessJson()
+		// BYADMIN SHOULD BE TRUE BUT BREAKS OTHERWISE
+        Person person = personService.updatePerson(settings, true)
+		if(settings.startPage) {
+			Map preferences = [
+					START_PAGE     : settings.startPage,
+					CURR_POWER_TYPE: settings.powerType
+			]
+			userPreferenceService.setPreferences(null, preferences)
+		}
+		renderSuccessJson(person)
     }
 
 	@HasPermission(Permission.UserGeneralAccess)

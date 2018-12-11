@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {UserPreferencesComponent} from '../preferences/user-preferences.component';
 import {UserService} from '../../service/user.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserManageStaffComponent} from '../manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 

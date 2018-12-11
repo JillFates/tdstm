@@ -142,7 +142,7 @@ class Person extends Party {
 	}
 
 	/**
-	 * The company for this person.
+ack	 * The company for this person.l
 	 */
 	Party getCompany() {
 		partyRelationshipService.getCompanyOfStaff(this)
@@ -274,5 +274,38 @@ class Person extends Party {
 			log.warn(msg)
 			throw new UnsupportedOperationException(msg)
 		}
+	}
+
+	/**
+	 * Converts this person object to a map
+	 * @return
+	 */
+	Map toMap(Project project) {
+		def teams = getTeamsCanParticipateIn()
+		Map data = [
+				id: id,
+				firstName: firstName,
+				middleName: middleName,
+				lastName: lastName,
+				nickName: nickName,
+				title: title,
+				email: email,
+				department: department,
+				location: location,
+				workPhone: workPhone,
+				mobilePhone: mobilePhone,
+				active: active,
+				company: company.toString(),
+				country: country,
+				stateProv: stateProv,
+				keyWords: keyWords,
+				tdsNote: tdsNote,
+				tdsLink: tdsLink,
+				travelOK: travelOK,
+				blackOutDates: [date: blackOutDates.exceptionDay],
+				teams: teams,
+				staffType: staffType
+		]
+		return data.asImmutable()
 	}
 }

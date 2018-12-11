@@ -1611,15 +1611,15 @@ class PersonService implements ServiceMethods {
 			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
 		}
 
-		params.travelOK == "1" ? params : (params.travelOK = 0)
+		params.travelOK = params.travelOK == 1 ? 1 : 0
 
 		if (!person.staffType && !params.staffType) {
 			params.staffType = 'Hourly'
 		}
 
 		// TODO : JPM 8/31/2015 : Replace person.properties = params with proper field assignments
-		person.properties = params
-
+		// person.properties = params
+		GormUtil.bindMapToDomain(person, params, ["blackoutDates","userLogin"])
 		Project project = securityService.userCurrentProject
 
 		Map nameMap = [first: person.firstName, middle: person.middleName, last: person.lastName]
@@ -1680,13 +1680,13 @@ class PersonService implements ServiceMethods {
 
 		// Additional changes allowed by adminstrator of a person
 		if (byAdmin) {
-			List teams = params.list("function")
-			if (params.manageFuncs != '0' || teams) {
-				partyRelationshipService.updateAssignedTeams(person, teams)
+			// THIS IS BROKEN FROM WS
+			if (params.manageFuncs != '0' || params.teams) {
+				partyRelationshipService.updateAssignedTeams(person, params.teams)
 			}
 
 			// TODO : JPM 8/31/2015 : Overhaul how exception dates are handled - shouldn't delete all then re-add
-			List<Date> personExpDates = params.list("availability").collect { TimeUtil.parseDate(it) }
+			/*List<Date> personExpDates = params.list("availability").collect { TimeUtil.parseDate(it) }
 			if (personExpDates) {
 				ExceptionDates.executeUpdate('DELETE FROM ExceptionDates WHERE person = :person AND exceptionDay NOT IN (:dates)',
 						[person: person, dates: personExpDates])
@@ -1703,7 +1703,7 @@ class PersonService implements ServiceMethods {
 			}
 			else {
 				ExceptionDates.executeUpdate('DELETE FROM ExceptionDates WHERE person = :person', [person: person])
-			}
+			}*/
 		}
 
 		if (!byAdmin) {
