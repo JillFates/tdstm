@@ -8,7 +8,7 @@ import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 
 /**
- * Implementation of a custom {@code SQLFunction} to be used in Dataviews. It can convert "cast" function for decimal formats
+ * Implementation of a custom {@code SQLFunction} to be used in Dataviews. It can convert "cast" function for non decimal formats
  * Following the following HQL Sentence:
  * <pre>
  * select AE.id,
@@ -24,14 +24,13 @@ import org.hibernate.type.Type
  * group by AE.id
  * order by AE.id asc
  * </pre>
- * <p>This class is in charged to convert <pre>cast_big_decimal(AE.custom13, 2)</pre> in <pre>cast(assetentit0_.custom13 as decimal(12,2)</pre></p>
- * <p>For tha reason, it is necessary 2 parameters:</p>
+ * <p>This class is in charged to convert <pre>cast_long(AE.custom10)</pre> in <pre>CASE WHEN $field != '' THEN CONVERT(assetentit0_.custom10,UNSIGNED INTEGER) ELSE NULL END</pre></p>
+ * <p>For that reason, it is necessary 1 parameter:</p>
  * <ul>
  *  <li>First, the property to be used in this custom cast function</li>
- * 	<li>Second, precision digits taken from field specs</li>
  * </ul>
  */
-class BigDecimalSQLFunction implements SQLFunction {
+class LongSQLFunction implements SQLFunction {
 
 	@Override
 	boolean hasArguments() {
@@ -45,12 +44,12 @@ class BigDecimalSQLFunction implements SQLFunction {
 
 	@Override
 	Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-		return StandardBasicTypes.BIG_DECIMAL
+		return StandardBasicTypes.LONG
 	}
 
 	/**
-	 * <p>Prepares custom cast function for dealing with big decimals in an HQL sentence.</p>
-	 * <p>It prepares a MySQL sentence using specific  functions.</p>
+	 * <p>Prepares custom cast function for dealing with non decimal numeric values in an HQL sentence.</p>
+	 * <p>It prepares a MySQL sentence using specific functions.</p>
 	 * <p>It uses 'CASE' function to avoid casting on empty String content</p>
 	 * @param firstArgumentType
 	 * @param arguments
@@ -61,12 +60,11 @@ class BigDecimalSQLFunction implements SQLFunction {
 	@Override
 	String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) throws QueryException {
 
-		if (arguments.size() < 2) {
-			throw new IllegalArgumentException("The function must be passed 2 arguments")
+		if (arguments.size() < 1) {
+			throw new IllegalArgumentException("The function must be passed 1 arguments")
 		}
 
 		String field = (String) arguments.get(0)
-		String precision = (String) arguments.get(1)
-		return "CASE WHEN $field != '' THEN cast($field as decimal(12,$precision)) ELSE NULL END"
+		return "CASE WHEN $field != '' THEN CONVERT($field,UNSIGNED INTEGER) ELSE NULL END"
 	}
 }

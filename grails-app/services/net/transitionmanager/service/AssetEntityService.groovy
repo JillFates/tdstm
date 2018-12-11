@@ -45,6 +45,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
@@ -53,6 +54,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -3041,6 +3043,25 @@ class AssetEntityService implements ServiceMethods {
 			Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), assetIds: assetIds]
 			AssetEntity.executeUpdate(query, params)
 		}
+	}
+
+	/**
+	 * Create and return a list with the dependencies needed to populate the Dependency List.
+	 * @param project - user's current project
+	 * @param filterParams - filters for narrowing down the search (user input).
+	 * @param sortingParams - params for sorting results.
+	 * @param paginationParams - params for pagination.
+	 *
+	 * @return a list with a map for each dependency of the form [id: dep id, cell: dep cells]
+	 */
+	Map listDependencies(Project project, Map filterParams, Map sortingParams, Map paginationParams) {
+
+		AssetDependencyQueryBuilder queryBuilder = new AssetDependencyQueryBuilder(project, filterParams, sortingParams, paginationParams)
+		Map results = queryBuilder.queryDomain()
+		return [
+		    dependencies: results['domains'],
+			total: results['total']
+		]
 	}
 
 	/**

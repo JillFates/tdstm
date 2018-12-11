@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
@@ -235,8 +236,17 @@ class WsAssetController implements ControllerMethods {
     */
    @HasPermission(Permission.AssetEdit)
    def bulkDeleteDependencies(){
-      Project project = projectForWs
-      renderAsJson(resp: assetService.bulkDeleteDependencies(project, params.list("dependencyIds[]")))
+       Project project = projectForWs
+
+	   Map requestParams = null
+	   if (request.format == 'json') {
+		   requestParams = request.JSON
+	   } else {
+		   params.dependencies = params.list('dependencyIds[]')
+		   requestParams = params
+	   }
+
+	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, requestParams.dependencies))
    }
 
 	/**
@@ -526,5 +536,19 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(AssetClass.classOptions)
 	}
 
+	/**
+	 * Return the list of dependencies for the Dependency List.
+	 */
+	@HasPermission(Permission.AssetView)
+	def listDependencies() {
+		Project project = getProjectForWs()
+		Map jsonParams = request.JSON
+		int maxRows = NumberUtil.toPositiveInteger(jsonParams['rows'], 25)
+		int currentPage =NumberUtil.toPositiveInteger(jsonParams['page'], 1)
+		int rowOffset = (currentPage - 1) * maxRows
+		Map paginationParams = [max: maxRows, offset: rowOffset]
+		Map sortingParams = [index: jsonParams['sidx'] , order: jsonParams['sord']]
+		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
+	}
 
 }
