@@ -23,6 +23,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service';
 // Services
 import {DependenciesService} from './service/dependencies.service';
+import {OpenAssetDependenciesService} from './service/open-asset-dependencies.service';
 import { TagService } from '../assetTags/service/tag.service';
 
 @NgModule({
@@ -51,6 +52,7 @@ import { TagService } from '../assetTags/service/tag.service';
 		TagsResolveService,
 		ModuleResolveService,
 		DependenciesService,
+		OpenAssetDependenciesService,
 		// Services
 		TagService
 	],

@@ -52,10 +52,9 @@ import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/t
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetDependencyComponent} from '../../../assetExplorer/components/asset-dependency/asset-dependency.component';
 import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
+import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
 
 declare var jQuery: any;
 
@@ -83,6 +82,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	protected state: ComponentState;
 	private componentState: BehaviorSubject<ComponentState>;
 	protected readonly actionableAssets = ['assetName', 'dependentName', 'type'];
+	private openAssetsHandler = null;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -91,12 +91,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService,
+		private openAssetDependenciesService: OpenAssetDependenciesService,
 		protected assetService: DependecyService) {
 	}
 
 	ngOnInit() {
 		// set the initial component state
 		this.state = this.getInitialComponentState();
+		// set the open assets handler
+		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(this.actionableAssets)
 
 		this.destroySubject = new Subject<any>();
 		this.componentState = new BehaviorSubject<any>(this.state);
@@ -378,68 +381,23 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		const assetRelationship = {
+		const assetDependency: AssetDependency = {
 			id: gridCell.dataItem['assetId'],
 			class: gridCell.dataItem['assetClass'],
 			dependentId: gridCell.dataItem['dependentId'],
 			dependentClass: gridCell.dataItem['dependentClass']
 		};
 
-		const asset = this.assetViewFactory(fieldName, assetRelationship);
-		if (asset) {
-			asset.params
-				.subscribe((results) => {
-					asset.openWindowService(asset.component, results, ...asset.extra)
-						.then(() => this.changeState())
-						.catch(error => {
-							console.log('Error:', error);
-							this.changeState();
-						});
-				})
-		}
-
-	}
-
-	/**
-	 * Based upon the fieldName selected, get the object that represents an asset along with the parameters
-	 * required to open it in a view
-	 * @param fieldName  Asset field name
-	 * @param asset Asset id and corresponding asset dependency id
-	 */
-	private assetViewFactory(fieldName: string, asset: {id: number, class: string, dependentId: number, dependentClass: string}): any {
-		const [assetName, dependentName, type] = this.actionableAssets;
-
-		const assetParameters = {
-			[assetName]: {
-				component: AssetShowComponent,
-				params: Observable.of([
-					{ provide: 'ID', useValue: asset.id },
-					{ provide: 'ASSET', useValue: asset.class }
-				]),
-				extra: [DIALOG_SIZE.LG],
-				openWindowService: this.dialog.open.bind(this.dialog)
-			},
-			[dependentName]: {
-				component: AssetShowComponent,
-				params: Observable.of([
-					{ provide: 'ID', useValue: asset.dependentId },
-					{ provide: 'ASSET', useValue: asset.dependentClass }
-				]),
-				extra: [DIALOG_SIZE.LG],
-				openWindowService: this.dialog.open.bind(this.dialog)
-			},
-			[type]: {
-				component: AssetDependencyComponent,
-				params: this.assetService
-							.getDependencies(asset.id, asset.dependentId)
-							.pipe(
-								switchMap((result: any) => Observable.of([{provide: 'ASSET_DEP_MODEL', useValue: result}]))
-							),
-				extra: [true],
-				openWindowService: this.dialog.extra.bind(this.dialog)
-			}
-		};
-
-		return assetParameters[fieldName] || null;
+		this.openAssetsHandler(fieldName, assetDependency)
+			.pipe(
+				takeUntil(this.destroySubject)
+			)
+			.subscribe(
+				_ => this.changeState(),
+				(error) => {
+					console.log(error);
+					this.changeState();
+				}
+			);
 	}
 }
