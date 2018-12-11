@@ -6,6 +6,7 @@ import modules.MenuModule
 import modules.ProjectsModule
 import modules.AssetsModule
 import modules.TasksModule
+import modules.ReportsModule
 
 import modules.PlanningModule
 
@@ -22,7 +23,7 @@ class MenuPage extends Page {
         projectsModule { module ProjectsModule}
         assetsModule { module AssetsModule}
         tasksModule { module TasksModule}
-
         planningModule { module PlanningModule}
+        reportsModule { module ReportsModule}
     }
 }
