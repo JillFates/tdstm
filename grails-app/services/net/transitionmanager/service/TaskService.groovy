@@ -3156,6 +3156,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		} catch(e)	{
 			// exceptions.append("We BLEW UP damn it!<br>")
 			// exceptions.append(failure)
+			log.error "$failure\n${ExceptionUtil.stackTraceToString(e,80)}"
 			if (! failure) {
 				// If the failed variable is empty then we have an unexpected error so dump the stack for debugging purposes
 				failure = e.message
@@ -4003,7 +4004,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		String where = ''
 		//def project = moveEvent.project
 		Map map = [:]
-		String filter
+		Map filter = [:]
 
 		if (! groupOrTaskSpec.containsKey('filter')) {
 			throw new RuntimeException("Required 'filter' section was missing from $groupOrTaskSpec")
@@ -4491,7 +4492,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		String updatedWhereStatement = existingWhereStatement
 
 		// Avoid going through the field specs if there's not filter.asset
-		if (filter?.containsKey('asset')) {
+		if (filter?.containsKey('asset') && filter.asset) {
 			Map assetFilter = filter.asset
 			fieldSpecs.each { fieldSpec ->
 				String matchKey = null
