@@ -659,7 +659,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Create a local variable using variableName parameter.
 	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
-	 * 	iterate {* 		domain Application
+	 * 	iterate {
+	 * 		domain Application
 	 * 	    ...
 	 * 		set environmentVar with 'Production'
 	 * 		set environmentVar with SOURCE.'application id'
