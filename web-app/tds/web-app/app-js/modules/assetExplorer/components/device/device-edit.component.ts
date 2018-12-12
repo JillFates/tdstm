@@ -55,6 +55,12 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 */
 		private initModel(): void {
 			this.model.asset = R.clone(editModel.asset);
+
+			this.model.sourceRoomSelect = [this.defaultRoom, ...this.model.sourceRoomSelect];
+			this.model.targetRoomSelect = [this.defaultRoom, ...this.model.targetRoomSelect];
+
+			this.model.asset.priority = (this.model.asset.priority || '').toString();
+
 			if (this.model.asset.scale && this.model.asset.scale.name) {
 				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
@@ -75,17 +81,27 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 				this.model.asset.modelSelectValue.text = this.model.modelName;
 			}
 			if (this.model.sourceRackSelect) {
-				this.rackSourceOptions = this.model.sourceRackSelect;
+				this.rackSourceOptions = [this.defaultRoom,  ...this.model.sourceRackSelect];
 			}
 			if (this.model.targetRackSelect) {
-				this.rackTargetOptions = this.model.targetRackSelect;
+				this.rackTargetOptions = [this.defaultRoom,  ...this.model.targetRackSelect];
 			}
 			if (this.model.sourceChassisSelect) {
-				this.bladeSourceOptions = this.model.sourceChassisSelect;
+				this.bladeSourceOptions = [this.defaultRoom, ...this.model.sourceChassisSelect];
 			}
 			if (this.model.targetChassisSelect) {
-				this.bladeTargetOptions = this.model.targetChassisSelect;
+				this.bladeTargetOptions = [this.defaultRoom, this.model.targetChassisSelect];
 			}
+
+			this.model.asset.roomSource = this.model.asset.roomSource || this.defaultRoom;
+			this.model.asset.roomTarget = this.model.asset.roomTarget ||  this.defaultRoom;
+			this.model.asset.rackSource = this.model.asset.rackSource || this.defaultRoom;
+			this.model.asset.rackTarget = this.model.asset.rackTarget || this.defaultRoom;
+			this.model.asset.sourceChassis = this.model.asset.sourceChassis || this.defaultRoom;
+			this.model.asset.targetChassis = this.model.asset.targetChassis || this.defaultRoom;
+
+			this.model.asset.scale = this.model.asset.scale || null;
+
 		}
 
 		/**

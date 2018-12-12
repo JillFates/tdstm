@@ -13,7 +13,7 @@ import java.sql.Timestamp
 class FieldSpecSpec extends Specification {
 
 	private Integer setUdfProperty(String fieldName) {
-		return ( fieldName.startsWith('custom') ? 1 : 0 )
+		return (fieldName.startsWith('custom') ? 1 : 0)
 	}
 
 	void 'test if a field spec is custom'() {
@@ -158,10 +158,10 @@ class FieldSpecSpec extends Specification {
 			control    | field       | label             | precision | separator | allowNegative || castSentence
 			'String'   | 'assetName' | 'Name'            | null      | false     | false         || "cast(A.custom10 as $StringType.INSTANCE.name)"
 			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || "$FieldSpec.CAST_BIG_DECIMAL_FUNCTION(A.custom10, 2)"
-			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || "cast(A.custom10 as $LongType.INSTANCE.name)"
-			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $LongType.INSTANCE.name)"
-			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $DateType.INSTANCE.name)"
-			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast(A.custom10 as $TimestampType.INSTANCE.name)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || "cast_long(A.custom10)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_long(A.custom10)"
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(A.custom10, '%Y-%m-%d')"
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(A.custom10, '%Y-%m-%dT%TZ')"
 	}
 
 }

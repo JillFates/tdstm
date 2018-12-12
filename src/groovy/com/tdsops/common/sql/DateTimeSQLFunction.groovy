@@ -8,7 +8,7 @@ import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 
 /**
- * Implementation of a custom {@code SQLFunction} to be used in Dataviews. It can convert "cast" function for decimal formats
+ * Implementation of a custom {@code SQLFunction} to be used in Dataviews. It can convert "cast" function for date and datetime formats
  * Following the following HQL Sentence:
  * <pre>
  * select AE.id,
@@ -24,33 +24,37 @@ import org.hibernate.type.Type
  * group by AE.id
  * order by AE.id asc
  * </pre>
- * <p>This class is in charged to convert <pre>cast_big_decimal(AE.custom13, 2)</pre> in <pre>cast(assetentit0_.custom13 as decimal(12,2)</pre></p>
+ * <p>This class is in charged to convert
+ * <pre>cast_date_time(AE.custom19, '%Y-%m-%d')</pre>
+ * in
+ * <pre>CASE WHEN assetentit0_.custom13 != '' THEN STR_TO_DATE(assetentit0_.custom13, '%Y-%m-%d'') ELSE NULL END</pre>
  * <p>For tha reason, it is necessary 2 parameters:</p>
  * <ul>
  *  <li>First, the property to be used in this custom cast function</li>
- * 	<li>Second, precision digits taken from field specs</li>
+ * 	<li>Second, format taken from field specs definition</li>
  * </ul>
+ *  @see net.transitionmanager.dataview.FieldSpec#CAST_DATE_TIME_FUNCTION
  */
-class BigDecimalSQLFunction implements SQLFunction {
+class DateTimeSQLFunction implements SQLFunction {
 
 	@Override
 	boolean hasArguments() {
-		return true
+		return false
 	}
 
 	@Override
 	boolean hasParenthesesIfNoArguments() {
-		return true
+		return false
 	}
 
 	@Override
 	Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-		return StandardBasicTypes.BIG_DECIMAL
+		return StandardBasicTypes.TIMESTAMP
 	}
 
 	/**
-	 * <p>Prepares custom cast function for dealing with big decimals in an HQL sentence.</p>
-	 * <p>It prepares a MySQL sentence using specific  functions.</p>
+	 * <p>Prepares custom cast function for dealing with datetime values in an HQL sentence.</p>
+	 * <p>It prepares a MySQL sentence using specific functions.</p>
 	 * <p>It uses 'CASE' function to avoid casting on empty String content</p>
 	 * @param firstArgumentType
 	 * @param arguments
@@ -65,8 +69,8 @@ class BigDecimalSQLFunction implements SQLFunction {
 			throw new IllegalArgumentException("The function must be passed 2 arguments")
 		}
 
-		String field = (String) arguments.get(0)
-		String precision = (String) arguments.get(1)
-		return "CASE WHEN $field != '' THEN cast($field as decimal(12,$precision)) ELSE NULL END"
+		String date = (String) arguments.get(0)
+		String format = (String) arguments.get(1)
+		return "CASE WHEN $date != '' THEN STR_TO_DATE($date, $format) ELSE NULL END"
 	}
 }
