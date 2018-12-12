@@ -48,6 +48,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			if (this.model.asset.scale && this.model.asset.scale.name) {
 				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
+			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
 		}

@@ -34,20 +34,8 @@
 										</tr>
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${assetInstance.dbFormat}" tabindex="13" ngmodel="model.asset.dbFormat"/>
-
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance?.supportType}" ngmodel="model.asset.supportType" tabIndex="17"/>
-
-											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance?.environment}"/>
-											<td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
-												<kendo-dropdownlist
-														[tabIndex]="21"
-														class="tm-input-control"
-														name="modelAssetEnvironment"
-														[(ngModel)]="model.asset.environment"
-														[defaultItem]="'Please Select'"
-														[data]="model.environmentOptions">
-												</kendo-dropdownlist>
-											</td>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 										</tr>
 										<tr>
 											<td class="label ${standardFieldSpecs.size.imp?:''}"
@@ -65,7 +53,6 @@
 														name="modelAssetScaleName"
 														[data]="${SizeScale.getAsJsonList() as JSON}"
 														[(ngModel)]="model.asset.scale"
-														[defaultItem]="''"
 														[textField]="'text'"
 														[valueField]="'value'"
 														style="width: 100px;">
@@ -134,7 +121,6 @@
 											<td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
 												<kendo-dropdownlist
 														[tabIndex]="24"
-														[defaultItem]="${assetInstance.constraints.validation.inList as JSON}[0]"
 														class="tm-input-control"
 														name="modelAssetValidation"
 														[data]="${assetInstance.constraints.validation.inList as JSON}"

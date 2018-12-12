@@ -62,17 +62,7 @@
                                             <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${assetInstance.size}" ngmodel="model.asset.size"/>&nbsp;
                                         </td>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" tabindex="16" ngmodel="model.asset.externalRefId"/>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance.environment}"/>
-                                        <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-                                            <kendo-dropdownlist
-                                                    [tabIndex]="19"
-                                                    class="tm-input-control"
-                                                    name="modelAssetEnvironment"
-                                                    [(ngModel)]="model.asset.environment"
-                                                    [defaultItem]="'Please Select'"
-                                                    [data]="model.environmentOptions">
-                                            </kendo-dropdownlist>
-                                        </td>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="19" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
                                         <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                             <kendo-dropdownlist
@@ -94,7 +84,6 @@
                                                     name="modelAssetScaleName"
                                                     [data]="${SizeScale.getAsJsonList() as JSON}"
                                                     [(ngModel)]="model.asset.scale"
-                                                    [defaultItem]="''"
                                                     [textField]="'text'"
                                                     [valueField]="'value'">
                                             </kendo-dropdownlist>

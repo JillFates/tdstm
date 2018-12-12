@@ -18,7 +18,8 @@ class StorageService implements ServiceMethods {
 	 * @param params - parameters coming from the request
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
-		[filesInstance: storage, currentUserId: securityService.currentPersonId] + assetEntityService.getCommonModelForShows('Files', project, params)
+		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params)
+		[filesInstance: storage, currentUserId: securityService.currentPersonId] + commonModel
 	}
 
 	/**
@@ -29,7 +30,9 @@ class StorageService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		Files file = new Files(project: project);
-		return [assetInstance: file] + assetEntityService.getCommonModelForCreate('Files', project, file)
+		Map commonModel = assetEntityService.getCommonModel(true, project, file, 'Files', params)
+
+		return [assetInstance: file] + commonModel
 	}
 
 	/**

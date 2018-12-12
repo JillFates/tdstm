@@ -2,8 +2,9 @@ import {EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {IntlService} from '@progress/kendo-angular-intl';
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
+import {TDSCustomControl} from '../common/custom-control';
 
-export abstract class DateControlCommons implements OnInit {
+export abstract class DateControlCommons extends TDSCustomControl implements OnInit {
 
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
@@ -16,6 +17,7 @@ export abstract class DateControlCommons implements OnInit {
 				protected userPreferenceService: PreferenceService,
 				protected intl: IntlService,
 				outputFormat: string) {
+		super();
 		this.outputFormat = outputFormat;
 	}
 
