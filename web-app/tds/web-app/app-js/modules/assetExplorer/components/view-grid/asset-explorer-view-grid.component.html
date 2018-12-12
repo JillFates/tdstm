@@ -160,7 +160,7 @@
 			<ng-template kendoGridHeaderTemplate>
 				<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 					<div [ngClass]="{'field-not-found': column?.notFound }">
-						<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+						<label> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 					</div>
 				</div>
 			</ng-template>
