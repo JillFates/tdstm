@@ -34,7 +34,6 @@ class WsUserController implements ControllerMethods {
 	 * @example GET ./ws/user/preferences/EVENT,BUNDLE
 	 * @return a MAP of the parameters (e.g. preferences:[EVENT:5, BUNDLE:30])
 	 */
-	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserGeneralAccess)
 	def preferences(String id) {
         UserLogin userLogin = currentPerson().userLogin

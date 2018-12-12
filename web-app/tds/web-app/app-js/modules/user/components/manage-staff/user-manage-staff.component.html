@@ -169,8 +169,8 @@
             </form>
         </div>
         <div class="footer_buttons">
-            <button *ngIf="!editing" class="btn btn-default" role="button" (click)="submitPreferences()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
-            <button *ngIf="editing" (click)="submitPreferences()" type="button" class="btn btn-primary pull-left">
+            <button *ngIf="!editing" class="btn btn-default" role="button" (click)="submitInfo()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+            <button *ngIf="editing" (click)="submitInfo()" type="button" class="btn btn-primary pull-left">
                 <span class="fa fa-fw fa-floppy-o"></span>
                 <span>Update</span>
             </button>

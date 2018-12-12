@@ -27,6 +27,7 @@ export class UserManageStaffComponent {
 		this.teamKeys = {};
 	}
 
+	// Decide whether or not to launch the confirmation dialogue before closing
 	protected cancelCloseDialog(): void {
 		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 			this.promptService.open(
@@ -44,6 +45,7 @@ export class UserManageStaffComponent {
 		}
 	}
 
+	// Decide what to do when the cancel button is clicked
 	protected handleCancelButton() {
 		if(this.editing) {
 			this.personModel =  Object.assign({}, this.savedPersonModel);
@@ -54,6 +56,7 @@ export class UserManageStaffComponent {
 		}
 	}
 
+	// Populate the data for the model
 	private loadComponentModel() {
 		this.userService.fetchModelForStaffViewEdit().subscribe(
 			(result: any) => {
@@ -89,11 +92,10 @@ export class UserManageStaffComponent {
 						personModel[key] = currentPersonInfo[key];
 					}
 				});
-				this.personModel = personModel;
 				this.savedPersonModel = Object.assign({}, this.personModel, this.savedPersonModel);
 				this.currentPersonId = result.person.id;
 				this.availableTeamNames = result.availableTeams.map(a => a.description);
-				//Populate the key map
+				//Populate the key map so we can reference which ids apply to which descriptions
 				for(let i = 0; i < result.availableTeams.length; i++)
 				{
 					this.teamKeys[result.availableTeams[i].description] = result.availableTeams[i].id;
@@ -121,30 +123,32 @@ export class UserManageStaffComponent {
 		}
 	}
 
-	public submitPreferences() {
+	// Save changes
+	public submitInfo() {
 		if (this.editing) {
-			let preferences = Object.assign({}, this.personModel);
-			preferences['travelOK'] = preferences['travelOK'] ? 1 : 0;
-			preferences['id'] = this.currentPersonId;
+			let data = Object.assign({}, this.personModel);
 
-			// Filter out duplicates
+			// Convert travelOK into integer format from boolean
+			data['travelOK'] = data['travelOK'] ? 1 : 0;
+			// Add Id to the model
+			data['id'] = this.currentPersonId;
+			// Remove info that shouldn't be saved
+			delete data['company'];
+
+			// Filter out teams with duplicate ids
 			let person = this.personModel;
 			person.teams = person.teams.filter(function(team, index) {
 				return person.teams.map(a => a.id).indexOf(team.id) === index;
 			})
 
 			// Isolate just team codes
-			preferences['teams'] = this.personModel.teams.map(a => a.id);
+			data['teams'] = this.personModel.teams.map(a => a.id);
 
-			delete preferences['company'];
-			this.userService.updateAccountAdmin(preferences).subscribe(
-				(result: any) => {
-					this.savedPersonModel =  Object.assign({}, this.personModel);
-					this.editing = false;
-				},
-				(err) => {
-					if (err) {
-						console.log(err)
+			this.userService.updateAccountAdmin(data).subscribe(
+				(result) => {
+					if(result) {
+						this.savedPersonModel = Object.assign({}, this.personModel);
+						this.editing = false;
 					}
 				});
 		} else {
