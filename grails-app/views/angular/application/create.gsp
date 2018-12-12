@@ -133,22 +133,21 @@
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
-												<kendo-datepicker
-													[tabIndex]="24"
-													class="tm-input-control"
-													name="modelAssetRetireDate"
-													[format]="dateFormat"
-													[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+                                                <tds-date-control
+													[tabindex]="24"
+                                                    class="tm-input-control"
+                                                    name="modelAssetRetireDate"
+                                                    [(value)]="model.asset.retireDate">
+                                                </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"  />
 											<td data-for="validation" class="${standardFieldSpecs.validation.imp?:''}">
 												<kendo-dropdownlist
-														[tabIndex]="33"
-														class="tm-input-control"
-														name="modelAssetValidation"
-														[data]="${assetInstance.constraints.validation.inList as JSON}"
-														[(ngModel)]="model.asset.validation">
+													[tabIndex]="33"
+													class="tm-input-control"
+													name="modelAssetValidation"
+													[data]="${assetInstance.constraints.validation.inList as JSON}"
+													[(ngModel)]="model.asset.validation">
 												</kendo-dropdownlist>
 											</td>
 										<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="42"  ngmodel="model.asset.testProc" blankOptionListText="?" />
@@ -158,13 +157,12 @@
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}  ${standardFieldSpecs.maintExpDate.imp?:''} ">
-												<kendo-datepicker
-														[tabIndex]="25"
-														class="tm-input-control"
-														name="modelAssetMaintExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker>
+                                                <tds-date-control
+                                                    class="tm-input-control"
+                                                    name="modelAssetMaintExpDate"
+                                                    [tabindex]="25"
+                                                    [(value)]="model.asset.maintExpDate">
+                                                </tds-date-control>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${assetInstance.latency}" tabindex="34"  ngmodel="model.asset.latency" blankOptionListText="?" />
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}" tabindex="43" ngmodel="model.asset.startupProc" blankOptionListText="?" />

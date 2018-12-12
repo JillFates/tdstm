@@ -67,7 +67,7 @@
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}" />
 			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-                {{ '${asset?.retireDate}' | tdsDateTime: userTimeZone }}
+                {{ '${asset?.retireDate}' | tdsDate: userDateFormat }}
             </td>
 
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
@@ -78,7 +78,7 @@
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}" />
 			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-                {{ '${asset?.maintExpDate}' | tdsDateTime: userTimeZone }}
+                {{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
             </td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency == '?' ? '' : asset.latency}"/>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc == '?' ? '' : asset.startupProc}" tooltipDataPlacement="bottom"/>

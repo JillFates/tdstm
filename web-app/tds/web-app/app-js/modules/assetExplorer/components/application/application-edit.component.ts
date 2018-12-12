@@ -62,8 +62,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 */
 		private initModel(): void {
 			this.model.asset = R.clone(editModel.asset);
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
 			this.model.asset.shutdownBy = {id : this.model.asset.shutdownBy || null };

@@ -59,8 +59,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.model.sourceRoomSelect = [this.defaultRoom, ...this.model.sourceRoomSelect];
 			this.model.targetRoomSelect = [this.defaultRoom, ...this.model.targetRoomSelect];
 
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			this.model.asset.priority = (this.model.asset.priority || '').toString();
 
 			if (this.model.asset.scale && this.model.asset.scale.name) {

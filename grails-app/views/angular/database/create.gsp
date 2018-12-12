@@ -61,13 +61,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance?.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="18"
-														class="tm-input-control"
-														name="modelAssetRetireDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+												<tds-date-control
+													class="tm-input-control"
+													name="modelAssetRetireDate"
+													[tabindex]="18"
+													[(value)]="model.asset.retireDate">
+												</tds-date-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
@@ -91,13 +90,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance?.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="19"
-														class="tm-input-control"
-														name="modelAssetMainExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker>
+                                                <tds-date-control
+													class="tm-input-control"
+													name="modelAssetMainExpDate"
+													[tabindex]="19"
+                                                    [(value)]="model.asset.maintExpDate">
+                                                </tds-date-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance?.planStatus}"/>
