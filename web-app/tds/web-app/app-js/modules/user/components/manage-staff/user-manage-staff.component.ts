@@ -24,7 +24,6 @@ export class UserManageStaffComponent {
 		public activeDialog: UIActiveDialogService) {
 		this.loadComponentModel();
 		this.editing = false;
-		this.currentTab = 'person';
 		this.teamKeys = {};
 	}
 
@@ -105,7 +104,7 @@ export class UserManageStaffComponent {
 
 	// Add entry to the list of teams
 	public addTeam() {
-		this.personModel.teams.push({description: this.availableTeamNames[0], id: this.teamKeys[0]});
+		this.personModel.teams.push({description: this.availableTeamNames[0], id: this.teamKeys[this.availableTeamNames[0]]});
 	}
 
 	// Apply changes to team entry based on description change
@@ -138,7 +137,7 @@ export class UserManageStaffComponent {
 			preferences['teams'] = this.personModel.teams.map(a => a.id);
 
 			delete preferences['company'];
-			this.userService.updateAccount(preferences).subscribe(
+			this.userService.updateAccountAdmin(preferences).subscribe(
 				(result: any) => {
 					this.savedPersonModel =  Object.assign({}, this.personModel);
 					this.editing = false;

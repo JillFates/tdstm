@@ -4,18 +4,7 @@
         <h4 class="modal-title">Manage Staff</h4>
     </div>
     <div class="modal-body">
-        <div class="menu4">
-            <div class="menuTab">
-                <span id="generalShowHeadId" (click)="currentTab='person'" class="mobmenu mobselect">Person/Contact</span>
-            </div>
-            <div class="menuTab">
-                <span id="availShowHeadId" (click)="currentTab='availability'" class="mobmenu">Availability</span>
-            </div>
-            <div class="menuTab">
-                <span id="tdsShowHeadId" (click)="currentTab='misc'" class="mobmenu">Misc</span>
-            </div>
-        </div>
-        <div *ngIf="currentTab=='person'" id="generalInfoShowId" class="person" >
+        <div id="generalInfoShowId" class="person" >
             <form name="personDialogForm">
                 <div class="dialog">
                     <div>
@@ -105,31 +94,70 @@
                                     </kendo-dropdownlist>
                                 </td>
                             </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><span>Keywords:</span></td>
+                                <td valign="top" class="value" colspan="2">
+                                    <span *ngIf="!editing" class="personShow" id="keywordsId">{{personModel.keyWords}}</span>
+                                    <input *ngIf="editing" name="keywords" [(ngModel)]="personModel.keyWords"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><span>Comments:</span></td>
+                                <td valign="top" class="value" colspan="2">
+                                    <span *ngIf="!editing" class="personShow" id="commentsId">{{personModel.tdsNote}}</span>
+                                    <input *ngIf="editing" name="comments" [(ngModel)]="personModel.tdsNote"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><span>Contact URL:</span></td>
+                                <td valign="top" class="value" colspan="2">
+                                    <span *ngIf="!editing" class="personShow" id="urlId">{{personModel.tdsLink}}</span>
+                                    <input *ngIf="editing" name="url" [(ngModel)]="personModel.tdsLink"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><span>Staff Type:</span></td>
+                                <td valign="top" class="value" colspan="2">
+                                    <span *ngIf="!editing" class="personShow" id="staffTypeId">{{personModel.staffType}}</span>
+                                    <kendo-dropdownlist
+                                            *ngIf="editing"
+                                            name="staffType"
+                                            [(ngModel)]="personModel.staffType"
+                                            [data]="['Contractor','Hourly','Salary']">
+                                    </kendo-dropdownlist>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name"><span>Can Travel:</span></td>
+                                <td valign="top" class="value" colspan="2">
+                                    <input type="checkbox" [disabled]="!editing" name="canTravel" [(ngModel)]="personModel.travelOK"/>
+                                </td>
+                            </tr>
 
                             <tr class="prop">
                                 <td valign="top" class="name"><span>Team :</span></td>
                                 <td valign="top" class="value" colspan="2">
                                     <table style="border: 0px">
                                         <tbody id="funcsTbodyId">
-                                            <tr id="team">
-                                                <td>
-                                                    <div  *ngFor="let team of personModel.teams">
+                                        <tr id="team">
+                                            <td>
+                                                <div  *ngFor="let team of personModel.teams">
                                                         <span *ngIf="!editing" class="personShow">
                                                             {{team.description}}
                                                         </span>
-                                                        <div *ngIf="editing">
-                                                            <kendo-dropdownlist
-                                                                    name="{{team.description}}"
-                                                                    (ngModelChange)="updateTeamEntry(team, $event)"
-                                                                    [(ngModel)]="team.description"
-                                                                    [data]="availableTeamNames">
-                                                            </kendo-dropdownlist>
-                                                            <span class="clickable" (click)="removeTeam(team.description)">X</span>
-                                                        </div>
+                                                    <div *ngIf="editing">
+                                                        <kendo-dropdownlist
+                                                                name="{{team.description}}"
+                                                                (ngModelChange)="updateTeamEntry(team, $event)"
+                                                                [(ngModel)]="team.description"
+                                                                [data]="availableTeamNames">
+                                                        </kendo-dropdownlist>
+                                                        <span class="clickable" (click)="removeTeam(team.description)">X</span>
                                                     </div>
-                                                    <span *ngIf="editing" class="clickable" (click)="addTeam()">Add team</span>
-                                                </td>
-                                            </tr>
+                                                </div>
+                                                <span *ngIf="editing" class="clickable" (click)="addTeam()">Add team</span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </td>
@@ -139,53 +167,6 @@
                     </div>
                 </div>
             </form>
-        </div>
-        <div *ngIf="currentTab=='availability'">
-            <span>Available, except for the following dates</span>
-            <a *ngIf="editing">Add Date</a>
-        </div>
-        <div *ngIf="currentTab=='misc'">
-            <table>
-                <tr class="prop">
-                    <td valign="top" class="name"><span>Keywords:</span></td>
-                    <td valign="top" class="value" colspan="2">
-                        <span *ngIf="!editing" class="personShow" id="keywordsId">{{personModel.keyWords}}</span>
-                        <input *ngIf="editing" name="keywords" [(ngModel)]="personModel.keyWords"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name"><span>Comments:</span></td>
-                    <td valign="top" class="value" colspan="2">
-                        <span *ngIf="!editing" class="personShow" id="commentsId">{{personModel.tdsNote}}</span>
-                        <input *ngIf="editing" name="comments" [(ngModel)]="personModel.tdsNote"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name"><span>Contact URL:</span></td>
-                    <td valign="top" class="value" colspan="2">
-                        <span *ngIf="!editing" class="personShow" id="urlId">{{personModel.tdsLink}}</span>
-                        <input *ngIf="editing" name="url" [(ngModel)]="personModel.tdsLink"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name"><span>Staff Type:</span></td>
-                    <td valign="top" class="value" colspan="2">
-                        <span *ngIf="!editing" class="personShow" id="staffTypeId">{{personModel.staffType}}</span>
-                        <kendo-dropdownlist
-                                *ngIf="editing"
-                                name="staffType"
-                                [(ngModel)]="personModel.staffType"
-                                [data]="['Contractor','Hourly','Salary']">
-                        </kendo-dropdownlist>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name"><span>Can Travel:</span></td>
-                    <td valign="top" class="value" colspan="2">
-                        <input type="checkbox" [disabled]="!editing" name="canTravel" [(ngModel)]="personModel.travelOK"/>
-                    </td>
-                </tr>
-            </table>
         </div>
         <div class="footer_buttons">
             <button *ngIf="!editing" class="btn btn-default" role="button" (click)="submitPreferences()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>

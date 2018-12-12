@@ -89,6 +89,15 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
+	updateAccountAdmin(params) {
+		return this.http.post(`${this.userPreferenceUrl}/updateAccountAdmin`, params)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	getMapAreas() {
 		return this.http.get(`${this.userPreferenceUrl}/mapAreas`)
 			.map((res: Response) => {

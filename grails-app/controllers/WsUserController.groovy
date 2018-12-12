@@ -137,23 +137,31 @@ class WsUserController implements ControllerMethods {
 
 	/**
 	 * Update the person account that is invoked by the user himself
-	 * @param  : person id and input password
-	 * @return : pass:"no" or the return of the update method
+	 * @param  : map of settings for the person
+	 * @return : the person that has been updated
 	 */
-	@GrailsCompileStatic(TypeCheckingMode.SKIP)
 	@HasPermission(Permission.UserUpdateOwnAccount)
 	def updateAccount() {
 		Map settings = request.JSON
-		// BYADMIN SHOULD BE TRUE BUT BREAKS OTHERWISE
-        Person person = personService.updatePerson(settings, true)
-		if(settings.startPage) {
-			Map preferences = [
-					START_PAGE     : settings.startPage,
-					CURR_POWER_TYPE: settings.powerType
-			]
-			userPreferenceService.setPreferences(null, preferences)
-		}
+        Person person = personService.updatePerson(settings, false)
+		Map preferences = [
+				START_PAGE     : settings.startPage,
+				CURR_POWER_TYPE: settings.powerType
+		]
+		userPreferenceService.setPreferences(null, preferences)
 		renderSuccessJson(person)
+    }
+
+    /**
+     * Update the person account that is invoked by the admin
+     * @param  : map of settings for the person
+     * @return : the person that has been updated
+     */
+	@HasPermission(Permission.ProjectStaffEdit)
+    def updateAccountAdmin() {
+        Map settings = request.JSON
+        Person person = personService.updatePerson(settings, true)
+        renderSuccessJson(person)
     }
 
 	@HasPermission(Permission.UserGeneralAccess)

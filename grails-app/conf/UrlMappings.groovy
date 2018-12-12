@@ -480,6 +480,11 @@ class UrlMappings {
 			action = [POST:"updateAccount"]
 		}
 
+		"/ws/user/updateAccountAdmin" {
+			controller = "wsUser"
+			action = [POST:"updateAccountAdmin"]
+		}
+
 		"/ws/progress" {
 			controller = "wsProgress"
 			action = [GET:"list"]

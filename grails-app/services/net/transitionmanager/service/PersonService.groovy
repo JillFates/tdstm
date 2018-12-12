@@ -1611,14 +1611,12 @@ class PersonService implements ServiceMethods {
 			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
 		}
 
-		params.travelOK = params.travelOK == 1 ? 1 : 0
+		params.travelOK = params.travelOK == 1 || params.travelOK == "1" ? 1 : 0
 
 		if (!person.staffType && !params.staffType) {
 			params.staffType = 'Hourly'
 		}
 
-		// TODO : JPM 8/31/2015 : Replace person.properties = params with proper field assignments
-		// person.properties = params
 		GormUtil.bindMapToDomain(person, params, ["blackoutDates","userLogin"])
 		Project project = securityService.userCurrentProject
 
@@ -1680,30 +1678,9 @@ class PersonService implements ServiceMethods {
 
 		// Additional changes allowed by adminstrator of a person
 		if (byAdmin) {
-			// THIS IS BROKEN FROM WS
 			if (params.manageFuncs != '0' || params.teams) {
 				partyRelationshipService.updateAssignedTeams(person, params.teams)
 			}
-
-			// TODO : JPM 8/31/2015 : Overhaul how exception dates are handled - shouldn't delete all then re-add
-			/*List<Date> personExpDates = params.list("availability").collect { TimeUtil.parseDate(it) }
-			if (personExpDates) {
-				ExceptionDates.executeUpdate('DELETE FROM ExceptionDates WHERE person = :person AND exceptionDay NOT IN (:dates)',
-						[person: person, dates: personExpDates])
-				for (Date presentExpDate in personExpDates) {
-					def exp = ExceptionDates.findByExceptionDayAndPerson(presentExpDate, person)
-					if (!exp) {
-						def expDates = new ExceptionDates(exceptionDay: presentExpDate, person: person)
-						save expDates
-						if (expDates.hasErrors()) {
-							throw new DomainUpdateException('An error occurred while attempting to save exception dates')
-						}
-					}
-				}
-			}
-			else {
-				ExceptionDates.executeUpdate('DELETE FROM ExceptionDates WHERE person = :person', [person: person])
-			}*/
 		}
 
 		if (!byAdmin) {
