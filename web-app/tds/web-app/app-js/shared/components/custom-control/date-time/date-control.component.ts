@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
+import {TDSCustomControl} from '../common/custom-control';
 
 @Component({
 	selector: 'tds-date-control',
@@ -19,7 +20,7 @@ import {DateUtils} from '../../../utils/date.utils';
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent implements OnInit  {
+export class DateControlComponent extends TDSCustomControl implements OnInit  {
 
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
@@ -28,6 +29,7 @@ export class DateControlComponent implements OnInit  {
 	protected dateValue: Date;
 
 	constructor(private userPreferenceService: PreferenceService) {
+		super();
 		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
 	}
 
