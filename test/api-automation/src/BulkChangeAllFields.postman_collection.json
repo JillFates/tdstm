@@ -49,7 +49,7 @@
 					]
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/auth/signIn?username={{username}}&password={{password}}",
+					"raw": "{{host}}/tdstm/auth/signIn",
 					"host": [
 						"{{host}}"
 					],
@@ -57,16 +57,6 @@
 						"tdstm",
 						"auth",
 						"signIn"
-					],
-					"query": [
-						{
-							"key": "username",
-							"value": "{{username}}"
-						},
-						{
-							"key": "password",
-							"value": "{{password}}"
-						}
 					]
 				}
 			},
@@ -4075,13 +4065,13 @@
 	],
 	"variable": [
 		{
-			"id": "54f3b44d-b48e-42ea-8e26-bfb598829017",
+			"id": "3287983a-1c46-4172-9114-921dcd7c3eab",
 			"key": "asset1",
 			"value": "113835",
 			"type": "string"
 		},
 		{
-			"id": "5e3eab87-070f-42fe-b764-3e09f59abe95",
+			"id": "185dcfad-e7d4-453c-a1fd-d0bdb1a71849",
 			"key": "asset2",
 			"value": "113848",
 			"type": "string"
