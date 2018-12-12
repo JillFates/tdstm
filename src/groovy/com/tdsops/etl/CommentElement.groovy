@@ -5,7 +5,6 @@ import groovy.transform.CompileStatic
 /**
  *
  * <p>This class represents, internally, comments command in an ETL script.</p>
- * @formatter:off
  * <pre>
  *     read labels
  *     domain Device
@@ -14,7 +13,28 @@ import groovy.transform.CompileStatic
  *     		extract 'description' load 'comments'
  *     	}
  * </pre>
- * @formatter:on
+ * (see <a href="CommentElement#with">CommentElement with(Object value) </a>)
+ * <br>
+ * It is used to process comments adding them in {@code ETLProcessorResult}.
+ * <pre>
+ * "data": [
+ *	{
+ * 		"duplicate": false,
+ * 		"errorCount": 0,
+ * 		"errors": [],
+ * 		"fields": { ... },
+ * 		"comments": [
+ * 			"comment #1",
+ * 			"comment #2"
+ * 		]
+ * 		"ignore": false,
+ * 		"op": "I",
+ * 		"rowNum": 1,
+ * 		"warn": false
+ * 	},
+ * 			...
+ * ]
+ * </pre>
  */
 @CompileStatic
 class CommentElement implements ETLCommand {
