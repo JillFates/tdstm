@@ -134,7 +134,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
                                                 <tds-date-control
-													[tabIndex]="24"
+													[tabindex]="24"
                                                     class="tm-input-control"
                                                     name="modelAssetRetireDate"
                                                     [(value)]="model.asset.retireDate">

@@ -64,7 +64,7 @@
 												<tds-date-control
 													class="tm-input-control"
 													name="modelAssetRetireDate"
-													[tabIndex]="18"
+													[tabindex]="18"
 													[(value)]="model.asset.retireDate">
 												</tds-date-control>
 											</td>
@@ -93,7 +93,7 @@
                                                 <tds-date-control
 													class="tm-input-control"
 													name="modelAssetMainExpDate"
-													[tabIndex]="19"
+													[tabindex]="19"
                                                     [(value)]="model.asset.maintExpDate">
                                                 </tds-date-control>
 											</td>
