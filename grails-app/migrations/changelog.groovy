@@ -290,4 +290,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_0/20181130-validated-should-only-have-replace.groovy'
 	include file: 'version/v4_6_0/20181205-validation-should-only-have-replace.groovy'
 	include file: 'version/v4_6_0/20181203-maintence-retire-date-times-to-dates.groovy'
+	include file: 'version/v4_6_1/20181211-usability-and-style-changes-to-system-views-part1.groovy'
 }
