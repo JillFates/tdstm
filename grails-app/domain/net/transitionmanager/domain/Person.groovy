@@ -142,7 +142,7 @@ class Person extends Party {
 	}
 
 	/**
-ack	 * The company for this person.l
+	 * The company for this person.
 	 */
 	Party getCompany() {
 		partyRelationshipService.getCompanyOfStaff(this)
@@ -302,7 +302,6 @@ ack	 * The company for this person.l
 				tdsNote: tdsNote,
 				tdsLink: tdsLink,
 				travelOK: travelOK,
-				blackOutDates: [date: blackOutDates.exceptionDay],
 				teams: teams,
 				staffType: staffType
 		]

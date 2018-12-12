@@ -177,7 +177,6 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 			tdsLink: '',
 			tdsNote: '',
 			travelOK: 0,
-			blackOutDates: [],
 			companies: [],
 			teams: [] ,
 			staffType: [],

@@ -20,7 +20,6 @@ export class PersonModel {
 	public tdsNote: string;
 	public tdsLink: string;
 	public travelOK: number;
-	public blackOutDates: any[];
 	public companies: any[];
 	public teams: any[];
 	public staffType: any[];

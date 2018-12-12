@@ -62,11 +62,11 @@ class WsUserController implements ControllerMethods {
     }
 
 	/**
-	 * Used by the User Preference Edit dialog. This will return a List<Map> where the map will
-	 * consist of the following:
-	 *    code - the Preference Code
-	 *    label - the human readable name of the code
-	 *    value - the value of the preference. Note that references will get substituted (e.g. CURR_PROJ returns the name)
+	 * Used by the Manage Staff dialog.
+	 * @param: id - ID of the person to be requested
+	 * This will return the following:
+	 *    person - All the info associated with the person requested
+	 *    availableTeams - All teams that this person can be assigned to
 	 * @return Success Structure with preferences property containing List<Map>
 	 */
 	def modelForStaffViewEdit() {

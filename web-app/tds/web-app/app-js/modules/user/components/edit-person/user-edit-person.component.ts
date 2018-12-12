@@ -66,11 +66,10 @@ export class UserEditPersonComponent {
 					company: '',
 					country: '',
 					stateProv: '',
-					keywords: '',
+					keyWords: '',
 					tdsNote: '',
 					tdsLink: '',
 					travelOK: 0,
-					blackOutDates: [],
 					teams: [] ,
 					staffType: [],
 				};
