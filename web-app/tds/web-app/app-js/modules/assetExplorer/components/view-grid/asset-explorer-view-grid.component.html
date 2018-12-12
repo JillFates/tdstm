@@ -153,7 +153,7 @@
 				*ngFor="let column of model.columns; let i = index"
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
-				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH"
+				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
 				[width]="column.width"
 				[class]="column.domain"
 		>
