@@ -67,11 +67,10 @@ class CommentService implements ServiceMethods {
 	 * @param params - the request params
 	 * @param isNew - a flag to indicate of the request was for a new (true) or existing (false)
 	 * @param flash - the controller flash message object to stuff messages into (YUK!!!)
-	 * @param madeReadyByPredecessor - flag that indicates that the task has been set to ready by the predecessor being completed.
 	 * @return map of the AssetComment data used to refresh the view
 	 */
 	@Transactional
-	def saveUpdateCommentAndNotes(String tzId, String userDTFormat, Map params, boolean isNew=true, flash, boolean madeReadyByPredecessor = false) {
+	def saveUpdateCommentAndNotes(String tzId, String userDTFormat, Map params, boolean isNew=true, flash) {
 		boolean canEditAsset = securityService.hasPermission(Permission.AssetEdit)
 		String currentUsername = securityService.currentUsername
 		Person currentPerson = securityService.loadCurrentPerson()
@@ -364,7 +363,7 @@ class CommentService implements ServiceMethods {
 			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note
 
 			// Note that shouldSendNotification has to be called before calling save on the object
-				boolean shouldSendNotification = shouldSendNotification(assetComment, currentPerson, isNew, addingNote, madeReadyByPredecessor)
+			boolean shouldSendNotification = shouldSendNotification(assetComment, currentPerson, isNew, addingNote)
 
 			if (!assetComment.hasErrors() && assetComment.save(flush: true)) {
 				// Deal with Notes if there are any
@@ -466,9 +465,8 @@ class CommentService implements ServiceMethods {
 	 * @param triggeredByWhom - the person that created/modified the task
 	 * @param isNew - a flag that indicates if the task was just created
 	 * @return true if a notification should be sent
-	 * @return madeReadyByPredecessor - flag that signals if the task has been set to READY because of its predecessor being marked as completed.
 	 */
-	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote, boolean madeReadyByPredecessor = false) {
+	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
 		boolean shouldNotify = (
 			task.commentType == AssetCommentType.TASK
 			&& task.sendNotification
@@ -485,14 +483,12 @@ class CommentService implements ServiceMethods {
 			} else {
 				if (!addingNote) { //NOT ADDING NOTES? Only send if any of the watched properties was modified
 					List<String> dirtyPropNames = task.dirtyPropertyNames
-					if (!madeReadyByPredecessor) {
-						// log.debug "shouldSendNotification() the dirty properties include $dirtyPropNames"
-						shouldNotify = false
-						for (name in dirtyPropNames) {
-							if (watchProps.contains(name)) {
-								shouldNotify = true
-								break
-							}
+					// log.debug "shouldSendNotification() the dirty properties include $dirtyPropNames"
+					shouldNotify = false
+					for (name in dirtyPropNames) {
+						if (watchProps.contains(name)) {
+							shouldNotify = true
+							break
 						}
 					}
 				}
