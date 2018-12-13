@@ -61,7 +61,7 @@ export class DependenciesColumnModel {
 				width: 140
 			},
 			{
-				label: 'Tags Dependency',
+				label: 'Dep Asset Tags',
 				property: 'tagsDependent',
 				type: 'tags',
 				width: 220,

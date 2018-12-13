@@ -138,6 +138,7 @@ export class UserEditPersonComponent {
 			this.userService.updateAccount(preferences).subscribe(
 				(result: any) => {
 					this.savedPersonModel = this.personModel;
+					this.cancelCloseDialog();
 				},
 				(err) => {
 					if (err) {

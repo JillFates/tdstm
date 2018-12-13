@@ -1,4 +1,4 @@
-package pages.Planning
+package pages.Planning.Events
 
 import geb.Page
 import modules.PlanningModule

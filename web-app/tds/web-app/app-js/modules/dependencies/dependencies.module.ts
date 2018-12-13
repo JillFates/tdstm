@@ -4,6 +4,8 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
+// Assets Module
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
 import {DependenciesRouteModule} from './dependencies-routing.states';
 // Kendo
@@ -21,6 +23,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service';
 // Services
 import {DependenciesService} from './service/dependencies.service';
+import {OpenAssetDependenciesService} from './service/open-asset-dependencies.service';
 import { TagService } from '../assetTags/service/tag.service';
 
 @NgModule({
@@ -28,6 +31,7 @@ import { TagService } from '../assetTags/service/tag.service';
 		// Angular
 		CommonModule,
 		SharedModule,
+		AssetExplorerModule,
 		FormsModule,
 		// Kendo
 		DropDownsModule,
@@ -48,6 +52,7 @@ import { TagService } from '../assetTags/service/tag.service';
 		TagsResolveService,
 		ModuleResolveService,
 		DependenciesService,
+		OpenAssetDependenciesService,
 		// Services
 		TagService
 	],

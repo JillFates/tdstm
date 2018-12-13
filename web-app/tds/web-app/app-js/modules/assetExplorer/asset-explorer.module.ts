@@ -110,6 +110,10 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		ModelService
 	],
 	exports: [
+		AssetShowComponent,
+		AssetEditComponent,
+		AssetCreateComponent,
+		AssetDependencyComponent,
 		AssetExplorerIndexComponent,
 		TaskCommentComponent],
 	entryComponents: [

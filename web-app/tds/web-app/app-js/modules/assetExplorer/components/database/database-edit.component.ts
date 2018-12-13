@@ -42,12 +42,11 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 
 		ngOnInit() {
 			this.model.asset = R.clone(editModel.asset);
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 
 			if (this.model.asset.scale && this.model.asset.scale.name) {
 				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
+			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
 		}

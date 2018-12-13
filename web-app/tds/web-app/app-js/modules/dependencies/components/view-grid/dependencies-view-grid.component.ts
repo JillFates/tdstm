@@ -15,6 +15,7 @@ import {
 	map,
 	mergeMap,
 	scan,
+	switchMap,
 	takeUntil,
 	withLatestFrom,
 } from 'rxjs/operators';
@@ -39,7 +40,7 @@ import {
 import {DependenciesColumnModel} from '../../model/dependencies-column.model';
 import {
 	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE
+	GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE
 } from '../../../../shared/model/constants';
 import {TagState} from '../../model/dependencies.model';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
@@ -51,6 +52,9 @@ import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/t
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
+import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
 
 declare var jQuery: any;
 
@@ -77,18 +81,25 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private tagsStateSubject: Subject<TagState>;
 	protected state: ComponentState;
 	private componentState: BehaviorSubject<ComponentState>;
+	protected readonly actionableAssets = ['assetName', 'dependentName', 'type'];
+	private openAssetsHandler = null;
 
 	constructor(
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
+		private dialog: UIDialogService,
 		private notifier: NotifierService,
 		private bulkCheckboxService: BulkCheckboxService,
-		private dependenciesService: DependenciesService) {
+		private dependenciesService: DependenciesService,
+		private openAssetDependenciesService: OpenAssetDependenciesService,
+		protected assetService: DependecyService) {
 	}
 
 	ngOnInit() {
 		// set the initial component state
 		this.state = this.getInitialComponentState();
+		// set the open assets handler
+		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(this.actionableAssets)
 
 		this.destroySubject = new Subject<any>();
 		this.componentState = new BehaviorSubject<any>(this.state);
@@ -356,5 +367,37 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * On cell click event.
+	 * Determines if cell clicked property is either asset/dependent asset/dependency detail and opens detail popup.
+	 * gridCell field must be an actionable item
+	 * @param gridCell Reference to the current grid cell clicked
+	 */
+	protected  onClickActionableColumn(gridCell: any): void {
+		const fieldName = gridCell.column.field;
+		if (!this.actionableAssets.includes(fieldName)) {
+			return;
+		}
+
+		const assetDependency: AssetDependency = {
+			id: gridCell.dataItem['assetId'],
+			class: gridCell.dataItem['assetClass'],
+			dependentId: gridCell.dataItem['dependentId'],
+			dependentClass: gridCell.dataItem['dependentClass']
+		};
+
+		this.openAssetsHandler(fieldName, assetDependency)
+			.pipe(
+				takeUntil(this.destroySubject)
+			)
+			.subscribe(
+				_ => this.changeState(),
+				(error) => {
+					console.log(error);
+					this.changeState();
+				}
+			);
 	}
 }

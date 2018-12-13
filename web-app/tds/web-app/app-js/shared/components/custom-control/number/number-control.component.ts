@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
 import {NumberControlHelper} from './number-control.helper';
+import {TDSCustomControl} from '../common/custom-control';
 
 @Component({
 	selector: 'tds-number-control',
@@ -10,13 +11,14 @@ import {NumberControlHelper} from './number-control.helper';
                                   [(ngModel)]="numberValue"
                                   [min]="realMinRange" [max]="maxRange"
                                   [autoCorrect]="true"
+                                  [tabindex]="tabindex"
                                   (ngModelChange)="onValueChange($event)"
                                   class="form-control">
             </kendo-numerictextbox>
 		</div>
 	`
 })
-export class NumberControlComponent implements OnInit {
+export class NumberControlComponent extends TDSCustomControl implements OnInit {
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
 	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
@@ -30,7 +32,7 @@ export class NumberControlComponent implements OnInit {
 	protected realMinRange: number;
 
 	constructor() {
-		// Silence is golden.
+		super();
 	}
 
 	/**

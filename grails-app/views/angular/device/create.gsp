@@ -46,17 +46,7 @@
                                                 (valueChange)="onAssetTypeValueChange($event)">
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance.environment}"/>
-                                    <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
-                                        <kendo-dropdownlist
-                                                [tabIndex]="21"
-                                                class="tm-input-control"
-                                                name="modelAssetEnvironment"
-                                                [(ngModel)]="model.asset.environment"
-                                                [defaultItem]="'Please Select'"
-                                                [data]="model.environmentOptions">
-                                        </kendo-dropdownlist>
-                                    </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                                     <td colspan="1"></td>
                                     <td class="label_sm">Source</td>
                                     <td class="label_sm">Target</td>
@@ -79,17 +69,7 @@
                                                 (valueChange)="onManufacturerValueChange($event)" >
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.priority}" value="${assetInstance.priority}"/>
-                                    <td class="${standardFieldSpecs.priority.imp ?: ''}" data-for="priority">
-                                        <kendo-dropdownlist
-											    [tabIndex]="22"
-                                                class="tm-input-control"
-                                                name="priorityAssetEnvironment"
-                                                [(ngModel)]="model.asset.priority"
-                                                [defaultItem]="'Please Select'"
-                                                [data]="model.priorityOption">
-                                        </kendo-dropdownlist>
-                                    </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.priority}" value="${assetInstance.priority}" tabindex="22" blankOptionListText="Please Select..." ngmodel="model.asset.priority" />
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
                                         [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetInstance}" fieldName="roomSource" /> }"
                                         nowrap="nowrap">
@@ -101,7 +81,6 @@
                                                 class="tm-input-control"
                                                 name="roomSourceId"
                                                 [(ngModel)]="model.asset.roomSource"
-                                                [defaultItem]="{id: -2, value: 'Please Select'}"
                                                 [data]="model.sourceRoomSelect"
                                                 [textField]="'value'"
                                                 [valueField]="'id'"
@@ -119,7 +98,6 @@
                                                 class="tm-input-control"
                                                 name="roomTargetId"
                                                 [(ngModel)]="model.asset.roomTarget"
-                                                [defaultItem]="{id: -2, value: 'Please Select'}"
                                                 [data]="model.targetRoomSelect"
                                                 [textField]="'value'"
                                                 [valueField]="'id'"
@@ -158,7 +136,6 @@
                                                     class="tm-input-control useRackS"
                                                     name="modelAssetRackSource"
                                                     [(ngModel)]="model.asset.rackSource"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="rackSourceOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -178,7 +155,6 @@
                                                     class="tm-input-control useRackT"
                                                     name="modelAssetRackTarget"
                                                     [(ngModel)]="model.asset.rackTarget"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="rackTargetOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -205,7 +181,6 @@
                                                     class="tm-input-control"
                                                     name="modelAssetBladeSource"
                                                     [(ngModel)]="model.asset.sourceChassis"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="bladeSourceOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -218,7 +193,6 @@
                                                     class="tm-input-control"
                                                     name="modelAssetBladeTarget"
                                                     [(ngModel)]="model.asset.targetChassis"
-                                                    [defaultItem]="{id: -2, value: 'Please Select'}"
                                                     [data]="bladeTargetOptions"
                                                     [textField]="'value'"
                                                     [valueField]="'id'">
@@ -289,13 +263,12 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetInstance.assetTag}" tabindex="18" ngmodel="model.asset.assetTag"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}" />
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-                                        <kendo-datepicker
-											    [tabIndex]="26"
-                                                class="tm-input-control"
-                                                name="modelAssetRetireDate"
-                                                [format]="dateFormat"
-                                                [(value)]="model.asset.retireDate">
-                                        </kendo-datepicker>
+                                        <tds-date-control
+                                            class="tm-input-control"
+                                            name="modelAssetRetireDate"
+										    [tabindex]="26"
+                                            [(value)]="model.asset.retireDate">
+                                        </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
                                     <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
@@ -315,7 +288,6 @@
                                                 name="modelAssetScaleName"
                                                 [data]="${SizeScale.getAsJsonList() as JSON}"
                                                 [(ngModel)]="model.asset.scale"
-                                                [defaultItem]="''"
                                                 [textField]="'text'"
                                                 [valueField]="'value'">
                                         </kendo-dropdownlist>
@@ -334,13 +306,12 @@
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-                                        <kendo-datepicker
-                                                [tabIndex]="27"
-                                                class="tm-input-control"
-                                                name="modelAssetMaintExpDate"
-                                                [format]="dateFormat"
-                                                [(value)]="model.asset.maintExpDate">
-                                        </kendo-datepicker>
+                                        <tds-date-control
+                                            class="tm-input-control"
+                                            name="modelAssetMaintExpDate"
+                                            [tabindex]="27"
+                                            [(value)]="model.asset.maintExpDate">
+                                        </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constraints.validation.inList as JSON}[0]" />
                                     <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">

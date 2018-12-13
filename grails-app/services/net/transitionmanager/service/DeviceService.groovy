@@ -102,14 +102,14 @@ class DeviceService implements ServiceMethods {
 					[sc: assetEntity, tc: assetEntity])[0]
 			deleteChassisWarning = count > 0
 		}
-
-		def model = [
+		Map commonModel = this.getCommonModel(false, project, assetEntity, params)
+		Map model = [
 			assetEntity: assetEntity,
 			/*label: frontEndLabel,*/
 			canEdit: securityService.hasPermission(Permission.AssetEdit),
 			deleteChassisWarning: deleteChassisWarning,
 			currentUserId: securityService.currentPersonId
-		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
+		] + commonModel
 
 		model.roomSource = null
 		model.roomTarget = null
@@ -157,7 +157,8 @@ class DeviceService implements ServiceMethods {
 	Map getModelForCreate(Map params=null) {
 		Project project = securityService.getUserCurrentProject()
 		AssetEntity assetEntity = new AssetEntity(project: project)
-		Map model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
+		Map model = this.getCommonModel(true, project, assetEntity, params)
+
 		model.assetInstance = assetEntity
 		model.roomSource = null
 		model.roomTarget = null
@@ -330,5 +331,20 @@ class DeviceService implements ServiceMethods {
 		if (device.model) {
 			userPreferenceService.setPreference(PREF.LAST_TYPE, device.model.assetType)
 		}
+	}
+
+	/**
+	 * Used to get the model map used to render the create view of an Device domain asset
+	 * @param forCreate - is model for create or show/edit
+	 * @param project - the project of the user
+	 * @param assetEntity - current assetEntity
+	 * @param params - request parameters
+	 * @return a map of the properties containing the list values to populate the list controls
+	 */
+	private Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity , Map params) {
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, assetEntity, 'AssetEntity', params)
+		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
+
+		return commonModel;
 	}
 }
