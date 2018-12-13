@@ -24,8 +24,8 @@ export class UserManageStaffComponent extends UIExtraDialog{
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
-		this.modalOptions = { isResizable: true, isCentered: true };
 		super('#user-manage-staff-component');
+		this.modalOptions = { isResizable: true, isCentered: true };
 		this.loadComponentModel();
 		this.editing = false;
 		this.teamKeys = {};
