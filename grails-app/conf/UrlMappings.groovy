@@ -427,7 +427,7 @@ class UrlMappings {
 			action = [ GET: "modelForPreferenceManager" ]
 		}
 
-		"/ws/user/modelForStaffViewEdit" {
+		"/ws/user/modelForStaffViewEdit/$id" {
 			controller = "wsUser"
 			action = [ GET: "modelForStaffViewEdit" ]
 		}

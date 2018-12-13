@@ -45,8 +45,8 @@ export class UserService {
 	/**
 	 * Used to retrieve all of the model data that will be used by the manage staff component
 	 */
-	fetchModelForStaffViewEdit() {
-		return this.http.get(`${this.userPreferenceUrl}/modelForStaffViewEdit`)
+	fetchModelForStaffViewEdit(id) {
+		return this.http.get(`${this.userPreferenceUrl}/modelForStaffViewEdit/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;

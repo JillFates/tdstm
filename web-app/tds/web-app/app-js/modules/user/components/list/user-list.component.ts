@@ -19,7 +19,10 @@ export class UserListComponent implements OnInit{
 	}
 
 	ngOnInit(): void {
-		this.dialogService.open(UserManageStaffComponent, [{provide: PersonModel, useValue: {}}]).catch(result => {
+		this.dialogService.open(UserManageStaffComponent, [
+			{provide: 'id', useValue: 5662},
+			{provide: PersonModel, useValue: {}}
+		]).catch(result => {
 			if (result) {
 				console.error(result);
 			}

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 
 import {UserService} from '../../service/user.service';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
@@ -14,14 +14,14 @@ export class UserManageStaffComponent {
 	public currentTab;
 	public availableTeamNames;
 	private teamKeys;
-	private currentPersonId;
 	private savedPersonModel;
 
 	constructor(
 		public personModel: PersonModel,
 		private userService: UserService,
 		private promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService) {
+		public activeDialog: UIActiveDialogService,
+		@Inject('id') private id) {
 		this.loadComponentModel();
 		this.editing = false;
 		this.teamKeys = {};
@@ -58,7 +58,7 @@ export class UserManageStaffComponent {
 
 	// Populate the data for the model
 	private loadComponentModel() {
-		this.userService.fetchModelForStaffViewEdit().subscribe(
+		this.userService.fetchModelForStaffViewEdit(this.id).subscribe(
 			(result: any) => {
 				const defaultPerson = {
 					firstName: '',
@@ -93,7 +93,6 @@ export class UserManageStaffComponent {
 					}
 				});
 				this.savedPersonModel = Object.assign({}, this.personModel, this.savedPersonModel);
-				this.currentPersonId = result.person.id;
 				this.availableTeamNames = result.availableTeams.map(a => a.description);
 				//Populate the key map so we can reference which ids apply to which descriptions
 				for(let i = 0; i < result.availableTeams.length; i++)
@@ -131,7 +130,7 @@ export class UserManageStaffComponent {
 			// Convert travelOK into integer format from boolean
 			data['travelOK'] = data['travelOK'] ? 1 : 0;
 			// Add Id to the model
-			data['id'] = this.currentPersonId;
+			data['id'] = this.id;
 			// Remove info that shouldn't be saved
 			delete data['company'];
 

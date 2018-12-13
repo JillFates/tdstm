@@ -69,9 +69,10 @@ class WsUserController implements ControllerMethods {
 	 *    availableTeams - All teams that this person can be assigned to
 	 * @return Success Structure with preferences property containing List<Map>
 	 */
-	def modelForStaffViewEdit() {
+	def modelForStaffViewEdit(String id) {
 		Project project = getProjectForWs()
-		Person person = currentPerson()
+
+		Person person = Person.get(Long.valueOf(id))
 		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
 
 		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
