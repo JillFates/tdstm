@@ -83,7 +83,6 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
-
 	/**
 	 * Used to save account info from the edit person module (No admin privileges)
 	 */
