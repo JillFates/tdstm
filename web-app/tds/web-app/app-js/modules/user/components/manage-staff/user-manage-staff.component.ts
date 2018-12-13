@@ -3,13 +3,15 @@ import {Component, Inject} from '@angular/core';
 import {UserService} from '../../service/user.service';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'user-manage-staff',
 	templateUrl: '../tds/web-app/app-js/modules/user/components/manage-staff/user-manage-staff.component.html'
 })
-export class UserManageStaffComponent {
+export class UserManageStaffComponent extends UIExtraDialog{
+	public modalOptions: DecoratorOptions;
 	public editing;
 	public currentTab;
 	public availableTeamNames;
@@ -22,6 +24,8 @@ export class UserManageStaffComponent {
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
+		this.modalOptions = { isResizable: true, isCentered: true };
+		super('#user-manage-staff-component');
 		this.loadComponentModel();
 		this.editing = false;
 		this.teamKeys = {};
@@ -36,12 +40,12 @@ export class UserManageStaffComponent {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
+						this.dismiss();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.dismiss();
 		}
 	}
 
