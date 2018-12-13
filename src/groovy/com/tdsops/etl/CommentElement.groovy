@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
  *     iterate {
  *     		extract 'name' load 'assetName' when populated
  *     		extract 'description' load 'comments'
+ *     		load 'comments' with myCommentContentVar
  *     	}
  * </pre>
  * (see <a href="CommentElement#with">CommentElement with(Object value) </a>)

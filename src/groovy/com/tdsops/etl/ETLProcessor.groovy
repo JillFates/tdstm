@@ -45,8 +45,10 @@ import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
  * <pre>
  * 	extract 'dataSetFieldName' load 'assetFieldName'
  * 	set assetFieldName with 'A simple label value'
- *  iterate {*     ....
- *}* </pre>
+ *  iterate {
+ *  	....
+ *	}
+ * </pre>
  * There is a method for each one of this methods in ETLProcessor class.
  * @see com.tdsops.etl.ETLProcessor#load
  * @see com.tdsops.etl.ETLProcessor#set
@@ -329,8 +331,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Iterate command from one row to another one using their position in the DataSet.
 	 * <code>
-	 *  from 1 to 3 iterate {*  	...
-	 *}* <code>
+	 *  from 1 to 3 iterate {
+	 *  	...
+	 *  }
+	 * <code>
 	 * @param from
 	 * @return a Map with the next steps in this command.
 	 */
@@ -351,8 +355,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Iterates a given number of rows based on its ordinal position
 	 * <code>
-	 * from 1, 3, 5 iterate {* 			......
-	 *}* </code>
+	 * from 1, 3, 5 iterate {
+	 * 		......
+	 *	}
+	 *	</code>
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
@@ -629,8 +635,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	}
 
 	/**
-	 * Load a domain fieldName using an explicit value. It could be a simple String,
-	 * a DOMAIN or SOURCE reference, or a CE/local variable.
+	 * <p>Load a domain fieldName using an explicit value. It could be a simple String,
+	 * a DOMAIN or SOURCE reference, or a CE/local variable.</p>
+	 * <p>If load command is for 'comments', then an instance of {@code CommentElement} is returned.</b>
+	 * <p>Otherwise it returns an instance of {@code Element}</b>
 	 * <pre>
 	 *    domain Application
 	 *    load 'assetName' with 'Asset Name'
@@ -639,21 +647,41 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *    load 'assetName' with DOMAIN.id
 	 *    load 'assetName' with SOURCE.'data name'
 	 *    load 'assetName' with concat(',', SOURCE.'column 1', SOURCE.'column 2')
+	 *    ...
+	 *	  load 'comments' with myCommentContentVar
+	 *	  load 'assetName' with DOMAIN.id
+	 *	  load 'assetName' with SOURCE.'data name'
 	 * </pre>
-	 * @param fieldName
-	 * @return
+	 * @param fieldName a field name used to create a load command
+	 * @return an instance of {@code CommentElement} or an instance of {@code Element}
 	 */
 	ETLCommand load(final String fieldName) {
 		validateStack()
 		if (isCommentsCommand(fieldName)) {
-			return new CommentElement(this, this.selectedDomain.domain)
+			return loadCommentElement()
 		} else {
-			Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
-			element.loadedElement = true
-			return element
+			return loadElement(fieldName)
 		}
 	}
 
+	/**
+	 * Creates an instance of {@code Element} to manage next step in chain method
+	 * @param fieldName a field name used to initialize a load command
+	 * @return an instance of {@code Element}
+	 */
+	private Element loadElement(final String fieldName) {
+		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
+		element.loadedElement = true
+		return element
+	}
+	/**
+	 * Creates an instance of {@code CommentElement} to manage next step in chain method
+	 * @param fieldName a field name used to initialize a load 'comments' command
+	 * @return an instance of {@code CommentElement}
+	 */
+	private CommentElement loadCommentElement() {
+		return new CommentElement(this, this.selectedDomain.domain)
+	}
 
 	/**
 	 * Create a local variable using variableName parameter.
@@ -699,14 +727,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Lookup ETL command implementation:
 	 * <pre>
-	 *  iterate {*      ...
+	 *  iterate {
+	 *  	...
 	 *      domain Device
 	 *      extract 'Vm' load 'Name'
 	 *      extract Cluster
 	 *      def clusterName = CE
 	 *
 	 *      lookup 'assetName' with 'clusterName'
-	 *}* </pre>
+	 *	}
+	 *	</pre>
 	 * @param fieldNames
 	 */
 	LookupElement lookup(final Object fieldName) {
@@ -719,14 +749,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * <pre>
 	 *  set lookupNameVar = 'assetName'
 	 *  set lookupValueVar = 'xyzzy'
-	 *  iterate {*      ...
+	 *  iterate {
+	 *  	...
 	 *      domain Device
 	 *      extract 'Vm' load 'Name'
 	 *      extract Cluster
 	 *      def clusterName = CE
 	 *
 	 *      lookup lookupNameVar, 'assetType' with lookupValueVar, 'clusterName'
-	 *}* </pre>
+	 *	}
+	 * </pre>
 	 * @param fieldNames
 	 */
 	LookupElement lookup(Object... fieldNames) {
@@ -737,7 +769,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
-	 * 	iterate {* 		domain Application
+	 * 	iterate {
+	 * 		domain Application
 	 * 		initialize 'environment' with 'Production'
 	 * 	    initialize 'environment' with Production
 	 * 	    initialize 'environment' with SOURCE.'application id'
@@ -745,7 +778,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *
 	 * 	    extract 'application id'
 	 * 	    initialize 'environment' with CE
-	 *}* </pre>
+	 *	}
+	 * </pre>
 	 * @param field
 	 * @return
 	 */
@@ -765,9 +799,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
-	 * 	iterate {* 		domain Application
+	 * 	iterate {
+	 * 		domain Application
 	 * 		init 'environment' with 'Production'
-	 *}* </pre>
+	 *	}
+	 * </pre>
 	 * @param field
 	 * @return
 	 * @see ETLProcessor#initialize(java.lang.String)
@@ -914,11 +950,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 * 		whenNotFound 'asset' create {* 			assetClass: Application
+	 * 		whenNotFound 'asset' create {
+	 * 			assetClass: Application
 	 * 			assetName: primaryNameVar
 	 * 			assetType: primaryTypeVar
 	 * 			"SN Last Seen": NOW
-	 *}* </pre>
+	 *	}
+	 *	</pre>
 	 * @param fieldName
 	 * @return the current find Element
 	 */
@@ -933,8 +971,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * WhenNotFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 * 		whenFound asset update {* 			"TN Last Seen": NOW
-	 *}* </pre>
+	 * 		whenFound asset update {
+	 * 			"TN Last Seen": NOW
+	 *	}
+	 *	</pre>
 	 * @param fieldName
 	 * @return the current find Element
 	 */
@@ -944,30 +984,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			throw ETLProcessorException.whenFoundCommandWithoutCurrentFindElement(fieldName)
 		}
 		return new WhenFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
-	}
-
-	/**
-	 *
-	 * @param domain
-	 * @param closure
-	 * @return
-	 */
-	CommentElement attach(ETLDomain domain) {
-		return new CommentElement(this, domain)
-	}
-
-	/**
-	 *
-	 * @param domainName
-	 * @param closure
-	 * @return
-	 */
-	CommentElement attach(String domainName) {
-		ETLDomain domain = ETLDomain.lookup(domainName)
-		if (domain) {
-			return attach(domain)
-		}
-		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
 	/**

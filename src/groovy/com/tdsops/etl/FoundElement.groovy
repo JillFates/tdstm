@@ -25,7 +25,8 @@ abstract class FoundElement implements ETLCommand {
 	 * to define the field that will be used in the creation or update of an doamin class
 	 * <pre>
 	 *     find Dependency ....
-	 *     whenFound 'asset' update { .... }* </pre>
+	 *     whenFound 'asset' update { .... }
+	 * </pre>
 	 * Following the example above, 'asset' field belongs to a Dependency domain class
 	 */
 	ETLFieldDefinition fieldDefinition
@@ -33,7 +34,9 @@ abstract class FoundElement implements ETLCommand {
 	/**
 	 * Found Element enum type used to define if whenFound and whenNotFound command
 	 * <pre>
-	 *      whenFound 'asset' update { .... }*      whenNotFound 'asset' create { .... }* </pre>
+	 * 		whenFound 'asset' update { .... }
+	 *  	whenNotFound 'asset' create { .... }
+	 * </pre>
 	 */
 	enum FoundElementType {
 		update, create, unknown
@@ -67,9 +70,11 @@ abstract class FoundElement implements ETLCommand {
 	/**
 	 * Validates WhenNotFound create ETL command used incorrectly
 	 * <pre>
-	 *     // Invalid use of whenNotFound  command
-	 * 		whenNotFound asset update {* 			......
-	 *}* </pre>
+	 *  // Invalid use of whenNotFound  command
+	 * 	whenNotFound asset update {
+	 * 			......
+	 *	}
+	 * </pre>
 	 * @param closure
 	 * @return the current find Element
 	 */
@@ -80,9 +85,11 @@ abstract class FoundElement implements ETLCommand {
 	/**
 	 * Validates WhenFound create ETL command used incorrectly
 	 * <pre>
-	 *     // Invalid use of WhenFound  command
-	 * 		whenFound asset create {* 			....
-	 *}* </pre>
+	 *  // Invalid use of WhenFound  command
+	 * 	whenFound asset create {
+	 * 		....
+	 *	}
+	 *	</pre>
 	 * @param closure
 	 * @return the current find Element
 	 */

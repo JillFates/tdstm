@@ -648,7 +648,7 @@ class RowResult {
 /**
  * Prepares some of the fields result in the data result.
  * <pre>
-	 *	"asset": {
+ *	"asset": {
  *	    "value": "",
  *	    "originalValue": "",
  *	    "init": "Default Value"

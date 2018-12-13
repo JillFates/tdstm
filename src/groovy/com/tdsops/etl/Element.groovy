@@ -116,19 +116,44 @@ class Element implements RangeChecker, ETLCommand {
 	 */
 	ETLCommand load(String fieldName) {
 		processor.validateStack()
-		if (processor.hasSelectedDomain()) {
-			if (isCommentsCommand(fieldName)) {
-				return new CommentElement(this.processor, this.processor.selectedDomain.domain).with(this.value)
-			} else {
-				this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
-				processor.addElementLoaded(this)
-				return this
-			}
+		validateSelectedDomainAlreadyDefined()
+
+		if (isCommentsCommand(fieldName)) {
+			return loadCommentElement()
 		} else {
-			throw ETLProcessorException.domainMustBeSpecified()
+			return loadElement(fieldName)
 		}
 	}
 
+	/**
+	 * Creates an instance of {@code Element} to manage next step in chain method
+	 * @param fieldName a field name used to continue with the extract ... load 'comments' command
+	 * @return an instance of {@code Element}
+	 */
+	private Element loadElement(final String fieldName) {
+		this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
+		processor.addElementLoaded(this)
+		return this
+	}
+	/**
+	 * Creates an instance of {@code CommentElement} to manage next step in chain method
+	 * @param fieldName a field name used to continue with the extract ... load 'comments' command
+	 * @return an instance of {@code CommentElement}
+	 */
+	private CommentElement loadCommentElement() {
+		return new CommentElement(this.processor, this.processor.selectedDomain.domain).with(this.value)
+	}
+
+	/**
+	 * <p>Validates if in the current status of an ETL script,
+	 * domain command was already defined.</p>
+	 * @throws ETLProcessorException
+	 */
+	private void validateSelectedDomainAlreadyDefined() {
+		if (!processor.hasSelectedDomain()) {
+			throw ETLProcessorException.domainMustBeSpecified()
+		}
+	}
 	/**
 	 * Initialize an Element with a particular value
 	 * <code>
