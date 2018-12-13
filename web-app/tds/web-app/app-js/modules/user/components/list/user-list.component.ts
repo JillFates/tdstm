@@ -12,7 +12,7 @@ import {PersonModel} from '../../../../shared/components/add-person/model/person
 	templateUrl: '../tds/web-app/app-js/modules/user/components/list/user-list.component.html'
 })
 
-export class UserListComponent implements OnInit{
+export class UserListComponent implements OnInit {
 	constructor(
 		private userService: UserService,
 		private dialogService: UIDialogService) {

@@ -47,11 +47,10 @@ export class UserManageStaffComponent {
 
 	// Decide what to do when the cancel button is clicked
 	protected handleCancelButton() {
-		if(this.editing) {
-			this.personModel =  Object.assign({}, this.savedPersonModel);
+		if (this.editing) {
+			this.personModel = Object.assign({}, this.savedPersonModel);
 			this.editing = false;
-		}
-		else {
+		} else {
 			this.cancelCloseDialog();
 		}
 	}
@@ -94,9 +93,8 @@ export class UserManageStaffComponent {
 				});
 				this.savedPersonModel = Object.assign({}, this.personModel, this.savedPersonModel);
 				this.availableTeamNames = result.availableTeams.map(a => a.description);
-				//Populate the key map so we can reference which ids apply to which descriptions
-				for(let i = 0; i < result.availableTeams.length; i++)
-				{
+				// Populate the key map so we can reference which ids apply to which descriptions
+				for (let i = 0; i < result.availableTeams.length; i++) {
 					this.teamKeys[result.availableTeams[i].description] = result.availableTeams[i].id;
 				}
 			},
@@ -138,14 +136,14 @@ export class UserManageStaffComponent {
 			let person = this.personModel;
 			person.teams = person.teams.filter(function(team, index) {
 				return person.teams.map(a => a.id).indexOf(team.id) === index;
-			})
+			});
 
 			// Isolate just team codes
 			data['teams'] = this.personModel.teams.map(a => a.id);
 
 			this.userService.updateAccountAdmin(data).subscribe(
 				(result) => {
-					if(result) {
+					if (result) {
 						this.savedPersonModel = Object.assign({}, this.personModel);
 						this.editing = false;
 					}
