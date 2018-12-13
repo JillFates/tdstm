@@ -2330,7 +2330,7 @@ class ImportService implements ServiceMethods {
 
 					// Prevent the creation of dependencies of an asset to itself.
 					if (asset.id == dependent.id) {
-						dependencyError("Cannot create a dependency of an asset to itself (row $rowNum).")
+						dependencyError("Creating a dependency for an asset to itself is not allowed (row $rowNum).")
 						continue
 					}
 
