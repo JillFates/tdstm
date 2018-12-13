@@ -46,7 +46,8 @@
                             <kendo-grid-column title="Field Name" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <kendo-dropdownlist
-                                            name="field" class="form-control field"
+                                            name="field"
+											class="form-control field"
                                             [data]="availableFields"
                                             [value]="editRows.selectedValues[rowIndex].field"
                                             (valueChange)="onFieldValueChange($event, rowIndex)"
@@ -59,13 +60,14 @@
                             <!-- Action -->
                             <kendo-grid-column title="Action" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <kendo-dropdownlist *ngIf="this.editRows.selectedValues[rowIndex].field"
-                                                        name="action" class="form-control action"
-                                                        [data]="fieldActionsMap[this.editRows.selectedValues[rowIndex].field.id]"
-                                                        [value]="editRows.selectedValues[rowIndex].action"
-                                                        (valueChange)="onActionValueChange($event, rowIndex)"
-                                                        [valueField]="'id'"
-                                                        [textField]="'text'">
+                                    <kendo-dropdownlist
+											*ngIf="this.editRows.selectedValues[rowIndex].field"
+                                            name="action" class="form-control action"
+                                            [data]="fieldActionsMap[this.editRows.selectedValues[rowIndex].field.id]"
+                                            [value]="editRows.selectedValues[rowIndex].action"
+                                            (valueChange)="onActionValueChange($event, rowIndex)"
+                                            [valueField]="'id'"
+                                            [textField]="'text'">
                                     </kendo-dropdownlist>
                                 </ng-template>
                             </kendo-grid-column>
@@ -75,7 +77,7 @@
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <!-- Text Fields -->
                                     <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
-                                           type="text" name="actionValue" class="form-control"
+                                           type="text" name="actionValue{{rowIndex}}" class="form-control"
                                            *ngIf="canShowControl('String', rowIndex)"/>
 
                                     <!-- Number Fields -->
