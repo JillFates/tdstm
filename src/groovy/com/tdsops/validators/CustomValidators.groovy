@@ -252,7 +252,7 @@ class CustomValidators {
 					return // with or without error, as the value is empty, just return
 				}
 
-				if ( !(value ==~ /^(\+|-)?[0-9]\d*(\.\d+)?$/)) {
+				if ( !(value ==~ /^(-)?\d*(\.\d+)?$/)) {
 					// If it's not a valid number format there is not much to do, so return
 					addError ('typeMismatch.java.lang.Long', [getLabel()])
 					return
