@@ -6,6 +6,7 @@ import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 /**
  *
@@ -23,6 +24,7 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 export class SelectListConfigurationPopupComponent implements OnInit {
 
 	public items: any[] = [];
+	public savedItems: any[] = [];
 	public newItem = '';
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
@@ -38,7 +40,8 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
-		private activeDialog: UIActiveDialogService) {
+		private activeDialog: UIActiveDialogService,
+		private promptService: UIPromptService) {
 	}
 
 	ngOnInit() {
@@ -82,7 +85,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 
 				// add any distinctValue that was not found on original field.constraint.values at the end.
 				this.items = this.items.concat( distinctValues.map( o => { return {deletable: false, value: o}; }) );
-
+				this.savedItems = this.items.slice();
 			});
 		this.defaultValue = this.field.default;
 	}
@@ -96,6 +99,14 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		if ((index % 2) === 0) {
 			return { 'background-color': '#f6f6f6' };
 		}
+	}
+
+	/**
+	 * See if the list has been modified since last save.
+	 */
+	isDirty(): boolean {
+		return (JSON.stringify(this.items) !== JSON.stringify(this.savedItems) ||
+				this.field.default !== this.defaultValue);
 	}
 
 	/**
@@ -191,7 +202,21 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		this.items = [];
-		this.activeDialog.dismiss();
+		if (this.isDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.items = [];
+						this.activeDialog.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.items = [];
+			this.activeDialog.dismiss();
+		}
 	}
 }
