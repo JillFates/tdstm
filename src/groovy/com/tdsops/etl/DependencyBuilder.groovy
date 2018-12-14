@@ -7,7 +7,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 /**
  *
  * <code>
- * 	iterate
+ * 	iterate {
  * 		domain Application
  * 		...
  * 		set assetResultVar with DOMAIN
@@ -170,10 +170,9 @@ class DependencyBuilder extends DomainBuilder {
 		 */
 		fieldResult.create = [:]
 		fieldMap.each { String fieldName, FieldResult results ->
-			if (ID_FIELD_NAME != fieldName ) {
-				fieldResult.create[fieldName] = results.init ?: results.value
+			if (ID_FIELD_NAME != fieldName) {
+				fieldResult.create[fieldName] = (results.init != null) ? results.init : results.value
 			}
-
 		}
 	}
 
