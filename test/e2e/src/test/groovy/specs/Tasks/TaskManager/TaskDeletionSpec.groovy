@@ -28,7 +28,7 @@ class TaskDeletionSpec extends GebReportingSpec {
         at MenuPage
         tasksModule.goToTasksManager()
         at TaskManagerPage
-        tmCreateTaskBtn.click()
+        waitFor{tmCreateTaskBtn.click()}
         at TaskCreationPage
         waitFor {tcModalLoading.hasClass("ng-hide")}
         tcModalTaskName = taskName

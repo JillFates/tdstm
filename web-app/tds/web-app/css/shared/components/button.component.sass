@@ -1,0 +1,44 @@
+$tds-button-icon-flat-color: #666
+
+@mixin tds-button-no-outline-mixin()
+  border: 0
+  background-color: transparent
+  outline: 0
+
+.tds-button
+  i
+    font-size: 16px
+
+// style for buttons contained in a grid row
+.tds-button-in-row
+  @include tds-button-no-outline-mixin()
+  padding: 0 2px
+  .tds-button
+    i
+      position: relative
+      vertical-align: middle
+
+// group a set of tds-buttons
+.tds-button-set
+  align-items: center
+  display: flex
+  justify-content: center
+  position: relative
+  .tds-button-in-row
+    .tds-button
+      i
+        color: $tds-button-icon-flat-color
+
+// icon used like button, used in add favorites, edit configuration, ...
+.tds-button-icon
+  @include tds-button-no-outline-mixin()
+  vertical-align: middle
+  margin: 0 10px
+  .tds-button
+    i
+      font-size: 22px
+
+// Match the first tds-button with an icon set belonging to a btn-group
+.btn-group > [tds-button]:not([icon=""]):first-child()
+  padding-top: 5px
+

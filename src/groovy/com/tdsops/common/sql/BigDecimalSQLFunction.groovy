@@ -8,23 +8,21 @@ import org.hibernate.type.StandardBasicTypes
 import org.hibernate.type.Type
 
 /**
- * Implementation of a custom {@code SQLFuntion} to be used in Dataviews. It can convert "cast" function for decimal formats
+ * Implementation of a custom {@code SQLFunction} to be used in Dataviews. It can convert "cast" function for decimal formats
  * Following the following HQL Sentence:
  * <pre>
- * select
- *   AE.id,
- *   AE.assetName,
- *   AE.environment,
- *   cast(AE.custom10 as long),
- *   cast_big_decimal(AE.custom13, 2),
- *   cast(AE.custom11 as date),
- *   cast(AE.custom12 as timestamp),
- *   str(AE.assetClass)
+ * select AE.id,
+ *        AE.assetName,
+ *        cast_long(AE.custom10),
+ *        cast_big_decimal(AE.custom18, 2),
+ *        cast_date_time(AE.custom19, '%Y-%m-%d'),
+ *        cast_date_time(AE.custom20, '%Y-%m-%dT%TZ'),
+ *        str(AE.assetClass)
  * from AssetEntity AE
- *   left outer join AE.moveBundle
- * where AE.project = :project and AE.assetClass in (:assetClasses)
+ * where AE.project = :project
+ *   and AE.assetClass in (:assetClasses)
  * group by AE.id
- * order by cast(AE.custom10 as long) desc
+ * order by AE.id asc
  * </pre>
  * <p>This class is in charged to convert <pre>cast_big_decimal(AE.custom13, 2)</pre> in <pre>cast(assetentit0_.custom13 as decimal(12,2)</pre></p>
  * <p>For tha reason, it is necessary 2 parameters:</p>
@@ -32,7 +30,6 @@ import org.hibernate.type.Type
  *  <li>First, the property to be used in this custom cast function</li>
  * 	<li>Second, precision digits taken from field specs</li>
  * </ul>
- *
  */
 class BigDecimalSQLFunction implements SQLFunction {
 
@@ -52,8 +49,9 @@ class BigDecimalSQLFunction implements SQLFunction {
 	}
 
 	/**
-	 * Prepares custom cast function for dealing with big decimals in an HQL sentence.
-	 *
+	 * <p>Prepares custom cast function for dealing with big decimals in an HQL sentence.</p>
+	 * <p>It prepares a MySQL sentence using specific  functions.</p>
+	 * <p>It uses 'CASE' function to avoid casting on empty String content</p>
 	 * @param firstArgumentType
 	 * @param arguments
 	 * @param factory
@@ -69,6 +67,6 @@ class BigDecimalSQLFunction implements SQLFunction {
 
 		String field = (String) arguments.get(0)
 		String precision = (String) arguments.get(1)
-		return "cast($field as decimal(12,$precision))"
+		return "CASE WHEN $field != '' THEN cast($field as decimal(12,$precision)) ELSE NULL END"
 	}
 }

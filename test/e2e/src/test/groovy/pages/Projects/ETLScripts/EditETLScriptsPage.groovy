@@ -21,8 +21,8 @@ class EditETLScriptsPage extends Page{
         datascriptDesc { $("label", for:"dataScriptDescription")}
         datascriptSaveBtn  { $("button", text: contains("Save"))}
         datascriptXIcon { $('div.modal.fade.in button.close')}
-        providerDropdown { $('span#dataScriptProvider')}
-        selectedProvider { providerDropdown.find("span.k-input")}
+        providerDropdown { $('#dataScriptProvider span.k-select')}
+        selectedProvider { $("#dataScriptProvider span.k-input")}
         //This gives you the latest created provider
         providers { $("div", class:"k-list-scroller").find("li", class:"k-item")}
         datascriptNameField { $('input#dataScriptName')}

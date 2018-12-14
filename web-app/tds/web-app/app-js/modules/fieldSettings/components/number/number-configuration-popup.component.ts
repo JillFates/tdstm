@@ -49,8 +49,12 @@ export class NumberConfigurationPopupComponent {
 		if (this.localMinRange !== null || this.model.maxRange !== null) {
 			this.model.allowNegative = false;
 		}
-		if (this.model.allowNegative) {
+		if (this.model.allowNegative === true) {
 			this.model.minRange = null;
+		} else {
+			if ((!this.localMinRange || this.localMinRange === null) && this.model.minRange === null) {
+				this.model.minRange = 0;
+			}
 		}
 		this.model.format = NumberControlHelper.buildFormat(this.model);
 		this.buildExampleValue();

@@ -51,6 +51,8 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.validation =  this.defaultValidation;
+			this.model.asset.environment = '';
+			this.model.asset.scale = null;
 		}
 
 		/**

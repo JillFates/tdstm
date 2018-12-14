@@ -282,4 +282,20 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	protected onGridStateChange(state: State): void {
 		this.gridState = state;
 	}
+
+	/**
+	 -
+	 * Based on isOwner property determines which save function call
+	 */
+	protected save() {
+		this.model.isOwner ? this.onSave() : this.onSaveAs()
+	}
+
+	/**
+	 -
+	 * Based on isOwner property determines the id of the button save
+	 */
+	protected getSaveButtonId(): string {
+		return this.model.isOwner ? 'btnSave' : 'btnSaveAs'
+	}
 }

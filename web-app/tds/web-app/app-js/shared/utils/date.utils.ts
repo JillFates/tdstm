@@ -22,9 +22,10 @@ export class DateUtils {
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
-	public static readonly TDS_OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
-	public static readonly TDS_OUTPUT_DATETIME_FORMAT = 'YYYY-MM-DDT' + DateUtils.TDS_OUTPUT_PIPE_TIME_FORMAT;
-	public static readonly TDS_OUTPUT_DATE_FORMAT = 'yyyy-MM-dd';
+	public static readonly OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
+	public static readonly SERVER_FORMAT_DATETIME = 'YYYY-MM-DDT' + DateUtils.OUTPUT_PIPE_TIME_FORMAT;
+	public static readonly SERVER_FORMAT_DATE = 'YYYY-MM-DD';
+	public static readonly TIMEZONE_GMT = 'GMT';
 
 	/**
 	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
@@ -44,32 +45,44 @@ export class DateUtils {
 		if (iso8601Value === undefined || !iso8601Value) {
 			return '';
 		}
-		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.TDS_OUTPUT_PIPE_TIME_FORMAT}`);
+		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.OUTPUT_PIPE_TIME_FORMAT}`);
 	}
 
 	/**
-	 * Converts and Formats a Date into GMT time with an output result format.
+	 * Converts and Formats a Date into GMT
+	 * GMT is being used on the server and should always consider the User Timezone preference
+	 * @param {sourceLocalTime} date
+	 * @param {userTimeZone} string i.e America/Monterrey
+	 * @returns {string} The formatted day
 	 */
-	public static convertAndFormatDateToGMT(date: Date, format: string) {
-		if (!date || date === undefined || date === null) {
-			return null;
-		}
-		return moment.tz(date, 'GMT').format(format);
+	public static convertToGMT(sourceLocalTime: Date, userTimeZone: string): string {
+		// We stripped any reference to a Time zone
+		const datetimeStringWithNoTZ  = moment(sourceLocalTime).format('YYYY-MM-DDTHH:mm:ss');
+		const momentObjectWithUserTimezone = moment.tz(datetimeStringWithNoTZ, userTimeZone);
+		const momentObjectWithGMT = momentObjectWithUserTimezone.clone().tz(this.TIMEZONE_GMT);
+		return momentObjectWithGMT.format();
 	}
 
 	/**
-	 * Create a Date Object
-	 * @param destination
-	 * @returns {Date}
+	 * Converts and Formats a Date from GMT (Default DATABASE Timezone) into the User Preference Format
+	 * @param {sourceLocalTime} date
+	 * @param {userTimeZone} string i.e America/Monterrey
+	 * @returns {string} The formatted day
 	 */
-	public static compose(destination: any): Date {
-		// TODO: MomentJS? User Preference?
-		let compose = destination;
-		if (destination !== '' && destination !== null && destination !== 'undefined') {
-			compose = new Date(destination);
-		}
-		return compose;
+	public static convertFromGMT(sourceTime: Date | string, userTimeZone: string): string {
+		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
+		const targetZonedTime = sourceZonedTime.clone().tz(userTimeZone);
+		return targetZonedTime.format();
+	}
 
+	/**
+	 * Get the Date without the hh:mm:ss
+	 * @param {sourceTime} The original source in a GMT based timezone
+	 * @returns {string} The formatted day without hh:mm:ss
+	 */
+	public static getDateFromGMT(sourceTime: Date): string {
+		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
+		return sourceZonedTime.format('YYYY-MM-DD');
 	}
 
 	public static getTimestamp(): String {
@@ -328,8 +341,12 @@ export class DateUtils {
 	 * @param {string} format
 	 * @returns {Date}
 	 */
-	public static toDate(value: string): Date {
-		return moment(value).toDate()
+	public static toDateUsingFormat(value: string, format: string): Date {
+		let momentObject: moment.Moment = moment(value, format);
+		if (momentObject.isValid()) {
+			return momentObject.toDate();
+		}
+		return null;
 	}
 
 }

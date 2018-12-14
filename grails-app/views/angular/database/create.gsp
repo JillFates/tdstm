@@ -34,20 +34,8 @@
 										</tr>
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${assetInstance.dbFormat}" tabindex="13" ngmodel="model.asset.dbFormat"/>
-
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance?.supportType}" ngmodel="model.asset.supportType" tabIndex="17"/>
-
-											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance?.environment}"/>
-											<td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
-												<kendo-dropdownlist
-														[tabIndex]="21"
-														class="tm-input-control"
-														name="modelAssetEnvironment"
-														[(ngModel)]="model.asset.environment"
-														[defaultItem]="'Please Select'"
-														[data]="model.environmentOptions">
-												</kendo-dropdownlist>
-											</td>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 										</tr>
 										<tr>
 											<td class="label ${standardFieldSpecs.size.imp?:''}"
@@ -65,7 +53,6 @@
 														name="modelAssetScaleName"
 														[data]="${SizeScale.getAsJsonList() as JSON}"
 														[(ngModel)]="model.asset.scale"
-														[defaultItem]="''"
 														[textField]="'text'"
 														[valueField]="'value'"
 														style="width: 100px;">
@@ -74,13 +61,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance?.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="18"
-														class="tm-input-control"
-														name="modelAssetRetireDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.retireDate">
-												</kendo-datepicker>
+												<tds-date-control
+													class="tm-input-control"
+													name="modelAssetRetireDate"
+													[tabindex]="18"
+													[(value)]="model.asset.retireDate">
+												</tds-date-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
@@ -104,13 +90,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance?.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
-												<kendo-datepicker
-														[tabIndex]="19"
-														class="tm-input-control"
-														name="modelAssetMainExpDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.maintExpDate">
-												</kendo-datepicker>
+                                                <tds-date-control
+													class="tm-input-control"
+													name="modelAssetMainExpDate"
+													[tabindex]="19"
+                                                    [(value)]="model.asset.maintExpDate">
+                                                </tds-date-control>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance?.planStatus}"/>
@@ -134,7 +119,6 @@
 											<td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
 												<kendo-dropdownlist
 														[tabIndex]="24"
-														[defaultItem]="${assetInstance.constraints.validation.inList as JSON}[0]"
 														class="tm-input-control"
 														name="modelAssetValidation"
 														[data]="${assetInstance.constraints.validation.inList as JSON}"

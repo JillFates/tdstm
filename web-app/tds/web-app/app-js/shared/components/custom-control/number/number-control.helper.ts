@@ -13,13 +13,14 @@ export class NumberControlHelper {
 		let format = this.DEFAULT_NUMBER_FORMAT;
 		if (constraints.precision > 0) {
 			if (constraints.separator) {
-				format = `n${constraints.precision}`;
-			} else {
-				format = '0.';
-				for (let i = 0; i < constraints.precision; i++) {
-					format = format.concat('0');
-				}
+				format = format.concat(',');
 			}
+			let decimals = '\'.';
+			for (let i = 0; i < constraints.precision; i++) {
+				decimals = decimals.concat('0');
+			}
+			decimals = decimals.concat('\'');
+			format = format.concat(decimals);
 		} else if (constraints.separator) {
 			format = 'n';
 		}

@@ -1071,13 +1071,12 @@ class RackLayoutsController implements ControllerMethods {
 	 * Saves 'ShowAddIcons' Preference
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreference() {
+	def saveAddIconPreference(String mode) {
 		def preference = params.preference
-		if (params.add == "true") {
-			userPreferenceService.setPreference(preference, "true")
-		}
-		else {
-			userPreferenceService.removePreference(preference)
+		if (mode == 'enabled') {
+			userPreferenceService.setPreference(PREF.SHOW_ADD_ICONS, 'true')
+		} else {
+			userPreferenceService.removePreference(PREF.SHOW_ADD_ICONS)
 		}
 
 		render true

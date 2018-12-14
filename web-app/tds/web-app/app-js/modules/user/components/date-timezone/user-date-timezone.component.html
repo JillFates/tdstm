@@ -11,7 +11,8 @@
                         id="dateTimezone"
                         name="timezone"
                         [(ngModel)]="selectedTimezone"
-                        [data]="timezonesList">
+                        [data]="timezonesList"
+                        (valueChange)="onTimezoneSelected($event)">
                 </kendo-dropdownlist>
                 <b style="padding-left: 30px">Date Format:</b>
                 <kendo-dropdownlist
@@ -44,7 +45,7 @@
             </map>
 
             <img id="timezoneImage" src="../images/world_map_800.jpg" width="800" height="400" usemap="#timezoneMap"/>
-            <img class="timezone-pin" src="../images/pin.png" style="padding-top: 4px; display: none;" />
+            <img class="timezone-pin" src="../images/pin.png" style="padding-top: 4px;" [ngClass]="{'timezone-pin-hidden': !timezonePinShow}" />
 
         </form>
 
