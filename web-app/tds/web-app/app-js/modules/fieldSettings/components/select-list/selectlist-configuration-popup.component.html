@@ -58,7 +58,7 @@
         <label for="" class="info-label">
             <i class="fa fa-fw fa-ban"></i> are values that are in use therefore can not be deleted.
         </label>
-        <button name="saveButton" class="btn btn-default btn-sm" [disabled]="items.length === 0" (click)="onSave()">
+        <button name="saveButton" class="btn btn-default btn-sm" [disabled]="items.length === 0 || !isDirty()" (click)="onSave()">
             <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
         </button>
         <button name="cancelButton" class="btn btn-default btn-sm" (click)="cancelCloseDialog()">
