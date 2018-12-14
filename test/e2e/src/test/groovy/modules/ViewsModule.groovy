@@ -14,7 +14,7 @@ class ViewsModule extends Module {
         clearFilterX      {$(".form-control-feedback")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
-        viewsListed       (required: false) {$("[uisref]")}
+        viewsListed       (required: false) {viewListTableBody.find("a")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
