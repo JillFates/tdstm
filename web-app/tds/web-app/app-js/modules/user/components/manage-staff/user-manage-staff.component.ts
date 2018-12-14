@@ -10,7 +10,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 	selector: 'user-manage-staff',
 	templateUrl: '../tds/web-app/app-js/modules/user/components/manage-staff/user-manage-staff.component.html'
 })
-export class UserManageStaffComponent extends UIExtraDialog{
+export class UserManageStaffComponent extends UIExtraDialog {
 	public modalOptions: DecoratorOptions;
 	public editing;
 	public currentTab;

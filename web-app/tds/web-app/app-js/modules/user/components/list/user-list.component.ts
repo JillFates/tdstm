@@ -5,7 +5,8 @@ import {Component} from '@angular/core';
 	templateUrl: '../tds/web-app/app-js/modules/user/components/list/user-list.component.html'
 })
 
-export class UserListComponent{
+export class UserListComponent {
 	constructor() {
+		//
 	}
 }
