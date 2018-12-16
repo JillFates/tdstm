@@ -3,6 +3,8 @@ import {
 	getRangeValidationRule
 } from './validation-rules.helper';
 
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
+
 interface NumberConstraints {
 	allowNegative: boolean;
 	max: number;
@@ -12,22 +14,23 @@ interface NumberConstraints {
 
 /**
  * Factory function to create the validations rules to apply, those vary by component
- * @param componentType - used to determinate the set of rules to create
+ * @param factoryType - used to determinate the set of rules to create (Number, date, dateTime, etc...)
  * @return array of validation functions to apply
  */
-export function fieldRulesFactory(componentType: string) {
+export function createFieldRulesFactory(factoryType: CUSTOM_FIELD_TYPES) {
+	const customRules = {
+		[CUSTOM_FIELD_TYPES.Number] : getRulesForNumberField(),
+	};
+
+	return customRules[factoryType] || getEmptyRules();
+
+	/*
 	return {
 		create() {
-			switch (componentType) {
-				case 'number' :
-					return getRulesForNumberField();
-
-				default:
-					// no rules
-					return getEmptyRules();
-			}
+			return customRules[factoryType] || getEmptyRules();
 		}
 	}
+	*/
 }
 
 /**

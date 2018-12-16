@@ -9,8 +9,9 @@ import {
 	FormControl
 } from '@angular/forms'
 
-import {fieldRulesFactory} from './field-rules-factory.helper';
+import {createFieldRulesFactory} from './field-rules-factory.helper';
 import {ObjectUtils} from '../../../utils/object.utils';
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 
 export abstract class TDSCustomControl implements ControlValueAccessor {
 	// common attributes
@@ -31,8 +32,8 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 		this.propagateChange(this._value);
 	}
 
-	private createRulesFactory(factoryType: string) {
-		return fieldRulesFactory(factoryType).create();
+	private createRulesFactory(factoryType: CUSTOM_FIELD_TYPES) {
+		return createFieldRulesFactory(factoryType);
 	}
 
 	/**
@@ -41,7 +42,7 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	 * @param factoryType - Type of custom control
 	 * @param constraints - Object containing the constraints to apply
 	 */
-	setupValidatorFunction(factoryType: string, constraints: any) {
+	setupValidatorFunction(factoryType: CUSTOM_FIELD_TYPES, constraints: any) {
 		const rulesFactory = this.createRulesFactory(factoryType);
 		this.validateFunction =  this.applyRules(rulesFactory(constraints))
 		this.propagateChange(this.value);

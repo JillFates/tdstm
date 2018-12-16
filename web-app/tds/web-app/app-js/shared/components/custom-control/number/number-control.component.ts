@@ -4,6 +4,7 @@ import {pathOr} from 'ramda';
 
 import {NumberControlHelper} from './number-control.helper';
 import {TDSCustomControl} from '../common/custom-control.component';
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 
 @Component({
 	selector: 'tds-number-control',
@@ -19,6 +20,7 @@ import {TDSCustomControl} from '../common/custom-control.component';
 			[max]="max"
 			[min]="min"
 			[tabindex]="tabindex"
+			[value]="value"
 			(valueChange)="onValueChange($event)">
 		</kendo-numerictextbox>
 	`,
@@ -56,13 +58,13 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 			required: this.required
 		};
 
-		this.setupValidatorFunction('number', numberConstraints);
+		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Number, numberConstraints);
 	}
 
 	/**
 	 * If value is set cast it to integer
 	 */
 	onValueChange(value: number): void {
-		this.value = (value !== null) ? Math.trunc(value) : null;
+		this.value = value;
 	}
 }
