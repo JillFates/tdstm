@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
-import {TDSCustomControl} from '../common/custom-control';
+import {TDSCustomControl} from '../common/custom-control.component';
+import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 @Component({
 	selector: 'tds-date-control',
@@ -28,8 +29,11 @@ export class DateControlComponent extends TDSCustomControl implements OnInit  {
 	protected displayFormat: string;
 	protected dateValue: Date;
 
-	constructor(private userPreferenceService: PreferenceService) {
-		super();
+	constructor(
+		private userPreferenceService: PreferenceService,
+		protected validationRulesFactory: ValidationRulesFactoryService
+	) {
+		super(validationRulesFactory);
 		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
 	}
 
@@ -39,7 +43,7 @@ export class DateControlComponent extends TDSCustomControl implements OnInit  {
 	ngOnInit(): void {
 		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
 		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
-		this.onValueChange(this.dateValue);
+		// this.onValueChange(this.dateValue);
 	}
 
 	/**

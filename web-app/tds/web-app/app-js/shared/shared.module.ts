@@ -23,6 +23,8 @@ import { WindowService } from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
+import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
+import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -223,7 +225,9 @@ export class SharedModule {
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY
-				}
+				},
+				ValidationRulesFactoryService,
+				ValidationRulesDefinitionsService
 			]
 		};
 	}

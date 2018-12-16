@@ -9,9 +9,9 @@ import {
 	FormControl
 } from '@angular/forms'
 
-import {createFieldRulesFactory} from './field-rules-factory.helper';
 import {ObjectUtils} from '../../../utils/object.utils';
 import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
+import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 export abstract class TDSCustomControl implements ControlValueAccessor {
 	// common attributes
@@ -23,6 +23,10 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	private propagateChange: any = () => { /* Notify changes to host */ };
 	private validateFunction: any = () => { /* Validator function */};
 
+	constructor(protected validationRulesFactory: ValidationRulesFactoryService) {
+
+	}
+
 	get value() {
 		return this._value;
 	}
@@ -32,10 +36,6 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 		this.propagateChange(this._value);
 	}
 
-	private createRulesFactory(factoryType: CUSTOM_FIELD_TYPES) {
-		return createFieldRulesFactory(factoryType);
-	}
-
 	/**
 	 * Based on the component type, setup the function to validate the changes on the component value
 	 * Propagates the change to the ControlValueAccessor
@@ -43,7 +43,7 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	 * @param constraints - Object containing the constraints to apply
 	 */
 	setupValidatorFunction(factoryType: CUSTOM_FIELD_TYPES, constraints: any) {
-		const rulesFactory = this.createRulesFactory(factoryType);
+		const rulesFactory = this.validationRulesFactory.createFieldRulesFactory(factoryType);
 		this.validateFunction =  this.applyRules(rulesFactory(constraints))
 		this.propagateChange(this.value);
 	}

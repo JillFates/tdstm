@@ -1,10 +1,11 @@
 import {Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
-import {FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
+import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
 import {pathOr} from 'ramda';
 
 import {NumberControlHelper} from './number-control.helper';
 import {TDSCustomControl} from '../common/custom-control.component';
 import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
+import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 @Component({
 	selector: 'tds-number-control',
@@ -46,8 +47,8 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 	@Input('separator') separator: boolean;
 	@Input('autoCorrect') autoCorrect = false;
 
-	constructor() {
-		super();
+	constructor(protected validationRulesFactory: ValidationRulesFactoryService) {
+		super(validationRulesFactory);
 	}
 
 	ngOnChanges(inputs: SimpleChanges) {
@@ -61,9 +62,6 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Number, numberConstraints);
 	}
 
-	/**
-	 * If value is set cast it to integer
-	 */
 	onValueChange(value: number): void {
 		this.value = value;
 	}
