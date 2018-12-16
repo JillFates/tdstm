@@ -1,3 +1,6 @@
+import {CUSTOM_FIELD_TYPES as CUSTOM_FIELD_CONTROL_TYPE} from '../../../shared/model/constants';
+export {CUSTOM_FIELD_CONTROL_TYPE}
+
 export class FieldSettingsModel {
 	field: string;
 	label: string;
@@ -60,12 +63,3 @@ export class FieldImportance {
 export const FIELD_COLORS = ['Y', 'G', 'P', 'B', 'O', 'N', 'U'];
 
 export const FIELD_NOT_FOUND = 'Field Not Found';
-
-export enum CUSTOM_FIELD_CONTROL_TYPE {
-	List = 'List',
-	String = 'String',
-	YesNo = 'YesNo',
-	Date = 'Date',
-	DateTime = 'DateTime',
-	Number = 'Number'
-}
