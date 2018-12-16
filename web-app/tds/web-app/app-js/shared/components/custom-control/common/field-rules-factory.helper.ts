@@ -11,7 +11,7 @@ interface NumberConstraints {
 }
 
 /**
- * Factory function to create the validations rules to apply
+ * Factory function to create the validations rules to apply, those vary by component
  * @param componentType - used to determinate the set of rules to create
  * @return array of validation functions to apply
  */

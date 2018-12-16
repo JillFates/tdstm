@@ -1,56 +1,68 @@
-import {Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
+import {Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
+import {pathOr} from 'ramda';
+
 import {NumberControlHelper} from './number-control.helper';
-import {TDSCustomControl} from '../common/custom-control';
+import {TDSCustomControl} from '../common/custom-control.component';
 
 @Component({
 	selector: 'tds-number-control',
+	host: {
+		'(blur)': 'onTouched()'
+	},
 	styles: [``],
 	template: `
-		<div>
-            <kendo-numerictextbox [format]="format"
-                                  [(ngModel)]="numberValue"
-                                  [min]="realMinRange" [max]="maxRange"
-                                  [autoCorrect]="true"
-                                  [tabindex]="tabindex"
-                                  (ngModelChange)="onValueChange($event)"
-                                  class="form-control">
-            </kendo-numerictextbox>
-		</div>
-	`
+		<kendo-numerictextbox
+			[autoCorrect]="autoCorrect"
+			class="form-control"
+			[format]="format"
+			[max]="max"
+			[min]="min"
+			[tabindex]="tabindex"
+			(valueChange)="onValueChange($event)">
+		</kendo-numerictextbox>
+	`,
+	providers: [
+		{
+			provide: NG_VALUE_ACCESSOR,
+			useExisting: forwardRef(() => NumberControlComponent),
+			multi: true
+		},
+		{
+			provide: NG_VALIDATORS,
+			useExisting: forwardRef(() => NumberControlComponent),
+			multi: true
+		}
+	]
 })
-export class NumberControlComponent extends TDSCustomControl implements OnInit {
-	@Input('value') value: any;
-	@Output() valueChange = new EventEmitter<any>();
+export class NumberControlComponent extends TDSCustomControl implements OnChanges {
 	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
 	@Input('precision') precision: number;
-	@Input('maxRange') maxRange: number;
-	@Input('minRange') minRange: number;
-	@Input('required') required: boolean;
+	@Input('max') max: number;
+	@Input('min') min: number;
 	@Input('allowNegative') allowNegative: boolean;
 	@Input('separator') separator: boolean;
-	protected numberValue: number;
-	protected realMinRange: number;
+	@Input('autoCorrect') autoCorrect = false;
 
 	constructor() {
 		super();
 	}
 
-	/**
-	 * On Init build the number format.
-	 */
-	ngOnInit(): void {
-		this.numberValue = this.value ? +this.value : 0;
-		// double check
-		this.numberValue = Number.isNaN(this.numberValue) ? 0 : this.numberValue;
-		this.realMinRange = this.minRange;
+	ngOnChanges(inputs: SimpleChanges) {
+		const numberConstraints = {
+			allowNegative: this.allowNegative,
+			max: this.max,
+			min: this.min,
+			required: this.required
+		};
+
+		this.setupValidatorFunction('number', numberConstraints);
 	}
 
 	/**
-	 * Emit the value changed.
-	 * @param $event
+	 * If value is set cast it to integer
 	 */
-	onValueChange($event: any): void {
-		this.numberValue = Math.trunc($event);
-		this.valueChange.emit(this.numberValue);
+	onValueChange(value: number): void {
+		this.value = (value !== null) ? Math.trunc(value) : null;
 	}
 }
