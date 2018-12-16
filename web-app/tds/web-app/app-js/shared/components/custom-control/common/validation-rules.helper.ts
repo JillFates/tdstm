@@ -2,7 +2,7 @@ import {FormControl} from '@angular/forms';
 import {isNil} from 'ramda';
 
 /**
- *	Defines the rule function to validate a range of number
+ *	Defines the rule function to validate a range of numbers
  * 	@return Curried function that determines if the provided range meets the rule
  */
 export function getRangeValidationRule(maxValue: number, minValue: number): Function {
