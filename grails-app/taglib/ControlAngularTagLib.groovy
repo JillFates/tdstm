@@ -766,7 +766,7 @@ class ControlAngularTagLib {
 
 		StringBuilder control = new StringBuilder("")
 		control.append("<tds-field-validation-errors ")
-		control.append("	[label]='\"${controlLabel}\"' ")
+		control.append("   [label]='\"${controlLabel}\"' ")
 		control.append("   [errors]='${field}.errors' ")
 		control.append("   [submitted]='form && form.submitted' ")
 		control.append("   [valid]='${field}.valid' ")

@@ -20,7 +20,7 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	onTouched = () => { /* Default on touched */} ;
 
 	private propagateChange: any = () => { /* Notify changes to host */ };
-	private validateFn: any = () => { /* Validator function */};
+	private validateFunction: any = () => { /* Validator function */};
 
 	get value() {
 		return this._value;
@@ -35,9 +35,15 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 		return fieldRulesFactory(factoryType).create();
 	}
 
+	/**
+	 * Based on the component type, setup the function to validate the changes on the component value
+	 * Propagates the change to the ControlValueAccessor
+	 * @param factoryType - Type of custom control
+	 * @param constraints - Object containing the constraints to apply
+	 */
 	setupValidatorFunction(factoryType: string, constraints: any) {
 		const rulesFactory = this.createRulesFactory(factoryType);
-		this.validateFn =  this.applyRules(rulesFactory(constraints))
+		this.validateFunction =  this.applyRules(rulesFactory(constraints))
 		this.propagateChange(this.value);
 	}
 
@@ -57,7 +63,7 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	}
 
 	validate(formControl: FormControl) {
-		return this.validateFn(formControl);
+		return this.validateFunction(formControl);
 	}
 
 	/**
