@@ -210,7 +210,8 @@ class ViewsModule extends Module {
      */
     def clickOnNonSharedView(){
         def nonSharedView=vwGridRows.find(":nth-child(7)").hasNot(".glyphicon-ok")[0]
-        nonSharedView.siblings().find("[uisref]").click()
+        //nonSharedView.siblings().find("[uisref]").click()
+        nonSharedView.siblings().find("a")[1].click()
     }
 
 }
