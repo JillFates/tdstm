@@ -1562,12 +1562,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @return
 	 */
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object evaluate(String script, ProgressCallback progressCallback = null) {
 		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object execute(String script) {
 		Object result = new GroovyShell(
 				this.class.classLoader,
@@ -1650,13 +1650,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @see TimedInterrupt
 	 */
-	@TimedInterrupt(600l)
+	@TimedInterrupt(1200l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
 		setUpProgressIndicator(script, progressCallback)
 
 		String tag = this.dataSetFacade.fileName()
 		this.stopWatch.begin(tag)
 
+		script = preProcess(script)
 		Object result = new GroovyShell(
 				this.class.classLoader,
 				this.binding,
@@ -1667,6 +1668,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return result
 	}
 
+	/**
+	 * <p>It prepares an ETL script removing whitespaces after backslash (\) character.</p>
+	 * <p>It creates a new script content doing a right trim over each line</p>
+	 * @param script an ETL script content
+	 * @return ETL script content without trailing spaces after backslash (\) character
+	 */
+	private String preProcess(String script) {
+		String cleanScript = ''
+		script.eachLine {
+			cleanScript += it.replaceAll(/\s+$/,'') + '\n'
+		}
+		return cleanScript
+	}
+  
 	/**
 	 * Logs metrics related with evaluation time and findCache hit ratio
 	 *

@@ -17,6 +17,7 @@ export class DeviceCommonComponent extends AssetCommonEdit {
 	protected bladeTargetOptions: Array<any> = [];
 	private readonly SET_TO_NULL = '0';
 	private readonly CREATE_NEW = '-1';
+	protected readonly defaultRoom = {id: null, value: 'Please Select'};
 
 	protected prepareModelRequestToSave(modelRequest: any): void {
 		// currentAssetType, manufacturerId, modelId

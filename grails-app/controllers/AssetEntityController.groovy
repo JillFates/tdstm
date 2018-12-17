@@ -2008,7 +2008,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	// removes the user's dependency analyzer map related preferences
 	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.value())
+		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.name())
 		render true
 	}
 
@@ -2865,7 +2865,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					results = qm.domain.executeQuery(rquery, qparams, [max:max, offset:offset, sort:'assetName' ])
 
 					// Convert the columns into a map that Select2 requires
-					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJavaScript(r[1])) ]}
+					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJava(r[1])) ]}
 				}
 			} else {
 				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
@@ -3060,10 +3060,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 			graphNodes << [
 				id:it.id,
-				name: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				name: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				type:type, assetClass:it.assetClass.toString(),
 				shape:shape, size:size,
-				title: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				title: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				color: it == asset ? 'red' : 'grey',
 				parents:[], children:[], checked:false, siblings:[]
 			]

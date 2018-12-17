@@ -1,6 +1,8 @@
 package net.transitionmanager.asset
 
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
+import com.tds.asset.AssetOptions.AssetOptionsType
 import com.tds.asset.AssetType
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -39,7 +41,8 @@ class DeviceUtils {
 			sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
 			targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
 			sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
-			targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
+			targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId),
+	        priorityOption: getPriorityOptions()
 		]
     }
 
@@ -167,6 +170,14 @@ class DeviceUtils {
 			}
 		}
 		return assets
+	}
+
+	/**
+	 * Return the list of priorities options.
+	 * @return a list with the different priority values.
+	 */
+	static List<String> getPriorityOptions() {
+		return AssetUtils.getAssetOptionsValues(AssetOptionsType.PRIORITY_OPTION)
 	}
 
 }

@@ -63,7 +63,7 @@ class Dgenerator {
 
 	List<String> metrics = ['APP-CNT', 'APP-VALID-CNT', 'APP-VALID_PLAN-CNT', 'SERVER-CNT']
 
-	List<String> validations = ['Discovery', 'Validated', 'BundleReady']
+	List<String> validations = ['Unknown', 'Validated', 'PlanReady']
 
 	List<String> planStatuses = [
 			'Unassigned',

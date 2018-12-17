@@ -211,6 +211,7 @@ class ETLProcessorResult {
 	RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
 			reference.data.add(new RowResult(
+				fieldsValidator: processor.fieldsValidator,
 				rowNum: processor.iterateIndex.pos,
 				domain: reference.domain)
 			)
@@ -231,17 +232,15 @@ class ETLProcessorResult {
 
 	/**
 	 * Return the value for a field name using the current row in the JSON results
-	 * @param field
+	 * @param fieldNameOrLabel a name or label for a domain field.
 	 * @return an object with value content
-	 *
 	 */
-	Object getFieldValue(String fieldName){
+	Object getFieldValue(String fieldNameOrLabel){
 		if (resultIndex >= 0) {
+
 			RowResult row = currentRow()
-			if(!row.fields.containsKey(fieldName)) {
-				throw ETLProcessorException.unknownDomainProperty(fieldName)
-			}
-			return row.fields[fieldName].value
+			FieldResult fieldResult = row.getField(fieldNameOrLabel)
+			return fieldResult.value
 
 		} else {
 			throw ETLProcessorException.domainOnlyAllowOnNewRows()
@@ -503,6 +502,8 @@ class RowResult {
 	Map<String, FieldResult> fields = [:]
 	@DoNotMarshall
 	String domain
+	@DoNotMarshall
+	ETLFieldsValidator fieldsValidator
 
 	/**
 	 * Add element to the current row data
@@ -603,6 +604,23 @@ class RowResult {
 			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)
 		}
 		return fields[fieldDefinition.name]
+	}
+
+	/**
+	 * Return {@code FieldResult} based on field name or label
+	 * @param fieldNameOrLabel a name or label for a domain field.
+	 * @return an instance of {@code FieldResult}
+	 */
+	FieldResult getField(String fieldNameOrLabel){
+
+		Map<String, String> fieldLabelMap = fieldsValidator.labelFieldMap[domain]
+		String fieldName = fieldLabelMap.containsKey(fieldNameOrLabel)? fieldLabelMap[fieldNameOrLabel]: fieldNameOrLabel
+
+		if(!fields.containsKey(fieldName)) {
+			throw ETLProcessorException.unknownDomainProperty(fieldName)
+		}
+
+		return fields[fieldName]
 	}
 }
 

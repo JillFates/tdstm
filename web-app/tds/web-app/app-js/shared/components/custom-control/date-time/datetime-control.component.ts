@@ -1,8 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
-import {IntlService} from '@progress/kendo-angular-intl';
-import {DateControlCommons} from './date-control-commons';
 import {DateUtils} from '../../../utils/date.utils';
+import {TDSCustomControl} from '../common/custom-control';
 
 @Component({
 	selector: 'tds-datetime-control',
@@ -10,7 +9,9 @@ import {DateUtils} from '../../../utils/date.utils';
 		<div>
             <kendo-datepicker [(value)]="dateValue"
 							  [format]="displayFormat"
-                              (valueChange)="onValueChange($event)">
+							  [tabindex]="tabindex"
+                              (valueChange)="onValueChange($event)"
+							  class="form-control">
 			</kendo-datepicker>
 		</div>
 	`
@@ -19,21 +20,41 @@ import {DateUtils} from '../../../utils/date.utils';
  * input: yyyy-MM-dd hh:mm:ss
  * output: yyyy-MM-ddThh:mm:ssZ
  */
-export class DateTimeControlComponent extends DateControlCommons {
+export class DateTimeControlComponent extends TDSCustomControl implements OnInit {
 
-	private readonly DISPLAY_FORMAT = 'yyyy-MM-dd hh:mm:ss';
+	@Input('value') value: any;
+	@Output() valueChange = new EventEmitter<any>();
+	@Input('required') required = false;
+	protected outputFormat: string;
+	protected displayFormat: string;
+	protected dateValue: Date;
 
-	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
-		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATETIME_FORMAT);
-		this.displayFormat = this.DISPLAY_FORMAT;
+	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+
+	constructor(private userPreferenceService: PreferenceService) {
+		super();
+		this.displayFormat = this.KENDO_DATETIME_DISPLAY_FORMAT;
 	}
 
 	/**
-	 * Emit value changed.
-	 * @param {Date} $event
+	 * OnInit set a date value.
 	 */
-	onValueChange($event: Date): void {
-		this.value = this.intl.formatDate($event, this.outputFormat);
+	ngOnInit(): void {
+		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
+		this.onValueChange(this.dateValue);
+	}
+
+	/**
+	 * On value Change on the component, emits the value to the listeners.
+	 * @param {value} Date
+	 */
+	onValueChange(value: Date): void {
+		if (value && value !== null) {
+			this.value = DateUtils.convertToGMT(value, this.userPreferenceService.getUserTimeZone());
+		} else {
+			this.value = null;
+		}
 		this.valueChange.emit(this.value);
 	}
 }

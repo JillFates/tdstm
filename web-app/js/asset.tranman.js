@@ -14,7 +14,7 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
 
 // function to generate createForm
  function generateCreateForm( e ){
-		var browser=navigator.appName;		
+		var browser=navigator.appName;
     	var assetEntityAttributes = eval('(' + e.responseText + ')');
     	var tb = $("#createFormTbodyId");
     	var autoComp = new Array();
@@ -22,23 +22,23 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
     	var tbody = ""
     	if (assetEntityAttributes != "") {
     		var length = assetEntityAttributes.length
-    		
+
     		var tableLeft = ""
 
     		for (var i=0; i < length; i ++ ) {
     			var attribute = assetEntityAttributes[i]
-    			
+
     			var labelTd = "<td class='label' nowrap><label>"+attribute.label+""
 			    if(requiredFields.contains(attribute.attributeCode)){
 			    	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
-				    labelTd += spanAst 
+				    labelTd += spanAst
 			    }
 			    labelTd +="</label></td>"
-			      
+
 			    var inputTd = "<td>";
 			    inputTd += getInputType(attribute,'');
 			    inputTd += "</td>"
-			    
+
 			    if( i % 3 == 0){
 			    	tableLeft +="<tr>"+labelTd + inputTd
 				} else if( i % 3 == 1){
@@ -51,19 +51,19 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
                 	autoComp.push(attribute.attributeCode)
                 }
     		}
-		     
+
 		    tbody += filedRequiredMess()
-		    tbody += tableLeft 
+		    tbody += tableLeft
     	}
     	tb.html( tbody );
     	$('#createFormTbodyId').css('display','block');
-	      
+
 	    new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
 	    $("#assetTypeId").val("Server")
 		updateManufacturerOptions("Server", null, 1)
  }
  function filedRequiredMess( table ){
-	 
+
 	var etr = "<tr><td colspan='6'><div><span class='required'>Fields marked ( * ) are mandatory</span></div></td></tr>"
 	return etr;
      //table.appendChild( etr )
@@ -84,14 +84,14 @@ var modelId
 var manufacturerId
 // function to show asset dialog
 function showAssetDialog (e, action) {
-	
+
 	$('#createCommentDialog').dialog('close');
 	$('#commentsListDialog').dialog('close');
 	$('#editCommentDialog').dialog('close');
 	$('#showCommentDialog').dialog('close');
 	$('#changeStatusDialog').dialog('close');
 	$('#filterDialog').dialog('close');
-    
+
 	var assetEntityAttributes = eval('(' + e.responseText + ')');
 	var autoComp = new Array();
 
@@ -120,15 +120,15 @@ function showAssetDialog (e, action) {
 			} else {
 				labelTdE = "<td class='label' nowrap>"+attribute.label
 			}
-			
+
 			if (requiredFields.contains(attribute.attributeCode)) {
 				var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
-				labelTd += spanAst 
+				labelTd += spanAst
 				labelTdE += spanAst
 			}
 			labelTd +="</label></td>"
 			labelTdE +="</label></td>"
-		    	
+
 			var inputTd = ""
 			if (attribute.attributeCode == "manufacturer") {
 				inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.value+"</a></td>"
@@ -141,14 +141,14 @@ function showAssetDialog (e, action) {
 			// td for Edit page
 			var inputTdE = "<td>";
 			inputTdE += getInputType(attribute,'edit');
-			inputTdE += "</td>"   
+			inputTdE += "</td>"
 
 			if (i % 3 == 0) {
 				stableLeft +="<tr>"+labelTd + inputTd
 				etableLeft +="<tr>"+labelTdE + inputTdE
 			} else if (i % 3 == 1) {
-				stableLeft += labelTd + inputTd 
-				etableLeft += labelTdE + inputTdE 
+				stableLeft += labelTd + inputTd
+				etableLeft += labelTdE + inputTdE
 			} else {
 				stableLeft +=labelTd + inputTd+"</tr>"
 				etableLeft +=labelTdE + inputTdE+"</tr>"
@@ -204,7 +204,7 @@ function showAssetDialog (e, action) {
 				var inputField  = '<option value=\'\'>Unassigned</option>'
 				for(i=0; i<manufacturersList.length; i++){
 					var manufacturer = manufacturersList[i]
-					                       
+
 					if( manufacturerId != manufacturer.id){
 						inputField += '<option value=\''+manufacturer.id+'\'>'+manufacturer.name+'</option>'
 					} else {
@@ -214,7 +214,7 @@ function showAssetDialog (e, action) {
 				if( type == 2 ){
 					$("#editmanufacturerId").html( inputField )
 				} else {
-					$("#manufacturerId").html( inputField )	
+					$("#manufacturerId").html( inputField )
 				}
 			}
 		})
@@ -245,7 +245,7 @@ function showAssetDialog (e, action) {
 				if( type == 2 ){
 					$("#editmodelId").html( inputField )
 				} else {
-					$("#modelId").html( inputField )	
+					$("#modelId").html( inputField )
 				}
 			}
 		})
@@ -297,19 +297,19 @@ function showAssetDialog (e, action) {
  function setAssetEditId(assetId){
 	 $("#assetValueId").val(assetId)
  }
- 
+
  function getLength( length ){
  	var isOdd = (length%2 != 0) ? true : false
     var halfLength
     	if(isOdd){
     		length += 1;
-    		halfLength = length / 2 
+    		halfLength = length / 2
     	} else {
-    		halfLength = length / 2 
+    		halfLength = length / 2
     	}
-    return halfLength; 
+    return halfLength;
  }
-    		
+
  // function to construct the frontendInput tag
  function getInputType( attribute, id ){
  	var name = attribute.attributeCode
@@ -324,10 +324,10 @@ function showAssetDialog (e, action) {
   				onComplete:function(e){
   					var  bundlesList = eval('(' + e.responseText + ')')
   					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
-  					
+
   					for(i=0; i<bundlesList.length; i++){
   						var bundle = bundlesList[i]
-  						                         
+
   						if(attribute.bundleId != bundle.id){
   						inputField += '<option value=\''+bundle.id+'\'>'+bundle.name+'</option>'
   						} else {
@@ -339,7 +339,7 @@ function showAssetDialog (e, action) {
   			})
   	} else if( name == "model"){
   		modelId = attribute.modelId
-  		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit 
+  		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit
   		inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\' onchange=\'confirmModelChange('+ attribute.modelId +', this.value, '+type+');\'><option value=\'\'>Unassigned</option></select>'
   		/*new Ajax.Request('../model/retrieveModelsListAsJSON',{
 				asynchronous:false,
@@ -347,10 +347,10 @@ function showAssetDialog (e, action) {
 				onComplete:function(e){
 					var  modelsList = eval('(' + e.responseText + ')')
 					inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\'><option value=\'\'>Unassigned</option>'
-					
+
 					for(i=0; i<modelsList.length; i++){
 						var model = modelsList[i]
-						                       
+
 						if(attribute.modelId != model.id){
 						inputField += '<option value=\''+model.id+'\'>'+model.modelName+'</option>'
 						} else {
@@ -369,10 +369,10 @@ function showAssetDialog (e, action) {
 				evalScripts:true,
 				onComplete:function(e){
 					var  manufacturersList = eval('(' + e.responseText + ')')
-					
+
 					for(i=0; i<manufacturersList.length; i++){
 						var manufacturer = manufacturersList[i]
-						                       
+
 						if(attribute.manufacturerId != manufacturer.id){
 						inputField += '<option value=\''+manufacturer.id+'\'>'+manufacturer.name+'</option>'
 						} else {
@@ -421,9 +421,9 @@ function showAssetDialog (e, action) {
 		 		inputField = '<input type="text" name="'+name +'" id="'+ id + name + 'Id"'+' ></input>'
 		 	}
 	 }
-	return inputField; 
+	return inputField;
  }
- 
+
  /*Actions to perform Delete Assest and Remove Assest from project*/
  function editDialogDeleteRemove( actionType ) {
 	var confirmMessage = 'Remove Asset from project, are you sure?';
@@ -445,10 +445,10 @@ function showAssetDialog (e, action) {
 		var ValidChars = "0123456789";
 		var IsNumber=true;
 		var Char;
-		for (i = 0; i < sText.length && IsNumber == true; i++) 
-		{ 
-			Char = sText.charAt(i); 
-			if (ValidChars.indexOf(Char) == -1) 
+		for (i = 0; i < sText.length && IsNumber == true; i++)
+		{
+			Char = sText.charAt(i);
+			if (ValidChars.indexOf(Char) == -1)
   		{
   			IsNumber = false;
   		}
@@ -486,7 +486,7 @@ function showAssetCommentDialog( e , action){
 	if(B2 != ''){
 		B2.Pause()
 	}
-	
+
 	var assetComments = eval('(' + e.responseText + ')');
 	if (assetComments) {
 		var params = assetComments[0]
@@ -505,13 +505,13 @@ function showAssetCommentDialog( e , action){
 
 function addCommentsToList( e ){
 	var status = $('#statusId').val();
-	
+
 	$("#editCommentDialog").dialog("close")
     var assetComments = eval('(' + e.responseText + ')');
 	var tbody = $('#listCommentsTbodyId')
 	if (assetComments != "") {
 			$("#createCommentDialog").dialog("close")
-	      	//generate dynamic rows	
+	      	//generate dynamic rows
 	      	  var tr = document.createElement('tr');
 	      	  tr.style.background = '#65a342'
 	      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
@@ -520,7 +520,7 @@ function addCommentsToList( e ){
 		      	  tr.style.background = assetComments.cssClass
 	          }
 	      	  tr.id = "commentTr_"+assetComments.assetComment.id
-		     
+
 		      var editTd = document.createElement('td');
 			  var commentTd = document.createElement('td');
 			  commentTd.id = 'comment_'+assetComments.assetComment.id
@@ -530,26 +530,26 @@ function addCommentsToList( e ){
 			  typeTd.id = 'type_'+assetComments.assetComment.id
 			  typeTd.name = assetComments.assetComment.id
 			  typeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			  
+
 			  var dueDateTd = document.createElement('td');
 			  dueDateTd.id = 'type_'+assetComments.assetComment.id
 			  dueDateTd.name = assetComments.assetComment.id
 			  dueDateTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			  
+
 			  var categoryTd = document.createElement('td');
 			  categoryTd.id = 'category_'+assetComments.assetComment.id
 			  categoryTd.name = assetComments.assetComment.id
 			  categoryTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			  
+
 			  var commentCodeTd = document.createElement('td');
 			  commentCodeTd.id = 'commentCode_'+assetComments.assetComment.id
 			  commentCodeTd.name = assetComments.assetComment.id
 			  commentCodeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			  
+
 			  var resolveTd = document.createElement('td');
 			  resolveTd.id = 'resolve_'+assetComments.assetComment.id
 			  resolveTd.name = assetComments.assetComment.id
-		      resolveTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
+		      resolveTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
 		   	  var verifyTd = document.createElement('td');
 			  verifyTd.id = 'verify_'+assetComments.assetComment.id
 			  verifyTd.name = assetComments.assetComment.id
@@ -567,25 +567,25 @@ function addCommentsToList( e ){
 		      var duedate = document.createTextNode(formatedDueDate);
 		      var categoryText = document.createTextNode(assetComments.assetComment.category);
 		      var commentCodeText = document.createTextNode(assetComments.assetComment.commentCode);
-		      
+
 		      var resolveVal
 		      if(assetComments.assetComment.commentType != "issue"){
 		      resolveVal = document.createTextNode('');
 		      }else{
 		      resolveVal = document.createElement('input')
 		      resolveVal.id = 'verifyResolved_'+assetComments.assetComment.id
-		      resolveVal.type = 'checkbox'					     
+		      resolveVal.type = 'checkbox'
 		      resolveVal.disabled = 'disabled'
-		     
+
 		      }
 		      var verifyText = document.createElement('input')
 		      verifyText.id = 'verifyText_'+assetComments.assetComment.id
 		      verifyText.type = 'checkbox'
 		      verifyText.disabled = 'disabled'
-		     
+
 		      //createTextNode(assetComments.mustVerify);
 		      link.appendChild( image )
-			  editTd.appendChild( link  )					      
+			  editTd.appendChild( link  )
 		      commentTd.appendChild( commentText )
 		      typeTd.appendChild( typeText )
 		      dueDateTd.appendChild( duedate )
@@ -619,7 +619,7 @@ function updateCommentsOnList( e ){
 	var assetComments = eval('(' + e.responseText + ')');
 	if (assetComments != "") {
 		$("#editCommentDialog").dialog("close")
-      	//generate dynamic rows	
+      	//generate dynamic rows
       	  var tr = $('#commentTr_'+assetComments.assetComment.id);
       	 tr.css( 'background', '#65a342' );
       	  if(assetComments.assetComment.mustVerify != 0){
@@ -639,7 +639,7 @@ function updateCommentsOnList( e ){
 		      resolveVal.type = 'checkbox'
 		      resolveVal.disabled = 'disabled'
 		      $('#resolve_'+assetComments.assetComment.id).append( resolveVal )
-		   
+
 		      if(assetComments.assetComment.isResolved != 0){
 		      	$('#verifyResolved_'+assetComments.assetComment.id).attr('checked', true);
 		      } else {
@@ -648,7 +648,7 @@ function updateCommentsOnList( e ){
 	      }
 	      var formatedDueDate = formatDueDate(assetComments.assetComment.dueDate);
 	      var duedate = document.createTextNode(formatedDueDate);
-	      
+
 	      $('#type_'+assetComments.assetComment.id).html(assetComments.assetComment.commentType);
 	      $('#dueDate_'+assetComments.assetComment.id).html(duedate);
 	      $('#comment_'+assetComments.assetComment.id).html(truncate(assetComments.assetComment.comment));
@@ -665,13 +665,13 @@ function createIssue(asset, type, id, forWhom, assetType){
     injector.invoke(function($rootScope, commentUtils){
         $rootScope.$broadcast('createComment', ((!type || type=='' || type=='issue')?'issue':'comment'), commentUtils.assetTO(id, assetType));
     });
-}	
+}
 
 /*UPDATE THE ASSET COMMENT ICON*/
 function updateAssetCommentIcon( assetComments ){
 	var link = document.createElement('a');
 	link.href = '#'
-		
+
 	link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity.id);new Ajax.Request(contextPath+'/assetEntity/listComments?id='+assetComments.assetComment.assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 	if( assetComments.status ){
 		link.innerHTML = "<img src=\"../i/db_table_red.png\" border=\"0px\">"
@@ -683,15 +683,15 @@ function updateAssetCommentIcon( assetComments ){
 }
 
 /*
- * remove a single element from an Array 
+ * remove a single element from an Array
  * Used to Remove Current Task from from succ or Pred select list.
  */
 function removeByElement(arrayName,arrayElement)
 {
-	 for(var i=0; i<arrayName.length;i++ ){ 
+	 for(var i=0; i<arrayName.length;i++ ){
 		 if(arrayName[i].split("_")[1]==arrayElement)
-		 arrayName.splice(i,1); 
-	 } 
+		 arrayName.splice(i,1);
+	 }
  return arrayName
 }
 
@@ -708,7 +708,7 @@ function textCounter(fieldId, maxlimit) {
     }
 }
 /*
- * 
+ *
  */
 function showManufacturer(id){
 	new Ajax.Request(contextPath+'/manufacturer/retrieveManufacturerAsJSON?id='+id,{
@@ -741,7 +741,7 @@ function showModel(id){
 			$("#namePlatePowerSpanId").html( model.powerNameplate )
 			$("#PowerDesignSpanId").html( model.powerDesign )
 			$("#powerSpanId").html( model.powerUse )
-			
+
 			if(model.frontImage != ''){
 				$("#showModelFrontImage").html( "<img src='../model/retrieveFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
 			} else {
@@ -776,7 +776,7 @@ function showModel(id){
 			} else {
 				$("#showModelSourceTds").html( "<input type='checkbox' disabled='disabled'/>" )
 			}
-			
+
 			$("#modelShowDialog").dialog("open")
 		}
 	})
@@ -823,7 +823,7 @@ function updateCommentsLists(){
 	    var D = "" + (dateValue.getDate());
 	    var DD = "0" + D;
 	    DD = DD.substring(DD.length-2, DD.length);
-	    var YYYY = "" + (dateValue.getFullYear()); 
+	    var YYYY = "" + (dateValue.getFullYear());
         var currentDate = MM + "/" +DD + "/" + YYYY
         $("#dueDateCreateId").val(currentDate);
 }*/
@@ -851,7 +851,7 @@ function showResolve(value){
 		$('#resolutionTrId').css('display','none')
 		$('#resolutionEditTrId').css('display','none')
 	}
-	
+
 }
 
 function generateDepSel(taskId, taskDependencyId, category, selectedPred, selectId, selectName){
@@ -873,14 +873,14 @@ function enableCreateIcon(id){
 	$(".create_"+id).css("display","block")
 	$("#span_"+id).html("<img src='../images/plus_disabled.gif'/>")
 	$("#span_"+id).attr("onClick","disableCreateIcon("+id+")")
-	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=true',{asynchronous:true,evalScripts:true })
+	new Ajax.Request(contextPath+'/rackLayouts/saveAddIconPreference?mode=enabled',{asynchronous:true,evalScripts:true })
 }
 
 function disableCreateIcon(id){
 	$(".create_"+id).css("display","none")
 	$("#span_"+id).html(" <img src='../images/plus.gif'/>")
 	$("#span_"+id).attr("onClick","enableCreateIcon("+id+")")
-	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
+	new Ajax.Request(contextPath +'/rackLayouts/saveAddIconPreference?mode=disabled',{asynchronous:true,evalScripts:true })
 }
 
 function toggleDependencies(forWhom,view){

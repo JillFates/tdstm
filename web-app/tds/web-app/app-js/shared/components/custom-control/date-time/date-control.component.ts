@@ -1,8 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
-import {IntlService} from '@progress/kendo-angular-intl';
-import {DateControlCommons} from './date-control-commons';
 import {DateUtils} from '../../../utils/date.utils';
+import {TDSCustomControl} from '../common/custom-control';
 
 @Component({
 	selector: 'tds-date-control',
@@ -10,7 +9,9 @@ import {DateUtils} from '../../../utils/date.utils';
 		<div>
             <kendo-datepicker [(value)]="dateValue"
 							  [format]="displayFormat"
-                              (valueChange)="onValueChange($event)">
+							  [tabindex]="tabindex"
+                              (valueChange)="onValueChange($event)"
+							  class="form-control">
 			</kendo-datepicker>
 		</div>
 	`
@@ -19,19 +20,38 @@ import {DateUtils} from '../../../utils/date.utils';
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent extends DateControlCommons {
+export class DateControlComponent extends TDSCustomControl implements OnInit  {
 
-	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
-		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATE_FORMAT);
-		this.displayFormat = this.userPreferenceService.getUserDateFormatForKendo();
+	@Input('value') value: any;
+	@Output() valueChange = new EventEmitter<any>();
+	@Input('required') required = false;
+	protected displayFormat: string;
+	protected dateValue: Date;
+
+	constructor(private userPreferenceService: PreferenceService) {
+		super();
+		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
 	}
 
 	/**
-	 * Emit value changed.
-	 * @param {Date} $event
+	 * OnInit set a date value.
 	 */
-	onValueChange($event: Date): void {
-		this.value = this.intl.formatDate($event, this.outputFormat);
+	ngOnInit(): void {
+		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
+		this.onValueChange(this.dateValue);
+	}
+
+	/**
+	 * On value Change on the component, emits the value to the listeners.
+	 * @param {value} Date
+	 */
+	onValueChange(value: Date): void {
+		if (value && value !== null) {
+			this.value = DateUtils.formatDate(value, DateUtils.SERVER_FORMAT_DATE)
+		} else {
+			this.value = null;
+		}
 		this.valueChange.emit(this.value);
 	}
 }

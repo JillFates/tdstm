@@ -46,10 +46,10 @@ class LoginSpec extends GebReportingSpec {
             at MenuPage
     }
 
-    def "4. Lock the login_e2e_test_user@dev.com user"(){
+    def "4. Lock the login_e2e_test_user@tdsi.com user"(){
         given: "The User goes to Login page"
             to LoginPage
-        when: "The login_e2e_test_user@dev.com username is locked"
+        when: "The login_e2e_test_user@tdsi.com username is locked"
             /*
                 This means that we will use that username and try to login as many times as necessary until we lock it.
                 We're sending a 6 because on the testDataFile.txt the 6th position is the login_e2e_test_user.
@@ -59,7 +59,7 @@ class LoginSpec extends GebReportingSpec {
             at LoginPage
     }
 
-    def "5. Verify with an admin that the login_e2e_test_user@dev.com user is locked"(){
+    def "5. Verify with an admin that the login_e2e_test_user@tdsi.com user is locked"(){
         given: "The User goes to Login page"
             to LoginPage
         and: "An admin logs in (we assume the e2e_test_user is being used)"
@@ -69,7 +69,7 @@ class LoginSpec extends GebReportingSpec {
             adminModule.goToListUsers()
             at UserListPage
         and: "The username is filtered"
-            filterByUsername("login_e2e_test_user@dev.com")
+            filterByUsername("login_e2e_test_user@tdsi.com")
         and: "The locked icon is displayed"
             lockedIconDisplayed()
         and: "We open the locked user by clicking on its username"
@@ -86,12 +86,12 @@ class LoginSpec extends GebReportingSpec {
         when: "We click the Unlock icon"
             unlockButtonID.click()
         then: "The modal has the username info"
-            verifyUsernameLocked("login_e2e_test_user@dev.com")
+            verifyUsernameLocked("login_e2e_test_user@tdsi.com")
         and: "We click the Cancel button"
             unlockUserLoginCancelBtn.click()
     }
 
-    def "7. Unlock the login_e2e_test_user@dev.com user"(){
+    def "7. Unlock the login_e2e_test_user@tdsi.com user"(){
         given: "The User is on the User Details Page of the locked user"
             at UserDetailsPage
         and: "We click the Unlock icon"

@@ -697,7 +697,6 @@ class TaskService implements ServiceMethods {
 				break
 		}
 
-		task.save(flush: true)
 		return task
 	}
 
@@ -3156,6 +3155,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		} catch(e)	{
 			// exceptions.append("We BLEW UP damn it!<br>")
 			// exceptions.append(failure)
+			log.error "$failure\n${ExceptionUtil.stackTraceToString(e,80)}"
 			if (! failure) {
 				// If the failed variable is empty then we have an unexpected error so dump the stack for debugging purposes
 				failure = e.message
@@ -3997,13 +3997,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
 	 */
 	def findAllAssetsWithFilter(contextObject, groupOrTaskSpec, loadedGroups, exceptions, project) {
-		def assets = []
-		def msg
-		def addFilters = true
-		def where = ''
+		List assets = []
+		String msg
+		Boolean addFilters = true
+		String where = ''
 		//def project = moveEvent.project
-		def map = [:]
-		def filter
+		Map map = [:]
+		Map filter = [:]
 
 		if (! groupOrTaskSpec.containsKey('filter')) {
 			throw new RuntimeException("Required 'filter' section was missing from $groupOrTaskSpec")
@@ -4011,7 +4011,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			filter = groupOrTaskSpec.filter
 		}
 
-		def filterName = groupOrTaskSpec.containsKey('name') ? groupOrTaskSpec.name : 'Inline Filter'
+		String filterName = groupOrTaskSpec.containsKey('name') ? groupOrTaskSpec.name : 'Inline Filter'
 
 		log.debug "findAllAssetsWithFilter: ** Starting filter for $filterName"
 
@@ -4102,8 +4102,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// HANDLE performing an actual filter to find assets
 			//
 
-			def sql
-			def sm
+			String sql
+			Map sqlMap
 
 			//
 			// HANDLE filter.include - This can be use in conjustion with other filter properties handled below
@@ -4143,9 +4143,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 				incIds.unique()
 
-				sm = SqlUtil.whereExpression("a.id", incIds, 'assetToInc')
-				if (sm) {
-					where = SqlUtil.appendToWhere(where, sm.sql)
+				sqlMap = SqlUtil.whereExpression("a.id", incIds, 'assetToInc')
+				if (sqlMap) {
+					where = SqlUtil.appendToWhere(where, sqlMap.sql)
 					map['assetToInc'] = incIds
 				} else {
 					msg = "Unable to create SQL for filter.include ($filter.include)"
@@ -4155,27 +4155,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
-
-            /**
-             * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
-             * WHERE expressions based on the properties passed in the filter
-             * @param String[] - list of the properties FROM fieldSpecs of project asset domain to examine
-             */
-            def addWhereConditionsForFieldSpecs = { fieldSpecs ->
-                fieldSpecs.each { customField ->
-                    if (filter?.asset?.containsKey(customField.label)) {
-                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.label], customField.field)
-                        if (sm) {
-                            where = SqlUtil.appendToWhere(where, sm.sql)
-                            if (sm.param) {
-                                map[customField.field] = sm.param
-                            }
-                        } else {
-                            log.error "SqlUtil.whereExpression unable to resolve $customField.field expression [${filter.asset[customField.field]}]"
-                        }
-                    }
-                }
-            }
 
 			/**
 			 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
@@ -4187,11 +4166,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				list.each { code ->
 					if (filter?.asset?.containsKey(code)) {
 						log.debug("addWhereConditions: code $code matched")
-						sm = SqlUtil.whereExpression('a.' + code, filter.asset[code], code)
-						if (sm) {
-							where = SqlUtil.appendToWhere(where, sm.sql)
-							if (sm.param) {
-								map[code] = sm.param
+						sqlMap = SqlUtil.whereExpression('a.' + code, filter.asset[code], code)
+						if (sqlMap) {
+							where = SqlUtil.appendToWhere(where, sqlMap.sql)
+							if (sqlMap.param) {
+								map[code] = sqlMap.param
 							}
 						} else {
 							log.error "SqlUtil.whereExpression unable to resolve $code expression [${filter.asset[code]}]"
@@ -4210,11 +4189,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				fieldMap.each { propertyName, columnName ->
 					if (filter?.asset?.containsKey(propertyName)) {
 						log.debug("addJoinWhereConditions: $propertyName/$columnName matched")
-						sm = SqlUtil.whereExpression(alias + '.' + columnName, filter.asset[propertyName], propertyName)
-						if (sm) {
-							where = SqlUtil.appendToWhere(where, sm.sql)
-							if (sm.param) {
-								map[propertyName] = sm.param
+						sqlMap = SqlUtil.whereExpression(alias + '.' + columnName, filter.asset[propertyName], propertyName)
+						if (sqlMap) {
+							where = SqlUtil.appendToWhere(where, sqlMap.sql)
+							if (sqlMap.param) {
+								map[propertyName] = sqlMap.param
 							}
 						} else {
 							log.error "SqlUtil.whereExpression unable to resolve '$propertyName' expression [${filter.asset[propertyName]}]"
@@ -4247,9 +4226,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
                 def fieldSpecs = customDomainService.fieldSpecs(project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
                 if (fieldSpecs) {
                     // Add WHERE clauses based on the field specs (custom fields) configured by project asset.
-                    addWhereConditionsForFieldSpecs(fieldSpecs)
+                    where = addWhereConditionsForFieldSpecs(fieldSpecs, filter, where, map)
                 }
             }
+
 			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
 			addWhereConditions(commonFilterProperties)
 
@@ -4492,6 +4472,55 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		return assets
 	}
+
+
+	/**
+	 * Used to extend a Where Clause HQL statement and append appropriate parameters to the whereParams map
+	 * based on the filter containing asset filtering. For such filters the field will be matched to either the fieldSpec
+	 * field name or label according.
+	 *
+	 * Note that for any addition to the WHERE statement, corresponding parameters will be added to whereParams as well.
+	 *
+	 * @param fieldSpecs - the field specification definition that includes all the field names and labels
+	 * @param filter - the filter object that was specified in the task spec (recipe)
+	 * @param existingWhereStatement - the existing where statement that is being built up
+	 * @param whereParams - the map that contains and/or will have addition where query parameters add to
+	 * @return the updated WHERE statement and whereParams Map will be modified accordingly
+	 */
+	String addWhereConditionsForFieldSpecs(List<Map> fieldSpecs, Map filter, String existingWhereStatement, Map whereParams) {
+		String updatedWhereStatement = existingWhereStatement
+
+		// Avoid going through the field specs if there's not filter.asset
+		if (filter?.containsKey('asset') && filter.asset) {
+			Map assetFilter = filter.asset
+			fieldSpecs.each { fieldSpec ->
+				String matchKey = null
+				// Look for a fieldSpec with the field matching the filter's key
+				if (assetFilter.containsKey(fieldSpec.field)) {
+					matchKey = fieldSpec.field
+					// Look for a fieldSpec with the label matching the filter's key
+				} else if (assetFilter.containsKey(fieldSpec.label)) {
+					matchKey = fieldSpec.label
+				}
+
+				// Proceed to construct the where expression only if a fieldSpec was found
+				if (matchKey) {
+					Object assetFilterValue = assetFilter[matchKey]
+					Map whereMap = SqlUtil.whereExpression('a.' + fieldSpec.field, assetFilterValue, fieldSpec.field)
+					if (whereMap) {
+						updatedWhereStatement = SqlUtil.appendToWhere(updatedWhereStatement, whereMap.sql)
+						if (whereMap.param) {
+							whereParams[fieldSpec.field] = whereMap.param
+						}
+					} else {
+						log.error "addWhereConditionsForFieldSpecs() unable to resolve $fieldSpec.field expression [${assetFilterValue}]"
+					}
+				}
+			}
+		}
+		return updatedWhereStatement
+	}
+
 
 	// Used by the addTagFilteringToWhere method to build TAG filtering
 	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(taws.asset.id) FROM TagAsset taws WHERE '

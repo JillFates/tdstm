@@ -66,7 +66,9 @@
 			<td></td>
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}" />
-			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${asset?.retireDate}" endian="${dateFormat}"/></td>
+			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
+                {{ '${asset?.retireDate}' | tdsDate: userDateFormat }}
+            </td>
 
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc == '?' ? '' : asset.testProc}" tooltipDataPlacement="bottom"/>
@@ -75,7 +77,9 @@
 			<td></td>
 			<td></td>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}" />
-			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}"><tds:convertDate date="${asset?.maintExpDate}" endian="${dateFormat}" /></td>
+			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
+                {{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
+            </td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency == '?' ? '' : asset.latency}"/>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc == '?' ? '' : asset.startupProc}" tooltipDataPlacement="bottom"/>
 		</tr>

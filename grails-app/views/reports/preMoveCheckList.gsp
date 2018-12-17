@@ -45,8 +45,8 @@
 	</div>
 	<script type="text/javascript">
 	currentMenuId = "#reportsMenu";
-	$('.menu-reports-pre-checklist').addClass('active');
-	$('.menu-parent-reports').addClass('active');
+	$('.menu-planning-pre-checklist').addClass('active');
+	$('.menu-parent-planning').addClass('active');
 	 function submitForm(form){
 			if($("form input:radio:checked").val() == "web"){
 		    	$('#checkListId').html('Loading...');

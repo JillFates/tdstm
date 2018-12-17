@@ -1188,7 +1188,7 @@ class DataImportService implements ServiceMethods {
 						try {
 							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
 							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_ISO8601, valueToSet, TimeUtil.FORMAT_DATE_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
 								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
@@ -1314,7 +1314,8 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to clear out the errors recorded at the field level and row level and the record level count
+	 * Used to clear out the errors recorded at the field level and row level and the record level count.
+	 * It also removes previousValue key from fieldsInfo when it exist so previous value data shown is more accurate.
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
 	 */
@@ -1324,6 +1325,9 @@ class DataImportService implements ServiceMethods {
 		record.resetErrors()
 		for (field in fieldsInfo) {
 			field.value.errors = []
+			if (field.value.containsKey(PREVIOUS_VALUE_PROPERTY)) {
+				field.value.remove(PREVIOUS_VALUE_PROPERTY)
+			}
 		}
 	}
 

@@ -38,6 +38,8 @@ import java.sql.Timestamp
 class FieldSpec {
 
 	public static final CAST_BIG_DECIMAL_FUNCTION = 'cast_big_decimal'
+	public static final CAST_LONG_FUNCTION = 'cast_long'
+	public static final CAST_DATE_TIME_FUNCTION = 'cast_date_time'
 
 	String control
 	Object defaultValue
@@ -263,8 +265,14 @@ class FieldSpec {
 				if (hibernateType == CAST_BIG_DECIMAL_FUNCTION) {
 					castSentence = "$CAST_BIG_DECIMAL_FUNCTION($property, $precision)"
 				} else {
-					castSentence = "cast($property as $hibernateType)"
+					castSentence = "$CAST_LONG_FUNCTION($property)"
 				}
+				break
+			case 'DateTime':
+				castSentence = "$CAST_DATE_TIME_FUNCTION($property, '%Y-%m-%dT%TZ')"
+				break
+			case 'Date':
+				castSentence = "$CAST_DATE_TIME_FUNCTION($property, '%Y-%m-%d')"
 				break
 			default:
 				castSentence = "cast($property as $hibernateType)"

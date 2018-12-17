@@ -358,7 +358,12 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.PersonView)
 	def retrievePersonDetails() {
 		try {
-			Person person = personService.validatePersonAccess(params.id)
+			Person person
+			if(params.id) {
+				person = personService.validatePersonAccess(params.id)
+			} else {
+				person = personService.validatePersonAccess(currentPerson().id)
+			}
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
 			def expiryDate = TimeUtil.formatDateTime(userLogin.expiryDate)
 
@@ -518,19 +523,10 @@ class PersonController implements ControllerMethods {
 		// log.debug "loadFilteredStaff() phase 3 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-		// Save the user preferences from the filter if the preference has changed
-		String prefValue
-		Map<String, String> prefMap = [
-			StaffingRole: role,
-			ShowClientStaff: onlyClientStaff,
-			ShowAssignedStaff: assigned
-		]
-		prefMap.each { String k, String v ->
-			prefValue = userPreferenceService.getPreference(k)
-			if (prefValue != v) {
-				userPreferenceService.setPreference(k, v)
-			}
-		}
+		// Save the user preferences from the filter (internally it only saves it if the preference has changed)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.STAFFING_ROLE, role)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.SHOW_CLIENT_STAFF, onlyClientStaff)
+		userPreferenceService.setPreference(loginPerson.userLogin, UserPreferenceEnum.SHOW_ASSIGNED_STAFF, assigned)
 
 		// log.debug "loadFilteredStaff() phase 4 took ${TimeUtil.elapsed(start)} (user preferences)"
 		// start = new Date()
