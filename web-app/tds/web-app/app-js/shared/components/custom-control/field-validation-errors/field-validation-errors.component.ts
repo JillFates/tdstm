@@ -13,6 +13,11 @@ interface ErrorConstraints {
 	template: `
 		<div class="error" *ngIf="hasErrors">
 			<div *ngIf="errors.isRequired">{{label}} is required</div>
+			<div *ngIf="errors.range; let range">
+				<span>Invalid range number</span>
+				<div>Min: {{range.min}} Max: {{range.max}}</div>
+			</div>
+			<div *ngIf="errors.notNegative">Not could be negative</div>			
 		</div>
 	`
 })

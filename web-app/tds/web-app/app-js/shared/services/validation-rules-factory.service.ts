@@ -46,8 +46,15 @@ export class ValidationRulesFactoryService {
 		return (constraints: NumberValidationConstraints) => {
 			const params = <NumberValidationConstraints>{...defaultConstraints, ...constraints};
 			const rules  = [...this.getCommonValidationRules(params)];
+
 			// specific validation rules for numbers
-			// ...
+			if (params.max !== null || params.min || null) {
+				rules.push(this.validationRulesDefinitions.rangeValidationRule(params.max, params.min))
+			}
+
+			if (!params.allowNegative) {
+				rules.push(this.validationRulesDefinitions.notNegativeValidationRule())
+			}
 
 			return rules;
 		}

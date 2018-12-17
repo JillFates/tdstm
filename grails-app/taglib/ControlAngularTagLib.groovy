@@ -739,7 +739,7 @@ class ControlAngularTagLib {
 		StringBuilder control = new StringBuilder("")
 		control.append("<tds-number-control ")
 		control.append("  #field${fieldSpec.field}='ngModel' ")
-		control.append("  [ngModel]=\"$ngmodel\" ")
+		control.append("  [(ngModel)]=\"$ngmodel\" ")
 		control.append("  name=\"$name\" ")
 		control.append("  [allowNegative]=\"$allowNegative\"")
 		control.append("  [precision]=\"$precision\"")

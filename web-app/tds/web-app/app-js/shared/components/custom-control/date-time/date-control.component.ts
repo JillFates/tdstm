@@ -1,4 +1,6 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, forwardRef} from '@angular/core';
+import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
+
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
 import {TDSCustomControl} from '../common/custom-control.component';
@@ -15,14 +17,26 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 							  class="form-control">
 			</kendo-datepicker>
 		</div>
-	`
+	`,
+	providers: [
+		{
+			provide: NG_VALUE_ACCESSOR,
+			useExisting: forwardRef(() => DateControlComponent),
+			multi: true
+		},
+		{
+			provide: NG_VALIDATORS,
+			useExisting: forwardRef(() => DateControlComponent),
+			multi: true
+		}
+	]
 })
 /**
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class DateControlComponent extends TDSCustomControl implements OnInit  {
-	@Input('value') value: any;
+	// @Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
 	@Input('required') required = false;
 	protected displayFormat: string;
