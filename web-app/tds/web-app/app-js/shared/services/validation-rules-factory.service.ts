@@ -5,7 +5,11 @@
 import {Injectable} from '@angular/core'
 import {CUSTOM_FIELD_TYPES} from '../model/constants';
 import {ValidationRulesDefinitionsService} from './validation-rules-definitions.service';
-import {NumberValidationConstraints} from '../model/validation-contraintes.model';
+import {
+	NumberValidationConstraints,
+	DateValidationConstraints,
+	DateTimeValidationConstraints
+} from '../model/validation-contraintes.model';
 
 @Injectable()
 export class ValidationRulesFactoryService {
@@ -20,6 +24,8 @@ export class ValidationRulesFactoryService {
 	createFieldRulesFactory(factoryType: CUSTOM_FIELD_TYPES) {
 		const customRules = {
 			[CUSTOM_FIELD_TYPES.Number] : this.getRulesForNumberField(),
+			[CUSTOM_FIELD_TYPES.Date] : this.getRulesForDateField(),
+			[CUSTOM_FIELD_TYPES.DateTime] : this.getRulesForDateTimeField()
 		};
 
 		return customRules[factoryType] || this.getEmptyRules();
@@ -38,19 +44,65 @@ export class ValidationRulesFactoryService {
 		};
 
 		return (constraints: NumberValidationConstraints) => {
-			const rules  = [];
 			const params = <NumberValidationConstraints>{...defaultConstraints, ...constraints};
-
-			if (params.max !== null || params.min || null) {
-				rules.push(this.validationRulesDefinitions.rangeValidationRule(params.max, params.min))
-			}
-
-			if (!params.allowNegative) {
-				rules.push(this.validationRulesDefinitions.notNegativeValidationRule())
-			}
+			const rules  = [...this.getCommonValidationRules(params)];
+			// specific validation rules for numbers
+			// ...
 
 			return rules;
 		}
+	}
+
+	/**
+	 *	Defines the set of validation rules for the fields of type date
+	 * 	@return array of validation functions to apply
+	 */
+	private getRulesForDateField()  {
+		const defaultConstraints: DateValidationConstraints = {
+			required: false
+		};
+
+		return (constraints: DateValidationConstraints) => {
+			const params = <DateValidationConstraints>{...defaultConstraints, ...constraints};
+			const rules  = [...this.getCommonValidationRules(params)];
+			// specific validation rules for dates
+			// ...
+
+			return rules;
+		}
+	}
+
+	/**
+	 *	Defines the set of validation rules for the fields of type date time
+	 * 	@return array of validation functions to apply
+	 */
+	private getRulesForDateTimeField()  {
+		const defaultConstraints: DateTimeValidationConstraints = {
+			required: false
+		};
+
+		return (constraints: DateTimeValidationConstraints) => {
+			const params = <DateTimeValidationConstraints>{...defaultConstraints, ...constraints};
+			const rules  = [...this.getCommonValidationRules(params)];
+			// specific validation rules for date time
+			// ...
+
+			return rules;
+		}
+	}
+
+	/**
+	 *  Get the validation rules that apply to all custom fields
+	 * 	@return array of validation functions
+	 */
+	private getCommonValidationRules(constraints: any) {
+		const rules = [];
+
+		if (constraints.required) {
+			rules.push(this.validationRulesDefinitions.requiredValidationRule());
+		}
+
+		return rules;
 	}
 
 	/**

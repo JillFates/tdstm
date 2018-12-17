@@ -45,7 +45,7 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 	@Input('min') min: number;
 	@Input('allowNegative') allowNegative: boolean;
 	@Input('separator') separator: boolean;
-	@Input('autoCorrect') autoCorrect = false;
+	@Input('autoCorrect') autoCorrect = true;
 
 	constructor(protected validationRulesFactory: ValidationRulesFactoryService) {
 		super(validationRulesFactory);

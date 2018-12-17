@@ -22,7 +22,6 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class DateControlComponent extends TDSCustomControl implements OnInit  {
-
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
 	@Input('required') required = false;

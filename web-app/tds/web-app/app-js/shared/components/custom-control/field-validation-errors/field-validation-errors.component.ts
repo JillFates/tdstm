@@ -1,28 +1,18 @@
 /**
- * Component used to display the angular form errors reported by some custom field
+ * Component used to display the angular form errors reported by the custom field
  */
 import {Component, Input} from '@angular/core';
 import {pathOr} from 'ramda';
 
 interface ErrorConstraints {
 	required?: boolean;
-	range?: {
-		given: number;
-		min: number;
-		max: number;
-	}
 }
 // TODO internationalize texts
 @Component({
 	selector: 'tds-field-validation-errors',
 	template: `
 		<div class="error" *ngIf="hasErrors">
-			<div *ngIf="errors.required">{{label}} is required</div>
-			<div *ngIf="errors.range; let range">
-				<span>Invalid range number</span>
-				<div>Min: {{range.min}} Max: {{range.max}}</div>
-			</div>
-			<div *ngIf="errors.notNegative">Not could be negative</div>
+			<div *ngIf="errors.isRequired">{{label}} is required</div>
 		</div>
 	`
 })
