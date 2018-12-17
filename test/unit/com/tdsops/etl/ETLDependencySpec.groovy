@@ -573,6 +573,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 							)
 
 							with(fields['asset'].create) {
+								!it.containsKey('id')
 								it.'assetName' == 'xraysrv01'
 								it.'manufacturer' == 'Dell'
 								it.'model' == 'PE2950'
@@ -593,6 +594,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 							)
 
 							with(fields['dependent'].create) {
+								!it.containsKey('id')
 								it.'appVendor' == 'Microsoft'
 								it.'appTech' == '(xlsx updated)'
 								it.'url' == 'www.microsoft.com'
@@ -750,6 +752,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 							)
 
 							with(fields['asset'].create) {
+								!it.containsKey('id')
 								it.'assetName' == 'Exchange'
 								it.'appVendor' == 'Microsoft'
 							}
@@ -767,6 +770,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 							)
 
 							with(fields['dependent'].create) {
+								!it.containsKey('id')
 								it.'assetName' == 'exchangedb01'
 								it.'manufacturer' == 'VMWare'
 								it.'model' == 'VM'

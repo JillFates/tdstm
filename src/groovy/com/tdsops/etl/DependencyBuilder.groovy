@@ -19,9 +19,9 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
  * 		// Here's the cool stuff
  * 		domain Dependency with assetResultVar 'Runs on' dependentResult
  * 		...
- *	}
+ *}
  * </code>
- * @see TM-12031.
+ * @see TM-12031, TM-13542
  *
  */
 @CompileStatic
@@ -50,7 +50,6 @@ class DependencyBuilder extends DomainBuilder {
 	 *  domain Dependency with assetResultVar
 	 * 	// or alternatively
 	 * 	domain Dependency with assetResultVar and null
-	 *  }
 	 * <code>
 	 * @param dependent
 	 * @return
@@ -69,9 +68,11 @@ class DependencyBuilder extends DomainBuilder {
 	 * 	console on
 	 * 	read labels
 	 * 	domain Device
-	 * 	iterate {* 		extract 'name' load 'Name' set myVar
+	 * 	iterate {
+	 * 		extract 'name' load 'Name' set myVar
 	 * 		domain Dependency with myVar
-	 *}* </pre>
+	 *	}
+	 * </pre>
 	 * @param asset
 	 * @return
 	 */
@@ -93,7 +94,6 @@ class DependencyBuilder extends DomainBuilder {
 	 * 	// or alternatively
 	 * 	domain Dependency with assetResultVar and dependentResultVar
 	 *  	...
-	 *  }
 	 * </code>
 	 * @param methodName a method name used in the
 	 * @param args an array with params for method missing
@@ -128,7 +128,7 @@ class DependencyBuilder extends DomainBuilder {
 	}
 
 	/**
-	 * Process an instance of {@code RowResult} copying logically all the necessary data to populate Dpendency domain parameters.
+	 * Process an instance of {@code RowResult} copying logically all the necessary data to populate Dependency domain parameters.
 	 * @param field
 	 * @param rowResult
 	 */
@@ -170,7 +170,9 @@ class DependencyBuilder extends DomainBuilder {
 		 */
 		fieldResult.create = [:]
 		fieldMap.each { String fieldName, FieldResult results ->
-			fieldResult.create[fieldName] = results.init ?: results.value
+			if (ID_FIELD_NAME != fieldName) {
+				fieldResult.create[fieldName] = (results.init != null) ? results.init : results.value
+			}
 		}
 	}
 
@@ -202,7 +204,7 @@ class DependencyBuilder extends DomainBuilder {
 	 * 		extract 'name' load 'Name' set myVar
 	 * 		domain Application with myVar
 	 *	}
-	 * </pre>
+	 *	</pre>
 	 */
 	private void validateDependencyDomain() {
 		if (ETLDomain.Dependency != this.domain) {

@@ -4,6 +4,7 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
+import {TranslatePipe} from '../../shared/pipes/translate.pipe';
 // Assets Module
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
@@ -54,7 +55,8 @@ import { TagService } from '../assetTags/service/tag.service';
 		DependenciesService,
 		OpenAssetDependenciesService,
 		// Services
-		TagService
+		TagService,
+		TranslatePipe
 	],
 	exports: [DependenciesViewGridComponent],
 	entryComponents: []
