@@ -2,7 +2,7 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
-import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Specification
 import test.helper.AssetCommentTestHelper
 import test.helper.MoveEventTestHelper

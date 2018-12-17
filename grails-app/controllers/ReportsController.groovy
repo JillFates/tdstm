@@ -45,7 +45,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate

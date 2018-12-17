@@ -1,7 +1,7 @@
 import com.tds.asset.AssetEntity
 import grails.converters.JSON
 import groovy.json.JsonOutput
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.InvalidParamException
@@ -88,7 +88,7 @@ class ControlAngularTagLib {
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
-		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		sb.append(StringEscapeUtils.escapeHtml4(fieldSpec.label))
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -709,9 +709,9 @@ class ControlAngularTagLib {
 
 		boolean isBlank = StringUtil.isBlank(value)
 		if (! isBlank) {
-			attrib += StringEscapeUtils.escapeHtml(value)
+			attrib += StringEscapeUtils.escapeHtml4(value)
 		} else if (defValue != null) {
-			attrib += StringEscapeUtils.escapeHtml(defValue)
+			attrib += StringEscapeUtils.escapeHtml4(defValue)
 		}
 		attrib += '"'
 
@@ -730,7 +730,7 @@ class ControlAngularTagLib {
 		if (label==null) label = ''
 
 		boolean labelBlank = StringUtil.isBlank(label)
-		String escapedvalue = StringEscapeUtils.escapeHtml(option)
+		String escapedvalue = StringEscapeUtils.escapeHtml4(option)
 		String text = (labelBlank ? option : label)
 		return ["value": "$escapedvalue", "text": "$text"]
 	}
