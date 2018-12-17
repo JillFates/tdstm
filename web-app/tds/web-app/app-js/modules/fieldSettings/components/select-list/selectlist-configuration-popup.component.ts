@@ -202,7 +202,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
+		if (this.isDirty() || this.newItem.length > 0) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
