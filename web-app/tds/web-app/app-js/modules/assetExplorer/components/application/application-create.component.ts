@@ -59,6 +59,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.model.asset.validation = this.defaultValidation;
 		}
 
 		/**
@@ -81,6 +82,12 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.model.asset.shutdownBy = {id: null };
 			this.model.asset.startupBy = {id: null };
 			this.model.asset.testingBy = {id: null };
+
+			this.model.asset.startupProc = '';
+			this.model.asset.testProc = '';
+			this.model.asset.latency = '';
+			this.model.asset.environment = '';
+			this.model.asset.criticality = '';
 
 			this.model.asset.scale = { name: { value: '', text: ''} };
 

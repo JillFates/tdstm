@@ -88,13 +88,15 @@ class ApplicationService implements ServiceMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
+		Map commonModel = this.getCommonModel(false, project, app, params)
 
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
 				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: Person.constraints.staffType.inList,
 		        personList: personList, currentUserId: securityService.currentPersonId] +
-		        assetEntityService.getCommonModelForShows('Application', project, params, app)
+				commonModel
+
 	}
 
 	/**
@@ -111,6 +113,7 @@ class ApplicationService implements ServiceMethods {
 		List personList = partyRelationshipService.getProjectApplicationStaff(project)
 		List availableRoles = partyRelationshipService.getStaffingRoles()
 		List partyGroupList = partyRelationshipService.getCompaniesList()
+		Map commonModel = this.getCommonModel(true, project, application, params)
 
 		return [
 			assetInstance: application,
@@ -119,7 +122,7 @@ class ApplicationService implements ServiceMethods {
 			partyGroupList: partyGroupList,
 			staffTypes: Person.constraints.staffType.inList,
 			personList: personList
-		] + assetEntityService.getCommonModelForCreate('Application', project, application)
+		] + commonModel
 	}
 
 	/**
@@ -212,5 +215,19 @@ class ApplicationService implements ServiceMethods {
 	 */
 	void deleteApplication(Application application) {
 		assetEntityService.deleteAsset(application)
+	}
+
+	/**
+	 * Used to get the model map used to render the create view of an Application domain asset
+	 * @param forCreate - is model for create or show/edit
+	 * @param project - the project of the user
+	 * @param application - current application
+	 * @param params - request parameters
+	 * @return a map of the properties containing the list values to populate the list controls
+	 */
+	private Map getCommonModel(Boolean forCreate, Project project, Application application, Map params) {
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, application, 'Application', params)
+		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
+		return commonModel
 	}
 }

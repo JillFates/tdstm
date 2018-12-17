@@ -14,6 +14,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -677,14 +678,14 @@ class MoveBundleController implements ControllerMethods {
 			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
 		}
 
-/*
+		/*
 		// TODO - this is unnecessary and could just load the map
 
 		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
 		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
 		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
-*/
+		*/
 
 		// ------------------------------------
 		// Calculate the Plan Status values
@@ -699,7 +700,7 @@ class MoveBundleController implements ControllerMethods {
 
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
-			(total > 0 ? Math.round(count/total*100)  : 0)
+			(total > 0 ? ((count/total*100)as double).trunc(2).intValue() : 0)
 		}
 
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
@@ -718,9 +719,6 @@ class MoveBundleController implements ControllerMethods {
 			countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.storageTypes])[0] : 0
 
 		percentagePhyStorageCount = percOfCount(percentagePhyStorageCount, phyStorageCount)
-
-		int percentageFilesCount = moveBundleList ? Files.executeQuery(filesCountQuery + planStatusMovedQuery, countArgs)[0] : 0
-		percentageFilesCount = percOfCount(percentageFilesCount, fileCount)
 
 		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.allServerTypes])[0] : 0
@@ -787,12 +785,10 @@ class MoveBundleController implements ControllerMethods {
 		def filesValidateCountQuery = filesCountQuery + validationQuery
 
 		// This section could be consolidated to a simple query instead of a bunch
-		def dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'])[0]
-		def validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
-		def dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
-		def bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
+		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.UNKNOWN])[0]
+		def planReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.PLAN_READY])[0]
 
-		countArgs.validation = 'Discovery'
+		countArgs.validation = ValidationType.UNKNOWN
 		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
 		def dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
 		def fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]
@@ -804,11 +800,12 @@ class MoveBundleController implements ControllerMethods {
 		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes])[0]
 
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
-		def percentageBundleReady = applicationCount ? percOfCount(bundleReady, applicationCount) : 0
+		def percentagePlanReady = applicationCount ? percOfCount(planReady, applicationCount) : 0
 		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100
 		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
 		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
-		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
+		def percentageStorToValidate=phyStorageCount ? percOfCount(phyStorageToValidate, phyStorageCount) :100
+		int percentageFilesCount = percOfCount(fileToValidate, fileCount)
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 
@@ -818,7 +815,7 @@ class MoveBundleController implements ControllerMethods {
 				COUNT(ae) AS all,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END) AS allMoved
 			FROM AssetEntity ae
-			WHERE ae.project=:project 
+			WHERE ae.project=:project
 			AND ae.assetClass = :deviceAssetClass
 			AND ae.assetType IN (:allServers)
 			AND ae.moveBundle IN (:moveBundles)
@@ -844,85 +841,95 @@ class MoveBundleController implements ControllerMethods {
 		}
 
 		return [
-			appList:appList,
-			applicationCount:applicationCount,
-			unassignedAppCount:unassignedAppCount,
-			assignedAppPerc: assignedAppPerc,
-			confirmedAppPerc: confirmedAppPerc,
-			movedAppPerc: movedAppPerc,
-			movedServersPerc: serversCompletedPercentage,
-			appToValidate:appToValidate,
-			unassignedServerCount: unassignedServerCount,
-			unassignedPhysicalServerCount:unassignedPhysicalServerCount,
-			percentagePhysicalServerCount:percentagePhysicalServerCount,
-			psToValidate:psToValidate,
-			unassignedVirtualServerCount:unassignedVirtualServerCount,
-			percVirtualServerCount:percVirtualServerCount,
-			vsToValidate:vsToValidate,
-			dbList:dbList, dbCount:databaseCount,
-			unassignedDbCount:unassignedDbCount,
-			percentageDBCount:percentageDBCount,
-			dbToValidate:dbToValidate,
+			appList                       : appList,
+			applicationCount              : applicationCount,
+			unassignedAppCount            : unassignedAppCount,
+			assignedAppPerc               : assignedAppPerc,
+			confirmedAppPerc              : confirmedAppPerc,
+			movedAppPerc                  : movedAppPerc,
+			movedServersPerc              : serversCompletedPercentage,
+			appToValidate                 : appToValidate,
+			unassignedServerCount         : unassignedServerCount,
+			unassignedPhysicalServerCount : unassignedPhysicalServerCount,
+			percentagePhysicalServerCount : percentagePhysicalServerCount,
+			psToValidate                  : psToValidate,
+			unassignedVirtualServerCount  : unassignedVirtualServerCount,
+			percVirtualServerCount        : percVirtualServerCount,
+			vsToValidate                  : vsToValidate,
+			dbList                        : dbList,
+			dbCount                       : databaseCount,
+			unassignedDbCount             : unassignedDbCount,
+			percentageDBCount             : percentageDBCount,
+			dbToValidate                  : dbToValidate,
 			// Files (aka Storage)
-			filesList:filesList, fileCount:fileCount,
-			unassignedFilesCount:unassignedFilesCount,
-			percentageFilesCount:percentageFilesCount,
-			fileToValidate:fileToValidate,
-			unAssignedPhyStorageCount:unAssignedPhyStorageCount,
-			phyStorageCount:phyStorageCount,
-			phyStorageList:phyStorageList,
-			phyStorageToValidate:phyStorageToValidate,
-			percentagePhyStorageCount:percentagePhyStorageCount,
+			filesList                     : filesList,
+			fileCount                     : fileCount,
+			unassignedFilesCount          : unassignedFilesCount,
+			percentageFilesCount          : percentageFilesCount,
+			fileToValidate                : fileToValidate,
+			unAssignedPhyStorageCount     : unAssignedPhyStorageCount,
+			phyStorageCount               : phyStorageCount,
+			phyStorageList                : phyStorageList,
+			phyStorageToValidate          : phyStorageToValidate,
+			percentagePhyStorageCount     : percentagePhyStorageCount,
 			// Other
-			otherTypeList:otherTypeList,
-			otherAssetCount:otherAssetCount,
-			unassignedOtherCount:unassignedOtherCount,
-			percentageOtherCount:percentageOtherCount,
-			otherToValidate:otherToValidate,
+			otherTypeList                 : otherTypeList,
+			otherAssetCount               : otherAssetCount,
+			unassignedOtherCount          : unassignedOtherCount,
+			percentageOtherCount          : percentageOtherCount,
+			otherToValidate               : otherToValidate,
 
 			// assetList:assetList, assetCount:assetCount,
-			totalServerCount: totalServerCount,
-			allServerList: allServerList,
-			phyServerCount:totalPhysicalServerCount,
-			phyServerList: phyServerList,
-			virtServerCount:totalVirtualServerCount,
-			virtServerList: virtServerList,
+			totalServerCount              : totalServerCount,
+			allServerList                 : allServerList,
+			phyServerCount                : totalPhysicalServerCount,
+			phyServerList                 : phyServerList,
+			virtServerCount               : totalVirtualServerCount,
+			virtServerList                : virtServerList,
 
-			unassignedAssetCount:unassignedAssetCount,
+			unassignedAssetCount          : unassignedAssetCount,
 /*
 			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount,
 			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount,
 			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount,
 */
-			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
-			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount,
+			appDependenciesCount          : appDependenciesCount,
+			pendingAppDependenciesCount   : pendingAppDependenciesCount,
+			serverDependenciesCount       : serverDependenciesCount,
+			pendingServerDependenciesCount: pendingServerDependenciesCount,
 
-			project:project,
-			moveEventList:moveEventList,
-			moveBundleList:moveBundleList,
-			dependencyConsoleList:dependencyConsoleList,
-			dependencyBundleCount:dependencyBundleCount,
-			planningDashboard:'planningDashboard',
-			eventStartDate:eventStartDate,
-			date:time,
+			project                       : project,
+			moveEventList                 : moveEventList,
+			moveBundleList                : moveBundleList,
+			dependencyConsoleList         : dependencyConsoleList,
+			dependencyBundleCount         : dependencyBundleCount,
+			planningDashboard             : 'planningDashboard',
+			eventStartDate                : eventStartDate,
+			date                          : time,
 
-			issuesCount:issues.size(),
-			openIssue:openIssue, dueOpenIssue:dueOpenIssue,
-			openTasks:openTasks, generalOverDue:generalOverDue,
+			issuesCount                   : issues.size(),
+			openIssue                     : openIssue,
+			dueOpenIssue                  : dueOpenIssue,
+			openTasks                     : openTasks,
+			generalOverDue                : generalOverDue,
 
-			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
-			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount,
-			percAppDoneCount:percAppDoneCount, percentageAppToValidate:percentageAppToValidate,
-			percentageBundleReady:percentageBundleReady,
+			validated                     : applicationCount - unknown,
+			planReady                     : planReady,
+			movedAppCount                 : movedAppCount,
+			assignedAppCount              : assignedAppCount,
+			confirmedAppCount             : confirmedAppCount,
+			percAppDoneCount              : percAppDoneCount,
+			percentageAppToValidate       : percentageAppToValidate,
+			percentagePlanReady           : percentagePlanReady,
 
-			percentagePSToValidate:percentagePSToValidate,
-			percentageVMToValidate:percentageVMToValidate,
-			percentageDBToValidate:percentageDBToValidate,
-			percentageStorToValidate:percentageStorToValidate,
-			percentageOtherToValidate:percentageOtherToValidate,
-			percentageUnassignedAppCount:percentageUnassignedAppCount,
+			percentagePSToValidate        : percentagePSToValidate,
+			percentageVMToValidate        : percentageVMToValidate,
+			percentageDBToValidate        : percentageDBToValidate,
+			percentageStorToValidate      : percentageStorToValidate,
+			percentageOtherToValidate     : percentageOtherToValidate,
+			percentageUnassignedAppCount  : percentageUnassignedAppCount,
 
-			groupPlanMethodologyCount: groupPlanMethodologyCount
+			groupPlanMethodologyCount     : groupPlanMethodologyCount
 		]
 	}
 

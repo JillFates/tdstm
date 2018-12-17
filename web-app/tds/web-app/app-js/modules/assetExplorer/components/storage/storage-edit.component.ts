@@ -51,6 +51,8 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			if (this.model.asset.scale && this.model.asset.scale.name) {
 				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
+
+			this.model.asset.environment = this.model.asset.environment || '';
 		}
 
 		/**

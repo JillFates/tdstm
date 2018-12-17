@@ -13,11 +13,11 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
-import net.transitionmanager.dataview.FieldSpec
-import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
@@ -27,6 +27,8 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
+
+import java.sql.Timestamp
 
 /**
  * Service class with main database operations for Dataview.
@@ -679,8 +681,10 @@ class DataviewService implements ServiceMethods {
 		// Iterate over each column
 		dataviewSpec.columns.each { Map column ->
 
+			Class type = typeFor(column)
 			// Check if the user provided a filter expression.
-			if (StringUtil.isNotBlank(filterFor(column))) {
+			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
+			if (StringUtil.isNotBlank(filterFor(column)) && !(type in [Date, Timestamp])) {
 
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -688,7 +692,7 @@ class DataviewService implements ServiceMethods {
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
 						filter: filterFor(column),
-						type: typeFor(column),
+						type: type,
 						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
 						fieldSpec: column.fieldSpec
@@ -1087,6 +1091,8 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: ""],
 		'sourceBladePosition': [property: "AE.sourceBladePosition", type: Integer, namedParameter: 'sourceBladePosition', join: ""],
 		'targetBladePosition': [property: "AE.targetBladePosition", type: Integer, namedParameter: 'targetBladePosition', join: ""],
+		'size': [property: "AE.size", type: Integer, namedParameter: 'size', join: ""],
+		'rateOfChange': [property: "AE.rateOfChange", type: Integer, namedParameter: 'rateOfChange', join: ""],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
 		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
 		'lastUpdated': [property: "AE.lastUpdated", type: Date, namedParameter: 'lastUpdated', join: ''],

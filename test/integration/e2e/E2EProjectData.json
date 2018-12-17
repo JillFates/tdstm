@@ -30,7 +30,7 @@
     "roles": [
       "ADMIN"
     ],
-    "email": "e2e_test_user@e2e.com"
+    "email": "e2e_test_user@tdsi.com"
   },
   "userData2": { // Main E2E user test execution
     "firstName": "Secondary",
@@ -40,7 +40,7 @@
     "roles": [
       "ADMIN"
     ],
-    "email": "e2e_test_user2@e2e.com"
+    "email": "e2e_test_user2@tdsi.com"
   },
   "userData3": { // Main E2E user test execution for Projects specs
     "firstName": "Projects",
@@ -50,7 +50,7 @@
     "roles": [
       "ADMIN"
     ],
-    "email": "e2e_projects_user@e2e.com"
+    "email": "e2e_projects_user@tdsi.com"
   },
   "userData4": { // Main E2E user test execution
     "firstName": "Login",
@@ -60,21 +60,21 @@
     "roles": [
       "ADMIN"
     ],
-    "email": "login_e2e_test_user@e2e.com"
+    "email": "login_e2e_test_user@tdsi.com"
   },
   "staffFiltering": { // StaffSearchndFilteringSpec
     "firstName": "StaffFirst",
     "middleName": "Middle",
     "lastName": "StaffLast",
     "userName": "StaffTest",
-    "email": "staff@transitionaldata.com"
+    "email": "staff@tdsi.com"
   },
   "userFiltering": { // UserSearchndFilteringSpec
     "firstName": "userFirst",
     "middleName": "userMiddle",
     "lastName": "userLast",
     "userName": "userTest",
-    "email": "user@transitionaldata.com",
+    "email": "user@tdsi.com",
     "password": "e2e_password",
     "roles": [
       "ADMIN"

@@ -1,0 +1,124 @@
+<tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
+
+<div class="dependencies-view-grid-component">
+	<kendo-grid #grid
+	            [data]="state.gridData"
+	            [filterable]="true"
+	            [sortable]="{'allowUnsort': false, 'mode': 'single'}"
+	            [resizable]="true"
+	            [pageable]="{'pageSizes': GRID_PAGE_SIZES, 'info': true}"
+	            (dataStateChange)="dataStateChange($event)"
+	            (cellClick)="onClickActionableColumn($event)"
+	            class="tds-kendo-grid without-selectabe-rows">
+
+		<!-- Header Toolbar -->
+		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+			<div class="col-sm-6 bulkchange-section">
+				<tds-bulk-change-button #tdsBulkChangeButton
+				                        [enabled]="bulkCheckboxService.hasSelectedItems()"
+				                        [showDelete]="true"
+				                        [showEdit]="false"
+				                        [bulkChangeType]="bulkChangeType"
+				                        (clickBulk)="onClickBulkButton()"
+				                        (operationResult)="onBulkOperationResult($event)">
+				</tds-bulk-change-button>
+
+				<div *ngIf="getSelectedItemsCount(); let counter"  class="bulk-change-counter">
+					<span class="badge badge-light">{{counter.count}}</span><label>{{counter.entityName}} selected</label>
+				</div>
+			</div>
+			<div class="col-sm-6 filters-section"></div>
+		</ng-template>
+
+		<!-- Select All column -->
+		<kendo-grid-column [width]="45" [locked]="true" [filterable]="false">
+			<ng-template kendoGridHeaderTemplate>
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<tds-checkbox name="assetsSelector"
+						              [hasThirdState]="true"
+						              (changeState)="bulkCheckboxService.changeState(($event))"
+						              id="assetSelector"
+						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+					</div>
+				</div>
+			</ng-template>
+
+			<ng-template kendoGridCellTemplate let-dataItem>
+				<div class="check-row">
+					<input type="checkbox" id="checkbox_{{dataItem.id}}"
+					       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.id)"
+					       (change)="bulkCheckboxService.checkItem(dataItem.id, $event.target.checked)"
+					       name="checkbox_{{dataItem.id}}">
+				</div>
+			</ng-template>
+		</kendo-grid-column>
+
+		<!-- Configured View Columns (*ngFor) -->
+		<kendo-grid-column *ngFor="let column of dependenciesColumnModel.columns" field="{{column.property}}"
+		                   format="{{column.format}}"
+		                   [locked]="column.locked"
+		                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+			<!-- Default Generic Filter Template -->
+			<ng-template kendoGridHeaderTemplate>
+				<div class="sortable-column">
+					<label [ngClass]="{'action-header':column.type === 'action'}">{{column.label}}</label>
+				</div>
+			</ng-template>
+
+			<!-- Default Generic Filter Template -->
+			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
+			             *ngIf="!tagsFieldNames.includes(column.property)">
+				<kendo-grid-string-filter-cell
+						[showOperators]="false"
+						[column]="column"
+						[filter]="filter">
+				</kendo-grid-string-filter-cell>
+			</ng-template>
+
+			<!-- Asset Tags Filter Template -->
+			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
+			             *ngIf="tagsFieldNames.includes(column.property)">
+				<tds-asset-tag-selector #tagSelector
+				                        [tagList]="state.tagList"
+				                        (valueChange)="onTagFilterChange(column.field, $event)">
+				</tds-asset-tag-selector>
+			</ng-template>
+
+			<!-- Asset and Dependency Tags Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem
+			             *ngIf="tagsFieldNames.includes(column.property)">
+				<div>
+				   <span *ngFor="let tag of dataItem[column.property]"
+						 class="label tag dependency-tag"
+						 [ngClass]="tag.css"> {{tag.name}}
+				   </span>
+				</div>
+			</ng-template>
+
+			<!-- Actionable assets Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem
+			             *ngIf="actionableAssets.includes(column.property)">
+				<div class="actionable-column">
+					{{dataItem[column.property]}}
+				</div>
+			</ng-template>
+
+
+
+		</kendo-grid-column>
+
+		<!-- Pagination Footer -->
+		<ng-template kendoPagerTemplate>
+			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+			<kendo-pager-next-buttons></kendo-pager-next-buttons>
+			<kendo-pager-page-sizes [pageSizes]="GRID_PAGE_SIZES"></kendo-pager-page-sizes>
+			<kendo-pager-info></kendo-pager-info>
+		</ng-template>
+	</kendo-grid>
+	{{state.gridConfig | json}}
+</div>
+
+
+

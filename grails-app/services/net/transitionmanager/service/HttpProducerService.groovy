@@ -577,7 +577,7 @@ class HttpProducerService {
             }
 
             // fetch a fresh copy of the credentials to have access to password and salt when needed
-            Credential credential = credentialService.findById(actionRequest.options.credentials.id)
+            Credential credential = credentialService.findById(actionRequest.options.credentials.id, actionRequest.options.projectId)
             switch (credential.authenticationMethod) {
                 case AuthenticationMethod.BASIC_AUTH:
                     Credentials credentials = new UsernamePasswordCredentials(credential.username, credentialService.decryptPassword(credential))

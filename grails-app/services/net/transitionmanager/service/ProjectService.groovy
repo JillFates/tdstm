@@ -6,6 +6,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
@@ -302,31 +303,38 @@ class ProjectService implements ServiceMethods {
 		}
 	}
 
-	def getProjectReportSummary(Map params) {
+	/**
+	 * Generates a list of projects and the details including assets and staff counts
+	 * @param active - flag to include active projects
+	 * @param inactive - flag to include inactive projects
+	 * @return A list of projects and their details as a Map
+	 */
+	List<Map> getProjectReportSummary(Map params) {
 
-		def projects = []
+		List projects = []
 
 		// check if either of the active/inactive checkboxes are checked
-		if(params.active || params.inactive) {
+		if (params.active || params.inactive) {
 			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
-					COUNT(IF(ae.asset_type = "$AssetType.FILES",1,NULL)) AS filesCount,
-					COUNT(IF(ae.asset_type = "$AssetType.DATABASE",1,NULL)) AS dbCount,
-					COUNT(IF(ae.asset_type = "$AssetType.APPLICATION",1,NULL)) AS appCount,
-					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}), 1, NULL)) AS totalServCount,
-					COUNT(IF(ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}) and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.STORAGE.toString()}',1,NULL)) AS filesCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.DATABASE.toString()}',1,NULL)) AS dbCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.APPLICATION.toString()}',1,NULL)) AS appCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.DEVICE.toString()}' AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}), 1, NULL)) AS totalServCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.DEVICE.toString()}' AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}) and mb.use_for_planning and ae.move_bundle_id = mb.move_bundle_id ,1,NULL)) AS inPlanningServCount,
+					COUNT(IF(ae.asset_class = '${AssetClass.DEVICE.toString()}' AND NOT(COALESCE(ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.virtualServerTypes)})),1,NULL)) AS deviceCount,
 					COUNT(*) AS totalAssetCount,
 					DATE(p.start_date) AS startDate,
 					DATE(p.completion_date) AS completionDate,
 					pg.name AS clientName,
 					p.description AS description,
 					(SELECT GROUP_CONCAT(pg2.name)
-						FROM party_relationship pr 
+						FROM party_relationship pr
 						LEFT JOIN party_group pg2 ON pg2.party_group_id = pr.party_id_to_id
-                        WHERE (pr.party_relationship_type_id = 'PROJ_PARTNER' 
-							AND pr.party_id_from_id = p.project_id 
-							AND pr.role_type_code_from_id = 'PROJECT' 
+                        WHERE (pr.party_relationship_type_id = 'PROJ_PARTNER'
+							AND pr.party_id_from_id = p.project_id
+							AND pr.role_type_code_from_id = 'PROJECT'
                             AND pr.role_type_code_to_id = 'PARTNER')
 					) AS partnerNames
 					FROM asset_entity ae
@@ -344,10 +352,10 @@ class ProjectService implements ServiceMethods {
 			query.append(""" GROUP BY ae.project_id
 					) inside
 				ORDER BY inside.projName """)
-			
+
 			projects = jdbcTemplate.queryForList(query.toString())
 
-			// add the staff count to each project
+			// Add the staff count to each project
 			projects.each {
 				it["staffCount"] = partyRelationshipService.getCompanyStaff(it["clientId"]).size()
 			}
@@ -581,10 +589,10 @@ class ProjectService implements ServiceMethods {
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
 		String eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
 		String roomQuery = " select ro.id from Room ro where ro.project = $projectInstance.id"
-		List projectCodes = [UserPreferenceEnum.CURR_PROJ.value()]
-		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.value(), UserPreferenceEnum.CURR_BUNDLE.value()]
-		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.value(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.value()]
-		String roomCode = UserPreferenceEnum.CURR_ROOM.value()
+		List projectCodes = [UserPreferenceEnum.CURR_PROJ.name()]
+		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
+		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
+		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
 		String prefDelSql = '''
 			delete from UserPreference up where
 			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or

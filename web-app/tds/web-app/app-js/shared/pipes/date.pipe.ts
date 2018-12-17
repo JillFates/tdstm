@@ -13,9 +13,9 @@ import {DateUtils} from '../utils/date.utils';
 export class DatePipe implements PipeTransform {
 
 	transform(value: string, args?: any): any {
-		let dateValue = DateUtils.toDate(value);
-		if (isNaN(dateValue.getTime())) {
-			return value;
+		let dateValue = DateUtils.toDateUsingFormat(value, DateUtils.SERVER_FORMAT_DATE);
+		if (!dateValue) {
+			return '';
 		}
 		return DateUtils.formatDate(dateValue, args);
 	}

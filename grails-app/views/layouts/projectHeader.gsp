@@ -179,7 +179,7 @@ int minPasswordLength = tds.minPasswordLength()
 								<li><g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link> </li>
 					</g:if>
 					<g:else>
-						<span class="megamenuSection">No Project Selected</strong></span><br />
+						<span class="megamenuSection">No Project Selected</span><br />
 							<ul>
 					</g:else>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
@@ -427,18 +427,6 @@ int minPasswordLength = tds.minPasswordLength()
 			<li id="reportsMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
 				<div class="megamenu reports inActive" id="reportsMegaMenu">
 					<table class="mmtable "><tr>
-					<tds:hasPermission permission="${Permission.ReportViewDiscovery}">
-					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
-						<ul>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Conflict</a> </li>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Data</a> </li>
-							<li><a href="/tdstm/reports/powerReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Power</a> </li>
-							<tds:hasPermission permission="${Permission.HelpMenuView}">
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					</tds:hasPermission>
 					<td style="vertical-align:top"><span class="megamenuSection">Planning</span><br />
 						<ul>
 							<li><a href="/tdstm/reports/applicationProfiles" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Profiles</a> </li>
@@ -459,8 +447,6 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
 							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Transport Worksheets</a></li>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
@@ -471,8 +457,6 @@ int minPasswordLength = tds.minPasswordLength()
 					<td style="vertical-align:top"><span class="megamenuSection">Event Day</span><br />
 						<ul>
 							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a> </li>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
-							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
@@ -490,7 +474,7 @@ int minPasswordLength = tds.minPasswordLength()
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${tds.currentPersonName()}</span><br />
 				<ul>
-					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${tds.currentPersonId()}" onComplete="updatePersonDetails(XMLHttpRequest)">Account Details...</g:remoteLink></li>
+					<li><a href="#" style="cursor: pointer;" id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson()">Account Details...</a></li>
 					<li><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone()">Date and Timezone</a></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>

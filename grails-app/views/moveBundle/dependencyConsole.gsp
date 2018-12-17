@@ -169,7 +169,7 @@
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
 								<div class="box-body">
-									Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different bundles/events or one or more assets' dependency status is set to Questioned or Unknown.
+									Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different events or one or more assets' dependency status is set to Questioned or Unknown.
 								</div><!-- /.box-body -->
 							</div>
 						</div>
@@ -184,7 +184,7 @@
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
 								<div class="box-body">
-									Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Bundle Ready indicating the group is ready to Bundle.
+									Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Plan Ready indicating the group is ready to be assigned.
 								</div><!-- /.box-body -->
 							</div>
 						</div>
@@ -193,13 +193,13 @@
 						<div class="col-sm-12">
 							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
 								<div class="box-header with-border" style="background-color: lightgreen;">
-									<h3 class="box-title">Ready to Bundle</h3>
+									<h3 class="box-title">Ready to Assign</h3>
 									<div class="box-tools pull-right">
 										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
 								<div class="box-body">
-									Green indicates that the assets in the group are Ready to be assigned to bundles.
+									Green indicates that the assets in the group are Ready to be assigned.
 								</div><!-- /.box-body -->
 							</div>
 						</div>
@@ -214,7 +214,7 @@
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
 								<div class="box-body">
-									Blue indicates that there are no conflicts and all of the assets in the group have been assigned to common bundles (in same event).
+									Blue indicates that there are no conflicts and all of the assets in the group have been assigned correctly.
 								</div><!-- /.box-body -->
 							</div>
 						</div>

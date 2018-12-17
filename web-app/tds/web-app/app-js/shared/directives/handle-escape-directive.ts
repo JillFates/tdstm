@@ -1,9 +1,18 @@
-import {Directive, HostListener, Output, EventEmitter} from '@angular/core';
+import {Directive, ElementRef, OnInit, HostListener, Output, EventEmitter, Renderer2} from '@angular/core';
 import {KEYSTROKE} from '../model/constants';
 
 @Directive({ selector: '[tds-handle-escape]' })
-export class UIHandleEscapeDirective {
+export class UIHandleEscapeDirective implements OnInit {
 	@Output() escPressed: EventEmitter<any> = new EventEmitter();
+
+	constructor(private el: ElementRef, private renderer: Renderer2) {
+	}
+
+	ngOnInit() {
+		// the form needs to have tabindex defined in order it can be able to detect keyboard events
+		this.renderer.setAttribute(this.el.nativeElement, 'tabindex',  '0');
+	}
+
 	@HostListener('keyup', ['$event']) handleKeyboardEventUp(event: KeyboardEvent) {
 		if (event) {
 			const isEscPressed = event.code === KEYSTROKE.ESCAPE;

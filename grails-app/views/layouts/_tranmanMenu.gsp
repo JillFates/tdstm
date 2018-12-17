@@ -239,13 +239,13 @@
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
-                                <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <asset:image src="icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
+                                <g:link class="mmlink" controller="module" action="dependencies" id="list"  elementId="list">
+	                                <asset:image src="icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-comments-list">
-                                <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <asset:image src="icons/comments.png" width="16" height="16" alt="Comments" /> Comments
+                            <li class="menu-child-item menu-parent-assets-comments-list" onclick="hideMegaMenu('assetMegaMenu')">
+                                <g:link class="mmlink" controller="assetEntity" action="listComment">
+	                                <asset:image src="icons/comments.png" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>
                             </li>
                             <li class="divider"></li>
@@ -323,7 +323,7 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                <li class="menu-child-item">
+                                <li class="menu-child-item menu-planning-pre-checklist">
                                     <g:link controller="reports" action="preMoveCheckList">Pre-event Checklist</g:link>
                                 </li>
                             </tds:hasPermission>
@@ -463,20 +463,6 @@
                                 <li class="menu-child-item menu-reports-activity-metrics">
                                     <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
                                 </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                <li class="divider"></li>
-                                <li class="menu-parent-item">Event Prep</li>
-                                <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                    <li class="menu-child-item menu-reports-pre-checklist">
-                                        <a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a>
-                                    </li>
-                                </tds:hasPermission>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">
                                 <li class="divider"></li>

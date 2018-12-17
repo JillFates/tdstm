@@ -50,7 +50,7 @@
 				<span style="cursor: pointer;" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
 			</td>
 			<td>Asset Type:</td>
-			<td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
+			<td><g:select id="assetTypeId" name="assetType" from="${assetTypes}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
 		</tr>
 		<tr>
 			<td>Usize:</td>

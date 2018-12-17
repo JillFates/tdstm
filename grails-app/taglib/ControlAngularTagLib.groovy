@@ -139,6 +139,7 @@ class ControlAngularTagLib {
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
 	 * @param min - used to specify minimum allowed value (used by the number fields)
+	 * @param blankOptionListText - Text used to represent a blank option list text (optional)
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
@@ -160,15 +161,20 @@ class ControlAngularTagLib {
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 		String min = (attrs.min ?: (attrs.min ?: "" ))
+		String blankOptionListText = (attrs.blankOptionListText ?: (attrs.blankOptionListText ?: null ))
+		String tabIndexInput = tabIndex ? tabIndex : calculateTabIndexNumber(fieldSpec, tabIndex, tabOffset)
 
 		String placeholder = attrs.placeholder ?: ''
 		boolean isRequired = fieldSpec.constraints?.required
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
-				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
+			case ControlType.IN_LIST.toString():
+			case ControlType.OPTIONS_ENVIRONMENT.toString():
+			case ControlType.OPTIONS_PRIORITY.toString():
+				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.YES_NO.toString():
-				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
+				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.NUMBER.toString():
 				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
@@ -178,20 +184,29 @@ class ControlAngularTagLib {
 						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
 						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
 						" [required]=\"$isRequired\" " +
-						" [format]=\"'${fieldSpec.constraints.format ? fieldSpec.constraints.format : 0}'\">" +
+						" [tabindex]=\"$tabIndexInput\" " +
+						" [format]=\"'${transformNumberFormat(fieldSpec)}'\">" +
 						"</tds-number-control>"
 				break
 			case ControlType.DATE.toString():
-				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				out << "<tds-date-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
 				break
 			case ControlType.DATETIME.toString():
-				out << "<tds-datetime-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
+				out << "<tds-datetime-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
 				break
 			case ControlType.STRING.toString():
 			default:
 				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
 		}
 	}
+
+    private String transformNumberFormat(Map fieldSpec) {
+        String outputFormat = fieldSpec.constraints.format
+        if (fieldSpec.constraints.precision > 0) {
+            outputFormat = outputFormat.replace("\'","\\'")
+        }
+        outputFormat
+    }
 
 	/**
 	 * Used to render the value for any of the supported custom fields in the Asset Show Views.
@@ -237,7 +252,7 @@ class ControlAngularTagLib {
 				out << "{{ '$value' | tdsDateTime: userTimeZone }}"
 				break
 			case ControlType.NUMBER.toString():
-				out << "{{ ${value ? value : '0'} | tdsNumber: '${fieldSpec.constraints.format}' }}"
+				out << "{{ ${value ? value : '0'} | tdsNumber: '${transformNumberFormat(fieldSpec)}' }}"
 				break
 			case ControlType.STRING.toString():
 			default: // call textAsLink
@@ -258,8 +273,9 @@ class ControlAngularTagLib {
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
+		def tdAttr = " data-for='" + attrs.field.field + "' class='" + attrs.field.imp + "' "
 		out << inputLabel(attrs)
-		out << '<td>'
+		out << "<td" + tdAttr + ">"
 		out << inputControl(attrs)
 		out << '</td>'
 	}
@@ -284,10 +300,10 @@ class ControlAngularTagLib {
 
 		def value = domainField && domainField != null ? domainObject[domainField] : domainObject[fieldName]
 
-        def isImportantClass = 'YG'.indexOf(fieldSpec[fieldName].imp.toUpperCase()) != -1
+        def isImportantClass = 'YG'.contains(fieldSpec[fieldName].imp.toUpperCase())
 		boolean hasValue = (value != '' && value != null) || value?.trim()
 
-        out << isImportantClass && hasValue == false;
+        out << (isImportantClass && !hasValue)
 	}
 
 	/**
@@ -297,9 +313,10 @@ class ControlAngularTagLib {
 	 * @param value - the value to set the control to (optional)
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @param blankOptionListText - Text used to represent a blank text (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
@@ -318,7 +335,7 @@ class ControlAngularTagLib {
 			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
 		} else {
 			// Add a blank option so users can unset a value
-			stringList.add(selectOption('', value))
+			stringList.add(selectOption('', value, StringUtil.isBlank(blankOptionListText) ? null : blankOptionListText))
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -328,7 +345,7 @@ class ControlAngularTagLib {
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
 		boolean isBlankValue = StringUtil.isBlank(value);
-		if (( ! isBlankValue && ! options.contains(value)) ) {
+		if (( ! isBlankValue && options && !options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
 			stringList.add(selectOption(value, value, warning))
 		}
@@ -394,9 +411,10 @@ class ControlAngularTagLib {
 	 * @param value - the value to set the control to
 	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @param blankOptionListText - Text used to represent a blank option list text (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderYesNoInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
 		List options = []
 		List valid = ['Yes', 'No']
 
@@ -415,7 +433,7 @@ class ControlAngularTagLib {
 			stringList.add([ 'value' : '', 'text': SELECT_REQUIRED_PROMPT])
 		} else {
 			// Put a blank entry in to allow the user to unset a field
-			stringList.add([ 'value' : '', 'text': ''])
+			stringList.add([ 'value' : '', 'text': StringUtil.isBlank(blankOptionListText) ? '' : blankOptionListText])
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -582,7 +600,20 @@ class ControlAngularTagLib {
 	 * @param tabOffset - a value that if supplied is added to the tabindex (used by Custom Fields presently)
 	 * @return The tabIndex attribute HTML for controls
 	 */
-	private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
+		private String tabIndexAttrib(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
+		def ti = calculateTabIndexNumber(fieldSpec, tabIndex, tabOffset)
+		return " tabindex=\"$ti\""
+	}
+
+	/**
+	 * Returns the  tabIndex number attribute based on the field specification
+	 * @param field - the Field specification object
+	 * @param tabIndex - the tabindex of the field that if supplied overrides the setting in field spec order property
+	 * @param tabOffset - a value that if supplied is added to the tabindex (used by Custom Fields presently)
+	 * @param attributeName - The name of the tabindex property (default: tabindex)
+	 * @return The tabIndex number
+	 */
+	private String calculateTabIndexNumber(Map fieldSpec, String tabIndex=null, String tabOffset=null) {
 		Integer ti = NumberUtil.toInteger(tabIndex, -1)
 		if (ti < 1) {
 			ti = fieldSpec.order
@@ -598,7 +629,7 @@ class ControlAngularTagLib {
 		}
 
 		if (ti > 0) {
-			return " tabindex=\"$ti\""
+			return ti
 		}
 		return ''
 	}

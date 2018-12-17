@@ -16,13 +16,17 @@ import {
 	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../asset/asset-show.component';
-import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
+import {
+	CUSTOM_FIELD_CONTROL_TYPE,
+	FIELD_NOT_FOUND,
+	FieldSettingsModel
+} from '../../../fieldSettings/model/field-settings.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
-import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
+import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -38,7 +42,9 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {BulkChangeButtonComponent} from '../bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -82,7 +88,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	public typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
-	public userTimeZone: string;
+	protected userTimeZone: string;
+	protected userDateFormat: string;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -98,6 +105,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 	private currentUser: any;
+	protected fieldPipeMap: {pipe: any, metadata: any};
+	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -105,7 +114,10 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
+		private assetExplorerService: AssetExplorerService,
 		private userService: UserService) {
+			this.fieldPipeMap = {pipe: {}, metadata: {}};
+			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 	}
 
 	ngOnInit(): void {
@@ -129,15 +141,22 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.currentFields = this.fields.reduce((p, c) => {
 			return p.concat(c.fields);
 		}, []).map((f: FieldSettingsModel) => {
+			if (f.control === CUSTOM_FIELD_CONTROL_TYPE.DateTime
+				|| f.control === CUSTOM_FIELD_CONTROL_TYPE.Date
+				|| f.control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
+					this.fieldPipeMap.pipe[`${f['domain']}_${f.field}`] = f.control;
+					if (f.control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
+						let format = (f.constraints as NumberConfigurationConstraintsModel).format || '0';
+						this.fieldPipeMap.metadata[`${f['domain']}_${f.field}`] = format;
+					}
+			}
 			return {
 				key: `${f['domain']}_${f.field}`,
 				label: f.label
 			};
 		});
-
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
-
 		this.getCurrentUser();
 
 	}
@@ -324,12 +343,15 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, false).then(x => {
-				if (x) {
-					this.createDependencyPromise(x.assetClass, x.id);
+			DIALOG_SIZE.LG, false)
+			.then(asset => {
+				if (asset) {
+					this.createDependencyPromise(asset.assetClass, asset.id);
 				}
-			}).catch(x => {
-				console.log(x);
+				this.onReload();
+			}).catch(error => {
+				console.log('Error:', error);
+				this.onReload();
 			});
 	}
 
@@ -491,7 +513,9 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+			.then(() => this.onReload())
+			.catch((err) => this.onReload() )
 	}
 
 	/**
@@ -571,13 +595,11 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * It was fixed by Kendo itself, this just prevent the double click
 	 * @param event:any
 	 */
 	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
+		event.preventDefault();
 	}
 
 	/**
@@ -585,9 +607,8 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private  cellClick(e): void {
+	protected  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			this.highlightGridRow(e.rowIndex);
 			this.onShow(e.dataItem);
 		}
 	}
@@ -640,7 +661,12 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	 * Gather the List of Selected Items for the Bulk Process
 	 */
 	public onClickBulkButton(): void {
-		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning).subscribe((results: any) => {
+		this.bulkCheckboxService.getBulkSelectedItems({
+			viewId: this._viewId,
+			model: this.model,
+			justPlanning: this.justPlanning
+		}, this.getBulkAssetIdsFromView.bind(this))
+		.subscribe((results: any) => {
 			this.bulkItems = [...results.selectedAssetsIds];
 			this.selectedAssetsForBulk = [...results.selectedAssets];
 			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
@@ -669,5 +695,31 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	private updateGridState(state: State): void {
 		const newState = Object.assign({}, this.gridState, state) ;
 		this.gridStateChange.emit(newState);
+	}
+
+	/**
+	 *  Get the bulk list of asset ids
+	 */
+	private getBulkAssetIdsFromView(params): Observable<any> {
+		const {viewId, model, justPlanning} = params;
+
+		let payload = {
+			forExport: true,
+			offset: 0,
+			limit: 0,
+			sortDomain: model.sort.domain,
+			sortProperty: model.sort.property,
+			sortOrder: model.sort.order,
+			filters: {
+				domains: model.domains,
+				columns: model.columns
+			}
+		};
+
+		if (justPlanning) {
+			payload['justPlanning'] = true;
+		}
+
+		return this.assetExplorerService.query(viewId, payload);
 	}
 }

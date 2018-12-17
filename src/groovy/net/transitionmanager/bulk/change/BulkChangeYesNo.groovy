@@ -70,7 +70,7 @@ class BulkChangeYesNo {
 			return ''
 		}
 
-		return BooleanUtils.toBoolean(value) ? 'Y' : 'N'
+		return BooleanUtils.toBoolean(value) ? 'Yes' : 'No'
 	}
 
 	/**

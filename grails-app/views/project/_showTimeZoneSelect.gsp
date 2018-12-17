@@ -20,9 +20,6 @@
 		</g:if>
 	</div>
 
-
-
-
 	<img id="timezoneImage" src="${assetPath(src: 'images/world_map_800.jpg')}" width="800" height="400" usemap="#timezoneMap"/>
 	<asset:image src="images/pin.png" style="padding-top: 4px;" />
 
