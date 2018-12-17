@@ -36,6 +36,7 @@ class SaveViewPage extends Page{
         commonsModule.waitForDialogModalHidden()
         commonsModule.waitForLoader 5 // to save
         commonsModule.waitForLoader 5 // to fill grid content
+        true //this avoids assertion failure when the action is in the context of a "given" statement
     }
 
     def setViewAsShared(){
