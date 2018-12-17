@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
-import {pathOr} from 'ramda';
+import {isNil} from 'ramda';
 
 import {NumberControlHelper} from './number-control.helper';
 import {TDSCustomControl} from '../common/custom-control.component';
@@ -21,7 +21,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 			[max]="max"
 			[min]="min"
 			[tabindex]="tabindex"
-			[value]="value"
+			[value]="numberValue"
 			(valueChange)="onValueChange($event)">
 		</kendo-numerictextbox>
 	`,
@@ -65,4 +65,13 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 	onValueChange(value: number): void {
 		this.value = value;
 	}
+
+	// Kendo doesn't allow to use a string for the kendo number control,
+	// so we need to wrap up the value function doing a cast to number
+	get numberValue() {
+		// if the value is null or undefined leave it as it is
+		// just if it has valid value do the conversion
+		return isNil(this.value)  ? this.value :  Number(this.value);
+	}
+
 }

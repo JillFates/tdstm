@@ -9,19 +9,19 @@ interface ErrorConstraints {
 }
 // TODO internationalize texts
 @Component({
-	selector: 'tds-field-validation-errors',
+	selector: 'tds-custom-validation-errors',
 	template: `
 		<div class="error" *ngIf="hasErrors">
-			<div *ngIf="errors.isRequired">{{label}} is required</div>
+			<div *ngIf="errors.isRequired">* {{label}} is required</div>
 			<div *ngIf="errors.range; let range">
-				<span>Invalid range number</span>
+				<span>* Invalid range number</span>
 				<div>Min: {{range.min}} Max: {{range.max}}</div>
 			</div>
-			<div *ngIf="errors.notNegative">Not could be negative</div>			
+			<div *ngIf="errors.notNegative">* Not could be negative</div>
 		</div>
 	`
 })
-export class TDSFieldValidationErrorsComponent {
+export class TDSCustomValidationErrorsComponent {
 	@Input() label = '';
 	@Input() submitted = false;
 	@Input() valid = false;

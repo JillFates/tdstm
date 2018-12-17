@@ -765,13 +765,13 @@ class ControlAngularTagLib {
 		def controlLabel = fieldSpec?.label
 
 		StringBuilder control = new StringBuilder("")
-		control.append("<tds-field-validation-errors ")
+		control.append("<tds-custom-validation-errors ")
 		control.append("   [label]='\"${controlLabel}\"' ")
 		control.append("   [errors]='${field}.errors' ")
 		control.append("   [submitted]='form && form.submitted' ")
 		control.append("   [valid]='${field}.valid' ")
 		control.append("   [dirty]='${field}.dirty' >")
-		control.append("</tds-field-validation-errors>")
+		control.append("</tds-custom-validation-errors>")
 
 		return control.toString()
 	}

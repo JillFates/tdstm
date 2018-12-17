@@ -73,7 +73,7 @@ import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
-import {TDSFieldValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
+import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
@@ -136,7 +136,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSFieldValidationErrorsComponent
+		TDSCustomValidationErrorsComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -182,7 +182,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
-		TDSFieldValidationErrorsComponent
+		TDSCustomValidationErrorsComponent
 	],
 	entryComponents: [
 		DynamicComponent,
