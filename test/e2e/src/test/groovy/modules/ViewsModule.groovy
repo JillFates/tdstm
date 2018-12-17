@@ -14,11 +14,11 @@ class ViewsModule extends Module {
         clearFilterX      {$(".form-control-feedback")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
-        viewsListed       (required: false) {viewListTableBody.find("a")}
+
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
-
+        viewsListed       (required: false) {vwGridRows.find("td:nth-child(3)")}
         deleteButtons     {viewList.find("title": "Click to delete this view")}
         editButtons       {viewList.find("title": "Click to edit this view")}
         createViewButton  {viewModuleContainer.find(".box-tools-actions button", text:containsWord("Create"))}
@@ -107,6 +107,7 @@ class ViewsModule extends Module {
         def element
         def elements
         if(isListed){
+            clearFilterViewByName()
             element=viewsListed.find{el -> el.text()==viewName}
             if(element) found = true
         }else{

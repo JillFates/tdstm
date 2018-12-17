@@ -11,8 +11,7 @@ class ViewPage extends Page{
 
     static at = {
         waitFor {view.displayed}
-        createButton.displayed
-        exportViewButton.displayed
+        waitFor{exportViewButton.displayed}
     }
     static content = {
         view (wait:true) { $("section","class":"page-asset-explorer-config")}
@@ -20,7 +19,7 @@ class ViewPage extends Page{
         clearBtn {$("button", id:"btnClear")}
         createButton {$("button[type=button]", text: "Create")}
         bulkChangeButton {$('#btnBulkChange')}
-        exportViewButton {$("button", id:"btnExport")}
+        exportViewButton {$("button#btnExport")}
         exportModalContainer {$('#tdsUiDialog')}
         fileNameField {exportModalContainer.find("input", id: "fileName")}
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
