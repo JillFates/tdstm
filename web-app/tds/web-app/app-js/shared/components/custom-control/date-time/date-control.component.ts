@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output, forwardRef} from '@angular/core';
+import {Component, forwardRef, OnInit, OnChanges, SimpleChanges} from '@angular/core';
 import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
-
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
 import {TDSCustomControl} from '../common/custom-control.component';
 import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 
 @Component({
 	selector: 'tds-date-control',
@@ -35,19 +35,18 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent extends TDSCustomControl implements OnInit  {
+export class DateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
 	// @Input('value') value: any;
-	@Output() valueChange = new EventEmitter<any>();
-	@Input('required') required = false;
+	// @Output() valueChange = new EventEmitter<any>();
+	// @Input('required') required = false;
 	protected displayFormat: string;
 	protected dateValue: Date;
 
 	constructor(
 		private userPreferenceService: PreferenceService,
-		protected validationRulesFactory: ValidationRulesFactoryService
-	) {
-		super(validationRulesFactory);
-		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
+		protected validationRulesFactory: ValidationRulesFactoryService) {
+			super(validationRulesFactory);
+			this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
 	}
 
 	/**
@@ -69,6 +68,13 @@ export class DateControlComponent extends TDSCustomControl implements OnInit  {
 		} else {
 			this.value = null;
 		}
-		this.valueChange.emit(this.value);
+		// this.valueChange.emit(this.value);
+	}
+
+	ngOnChanges(inputs: SimpleChanges) {
+		const dateConstraints = {
+			required: this.required
+		};
+		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 	}
 }
