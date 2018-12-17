@@ -12,7 +12,7 @@
                     <input class="form-control" id="newItem" type="text" [(ngModel)]="newItem" (keyup.enter)="onAdd()" placeholder="Enter value to add to list">
                 </div>
                 <div class="col-sm-3" style="margin-top: 5px; padding-left: 0px;">
-                    <button name="addButton" class="btn btn-xs" [disabled]="newItem.length === 0" [ngClass]="{'btn-success':newItem.length > 0,'btn-default':newItem.length === 0}" (click)="onAdd()">
+                    <button name="addButton" class="btn btn-xs" [disabled]="newItem.length === 0" [ngClass]="newItem.length > 0 ? 'btn-success':'btn-default'" (click)="onAdd()">
                         <i class="fa fa-plus"></i> {{'GLOBAL.ADD' | translate}}
                     </button>
                     <button name="sortButton" class="btn btn-default btn-xs sort-button" [disabled]="items.length === 0" (click)="toggleSort()">
