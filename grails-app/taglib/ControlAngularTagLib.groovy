@@ -180,7 +180,7 @@ class ControlAngularTagLib {
 				out << renderNumberInput(fieldSpec, attrs.ngmodel, tabIndexInput)
 				break
 			case ControlType.DATE.toString():
-				out << "<tds-date-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				out << renderDateInput(fieldSpec, attrs.ngmodel, tabIndexInput)
 				break
 			case ControlType.DATETIME.toString():
 				out << "<tds-datetime-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
@@ -750,7 +750,33 @@ class ControlAngularTagLib {
 		control.append("  [tabindex]=\"$tabIndex\" ")
 		control.append("  [format]=\"'${transformNumberFormat(fieldSpec)}'\">")
 		control.append("</tds-number-control>")
-		control.append(renderFieldValidationErrors(fieldSpec))
+		control.append(renderCustomValidationErrors(fieldSpec))
+
+		return control.toString()
+	}
+
+	/**
+	 * Generates a String HTML to render the angular control used to represent dates
+	 * parameters passed to the method.
+	 * @param fieldSpec - the map of field specifications
+	 * @param ngmodel - angular variable holding the value
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @return the Angular Tag Component HTML
+	 */
+	private String renderDateInput(Map fieldSpec, String ngmodel, String tabIndex) {
+		def name = fieldSpec.field
+		def required = fieldSpec?.constraints?.required
+
+		StringBuilder control = new StringBuilder("")
+		control.append("<tds-date-control ")
+		control.append("  #field${fieldSpec.field}='ngModel' ")
+		control.append("  [(ngModel)]=\"$ngmodel\" ")
+		control.append("  [value]=\"$ngmodel\" ")
+		control.append("  name=\"$name\" ")
+		control.append("  [required]=\"$required\" ")
+		control.append("  [tabindex]=\"$tabIndex\"> ")
+		control.append("</tds-date-control>")
+		control.append(renderCustomValidationErrors(fieldSpec))
 
 		return control.toString()
 	}
@@ -760,7 +786,7 @@ class ControlAngularTagLib {
 	 * @param fieldSpec - the map of field specifications
 	 * @return the HTML tag to represent the angular control with the properties loaded
 	 */
-	private String renderFieldValidationErrors(Map fieldSpec) {
+	private String renderCustomValidationErrors(Map fieldSpec) {
 		def field = 'field' + fieldSpec?.field
 		def controlLabel = fieldSpec?.label
 
