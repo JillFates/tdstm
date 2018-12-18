@@ -1,10 +1,19 @@
-import {Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
-import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
+import {
+	Component,
+	forwardRef,
+	Input,
+	OnChanges,
+	SimpleChanges
+} from '@angular/core';
+import {
+	NG_VALUE_ACCESSOR,
+	NG_VALIDATORS
+} from '@angular/forms';
 import {isNil} from 'ramda';
 
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {NumberControlHelper} from './number-control.helper';
 import {TDSCustomControl} from '../common/custom-control.component';
-import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 @Component({

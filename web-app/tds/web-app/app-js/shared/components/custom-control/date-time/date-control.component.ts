@@ -1,22 +1,30 @@
-import {Component, forwardRef, OnInit, OnChanges, SimpleChanges} from '@angular/core';
-import {NG_VALUE_ACCESSOR, NG_VALIDATORS} from '@angular/forms';
-import {PreferenceService} from '../../../services/preference.service';
+import {
+	Component,
+	forwardRef,
+	OnInit,
+	OnChanges,
+	SimpleChanges
+} from '@angular/core';
+import {
+	NG_VALUE_ACCESSOR,
+	NG_VALIDATORS
+} from '@angular/forms';
+
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {DateUtils} from '../../../utils/date.utils';
+import {PreferenceService} from '../../../services/preference.service';
 import {TDSCustomControl} from '../common/custom-control.component';
 import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
-import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 
 @Component({
 	selector: 'tds-date-control',
 	template: `
-		<div>
-            <kendo-datepicker [(value)]="dateValue"
-							  [format]="displayFormat"
-							  [tabindex]="tabindex"
-                              (valueChange)="onValueChange($event)"
-							  class="form-control">
-			</kendo-datepicker>
-		</div>
+		<kendo-datepicker [(value)]="dateValue"
+						  [format]="displayFormat"
+						  [tabindex]="tabindex"
+						  (valueChange)="onValueChange($event)"
+						  class="form-control">
+		</kendo-datepicker>
 	`,
 	providers: [
 		{
@@ -36,9 +44,6 @@ import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class DateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
-	// @Input('value') value: any;
-	// @Output() valueChange = new EventEmitter<any>();
-	// @Input('required') required = false;
 	protected displayFormat: string;
 	protected dateValue: Date;
 
@@ -55,7 +60,6 @@ export class DateControlComponent extends TDSCustomControl implements OnInit, On
 	ngOnInit(): void {
 		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
 		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
-		// this.onValueChange(this.dateValue);
 	}
 
 	/**
@@ -68,7 +72,6 @@ export class DateControlComponent extends TDSCustomControl implements OnInit, On
 		} else {
 			this.value = null;
 		}
-		// this.valueChange.emit(this.value);
 	}
 
 	ngOnChanges(inputs: SimpleChanges) {
