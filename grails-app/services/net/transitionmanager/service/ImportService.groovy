@@ -2201,7 +2201,8 @@ class ImportService implements ServiceMethods {
 							return option
 						}
 					}
-					'Unknown'
+					// If no existing option matched the given value, return 'Unknowm'.
+					return 'Unknown'
 				}
 
 				for (int r = 1; r <= dependencySheetRow ; r++) {
