@@ -9,12 +9,10 @@ let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 
 module.exports = function (env) {
 
-	let devEnv = (env !== 'prod');
-
-	console.log('Production Environment: ' + (!devEnv));
+	console.log('Development Environment');
 
 	return {
-		mode: 'production',
+		mode: 'development',
 		entry: {
 			app: './web-app/app-js/main.ts',
 			polyfills: './web-app/app-js/polyfills.ts',
@@ -39,7 +37,7 @@ module.exports = function (env) {
 		},
 		plugins: [
 			new webpack.DefinePlugin({
-				'process.env.NODE_ENV': '"production"'
+				NODE_ENV: '"development"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
 				filename: '[name].js.map'
@@ -65,7 +63,7 @@ module.exports = function (env) {
 		},
 		cache: true,
 		context: __dirname,
-		watch: devEnv,
+		watch: true,
 		watchOptions: {
 			ignored: /node_modules/,
 			aggregateTimeout: 300,
