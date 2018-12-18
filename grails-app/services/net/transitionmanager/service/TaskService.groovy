@@ -667,8 +667,6 @@ class TaskService implements ServiceMethods {
 				addNote(task, whom, "Task was Terminated")
 				break
 		}
-
-		task.save(flush: true)
 		return task
 	}
 
