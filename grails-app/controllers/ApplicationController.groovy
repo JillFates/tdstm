@@ -121,7 +121,7 @@ class ApplicationController implements ControllerMethods {
 		Map queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
-				(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+				(SELECT if (count(ac_task.comment_type) = 0, 'noTasks','tasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
 				(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
 				me.move_event_id AS event, ''')
 
