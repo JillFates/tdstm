@@ -15,7 +15,7 @@ class DependenciesPage extends Page {
 
     static content = {
         dependenciesPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        dependenciesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        dependenciesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         assetsModule { module AssetsModule}
         commonsModule { module CommonsModule }
     }

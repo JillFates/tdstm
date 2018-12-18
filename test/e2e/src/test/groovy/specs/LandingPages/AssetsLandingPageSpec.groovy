@@ -76,7 +76,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Applications Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Applications")
+            verifyViewTitle("Application List")
     }
 
     def "5. Verify the Devices Landing Page"() {
@@ -85,7 +85,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Devices Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Devices")
+            verifyViewTitle("Device List")
     }
 
     def "6. Verify the Servers Landing Page"() {
@@ -94,7 +94,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Servers Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Servers")
+            verifyViewTitle("Server List")
     }
 
     def "7. Verify the Databases Landing Page"() {
@@ -103,7 +103,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Databases Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Databases")
+            verifyViewTitle("Database List")
     }
 
     def "8. Verify the Storage Devices Landing Page"() {
@@ -112,7 +112,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Storage Devices Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Storage - Physical")
+            verifyViewTitle("Storage Device List")
     }
 
     def "9. Verify the Storage Logical Landing Page"() {
@@ -121,7 +121,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Storage Logical Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("All Storage - Virtual")
+            verifyViewTitle("Logical Storage List")
     }
 
     def "10. Verify the Dependencies Landing Page"() {
