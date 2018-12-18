@@ -10,7 +10,7 @@ import {
 } from '../../service/data-script.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST } from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -70,6 +70,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private importAssetsService: ImportAssetsService,
+		private preferenceService: PreferenceService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
 			super('#etlBuilder');
@@ -81,6 +82,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	ngAfterViewInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
+		this.preferenceService.getDataScriptDesignerSize()
+			.subscribe((size: {width: number, height: number}) => {
+				size.width = size.width >= window.innerWidth - 5 ? window.innerWidth : size.width;
+				size.height = size.height >= window.innerHeight - 5 ? window.innerHeight : size.height;
+				this.isWindowMaximized = (size.height === window.innerHeight && size.width === window.innerWidth);
+			});
+
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
