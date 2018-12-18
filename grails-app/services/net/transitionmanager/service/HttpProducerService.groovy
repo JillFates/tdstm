@@ -79,7 +79,10 @@ class HttpProducerService {
 //    private static final String DEFAULT_HTTP_METHOD = HttpMethod.GET.name()
     private static final String DEFAULT_CONTENT_TYPE_HEADER = MediaType.APPLICATION_JSON_VALUE
     private static final String DEFAULT_ACCEPT_HEADER = MediaType.APPLICATION_JSON_VALUE
-    private static final int DEFAULT_REQUEST_TIMEOUT = -1
+    private static final int MILLISECOND = 1000
+    private static final int DEFAULT_HTTP_CONNECTION_TIMEOUT = 60
+    private static final int DEFAULT_HTTP_REQUEST_TIMEOUT = 120
+    private static final int DEFAULT_HTTP_RESPONSE_TIMEOUT = 600
     private static final Charset DEFAULT_CHARSET = Consts.UTF_8
     private static final String RESPONSE_TEMPORARY_FILENAME_PREFIEX = 'APIActionResponse'
     private static final String DEFAULT_TDSTM_TMP_RESPONSE_FILENAME_HEADER  = 'X-TDSTM-TMP-RESPONSE-FILENAME'
@@ -523,9 +526,10 @@ class HttpProducerService {
      */
     @Transactional(noRollbackFor = [RuntimeException])
     private HttpResponse executeHttpCall(ActionRequest actionRequest) {
-        RequestConfig.Builder requestBuilder = RequestConfig.custom().setConnectTimeout(DEFAULT_REQUEST_TIMEOUT)
-                .setConnectionRequestTimeout(DEFAULT_REQUEST_TIMEOUT)
-                .setSocketTimeout(DEFAULT_REQUEST_TIMEOUT);
+        RequestConfig.Builder requestBuilder = RequestConfig.custom()
+                .setConnectTimeout(DEFAULT_HTTP_CONNECTION_TIMEOUT * MILLISECOND)
+                .setConnectionRequestTimeout(DEFAULT_HTTP_REQUEST_TIMEOUT * MILLISECOND)
+                .setSocketTimeout(DEFAULT_HTTP_RESPONSE_TIMEOUT * MILLISECOND);
 
         ActionHttpRequestElements httpElements = new ActionHttpRequestElements(actionRequest)
         HttpMethod httpMethod = HttpMethod.valueOf(actionRequest.headers.get(HTTP_METHOD))
