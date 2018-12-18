@@ -18,6 +18,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.WorkbookUtil
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
@@ -2191,13 +2192,13 @@ class ImportService implements ServiceMethods {
 					dependencySkipped--
 				}
 
-				List<AssetOptions> assetDepTypeList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-				List<AssetOptions> assetDepStatusList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+				List<String> assetDepTypeList = AssetUtils.getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+				List<String> assetDepStatusList = AssetUtils.getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
-				def lookupValue = { String value, List<AssetOptions> list ->
-					for (it in list) {
-						if (it.equalsIgnoreCase(value)) {
-							return it
+				def lookupValue = { String value, List<String> assetOptions ->
+					for (option in assetOptions) {
+						if (option.equalsIgnoreCase(value)) {
+							return option
 						}
 					}
 					'Unknown'
