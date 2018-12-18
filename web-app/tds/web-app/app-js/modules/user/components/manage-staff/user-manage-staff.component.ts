@@ -15,6 +15,8 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public editing;
 	public currentTab;
 	public availableTeamNames;
+	public salaryOptions;
+	public activeOptions;
 	private teamKeys;
 	private savedPersonModel;
 
@@ -26,6 +28,8 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		@Inject('id') private id) {
 		super('#user-manage-staff-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
+		this.salaryOptions = ['Contractor','Hourly','Salary'];
+		this.activeOptions = ['Y', 'N'];
 		this.loadComponentModel();
 		this.editing = false;
 		this.teamKeys = {};

@@ -26,9 +26,7 @@
                                     </tr>
 
                                     <tr class="prop">
-                                        <td valign="top" class="name">
-                                            <span>First Name:&nbsp;</span>
-                                        </td>
+                                        <td valign="top" class="name"><span>First Name:</span></td>
                                         <td valign="top" class="value" style="width: 40px">
                                             <span *ngIf="!editing" class="personShow" id="firstNameId" class="asset_details_block_task">{{personModel.firstName}}</span>
                                             <input *ngIf="editing" name="firstName" [(ngModel)]="personModel.firstName"/>
@@ -97,7 +95,7 @@
                                                     *ngIf="editing"
                                                     name="active"
                                                     [(ngModel)]="personModel.active"
-                                                    [data]="['Y','N']">
+                                                    [data]="activeOptions">
                                             </kendo-dropdownlist>
                                         </td>
                                     </tr>
@@ -130,7 +128,7 @@
                                                     *ngIf="editing"
                                                     name="staffType"
                                                     [(ngModel)]="personModel.staffType"
-                                                    [data]="['Contractor','Hourly','Salary']">
+                                                    [data]="salaryOptions">
                                             </kendo-dropdownlist>
                                         </td>
                                     </tr>
