@@ -13,6 +13,7 @@ module.exports = function (env) {
 
 	return {
 		mode: 'development',
+		devtool: false,
 		entry: {
 			app: './web-app/app-js/main.ts',
 			polyfills: './web-app/app-js/polyfills.ts',
@@ -40,12 +41,13 @@ module.exports = function (env) {
 				NODE_ENV: '"development"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map'
+				filename: '[name].js.map',
+				exclude: ['vendor.js', 'polyfills.js']
 			}),
 			new webpack.ContextReplacementPlugin(
 				/\@angular(\\|\/)core(\\|\/)esm5/,
 				path.resolve(__dirname, "app-js")
-			),
+			)
 			// Uncomment if you want to take a peek to the structure of dependencies
 			// new BundleAnalyzerPlugin()
 		],
