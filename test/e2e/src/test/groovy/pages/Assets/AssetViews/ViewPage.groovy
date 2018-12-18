@@ -11,7 +11,6 @@ class ViewPage extends Page{
 
     static at = {
         waitFor {view.displayed}
-        createButton.displayed
         exportViewButton.displayed
     }
     static content = {
