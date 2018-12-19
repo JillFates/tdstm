@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-
 /**
  *
  * ETLProcess exception used in DSL processing
@@ -258,6 +257,9 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unrecognized argument '${argument}', was expecting 'with'")
     }
 
+    static ETLProcessorException invalidDomainForComments(ETLDomain domain) {
+        new ETLProcessorException("The 'comments' property is not supported for the current domain $domain")
+    }
 
     static ETLProcessorException unrecognizedArguments() {
         new ETLProcessorException("unrecognized argument")
