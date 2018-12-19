@@ -1,14 +1,48 @@
 package net.transitionmanager.asset
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import com.tds.asset.AssetOptions
 
+@CompileStatic
 class AssetUtils {
+
+	/*
+	 * Default value for AssetDependency.status field
+	 */
+	static final ASSET_OPTION_DEPENDENCY_STATUS_DEFAULT = 'Unknown'
+
+	/*
+	 * Default value for AssetDependency.type field
+	 */
+	static final ASSET_OPTION_DEPENDENCY_TYPE_DEFAULT = 'Unknown'
+
+	/*
+	 * Default value for AssetEntity.priority field
+	 */
+	static final ASSET_OPTION_PRIORITY_DEFAULT = '3'
+
+	/*
+	 * Default value for AssetEntity.status field
+	 */
+	static final ASSET_OPTION_STATUS_DEFAULT = com.tdsops.tm.enums.domain.AssetEntityPlanStatus.UNASSIGNED
+
+	/*
+	 * Default value for AssetEntity.environment field
+	 */
+	static final ASSET_OPTION_ENVIRONMENT_DEFAULT = 'Unknown'
+
+	/*
+	 * Default value for AssetEntity.assetType field
+	 */
+	static final ASSET_OPTION_TYPE_DEFAULT = com.tds.asset.AssetType.SERVER.toString()
 
 	/**
 	 * Create and return a list with the values for all the AssetOptions with the given type.
 	 * @param assetOptionsType - type of options
 	 * @return a list with only the value for each AssetOptions found.
 	 */
+	@CompileStatic(TypeCheckingMode.SKIP)
 	static List<String> getAssetOptionsValues(AssetOptions.AssetOptionsType assetOptionsType) {
 		return AssetOptions.where {
 			type == assetOptionsType
@@ -47,6 +81,24 @@ class AssetUtils {
 	 */
 	static List<String> getDependencyStatusOptions() {
 		return getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+	}
+
+	/**
+	 * Used to find the matching AssetOption value case using a case insensitive search
+	 * @param value - the value to lookup
+	 * @param assetOptions - the list of AssetOption codes
+	 * @param defaultWhenNotFound
+	 * @return the case sensitive code when found otherwise the defaultWhenNotFound value
+	 */
+	@CompileStatic
+	static String matchAssetOptionCaseInsensitive(String value, List<String> assetOptions, String defaultWhenNotFound = null) {
+		for (String option in assetOptions) {
+			if (option.equalsIgnoreCase(value)) {
+				return option
+			}
+		}
+		// If no existing option matched the given value, return 'Unknown'.
+		return defaultWhenNotFound
 	}
 
 }
