@@ -65,9 +65,9 @@ import { AkaComponent } from './components/aka/aka.component';
 import { PasswordChangeComponent } from './components/password-change/password-change.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
-import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
-import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
-import { NumberControlComponent } from './components/custom-control/number/number-control.component';
+import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
+import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
+import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
 import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
@@ -128,9 +128,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		ConnectorComponent,
 		FieldReferencePopupComponent,
 		PasswordChangeComponent,
-		DateTimeControlComponent,
-		NumberControlComponent,
-		DateControlComponent,
+		TDSDateTimeControlComponent,
+		TDSNumberControlComponent,
+		TDSDateControlComponent,
 		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
@@ -174,9 +174,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PopupModule,
 		FieldReferencePopupComponent,
 		PasswordChangeComponent,
-		DateTimeControlComponent,
-		NumberControlComponent,
-		DateControlComponent,
+		TDSDateTimeControlComponent,
+		TDSNumberControlComponent,
+		TDSDateControlComponent,
 		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,

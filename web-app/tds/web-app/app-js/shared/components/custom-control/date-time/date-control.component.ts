@@ -31,12 +31,12 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
-			useExisting: forwardRef(() => DateControlComponent),
+			useExisting: forwardRef(() => TDSDateControlComponent),
 			multi: true
 		},
 		{
 			provide: NG_VALIDATORS,
-			useExisting: forwardRef(() => DateControlComponent),
+			useExisting: forwardRef(() => TDSDateControlComponent),
 			multi: true
 		}
 	]
@@ -45,7 +45,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
+export class TDSDateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
 	protected displayFormat: string;
 	protected dateValue: Date;
 

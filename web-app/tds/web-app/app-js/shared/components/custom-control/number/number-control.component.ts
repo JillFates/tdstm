@@ -36,17 +36,17 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
-			useExisting: forwardRef(() => NumberControlComponent),
+			useExisting: forwardRef(() => TDSNumberControlComponent),
 			multi: true
 		},
 		{
 			provide: NG_VALIDATORS,
-			useExisting: forwardRef(() => NumberControlComponent),
+			useExisting: forwardRef(() => TDSNumberControlComponent),
 			multi: true
 		}
 	]
 })
-export class NumberControlComponent extends TDSCustomControl implements OnChanges {
+export class TDSNumberControlComponent extends TDSCustomControl implements OnChanges {
 	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
 	@Input('precision') precision = 0;
 	@Input('max') max: number;
