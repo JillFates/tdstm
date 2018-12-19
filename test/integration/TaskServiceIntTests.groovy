@@ -1,6 +1,7 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
@@ -13,6 +14,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -24,6 +26,7 @@ import java.util.concurrent.Future
 
 class TaskServiceIntTests extends IntegrationSpec {
 
+    CustomDomainService customDomainService
     TaskService taskService
     AssetTestHelper assetTestHelper
     PersonTestHelper personTestHelper
@@ -205,5 +208,73 @@ class TaskServiceIntTests extends IntegrationSpec {
                 }
             }
             ['Ready', 'Ready'] == results
+    }
+
+
+
+    void 'addWhereConditionsForFieldSpecs'() {
+        setup: 'create a project and load the fieldspecs'
+            Project project = Project.read(Project.DEFAULT_PROJECT_ID)
+            List<Map> fieldSpecs = customDomainService.fieldSpecs(project, AssetClass.DEVICE.toString(), CustomDomainService.ALL_FIELDS, ['field', 'label'])
+            Map whereParams = [:]
+            String whereSql = ''
+            Map filter = [
+                class: 'device',
+                asset: [
+                        os: '%win%'
+                ]
+            ]
+
+        when: 'calling addWhereConditionsForFieldSpecs for a field name'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'a LIKE statement should be generated'
+            'a.os LIKE :os' == whereSql
+        and: 'the OS query parameter should be added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+
+
+        when: 'filter has the asset virtual criteria'
+            filter.asset.put('virtual', true)
+            whereSql = ''
+            whereParams = [:]
+        and: 'calling with no previous where'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the query will not have virtual'
+            'a.os LIKE :os' == whereSql
+        and: 'the os parameter was added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+
+        when: 'filter has the field and label based criteria'
+            filter.asset = [
+                os: '%win%',
+                Name: '%prod'
+            ]
+            whereSql = ''
+            whereParams = [:]
+        and: 'calling with no previous where'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the query should have both criteria'
+            'a.assetName LIKE :assetName and a.os LIKE :os' == whereSql
+        and: 'the parameters should have both parameters added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+            whereParams.containsKey('assetName')
+            whereParams.get('assetName') == '%prod'
+
+        when: 'a filter is applied after other where logic was performed'
+            filter.asset = [
+                Description: 'abc'
+            ]
+        and: 'addWhereConditionsForFieldSpecs is called'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the where statement should have the Description criteria added'
+            'a.assetName LIKE :assetName and a.os LIKE :os and a.description = :description' == whereSql
+        and: 'the whereParams map has the 3rd parameter'
+            whereParams.get('os') == '%win%'
+            whereParams.get('assetName') == '%prod'
+            whereParams.get('description') == 'abc'
+
     }
 }
