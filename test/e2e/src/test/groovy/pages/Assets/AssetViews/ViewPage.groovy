@@ -11,7 +11,7 @@ class ViewPage extends Page{
 
     static at = {
         waitFor {view.displayed}
-        waitFor{exportViewButton.displayed}
+        exportViewButton.displayed
     }
     static content = {
         view (wait:true) { $("section","class":"page-asset-explorer-config")}
