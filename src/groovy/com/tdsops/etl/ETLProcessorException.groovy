@@ -258,7 +258,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidDomainForComments(ETLDomain domain) {
-        new ETLProcessorException("Invalid domain: '$domain' for comments. It should be in Asset hierarchy")
+        new ETLProcessorException("The 'comments' property is not supported for the current domain $domain")
     }
 
     static ETLProcessorException unrecognizedArguments() {
