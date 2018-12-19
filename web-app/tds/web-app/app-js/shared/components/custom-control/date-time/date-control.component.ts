@@ -20,7 +20,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 	selector: 'tds-date-control',
 	template: `
 		<kendo-datepicker
-			[(value)]="dateValue"
+			[value]="dateValue"
 			(blur)="onTouched()"
 			[format]="displayFormat"
 			[tabindex]="tabindex"

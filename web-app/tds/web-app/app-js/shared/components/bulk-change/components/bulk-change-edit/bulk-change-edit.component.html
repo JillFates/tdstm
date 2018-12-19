@@ -80,21 +80,23 @@
 
                                     <!-- Number Fields -->
                                     <tds-number-control *ngIf="canShowControl('Number', rowIndex)"
-                                                        [(value)]="editRows.selectedValues[rowIndex].value"
+                                                        [name]="'controlNumber' + rowIndex"
+                                                        [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                                         [format]="editRows.selectedValues[rowIndex].field.constraints?.format"
                                                         [min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
                                                         [max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
                                     </tds-number-control>
 
                                     <!-- Date Fields -->
-                                    <tds-date-control
-										*ngIf="canShowControl('Date', rowIndex)"
-                                        [(value)]="editRows.selectedValues[rowIndex].value">
+                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
+										[name]="'controlDate' + rowIndex"
+										[(ngModel)]="editRows.selectedValues[rowIndex].value">
 									</tds-date-control>
 
                                     <!-- Datetime Fields -->
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
-                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
+                                         [name]="'controlDateTime' + rowIndex"
+                                         [(ngModel)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
 
                                     <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist

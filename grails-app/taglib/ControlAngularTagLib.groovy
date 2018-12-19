@@ -384,7 +384,7 @@ class ControlAngularTagLib {
 			def field = 'field' + fieldSpec.field
 
 			return "<div class=\"error\" *ngIf=\"form && (form.submitted && ${field} && !${field}.valid) || " +
-					" (${field}.dirty && !${field}.valid)\">${fieldSpec.label} is required</div>"
+					" (${field}.dirty && !${field}.valid)\">* ${fieldSpec.label} is required</div>"
 		}
 		return ''
 	}

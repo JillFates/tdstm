@@ -23,7 +23,8 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 		<kendo-numerictextbox
 			[autoCorrect]="autoCorrect"
 			class="form-control"
-			[format]="format"
+			[decimals]="precision"
+			[format]="numberFormat"
 			(blur)="onTouched()"
 			[max]="max"
 			[min]="min"
@@ -47,7 +48,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 })
 export class NumberControlComponent extends TDSCustomControl implements OnChanges {
 	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
-	@Input('precision') precision: number;
+	@Input('precision') precision = 0;
 	@Input('max') max: number;
 	@Input('min') min: number;
 	@Input('allowNegative') allowNegative: boolean;
@@ -80,6 +81,11 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 		// if the value is null or undefined leave it as it is
 		// just if it has valid value do the conversion
 		return isNil(this.value)  ? this.value :  Number(this.value);
+	}
+
+	// Kendo format used to define the number of decimal positions
+	get numberFormat() {
+		return this.precision ? `n${this.precision}`  : 'n'
 	}
 
 }
