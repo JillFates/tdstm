@@ -7,7 +7,6 @@ import {pathOr} from 'ramda';
 interface ErrorConstraints {
 	required?: boolean;
 }
-// TODO internationalize texts
 @Component({
 	selector: 'tds-custom-validation-errors',
 	template: `
@@ -22,7 +21,7 @@ interface ErrorConstraints {
 	`
 })
 export class TDSCustomValidationErrorsComponent {
-	@Input() label = '';
+	@Input() label = 'Field';
 	@Input() submitted = false;
 	@Input() touched = false;
 	@Input() valid = false;

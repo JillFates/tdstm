@@ -9,7 +9,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="modal-body-container full-height">
-					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment full-height">
+					<form name="form" role="form" data-toggle="validator" #form='ngForm' novalidate class="form-horizontal left-alignment full-height">
 						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected] }}</label>
 						<kendo-grid
 								*ngIf="gridSettings"
@@ -86,17 +86,39 @@
                                                         [min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
                                                         [max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
                                     </tds-number-control>
+	                                <tds-custom-validation-errors
+			                                *ngIf="getFormField(form,'controlNumber' + rowIndex); let numberField"
+			                                [errors]="numberField.errors"
+			                                [valid]="numberField.valid"
+			                                [touched]="numberField.touched"
+			                                [dirty]="numberField.dirty">
+	                                </tds-custom-validation-errors>
 
                                     <!-- Date Fields -->
                                     <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
 										[name]="'controlDate' + rowIndex"
 										[(ngModel)]="editRows.selectedValues[rowIndex].value">
 									</tds-date-control>
+	                                <tds-custom-validation-errors
+			                                *ngIf="getFormField(form,'controlDate' + rowIndex); let dateField"
+			                                [errors]="dateField.errors"
+			                                [valid]="dateField.valid"
+			                                [touched]="dateField.touched"
+			                                [dirty]="dateField.dirty">
+	                                </tds-custom-validation-errors>
 
                                     <!-- Datetime Fields -->
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
                                          [name]="'controlDateTime' + rowIndex"
-                                         [(ngModel)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
+                                         [(ngModel)]="editRows.selectedValues[rowIndex].value">
+                                    </tds-datetime-control>
+	                                <tds-custom-validation-errors
+			                                *ngIf="getFormField(form,'controlDateTime' + rowIndex); let dateTimeField"
+			                                [errors]="dateTimeField.errors"
+			                                [valid]="dateTimeField.valid"
+			                                [touched]="dateTimeField.touched"
+			                                [dirty]="dateTimeField.dirty">
+	                                </tds-custom-validation-errors>
 
                                     <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist
@@ -143,7 +165,7 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left" (click)="onNext()" [disabled]="!isAllInputEntered()">
+				<button type="button" class="btn btn-primary pull-left" (click)="onNext()" [disabled]="!form.valid || !isAllInputEntered()">
 					<span class="glyphicon glyphicon-step-forward"></span> Next
 				</button>
 
