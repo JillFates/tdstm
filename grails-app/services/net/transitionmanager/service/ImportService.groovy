@@ -18,6 +18,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.WorkbookUtil
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import grails.transaction.Transactional
+import groovy.transform.CompileStatic
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -2191,16 +2193,17 @@ class ImportService implements ServiceMethods {
 					dependencySkipped--
 				}
 
-				List<AssetOptions> assetDepTypeList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-				List<AssetOptions> assetDepStatusList = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+				List<String> assetDepTypeList = AssetUtils.getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+				List<String> assetDepStatusList = AssetUtils.getAssetOptionsValues(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
-				def lookupValue = { String value, List<AssetOptions> list ->
-					for (it in list) {
-						if (it.equalsIgnoreCase(value)) {
-							return it
+				def lookupValue = { String value, List<String> assetOptions ->
+					for (option in assetOptions) {
+						if (option.equalsIgnoreCase(value)) {
+							return option
 						}
 					}
-					'Unknown'
+					// If no existing option matched the given value, return 'Unknowm'.
+					return 'Unknown'
 				}
 
 				for (int r = 1; r <= dependencySheetRow ; r++) {
@@ -2336,7 +2339,6 @@ class ImportService implements ServiceMethods {
 
 					boolean isNew = false
 					if (!assetDep) {
-
 						// Try finding the dependency by the asset and the dependent
 						assetDep = AssetDependency.findByAssetAndDependent(asset, dependent)
 
@@ -2355,23 +2357,37 @@ class ImportService implements ServiceMethods {
 						assetDep.asset = asset
 						assetDep.dependent = dependent
 
-						def tmpType = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")
-						def luv = lookupValue(tmpType, assetDepTypeList)
-						if (tmpType && tmpType != 'Unknown' && luv == 'Unknown') {
-							dependencyError "Invalid Type specified ($tmpType) for row $rowNum"
-							continue
+						// Process the type property
+						String typeFromSheet = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")?.trim()
+						if (typeFromSheet) {
+							String matchedOption = AssetUtils.matchAssetOptionCaseInsensitive(typeFromSheet, assetDepTypeList)
+							if (matchedOption) {
+								assetDep.type = matchedOption
+							} else {
+								dependencyError "Invalid Type specified ($typeFromSheet) for row $rowNum"
+								continue
+							}
+						} else {
+							if (isNew) {
+								assetDep.type = AssetUtils.ASSET_OPTION_DEPENDENCY_TYPE_DEFAULT
+							}
 						}
-						assetDep.type = luv
 
-						// TODO : JPM 5/2016 : the status should probably have the same default value as the tmpType above
-						def tmpStatus = WorkbookUtil.getStringCellValue(dependencySheet,10, r, "").replace("'","\\'") ?:
-								(isNew ? "Unknown" : assetDep.status)
-						luv = lookupValue(tmpStatus, assetDepStatusList)
-						if (tmpStatus != 'Unknown' && luv == 'Unknown') {
-							dependencyError "Invalid Status specified ($tmpStatus) for row $rowNum"
-							continue
+						// Process the status property
+						String statusFromSheet = WorkbookUtil.getStringCellValue(dependencySheet,10, r, "").replace("'","\\'")?.trim()
+						if (statusFromSheet) {
+							String matchedOption = AssetUtils.matchAssetOptionCaseInsensitive(statusFromSheet, assetDepStatusList)
+							if (matchedOption) {
+								assetDep.status = matchedOption
+							} else {
+								dependencyError "Invalid Status specified ($statusFromSheet) for row $rowNum"
+								continue
+							}
+						} else {
+							if (isNew) {
+								assetDep.status = AssetUtils.ASSET_OPTION_DEPENDENCY_STATUS_DEFAULT
+							}
 						}
-						assetDep.status = luv
 
 						if (StringUtils.isNotEmpty(WorkbookUtil.getStringCellValue(dependencySheet, 8, r, ""))) {
 							assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "", true)
