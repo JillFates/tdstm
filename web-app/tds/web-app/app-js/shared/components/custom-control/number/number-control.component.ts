@@ -18,15 +18,13 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 
 @Component({
 	selector: 'tds-number-control',
-	host: {
-		'(blur)': 'onTouched()'
-	},
 	styles: [``],
 	template: `
 		<kendo-numerictextbox
 			[autoCorrect]="autoCorrect"
 			class="form-control"
 			[format]="format"
+			(blur)="onTouched()"
 			[max]="max"
 			[min]="min"
 			[tabindex]="tabindex"
@@ -73,6 +71,7 @@ export class NumberControlComponent extends TDSCustomControl implements OnChange
 
 	onValueChange(value: number): void {
 		this.value = value;
+		this.onTouched();
 	}
 
 	// Kendo doesn't allow to use a string for the kendo number control,

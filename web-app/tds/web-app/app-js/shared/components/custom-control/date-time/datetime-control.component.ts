@@ -19,11 +19,13 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 @Component({
 	selector: 'tds-datetime-control',
 	template: `
-		<kendo-datepicker [value]="dateValue"
-						  [format]="displayFormat"
-						  [tabindex]="tabindex"
-						  (valueChange)="onValueChange($event)"
-						  class="form-control">
+		<kendo-datepicker
+			[value]="dateValue"
+			(blur)="onTouched()"
+			[format]="displayFormat"
+			[tabindex]="tabindex"
+			(valueChange)="onValueChange($event)"
+			class="form-control">
 		</kendo-datepicker>
 	`,
 	providers: [
@@ -75,6 +77,7 @@ export class DateTimeControlComponent extends TDSCustomControl implements OnInit
 		} else {
 			this.value = null;
 		}
+		this.onTouched();
 	}
 
 	ngOnChanges(inputs: SimpleChanges) {

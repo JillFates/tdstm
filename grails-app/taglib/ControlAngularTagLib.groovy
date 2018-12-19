@@ -822,6 +822,7 @@ class ControlAngularTagLib {
 		control.append("   [errors]='${field}.errors' ")
 		control.append("   [submitted]='form && form.submitted' ")
 		control.append("   [valid]='${field}.valid' ")
+		control.append("   [touched]='${field}.touched' ")
 		control.append("   [dirty]='${field}.dirty' >")
 		control.append("</tds-custom-validation-errors>")
 

@@ -24,12 +24,13 @@ interface ErrorConstraints {
 export class TDSCustomValidationErrorsComponent {
 	@Input() label = '';
 	@Input() submitted = false;
+	@Input() touched = false;
 	@Input() valid = false;
 	@Input() dirty = false;
 	@Input('errors') errors: ErrorConstraints = {};
 
 	// Determine if the field has errors
 	get hasErrors(): boolean {
-		return  (this.submitted &&  !this.valid) || (this.dirty && !this.valid);
+		return  (this.submitted &&  !this.valid) || (this.touched && this.dirty && !this.valid);
 	}
 }
