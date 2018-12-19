@@ -30,7 +30,7 @@ enum UserPreferenceEnum {
 	DRAGGABLE_RACK('Draggable Rack'),
 	HIGHLIGHT_TASKS('Task Hightlight'),
 	ImportApplication,
-	IMPORT_BATCH_LIST_SIZE('Import Batch Record Filter'),
+	IMPORT_BATCH_LIST_SIZE('Import Batch List Size'),
 	IMPORT_BATCH_RECORDS_FILTER('Import Batch Record Filter'),
 	ImportCabling,
 	ImportComment,
