@@ -71,6 +71,7 @@ import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
+import {TDSActionButton} from './components/button/action-button.component';
 
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
@@ -132,7 +133,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
-		BulkChangeEditComponent
+		BulkChangeEditComponent,
+		TDSActionButton
 	],
 	exports: [
 		UILoaderDirective,
@@ -177,7 +179,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
-		BulkChangeActionsComponent
+		BulkChangeActionsComponent,
+		TDSActionButton
 	],
 	entryComponents: [
 		DynamicComponent,

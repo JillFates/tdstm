@@ -34,6 +34,7 @@ export class TDSActionButton implements OnInit {
 		if (!this.button) {
 			throw new Error(`Unable to create button ${buttonSelector}`);
 		}
+
 		this.titleButton = this.title || this.button.title;
 	}
 }
