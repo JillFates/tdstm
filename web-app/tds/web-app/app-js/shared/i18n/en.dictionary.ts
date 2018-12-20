@@ -189,6 +189,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',
+		'CREATE_LICENSE': 'Create License',
 		'GLOBAL': 'Global',
 		'SINGLE': 'Single',
 		'MANAGER': 'License Manager',
