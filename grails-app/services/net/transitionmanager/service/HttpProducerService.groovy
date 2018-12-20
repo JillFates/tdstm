@@ -577,7 +577,7 @@ class HttpProducerService {
             }
 
             // fetch a fresh copy of the credentials to have access to password and salt when needed
-            Credential credential = credentialService.findById(actionRequest.options.credentials.id)
+            Credential credential = credentialService.findById(actionRequest.options.credentials.id, actionRequest.options.projectId)
             switch (credential.authenticationMethod) {
                 case AuthenticationMethod.BASIC_AUTH:
                     Credentials credentials = new UsernamePasswordCredentials(credential.username, credentialService.decryptPassword(credential))
@@ -645,7 +645,13 @@ class HttpProducerService {
 
         // create a temporary file with the http response input stream
         def (String tmpFilename, OutputStream os) = fileSystemService.createTemporaryFile(RESPONSE_TEMPORARY_FILENAME_PREFIEX)
-        IOUtils.copy(closeableHttpResponse?.entity?.content, os)
+
+        // check whether http response has content
+        // this case is valid when Http STATUS code is 204 (No Content), so the verification is to prevent
+        // copying an null InputStream into a OutputStream which throws an error
+        if (closeableHttpResponse?.entity?.content != null) {
+            IOUtils.copy(closeableHttpResponse?.entity?.content, os)
+        }
         os.flush()
         os.close()
 
