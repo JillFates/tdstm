@@ -73,7 +73,7 @@
 					var editButton = '';
 					if (${canEditComments})
 						editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
-							"<asset:image src="icons/comment_edit.png' border='0px'/>"+"</a>"
+							'<asset:image src='icons/comment_edit.png' border='0px'/></a>'
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject) {

@@ -138,7 +138,7 @@
 							</td>
                             <g:if test="${projectLogoForProject}">
                                 <td class="valueNW" id="imageLogo">
-                                    <a onClick="deleteImage()"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></a>
+                                    <a onClick="deleteImage()"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><asset:image src="icons/delete.png" style="border:0px;padding:6px;"/></a>
                                 </td>
                             </g:if>
                             <g:hiddenField name="isLogoDeleted" value="false"/>

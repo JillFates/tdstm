@@ -17,7 +17,7 @@
 		<jqgrid:resources />
 		<g:javascript src="admin.js" />
 		<g:javascript src="projectStaff.js" />
-		<g:javascript src="person.js" />
+		<asset:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
 		<g:javascript src="asset.comment.js" />
 		<script type="text/javascript">
@@ -79,7 +79,7 @@
 					<g:if test="${isActive != 'N'}">
 						<tds:hasPermission permission="${Permission.UserUnlock}">
 							if (cellVal.lockedOutUntil && cellVal.lockedOutTime.charAt(0) != '-')
-								unlockButton += "<asset:image src="icons/lock_delete.png' border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
+								unlockButton += "<img tm-unlock-account src=" + '${assetPath(src:'icons/lock_delete.png')}'+"border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
 						</tds:hasPermission>
 					</g:if>
 					return unlockButton;
