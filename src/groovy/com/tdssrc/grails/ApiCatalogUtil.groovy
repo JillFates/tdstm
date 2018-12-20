@@ -4,7 +4,7 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey as ACDK
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
-import net.transitionmanager.connector.DictionaryItem
+import net.transitionmanager.agent.DictionaryItem
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
