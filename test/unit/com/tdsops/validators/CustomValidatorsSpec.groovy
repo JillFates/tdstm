@@ -91,8 +91,8 @@ class CustomValidatorsSpec extends Specification {
 		when: 'Apply a validation'
 			validator.call(dataDummy, app, errors)
 
-		then: 'No Errors'
-			1 * errors.rejectValue(*_)
+		then: 'Has an error validating the Number'
+			1 * errors.rejectValue('custom1', 'typeMismatch.java.lang.Long', [null], '')
 
 	}
 
@@ -113,8 +113,8 @@ class CustomValidatorsSpec extends Specification {
 		when: 'Apply a validation'
 			validator.call(dataDummy, app, errors)
 
-		then: 'No Errors'
-			1 * errors.rejectValue(*_)
+		then: 'Has an error validating the Yes/No field'
+			1 * errors.rejectValue('custom3', 'field.invalid.notInListOrBlank', ['Wrong YES NO', null, 'Yes, No'], '')
 
 	}
 
