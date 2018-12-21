@@ -3,21 +3,26 @@ export interface TDSButton {
 	title: string;
 }
 
+export enum TDSActionsButton {
+	AssetEdit,
+	AssetClone,
+	TaskCreate,
+	TaskList,
+	CommentCreate,
+	CommentList
+}
+
 const registeredButtons: {[key: string]: TDSButton} = {
-	'tds-button-asset-edit':     { icon: 'edit',        title: 'Edit Asset' },
-	'tds-button-asset-clone':    { icon: 'clone',       title: 'Clone Asset' },
-	'tds-button-task-create':    { icon: 'file-text-o', title: 'Create a Task' },
-	'tds-button-task-list':      { icon: 'list-alt',    title: 'List existing Tasks'},
-	'tds-button-comment-create': { icon: 'comment',     title: 'Create a Comment' },
-	'tds-button-comment-list':   { icon: 'comments',    title: 'List existing Comments'},
+	[TDSActionsButton.AssetEdit] :     { icon: 'edit',        title: 'Edit Asset' },
+	[TDSActionsButton.AssetClone]:    { icon: 'clone',       title: 'Clone Asset' },
+	[TDSActionsButton.TaskCreate]:    { icon: 'file-text-o', title: 'Create a Task' },
+	[TDSActionsButton.TaskList]:      { icon: 'list-alt',    title: 'List existing Tasks'},
+	[TDSActionsButton.CommentCreate]: { icon: 'comment',     title: 'Create a Comment' },
+	[TDSActionsButton.CommentList]:   { icon: 'comments',    title: 'List existing Comments'},
 };
 
 export class ButtonsFactory {
-	static create(key: string): TDSButton {
+	static create(key: TDSActionsButton): TDSButton {
 		return registeredButtons[key] || null;
-	}
-
-	static getButtonsSelector(): string {
-		return Object.keys(registeredButtons).join(',');
 	}
 }

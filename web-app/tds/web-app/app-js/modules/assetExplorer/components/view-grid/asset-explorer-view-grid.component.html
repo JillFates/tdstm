@@ -120,12 +120,12 @@
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="tds-action-button-set">
-					<tds-button-asset-edit (click)="showAssetEditView(dataItem, rowIndex)"></tds-button-asset-edit>
-					<tds-button-task-create *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button-task-create>
-					<tds-button-task-list *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button-task-list>
-					<tds-button-comment-create *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-comment-create>
-					<tds-button-comment-list *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button-comment-list>
-					<tds-button-asset-clone (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button-asset-clone>
+					<tds-button [action]="ButtonActions.AssetEdit" (click)="showAssetEditView(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.TaskCreate" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.TaskList" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.CommentCreate" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.CommentList" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.AssetClone" (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>
