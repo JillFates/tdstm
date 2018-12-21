@@ -6,8 +6,10 @@ export interface TDSButton {
 export enum TDSActionsButton {
 	AssetEdit,
 	AssetClone,
+	BulkEdit,
 	TaskCreate,
 	TaskList,
+	TaskSave,
 	CommentCreate,
 	CommentList
 }

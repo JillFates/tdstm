@@ -23,6 +23,7 @@ import { WindowService } from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
+import {ButtonsFactoryService} from './services/buttons-factory.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -220,6 +221,8 @@ export class SharedModule {
 				BulkChangeService,
 				BulkCheckboxService,
 				UserService,
+				TranslatePipe,
+				ButtonsFactoryService,
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY
