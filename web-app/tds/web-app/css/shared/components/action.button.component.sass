@@ -1,3 +1,5 @@
+$tds-action-button-icon-flat-color: #666
+
 .tds-action-button-set
   align-items: center
   display: flex
@@ -9,10 +11,14 @@
     outline: 0;
     padding: 0 2px;
     i
-      color: black // $tds-button-icon-flat-color
+      color: $tds-action-button-icon-flat-color
     span
       display: none
 
 .tds-action-button
   i
     font-size: 16px
+
+.tds-action-button--disabled
+  pointer-events: none
+
