@@ -5,7 +5,9 @@ import {
 	Input,
 	OnInit,
 } from '@angular/core';
-import {ButtonsFactory, TDSButton, TDSActionsButton} from './buttons-factory.helper';
+import {ButtonsFactory} from './buttons-factory.helper';
+import {TDSButton, TDSActionsButton} from './model/action-button.model';
+
 @Component({
 	selector: 'tds-button',
 	template: `

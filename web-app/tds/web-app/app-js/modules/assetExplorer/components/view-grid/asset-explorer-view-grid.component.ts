@@ -5,7 +5,7 @@ import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {Observable} from 'rxjs';
-import {TDSActionsButton} from '../../../../shared/components/button/buttons-factory.helper';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {

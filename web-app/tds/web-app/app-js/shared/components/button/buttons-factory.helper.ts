@@ -1,16 +1,5 @@
-export interface TDSButton {
-	icon: string;
-	title: string;
-}
-
-export enum TDSActionsButton {
-	AssetEdit,
-	AssetClone,
-	TaskCreate,
-	TaskList,
-	CommentCreate,
-	CommentList
-}
+import {TDSButton} from './model/action-button.model';
+import {TDSActionsButton} from './model/action-button.model';
 
 const registeredButtons: {[key: string]: TDSButton} = {
 	[TDSActionsButton.AssetEdit] :     { icon: 'edit',        title: 'Edit Asset' },
