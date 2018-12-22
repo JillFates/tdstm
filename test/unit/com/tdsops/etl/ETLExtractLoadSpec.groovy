@@ -8,7 +8,6 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -33,6 +32,7 @@ import net.transitionmanager.service.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Unroll
 
 /**
  * Test about ETLProcessor commands:
@@ -3054,4 +3054,130 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			}
 	}
+
+	@See('TM-13627')
+	void 'test can throw an exception if undefined variables are referenced in ETL load with statements'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name
+				abc
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					load 'Description' with aBogusVariableNameVar
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception because comments command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-13627')
+	void 'test can throw an exception if invalid variable is referenced in ETL load with statements'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name
+				abc
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					load 'Name' with aBogusVariableName
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception because comments command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == "${ETLProcessorException.missingPropertyException('aBogusVariableName').message} at line 5".toString()
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-13627')
+	@Unroll
+	void 'test can throw an exception if undefined variables are referenced in the ETL statement -> #findStatement'() {
+
+		setup:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				simpleDataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					 $findStatement
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception because comments command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == exceptionMessage
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		where:
+			findStatement                   || exceptionMessage
+			"find Device by 'Name' eq aBogusVariableNameVar into 'id'"   || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' ne aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' nseq aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' lt aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' le aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' gt aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' ge aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' like aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+			"find Device by 'Name' notLike aBogusVariableNameVar into 'id'"      || "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+	}
+
+	//TODO: DMC add test for whenNotFound
 }

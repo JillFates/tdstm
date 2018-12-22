@@ -673,6 +673,31 @@ class Element implements RangeChecker, ETLCommand {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 
+		doSet((String)variableName)
+	}
+
+	/**
+	 * Create a local variable using variableName parameter.
+	 * It's used in following ETL script command
+	 * <pre>
+	 * 	iterate {
+	 * 	    ...
+	 * 		extract 3 transform with lowercase() set myLocalVariable
+	 * 		.....
+	 *} </pre>
+	 * @param localVariable
+	 * @return
+	 */
+	Element set(LocalVariableDefinition localVariable) {
+		doSet(localVariable.name)
+	}
+
+	/**
+	 * It adds a new dynamic variable in he current script row execution.
+	 * @param variableName
+	 * @return
+	 */
+	private Element doSet(String variableName) {
 		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
@@ -860,6 +885,10 @@ class Element implements RangeChecker, ETLCommand {
 		this.originalValue = ETLValueHelper.valueOf(value)
 		processor.addElementLoaded(this)
 		return this
+	}
+
+	Element with(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
