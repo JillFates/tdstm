@@ -68,7 +68,6 @@ import { DateControlComponent } from './components/custom-control/date-time/date
 import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
 import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
-import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -130,7 +129,6 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
@@ -176,7 +174,6 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateTimeControlComponent,
 		NumberControlComponent,
 		DateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
