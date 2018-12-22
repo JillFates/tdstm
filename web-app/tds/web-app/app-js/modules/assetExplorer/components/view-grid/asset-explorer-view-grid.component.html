@@ -22,9 +22,7 @@
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
 
-					<button tds-button
-					        icon=""
-					        [disabled]="!canCreateAssets()"
+					<button [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
 					        class="btn btn-default dropdown-toggle"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
@@ -69,14 +67,12 @@
 			</div>
 			<div class="col-sm-6 filters-section">
 				<div>
-					<button tds-button
-					        icon="times"
-					        class="btn btn-default component-action-clear-filters"
-					        id="btnClear"
+					<tds-button [action]="ButtonActions.FilterClear"
+							class="component-action-clear-filters"
+					        [id]="btnClean"
 					        [disabled]="!hasFilterApplied()"
 					        (click)="onClearFilters()">
-						{{'GLOBAL.CLEAR_FILTERS' | translate}}
-					</button>
+					</tds-button>
 				</div>
 				<button tds-button
 				        icon="refresh"

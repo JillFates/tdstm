@@ -22,3 +22,11 @@ $tds-action-button-icon-flat-color: #666
 .tds-action-button--disabled
   pointer-events: none
 
+// Match the first tds-button with an icon set belonging to a btn-group
+.btn-group > tds-button:not([icon=""]) button:first-child()
+  padding-top: 5px
+
+.btn-group
+  tds-button + .dropdown-toggle
+    width: 31px
+    margin-left: -1px

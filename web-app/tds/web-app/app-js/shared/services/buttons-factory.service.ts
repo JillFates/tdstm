@@ -7,11 +7,17 @@ import {TranslatePipe} from '../pipes/translate.pipe';
 export class ButtonsFactoryService {
 	private registeredButtons: {[key: string]: TDSButton};
 
-	constructor(private translate: TranslatePipe) {
+	constructor(private translateService: TranslatePipe) {
+		const translate = this.translateService.transform.bind(this.translateService);
+
 		this.registeredButtons = {
 			[TDSActionsButton.AssetEdit] : { icon: 'edit', title: 'Edit Asset' },
 			[TDSActionsButton.AssetClone]: { icon: 'clone', title: 'Clone Asset' },
-			[TDSActionsButton.BulkEdit]: { icon: 'ellipsis-v', title: this.translate.transform('ASSET_EXPLORER.BULK_CHANGE.TITLE') },
+			[TDSActionsButton.BulkEdit]: { icon: 'ellipsis-v', title: translate('ASSET_EXPLORER.BULK_CHANGE.TITLE') },
+			[TDSActionsButton.FilterClear]: { icon: 'times', title: translate('GLOBAL.CLEAR_FILTERS') },
+			[TDSActionsButton.GenericExport]: { icon: 'download', title: 'Export' },
+			[TDSActionsButton.GenericSave]: { icon: 'floppy-o', title: translate('GLOBAL.SAVE') },
+			[TDSActionsButton.GenericSaveAs]: { icon: 'floppy-o', title: translate('GLOBAL.SAVE_AS') },
 			[TDSActionsButton.TaskCreate]: { icon: 'file-text-o', title: 'Create a Task' },
 			[TDSActionsButton.TaskSave]: { icon: 'floppy-o', title: 'Save' },
 			[TDSActionsButton.TaskList]: { icon: 'list-alt', title: 'List existing Tasks' },

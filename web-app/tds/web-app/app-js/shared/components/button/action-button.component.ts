@@ -3,7 +3,7 @@ import {
 	Component,
 	ElementRef,
 	Input,
-	OnInit,
+	OnInit
 } from '@angular/core';
 
 import {
@@ -20,8 +20,9 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			type="button"
 			[disabled]="disabled"
 			[id]="id"
-			[ngClass]="{ 'btn': true, 'btn-default': true, 'tds-action-button': true, 'btn-action': true }"
-			[title]="titleButton"><i class="fa fa-fw fa-{{button.icon}}"></i>
+			[title]="titleButton"
+			[ngClass]="{ 'btn': true, 'btn-default': true, 'tds-action-button': true, 'btn-action': true }">
+			<i class="fa fa-fw fa-{{button.icon}}"></i>
 			<span>{{titleButton}}</span>
 		</button>
 	`,
@@ -51,7 +52,6 @@ export class TDSActionButton implements OnInit {
 		if (!this.button) {
 			throw new Error(`Unable to create button ${buttonSelector}`);
 		}
-
 		this.titleButton = this.title || this.button.title;
 	}
 }
