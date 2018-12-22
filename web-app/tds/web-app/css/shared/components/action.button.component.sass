@@ -22,6 +22,17 @@ $tds-action-button-icon-flat-color: #666
 .tds-action-button--disabled
   pointer-events: none
 
+.tds-action-button--just-icon
+  border: 0
+  background-color: transparent
+  outline: 0
+  vertical-align: middle
+  margin: 0 10px
+  span
+    display: none
+  i
+    font-size: 22px
+
 // Match the first tds-button with an icon set belonging to a btn-group
 .btn-group > tds-button:not([icon=""]) button:first-child()
   padding-top: 5px

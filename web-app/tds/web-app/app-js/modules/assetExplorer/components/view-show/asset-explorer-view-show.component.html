@@ -7,14 +7,14 @@
                 <tds-button *ngIf="model.isOwner"
                         [action]="ButtonActions.GenericSave"
                         (click)="onSave()"
-                        [id]="'btnSave'"
+                        id="btnSave"
                         [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
                 </tds-button>
 
                 <tds-button *ngIf="!model.isOwner"
                             [action]="ButtonActions.GenericSaveAs"
                             (click)="onSaveAs()"
-                            [id]="'btnSaveAs'"
+                            id="btnSaveAs"
                             [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
                 </tds-button>
 
@@ -52,23 +52,23 @@
                 </tds-button>
             </ng-template>
 
-            <button tds-button
-                    [icon]="model.isFavorite? 'star' : 'star-o'"
-                    class="text-yellow tds-button-icon"
+            <tds-button
+                    [action]="model.isFavorite ? IconActions.GenericIsFavorite : IconActions.GenericIsNotFavorite"
+                    class="text-yellow"
                     (click)="onFavorite()">
-            </button>
+            </tds-button>
 
             <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="btnExport"></tds-button>
 
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
-            <button tds-button
-                    icon="cog"
-                    class="tds-button-icon pull-right"
-                    *ngIf="isEditAvailable()"
-                    (click)="onEdit()">
-            </button>
+
+            <tds-button *ngIf="isEditAvailable()"
+                        [action]="IconActions.GenericConfiguration"
+                        class="pull-right"
+                        (click)="onEdit()">
+            </tds-button>
         </div>
         <div class="box-body">
                 <asset-explorer-view-grid

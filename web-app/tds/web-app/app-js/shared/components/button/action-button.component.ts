@@ -1,10 +1,13 @@
 import {
-	ChangeDetectionStrategy,
-	Component,
 	ElementRef,
+	Component,
 	Input,
-	OnInit
+	OnInit,
+	OnChanges,
+	SimpleChanges
 } from '@angular/core';
+
+import {pathOr} from 'ramda';
 
 import {
 	TDSActionsButton,
@@ -21,24 +24,24 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[disabled]="disabled"
 			[id]="id"
 			[title]="titleButton"
-			[ngClass]="{ 'btn': true, 'btn-default': true, 'tds-action-button': true, 'btn-action': true }">
-			<i class="fa fa-fw fa-{{button.icon}}"></i>
-			<span>{{titleButton}}</span>
+			[ngClass]="buttonClasses">
+				<i class="{{iconPrefixVendor + button.icon}}"></i>
+				<span>{{titleButton}}</span>
 		</button>
 	`,
 	host: {
 		'[class.tds-action-button--disabled]': 'disabled'
-	},
-	changeDetection: ChangeDetectionStrategy.OnPush
+	}
 })
-export class TDSActionButton implements OnInit {
+export class TDSActionButton implements OnInit, OnChanges {
 	@Input() action: TDSActionsButton ;
 	@Input() title = '';
 	@Input() tooltip = '';
 	@Input() id = '';
 	@Input() disabled = false;
-	private button: TDSButton;
-	private titleButton: string;
+	button: TDSButton;
+	titleButton: string;
+	hostClasses: any = [];
 
 	constructor(
 		private elementRef: ElementRef,
@@ -46,12 +49,56 @@ export class TDSActionButton implements OnInit {
 	}
 
 	ngOnInit() {
-		const buttonSelector = this.elementRef.nativeElement.localName;
-		this.button = this.buttonsFactoryService.create(this.action);
+		this.hostClasses = this.elementRef.nativeElement.classList;
+	}
 
-		if (!this.button) {
-			throw new Error(`Unable to create button ${buttonSelector}`);
+	ngOnChanges(changes: SimpleChanges) {
+		const action = pathOr(null, ['action', 'currentValue'], changes);
+
+		if (action !== null) {
+			this.button = this.buttonsFactoryService.create(action);
+
+			if (!this.button) {
+				throw new Error(`Unable to create button ${action}`);
+			}
+			this.titleButton = this.title || this.button.title;
 		}
-		this.titleButton = this.title || this.button.title;
+	}
+
+	get iconPrefixVendor() {
+		return 'fa fa-fw fa-';  // prefix used by font awesome icons
+	}
+
+	get buttonClasses() {
+		let buttonClasses =  {
+			'btn': true,
+			'btn-action': true,
+			'tds-action-button': true
+		};
+
+		const hostClasses = this.getHostClasses();
+		const hasStyle = Array.from(this.hostClasses)
+			.some((className: string) => className.startsWith('btn-'));
+
+		if (!hasStyle) {
+			hostClasses['btn-default'] = true;
+		}
+
+		buttonClasses = {...buttonClasses, ...hostClasses};
+
+		const iconClasses = {
+			'tds-action-button--just-icon': true
+		};
+
+		return this.button.justIcon ? iconClasses : buttonClasses;
+	}
+
+	getHostClasses() {
+		const classes = {};
+
+		Array.from(this.hostClasses)
+			.forEach((className: string) =>  classes[className] = true);
+
+		return classes;
 	}
 }

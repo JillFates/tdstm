@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {TDSButton} from '../components/button/model/action-button.model';
-import {TDSActionsButton} from '../components/button/model/action-button.model';
+import {TDSActionsButton, TDSActionsIcon} from '../components/button/model/action-button.model';
 import {TranslatePipe} from '../pipes/translate.pipe';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class ButtonsFactoryService {
 		const translate = this.translateService.transform.bind(this.translateService);
 
 		this.registeredButtons = {
+			// buttons
 			[TDSActionsButton.AssetEdit] : { icon: 'edit', title: 'Edit Asset' },
 			[TDSActionsButton.AssetClone]: { icon: 'clone', title: 'Clone Asset' },
 			[TDSActionsButton.BulkEdit]: { icon: 'ellipsis-v', title: translate('ASSET_EXPLORER.BULK_CHANGE.TITLE') },
@@ -23,6 +24,11 @@ export class ButtonsFactoryService {
 			[TDSActionsButton.TaskList]: { icon: 'list-alt', title: 'List existing Tasks' },
 			[TDSActionsButton.CommentCreate]: { icon: 'comment', title: 'Create a Comment' },
 			[TDSActionsButton.CommentList]: { icon: 'comments', title: 'List existing Comments' },
+			// just icons
+			[TDSActionsIcon.GenericRefresh]: { icon: 'refresh', title: 'Refresh', justIcon: true},
+			[TDSActionsIcon.GenericIsFavorite]: { icon: 'star', title: 'Remove from favorites', justIcon: true},
+			[TDSActionsIcon.GenericIsNotFavorite]: { icon: 'star-o', title: 'Add to favorites', justIcon: true},
+			[TDSActionsIcon.GenericConfiguration]: { icon: 'cog', title: 'Configure', justIcon: true}
 		};
 	}
 
