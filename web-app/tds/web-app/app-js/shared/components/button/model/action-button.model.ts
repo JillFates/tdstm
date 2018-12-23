@@ -1,7 +1,6 @@
 export interface TDSButton {
 	icon: string;
 	title: string;
-	justIcon?: boolean;
 }
 
 export enum TDSActionsButton {
@@ -12,7 +11,11 @@ export enum TDSActionsButton {
 	CommentList,
 	FilterClear,
 	GenericCreate,
+	GenericConfiguration,
 	GenericExport,
+	GenericIsFavorite,
+	GenericIsNotFavorite,
+	GenericRefresh,
 	GenericSave,
 	GenericSaveAs,
 	TaskCreate,
@@ -20,11 +23,4 @@ export enum TDSActionsButton {
 	TaskSave,
 	ViewEdit,
 	ViewDelete
-}
-
-export enum TDSActionsIcon {
-	GenericConfiguration = 200,
-	GenericIsFavorite,
-	GenericIsNotFavorite,
-	GenericRefresh
 }

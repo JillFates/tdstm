@@ -74,7 +74,10 @@
 					        (click)="onClearFilters()">
 					</tds-button>
 				</div>
-				<tds-button [action]="IconActions.GenericRefresh" class="component-action-reload pull-righ" (click)="onReload()"></tds-button>
+				<tds-button [action]="ButtonActions.GenericRefresh"
+				            isIconButton="true"
+				            class="component-action-reload pull-righ"
+				            (click)="onReload()"></tds-button>
 			</div>
 		</ng-template>
 

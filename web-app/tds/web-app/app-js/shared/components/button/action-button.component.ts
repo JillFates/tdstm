@@ -39,6 +39,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 	@Input() tooltip = '';
 	@Input() id = '';
 	@Input() disabled = false;
+	@Input() isIconButton = false;
 	button: TDSButton;
 	titleButton: string;
 	hostClasses: any = [];
@@ -90,7 +91,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 			'tds-action-button--just-icon': true
 		};
 
-		return this.button.justIcon ? iconClasses : buttonClasses;
+		return this.isIconButton ? iconClasses : buttonClasses;
 	}
 
 	getHostClasses() {

@@ -79,8 +79,9 @@
 										</td>
 
 										<td class="asset-explorer-td-favorite text-center tds-action-button-set">
-											<tds-button [action]="report.isFavorite ? IconActions.GenericIsFavorite : IconActions.GenericIsNotFavorite"
+											<tds-button [action]="report.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
 											            class="text-yellow"
+											            isIconButton="true"
 											            (click)="toggleFavorite(report)">
 											</tds-button>
 										</td>

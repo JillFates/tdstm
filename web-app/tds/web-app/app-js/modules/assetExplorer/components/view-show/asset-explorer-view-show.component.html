@@ -52,8 +52,9 @@
                 </tds-button>
             </ng-template>
 
-            <tds-button [action]="model.isFavorite ? IconActions.GenericIsFavorite : IconActions.GenericIsNotFavorite"
+            <tds-button [action]="model.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
                     class="text-yellow"
+                    isIconButton="true"
                     (click)="onFavorite()">
             </tds-button>
 
@@ -64,7 +65,8 @@
             </asset-explorer-view-selector>
 
             <tds-button *ngIf="isEditAvailable()"
-                        [action]="IconActions.GenericConfiguration"
+                        isIconButton="true"
+                        [action]="ButtonActions.GenericConfiguration"
                         class="pull-right"
                         (click)="onEdit()">
             </tds-button>
