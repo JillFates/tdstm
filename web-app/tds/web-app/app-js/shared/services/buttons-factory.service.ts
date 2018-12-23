@@ -11,26 +11,91 @@ export class ButtonsFactoryService {
 		const translate = this.translateService.transform.bind(this.translateService);
 
 		this.registeredButtons = {
-			// buttons
-			[TDSActionsButton.AssetEdit] : { icon: 'edit', title: 'Edit Asset' },
-			[TDSActionsButton.AssetClone]: { icon: 'clone', title: 'Clone Asset' },
-			[TDSActionsButton.BulkEdit]: { icon: 'ellipsis-v', title: translate('ASSET_EXPLORER.BULK_CHANGE.TITLE') },
-			[TDSActionsButton.CommentCreate]: { icon: 'comment', title: 'Create a Comment' },
-			[TDSActionsButton.CommentList]: { icon: 'comments', title: 'List existing Comments' },
-			[TDSActionsButton.FilterClear]: { icon: 'times', title: translate('GLOBAL.CLEAR_FILTERS') },
-			[TDSActionsButton.GenericConfiguration]: { icon: 'cog', title: 'Configure'},
-			[TDSActionsButton.GenericCreate]: { icon: 'plus-square', title: translate('GLOBAL.CREATE') },
-			[TDSActionsButton.GenericExport]: { icon: 'download', title: 'Export' },
-			[TDSActionsButton.GenericIsFavorite]: { icon: 'star', title: 'Remove from favorites'},
-			[TDSActionsButton.GenericIsNotFavorite]: { icon: 'star-o', title: 'Add to favorites'},
-			[TDSActionsButton.GenericRefresh]: { icon: 'refresh', title: 'Refresh'},
-			[TDSActionsButton.GenericSave]: { icon: 'floppy-o', title: translate('GLOBAL.SAVE') },
-			[TDSActionsButton.GenericSaveAs]: { icon: 'floppy-o', title: translate('GLOBAL.SAVE_AS') },
-			[TDSActionsButton.TaskCreate]: { icon: 'file-text-o', title: 'Create a Task' },
-			[TDSActionsButton.TaskSave]: { icon: 'floppy-o', title: 'Save' },
-			[TDSActionsButton.TaskList]: { icon: 'list-alt', title: 'List existing Tasks' },
-			[TDSActionsButton.ViewEdit]: { icon: 'pencil', title: 'Edit view' },
-			[TDSActionsButton.ViewDelete]: { icon: 'trash', title: 'Delete view' }
+			[TDSActionsButton.AssetEdit] : {
+				icon: 'edit',
+				title: translate('GLOBAL.EDIT'),
+				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
+			[TDSActionsButton.AssetClone]: {
+				icon: 'clone',
+				title: translate('GLOBAL.CLONE'),
+				tooltip: `${translate('GLOBAL.CLONE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
+			[TDSActionsButton.BulkEdit]: {
+				icon: 'ellipsis-v',
+				title: translate('ASSET_EXPLORER.BULK_CHANGE.TITLE')
+			},
+			[TDSActionsButton.CommentCreate]: {
+				icon: 'comment',
+				title: translate('GLOBAL.CREATE'),
+				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
+			},
+			[TDSActionsButton.CommentList]: {
+				icon: 'comments',
+				title: `${translate('GLOBAL.LIST')} ${translate('GLOBAL.ARTIFACTS.COMMENTS')}`,
+				tooltip: `${translate('GLOBAL.LIST')} ${translate('GLOBAL.ARTIFACTS.COMMENTS')}`
+			},
+			[TDSActionsButton.FilterClear]: {
+				icon: 'times',
+				title: translate('GLOBAL.CLEAR_FILTERS')
+			},
+			[TDSActionsButton.GenericConfiguration]: {
+				icon: 'cog',
+				title: translate('GLOBAL.CONFIGURE')
+			},
+			[TDSActionsButton.GenericExport]: {
+				icon: 'download',
+				title: translate('GLOBAL.EXPORT')
+			},
+			[TDSActionsButton.GenericIsFavorite]: {
+				icon: 'star',
+				title: translate('GLOBAL.REMOVE_FAVORITES')
+			},
+			[TDSActionsButton.GenericIsNotFavorite]: {
+				icon: 'star-o',
+				title: translate('GLOBAL.ADD_FAVORITES')
+			},
+			[TDSActionsButton.GenericRefresh]: {
+				icon: 'refresh',
+				title: translate('GLOBAL.REFRESH')
+			},
+			[TDSActionsButton.GenericSave]: {
+				icon: 'floppy-o',
+				title: translate('GLOBAL.SAVE')
+			},
+			[TDSActionsButton.GenericSaveAs]: {
+				icon: 'floppy-o',
+				title: translate('GLOBAL.SAVE_AS')
+			},
+			[TDSActionsButton.TaskCreate]: {
+				icon: 'file-text-o',
+				title: translate('GLOBAL.CREATE'),
+				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.TASK')}`
+			},
+			[TDSActionsButton.TaskSave]: {
+				icon: 'floppy-o',
+				title: translate('GLOBAL.SAVE')
+			},
+			[TDSActionsButton.TaskList]: {
+				icon: 'list-alt',
+				title: translate('GLOBAL.LIST'),
+				tooltip: `${translate('GLOBAL.LIST')} ${translate('GLOBAL.ARTIFACTS.TASKS')}`
+			},
+			[TDSActionsButton.ViewCreate]: {
+				icon: 'plus-square',
+				title: translate('GLOBAL.CREATE'),
+				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.VIEW')}`
+			},
+			[TDSActionsButton.ViewEdit]: {
+				icon: 'pencil',
+				title: translate('GLOBAL.EDIT'),
+				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.VIEW')}`
+			},
+			[TDSActionsButton.ViewDelete]: {
+				icon: 'trash',
+				title: translate('GLOBAL.DELETE'),
+				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.VIEW')}`
+			}
 		};
 	}
 
