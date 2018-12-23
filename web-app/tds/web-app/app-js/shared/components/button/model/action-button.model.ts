@@ -8,20 +8,23 @@ export enum TDSActionsButton {
 	AssetEdit,
 	AssetClone,
 	BulkEdit,
+	CommentCreate,
+	CommentList,
 	FilterClear,
+	GenericCreate,
 	GenericExport,
 	GenericSave,
 	GenericSaveAs,
 	TaskCreate,
 	TaskList,
 	TaskSave,
-	CommentCreate,
-	CommentList
+	ViewEdit,
+	ViewDelete
 }
 
 export enum TDSActionsIcon {
-	GenericRefresh = 200,
+	GenericConfiguration = 200,
 	GenericIsFavorite,
 	GenericIsNotFavorite,
-	GenericConfiguration
+	GenericRefresh
 }

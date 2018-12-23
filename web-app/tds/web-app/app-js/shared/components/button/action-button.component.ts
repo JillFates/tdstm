@@ -23,7 +23,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			type="button"
 			[disabled]="disabled"
 			[id]="id"
-			[title]="titleButton"
+			[title]="tooltip || titleButton"
 			[ngClass]="buttonClasses">
 				<i class="{{iconPrefixVendor + button.icon}}"></i>
 				<span>{{titleButton}}</span>

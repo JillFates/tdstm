@@ -52,8 +52,7 @@
                 </tds-button>
             </ng-template>
 
-            <tds-button
-                    [action]="model.isFavorite ? IconActions.GenericIsFavorite : IconActions.GenericIsNotFavorite"
+            <tds-button [action]="model.isFavorite ? IconActions.GenericIsFavorite : IconActions.GenericIsNotFavorite"
                     class="text-yellow"
                     (click)="onFavorite()">
             </tds-button>

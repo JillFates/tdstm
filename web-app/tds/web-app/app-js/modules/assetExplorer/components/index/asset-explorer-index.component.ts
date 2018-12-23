@@ -16,6 +16,7 @@ import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TDSActionsButton, TDSActionsIcon} from '../../../../shared/components/button/model/action-button.model';
 
 @Component({
 	selector: 'asset-explorer-index',
@@ -29,6 +30,8 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private selectedFolder: ViewGroupModel;
 	private gridColumns: GridColumnModel[];
 	private report;
+	ButtonActions = TDSActionsButton;
+	IconActions = TDSActionsIcon;
 
 	constructor(
 		private route: ActivatedRoute,
