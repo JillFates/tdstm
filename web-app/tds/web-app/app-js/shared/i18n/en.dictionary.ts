@@ -189,13 +189,14 @@ export const en_DICTIONARY: Object = {
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',
+		'DEMO': 'Demo',
 		'CREATE_LICENSE': 'Create License',
 		'GLOBAL': 'Global',
 		'SINGLE': 'Single',
 		'MANAGER': 'License Manager',
 		'ENGINEERING': 'Engineering',
+		'REQUEST_NEW_LICENSE': 'Request New License',
 		'TRAINING': 'Training',
-		'DEMO': 'Demo',
 		'PRODUCTION': 'Production',
 	},
 	'IMPORT_ASSETS': {

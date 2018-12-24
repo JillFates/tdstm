@@ -1,0 +1,74 @@
+<div tds-autofocus class="modal-content data-script-view-edit-component"  #licenseViewEditContainer>
+	<div class="modal-header">
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<h4 class="modal-title">{{ 'LICENSE.REQUEST_NEW_LICENSE' | translate }}</h4>
+	</div>
+	<div class="modal-body">
+		<form name="providerForm" role="form" data-toggle="validator" #providerForm='ngForm' class="form-horizontal left-alignment">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="inputContactEmail" class="col-sm-3 control-label">Contact Email: <span style="color: red;">*</span></label>
+					<div class="col-sm-9">
+						<input type="email" name="inputContactEmail" id="inputContactEmail" class="form-control" placeholder="Contact Email" ng-model="requestLicense.newLicenseModel.email" required autofocus>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="selectEnvironment" class="col-sm-3 control-label">Environment: <span style="color: red;">*</span></label>
+					<div class="col-sm-9">
+						<select kendo-drop-down-list
+								k-placeholder="'Select an Environment'"
+								k-value-primitive="true"
+								k-value-template="'<span style=\'text-transform: capitalize;\'>#:((data)? data.toLowerCase(): \'\' )#</span>'"
+								k-template="'<span style=\'text-transform: capitalize;\'>#:((data)? data.toLowerCase(): \'\' )#</span>'"
+								k-data-source="requestLicense.environmentDataSource"
+								k-ng-model="requestLicense.newLicenseModel.environment"
+								id="selectEnvironment"
+								class="form-control"
+								required >
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="selectProject" class="col-sm-3 control-label">Project: <span style="color: red;">*</span></label>
+					<div class="col-sm-9">
+						<select kendo-drop-down-list="requestLicense.selectProject"
+								k-options="requestLicense.selectProjectListOptions"
+								k-ng-model="requestLicense.newLicenseModel.projectId"
+								id="selectProject"
+								class="form-control"
+								required >
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">Client Name:</label>
+					<div class="col-sm-9">
+						<label class="control-label">{{requestLicense.newLicenseModel.clientName}}</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="selectSpecialInstructions" class="col-sm-12 control-label">Special Instructions and/or PO# reference:</label>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-12">
+						<textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" ng-model="requestLicense.newLicenseModel.requestNote"></textarea>
+					</div>
+				</div>
+			</div><!-- /.box-body -->
+		</form>
+	</div>
+	<div class="modal-footer form-group-center">
+		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveProvider()" class="btn btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique ||  isEmptyValue()"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
+		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditProvider()" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteProvider()" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> Delete</button>
+		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+			<span class="glyphicon glyphicon-ban-circle"></span>
+			<span *ngIf="modalType === actionTypes.VIEW">
+				{{'GLOBAL.CLOSE' | translate }}
+			</span>
+			<span *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE">
+				{{'GLOBAL.CANCEL' | translate }}
+			</span>
+		</button>
+	</div>
+</div>

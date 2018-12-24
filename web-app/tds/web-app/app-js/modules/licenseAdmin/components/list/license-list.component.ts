@@ -1,6 +1,8 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+// Component
+import {RequestLicenseComponent} from '../request/request-license.component';
 // Service
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -9,11 +11,18 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {PreferenceService} from '../../../../shared/services/preference.service';
 // Model
 import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {LicenseColumnModel, LicenseType, LicenseStatus, LicenseEnvironment} from '../../model/license.model';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE} from '../../../../shared/model/constants';
+import {
+	LicenseColumnModel,
+	LicenseType,
+	LicenseStatus,
+	LicenseEnvironment,
+	LicenseModel
+} from '../../model/license.model';
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
+import {LicenseViewEditComponent} from '../view-edit/license-view-edit.component';
 
 @Component({
 	selector: 'tds-license-list',
@@ -44,6 +53,7 @@ export class LicenseListComponent implements OnInit {
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
+	private lastCreatedEditedRecordId = 0;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -97,6 +107,66 @@ export class LicenseListComponent implements OnInit {
 		if (event.target && event.target.parentNode) {
 			event.target.parentNode.click();
 		}
+	}
+
+	/**
+	 * Request a New License
+	 */
+	protected onCreateLicense(): void {
+		let licenseModel: LicenseModel = {
+			name: '',
+			description: '',
+			comment: ''
+		};
+		this.dialogService.open(RequestLicenseComponent, [
+			{ provide: LicenseModel, useValue: licenseModel }
+		]).then( (result: LicenseModel) => {
+			if (result && result.id) {
+				this.lastCreatedEditedRecordId = result.id;
+				this.reloadData();
+			}
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	/**
+	 * Reload the list with the latest created/edited license
+	 */
+	protected reloadData(): void {
+		this.licenseAdminService.getLicenses().subscribe(
+			(result) => {
+				this.resultSet = result;
+				this.gridData = process(this.resultSet, this.state);
+				setTimeout(() => {
+					if (this.lastCreatedEditedRecordId && this.lastCreatedEditedRecordId !== 0) {
+						this.selectRow(this.lastCreatedEditedRecordId);
+						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedEditedRecordId);
+						// this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW, lastCredentialModel);
+						this.lastCreatedEditedRecordId = 0;
+					}
+				}, 500);
+			},
+			(err) => console.log(err));
+	}
+
+	private openCredentialDialogViewEdit(credentialModel: LicenseModel, actionType: number, originalModel?: LicenseModel): void {
+		this.dialogService.open(LicenseViewEditComponent, [
+			{ provide: LicenseModel, useValue: credentialModel },
+			{ provide: Number, useValue: actionType }
+		], DIALOG_SIZE.XLG, false).then( (result: LicenseModel) => {
+			if (result && result.id) {
+				if (actionType === ActionType.CREATE) {
+					this.lastCreatedEditedRecordId = result.id;
+					this.reloadData();
+				} else {
+					// this.reloadItem(originalModel);
+				}
+			}
+		}).catch(result => {
+			this.reloadData();
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	/**

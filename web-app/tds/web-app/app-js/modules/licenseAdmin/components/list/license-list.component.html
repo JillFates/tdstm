@@ -19,7 +19,7 @@
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<button class="btn btn-default button-create-license" type="button" (click)="onCreateProvider()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'LICENSE.CREATE_LICENSE' | translate }}</button>
+						<button class="btn btn-default button-create-license" type="button" (click)="onCreateLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'LICENSE.CREATE_LICENSE' | translate }}</button>
 						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
 					<kendo-grid-column *ngFor="let column of licenseColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
