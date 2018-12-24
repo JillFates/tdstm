@@ -66,6 +66,14 @@ export class LicenseColumnModel {
 	}
 }
 
+export class RequestLicenseModel {
+	name: string;
+	environment?: LicenseEnvironment;
+	project?: object;
+	clientName?: string;
+	specialInstruction?: string;
+}
+
 export class LicenseModel {
 	id?: number;
 	name: string;

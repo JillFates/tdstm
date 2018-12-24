@@ -1,11 +1,13 @@
+// Angular
 import {ElementRef, Component, OnInit, ViewChild, HostListener } from '@angular/core';
-import {Subject} from 'rxjs/Subject';
+// Service
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ActionType} from '../../../dataScript/model/data-script.model';
-import {LicenseModel} from '../../model/license.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {KEYSTROKE} from '../../../../shared/model/constants';
 import {LicenseAdminService} from '../../service/license-admin.service';
+// Model
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {RequestLicenseModel} from '../../model/license.model';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'tds-license-create',
@@ -20,29 +22,24 @@ export class RequestLicenseComponent implements OnInit {
 
 	@ViewChild('providerNameElement', {read: ElementRef}) providerNameElement: ElementRef;
 	@ViewChild('licenseViewEditContainer') licenseViewEditContainer: ElementRef;
-	public providerModel: LicenseModel;
-	public actionTypes = ActionType;
+	protected requestLicense = new RequestLicenseModel();
+	protected environmentList: any = [];
+	protected projectList: any = [];
 	private dataSignature: string;
-	private isUnique = true;
-	private providerName = new Subject<String>();
 
 	constructor(
-		public originalModel: LicenseModel,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private licenseAdminService: LicenseAdminService) {
-
-		this.providerModel = Object.assign({}, this.originalModel);
-		this.dataSignature = JSON.stringify(this.providerModel);
-		this.providerName.next(this.providerModel.name);
+		this.dataSignature = JSON.stringify(this.requestLicense);
 	}
 
 	/**
 	 * Create Edit a Provider
 	 */
 	protected onSaveProvider(): void {
-		// this.licenseAdminService.saveProvider(this.providerModel).subscribe(
+		// this.licenseAdminService.saveProvider(this.requestLicense).subscribe(
 		// 	(result: any) => {
 		// 		this.activeDialog.close(result);
 		// 	},
@@ -50,31 +47,14 @@ export class RequestLicenseComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.providerName
-			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
-			.distinctUntilChanged()   // ignore if next search term is same as previous
-			.subscribe(term => {
-				if (term) {
-					term = term.trim();
-				}
-				if (term && term !== '') {
-					this.providerModel.name = this.providerModel.name.trim();
-					// this.licenseAdminService.validateUniquenessProviderByName(this.providerModel).subscribe(
-					// 	(result: any) => {
-					// 		this.isUnique = result.isUnique;
-					// 	},
-					// 	(err) => console.log(err));
-				}
-			});
-		setTimeout(() => { // Delay issues on Auto Focus
-			if (this.providerNameElement) {
-				this.providerNameElement.nativeElement.focus();
-			}
-		}, 500);
-	}
-
-	protected onValidateUniqueness(): void {
-		this.providerName.next(this.providerModel.name);
+		this.licenseAdminService.getEnvironments().subscribe((environmentList: any) => {
+			this.environmentList = environmentList;
+			this.requestLicense.environment = this.environmentList[0];
+		});
+		this.licenseAdminService.getProjects().subscribe((projectList: any) => {
+			this.projectList = projectList;
+			this.requestLicense.project = this.projectList[0];
+		});
 	}
 
 	/**
@@ -82,7 +62,7 @@ export class RequestLicenseComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.providerModel);
+		return this.dataSignature !== JSON.stringify(this.requestLicense);
 	}
 
 	/**
@@ -122,7 +102,7 @@ export class RequestLicenseComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					// this.licenseAdminService.deleteProvider(this.providerModel.id).subscribe(
+					// this.licenseAdminService.deleteProvider(this.requestLicense.id).subscribe(
 					// 	(result) => {
 					// 		this.activeDialog.close(result);
 					// 	},
@@ -147,8 +127,8 @@ export class RequestLicenseComponent implements OnInit {
 	 */
 	protected isEmptyValue(): boolean {
 		let term = '';
-		if (this.providerModel.name) {
-			term = this.providerModel.name.trim();
+		if (this.requestLicense.name) {
+			term = this.requestLicense.name.trim();
 		}
 		return term === '';
 	}

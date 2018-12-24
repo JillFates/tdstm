@@ -15,6 +15,9 @@ export class LicenseAdminService {
 	constructor(private http: HttpInterceptor) {
 	}
 
+	/**
+	 * Get all License from the User
+	 */
 	getLicenses(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}`)
 			.map((res: Response) => {
@@ -25,6 +28,30 @@ export class LicenseAdminService {
 					model.expirationDate = ((model.expirationDate) ? new Date(model.expirationDate) : '');
 				});
 				return licenseModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the possible Environment Data Source
+	 */
+	getEnvironments(): Observable<any[]> {
+		return this.http.get(`${this.licenseUrl}/environment`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the possible Projects Data Source
+	 */
+	getProjects(): Observable<any[]> {
+		return this.http.get(`${this.licenseUrl}/project`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}

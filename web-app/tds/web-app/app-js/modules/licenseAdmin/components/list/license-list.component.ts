@@ -113,14 +113,7 @@ export class LicenseListComponent implements OnInit {
 	 * Request a New License
 	 */
 	protected onCreateLicense(): void {
-		let licenseModel: LicenseModel = {
-			name: '',
-			description: '',
-			comment: ''
-		};
-		this.dialogService.open(RequestLicenseComponent, [
-			{ provide: LicenseModel, useValue: licenseModel }
-		]).then( (result: LicenseModel) => {
+		this.dialogService.open(RequestLicenseComponent, []).then( (result: LicenseModel) => {
 			if (result && result.id) {
 				this.lastCreatedEditedRecordId = result.id;
 				this.reloadData();
