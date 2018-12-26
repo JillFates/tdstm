@@ -57,6 +57,26 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Get the possible Projects Data Source
+	 */
+	createRequestLicense(requestLicense: any): Observable<any[]> {
+		let postRequest = {
+			clientName: requestLicense.clientName,
+			email: requestLicense.email,
+			environment: requestLicense.environment,
+			projectId: requestLicense.project.id,
+			requestNote: requestLicense.specialInstruction,
+		};
+
+		return this.http.post(`${this.licenseUrl}/request`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Based on provided column, update the structure which holds the current selected filters
 	 * @param {any} column: Column to filter
 	 * @param {any} state: Current filters state

@@ -53,7 +53,6 @@ export class LicenseListComponent implements OnInit {
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
-	private lastCreatedEditedRecordId = 0;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -113,9 +112,10 @@ export class LicenseListComponent implements OnInit {
 	 * Request a New License
 	 */
 	protected onCreateLicense(): void {
-		this.dialogService.open(RequestLicenseComponent, []).then( (result: LicenseModel) => {
+		this.dialogService.open(RequestLicenseComponent, []).then( (result: any) => {
+			console.log(result);
 			if (result && result.id) {
-				this.lastCreatedEditedRecordId = result.id;
+
 				this.reloadData();
 			}
 		}).catch(result => {
@@ -131,14 +131,6 @@ export class LicenseListComponent implements OnInit {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => {
-					if (this.lastCreatedEditedRecordId && this.lastCreatedEditedRecordId !== 0) {
-						this.selectRow(this.lastCreatedEditedRecordId);
-						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedEditedRecordId);
-						// this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW, lastCredentialModel);
-						this.lastCreatedEditedRecordId = 0;
-					}
-				}, 500);
 			},
 			(err) => console.log(err));
 	}
@@ -150,7 +142,6 @@ export class LicenseListComponent implements OnInit {
 		], DIALOG_SIZE.XLG, false).then( (result: LicenseModel) => {
 			if (result && result.id) {
 				if (actionType === ActionType.CREATE) {
-					this.lastCreatedEditedRecordId = result.id;
 					this.reloadData();
 				} else {
 					// this.reloadItem(originalModel);
