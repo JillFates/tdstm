@@ -366,6 +366,10 @@ class FindStatementBuilder {
 		return completeCurrentCondition(FindOperator.notInList, value)
 	}
 
+	FindStatementBuilder notInList(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
 	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a value being in a numeric range</p>
@@ -379,6 +383,10 @@ class FindStatementBuilder {
 		return completeCurrentCondition(FindOperator.between, value)
 	}
 
+	FindStatementBuilder between(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
 	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a value not being in a numeric range</p>
@@ -390,6 +398,10 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder notBetween(Object value){
 		return completeCurrentCondition(FindOperator.notBetween, value)
+	}
+
+	FindStatementBuilder notBetween(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
