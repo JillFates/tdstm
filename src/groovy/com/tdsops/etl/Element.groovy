@@ -871,13 +871,11 @@ class Element implements RangeChecker, ETLCommand {
 	/**
 	 * Perform the evaluation of the value parameter and update current element value and original value.
 	 * @param value - can be a variable, string, DOMAIN..., SOURCE... or a function like concat(....)
-	 *
 	 * <pre>
 	 *		load 'Name' transform with append(',', 'foo', 'bar')
 	 *		initialize 'Name' transform with append(' - ', envVar)
 	 *		extract 'Name' transform with append(' - ', envVar) load 'Name'
 	 * </pre>
-	 *
 	 * @return current Element updated
 	 */
 	Element with(Object value) {
@@ -887,6 +885,15 @@ class Element implements RangeChecker, ETLCommand {
 		return this
 	}
 
+	/**
+	 * Validates if an ETL script is using incorrectly variable names
+	 * <pre>
+	 *		load 'Name' with aBogusVariableName
+	 *		extract 1 load 'Name' with aBogusVariableName
+	 * </pre>
+	 * @param localVariableDefinition an instance of @{code LocalVariableDefinition}
+	 * @throws ETLProcessorException
+	 */
 	Element with(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}

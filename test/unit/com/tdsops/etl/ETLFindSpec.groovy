@@ -18,7 +18,6 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
-import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 /**
