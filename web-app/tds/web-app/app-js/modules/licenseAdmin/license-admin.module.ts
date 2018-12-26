@@ -16,6 +16,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {LicenseListComponent} from './components/list/license-list.component';
 import {RequestLicenseComponent} from './components/request/request-license.component';
 import {LicenseViewEditComponent} from './components/view-edit/license-view-edit.component';
+import {CreatedLicenseComponent} from './components/created-license/created-license.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {LicensesResolveService} from './resolve/licenses-resolve.service';
@@ -40,7 +41,8 @@ import {LicenseAdminService} from './service/license-admin.service';
 	declarations: [
 		LicenseListComponent,
 		RequestLicenseComponent,
-		LicenseViewEditComponent
+		LicenseViewEditComponent,
+		CreatedLicenseComponent
 	],
 	providers: [
 		// Resolve
@@ -52,11 +54,13 @@ import {LicenseAdminService} from './service/license-admin.service';
 	exports: [
 		LicenseListComponent,
 		RequestLicenseComponent,
-		LicenseViewEditComponent
+		LicenseViewEditComponent,
+		CreatedLicenseComponent
 	],
 	entryComponents: [
 		RequestLicenseComponent,
-		LicenseViewEditComponent
+		LicenseViewEditComponent,
+		CreatedLicenseComponent
 	]
 })
 

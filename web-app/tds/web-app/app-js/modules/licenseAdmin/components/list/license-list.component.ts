@@ -3,6 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Component
 import {RequestLicenseComponent} from '../request/request-license.component';
+import {LicenseViewEditComponent} from '../view-edit/license-view-edit.component';
+import {CreatedLicenseComponent} from '../created-license/created-license.component';
 // Service
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -17,12 +19,11 @@ import {
 	LicenseType,
 	LicenseStatus,
 	LicenseEnvironment,
-	LicenseModel
+	LicenseModel, RequestLicenseModel
 } from '../../model/license.model';
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {GridDataResult} from '@progress/kendo-angular-grid';
-import {LicenseViewEditComponent} from '../view-edit/license-view-edit.component';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-license-list',
@@ -99,6 +100,17 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	/**
+	 * Catch the Selected Row
+	 * @param {SelectionEvent} event
+	 */
+	protected cellClick(event: CellClickEvent): void {
+		if (event.columnIndex > 0) {
+			this.selectRow(event['dataItem'].id);
+			// this.openProviderDialogViewEdit(event['dataItem'], ActionType.VIEW);
+		}
+	}
+
+	/**
 	 * Make the entire header clickable on Grid
 	 * @param event: any
 	 */
@@ -109,16 +121,47 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	/**
+	 * Delete the selected License
+	 * @param dataItem
+	 */
+	protected onDelete(dataItem: any): void {
+		this.prompt.open('Confirmation Required', 'You are about to delete the selected license. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.licenseAdminService.deleteLicense(dataItem.id).subscribe(
+						(result) => {
+							this.reloadData();
+						},
+						(err) => console.log(err));
+				}
+			});
+	}
+
+	/**
 	 * Request a New License
 	 */
 	protected onCreateLicense(): void {
-		this.dialogService.open(RequestLicenseComponent, []).then( (result: any) => {
-			console.log(result);
-			if (result && result.id) {
-
+		this.dialogService.open(RequestLicenseComponent, []).then((result: any) => {
+			setTimeout(() => {
+				this.openCreatedLicenseDialog();
+			}, 500);
+			if (result) {
 				this.reloadData();
 			}
 		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	/**
+	 * Opens a dialog to show to the user that the request has been created and next steps to follow
+	 */
+	private openCreatedLicenseDialog(): void {
+		this.dialogService.open(CreatedLicenseComponent, [
+			{provide: RequestLicenseModel, useValue: {}}
+		]).then(() => {
+			console.log('Dismissed Dialog');
+		}).catch(() => {
 			console.log('Dismissed Dialog');
 		});
 	}

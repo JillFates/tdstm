@@ -196,6 +196,7 @@ export const en_DICTIONARY: Object = {
 		'MANAGER': 'License Manager',
 		'ENGINEERING': 'Engineering',
 		'REQUEST_NEW_LICENSE': 'Request New License',
+		'LICENSE_REQUEST_COMPLETED': 'License Request Completed',
 		'TRAINING': 'Training',
 		'PRODUCTION': 'Production',
 	},

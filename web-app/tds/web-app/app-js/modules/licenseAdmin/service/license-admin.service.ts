@@ -57,6 +57,19 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Delete the selected License
+	 * @param id
+	 */
+	deleteLicense(id: number): Observable<string> {
+		return this.http.delete(`${this.licenseUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the possible Projects Data Source
 	 */
 	createRequestLicense(requestLicense: any): Observable<any[]> {
