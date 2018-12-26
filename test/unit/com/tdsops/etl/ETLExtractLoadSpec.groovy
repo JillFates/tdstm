@@ -3056,6 +3056,46 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	}
 
 	@See('TM-13627')
+	void 'test can throw an exception if undefined variables are referenced in ETL extract load with statements'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name
+				abc
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					extract 'name' load 'Description' with aBogusVariableNameVar
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception because comments command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-13627')
 	void 'test can throw an exception if undefined variables are referenced in ETL load with statements'() {
 
 		given:
