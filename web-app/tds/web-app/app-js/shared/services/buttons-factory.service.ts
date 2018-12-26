@@ -11,8 +11,13 @@ export class ButtonsFactoryService {
 		const translate = this.translateService.transform.bind(this.translateService);
 
 		this.registeredButtons = {
+			[TDSActionsButton.ArchitectureGraphShow] : {
+				icon: 'sitemap',
+				title: translate('GLOBAL.ARTIFACTS.ARCHITECTURE_GRAPH'),
+				tooltip: `${translate('GLOBAL.SHOW')} ${translate('GLOBAL.ARTIFACTS.ARCHITECTURE_GRAPH')}`
+			},
 			[TDSActionsButton.AssetEdit] : {
-				icon: 'edit',
+				icon: 'pencil',
 				title: translate('GLOBAL.EDIT'),
 				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
 			},
@@ -20,6 +25,16 @@ export class ButtonsFactoryService {
 				icon: 'clone',
 				title: translate('GLOBAL.CLONE'),
 				tooltip: `${translate('GLOBAL.CLONE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
+			[TDSActionsButton.AssetClose]: {
+				icon: 'ban',
+				title: translate('GLOBAL.CLOSE'),
+				tooltip: `${translate('GLOBAL.CLOSE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
+			[TDSActionsButton.AssetDelete]: {
+				icon: 'trash',
+				title: translate('GLOBAL.DELETE'),
+				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
 			},
 			[TDSActionsButton.BulkEdit]: {
 				icon: 'ellipsis-v',
@@ -29,6 +44,16 @@ export class ButtonsFactoryService {
 				icon: 'comment',
 				title: translate('GLOBAL.CREATE'),
 				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
+			},
+			[TDSActionsButton.CommentEdit]: {
+			icon: 'pencil',
+				title: translate('GLOBAL.EDIT'),
+				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
+			},
+			[TDSActionsButton.CommentDelete]: {
+				icon: 'trash',
+				title: translate('GLOBAL.TRASH'),
+				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
 			},
 			[TDSActionsButton.CommentList]: {
 				icon: 'comments',
@@ -71,6 +96,16 @@ export class ButtonsFactoryService {
 				icon: 'file-text-o',
 				title: translate('GLOBAL.CREATE'),
 				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.TASK')}`
+			},
+			[TDSActionsButton.TaskDelete]: {
+				icon: 'trash',
+				title: translate('GLOBAL.DELETE'),
+				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.TASK')}`
+			},
+			[TDSActionsButton.TaskEdit]: {
+				icon: 'pencil',
+				title: translate('GLOBAL.EDIT'),
+				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.TASK')}`
 			},
 			[TDSActionsButton.TaskSave]: {
 				icon: 'floppy-o',

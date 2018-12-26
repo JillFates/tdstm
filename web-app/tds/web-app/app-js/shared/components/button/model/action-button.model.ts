@@ -5,9 +5,14 @@ export interface TDSButton {
 }
 
 export enum TDSActionsButton {
+	ArchitectureGraphShow,
 	AssetEdit,
 	AssetClone,
+	AssetClose,
+	AssetDelete,
 	BulkEdit,
+	CommentEdit,
+	CommentDelete,
 	CommentCreate,
 	CommentList,
 	FilterClear,
@@ -19,6 +24,8 @@ export enum TDSActionsButton {
 	GenericSave,
 	GenericSaveAs,
 	TaskCreate,
+	TaskDelete,
+	TaskEdit,
 	TaskList,
 	TaskSave,
 	ViewCreate,

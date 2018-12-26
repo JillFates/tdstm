@@ -12,6 +12,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -19,6 +20,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 		template: template
 	})
 	class StorageShowComponent extends AssetCommonShow {
+		protected ButtonActions = TDSActionsButton;
 
 		constructor(
 			activeDialog: UIActiveDialogService,

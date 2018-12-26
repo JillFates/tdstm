@@ -7,6 +7,7 @@ export const en_DICTIONARY: Object = {
 		'OK': 'Ok',
 		'ADD': 'Add',
 		'ACTION': 'Action',
+		'ARCHITECTURE_GRAPH': 'Arch Grap',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
 		'CONFIGURE': 'Configure',
@@ -27,6 +28,7 @@ export const en_DICTIONARY: Object = {
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
 		'DEFAULT': 'Default',
+		'SHOW': 'Show',
 		'SORT': 'Sort',
 		'ADD_FAVORITES': 'Add to Favorites',
 		'REMOVE_FAVORITES': 'Remove from Favorites',
@@ -48,6 +50,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
 		'ARTIFACTS': {
+			'ARCHITECTURE_GRAPH': 'Arch Grap',
 			'ASSET' : 'Asset',
 			'ASSETS' : 'Assets',
 			'COMMENT' : 'Comment',

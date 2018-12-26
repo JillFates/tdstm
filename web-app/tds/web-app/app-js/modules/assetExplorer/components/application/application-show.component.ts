@@ -12,6 +12,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -21,6 +22,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		template: template
 	})
 	class ApplicationShowComponent extends AssetCommonShow {
+		protected ButtonActions = TDSActionsButton;
 
 		constructor(
 			activeDialog: UIActiveDialogService,

@@ -24,12 +24,12 @@
 
 					<button [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
-					        class="btn btn-default dropdown-toggle"
+					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
 						{{ 'GLOBAL.CREATE' | translate }}
 					</button>
 
-					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!canCreateAssets()"
 					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
