@@ -68,12 +68,15 @@
 					"listen": "test",
 					"script": {
 						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
-						]
+							"    ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -115,7 +118,6 @@
 					"listen": "test",
 					"script": {
 						"id": "68d015c5-3903-4a68-beaa-4e6f58ae5300",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -132,8 +134,11 @@
 							"    pm.expect(data.css).to.eql('tag-red');",
 							"    ",
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
+							"    postman.setGlobalVariable(\"validator\",data.name.slice(14));",
+							"    ",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -174,7 +179,6 @@
 					"listen": "test",
 					"script": {
 						"id": "fbee500e-d785-4a85-a757-1418bba9df45",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -185,14 +189,15 @@
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
 							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.contain('Return of the Tag');",
-							"    pm.expect(data.description).to.eql('The tag returns');",
+							"    pm.expect(data.name).to.contain('Brand new Tag2');",
+							"    pm.expect(data.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(data.color).to.eql('Red');",
 							"    pm.expect(data.css).to.eql('tag-red');",
 							"    ",
 							"    postman.setGlobalVariable(\"tag_id2\", data.id);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -210,7 +215,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"Return of the Tag {{$randomInt}}\",\n  \"description\":\"The tag returns\",\n  \"color\":\"Red\"\n}"
+					"raw": "{ \n  \"name\":\"Brand new Tag2 {{validator}}\",\n  \"description\":\"Tag to test new tags events.\",\n  \"color\":\"Red\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -227,13 +232,83 @@
 			"response": []
 		},
 		{
+			"name": "List Events",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Events have been listed.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    ",
+							"    var data = jsonData.rows",
+							"    pm.globals.set(\"event1\", data[0].id);",
+							"    pm.globals.set(\"event2\", data[1].id);",
+							"    pm.globals.set(\"event3\", data[2].id);",
+							"    pm.globals.set(\"event4\", data[3].id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/moveEvent/listJson?_search=false&nd=15453170873241&sidx=name",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"moveEvent",
+						"listJson"
+					],
+					"query": [
+						{
+							"key": "_search",
+							"value": "false"
+						},
+						{
+							"key": "nd",
+							"value": "15453170873241"
+						},
+						{
+							"key": "sidx",
+							"value": "name"
+						}
+					]
+				},
+				"description": "This EP will bring a list of events. Some event ids will be saved in order to add the created tags to them."
+			},
+			"response": []
+		},
+		{
 			"name": "create tagEvent",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "b228c835-9f50-4371-bdd4-720b9c2ffef2",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -251,15 +326,16 @@
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"    ",
-							"    pm.expect(record2.name).to.contain('Return of the Tag');",
-							"    pm.expect(record2.description).to.eql('The tag returns');",
+							"    pm.expect(record2.name).to.contain('Brand new Tag2');",
+							"    pm.expect(record2.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record2.color).to.eql('Red');",
 							"    pm.expect(record2.css).to.eql('tag-red');",
 							"    ",
 							"    postman.setGlobalVariable(\"tag_event_id\", record.id);",
 							"    postman.setGlobalVariable(\"tag_event_id2\", record2.id);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -301,7 +377,6 @@
 					"listen": "test",
 					"script": {
 						"id": "47b94463-9faf-4ae2-afcd-e7d25071f4b1",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -309,21 +384,23 @@
 							"",
 							"pm.test(\"Get the newly created eventTags.\", function () {",
 							"    var json = pm.response.json();",
-							"    ",
-							"    var record = json.data[0];",
-							"    var record2 = json.data[1];",
-							"    ",
-							"    pm.expect(record.name).to.contain('Brand new Tag');",
-							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
-							"    pm.expect(record.color).to.eql('Red');",
-							"    pm.expect(record.css).to.eql('tag-red');",
-							"    ",
-							"    pm.expect(record2.name).to.contain('Return of the Tag');",
-							"    pm.expect(record2.description).to.eql('The tag returns');",
-							"    pm.expect(record2.color).to.eql('Red');",
-							"    pm.expect(record2.css).to.eql('tag-red');",
+							"    var val= pm.variables.get(\"validator\");",
+							"    var tagWasListed = false;",
+							"    var i;",
+							"    for (i = 0; i < json.data.length; i++) { ",
+							"      if(json.data[i].name.includes(val) ){",
+							"          tagWasListed=true;",
+							"          pm.expect(json.data[i].name).to.contain('Brand new Tag');",
+							"          pm.expect(json.data[i].description).to.eql('Tag to test new tags events.');",
+							"          pm.expect(json.data[i].color).to.eql('Red');",
+							"          pm.expect(json.data[i].css).to.eql('tag-red');",
+							"      }",
+							"    }",
+							"    pm.expect(tagWasListed).to.eql(true);",
+							"   ",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -427,7 +504,6 @@
 					"listen": "test",
 					"script": {
 						"id": "f321b0ef-76db-4600-bc83-52e341dbdbd6",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -439,14 +515,15 @@
 							"    ",
 							"    var data1 = json.data[0];",
 							"    ",
-							"    pm.expect(data1.name).to.contain('Return of the Tag');",
-							"    pm.expect(data1.description).to.eql('The tag returns');",
+							"    pm.expect(data1.name).to.contain('Brand new Tag2');",
+							"    pm.expect(data1.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(data1.color).to.eql('Red');",
 							"    pm.expect(data1.css).to.eql('tag-red');",
 							"    ",
 							"    postman.setGlobalVariable(\"tag_event_id4\", data1.id);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -489,7 +566,6 @@
 					"listen": "test",
 					"script": {
 						"id": "8fb47a0d-e6f2-4219-8633-174876fea8f9",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -501,14 +577,15 @@
 							"    ",
 							"    var data1 = jsonData.data[0];",
 							"    ",
-							"    pm.expect(data1.name).to.contain('Return of the Tag');",
-							"    pm.expect(data1.description).to.eql('The tag returns');",
+							"    pm.expect(data1.name).to.contain('Brand new Tag2');",
+							"    pm.expect(data1.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(data1.color).to.eql('Red');",
 							"    pm.expect(data1.css).to.eql('tag-red');",
 							"    ",
 							"    postman.setGlobalVariable(\"tag_event_id5\", data1.id);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -551,7 +628,6 @@
 					"listen": "test",
 					"script": {
 						"id": "253cba24-9d59-4b47-a428-eb87a3fc38e0",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -562,12 +638,13 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.contain('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.name).to.include('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -664,7 +741,6 @@
 					"listen": "test",
 					"script": {
 						"id": "a7ffbe31-26d4-44f5-8c91-f549f2cebf33",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -682,7 +758,8 @@
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1221,7 +1298,6 @@
 					"listen": "test",
 					"script": {
 						"id": "049e3830-bb5f-416f-a034-e408875b1317",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1230,7 +1306,7 @@
 							"pm.test(\"Tags that had been created are now deleted.\", function () {",
 							"    var response = pm.response.json();",
 							"     pm.expect(pm.response.text()).to.not.include(\"Brand new Tag\");",
-							"     pm.expect(pm.response.text()).to.not.include(\"Return of the Tag\");",
+							"     pm.expect(pm.response.text()).to.not.include(\"Tag to test new tags events.\");",
 							"});",
 							"",
 							"//cleanup code",
@@ -1240,8 +1316,10 @@
 							"pm.globals.unset(\"tag_event_id2\");",
 							"pm.globals.unset(\"tag_event_id3\");",
 							"pm.globals.unset(\"tag_event_id4\");",
-							"pm.globals.unset(\"tag_event_id5\");"
-						]
+							"pm.globals.unset(\"tag_event_id5\");",
+							"pm.globals.unset(\"validator\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1300,33 +1378,9 @@
 	],
 	"variable": [
 		{
-			"id": "16d4f8f7-5bbe-4f67-9fde-38e05581a2e4",
+			"id": "44f29fea-c3fc-4cc7-8c43-c47007e77d7c",
 			"key": "projectId",
 			"value": "2445",
-			"type": "string"
-		},
-		{
-			"id": "67229d7e-a237-42a4-bc8e-0318a337981f",
-			"key": "event1",
-			"value": "348",
-			"type": "string"
-		},
-		{
-			"id": "cc1a640a-7b3c-46f3-8220-3d39260df001",
-			"key": "event2",
-			"value": "349",
-			"type": "string"
-		},
-		{
-			"id": "67158b87-8e54-44bb-9554-51cae4c7c8a3",
-			"key": "event3",
-			"value": "350",
-			"type": "string"
-		},
-		{
-			"id": "fb61bf3d-fb80-42e8-b2c9-3e8e9cac4b98",
-			"key": "event4",
-			"value": "364",
 			"type": "string"
 		}
 	]
