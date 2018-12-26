@@ -3,8 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Component
 import {RequestLicenseComponent} from '../request/request-license.component';
-import {LicenseViewEditComponent} from '../view-edit/license-view-edit.component';
 import {CreatedLicenseComponent} from '../created-license/created-license.component';
+import {LicenseDetailComponent} from '../detail/license-detail.component';
 // Service
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -49,7 +49,6 @@ export class LicenseListComponent implements OnInit {
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: any[];
-	public selectedRows = [];
 	public dateFormat = '';
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
@@ -94,19 +93,13 @@ export class LicenseListComponent implements OnInit {
 		this.filterChange(this.state.filter);
 	}
 
-	private selectRow(dataItemId: number): void {
-		this.selectedRows = [];
-		this.selectedRows.push(dataItemId);
-	}
-
 	/**
 	 * Catch the Selected Row
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			// this.openProviderDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			this.openLicenseViewEdit(event['dataItem']);
 		}
 	}
 
@@ -178,17 +171,16 @@ export class LicenseListComponent implements OnInit {
 			(err) => console.log(err));
 	}
 
-	private openCredentialDialogViewEdit(credentialModel: LicenseModel, actionType: number, originalModel?: LicenseModel): void {
-		this.dialogService.open(LicenseViewEditComponent, [
-			{ provide: LicenseModel, useValue: credentialModel },
-			{ provide: Number, useValue: actionType }
+	/**
+	 * Opens the selected Licenser View
+	 * @param licenseModel
+	 */
+	private openLicenseViewEdit(licenseModel: LicenseModel): void {
+		this.dialogService.open(LicenseDetailComponent, [
+			{ provide: LicenseModel, useValue: licenseModel }
 		], DIALOG_SIZE.XLG, false).then( (result: LicenseModel) => {
 			if (result && result.id) {
-				if (actionType === ActionType.CREATE) {
-					this.reloadData();
-				} else {
-					// this.reloadItem(originalModel);
-				}
+				//
 			}
 		}).catch(result => {
 			this.reloadData();

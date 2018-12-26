@@ -1,0 +1,113 @@
+<div tds-autofocus class="modal-content data-script-view-edit-component" >
+	<div class="modal-header">
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<h4 class="modal-title">{{ 'LICENSE.LICENSE_DETAIL' | translate }}</h4>
+	</div>
+	<div class="modal-body">
+		<form name="licenseRequestForm" role="form" data-toggle="validator" #licenseRequestForm='ngForm' class="form-horizontal left-alignment">
+			<div class="box-body">
+				<div class="row">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Project: </label>
+							<div class="col-sm-9">
+								<label class="control-label " style="text-transform: capitalize;">{{licenseDetail.licenseModel.projectName}}</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-4 control-label">Email contact: </label>
+							<div class="col-sm-8">
+								<label class="control-label ">{{licenseDetail.licenseModel.email}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" ng-if="licenseDetail.licenseModel.clientName">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Client: </label>
+							<div class="col-sm-9">
+								<label class="control-label ">{{licenseDetail.licenseModel.clientName}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
+						<!-- <li><a href="#tab_2" data-toggle="tab">Activity</a></li> -->
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab_1">
+							<div class="form-group">
+								<label for="radioGroupMethod" class="col-sm-1 control-label">Method:</label>
+								<div class="col-sm-11" id="radioGroupMethod">
+									<label class="radio-inline" ng-repeat="methodOption in licenseDetail.methodOptions">
+										<input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseDetail.licenseModel.method.name" ng-value="methodOption.name" disabled> {{methodOption.text}}
+									</label>
+								</div>
+							</div>
+							<div class="form-group sub-option-50" ng-if="licenseDetail.licenseModel.method.name === 'MAX_SERVERS'">
+								<label class="col-sm-2 control-label">Max Server:</label>
+								<div class="col-sm-10" >
+									<label class="control-label ">{{licenseDetail.licenseModel.method.max}}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Environment:</label>
+								<div class="col-sm-10">
+									<label class="control-label" style="text-transform: capitalize;">{{licenseDetail.licenseModel.environment | lowercase}}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Inception:</label>
+								<div class="col-sm-10">
+									<label class="control-label"><!-- {{licenseDetail.licenseModel.inception | date | convertDateIntoTimeZone}} --></label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Expiration:</label>
+								<div class="col-sm-10">
+									<label class="control-label"><!-- {{licenseDetail.licenseModel.expiration | date | convertDateIntoTimeZone}} --></label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="selectSpecialInstructions" class="col-sm-12 control-label">Special Instructions and/or PO# reference:</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" ng-model="licenseDetail.licenseModel.requestNote" ng-disabled="true"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label text-right element-width-100">Id:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseDetail.licenseModel.id}}</label>
+								</div>
+							</div>
+							<div class="form-group" ng-if="licenseDetail.licenseModel.replaced">
+								<label class="col-sm-2 control-label text-right element-width-100">Replaced:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseDetail.licenseModel.replaced.date | date}}</label>
+									<label class="control-label pad-left-20">Server <a href="{{licenseDetail.licenseModel.replaced.url}}">{{licenseDetail.licenseModel.replaced.name}}</a></label>
+								</div>
+							</div>
+						</div><!-- /.tab-pane -->
+						<div class="tab-pane" id="tab_2">
+
+						</div><!-- /.tab-pane -->
+					</div><!-- /.tab-content -->
+				</div>
+			</div><!-- /.box-body -->
+		</form>
+	</div>
+	<div class="modal-footer form-group-center">
+		<button type="button" (click)="onCreateRequestLicense()" class="btn btn-primary pull-left" [disabled]="!licenseRequestForm.form.valid"><span class="fa fa-fw fa-floppy-o"></span> Submit Request</button>
+		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+			<span class="glyphicon glyphicon-ban-circle"></span>
+			<span>{{'GLOBAL.CANCEL' | translate }}</span>
+		</button>
+	</div>
+</div>

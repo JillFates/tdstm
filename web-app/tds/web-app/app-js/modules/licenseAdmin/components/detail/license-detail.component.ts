@@ -5,26 +5,26 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {LicenseAdminService} from '../../service/license-admin.service';
 // Model
-import {RequestLicenseModel} from '../../model/license.model';
-// Other
-import {Observable} from 'rxjs';
+import {LicenseModel, RequestLicenseModel} from '../../model/license.model';
 
 @Component({
-	selector: 'tds-license-create',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/request/request-license.component.html',
+	selector: 'tds-license-detail',
+	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/detail/license-detail.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
 	`]
 })
-export class RequestLicenseComponent implements OnInit {
+export class LicenseDetailComponent implements OnInit {
+
 	protected requestLicense = new RequestLicenseModel();
 	protected environmentList: any = [];
 	protected projectList: any = [];
 	private dataSignature: string;
 
 	constructor(
+		public licenseModel: LicenseModel,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
@@ -41,13 +41,9 @@ export class RequestLicenseComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		Observable.forkJoin(this.licenseAdminService.getEnvironments(), this.licenseAdminService.getProjects()).subscribe( (res: any) => {
-			this.environmentList = res[0];
-			this.requestLicense.environment = this.environmentList[0];
-			this.projectList = res[1];
-			this.requestLicense.project = this.projectList[0];
-			this.dataSignature = JSON.stringify(this.requestLicense);
-		});
+		this.licenseAdminService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
+			console.log(licenseModel)
+		})
 	}
 
 	/**
@@ -59,30 +55,9 @@ export class RequestLicenseComponent implements OnInit {
 	}
 
 	/**
-	 * Change the client based on the selected project
-	 * @param selectedProject
-	 */
-	protected onProjectSelect(selectedProject: any): void {
-		this.requestLicense.clientName = selectedProject.client.name;
-	}
-
-	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
-			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.activeDialog.dismiss();
-		}
+		this.activeDialog.dismiss();
 	}
 }

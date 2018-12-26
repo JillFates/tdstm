@@ -33,6 +33,18 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Get a single License instance
+	 */
+	getLicense(id: number): Observable<any> {
+		return this.http.get(`${this.licenseUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the possible Environment Data Source
 	 */
 	getEnvironments(): Observable<any[]> {
