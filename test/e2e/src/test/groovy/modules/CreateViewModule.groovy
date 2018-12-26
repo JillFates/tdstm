@@ -20,7 +20,7 @@ class CreateViewModule extends Module {
         filterBtn                    {$("button",text:"Filter")}
         clearSearchBtn               {searchField.siblings()}
         saveBtn                      {$("button", text:"Save")}
-        saveOptions                  {$("button.dropdown-toggle")}
+        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}
         saveAs                       {$("a",text:"Save As")}
         closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
@@ -43,7 +43,7 @@ class CreateViewModule extends Module {
         previewRows {$("tbody")[1]}
         firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
         tableHeaderNames {$('th label')}
-        gridToolbar (wait:true){$("kendo-grid-toolbar")}
+
     }
 
     def clickSaveOptions(){
@@ -57,8 +57,7 @@ class CreateViewModule extends Module {
     }
 
     def clickSpecificCheckbox(String name){
-        commonsModule.goToElement gridToolbar
-        waitFor{$("label", text: name).click()}
+        waitFor{$("label", title: name).click()}
     }
 
     def clickOnCloseViewEdition(){
@@ -214,7 +213,6 @@ class CreateViewModule extends Module {
         def checks = $("div.content.body input")
         checks.each {
             if (it.value() == "on") {
-                //listOfFields.add(it.parent().text().trim().contains(value().trim()))
                 listOfFields.add(it.parent().text())
             }
         }
