@@ -52,16 +52,6 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	private keyDownHandler($event: KeyboardEvent): void {
-		if ($event && $event.code === KEYSTROKE.ESCAPE) {
-			this.onCancelCloseDialog();
-		}
-	}
-
-	/**
 	 * On Fields Values updated successfully.
 	 */
 	private onUpdateSuccess(): void {
