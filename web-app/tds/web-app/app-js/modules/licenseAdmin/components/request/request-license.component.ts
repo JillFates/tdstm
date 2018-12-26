@@ -39,7 +39,7 @@ export class RequestLicenseComponent implements OnInit {
 	 */
 	protected onCreateRequestLicense(): void {
 		this.licenseAdminService.createRequestLicense(this.requestLicense).subscribe( (newLicense: any) => {
-			this.activeDialog.close(newLicense);
+			this.activeDialog.close(this.requestLicense);
 		});
 	}
 

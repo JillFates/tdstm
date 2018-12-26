@@ -141,11 +141,11 @@ export class LicenseListComponent implements OnInit {
 	 * Request a New License
 	 */
 	protected onCreateLicense(): void {
-		this.dialogService.open(RequestLicenseComponent, []).then((result: any) => {
+		this.dialogService.open(RequestLicenseComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
 			setTimeout(() => {
-				this.openCreatedLicenseDialog();
+				this.openCreatedLicenseDialog(requestLicenseModel);
 			}, 500);
-			if (result) {
+			if (requestLicenseModel) {
 				this.reloadData();
 			}
 		}).catch(result => {
@@ -156,9 +156,9 @@ export class LicenseListComponent implements OnInit {
 	/**
 	 * Opens a dialog to show to the user that the request has been created and next steps to follow
 	 */
-	private openCreatedLicenseDialog(): void {
+	private openCreatedLicenseDialog(requestLicenseModel: RequestLicenseModel): void {
 		this.dialogService.open(CreatedLicenseComponent, [
-			{provide: RequestLicenseModel, useValue: {}}
+			{provide: RequestLicenseModel, useValue: requestLicenseModel}
 		]).then(() => {
 			console.log('Dismissed Dialog');
 		}).catch(() => {
