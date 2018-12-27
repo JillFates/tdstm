@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {UIExtraDialog} from '../../../../services/ui-dialog.service';
+import {pathOr} from 'ramda';
 import {Observable} from 'rxjs';
 
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
@@ -377,5 +378,22 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			} else {
 				return originalValue;
 			}
+	}
+
+	/**
+	 * Get a field from the form by control name
+	 * @param {any} form  - Main form holding all the field
+	 * @param {string} controlName - Name of th field to get
+	 * @returns {any} - Returns the field or null if not found
+	 */
+	public getFormField(form, controlName): any {
+		const field = pathOr(null, ['controls', controlName], form);
+
+		return  field === null ? null : {
+			valid: field.valid,
+			touched: field.touched,
+			dirty: field.dirty,
+			errors: field.errors || {}
+		};
 	}
 }

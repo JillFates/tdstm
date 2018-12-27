@@ -1,36 +1,59 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {PreferenceService} from '../../../services/preference.service';
+import {
+	Component,
+	forwardRef,
+	OnInit,
+	OnChanges,
+	SimpleChanges
+} from '@angular/core';
+import {
+	NG_VALUE_ACCESSOR,
+	NG_VALIDATORS
+} from '@angular/forms';
+
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {DateUtils} from '../../../utils/date.utils';
-import {TDSCustomControl} from '../common/custom-control';
+import {PreferenceService} from '../../../services/preference.service';
+import {TDSCustomControl} from '../common/custom-control.component';
+import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 @Component({
 	selector: 'tds-date-control',
 	template: `
-		<div>
-            <kendo-datepicker [(value)]="dateValue"
-							  [format]="displayFormat"
-							  [tabindex]="tabindex"
-                              (valueChange)="onValueChange($event)"
-							  class="form-control">
-			</kendo-datepicker>
-		</div>
-	`
+		<kendo-datepicker
+			[value]="dateValue"
+			(blur)="onTouched()"
+			[format]="displayFormat"
+			[tabindex]="tabindex"
+			(valueChange)="onValueChange($event)"
+			class="form-control">
+		</kendo-datepicker>
+	`,
+	providers: [
+		{
+			provide: NG_VALUE_ACCESSOR,
+			useExisting: forwardRef(() => TDSDateControlComponent),
+			multi: true
+		},
+		{
+			provide: NG_VALIDATORS,
+			useExisting: forwardRef(() => TDSDateControlComponent),
+			multi: true
+		}
+	]
 })
 /**
  * input: yyyy-MM-dd
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
-export class DateControlComponent extends TDSCustomControl implements OnInit  {
-
-	@Input('value') value: any;
-	@Output() valueChange = new EventEmitter<any>();
-	@Input('required') required = false;
+export class TDSDateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
 	protected displayFormat: string;
 	protected dateValue: Date;
 
-	constructor(private userPreferenceService: PreferenceService) {
-		super();
-		this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
+	constructor(
+		private userPreferenceService: PreferenceService,
+		protected validationRulesFactory: ValidationRulesFactoryService) {
+			super(validationRulesFactory);
+			this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
 	}
 
 	/**
@@ -39,7 +62,6 @@ export class DateControlComponent extends TDSCustomControl implements OnInit  {
 	ngOnInit(): void {
 		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
 		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
-		this.onValueChange(this.dateValue);
 	}
 
 	/**
@@ -52,6 +74,13 @@ export class DateControlComponent extends TDSCustomControl implements OnInit  {
 		} else {
 			this.value = null;
 		}
-		this.valueChange.emit(this.value);
+		this.onTouched();
+	}
+
+	ngOnChanges(inputs: SimpleChanges) {
+		const dateConstraints = {
+			required: this.required
+		};
+		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 	}
 }
