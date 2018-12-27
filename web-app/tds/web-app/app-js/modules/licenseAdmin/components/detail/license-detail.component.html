@@ -107,7 +107,7 @@
         <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="applyLicenseKey()"><i class="fa fa-fw fa-key"></i> Apply License Key</button>
         <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="resubmitLicenseRequest()"><span class="glyphicon glyphicon-share-alt"></span> Resubmit Request</button>
         <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Manually Submit Request</button>
-        <button type="button" class="btn btn-danger" [ngClass]="{'pull-left': licenseModel.status === licenseStatus.ACTIVE}" (click)="deleteLicense()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
+        <button type="button" class="btn btn-danger" [ngClass]="{'pull-left': licenseModel.status === licenseStatus.ACTIVE}" (click)="onDelete()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span>{{'GLOBAL.CANCEL' | translate }}</span>

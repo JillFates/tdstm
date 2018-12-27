@@ -57,6 +57,18 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Resubmit the License
+	 */
+	resubmitLicenseRequest(id: number): Observable<any> {
+		return this.http.post(`${this.licenseUrl}/${id}/email/request`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the possible Environment Data Source
 	 */
 	getEnvironments(): Observable<any[]> {

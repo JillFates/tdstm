@@ -7,10 +7,12 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 // Model
 import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
 // Other
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {AlertType} from '../../../../shared/model/alert.model';
 
 @Component({
 	selector: 'tds-license-detail',
@@ -31,7 +33,8 @@ export class LicenseDetailComponent implements OnInit {
 		private prompt: UIPromptService,
 		private licenseAdminService: LicenseAdminService,
 		private preferenceService: PreferenceService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private notifierService: NotifierService) {
 	}
 
 	ngOnInit(): void {
@@ -63,5 +66,44 @@ export class LicenseDetailComponent implements OnInit {
 				//
 			})
 			.catch(error => console.log('Cancel Apply Key'));
+	}
+
+	/**
+	 * Submit again the License in case there was an error on the original creation
+	 */
+	protected resubmitLicenseRequest(): void {
+		this.licenseAdminService.resubmitLicenseRequest(this.licenseModel.id).subscribe(
+			(result) => {
+				let message = '';
+				let alertType: AlertType = null;
+				if (result) {
+					alertType = AlertType.INFO;
+					message = 'Request License was successfully';
+				} else {
+					message = 'There was an error on the request';
+					alertType = AlertType.WARNING;
+				}
+				this.notifierService.broadcast({
+					name: alertType,
+					message: message
+				});
+			},
+			(err) => console.log(err));
+	}
+
+	/**
+	 * Delete the current License
+	 */
+	protected onDelete(): void {
+		this.prompt.open('Confirmation Required', 'You are about to delete the license. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.licenseAdminService.deleteLicense(this.licenseModel.id).subscribe(
+						(result) => {
+							this.activeDialog.dismiss();
+						},
+						(err) => console.log(err));
+				}
+			});
 	}
 }
