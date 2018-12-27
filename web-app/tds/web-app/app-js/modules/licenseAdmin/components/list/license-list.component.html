@@ -44,7 +44,7 @@
 
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 							<div class="text-center">
-								<button class="btn btn-default" (click)="onEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+								<button class="btn btn-default" (click)="openLicenseViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
 								<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 							</div>
 						</ng-template>

@@ -6,8 +6,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 // Model
-import {LicenseModel, RequestLicenseModel, MethodOptions} from '../../model/license.model';
-import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
+import {LicenseModel, RequestLicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
@@ -25,8 +24,9 @@ export class LicenseDetailComponent implements OnInit {
 	protected environmentList: any = [];
 	protected projectList: any = [];
 	protected dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
+	protected methodOptions = MethodOptions;
+	protected licenseStatus = LicenseStatus;
 	private dataSignature: string;
-	private methodOptions = MethodOptions;
 
 	constructor(
 		public licenseModel: LicenseModel,

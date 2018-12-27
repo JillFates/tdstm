@@ -61,7 +61,9 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" (click)="onCreateRequestLicense()" class="btn btn-primary pull-left" [disabled]="!licenseRequestForm.form.valid"><span class="fa fa-fw fa-floppy-o"></span> Submit Request</button>
+		<button type="button" (click)="onCreateRequestLicense()" class="btn btn-primary pull-left" [disabled]="!licenseRequestForm.form.valid">
+			<span class="glyphicon glyphicon-share-alt"></span> Submit Request
+		</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span>{{'GLOBAL.CANCEL' | translate }}</span>
