@@ -98,3 +98,18 @@ export enum LicenseEnvironment {
 	DEMO = 'DEMO',
 	PRODUCTION = 'PRODUCTION'
 }
+
+export const MethodOptions = [
+	{
+		name: 'MAX_SERVERS',
+		text: 'Servers'
+	},
+	{
+		name: 'TOKEN',
+		text: 'Tokens'
+	},
+	{
+		name: 'CUSTOM',
+		text: 'Custom'
+	}
+];

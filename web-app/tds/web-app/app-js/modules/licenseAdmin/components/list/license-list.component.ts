@@ -172,13 +172,13 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	/**
-	 * Opens the selected Licenser View
+	 * Opens the selected License View
 	 * @param licenseModel
 	 */
 	private openLicenseViewEdit(licenseModel: LicenseModel): void {
 		this.dialogService.open(LicenseDetailComponent, [
 			{ provide: LicenseModel, useValue: licenseModel }
-		], DIALOG_SIZE.XLG, false).then( (result: LicenseModel) => {
+		], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
 			if (result && result.id) {
 				//
 			}

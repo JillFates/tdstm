@@ -11,7 +11,7 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Project: </label>
 							<div class="col-sm-9">
-								<label class="control-label " style="text-transform: capitalize;">{{licenseDetail.licenseModel.projectName}}</label>
+								<label class="control-label " style="text-transform: capitalize;">{{licenseModel.project.name}}</label>
 							</div>
 						</div>
 					</div>
@@ -19,17 +19,17 @@
 						<div class="form-group">
 							<label class="col-sm-4 control-label">Email contact: </label>
 							<div class="col-sm-8">
-								<label class="control-label ">{{licenseDetail.licenseModel.email}}</label>
+								<label class="control-label ">{{licenseModel.email}}</label>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="row" ng-if="licenseDetail.licenseModel.clientName">
+				<div class="row" ng-if="licenseModel.clientName">
 					<div class="col-sm-5">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Client: </label>
 							<div class="col-sm-9">
-								<label class="control-label ">{{licenseDetail.licenseModel.clientName}}</label>
+								<label class="control-label ">{{licenseModel.client.name}}</label>
 							</div>
 						</div>
 					</div>
@@ -37,40 +37,39 @@
 				<div class="nav-tabs-custom">
 					<ul class="nav nav-tabs">
 						<li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
-						<!-- <li><a href="#tab_2" data-toggle="tab">Activity</a></li> -->
 					</ul>
 					<div class="tab-content">
 						<div class="tab-pane active" id="tab_1">
 							<div class="form-group">
 								<label for="radioGroupMethod" class="col-sm-1 control-label">Method:</label>
 								<div class="col-sm-11" id="radioGroupMethod">
-									<label class="radio-inline" ng-repeat="methodOption in licenseDetail.methodOptions">
-										<input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="servers" ng-model="licenseDetail.licenseModel.method.name" ng-value="methodOption.name" disabled> {{methodOption.text}}
+									<label class="radio-inline" *ngFor="let methodOption of methodOptions">
+										<input type="radio" name="inlineRadioOptions" value="servers" [(ngModel)]="licenseModel.method.name" [value]="methodOption.name" disabled> {{methodOption.text}}
 									</label>
 								</div>
 							</div>
-							<div class="form-group sub-option-50" ng-if="licenseDetail.licenseModel.method.name === 'MAX_SERVERS'">
+							<div class="form-group sub-option-50" *ngIf="licenseModel.method.name === 'MAX_SERVERS'">
 								<label class="col-sm-2 control-label">Max Server:</label>
 								<div class="col-sm-10" >
-									<label class="control-label ">{{licenseDetail.licenseModel.method.max}}</label>
+									<label class="control-label ">{{licenseModel.method.max}}</label>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Environment:</label>
 								<div class="col-sm-10">
-									<label class="control-label" style="text-transform: capitalize;">{{licenseDetail.licenseModel.environment | lowercase}}</label>
+									<label class="control-label" style="text-transform: capitalize;">{{licenseModel.environment | lowercase}}</label>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Inception:</label>
 								<div class="col-sm-10">
-									<label class="control-label"><!-- {{licenseDetail.licenseModel.inception | date | convertDateIntoTimeZone}} --></label>
+									<label class="control-label">{{licenseModel.activationDate | date: dateFormat }}</label>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Expiration:</label>
 								<div class="col-sm-10">
-									<label class="control-label"><!-- {{licenseDetail.licenseModel.expiration | date | convertDateIntoTimeZone}} --></label>
+									<label class="control-label">{{licenseModel.expirationDate | date: dateFormat }}</label>
 								</div>
 							</div>
 							<div class="form-group">
@@ -78,20 +77,21 @@
 							</div>
 							<div class="form-group">
 								<div class="col-sm-12">
-									<textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" ng-model="licenseDetail.licenseModel.requestNote" ng-disabled="true"></textarea>
+									<textarea id="selectSpecialInstructions" name="selectSpecialInstructions" class="form-control" rows="3" placeholder="" [(ngModel)]="licenseModel.requestNote" [disabled]="true"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-2 control-label text-right element-width-100">Id:</label>
-								<div class="col-sm-10">
-									<label class="control-label">{{licenseDetail.licenseModel.id}}</label>
+								<label class="col-sm-1"></label>
+								<label class="col-sm-2 control-label text-right element-width-50">Id:</label>
+								<div class="col-sm-9">
+									<label class="control-label">{{licenseModel.id}}</label>
 								</div>
 							</div>
-							<div class="form-group" ng-if="licenseDetail.licenseModel.replaced">
+							<div class="form-group" *ngIf="licenseModel.replaced">
 								<label class="col-sm-2 control-label text-right element-width-100">Replaced:</label>
 								<div class="col-sm-10">
-									<label class="control-label">{{licenseDetail.licenseModel.replaced.date | date}}</label>
-									<label class="control-label pad-left-20">Server <a href="{{licenseDetail.licenseModel.replaced.url}}">{{licenseDetail.licenseModel.replaced.name}}</a></label>
+									<label class="control-label">{{licenseModel.replaced.date | date}}</label>
+									<label class="control-label pad-left-20">Server <a href="{{licenseModel.replaced.url}}">{{licenseModel.replaced.name}}</a></label>
 								</div>
 							</div>
 						</div><!-- /.tab-pane -->

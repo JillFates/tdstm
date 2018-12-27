@@ -4,8 +4,11 @@ import {Component, OnInit} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {LicenseAdminService} from '../../service/license-admin.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 // Model
-import {LicenseModel, RequestLicenseModel} from '../../model/license.model';
+import {LicenseModel, RequestLicenseModel, MethodOptions} from '../../model/license.model';
+import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'tds-license-detail',
@@ -21,28 +24,27 @@ export class LicenseDetailComponent implements OnInit {
 	protected requestLicense = new RequestLicenseModel();
 	protected environmentList: any = [];
 	protected projectList: any = [];
+	protected dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
 	private dataSignature: string;
+	private methodOptions = MethodOptions;
 
 	constructor(
 		public licenseModel: LicenseModel,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private licenseAdminService: LicenseAdminService) {
-	}
-
-	/**
-	 * Create Edit a Provider
-	 */
-	protected onCreateRequestLicense(): void {
-		this.licenseAdminService.createRequestLicense(this.requestLicense).subscribe( (newLicense: any) => {
-			this.activeDialog.close(this.requestLicense);
-		});
+		private licenseAdminService: LicenseAdminService,
+		private preferenceService: PreferenceService) {
 	}
 
 	ngOnInit(): void {
+
+		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+		});
+
 		this.licenseAdminService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
-			console.log(licenseModel)
+			this.licenseModel = licenseModel;
 		})
 	}
 
