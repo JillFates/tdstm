@@ -19,6 +19,7 @@ import 'rxjs/add/operator/finally';
 export class ApplyKeyComponent extends UIExtraDialog {
 
 	protected modalOptions: DecoratorOptions;
+	protected licenseKey = '';
 	private dataSignature = {};
 
 	constructor(
@@ -28,7 +29,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 		private licenseAdminService: LicenseAdminService) {
 		super('#licenseApplyKey');
 		this.modalOptions = {isFullScreen: false, isResizable: false};
-		this.dataSignature = JSON.stringify(this.licenseModel);
+		this.dataSignature = JSON.stringify(this.licenseKey);
 	}
 
 	protected cancelCloseDialog($event): void {
@@ -52,7 +53,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 	 * Apply the key and close the dialog, also send an info msg
 	 */
 	protected applyKey(): void {
-		this.licenseAdminService.applyKey(this.licenseModel.id, this.licenseModel.key).subscribe((res: any) => {
+		this.licenseAdminService.applyKey(this.licenseModel.id, this.licenseKey).subscribe((res: any) => {
 			let message = '';
 			let alertType: AlertType = null;
 
@@ -68,6 +69,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 				name: alertType,
 				message: message
 			});
+			this.close();
 		});
 	}
 
@@ -76,7 +78,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 	 * @returns {boolean}
 	 */
 	private isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.licenseModel);
+		return this.dataSignature !== JSON.stringify(this.licenseKey);
 	}
 
 }
