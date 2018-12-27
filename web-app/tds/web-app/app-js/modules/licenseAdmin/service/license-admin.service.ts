@@ -45,6 +45,18 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Apply the key for an specific license
+	 */
+	applyKey(id: number, hash: string): Observable<any> {
+		return this.http.post(`${this.licenseUrl}/${id}/load`, JSON.stringify({hash: hash}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the possible Environment Data Source
 	 */
 	getEnvironments(): Observable<any[]> {

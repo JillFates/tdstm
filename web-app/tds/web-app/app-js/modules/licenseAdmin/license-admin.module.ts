@@ -17,6 +17,7 @@ import {LicenseListComponent} from './components/list/license-list.component';
 import {RequestLicenseComponent} from './components/request/request-license.component';
 import {CreatedLicenseComponent} from './components/created-license/created-license.component';
 import {LicenseDetailComponent} from './components/detail/license-detail.component';
+import {ApplyKeyComponent} from './components/apply-key/apply-key.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {LicensesResolveService} from './resolve/licenses-resolve.service';
@@ -42,7 +43,8 @@ import {LicenseAdminService} from './service/license-admin.service';
 		LicenseListComponent,
 		RequestLicenseComponent,
 		CreatedLicenseComponent,
-		LicenseDetailComponent
+		LicenseDetailComponent,
+		ApplyKeyComponent
 	],
 	providers: [
 		// Resolve
@@ -55,12 +57,14 @@ import {LicenseAdminService} from './service/license-admin.service';
 		LicenseListComponent,
 		RequestLicenseComponent,
 		CreatedLicenseComponent,
-		LicenseDetailComponent
+		LicenseDetailComponent,
+		ApplyKeyComponent
 	],
 	entryComponents: [
 		RequestLicenseComponent,
 		CreatedLicenseComponent,
-		LicenseDetailComponent
+		LicenseDetailComponent,
+		ApplyKeyComponent
 	]
 })
 

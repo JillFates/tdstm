@@ -76,6 +76,7 @@ export class RequestLicenseModel {
 
 export class LicenseModel {
 	id?: number;
+	key?: string;
 	name: string;
 	description?: string;
 	comment?: string;
