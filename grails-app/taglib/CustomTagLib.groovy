@@ -265,6 +265,8 @@ class CustomTagLib implements InitializingBean {
 					if (s) label = s.encodeAsHTML()
 				}
 
+				label = label.replaceAll("'", "\\\\'")
+
 				if (!first) {
 					out << ","
 				}
