@@ -13,6 +13,7 @@ import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.mo
 // Other
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {ManualRequestComponent} from '../manual-request/manual-request.component';
 
 @Component({
 	selector: 'tds-license-detail',
@@ -66,6 +67,19 @@ export class LicenseDetailComponent implements OnInit {
 				//
 			})
 			.catch(error => console.log('Cancel Apply Key'));
+	}
+
+	/**
+	 * Open a dialog for a Manual Request
+	 */
+	protected manuallyRequest(): void {
+		this.dialogService.extra(ManualRequestComponent,
+			[{provide: LicenseModel, useValue: this.licenseModel}],
+			false, false)
+			.then((result) => {
+				//
+			})
+			.catch(error => console.log('Cancel Manual Request'));
 	}
 
 	/**

@@ -23,7 +23,10 @@
 			</div>
 			<div class="modal-footer form-group">
 				<button (click)="applyKey()" [disabled]="!applyLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Apply</button>
-				<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+					<span class="glyphicon glyphicon-ban-circle"></span>
+					<span>{{'GLOBAL.CANCEL' | translate }}</span>
+				</button>
 			</div>
 		</div>
 	</div>

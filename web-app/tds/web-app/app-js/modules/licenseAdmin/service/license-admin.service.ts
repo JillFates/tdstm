@@ -69,6 +69,18 @@ export class LicenseAdminService {
 	}
 
 	/**
+	 * Get the Email Content for this request
+	 */
+	getEmailContent(id: number): Observable<any> {
+		return this.http.get(`${this.licenseUrl}/${id}/email/request`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the possible Environment Data Source
 	 */
 	getEnvironments(): Observable<any[]> {
