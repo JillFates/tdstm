@@ -3617,16 +3617,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (! task.category && workflow.category) {
 				task.category = workflow.category
 			}
-			if (! task.estStart && workflow.plan_start_time) {
-				task.estStart = workflow.plan_start_time
-			}
-			if (! task.estFinish && workflow.plan_completion_time) {
-				task.estFinish = workflow.plan_completion_time
-			}
-			if (! task.duration && workflow.duration != null) {
-				task.duration = workflow.duration
-				task.durationScale = workflow.duration_scale ?: 'm'
-			}
+			// if (! task.estStart && workflow.plan_start_time) {
+			// 	task.estStart = workflow.plan_start_time
+			// }
+			// if (! task.estFinish && workflow.plan_completion_time) {
+			// 	task.estFinish = workflow.plan_completion_time
+			// }
+			// if (! task.duration && workflow.duration != null) {
+			// 	task.duration = workflow.duration
+			// 	task.durationScale = workflow.duration_scale ?: 'm'
+			// }
 		}
 
 		if (task.category == null) {
