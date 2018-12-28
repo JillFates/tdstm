@@ -232,11 +232,11 @@ class CustomValidatorsSpec extends Specification{
 
 	void '08. Test controlDateTimeValidator validator'() {
 		setup: 'setting the Field Specification Map'
-		Map<String, Object> fieldSpec = [
+			Map<String, Object> fieldSpec = [
 				constraints: [
 						required : 0
 				]
-		]
+			]
 		when: "the value 2018-10-26T22:00:15Z is passed (ISO8601 compliant)"
 			def validator = CustomValidators.controlDateTimeValidator("2018-10-26T22:00:15Z", fieldSpec, mockDomain)
 			validator.apply()
@@ -254,5 +254,81 @@ class CustomValidatorsSpec extends Specification{
 			validator.hasErrors()
 			1 == errors.size()
 			'field.incorrect.dateFormat' == errors[0].i18nMessageId
+	}
+
+	void '09. Test controlYesNoControlValidator validator'() {
+		setup: 'setting the Field Specification Map'
+			Map<String, Object> fieldSpec = [
+				constraints: [
+						required : 1
+				]
+			]
+		when: "the value Yes is passed"
+			def validator = CustomValidators.controlYesNoControlValidator("Yes", fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported'
+			!validator.hasErrors()
+		when: "the value No is passed"
+			validator = CustomValidators.controlYesNoControlValidator("No", fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported'
+			!validator.hasErrors()
+		when: 'a value other than Yes/No is passed'
+			validator = CustomValidators.controlYesNoControlValidator("maybe", fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'a "field.invalid.notInListOrBlank" error should be reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'field.invalid.notInListOrBlank' == errors[0].i18nMessageId
+		when: 'a blank value is passed'
+			validator = CustomValidators.controlYesNoControlValidator("", fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'a "default.blank.message" error should be reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'default.blank.message' == errors[0].i18nMessageId
+		when: 'a null value is passed'
+			validator = CustomValidators.controlYesNoControlValidator(null, fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'a "default.blank.message" error should be reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'default.blank.message' == errors[0].i18nMessageId
+	}
+
+	void '10. Test controlYesNoControlValidator validator with constraint required=0'() {
+		setup: 'setting the Field Specification Map'
+			Map<String, Object> fieldSpec = [
+				constraints: [
+						required : 0
+				]
+			]
+		when: "the value Yes is passed"
+			def validator = CustomValidators.controlYesNoControlValidator("Yes", fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported'
+			!validator.hasErrors()
+		when: "the value No is passed"
+			validator = CustomValidators.controlYesNoControlValidator("No", fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported'
+			!validator.hasErrors()
+		when: 'a value other than Yes/No is passed'
+			validator = CustomValidators.controlYesNoControlValidator("maybe", fieldSpec, mockDomain)
+			errors = validator.apply()
+		then: 'a "field.invalid.notInListOrBlank" error should be reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'field.invalid.notInListOrBlank' == errors[0].i18nMessageId
+		when: 'a blank value is passed'
+			validator = CustomValidators.controlYesNoControlValidator("", fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported (required=0)'
+			!validator.hasErrors()
+		when: 'a null value is passed'
+			validator = CustomValidators.controlYesNoControlValidator(null, fieldSpec, mockDomain)
+			validator.apply()
+		then: 'no error should be reported (required=0)'
+			!validator.hasErrors()
 	}
 }
