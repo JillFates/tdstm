@@ -3608,18 +3608,26 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Set various values if there is a workflow associated to this taskSpec and Asset
-		// if (workflow) {
-		// 	// log.info "Applying workflow values to task $taskNumber - values=$workflow"
-		// 	if (workflow.workflow_transition_id) { task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id) }
-		// 	// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
-		// 	if (! task.category && workflow.category) { task.category = workflow.category }
-		// 	if (! task.estStart && workflow.plan_start_time) { task.estStart = workflow.plan_start_time }
-		// 	if (! task.estFinish && workflow.plan_completion_time) { task.estFinish = workflow.plan_completion_time }
-		// 	if (! task.duration && workflow.duration != null) {
-		// 		task.duration = workflow.duration
-		// 		task.durationScale = workflow.duration_scale ?: 'm'
-		// 	}
-		// }
+		if (workflow) {
+			// log.info "Applying workflow values to task $taskNumber - values=$workflow"
+			if (workflow.workflow_transition_id) {
+				task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id)
+			}
+			// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
+			if (! task.category && workflow.category) {
+				task.category = workflow.category
+			}
+			if (! task.estStart && workflow.plan_start_time) {
+				task.estStart = workflow.plan_start_time
+			}
+			if (! task.estFinish && workflow.plan_completion_time) {
+				task.estFinish = workflow.plan_completion_time
+			}
+			if (! task.duration && workflow.duration != null) {
+				task.duration = workflow.duration
+				task.durationScale = workflow.duration_scale ?: 'm'
+			}
+		}
 
 		if (task.category == null) {
 			task.category = defCat
