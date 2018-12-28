@@ -20,7 +20,6 @@ export class ManualRequestComponent extends UIExtraDialog implements OnInit {
 
 	protected modalOptions: DecoratorOptions;
 	protected licenseEmail = {};
-	private dataSignature = {};
 
 	constructor(
 		private licenseModel: LicenseModel,
@@ -29,7 +28,6 @@ export class ManualRequestComponent extends UIExtraDialog implements OnInit {
 		private licenseAdminService: LicenseAdminService) {
 		super('#licenseManualRequest');
 		this.modalOptions = {isFullScreen: false, isResizable: false};
-		this.dataSignature = JSON.stringify(this.licenseEmail);
 	}
 
 	ngOnInit(): void {
@@ -39,28 +37,7 @@ export class ManualRequestComponent extends UIExtraDialog implements OnInit {
 	}
 
 	protected cancelCloseDialog($event): void {
-		if (this.isDirty()) {
-			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.close();
-		}
-	}
-
-	/**
-	 * Verify the Object has not changed
-	 * @returns {boolean}
-	 */
-	private isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.licenseEmail);
+		this.dismiss();
 	}
 
 }
