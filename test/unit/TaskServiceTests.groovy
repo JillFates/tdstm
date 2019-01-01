@@ -7,15 +7,22 @@ import com.tdsops.tm.enums.domain.TimeScale
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.SequenceService
 import net.transitionmanager.service.TaskService
+import org.joda.time.DateTime
+import org.quartz.DateBuilder
 import spock.lang.Specification
+import static org.quartz.DateBuilder.newDate
 
 @SuppressWarnings('unused')
 @TestFor(TaskService)
-@Mock([AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, PartyRelationshipService, Person])
+@Mock([AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, PartyRelationshipService, Person, WorkflowTransition])
 class TaskServiceTests extends Specification {
 
 	void testCompareStatus() {
@@ -444,7 +451,88 @@ class TaskServiceTests extends Specification {
 			4L == params['tagListSize']
 	}
 
+	def 'Test createTaskFromSpec with workflow'() {
+		setup:
+			service.sequenceService = Mock(SequenceService)
 
+			// Stubbing the read method of the workflow transition
+			GroovySpy(WorkflowTransition, global:true)
+			WorkflowTransition.read(_) >> new WorkflowTransition()
+
+		when:
+			def recipeId = 1
+			Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
+			Project project = buildMockProject()
+			def taskList = [:]
+			def taskSpec = [:]
+			List<Person> projectStaff = []
+			def settings = [
+					  clientId: 1,
+					  publishTasks: true,
+					  project: project
+			]
+			def exceptions = new StringBuilder()
+			def workflow = [
+					  workflow_transition_id: 1,
+					  category              : 'Category',
+					  plan_start_time       : DateTime.newInstance().toDate(),
+					  plan_completion_time  : DateTime.newInstance().plusDays(1).toDate(),
+					  duration              : 1,
+					  duration_scale        : TimeScale.D
+			]
+			def asset = null
+			AssetComment task = service.createTaskFromSpec(
+					  recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow, asset)
+
+		then: 'we get a new task object'
+			task != null
+
+		and: 'the workflow transition is obtained (currently a mock object)'
+			task.workflowTransition != null
+/*
+      and: 'the category is the same than in the workflow'
+         task.category == workflow.category
+
+		and: 'the start time is the same than in the workflow'
+			task.estStart == workflow.plan_start_time
+
+		and: 'the end time is the same than in the workflow'
+			task.estFinish == workflow.plan_completion_time
+
+		and: 'the duration is the same than in the workflow'
+			task.duration == workflow.duration
+			task.durationScale == workflow.duration_scale
+*/
+	}
+
+	private Project buildMockProject() {
+		String projectName = 'projectName'
+		String projectDescription = 'description'
+		long projectId = 123
+		String projectCode = 'projectCode'
+		String projectClientName = 'projectClientName'
+		long projectClientId = 321
+		int completionDateYear = 2100
+		int completionDateMonth = DateBuilder.DECEMBER
+		int completionDateDay = 15
+		Date completionDate = newDate()
+				  .inYear(completionDateYear)
+				  .inMonth(completionDateMonth)
+				  .onDay(completionDateDay)
+				  .build()
+		completionDate.clearTime()
+
+		Project project = new Project(
+				  name: projectName, projectCode: projectCode,
+				  completionDate: completionDate, description: projectDescription,
+				  client: new PartyGroup(name: projectClientName)
+		)
+
+		project.id = projectId
+		project.client.id = projectClientId
+
+		return project
+	}
 
 	// Helper method used to check a task duration settings
 	private boolean checkDurations(String label, AssetComment task, int duration, TimeScale scale) {
