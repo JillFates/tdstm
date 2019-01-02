@@ -1,56 +1,91 @@
-import {Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
+import {
+	Component,
+	forwardRef,
+	Input,
+	OnChanges,
+	SimpleChanges
+} from '@angular/core';
+import {
+	NG_VALUE_ACCESSOR,
+	NG_VALIDATORS
+} from '@angular/forms';
+import {isNil} from 'ramda';
+
+import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {NumberControlHelper} from './number-control.helper';
-import {TDSCustomControl} from '../common/custom-control';
+import {TDSCustomControl} from '../common/custom-control.component';
+import {ValidationRulesFactoryService} from '../../../services/validation-rules-factory.service';
 
 @Component({
 	selector: 'tds-number-control',
 	styles: [``],
 	template: `
-		<div>
-            <kendo-numerictextbox [format]="format"
-                                  [(ngModel)]="numberValue"
-                                  [min]="realMinRange" [max]="maxRange"
-                                  [autoCorrect]="true"
-                                  [tabindex]="tabindex"
-                                  (ngModelChange)="onValueChange($event)"
-                                  class="form-control">
-            </kendo-numerictextbox>
-		</div>
-	`
+		<kendo-numerictextbox
+			[autoCorrect]="autoCorrect"
+			class="form-control"
+			[decimals]="precision"
+			[format]="numberFormat"
+			(blur)="onTouched()"
+			[max]="max"
+			[min]="min"
+			[tabindex]="tabindex"
+			[value]="numberValue"
+			(valueChange)="onValueChange($event)">
+		</kendo-numerictextbox>
+	`,
+	providers: [
+		{
+			provide: NG_VALUE_ACCESSOR,
+			useExisting: forwardRef(() => TDSNumberControlComponent),
+			multi: true
+		},
+		{
+			provide: NG_VALIDATORS,
+			useExisting: forwardRef(() => TDSNumberControlComponent),
+			multi: true
+		}
+	]
 })
-export class NumberControlComponent extends TDSCustomControl implements OnInit {
-	@Input('value') value: any;
-	@Output() valueChange = new EventEmitter<any>();
+export class TDSNumberControlComponent extends TDSCustomControl implements OnChanges {
 	@Input('format') format = NumberControlHelper.DEFAULT_NUMBER_FORMAT;
-	@Input('precision') precision: number;
-	@Input('maxRange') maxRange: number;
-	@Input('minRange') minRange: number;
-	@Input('required') required: boolean;
+	@Input('precision') precision = 0;
+	@Input('max') max: number;
+	@Input('min') min: number;
 	@Input('allowNegative') allowNegative: boolean;
 	@Input('separator') separator: boolean;
-	protected numberValue: number;
-	protected realMinRange: number;
+	@Input('autoCorrect') autoCorrect = false;
 
-	constructor() {
-		super();
+	constructor(protected validationRulesFactory: ValidationRulesFactoryService) {
+		super(validationRulesFactory);
 	}
 
-	/**
-	 * On Init build the number format.
-	 */
-	ngOnInit(): void {
-		this.numberValue = this.value ? +this.value : 0;
-		// double check
-		this.numberValue = Number.isNaN(this.numberValue) ? 0 : this.numberValue;
-		this.realMinRange = this.minRange;
+	ngOnChanges(inputs: SimpleChanges) {
+		const numberConstraints = {
+			allowNegative: this.allowNegative,
+			max: this.max,
+			min: this.min,
+			required: this.required
+		};
+
+		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Number, numberConstraints);
 	}
 
-	/**
-	 * Emit the value changed.
-	 * @param $event
-	 */
-	onValueChange($event: any): void {
-		this.numberValue = Math.trunc($event);
-		this.valueChange.emit(this.numberValue);
+	onValueChange(value: number): void {
+		this.value = value;
+		this.onTouched();
 	}
+
+	// Kendo doesn't allow to use a string for the kendo number control,
+	// so we need to wrap up the value function doing a cast to number
+	get numberValue() {
+		// if the value is null or undefined leave it as it is
+		// just if it has valid value do the conversion
+		return isNil(this.value)  ? this.value :  Number(this.value);
+	}
+
+	// Kendo format used to define the number of decimal positions
+	get numberFormat() {
+		return this.precision ? `n${this.precision}`  : 'n'
+	}
+
 }
