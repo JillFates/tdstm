@@ -82,4 +82,13 @@ export class ObjectUtils {
 			return value;
 		}
 	}
+
+	/**
+	 * Determines if object has no properties
+	 * @param obj - object to evaluate
+	 * @returns {boolean}
+	 */
+	public static isEmpty(obj: any) {
+		return Object.keys(obj).length === 0 && obj.constructor === Object;
+	}
 }

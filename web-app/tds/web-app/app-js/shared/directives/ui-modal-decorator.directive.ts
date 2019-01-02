@@ -62,13 +62,18 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 		setTimeout(() => {
 			this.getWindowSize()
 				.subscribe((size: {width: number, height: number}) => {
-					if (size) {
+					// If the window is maximized by default, apply the default size for the restored size, and maximize the window
+					if (size && !this.isWindowMaximized) {
 						this.renderer.setStyle(this.el.nativeElement, 'width', this.toPixels(size.width));
 						this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(size.height));
 					}
 					this.setOptions();
 					// show host when setup is done
 					this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
+
+					if (this.isWindowMaximized) {
+						this.maximizeWindow();
+					}
 				});
 		}, 500);
 	}
@@ -192,6 +197,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	 * previously save the initial window setting in order to be able to get back to previous width and height setting
 	 */
 	private maximizeWindow(): void {
+		if (!this.initialWindowSettings) { return; }
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
@@ -256,7 +262,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	 * Save the width/height size as a user preference setting
 	 */
 	private saveWindowSize(): Observable<any> {
-		const { width, height } = this.isWindowMaximized ? this.initialWindowSettings : this.el.nativeElement.style;
+		const { width, height } = this.el.nativeElement.style;
 
 		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
 			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))

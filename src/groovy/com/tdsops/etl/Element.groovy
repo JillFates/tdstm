@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 @Slf4j(value='logger')
-class Element implements RangeChecker {
+class Element implements RangeChecker, ETLCommand {
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
 
@@ -114,17 +114,46 @@ class Element implements RangeChecker {
 	 * @param fieldName
 	 * @return the element instance that received this command
 	 */
-	Element load(String fieldName) {
+	ETLCommand load(String fieldName) {
 		processor.validateStack()
-		if(processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
-			processor.addElementLoaded(this)
-			return this
-		} else{
-			throw ETLProcessorException.domainMustBeSpecified()
+		validateSelectedDomainAlreadyDefined()
+
+		if (isCommentsCommand(fieldName)) {
+			return loadCommentElement()
+		} else {
+			return loadElement(fieldName)
 		}
 	}
 
+	/**
+	 * Creates an instance of {@code Element} to manage next step in chain method
+	 * @param fieldName a field name used to continue with the extract ... load 'comments' command
+	 * @return an instance of {@code Element}
+	 */
+	private Element loadElement(final String fieldName) {
+		this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
+		processor.addElementLoaded(this)
+		return this
+	}
+	/**
+	 * Creates an instance of {@code CommentElement} to manage next step in chain method
+	 * @param fieldName a field name used to continue with the extract ... load 'comments' command
+	 * @return an instance of {@code CommentElement}
+	 */
+	private CommentElement loadCommentElement() {
+		return new CommentElement(this.processor, this.processor.selectedDomain.domain).with(this.value)
+	}
+
+	/**
+	 * <p>Validates if in the current status of an ETL script,
+	 * domain command was already defined.</p>
+	 * @throws ETLProcessorException
+	 */
+	private void validateSelectedDomainAlreadyDefined() {
+		if (!processor.hasSelectedDomain()) {
+			throw ETLProcessorException.domainMustBeSpecified()
+		}
+	}
 	/**
 	 * Initialize an Element with a particular value
 	 * <code>

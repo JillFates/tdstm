@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1193723c-e435-4b8f-a4a3-449939b2b4dd",
+		"_postman_id": "d37b004e-70e5-4e6e-84eb-1ce5b6c24ef6",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -115,7 +115,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e150b7da-8898-4da0-8f65-7c6b98bce5b2",
+						"id": "778be97f-d870-4610-9440-19650deaf71c",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -125,9 +125,9 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.eql('A new Tag');",
-							"    pm.expect(data.description).to.eql('Description of a new tag.');",
+							"    var data = jsonData.data;",
+							"    pm.expect(data.name).includes('QA New Tag 1');",
+							"    pm.expect(data.description).includes('Description');",
 							"    pm.expect(data.color).to.eql('Red');",
 							"    pm.expect(data.css).to.eql('tag-red');",
 							"    ",
@@ -152,7 +152,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"A new Tag\",\n  \"description\":\"Description of a new tag.\",\n  \"color\":\"Red\"\n}"
+					"raw": "{ \n  \"name\":\"QA New Tag 1 {{$randomInt}}\",\n  \"description\":\"Description of a new tag {{$randomInt}}.\",\n  \"color\":\"Red\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -169,70 +169,12 @@
 			"response": []
 		},
 		{
-			"name": "Update tag",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8acaeb0e-ddab-4033-a76e-a72aef79e383",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Updating a tag\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('success');",
-							"    ",
-							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(data.description).to.eql('Different Description');",
-							"    pm.expect(data.color).to.eql('Blue');",
-							"    pm.expect(data.css).to.eql('tag-blue');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"name\":\"Revenge of the Tag\",\n  \"description\":\"Different Description\",\n  \"color\":\"Blue\"\n}"
-				},
-				"url": {
-					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"tag",
-						"{{tag_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "create another tag",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "3fee1283-8804-4cef-95a9-6662eb21943f",
+						"id": "1bdf2bc5-0b67-4789-b53e-073e23a3c5d4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -242,9 +184,9 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.eql('Return of the Tag');",
-							"    pm.expect(data.description).to.eql('The tag returns');",
+							"    var data = jsonData.data;",
+							"    pm.expect(data.name).includes('QA New Tag 2');",
+							"    pm.expect(data.description).includes('Description');",
 							"    pm.expect(data.color).to.eql('Red');",
 							"    pm.expect(data.css).to.eql('tag-red');",
 							"    ",
@@ -269,7 +211,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"Return of the Tag\",\n  \"description\":\"The tag returns\",\n  \"color\":\"Red\"\n}"
+					"raw": "{ \n  \"name\":\"QA New Tag 2 {{$randomInt}}\",\n  \"description\":\"Description of a new tag {{$randomInt}}.\",\n  \"color\":\"Red\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -280,6 +222,304 @@
 						"tdstm",
 						"ws",
 						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List tags after creating 2 tags",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d8f0e729-fcfa-4a8b-b6b3-5b941f44ec63",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"The new tags show up in the list and their data matches\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var lastIndex=jsonData.data.length-1;",
+							"    var secondTolastIndex=jsonData.data.length-2;",
+							"    ",
+							"    pm.expect(jsonData.data[secondTolastIndex].description).to.include('Description');",
+							"    pm.expect(jsonData.data[secondTolastIndex].color).to.eql('Red');",
+							"    pm.expect(jsonData.data[secondTolastIndex].css).to.eql('tag-red');",
+							"    ",
+							"    pm.expect(jsonData.data[lastIndex].description).to.include('Description');",
+							"    pm.expect(jsonData.data[lastIndex].color).to.eql('Red');",
+							"    pm.expect(jsonData.data[lastIndex].css).to.eql('tag-red');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3e4c37c-80d4-4c78-b431-02f7e8287c2e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Updating a tag\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"    pm.expect(data.name).includes('Updated');",
+							"    pm.expect(data.description).to.eql('Different Description');",
+							"    pm.expect(data.color).to.eql('Blue');",
+							"    pm.expect(data.css).to.eql('tag-blue');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"QA Updated Tag {{$randomInt}}\",\n  \"description\":\"Different Description\",\n  \"color\":\"Blue\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d8e9bde3-db54-4ee3-b964-62884e41242b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Set the 2 assetIDs for later\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var firstID = jsonObject.rows[0].id; ",
+							"    var secondID = jsonObject.rows[1].id; ",
+							"    pm.environment.set(\"asset1\", firstID);",
+							"    pm.environment.set(\"asset2\", secondID);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"assetEntity",
+						"listJson"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "all"
+						},
+						{
+							"key": "event",
+							"value": ""
+						},
+						{
+							"key": "type",
+							"value": ""
+						},
+						{
+							"key": "plannedStatus",
+							"value": ""
+						},
+						{
+							"key": "assetName",
+							"value": ""
+						},
+						{
+							"key": "planStatus",
+							"value": ""
+						},
+						{
+							"key": "moveBundle",
+							"value": ""
+						},
+						{
+							"key": "assetType",
+							"value": ""
+						},
+						{
+							"key": "model",
+							"value": ""
+						},
+						{
+							"key": "sourceLocationName",
+							"value": ""
+						},
+						{
+							"key": "sourceRackName",
+							"value": ""
+						},
+						{
+							"key": "targetLocationName",
+							"value": ""
+						},
+						{
+							"key": "targetRackName",
+							"value": ""
+						},
+						{
+							"key": "assetTag",
+							"value": ""
+						},
+						{
+							"key": "serialNumber",
+							"value": ""
+						},
+						{
+							"key": "moveBundleId",
+							"value": ""
+						},
+						{
+							"key": "manufacturer",
+							"value": ""
+						},
+						{
+							"key": "unassigned",
+							"value": ""
+						},
+						{
+							"key": "rows",
+							"value": "100"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Views",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "74db0821-5064-4e64-af4d-7b37c7ae705a",
+						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"firstDataview = jsonObject.data[0].id;",
+							"pm.environment.set(\"dataviewID\", firstDataview);",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/assetExplorer/views",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"assetExplorer",
+						"views"
 					]
 				}
 			},
@@ -320,7 +560,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}},{{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"add\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}},{{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"add\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -342,7 +582,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ca492d20-eb49-434f-8459-f936ea151f13",
+						"id": "6b78ab5c-6ebb-4fa9-aea7-9c31210998df",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -351,21 +591,20 @@
 							"pm.test(\"Validate Asset1 is now tagged\", function () {",
 							"    var json = pm.response.json();",
 							"    ",
-							"    pm.expect(json.data.length).to.eql(2);",
+							"    var arrayPosition = json.data.length;",
+							"    var record = json.data[arrayPosition-1];",
 							"    ",
-							"    var record = json.data[0];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(record.description).to.eql('Different Description');",
-							"    pm.expect(record.color).to.eql('Blue');",
-							"    pm.expect(record.css).to.eql('tag-blue');",
-							"    ",
-							"    record = json.data[1];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.name).includes('QA New Tag 2');",
+							"    pm.expect(record.description).includes('Description');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
+							"    ",
+							"    record = json.data[arrayPosition-2];",
+							"    ",
+							"    pm.expect(record.name).includes('Updated');",
+							"    pm.expect(record.description).includes('Description');",
+							"    pm.expect(record.color).to.eql('Blue');",
+							"    pm.expect(record.css).to.eql('tag-blue');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -410,7 +649,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "77ba0849-8093-421b-a74f-fc519ae9d674",
+						"id": "3f2c12ce-99c1-4846-bf26-6eb7a36e7897",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -419,21 +658,20 @@
 							"pm.test(\"Validate Asset2 is now tagged\", function () {",
 							"    var json = pm.response.json();",
 							"    ",
-							"    pm.expect(json.data.length).to.eql(2);",
+							"    var arrayPosition = json.data.length;",
+							"    var record = json.data[arrayPosition-1];",
 							"    ",
-							"    var record = json.data[0];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(record.description).to.eql('Different Description');",
-							"    pm.expect(record.color).to.eql('Blue');",
-							"    pm.expect(record.css).to.eql('tag-blue');",
-							"    ",
-							"    record = json.data[1];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.name).includes('QA New Tag 2');",
+							"    pm.expect(record.description).includes('Description');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
+							"    ",
+							"    record = json.data[arrayPosition-2];",
+							"    ",
+							"    pm.expect(record.name).includes('Updated');",
+							"    pm.expect(record.description).includes('Description');",
+							"    pm.expect(record.color).to.eql('Blue');",
+							"    pm.expect(record.css).to.eql('tag-blue');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -507,7 +745,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"remove\", \n\t\t\t\"value\"    : \"[{{tag_id}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"remove\", \n\t\t\t\"value\"    : \"[{{tag_id2}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -529,7 +767,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "91476b26-f101-43d4-aa50-f6f0347df6d8",
+						"id": "1217c3d8-bcd7-43cb-a78e-f69cdc019d7d",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -537,15 +775,13 @@
 							"",
 							"pm.test(\"Validate the tag has been removed from Asset 1\", function () {",
 							"    var json = pm.response.json();",
+							"    var arrayPosition = json.data.length;",
+							"    var record = json.data[arrayPosition-1];",
 							"    ",
-							"    pm.expect(json.data.length).to.eql(1);",
-							"    ",
-							"    var record = json.data[0];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
-							"    pm.expect(record.color).to.eql('Red');",
-							"    pm.expect(record.css).to.eql('tag-red');",
+							"    pm.expect(record.name).includes('Updated');",
+							"    pm.expect(record.description).includes('Description');",
+							"    pm.expect(record.color).to.eql('Blue');",
+							"    pm.expect(record.css).to.eql('tag-blue');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -590,30 +826,29 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "705e22ec-213a-4eef-8b7f-d62016ae0ecd",
+						"id": "93ec6ce9-acf0-4879-a6d1-798d6cd74f1c",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
 							"pm.test(\"Validate the tag has not been removed from Asset 2\", function () {",
-							"    var json = pm.response.json();",
+							"   var json = pm.response.json();",
 							"    ",
-							"    pm.expect(json.data.length).to.eql(2);",
+							"    var arrayPosition = json.data.length;",
+							"    var record = json.data[arrayPosition-1];",
 							"    ",
-							"    var record = json.data[0];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(record.description).to.eql('Different Description');",
-							"    pm.expect(record.color).to.eql('Blue');",
-							"    pm.expect(record.css).to.eql('tag-blue');",
-							"    ",
-							"    record = json.data[1];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.name).includes('QA New Tag 2');",
+							"    pm.expect(record.description).includes('Description');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
+							"    ",
+							"    record = json.data[arrayPosition-2];",
+							"    ",
+							"    pm.expect(record.name).includes('Updated');",
+							"    pm.expect(record.description).includes('Description');",
+							"    pm.expect(record.color).to.eql('Blue');",
+							"    pm.expect(record.css).to.eql('tag-blue');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -687,7 +922,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}},{{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}},{{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -847,7 +1082,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -882,15 +1117,15 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(record.description).to.eql('Different Description');",
+							"    pm.expect(record.name).includes('Updated');",
+							"    pm.expect(record.description).includes('Description');",
 							"    pm.expect(record.color).to.eql('Blue');",
 							"    pm.expect(record.css).to.eql('tag-blue');",
 							"    ",
 							"    record = json.data[1];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.name).includes('QA New Tag');",
+							"    pm.expect(record.description).includes('Description');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"});"
@@ -932,74 +1167,6 @@
 			"response": []
 		},
 		{
-			"name": "list tagAssetss after bulk replace 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "01e78b3e-2c9c-495e-80b6-52caae9bc7f4",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Get updated list for first asseet, after merged\", function () {",
-							"    var json = pm.response.json();",
-							"    ",
-							"    pm.expect(json.data.length).to.eql(2);",
-							"    ",
-							"    var record = json.data[0];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Revenge of the Tag');",
-							"    pm.expect(record.description).to.eql('Different Description');",
-							"    pm.expect(record.color).to.eql('Blue');",
-							"    pm.expect(record.css).to.eql('tag-blue');",
-							"    ",
-							"    record = json.data[1];",
-							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
-							"    pm.expect(record.description).to.eql('The tag returns');",
-							"    pm.expect(record.color).to.eql('Red');",
-							"    pm.expect(record.css).to.eql('tag-red');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset2}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"tag",
-						"asset",
-						"{{asset2}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Bulk change clear asset tags",
 			"event": [
 				{
@@ -1034,7 +1201,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1056,7 +1223,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"id": "50dd112b-874c-4051-bfff-7c34c43b7aea",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1066,7 +1233,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
+							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
 							"});"
 						],
@@ -1089,7 +1256,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": "{ \n  \"provider\": null,\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
@@ -1112,7 +1279,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"id": "77b4d767-f0eb-479d-b1b9-a5d06993e2ff",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1122,7 +1289,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
+							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
 							"    ",
 							"    ",
@@ -1149,7 +1316,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": "{ \n  \"provider\": null,\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/{{tag_id2}}",
@@ -1181,10 +1348,8 @@
 							"pm.test(\"Check asset after bulk operation\", function () {",
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
-							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
-							"    pm.expect(record.validation).to.eql(\"Unknown\");",
-							"",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1237,9 +1402,8 @@
 							"pm.test(\"Check asset after bulk operation\", function () {",
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
-							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
-							"    pm.expect(record.validation).to.eql(\"Unknown\");",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1312,7 +1476,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Validated\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Validated\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1343,8 +1507,8 @@
 							"pm.test(\"Check Validation value was changed for asset 1\", function () {",
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
-							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Validated');",
 							"",
 							"});"
@@ -1399,8 +1563,8 @@
 							"pm.test(\"Check Validation value was changed for asset2\", function () {",
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
-							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Validated');",
 							"});"
 						],
@@ -1474,7 +1638,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1506,7 +1670,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('');",
 							"",
 							"});"
@@ -1562,7 +1727,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('');",
 							"});"
 						],
@@ -1636,7 +1802,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Unknown\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Unknown\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1668,7 +1834,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Unknown');",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"",
@@ -1725,7 +1892,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Unknown');",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"});"
@@ -1800,7 +1968,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"planStatus\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Assigned\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"planStatus\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Assigned\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1832,7 +2000,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Unknown');",
 							"    pm.expect(record.planStatus).to.eql('Assigned');",
 							"",
@@ -1889,7 +2058,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.validation).to.eql('Unknown');",
 							"    pm.expect(record.planStatus).to.eql('Assigned');",
 							"});"
@@ -1964,7 +2134,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"planStatus\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Unassigned\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"planStatus\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Unassigned\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1996,7 +2166,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"",
@@ -2053,7 +2224,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"});"
@@ -2128,7 +2300,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"size\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : 5}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"size\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : 5}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2160,7 +2332,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.size).to.eql(5);",
 							"",
 							"});"
@@ -2216,7 +2389,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.size).to.eql(5);",
 							"});"
 						],
@@ -2290,7 +2464,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"size\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"size\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2322,7 +2496,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(null);",
 							"",
 							"});"
@@ -2378,7 +2553,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(null);",
 							"});"
 						],
@@ -2452,7 +2628,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"maintExpDate\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"2018-10-02T15:04:07Z\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"maintExpDate\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"2018-10-02T15:04:07Z\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2484,7 +2660,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(\"2018-10-02T00:00:00Z\");",
 							"",
 							"});"
@@ -2540,7 +2717,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(\"2018-10-02T00:00:00Z\");",
 							"});"
 						],
@@ -2614,7 +2792,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"maintExpDate\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"maintExpDate\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2646,9 +2824,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(null);",
-							"    pm.expect(record.supportType).to.eql(\"\");",
 							"",
 							"});"
 						],
@@ -2703,9 +2881,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.maintExpDate).to.eql(null);",
-							"    pm.expect(record.supportType).to.eql(\"\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2778,7 +2956,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"supportType\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Supported\"\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\":  {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"supportType\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Supported\"\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2810,7 +2988,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.supportType).to.eql(\"Supported\");",
 							"",
 							"});"
@@ -2866,8 +3045,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
-							"     pm.expect(record.supportType).to.eql(\"Supported\");",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
+							"    pm.expect(record.supportType).to.eql(\"Supported\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2940,7 +3120,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"supportType\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"supportType\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -2972,9 +3152,10 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.supportType).to.eql(\"\");",
-							"    pm.expect(record.custom1).to.eql(\"\");",
+							"",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3028,9 +3209,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.supportType).to.eql(\"\");",
-							"    pm.expect(record.custom1).to.eql(\"\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3103,7 +3284,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom1\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Item 1\"\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom1\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Item 1\"\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3135,7 +3316,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.supportType).to.eql(\"\");",
 							"    pm.expect(record.custom1).to.eql(\"Item 1\");",
 							"});"
@@ -3191,7 +3373,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.supportType).to.eql(\"\");",
 							"    pm.expect(record.custom1).to.eql(\"Item 1\");",
 							"});"
@@ -3266,7 +3449,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom1\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom1\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3298,9 +3481,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom1).to.eql(\"\");",
-							"    pm.expect(record.custom2).to.eql(\"\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3354,9 +3537,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom1).to.eql(\"\");",
-							"    pm.expect(record.custom2).to.eql(\"\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3429,7 +3612,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom2\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"YES\"\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom2\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"YES\"\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3461,7 +3644,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom2).to.eql(\"YES\");",
 							"});"
 						],
@@ -3516,7 +3700,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom2).to.eql(\"YES\");",
 							"});"
 						],
@@ -3590,7 +3775,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom2\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom2\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3622,7 +3807,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom2).to.eql(\"\");",
 							"    pm.expect(record.custom3).to.eql(\"\");",
 							"});"
@@ -3678,9 +3864,9 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom2).to.eql(\"\");",
-							"    pm.expect(record.custom3).to.eql(\"\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3753,7 +3939,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom3\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Some Value\"\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom3\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Some Value\"\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3785,7 +3971,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom3).to.eql(\"Some Value\");",
 							"});"
 						],
@@ -3840,7 +4027,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom3).to.eql(\"Some Value\");",
 							"});"
 						],
@@ -3914,7 +4102,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom3\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"custom3\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : null\n\t\t\t\n\t\t}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -3946,7 +4134,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"",
-							"    pm.expect(record.id).to.eql(113835);",
+							"    var assetID = pm.variables.get(\"asset1\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom3).to.eql(\"\");",
 							"});"
 						],
@@ -4001,7 +4190,8 @@
 							"    var json = pm.response.json();",
 							"    var record = json.data.result;",
 							"    ",
-							"    pm.expect(record.id).to.eql(113848);",
+							"    var assetID = pm.variables.get(\"asset2\"); ",
+							"    pm.expect(record.id).to.eql(assetID);",
 							"    pm.expect(record.custom3).to.eql(\"\");",
 							"});"
 						],
@@ -4035,6 +4225,62 @@
 						"ws",
 						"asset",
 						"{{asset2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bulk change replace PlanStatus Reset Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a2b9465-7a2c-43e7-8ab6-f5304ac67336",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Updating a tag\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"});",
+							"",
+							"pm.environment.unset(\"asset1\");",
+							"pm.environment.unset(\"asset2\");",
+							"pm.environment.unset(\"dataviewID\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"planStatus\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"Unassigned\"}\t\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/bulkChange",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"bulkChange"
 					]
 				}
 			},

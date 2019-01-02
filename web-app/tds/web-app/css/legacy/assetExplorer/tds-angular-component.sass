@@ -7,11 +7,34 @@
 .tds-angular-component-content
   display: table
   form.asset-entry-form
-    .ng-dirty.ng-invalid
+    .ng-touched.ng-dirty.ng-invalid
       border: 1px solid $color-message-error--red
+
+  form.asset-entry-form
+    tds-date-control.ng-touched.ng-dirty.ng-invalid,
+    tds-datetime-control.ng-touched.ng-dirty.ng-invalid,
+    tds-number-control.ng-touched.ng-dirty.ng-invalid
+      border: unset
+      kendo-datepicker,
+      kendo-numerictextbox
+        border: 1px solid $color-message-error--red
+
   form.asset-entry-form.form-submitted
     .ng-invalid
       border: 1px solid $color-message-error--red
+
+  form.asset-entry-form.form-submitted
+    tds-date-control.ng-invalid,
+    tds-datetime-control.ng-invalid,
+    tds-number-control.ng-invalid
+      border: unset
+      kendo-datepicker,
+      kendo-numerictextbox
+        border: 1px solid $color-message-error--red
+
+  tds-custom-validation-errors
+    .error
+      margin-top: 3px
 
   .dialog-container
     border: 1px solid transparent

@@ -4,13 +4,11 @@ package com.tdsops.etl
  * Abstract implementation for whenFound and whenNotFound ETL command.
  * It manages common behaviour between both commands.
  * <pre>
- *  whenFound DOMAIN_PROPERTY_NAME update {
- * </pre>
+ *  whenFound DOMAIN_PROPERTY_NAME update {* </pre>
  * The DOMAIN_PROPERTY_NAME can be createdBy, manufacturer, model, rack, bundle, etc.
- * @see WhenNotFoundElement
- * @see WhenFoundElement
+ * @see WhenNotFoundElement* @see WhenFoundElement
  */
-abstract class FoundElement {
+abstract class FoundElement implements ETLCommand {
 
 	/**
 	 * ETLProcessor instance used for fields validations
@@ -36,8 +34,8 @@ abstract class FoundElement {
 	/**
 	 * Found Element enum type used to define if whenFound and whenNotFound command
 	 * <pre>
-	 *      whenFound 'asset' update { .... }
-	 *      whenNotFound 'asset' create { .... }
+	 * 		whenFound 'asset' update { .... }
+	 *  	whenNotFound 'asset' create { .... }
 	 * </pre>
 	 */
 	enum FoundElementType {
@@ -72,10 +70,10 @@ abstract class FoundElement {
 	/**
 	 * Validates WhenNotFound create ETL command used incorrectly
 	 * <pre>
-	 *     // Invalid use of whenNotFound  command
-	 *		whenNotFound asset update {
-	 *			......
-	 *		}
+	 *  // Invalid use of whenNotFound  command
+	 * 	whenNotFound asset update {
+	 * 			......
+	 *	}
 	 * </pre>
 	 * @param closure
 	 * @return the current find Element
@@ -87,11 +85,11 @@ abstract class FoundElement {
 	/**
 	 * Validates WhenFound create ETL command used incorrectly
 	 * <pre>
-	 *     // Invalid use of WhenFound  command
-	 *		whenFound asset create {
-	 *			....
-	 *		}
-	 * </pre>
+	 *  // Invalid use of WhenFound  command
+	 * 	whenFound asset create {
+	 * 		....
+	 *	}
+	 *	</pre>
 	 * @param closure
 	 * @return the current find Element
 	 */
@@ -122,7 +120,7 @@ abstract class FoundElement {
 	 * @trows ETLProcessorException if assetClass parameter is not an ETLDomain
 	 * @see ETLDomain
 	 */
-	FoundElement assetClass(ETLDomain domain){
+	FoundElement assetClass(ETLDomain domain) {
 		this.propertiesMap.assetClass = domain.name()
 		this
 	}
@@ -137,7 +135,7 @@ abstract class FoundElement {
 	 * @return the current instance of FoundElement
 	 */
 	def methodMissing(String name, def args) {
-		if(args){
+		if (args) {
 			propertiesMap[fieldDefinitionNameFor(name)] = calculateValue(args)
 		} else {
 			throw ETLProcessorException.incorrectFoundUseWithoutArgValue(name)
@@ -154,30 +152,11 @@ abstract class FoundElement {
 	 * @see FoundElement#assetClass
 	 */
 	String fieldDefinitionNameFor(String fieldName) {
-		if(!domain){
+		if (!domain) {
 			throw ETLProcessorException.incorrectFoundUseWithoutAssetClass()
 		}
 		ETLFieldDefinition fieldDefinition = processor.lookUpFieldDefinition(domain, fieldName)
 		return fieldDefinition.name
-	}
-
-	/**
-	 * Calculates values for every args received in a WhenFound and WhenNotFound command.
-	 * @param args array with values received in a WhenFound and WhenNotFound command.
-	 * @return an array with all the args transformed by ETLValueHelper class.
-	 * @see ETLValueHelper#valueOf(java.lang.Object)
-	 */
-	private def calculateValue(def args) {
-
-		if(args.size() == 1) {
-			//TODO: DMC. Review with John. TM-11182 Application Description field not loading during asset posting when using a variable
-			if(processor.binding.isValidETLVariableName(args[0]?.toString())){
-				throw ETLProcessorException.missingPropertyException(args[0])
-			}
-			return ETLValueHelper.valueOf(args[0])
-		} else {
-			return args.collect{ ETLValueHelper.valueOf(it) }
-		}
 	}
 
 	String getActionName() {

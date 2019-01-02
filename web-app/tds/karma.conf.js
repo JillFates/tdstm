@@ -1,4 +1,4 @@
-let webpackConfig = require('./webpack.config')();
+let webpackConfig = require('./webpack-dev.config')();
 let webpack = require('webpack'); //to access built-in plugins
 let path = require('path');
 

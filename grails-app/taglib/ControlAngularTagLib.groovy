@@ -177,22 +177,13 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.NUMBER.toString():
-				out << "<tds-number-control [(value)]=\"" + attrs.ngmodel + "\"" +
-						" [allowNegative]=\"$fieldSpec.constraints.allowNegative\"" +
-						" [precision]=\"$fieldSpec.constraints.precision\"" +
-						" [separator]=\"$fieldSpec.constraints.separator\"" +
-						" [minRange]=\"$fieldSpec.constraints.minRange\"" +
-						" [maxRange]=\"$fieldSpec.constraints.maxRange\"" +
-						" [required]=\"$isRequired\" " +
-						" [tabindex]=\"$tabIndexInput\" " +
-						" [format]=\"'${transformNumberFormat(fieldSpec)}'\">" +
-						"</tds-number-control>"
+				out << renderNumberInput(fieldSpec, attrs.ngmodel, tabIndexInput)
 				break
 			case ControlType.DATE.toString():
-				out << "<tds-date-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				out << renderDateInput(fieldSpec, attrs.ngmodel, tabIndexInput)
 				break
 			case ControlType.DATETIME.toString():
-				out << "<tds-datetime-control [tabindex]=\"$tabIndexInput\" [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
+				out << renderDateTimeInput(fieldSpec, attrs.ngmodel, tabIndexInput)
 				break
 			case ControlType.STRING.toString():
 			default:
@@ -393,16 +384,9 @@ class ControlAngularTagLib {
 			def field = 'field' + fieldSpec.field
 
 			return "<div class=\"error\" *ngIf=\"form && (form.submitted && ${field} && !${field}.valid) || " +
-					" (${field}.dirty && !${field}.valid)\">${fieldSpec.label} is required</div>"
+					" (${field}.dirty && !${field}.valid)\">* ${fieldSpec.label} is required</div>"
 		}
 		return ''
-	}
-
-	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
-		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) +
-				attribute('placeholder', placeholder) +
-				commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
-				renderRequiredLabel(fieldSpec)
 	}
 
 	/**
@@ -735,4 +719,113 @@ class ControlAngularTagLib {
 		return ["value": "$escapedvalue", "text": "$text"]
 	}
 
+	/**
+	 * Generates a String HTML to render the angular control used to represent numbers
+	 * parameters passed to the method.
+	 * @param fieldSpec - the map of field specifications
+	 * @param ngmodel - angular variable holding the value
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @return the Angular Tag Component HTML
+	 */
+	private String renderNumberInput(Map fieldSpec, String ngmodel, String tabIndex) {
+		def name = fieldSpec.field
+		def allowNegative = fieldSpec?.constraints?.allowNegative
+		def precision = fieldSpec?.constraints?.precision
+		def separator = fieldSpec?.constraints?.separator
+		def min = fieldSpec?.constraints?.minRange
+		def max = fieldSpec?.constraints?.maxRange
+		def required = fieldSpec?.constraints?.required != 0
+
+		StringBuilder control = new StringBuilder("")
+		control.append("<tds-number-control ")
+		control.append("  #field${fieldSpec.field}='ngModel' ")
+		control.append("  [(ngModel)]=\"$ngmodel\" ")
+		control.append("  name=\"$name\" ")
+		control.append("  [allowNegative]=\"$allowNegative\"")
+		control.append("  [precision]=\"$precision\"")
+		control.append("  [separator]=\"$separator\"")
+		control.append("  [min]=\"$min\"")
+		control.append("  [max]=\"$max\"")
+		control.append("  [required]=\"$required\" ")
+		control.append("  [tabindex]=\"$tabIndex\" ")
+		control.append("  [format]=\"'${transformNumberFormat(fieldSpec)}'\">")
+		control.append("</tds-number-control>")
+		control.append(renderCustomValidationErrors(fieldSpec))
+
+		return control.toString()
+	}
+
+	/**
+	 * Generates a String HTML to render the angular control used to represent dates
+	 * parameters passed to the method.
+	 * @param fieldSpec - the map of field specifications
+	 * @param ngmodel - angular variable holding the value
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @return the Angular Tag Component HTML
+	 */
+	private String renderDateInput(Map fieldSpec, String ngmodel, String tabIndex) {
+		def name = fieldSpec.field
+		def required = fieldSpec?.constraints?.required != 0
+
+		StringBuilder control = new StringBuilder("")
+		control.append("<tds-date-control ")
+		control.append("  #field${fieldSpec.field}='ngModel' ")
+		control.append("  [(ngModel)]=\"$ngmodel\" ")
+		control.append("  [value]=\"$ngmodel\" ")
+		control.append("  name=\"$name\" ")
+		control.append("  [required]=\"$required\" ")
+		control.append("  [tabindex]=\"$tabIndex\"> ")
+		control.append("</tds-date-control>")
+		control.append(renderCustomValidationErrors(fieldSpec))
+
+		return control.toString()
+	}
+
+	/**
+	 * Generates a String HTML to render the angular control used to represent datetime
+	 * parameters passed to the method.
+	 * @param fieldSpec - the map of field specifications
+	 * @param ngmodel - angular variable holding the value
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @return the Angular Tag Component HTML
+	 */
+	private String renderDateTimeInput(Map fieldSpec, String ngmodel, String tabIndex) {
+		def name = fieldSpec.field
+		def required = fieldSpec?.constraints?.required != 0
+
+		StringBuilder control = new StringBuilder("")
+		control.append("<tds-datetime-control ")
+		control.append("  #field${fieldSpec.field}='ngModel' ")
+		control.append("  [(ngModel)]=\"$ngmodel\" ")
+		control.append("  [value]=\"$ngmodel\" ")
+		control.append("  name=\"$name\" ")
+		control.append("  [required]=\"$required\" ")
+		control.append("  [tabindex]=\"$tabIndex\"> ")
+		control.append("</tds-datetime-control>")
+		control.append(renderCustomValidationErrors(fieldSpec))
+
+		return control.toString()
+	}
+
+	/**
+	 * Generates a String HTML to render the control used to show field validation errors
+	 * @param fieldSpec - the map of field specifications
+	 * @return the HTML tag to represent the angular control with the properties loaded
+	 */
+	private String renderCustomValidationErrors(Map fieldSpec) {
+		def field = 'field' + fieldSpec?.field
+		def controlLabel = fieldSpec?.label
+
+		StringBuilder control = new StringBuilder("")
+		control.append("<tds-custom-validation-errors ")
+		control.append("   [label]='\"${controlLabel}\"' ")
+		control.append("   [errors]='${field}.errors' ")
+		control.append("   [submitted]='form && form.submitted' ")
+		control.append("   [valid]='${field}.valid' ")
+		control.append("   [touched]='${field}.touched' ")
+		control.append("   [dirty]='${field}.dirty' >")
+		control.append("</tds-custom-validation-errors>")
+
+		return control.toString()
+	}
 }

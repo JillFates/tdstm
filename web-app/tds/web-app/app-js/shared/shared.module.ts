@@ -23,6 +23,8 @@ import { WindowService } from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
+import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
+import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -63,14 +65,15 @@ import { AkaComponent } from './components/aka/aka.component';
 import { PasswordChangeComponent } from './components/password-change/password-change.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
-import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
-import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
-import { NumberControlComponent } from './components/custom-control/number/number-control.component';
+import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
+import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
+import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
 import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
+import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
@@ -125,14 +128,15 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		ConnectorComponent,
 		FieldReferencePopupComponent,
 		PasswordChangeComponent,
-		DateTimeControlComponent,
-		NumberControlComponent,
-		DateControlComponent,
+		TDSDateTimeControlComponent,
+		TDSNumberControlComponent,
+		TDSDateControlComponent,
 		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
-		BulkChangeEditComponent
+		BulkChangeEditComponent,
+		TDSCustomValidationErrorsComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -170,14 +174,15 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PopupModule,
 		FieldReferencePopupComponent,
 		PasswordChangeComponent,
-		DateTimeControlComponent,
-		NumberControlComponent,
-		DateControlComponent,
+		TDSDateTimeControlComponent,
+		TDSNumberControlComponent,
+		TDSDateControlComponent,
 		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
-		BulkChangeActionsComponent
+		BulkChangeActionsComponent,
+		TDSCustomValidationErrorsComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -220,7 +225,9 @@ export class SharedModule {
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY
-				}
+				},
+				ValidationRulesFactoryService,
+				ValidationRulesDefinitionsService
 			]
 		};
 	}

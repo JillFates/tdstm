@@ -11,7 +11,6 @@ class ViewPage extends Page{
 
     static at = {
         waitFor {view.displayed}
-        createButton.displayed
         exportViewButton.displayed
     }
     static content = {
@@ -20,7 +19,7 @@ class ViewPage extends Page{
         clearBtn {$("button", id:"btnClear")}
         createButton {$("button[type=button]", text: "Create")}
         bulkChangeButton {$('#btnBulkChange')}
-        exportViewButton {$("button", id:"btnExport")}
+        exportViewButton {$("button#btnExport")}
         exportModalContainer {$('#tdsUiDialog')}
         fileNameField {exportModalContainer.find("input", id: "fileName")}
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
@@ -31,7 +30,7 @@ class ViewPage extends Page{
         viewMgrBreadCrumb {$('a.font-weight-bold')}
         //starOn {$("fa text-yellow fa-star")}
         starOff {$(".fa.text-yellow.fa-star-o")}
-        gearBtn {$(".fa-cog")}
+        gearBtn {$("i.fa.fa-fw.fa-cog")}
         justPlanningCheck(required:false)  { $("input", type: "checkbox" , name: "justPlanning") }
         itemsPerPage(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-page-sizes", class:"k-pager-info k-label")}
         selectAllChecks(required:false) {$("[name=assetsSelector] input")}

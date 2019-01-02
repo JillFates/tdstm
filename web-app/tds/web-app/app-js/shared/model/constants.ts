@@ -76,3 +76,12 @@ export enum ModalType {
 
 export const DEFAULT_DIALOG_SIZE = DIALOG_SIZE.MD;
 export type MODAL_SIZE = DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL;
+
+export enum CUSTOM_FIELD_TYPES {
+	List = 'List',
+	String = 'String',
+	YesNo = 'YesNo',
+	Date = 'Date',
+	DateTime = 'DateTime',
+	Number = 'Number'
+}

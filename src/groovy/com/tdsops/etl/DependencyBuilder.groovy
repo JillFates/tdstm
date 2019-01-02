@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 
 /**
@@ -132,6 +133,7 @@ class DependencyBuilder extends DomainBuilder {
 	 * @param field
 	 * @param rowResult
 	 */
+	@CompileStatic(TypeCheckingMode.SKIP)
 	private void process(String field, RowResultFacade rowResultFacade, String dependencyType = null) {
 
 		/**
@@ -145,7 +147,7 @@ class DependencyBuilder extends DomainBuilder {
 		RowResult currentRow = processor.result.findOrCreateCurrentRow()
 		FieldResult fieldResult = currentRow.findOrCreateFieldData(createFieldDefinition(field))
 
-		Map<String, FieldResult> fieldMap = rowResultFacade.rowResult.fields
+		Map<String, FieldResult> fieldMap = rowResultFacade.getRowResult().fields
 		/**
 		 * Add Fields Part
 		 */

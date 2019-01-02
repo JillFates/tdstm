@@ -4,7 +4,6 @@ import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
@@ -167,6 +166,19 @@ class ETLProcessorResult {
 		}
 	}
 
+	/**
+	 * After completing a load 'comments' command, this methods adds results in {@code ETLProcessorResult}
+	 * <pre>
+	 *		extract 'column.name' load 'comments'
+	 *		....
+	 *		load 'comments' with myVar
+	 * </pre>
+	 * @param commentElement an instance of {@code CommentElement}
+	 */
+	void addComments(CommentElement commentElement) {
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.addComments(commentElement)
+	}
 	/**
 	 * Restart result index for the next row to be processed in an ETL script iteration
 	 */
@@ -504,6 +516,7 @@ class RowResult {
 	String domain
 	@DoNotMarshall
 	ETLFieldsValidator fieldsValidator
+	List<String> comments = []
 
 	/**
 	 * Add element to the current row data
@@ -621,6 +634,14 @@ class RowResult {
 		}
 
 		return fields[fieldName]
+	}
+
+	/**
+	 * Adds a new comment content in {@code RowResult#comments} field.
+	 * @param commentElement an instance of {@code CommentElement}
+	 */
+	void addComments(CommentElement commentElement) {
+		this.comments.add(commentElement.commentText)
 	}
 }
 

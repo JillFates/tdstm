@@ -244,9 +244,10 @@ class UserPreferenceService implements ServiceMethods {
      * @return Success Structure with preferences property containing List<Map>
      */
 	@GrailsCompileStatic
-	@Transactional(readOnly=true)
+	@Transactional
     List<Map> preferenceListForEdit(UserLogin userLogin) {
 		List<Map> preferences = []
+		List brokenPreferences = []
 
 		List prefList = UserPreference.where {
 			userLogin == userLogin
@@ -257,9 +258,12 @@ class UserPreferenceService implements ServiceMethods {
 
 		// Convert the list to a List<Map>
 		for (pref in prefList) {
-			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
+			try {
+				preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
+			} catch (InvalidParamException e) {
+				brokenPreferences << pref[0] // the preference is invalid/broken, so stage for deletion
+			}
 		}
-
 		// Sort into an alphabetical list by the Label
 		preferences = preferences.sort { a, b -> a.label.toLowerCase() <=> b.label.toLowerCase() }
 
@@ -292,6 +296,15 @@ class UserPreferenceService implements ServiceMethods {
 					setValueToReferenceName(Room.class, pref)
 					break
 			}
+		}
+
+	 // if any, remove broken/old preferences remaining in the database
+		for (brokePref in brokenPreferences) {
+			UserPreference.where {
+				userLogin == userLogin
+				preferenceCode == brokePref
+			}.deleteAll()
+			log.warn 'Invalid User preference {} for user {} was deleted', brokePref, userLogin
 		}
 
 		return preferences
