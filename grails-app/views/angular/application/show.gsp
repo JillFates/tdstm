@@ -64,7 +64,7 @@
 
 			<tds-button
 					[action]="ButtonActions.ArchitectureGraphShow"
-					(click)="getGraphUrl()">
+					(click)="openGraphUrl()">
 			</tds-button>
 		</div>
 
