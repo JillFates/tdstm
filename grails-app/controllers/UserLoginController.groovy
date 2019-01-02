@@ -20,6 +20,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 import grails.plugin.springsecurity.annotation.Secured
 
@@ -29,13 +30,14 @@ class UserLoginController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	AuditService auditService
-	JdbcTemplate jdbcTemplate
+	AuditService             auditService
+	JdbcTemplate             jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProjectService projectService
-	UserPreferenceService userPreferenceService
-	int indefinitelyThreshold = 10
+	PersonService            personService
+	ProjectService           projectService
+	UserPreferenceService    userPreferenceService
+	int                      indefinitelyThreshold = 10
+	LinkGenerator            grailsLinkGenerator
 
 	@HasPermission(Permission.UserView)
 	def list() {
@@ -144,7 +146,7 @@ class UserLoginController implements ControllerMethods {
 		else
 			userLogins = []
 
-		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
+		String acceptImgTag = '<img src="' + "$grailsLinkGenerator.serverBaseURL/assets/icons/accept.png" + '"></img>'
 		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {

@@ -56,7 +56,7 @@
 				<g:each var="key" in="['1','2']">
 					var depPref= '${depPref[key]}';
 
-				$("#dependencyGridIdGrid_"+depPref).append('<asset:image src="images/select2Arrow.png" class="selectImage editSelectimage_${key}" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\'${depPref}\',\'dependencyGrid\',\'${key}\')"/>');
+				$("#dependencyGridIdGrid_"+depPref).append('<asset:image src="images/select2Arrow.png" class="selectImage editSelectimage_${key}" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(${depPref},dependencyGrid,${key})"/>');
 
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';

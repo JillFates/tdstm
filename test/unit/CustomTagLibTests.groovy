@@ -1,9 +1,12 @@
+import asset.pipeline.grails.AssetProcessorService
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.UserPreferenceService
+import org.codehaus.groovy.grails.web.mapping.DefaultLinkGenerator
 import test.AbstractUnitSpec
 
 import java.text.SimpleDateFormat
@@ -143,6 +146,11 @@ class CustomTagLibTests extends AbstractUnitSpec {
 	}
 
 	void testSVGIcon() {
+		setup:
+			tagLib.assetProcessorService = [asset: { final Map attrs, final DefaultLinkGenerator linkGenerator ->
+				String name = attrs.file
+				return "icons/svg/${name}".toString()
+			}] as AssetProcessorService
 		expect:
 		// Verify it render the svg
 		applyTemplate('<tds:svgIcon name="${name}" />', [name: "application"]).startsWith('<svg')

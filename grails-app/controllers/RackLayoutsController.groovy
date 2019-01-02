@@ -8,7 +8,6 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -29,18 +28,20 @@ import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 @Slf4j(value='logger', category='grails.app.controllers.RackLayoutsController')
 class RackLayoutsController implements ControllerMethods {
 
-	AssetEntityService assetEntityService
-	ControllerService controllerService
-	RackService rackService
-	JdbcTemplate jdbcTemplate
-	TaskService taskService
+	AssetEntityService    assetEntityService
+	ControllerService     controllerService
+	RackService           rackService
+	JdbcTemplate          jdbcTemplate
+	TaskService           taskService
 	UserPreferenceService userPreferenceService
+	LinkGenerator         grailsLinkGenerator
 
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
@@ -399,7 +400,7 @@ class RackLayoutsController implements ControllerMethods {
 		def rackId = paramsMap.rackId
 		def forWhom = paramsMap.forWhom
 		boolean printView = paramsMap.printView
-		String disconnectImgUrl = HtmlUtil.resource([dir: "icons", file: "disconnect.png"])
+		String disconnectImgUrl = "$grailsLinkGenerator.serverBaseURL/assets/icons/disconnect.png"
 		asset.each {
 			def row = new StringBuilder("<tr>")
 			if (it.asset) {
@@ -616,7 +617,7 @@ class RackLayoutsController implements ControllerMethods {
 				if (!printView) {
 					def roomParameter = it.rackDetails.room?.id
 					def rackParameter = it.rackDetails.id
-					def rackAdd2ImgUrl = HtmlUtil.resource([dir: "i", file: "rack_add2.png"])
+					def rackAdd2ImgUrl = "$grailsLinkGenerator.serverBaseURL/assets/i/rack_add2.png"
 					row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${
 						rackId
 					}"><img src="${rackAdd2ImgUrl}">
@@ -793,7 +794,7 @@ class RackLayoutsController implements ControllerMethods {
 							assetLocation = assetEntity.getTargetLocationName()
 						}
 
-						def rackAdd2ImgUrl = HtmlUtil.resource([dir: "i", file: "rack_add2.png"])
+						def rackAdd2ImgUrl = "$grailsLinkGenerator.serverBaseURL/assets/i/rack_add2.png"
 						bladeTable.append("""<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${
 							rackId
 						}"><img src="${rackAdd2ImgUrl}"/>
@@ -1048,7 +1049,7 @@ class RackLayoutsController implements ControllerMethods {
 				def assetCableMapList = AssetCableMap.findAllByAssetFrom(assetEntity)
 				assetCableMapList.each { assetCable ->
 					cableDiagram.append("<div style=\"top:${assetCable.assetFromPort.connectorPosY / 2}px ;left:${assetCable.assetFromPort.connectorPosX}px\">")
-					def cableStatusImgUrl = HtmlUtil.createLinkToResource([dir: "i/cabling", file: "${assetCable.cableStatus}.png", absolute: true])
+					def cableStatusImgUrl = "$grailsLinkGenerator.serverBaseURL/assets/i/cabling/${assetCable.cableStatus}.png"
 					cableDiagram.append("<div><img src=\"${cableStatusImgUrl}\"/></div>")
 					cableDiagram.append("<div class=\"connector_${assetCable.assetFromPort.labelPosition}\"><span>${assetCable.assetFromPort.label}</span> </div>")
 					cableDiagram.append('</div>')

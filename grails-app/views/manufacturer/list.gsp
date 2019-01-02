@@ -15,7 +15,7 @@
 		<asset:stylesheet href="css/ui.datepicker.css" />
 		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
 		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
-		<g:javascript src="tds-common.js" />
+		<asset:javascript src="resources/tds-common.js"/>
 		<g:javascript src="model.manufacturer.js" />
 		<script type="text/javascript">
 		$(document).ready(function() {

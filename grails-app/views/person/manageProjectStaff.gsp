@@ -2,13 +2,13 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="topNav" />
-		<g:javascript src="tds-common.js" />
+		<asset:javascript src="resources/tds-common.js"/>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="angular/angular.js" />
-		<g:javascript src="angular/plugins/angular-ui.js"/>
-		<g:javascript src="angular/plugins/angular-resource.js" />
+		<asset:javascript src="angular/plugins/angular-ui.js"/>
+		<asset:javascript src="angular/plugins/angular-resource.js" />
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}"></script>
@@ -16,15 +16,15 @@
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+		<asset:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<asset:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<asset:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<g:javascript src="projectStaff.js" />
 		<asset:stylesheet href="css/tds.css" />
 		<asset:stylesheet href="css/qvga.css" />
 		<asset:stylesheet href="css/ui.datepicker.css" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+		<asset:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<asset:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<title>Project Staff</title>
 
 

@@ -121,7 +121,7 @@
              */
             var clearFiltersDisableText = filteredRequest? '' : " disabled = 'disabled' "
 			var listCaption = "<label for='lbl-task-list-title'>Tasks</label>: \
-				<tdsactionbutton id='createTask' label='Create Task' icon='${assetPath(src: '../icons/table_add.png')}' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
+				<tdsactionbutton id='createTask' label='Create Task' icon='${assetPath(src: 'icons/table_add.png')}' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton> \
 				<span class=\"capBtn task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary action-button\"> \
 				<input style=\"border: 0px; color: #2C61AA; padding:3px; font-weight: bold;\" type=\"button\" class=\"clearFilterId\" value=\"Clear Filters\" " + clearFiltersDisableText + " onclick=\"clearFilter('taskListId')\"></span>";
@@ -358,8 +358,8 @@
                     </div>
                 </div>
                 <div class="timeline-wrapper text-right pull-right">
-                    <tdsactionbutton id="graph" label="View Task Graph" icon="${assetPath(src: '../icons/tds_task_graph.png')}" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
-                    <tdsactionbutton id="timeline" label="View Timeline" icon="${assetPath(src: '../icons/timeline_marker.png')}" link="/task/taskTimeline"></tdsactionbutton>
+                    <tdsactionbutton id="graph" label="View Task Graph" icon="${assetPath(src: 'icons/tds_task_graph.png')}" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
+                    <tdsactionbutton id="timeline" label="View Timeline" icon="${assetPath(src: 'icons/timeline_marker.png')}" link="/task/taskTimeline"></tdsactionbutton>
                     <g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
                 </div>
             </div>
