@@ -208,23 +208,23 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 * @param avoidPreferenceSave used when we want to stop saving the filter in user preferences.
 	 */
-	private onStatusFilter($event, avoidPreferenceSave = false) {
+	private onStatusFilter(event, avoidPreferenceSave = false) {
 		for (const columnProperty of ['status.label', 'errorCount']) {
 			let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
 			foundMatch.filter = null;
 			this.dataGridOperationsHelper.clearValue(foundMatch);
 		}
-		if ($event.id !== 1) {
-			for (const filter of $event.filters) {
+		if (event.id !== 1) {
+			for (const filter of event.filters) {
 				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
 				if (foundMatch) {
 					foundMatch.filter = filter.value;
-					this.dataGridOperationsHelper.onFilter(foundMatch, $event.id === 3 ? 'gte' : null);
+					this.dataGridOperationsHelper.onFilter(foundMatch, event.id === 3 ? 'gte' : null);
 				}
 			}
 		}
 		if (!avoidPreferenceSave) {
-			this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER] = $event.name;
+			this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER] = event.name;
 			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( r => { /**/});
 		}
 	}
