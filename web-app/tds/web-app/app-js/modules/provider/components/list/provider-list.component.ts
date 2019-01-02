@@ -13,6 +13,7 @@ import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.compone
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
+declare var jQuery: any;
 
 @Component({
 	selector: 'provider-list',
@@ -195,5 +196,7 @@ export class ProviderListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+		// Adjusting the locked column(s) height to prevent cut-off issues.
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
