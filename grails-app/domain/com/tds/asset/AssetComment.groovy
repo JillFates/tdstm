@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import grails.util.Environment
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -160,6 +161,9 @@ class AssetComment {
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
+		if (Environment.current == Environment.TEST) { // For Testing we need to set this as nullable, it should always be like that?
+			score(nullable: true)
+		}
 	}
 
 	static mapping = {
