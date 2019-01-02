@@ -34,4 +34,5 @@ class TabTaskGenPage extends Page {
         waitFor{js.'$("[ui-view=taskBatchProgress] .progress-bar")'.size() > 0}
         waitFor{js.'$("[ui-view=taskBatchProgress] .progress-bar")'.size() == 0}
     }
+
 }
