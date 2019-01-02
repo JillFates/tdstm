@@ -41,7 +41,7 @@ export class ButtonsFactoryService {
 				title: translate('ASSET_EXPLORER.BULK_CHANGE.TITLE')
 			},
 			[TDSActionsButton.CommentCreate]: {
-				icon: 'comment',
+				icon: 'comment-o',
 				title: translate('GLOBAL.CREATE'),
 				tooltip: `${translate('GLOBAL.CREATE')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
 			},
@@ -56,7 +56,7 @@ export class ButtonsFactoryService {
 				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.COMMENT')}`
 			},
 			[TDSActionsButton.CommentList]: {
-				icon: 'comments',
+				icon: 'comments-o',
 				title: `${translate('GLOBAL.LIST')} ${translate('GLOBAL.ARTIFACTS.COMMENTS')}`,
 				tooltip: `${translate('GLOBAL.LIST')} ${translate('GLOBAL.ARTIFACTS.COMMENTS')}`
 			},
