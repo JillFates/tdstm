@@ -1,6 +1,6 @@
 package net.transitionmanager.domain
 
-import com.tdsops.etl.ETLDomain
+
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
@@ -101,6 +101,12 @@ class ImportBatchRecord {
 	 */
 	String fieldsInfo
 
+	static final String defaultCommentFieldValue = '[]'
+	/**
+	 * Comments for any domain that supports comment (Device, Task)
+	 */
+	String comments = defaultCommentFieldValue
+
 	Date lastUpdated
 
 	static belongsTo = [
@@ -124,6 +130,7 @@ class ImportBatchRecord {
 		duplicateReferences sqltype: 'TINYINT(1)'
 		errorList sqltype: 'TEXT' // JSON
 		fieldsInfo sqltype: 'TEXT' // JSON
+		comments sqltype: 'TEXT' // JSON
 		lastUpdated sqltype: 'DATE'
 		operation  enumType: "String"
 		sourceRowId sqltype: 'INT(8)'
@@ -190,6 +197,7 @@ class ImportBatchRecord {
 			// Populate the full errors and fieldsInfo sections instead of the currentValues
 			domainMap.errorList = errorListAsList()
 			domainMap.fieldsInfo = fieldsInfoAsMap()
+			domainMap.comments = commentsAsList()
 
 			// Populate the results of the find/elseFind queries if the record is pending
 			if (status == ImportBatchStatusEnum.PENDING) {
@@ -240,6 +248,13 @@ class ImportBatchRecord {
 		return JsonUtil.parseJson(fieldsInfo)
 	}
 
+	/**
+	 * Used to access the comments property as an Object instead of JSON
+	 */
+	List commentsAsList() {
+		return JsonUtil.parseJsonList(comments)
+	}
+
 	// TODO : JPM 2/2018 : When using these setters the assignments were NOT working correctly
 	//
 	// Setter functions to deal with the JSON properties
@@ -264,5 +279,13 @@ class ImportBatchRecord {
 		List errors = (errorList ? JsonUtil.parseJsonList(errorList) : [])
 		errors << error
 		errorList = JsonUtil.toJson(errors)
+	}
+
+	/**
+	 * Checks if {@code comments} fields is empty or not
+	 * @return true if comments contains any value or false if comments list is empty
+	 */
+	boolean hasComments() {
+		return comments != defaultCommentFieldValue
 	}
 }
