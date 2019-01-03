@@ -16,7 +16,7 @@ import net.transitionmanager.service.SequenceService
 import net.transitionmanager.service.TaskService
 import org.joda.time.DateTime
 import spock.lang.Specification
-import test.AbstractUnitSpec
+import test.helper.mock.ProjectMock
 
 @SuppressWarnings('unused')
 @TestFor(TaskService)
@@ -460,7 +460,7 @@ class TaskServiceTests extends Specification {
 		when:
 			def recipeId = 1
 			Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
-			Project project = AbstractUnitSpec.buildMockProject()
+			Project project = ProjectMock.create()
 			def taskList = [:]
 			def taskSpec = [:]
 			List<Person> projectStaff = []
