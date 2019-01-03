@@ -161,9 +161,7 @@ class AssetComment {
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
-		if (Environment.current == Environment.TEST) { // For Testing we need to set this as nullable, it should always be like that?
-			score(nullable: true)
-		}
+		score nullable: true
 	}
 
 	static mapping = {

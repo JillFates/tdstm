@@ -3559,7 +3559,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskSpec: taskSpec.id,
 			apiAction: settings.apiAction)
 
-		def msg
 		def errMsg
 
 		// Handle setting the task duration which can have an indirect reference to another property as well as a default value
@@ -3594,9 +3593,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			task.category = taskSpec.category
 		}
 
-		// def defCat = task.category
-		// task.category = null
-
 		try {
 			if (asset) {
 				task.comment = new GStringEval().toString(taskSpec.title, asset)
@@ -3609,33 +3605,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			task.comment = "** Error computing title **"
 		}
 
-		// Set various values if there is a workflow associated to this taskSpec and Asset
-		if (workflow) {
-		 	// log.info "Applying workflow values to task $taskNumber - values=$workflow"
-		 	if (workflow.workflow_transition_id) {
-			   task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id)
-		   }
-		 	// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
-		 	if (! task.category && workflow.category) {
-			   task.category = workflow.category
-		   }
-		 	// if (! task.estStart && workflow.plan_start_time) {
-			//   task.estStart = workflow.plan_start_time
-		   // }
-		 	// if (! task.estFinish && workflow.plan_completion_time) {
-			//   task.estFinish = workflow.plan_completion_time
-		   // }
-		 	// if (! task.duration && workflow.duration != null) {
-		 	// 	task.duration = workflow.duration
-		 	// 	task.durationScale = workflow.duration_scale ?: TimeScale.M
-		 	// }
-		 }
-
-		if (task.category == null) {
-			task.category = defCat
+		if ( workflow && workflow.workflow_transition_id ) {
+			task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id)
 		}
 
-		// log.info "About to save task: $task.category"
 		if (! task.save(flush:true, failOnError:false)) {
 			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
@@ -3722,12 +3695,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (predecessor.id == successor.id) {
 			throw new RuntimeException("Attempted to create dependency where predecessor and successor are the same task ($predecessor)")
 		}
-
-		/*
-		if (settings.deferPred) {
-			throw new RuntimeException("createTaskDependency: shouldn't be called with predecessor.defer:'$settings.deferPred' ($predecessor), succ ($successor)")
-		}
-		*/
 
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
 		if (! predecessor.getTmpHasSuccessorTaskFlag()) {
@@ -3975,13 +3942,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			recipe.groups.each { g ->
 				gCount++
 				if (!g.name || g.name.size() == 0) {
-					msg = "Group specification #$gCount missing required 'name' property"
-					throw new InvalidParamException(msg)
+					throw new InvalidParamException(
+							  "Group specification #$gCount missing required 'name' property"
+					)
 				}
 
 				if (g.filter?.containsKey('taskSpec')) {
-					msg = "Group specification ($g.name) references a taskSpec which is not supported"
-					throw new InvalidParamException(msg)
+					throw new InvalidParamException(
+							  "Group specification ($g.name) references a taskSpec which is not supported"
+					)
 				}
 
 				groups[g.name] = findAllAssetsWithFilter(contextObject, g, groups, exceptions, project)

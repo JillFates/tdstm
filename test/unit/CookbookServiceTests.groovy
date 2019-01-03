@@ -16,7 +16,7 @@ class CookbookServiceTests extends AbstractUnitSpec { //Specification {
 
 	void setup() {
 		login()
-		Project project = buildMockProject()
+		Project project = AbstractUnitSpec.buildMockProject()
 
 		//Mocking up the Users Current Project
 		service.securityService.metaClass.getUserCurrentProject = {

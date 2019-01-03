@@ -7,7 +7,6 @@ import com.tdsops.tm.enums.domain.TimeScale
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
@@ -16,9 +15,8 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SequenceService
 import net.transitionmanager.service.TaskService
 import org.joda.time.DateTime
-import org.quartz.DateBuilder
 import spock.lang.Specification
-import static org.quartz.DateBuilder.newDate
+import test.AbstractUnitSpec
 
 @SuppressWarnings('unused')
 @TestFor(TaskService)
@@ -462,7 +460,7 @@ class TaskServiceTests extends Specification {
 		when:
 			def recipeId = 1
 			Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
-			Project project = buildMockProject()
+			Project project = AbstractUnitSpec.buildMockProject()
 			def taskList = [:]
 			def taskSpec = [:]
 			List<Person> projectStaff = []
@@ -489,49 +487,7 @@ class TaskServiceTests extends Specification {
 
 		and: 'the workflow transition is obtained (currently a mock object)'
 			task.workflowTransition != null
-/*
-      and: 'the category is the same than in the workflow'
-         task.category == workflow.category
 
-		and: 'the start time is the same than in the workflow'
-			task.estStart == workflow.plan_start_time
-
-		and: 'the end time is the same than in the workflow'
-			task.estFinish == workflow.plan_completion_time
-
-		and: 'the duration is the same than in the workflow'
-			task.duration == workflow.duration
-			task.durationScale == workflow.duration_scale
-*/
-	}
-
-	private Project buildMockProject() {
-		String projectName = 'projectName'
-		String projectDescription = 'description'
-		long projectId = 123
-		String projectCode = 'projectCode'
-		String projectClientName = 'projectClientName'
-		long projectClientId = 321
-		int completionDateYear = 2100
-		int completionDateMonth = DateBuilder.DECEMBER
-		int completionDateDay = 15
-		Date completionDate = newDate()
-				  .inYear(completionDateYear)
-				  .inMonth(completionDateMonth)
-				  .onDay(completionDateDay)
-				  .build()
-		completionDate.clearTime()
-
-		Project project = new Project(
-				  name: projectName, projectCode: projectCode,
-				  completionDate: completionDate, description: projectDescription,
-				  client: new PartyGroup(name: projectClientName)
-		)
-
-		project.id = projectId
-		project.client.id = projectClientId
-
-		return project
 	}
 
 	// Helper method used to check a task duration settings

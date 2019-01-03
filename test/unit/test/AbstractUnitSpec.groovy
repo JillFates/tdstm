@@ -124,7 +124,7 @@ abstract class AbstractUnitSpec extends Specification {
 	 * This Creates a Mock Project used in Unit Test
 	 * @return a MockProject
 	 */
-	protected Project buildMockProject() {
+	static Project buildMockProject() {
 		String projectName = 'projectName'
 		String projectDescription = 'description'
 		long projectId = 123
