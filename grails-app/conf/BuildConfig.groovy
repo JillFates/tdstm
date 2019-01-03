@@ -45,7 +45,6 @@ grails.project.dependency.resolution = {
 
 		compile 'org.glassfish.external:ant:3.0-b29'
 		runtime 'mysql:mysql-connector-java:5.1.40'
-		// runtime 'org.apache.commons:commons-lang3:3.1'
 		runtime 'org.apache.commons:commons-lang3:3.8.1'
 		runtime 'org.apache.commons:commons-text:1.6'
 
