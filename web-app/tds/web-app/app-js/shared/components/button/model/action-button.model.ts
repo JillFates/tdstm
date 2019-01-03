@@ -21,6 +21,7 @@ export enum TDSActionsButton {
 	GenericIsFavorite,
 	GenericIsNotFavorite,
 	GenericRefresh,
+	GenericDelete,
 	GenericSave,
 	GenericSaveAs,
 	TaskCreate,

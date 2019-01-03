@@ -26,7 +26,8 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[title]="tooltip || button.tooltip || titleButton"
 			[ngClass]="buttonClasses">
 				<i class="{{iconPrefixVendor + button.icon}}"></i>
-				<span>{{titleButton}}</span>
+				<span class="title">{{titleButton}}</span>
+				<ng-content></ng-content>
 		</button>
 	`,
 	host: {

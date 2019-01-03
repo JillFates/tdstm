@@ -68,6 +68,11 @@ export class ButtonsFactoryService {
 				icon: 'cog',
 				title: translate('GLOBAL.CONFIGURE')
 			},
+			[TDSActionsButton.GenericDelete]: {
+				icon: 'trash',
+				title: translate('GLOBAL.DELETE'),
+				tooltip: translate('GLOBAL.DELETE')
+			},
 			[TDSActionsButton.GenericExport]: {
 				icon: 'download',
 				title: translate('GLOBAL.EXPORT')
