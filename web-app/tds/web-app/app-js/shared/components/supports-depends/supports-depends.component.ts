@@ -32,9 +32,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
-                <button (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)" tabindex="401" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                </button>
+                <tds-button
+                        class="float-right button-header-grid"
+                        [action]="ButtonActions.GenericAdd"
+                        id="add-support"
+                        (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
+                </tds-button>
             </ng-template>
 
             <!-- Columns -->
@@ -145,9 +148,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
-                <button tabindex="404" (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)"  class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                </button>
+                <tds-button
+                        class="float-right button-header-grid"
+                        [action]="ButtonActions.GenericAdd"
+                        id="dependent-support"
+                        (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
+                </tds-button>
             </ng-template>
 
             <!-- Columns -->

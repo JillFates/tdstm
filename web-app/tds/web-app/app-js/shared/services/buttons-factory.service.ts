@@ -64,6 +64,10 @@ export class ButtonsFactoryService {
 				icon: 'times',
 				title: translate('GLOBAL.CLEAR_FILTERS')
 			},
+			[TDSActionsButton.GenericAdd]: {
+				icon: 'plus-circle',
+				title: translate('GLOBAL.ADD')
+			},
 			[TDSActionsButton.GenericConfiguration]: {
 				icon: 'cog',
 				title: translate('GLOBAL.CONFIGURE')

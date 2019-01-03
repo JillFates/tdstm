@@ -16,6 +16,7 @@ export enum TDSActionsButton {
 	CommentCreate,
 	CommentList,
 	FilterClear,
+	GenericAdd,
 	GenericConfiguration,
 	GenericExport,
 	GenericIsFavorite,
