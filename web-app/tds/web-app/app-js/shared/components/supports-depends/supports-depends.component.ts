@@ -56,7 +56,7 @@ declare var jQuery: any;
 
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="k-grid-ignore-click action-button-list tds-action-button-set" style="cursor: default;">
+                    <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
 						<tds-button
 							[id]="'create-button-' + rowIndex"
 							[action]="ButtonActions.CommentCreate"
@@ -66,6 +66,7 @@ declare var jQuery: any;
 						</tds-button>
 						<tds-button
 							[id]="'delete-button-' + rowIndex"
+							class="command-delete"
 							[action]="ButtonActions.GenericDelete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
 						</tds-button>
@@ -172,7 +173,7 @@ declare var jQuery: any;
 
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="k-grid-ignore-click action-button-list tds-action-button-set" style="cursor: default;">
+                    <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
                     	<tds-button
 							[id]="'dependent-create-button-' + rowIndex"
 							[action]="ButtonActions.CommentCreate"
@@ -182,6 +183,7 @@ declare var jQuery: any;
 						</tds-button>
 						<tds-button
 							[id]="'dependent-delete-button-' + rowIndex"
+							class="command-delete"
 							[action]="ButtonActions.GenericDelete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
 						</tds-button>
