@@ -54,6 +54,7 @@ declare var jQuery: any;
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
                         <button (click)="onAddEditComment(dataItem)"
+                                type="button"
                                 class="btn btn-action btn-default btn-comment"
                                 title="Comments">
                             <i class="fa fa-fw fa-comment-o"></i>
@@ -61,6 +62,7 @@ declare var jQuery: any;
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
                         </button>
                         <button (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)"
+                                type="button"
                                 class="btn btn-action btn-default btn-delete"
                                 title="Delete">
                             <span class="fa fa-fw fa-trash"></span>
@@ -167,6 +169,7 @@ declare var jQuery: any;
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
                         <button (click)="onAddEditComment(dataItem)"
+                                type="button"
                                 class="btn btn-action btn-default btn-comment"
                                 title="Comments">
                             <i class="fa fa-fw fa-comment-o"></i>
@@ -174,6 +177,7 @@ declare var jQuery: any;
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
                         </button>
                         <button (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)"
+                                type="button"
                                 class="btn btn-action btn-default btn-delete"
                                 title="Delete">
                             <span class="fa fa-fw fa-trash"></span>
