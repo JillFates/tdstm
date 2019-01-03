@@ -30,6 +30,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import grails.util.Environment
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -1447,64 +1448,22 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		for (MoveBundle moveBundle in moveBundles) {
 
-			int physicalCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				eq('assetClass', AssetClass.DEVICE)
-				or {
-					isNull('assetType')
-					not {
-						'in'('assetType', AssetType.virtualServerTypes)
-					}
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
+			Map<String, Integer> summaryMap = AssetUtils.getAssetSummary(project, moveBundle, justPlanning)
 
-			int assetCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				and {
-					'in' ('assetType', AssetType.serverTypes)
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
+			Integer physicalCount = summaryMap['physical']
+			Integer serverCount = summaryMap['servers']
+			Integer applicationCount = summaryMap['applications']
+			Integer databaseCount = summaryMap['databases']
+			Integer filesCount = summaryMap['files']
 
-			int applicationCount = Application.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int databaseCount = Database.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int filesCount = Files.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			totalAsset += assetCount
+			totalAsset += serverCount
 			totalPhysical += physicalCount
 			totalApplication += applicationCount
 			totalDatabase += databaseCount
 			totalFiles += filesCount
 
-			if (!justPlanning || assetCount || applicationCount || physicalCount || databaseCount || filesCount) {
-				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
+			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
+				assetSummaryList << [name: moveBundle, assetCount: serverCount, applicationCount: applicationCount, physicalCount: physicalCount,
 									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
 			}
 

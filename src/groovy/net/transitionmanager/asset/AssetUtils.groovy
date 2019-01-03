@@ -1,8 +1,13 @@
 package net.transitionmanager.asset
 
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.AssetClass
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import com.tds.asset.AssetOptions
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Project
 
 @CompileStatic
 class AssetUtils {
@@ -99,6 +104,133 @@ class AssetUtils {
 		}
 		// If no existing option matched the given value, return 'Unknown'.
 		return defaultWhenNotFound
+	}
+
+
+	/**
+	 * Return a map with the total number of assets for the given project or bundle.
+	 * @param project - user's current project.
+	 * @param moveBundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return a map with the total broken down by type.
+	 */
+	static Map<String, Integer> getAssetSummary(Project project, MoveBundle moveBundle, boolean justPlanning) {
+		return [
+		    'applications': getApplicationCount(project, moveBundle, justPlanning),
+			'databases': getDatabaseCount(project, moveBundle, justPlanning),
+			'files': getFileCount(project, moveBundle, justPlanning),
+			'physical': getPhysicalCount(project, moveBundle, justPlanning),
+			'servers': getServerCount(project, moveBundle, justPlanning)
+		]
+	}
+
+	/**
+	 * Get the total number of databases for the given project (or bundle).
+	 * @param project - user's current project.
+	 * @param bundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return the number of databases found.
+	 */
+	private static Integer getDatabaseCount(Project project, MoveBundle moveBundle, boolean justPlanning) {
+		return getAssetCount(project, moveBundle, AssetClass.DATABASE, justPlanning)
+	}
+
+	/**
+	 * Get the total number of applications for the given project (or bundle).
+	 * @param project - user's current project.
+	 * @param bundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return the number of applications found.
+	 */
+	private static Integer getApplicationCount(Project project, MoveBundle moveBundle, boolean justPlanning) {
+		return getAssetCount(project, moveBundle, AssetClass.APPLICATION, justPlanning)
+	}
+
+	/**
+	 * Get the total number of files for the given project (or bundle).
+	 * @param project - user's current project.
+	 * @param bundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return the number of files found.
+	 */
+	private static Integer getFileCount(Project project, MoveBundle moveBundle, boolean justPlanning) {
+		return getAssetCount(project, moveBundle, AssetClass.STORAGE, justPlanning)
+	}
+
+	/**
+	 * Get the total number of physical devices for the given project (or bundle).
+	 * @param project - user's current project.
+	 * @param bundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return the number of physical devices found.
+	 */
+	private static Integer getPhysicalCount(Project project, MoveBundle bundle, boolean justPlanning) {
+		return AssetEntity.where {
+			if (bundle) {
+				moveBundle == bundle
+			} else {
+				project == project
+			}
+
+			assetClass == AssetClass.DEVICE
+			assetType == null || !(assetType in AssetType.virtualServerTypes)
+
+			if (justPlanning) {
+				moveBundle.useForPlanning == justPlanning
+			}
+		}.count().toInteger()
+	}
+
+	/**
+	 * Get the total number of servers for the given project (or bundle).
+	 * @param project - user's current project.
+	 * @param bundle - bundle to narrow down the assets being queried.
+	 * @param justPlanning - flag to filter only assets assigned to bundles used for planning.
+	 * @return the number of servers found.
+	 */
+	private static Integer getServerCount(Project project, MoveBundle bundle, boolean justPlanning) {
+		return AssetEntity.where {
+			if (bundle) {
+				moveBundle == bundle
+			} else {
+				project == project
+			}
+
+			assetType in AssetType.serverTypes
+			assetClass == AssetClass.DEVICE
+
+			if (justPlanning) {
+				moveBundle.useForPlanning == justPlanning
+			}
+		}.count().toInteger()
+	}
+
+
+	/**
+	 * Get the total number of assets for the AssetClass given. If a MoveBundle instance is provided,
+	 * only assets assigned to that bundle will be considered.
+	 *
+	 * @param project - user's current project.
+	 * @param bundle - MoveBundle to be used for querying the asset count.
+	 * @param assetClass - the AssetClass requested.
+	 * @param justPlanning - flag to filter planning assets.
+	 * @return an integer with the number of assets for the bundle.
+	 */
+	private static Integer getAssetCount(Project project, MoveBundle bundle, AssetClass assetClass, boolean justPlanning) {
+		return AssetEntity.where {
+			// Check if a bundle was passed. If so, use it. If not, use the project.
+			if (bundle) {
+				moveBundle == bundle
+			} else {
+				project == project
+			}
+
+			assetClass == assetClass
+
+			if (justPlanning) {
+				moveBundle.useForPlanning == justPlanning
+			}
+		}.count().toInteger()
 	}
 
 }
