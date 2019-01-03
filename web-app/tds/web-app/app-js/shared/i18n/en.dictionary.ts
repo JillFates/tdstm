@@ -54,7 +54,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
 		'ARTIFACTS': {
-			'ARCHITECTURE_GRAPH': 'Arch Grap',
+			'ARCHITECTURE_GRAPH': 'Arch Graph',
 			'ASSET' : 'Asset',
 			'ASSETS' : 'Assets',
 			'COMMENT' : 'Comment',
