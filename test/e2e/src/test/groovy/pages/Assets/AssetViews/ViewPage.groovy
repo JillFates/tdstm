@@ -40,7 +40,7 @@ class ViewPage extends Page{
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
-        nameFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetName")}
+        nameFilter {$('td#k-grid0-r1c2').find("div").find("input", type:"text")}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
         assetClassFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
