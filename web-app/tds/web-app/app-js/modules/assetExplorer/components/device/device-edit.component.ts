@@ -19,6 +19,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -31,6 +32,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DeviceEditComponent extends DeviceCommonComponent implements OnInit {
+		ButtonActions = TDSActionsButton;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,

@@ -30,6 +30,7 @@ export const en_DICTIONARY: Object = {
 		'DEFAULT': 'Default',
 		'SHOW': 'Show',
 		'SORT': 'Sort',
+		'UPDATE': 'Update',
 		'ADD_FAVORITES': 'Add to Favorites',
 		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',

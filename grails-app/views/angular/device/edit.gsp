@@ -352,10 +352,26 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" tabindex="501" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <tds-button
+                [action]="ButtonActions.AssetUpdate"
+                class="btn-primary pull-left component-action-update" tabindex="501"
+                [disabled]="!isDependenciesValidForm"
+                (click)="submitForm($event)">
+        </tds-button>
+
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger component-action-delete" tabindex="502" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <tds-button
+                    [action]="ButtonActions.AssetDelete"
+                    class="btn-danger component-action-delete" tabindex="502"
+                    (click)="onDeleteAsset()">
+            </tds-button>
         </tds:hasPermission>
-        <button class="btn btn-default pull-right component-action-delete" tabindex="503" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+
+        <tds-button
+                [action]="ButtonActions.AssetCancel"
+                class="pull-right component-action-cancel"
+                tabindex="503"
+                (click)="onCancelEdit()">
+        </tds-button>
     </div>
 </div>

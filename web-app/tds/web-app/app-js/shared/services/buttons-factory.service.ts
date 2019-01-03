@@ -21,6 +21,11 @@ export class ButtonsFactoryService {
 				title: translate('GLOBAL.EDIT'),
 				tooltip: `${translate('GLOBAL.EDIT')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
 			},
+			[TDSActionsButton.AssetCancel]: {
+				icon: 'ban',
+				title: translate('GLOBAL.CANCEL'),
+				tooltip: `${translate('GLOBAL.CANCEL')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
 			[TDSActionsButton.AssetClone]: {
 				icon: 'clone',
 				title: translate('GLOBAL.CLONE'),
@@ -35,6 +40,11 @@ export class ButtonsFactoryService {
 				icon: 'trash',
 				title: translate('GLOBAL.DELETE'),
 				tooltip: `${translate('GLOBAL.DELETE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
+			},
+			[TDSActionsButton.AssetUpdate] : {
+				icon: 'floppy-o',
+				title: translate('GLOBAL.UPDATE'),
+				tooltip: `${translate('GLOBAL.UPDATE')} ${translate('GLOBAL.ARTIFACTS.ASSET')}`
 			},
 			[TDSActionsButton.BulkEdit]: {
 				icon: 'ellipsis-v',

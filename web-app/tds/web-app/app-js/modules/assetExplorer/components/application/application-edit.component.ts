@@ -18,6 +18,7 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -37,6 +38,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			sme2: null,
 			appOwner: null
 		};
+		ButtonActions = TDSActionsButton;
 
 		constructor(
 			@Inject('model') model: any,
