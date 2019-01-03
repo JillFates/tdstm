@@ -27,17 +27,18 @@ import {ButtonsFactoryService} from './services/buttons-factory.service';
 import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
 import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
 // Shared Directives
-import { UIAutofocusDirective } from './directives/autofocus-directive';
-import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
-import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
-import { UIToastDirective } from '../shared/directives/ui-toast.directive';
-import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
-import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
-import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
-import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
-import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
-import { UIAutoCenterDirective } from './directives/autocenter-directive';
-import { InputPasteDirective } from './directives/input-paste.directive';
+import {UIAutofocusDirective} from './directives/autofocus-directive';
+import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
+import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
+import {UIToastDirective} from '../shared/directives/ui-toast.directive';
+import {UIDialogDirective} from '../shared/directives/ui-dialog.directive';
+import {UIPromptDirective, UIPromptService} from '../shared/directives/ui-prompt.directive';
+import {UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
+import {UISVGIconDirectiveDirective} from './directives/ui-svg-icon.directive';
+import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
+import {UIAutoCenterDirective} from './directives/autocenter-directive';
+import {InputPasteDirective} from './directives/input-paste.directive';
+import {CopyClipboardDirective} from './directives/copy-clipboard.directive';
 
 // Shared Pipes
 import {DateTimePipe} from './pipes/datetime.pipe';
@@ -47,6 +48,7 @@ import {FilterPipe} from './pipes/filter.pipe';
 import {UtilsPipe} from './pipes/utils.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
+import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
@@ -105,6 +107,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UtilsPipe,
 		DatePipe,
 		NumericPipe,
+		EscapeUrlEncodingPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -125,6 +128,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		InputPasteDirective,
+		CopyClipboardDirective,
 		AkaComponent,
 		ConnectorComponent,
 		FieldReferencePopupComponent,
@@ -150,11 +154,13 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
 		InputPasteDirective,
+		CopyClipboardDirective,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
 		DatePipe,
 		NumericPipe,
+		EscapeUrlEncodingPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		DynamicComponent,

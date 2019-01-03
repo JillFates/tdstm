@@ -168,7 +168,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             waitFor {tskGTabSetDefaultLink.click()}
 
         then: 'Link should Clear everything out'
-            waitFor {tskGTabClearDefaultLink.attr("class") != "ng-hide" }
+            waitFor {!tskGTabClearDefaultLink.attr("class").contains("ng-hide")}
             tskGTabClearDefaultLink.@disabled == ""
             tskGTabClearDefaultLink.text() == "Clear Default"
     }

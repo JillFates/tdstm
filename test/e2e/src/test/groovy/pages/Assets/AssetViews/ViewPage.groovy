@@ -27,7 +27,7 @@ class ViewPage extends Page{
         commonsModule { module CommonsModule }
         assetsModule { module AssetsModule }
         createViewModule {module CreateViewModule}
-        viewMgrBreadCrumb {$('a.font-weight-bold')}
+        viewMgrBreadCrumb {$('a', text: "View Manager")}
         //starOn {$("fa text-yellow fa-star")}
         starOff {$(".fa.text-yellow.fa-star-o")}
         gearBtn {$("i.fa.fa-fw.fa-cog")}
