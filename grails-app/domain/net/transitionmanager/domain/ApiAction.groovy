@@ -9,7 +9,7 @@ import net.transitionmanager.command.ApiActionMethodParam
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 

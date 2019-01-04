@@ -13,7 +13,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.MetricReportingService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared
 import spock.lang.See

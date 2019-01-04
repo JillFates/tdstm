@@ -9,7 +9,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model

@@ -11,7 +11,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerSync
 import net.transitionmanager.domain.Model
@@ -23,10 +23,10 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.multipart.MultipartFile
 
 class ModelService implements ServiceMethods {
 

@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.ProjectStatus
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
@@ -9,7 +9,7 @@ import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**

@@ -1,7 +1,7 @@
 package net.transitionmanager.command.event
 
 import grails.validation.Validateable
-import org.grails.databinding.BindUsing
+import grails.databinding.BindUsing
 
 /**
  * A command object used in creating an Event with tags.

@@ -5,7 +5,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.domain.Project
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsCustomDomainController')

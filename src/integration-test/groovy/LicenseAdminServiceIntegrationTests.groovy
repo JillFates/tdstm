@@ -7,7 +7,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.apache.commons.codec.binary.Base64
 import spock.lang.Narrative
 import spock.lang.See

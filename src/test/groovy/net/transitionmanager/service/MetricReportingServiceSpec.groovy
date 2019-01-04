@@ -20,7 +20,7 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 

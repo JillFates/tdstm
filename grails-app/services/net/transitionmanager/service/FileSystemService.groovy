@@ -13,7 +13,7 @@ import getl.excel.ExcelDataset
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand

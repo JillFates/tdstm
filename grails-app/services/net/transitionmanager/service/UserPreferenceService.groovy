@@ -8,7 +8,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import groovy.transform.TypeCheckingMode
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent

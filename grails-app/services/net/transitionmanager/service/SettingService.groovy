@@ -3,12 +3,12 @@ package net.transitionmanager.service
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 

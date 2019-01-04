@@ -2,7 +2,7 @@ package net.transitionmanager.bulk.change
 
 
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods

@@ -7,8 +7,8 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.service.TaskService
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
+import grails.core.GrailsDomainClassProperty
+import org.grails.core.exceptions.InvalidPropertyException
 import org.springframework.beans.factory.annotation.Autowired
 
 class TaskFacade {

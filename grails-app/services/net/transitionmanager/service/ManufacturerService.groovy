@@ -5,7 +5,7 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model

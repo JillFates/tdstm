@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.HtmlUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.UserAudit
 import org.springframework.beans.factory.InitializingBean

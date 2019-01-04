@@ -1,7 +1,7 @@
 import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.service.DatabaseMigrationService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 /**
  * This changelog convert any black tags from testing to grey tags.

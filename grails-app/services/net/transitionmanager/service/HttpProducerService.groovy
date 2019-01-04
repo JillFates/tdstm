@@ -10,7 +10,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.UrlUtil
 import com.tdssrc.grails.XmlUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Credential
@@ -54,7 +54,7 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType

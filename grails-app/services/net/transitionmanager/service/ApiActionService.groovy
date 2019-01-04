@@ -10,7 +10,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
@@ -37,7 +37,7 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 @Slf4j
 @Transactional

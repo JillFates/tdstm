@@ -6,8 +6,8 @@ import net.transitionmanager.domain.License.Environment
 import net.transitionmanager.domain.License.Status
 import net.transitionmanager.domain.License.Type
 import net.transitionmanager.domain.License.Method
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONElement
+import org.grails.web.json.JSONObject
 
 import java.text.ParseException
 

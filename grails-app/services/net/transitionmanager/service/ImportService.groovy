@@ -44,10 +44,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import org.springframework.transaction.interceptor.TransactionAspectSupport
-import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.multipart.MultipartFile
 
 import java.text.DateFormat
 import java.util.regex.Matcher
@@ -1947,7 +1947,7 @@ class ImportService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	def validateAndProcessWorkbookSheets(Project project, CommonsMultipartFile file, Map<String, String> params) {
+	def validateAndProcessWorkbookSheets(Project project, MultipartFile file, Map<String, String> params) {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
 

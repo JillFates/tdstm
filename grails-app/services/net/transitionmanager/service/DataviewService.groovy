@@ -12,7 +12,7 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -26,7 +26,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
 

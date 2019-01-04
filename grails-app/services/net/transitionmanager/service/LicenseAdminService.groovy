@@ -4,8 +4,8 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
-import grails.plugin.mail.MailService
-import grails.transaction.Transactional
+import grails.plugins.mail.MailService
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 
 import net.nicholaswilliams.java.licensing.License

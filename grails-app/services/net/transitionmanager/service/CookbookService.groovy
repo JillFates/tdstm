@@ -10,7 +10,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.cookbook.ContextCommand

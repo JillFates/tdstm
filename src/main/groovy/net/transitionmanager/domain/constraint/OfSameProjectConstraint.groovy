@@ -1,6 +1,6 @@
 package net.transitionmanager.domain.constraint
 
-import org.codehaus.groovy.grails.validation.AbstractConstraint
+import org.grails.datastore.gorm.validation.constraints.AbstractConstraint
 import org.springframework.validation.Errors
 
 /**

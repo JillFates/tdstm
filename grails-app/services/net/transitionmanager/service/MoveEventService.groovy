@@ -12,7 +12,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.domain.AppMoveEvent

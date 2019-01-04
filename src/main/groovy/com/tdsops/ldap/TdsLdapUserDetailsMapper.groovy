@@ -5,8 +5,8 @@ import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.UserService
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware
+import grails.core.GrailsApplication
+import grails.core.support.GrailsApplicationAware
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.ldap.core.DirContextOperations

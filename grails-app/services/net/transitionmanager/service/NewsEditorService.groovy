@@ -3,7 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project

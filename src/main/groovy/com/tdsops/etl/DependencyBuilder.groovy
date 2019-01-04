@@ -3,7 +3,7 @@ package com.tdsops.etl
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import grails.core.GrailsDomainClassProperty
 
 /**
  *

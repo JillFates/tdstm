@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferValue
 

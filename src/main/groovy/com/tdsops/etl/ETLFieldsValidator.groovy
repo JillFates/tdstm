@@ -1,7 +1,7 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import grails.core.GrailsDomainClassProperty
 
 class ETLFieldsValidator {
 

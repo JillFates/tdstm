@@ -1,7 +1,7 @@
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 class CustomDomainTestHelper {
 

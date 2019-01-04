@@ -8,7 +8,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent

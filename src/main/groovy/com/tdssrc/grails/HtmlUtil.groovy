@@ -3,7 +3,7 @@ package com.tdssrc.grails
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import org.apache.commons.validator.UrlValidator
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 

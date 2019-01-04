@@ -13,7 +13,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferValue
@@ -27,7 +27,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Sheet
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import grails.util.GrailsClassUtils
 
 @Slf4j(value='logger')
 class AssetEntityAttributeLoaderService implements ServiceMethods {

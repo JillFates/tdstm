@@ -12,7 +12,7 @@ import com.tdssrc.grails.UrlUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.credential.CredentialValidationExpression

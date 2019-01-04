@@ -1,7 +1,7 @@
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.DatabaseMigrationService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 databaseChangeLog = {
 	changeSet(author: 'arecordon', id: 'TM-10482-1') {

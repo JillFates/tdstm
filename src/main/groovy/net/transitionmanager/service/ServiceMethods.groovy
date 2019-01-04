@@ -3,9 +3,9 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.codehaus.groovy.grails.web.util.WebUtils
+import grails.core.GrailsApplication
+import  org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.util.WebUtils
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.ObjectError
 import org.springframework.web.context.request.RequestContextHolder

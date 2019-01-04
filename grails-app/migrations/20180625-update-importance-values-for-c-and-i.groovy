@@ -1,6 +1,6 @@
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.DatabaseMigrationService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 databaseChangeLog = {
 	changeSet(author: 'arecordon', id: 'TM-8090-1') {

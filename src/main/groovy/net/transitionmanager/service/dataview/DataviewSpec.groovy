@@ -6,7 +6,7 @@ import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 /**
  * DataviewSpec represents the specifications of a Dataview

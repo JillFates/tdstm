@@ -4,9 +4,9 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsClass
-import org.codehaus.groovy.grails.plugins.GrailsPluginManager
+import grails.core.GrailsApplication
+import grails.core.GrailsClass
+import grails.plugins.GrailsPluginManager
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 

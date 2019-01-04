@@ -17,7 +17,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PersonService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 @Slf4j
 class SearchQueryHelper {

@@ -20,7 +20,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 import grails.plugin.springsecurity.annotation.Secured
 

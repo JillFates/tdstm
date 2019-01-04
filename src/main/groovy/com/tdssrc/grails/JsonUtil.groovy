@@ -12,8 +12,8 @@ import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONElement
+import org.grails.web.json.JSONObject
 
 @CompileStatic
 @Slf4j(value='logger')

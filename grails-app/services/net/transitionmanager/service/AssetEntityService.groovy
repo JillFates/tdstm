@@ -29,7 +29,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.CloneAssetCommand

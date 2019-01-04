@@ -7,7 +7,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseManagerService
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.joda.time.DateTime
 import spock.lang.Narrative
 import spock.lang.See

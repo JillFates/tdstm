@@ -10,7 +10,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper

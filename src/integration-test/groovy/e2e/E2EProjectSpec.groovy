@@ -22,7 +22,7 @@ import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseManagerService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import test.helper.ApplicationTestHelper
 import test.helper.AssetCommentTestHelper

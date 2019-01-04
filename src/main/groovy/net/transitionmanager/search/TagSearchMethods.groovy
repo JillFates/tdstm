@@ -2,7 +2,7 @@ package net.transitionmanager.search
 
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 trait TagSearchMethods {
 

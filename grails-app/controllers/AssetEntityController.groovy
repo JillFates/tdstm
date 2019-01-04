@@ -27,7 +27,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.util.Environment
 import groovy.time.TimeDuration
 import net.transitionmanager.asset.DeviceUtils
@@ -86,7 +86,7 @@ import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.multipart.MultipartFile
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -269,7 +269,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		try {
 			// Get the uploaded spreadsheet file
 			MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
-			CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
+			MultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
 
 			StringBuilder message = importService.validateAndProcessWorkbookSheets(project, file, params)
 			forward action:forwardAction, params: [ message: message.toString() ]

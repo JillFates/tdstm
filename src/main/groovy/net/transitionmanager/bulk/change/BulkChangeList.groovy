@@ -5,7 +5,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.validators.CustomValidators
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods

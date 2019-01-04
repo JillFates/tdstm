@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 import com.tdsops.tm.enums.ControlType
 import net.transitionmanager.domain.Person
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import grails.core.GrailsDomainClassProperty
 
 class ETLFieldDefinition {
 

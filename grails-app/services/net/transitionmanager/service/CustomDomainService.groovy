@@ -10,8 +10,8 @@ import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONArray
+import org.grails.web.json.JSONObject
 
 class CustomDomainService implements ServiceMethods {
     static final String ALL_ASSET_CLASSES = 'ASSETS'

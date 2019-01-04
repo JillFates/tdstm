@@ -33,7 +33,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration

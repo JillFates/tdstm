@@ -1,6 +1,6 @@
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.GreenMailUtil
-import grails.plugin.mail.MailService
+import grails.plugins.mail.MailService
 import grails.test.spock.IntegrationSpec
 import spock.lang.Ignore
 

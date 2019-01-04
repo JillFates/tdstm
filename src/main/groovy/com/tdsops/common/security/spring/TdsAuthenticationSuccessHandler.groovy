@@ -5,7 +5,7 @@ import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.AuditService

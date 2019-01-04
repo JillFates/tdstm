@@ -13,7 +13,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
-import org.codehaus.groovy.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
+import org.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
 import org.quartz.DateBuilder
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authentication.TestingAuthenticationToken

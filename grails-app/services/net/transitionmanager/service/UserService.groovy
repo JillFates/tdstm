@@ -8,7 +8,7 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.MoveEventStaff

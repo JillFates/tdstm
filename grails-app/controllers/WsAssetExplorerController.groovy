@@ -16,7 +16,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.dataview.DataviewSpec
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 /**
  *

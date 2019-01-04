@@ -6,7 +6,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.RoomCommand
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project

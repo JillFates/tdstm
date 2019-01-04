@@ -3,7 +3,7 @@ package net.transitionmanager.domain
 import com.github.icedrake.jsmaz.Smaz
 import groovy.json.JsonBuilder
 import org.apache.commons.codec.binary.Base64
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 
 /**
  * Created by octavio on 9/20/16.

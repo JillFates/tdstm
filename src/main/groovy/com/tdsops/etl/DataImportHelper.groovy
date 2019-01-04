@@ -8,7 +8,7 @@ import com.tdssrc.grails.StringUtil
 import net.transitionmanager.connector.Environment
 import com.tds.asset.AssetEntity
 import net.transitionmanager.domain.Project
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 /**
  * This class provides a series of method for the

@@ -28,7 +28,7 @@ import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper

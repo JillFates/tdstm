@@ -7,7 +7,7 @@ import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.grails.core.artefact.DomainClassArtefactHandler
 
 class SqlUtil {
 	public static final String COMMA = ","

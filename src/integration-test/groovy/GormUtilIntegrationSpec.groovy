@@ -8,9 +8,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Ignore
 
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.validation.ConstrainedProperty
-import org.codehaus.groovy.grails.validation.Constraint
+import grails.core.GrailsDomainClassProperty
+import grails.gorm.validation.ConstrainedProperty
+import grails.gorm.validation.Constraint
 import com.tds.asset.AssetDependency
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Credential

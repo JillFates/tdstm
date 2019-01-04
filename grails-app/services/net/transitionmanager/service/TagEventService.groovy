@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag

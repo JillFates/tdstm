@@ -7,7 +7,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
 import net.transitionmanager.domain.MoveEvent
@@ -19,7 +19,7 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.math.RandomUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Transactional

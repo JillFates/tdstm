@@ -20,7 +20,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand

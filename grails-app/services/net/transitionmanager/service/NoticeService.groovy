@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.NoticeAcknowledgment
 import net.transitionmanager.domain.Person

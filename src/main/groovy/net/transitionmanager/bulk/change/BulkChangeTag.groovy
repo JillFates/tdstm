@@ -1,7 +1,7 @@
 package net.transitionmanager.bulk.change
 
 import com.tdssrc.grails.JsonUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag

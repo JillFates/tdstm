@@ -16,7 +16,7 @@ import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.codec.net.URLCodec
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.validator.routines.UrlValidator
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.LicenseAdminService

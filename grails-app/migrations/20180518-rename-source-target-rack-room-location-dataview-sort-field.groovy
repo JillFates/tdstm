@@ -1,6 +1,6 @@
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.service.DatabaseMigrationService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 
 databaseChangeLog = {

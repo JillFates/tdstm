@@ -19,7 +19,7 @@ import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import net.transitionmanager.dataImport.SearchQueryHelper
@@ -39,7 +39,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl

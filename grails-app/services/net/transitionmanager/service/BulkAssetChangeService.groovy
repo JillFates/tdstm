@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.transaction.NotTransactional
 import com.tdssrc.grails.GormUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.bulk.change.BulkChangeNumber

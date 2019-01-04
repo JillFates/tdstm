@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMReader
 import org.bouncycastle.openssl.PasswordFinder

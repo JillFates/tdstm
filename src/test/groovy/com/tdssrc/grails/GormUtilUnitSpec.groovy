@@ -17,8 +17,8 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.grails.core.artefact.DomainClassArtefactHandler
+import grails.core.GrailsDomainClassProperty
 import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll

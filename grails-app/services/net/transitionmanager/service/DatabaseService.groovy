@@ -5,7 +5,7 @@ import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 
 @Transactional

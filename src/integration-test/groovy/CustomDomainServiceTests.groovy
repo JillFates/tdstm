@@ -12,7 +12,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.BooleanUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
 import org.apache.commons.lang.RandomStringUtils as RSU
 

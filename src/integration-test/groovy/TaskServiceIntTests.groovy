@@ -22,7 +22,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import org.apache.commons.lang3.RandomStringUtils
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import spock.lang.See

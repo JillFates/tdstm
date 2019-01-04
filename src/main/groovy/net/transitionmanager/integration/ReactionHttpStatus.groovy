@@ -1,6 +1,6 @@
 package net.transitionmanager.integration
 
-import org.apache.commons.httpclient.HttpStatus
+import org.apache.http.HttpStatus
 
 /**
  *

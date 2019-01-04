@@ -34,7 +34,7 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured

@@ -5,15 +5,15 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
-import grails.plugin.mail.MailService
-import grails.transaction.Transactional
+import grails.plugins.mail.MailService
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicenseActivityTrack
 import net.transitionmanager.domain.LicensedClient
 import org.apache.commons.codec.binary.Base64
-import org.codehaus.groovy.grails.web.json.JSONElement
+import org.grails.web.json.JSONElement
 
 /**
  * Created by octavio on 12/9/16.

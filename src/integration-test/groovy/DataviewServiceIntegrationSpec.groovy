@@ -9,7 +9,7 @@ import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 
 class DataviewServiceIntegrationSpec extends IntegrationSpec {

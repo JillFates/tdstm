@@ -2,7 +2,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.DatabaseMigrationService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 databaseChangeLog = {
 	changeSet(author: 'dcorrea', id: 'TM-11229') {

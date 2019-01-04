@@ -11,7 +11,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.json.JsonBuilder
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.multipart.MultipartFile
 
 import java.text.DateFormat
 
@@ -1865,7 +1865,7 @@ class AccountImportExportService implements ServiceMethods {
 	 */
 	private String saveImportSpreadsheet(request, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-		CommonsMultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
+		MultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
 
 		// Generate a random filename to store the spreadsheet between page loads
 		String filename = 'AccountImport-' + securityService.currentUserLoginId + '-' +

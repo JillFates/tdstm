@@ -1,5 +1,5 @@
 import net.transitionmanager.command.PersonCO
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.*
 import com.tds.asset.Application

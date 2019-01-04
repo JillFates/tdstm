@@ -2,10 +2,10 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 @Transactional
 class ProviderService implements ServiceMethods {

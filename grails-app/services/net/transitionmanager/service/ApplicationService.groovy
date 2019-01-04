@@ -3,7 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.Application
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent

@@ -1,7 +1,7 @@
 package com.tdsops.etl.marshall
 
-import org.codehaus.groovy.grails.web.converters.Converter
-import org.codehaus.groovy.grails.web.converters.marshaller.ClosureObjectMarshaller
+import org.grails.web.converters.Converter
+import org.grails.web.converters.marshaller.ClosureObjectMarshaller
 import org.springframework.beans.BeanUtils
 
 import java.beans.PropertyDescriptor

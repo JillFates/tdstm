@@ -23,7 +23,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
@@ -63,7 +63,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.web.util.WebUtils
+import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

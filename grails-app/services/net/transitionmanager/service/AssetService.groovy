@@ -15,7 +15,7 @@ import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.asset.AssetFacade
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 
 class AssetService {

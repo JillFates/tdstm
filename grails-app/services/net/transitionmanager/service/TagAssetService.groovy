@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag

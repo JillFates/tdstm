@@ -13,7 +13,7 @@ import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import com.tdssrc.grails.StopWatch
 
 /**

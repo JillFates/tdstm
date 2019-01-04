@@ -4,7 +4,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 
 class StorageService implements ServiceMethods {

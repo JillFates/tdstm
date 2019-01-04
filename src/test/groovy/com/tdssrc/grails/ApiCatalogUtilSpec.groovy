@@ -2,7 +2,7 @@ package com.tdssrc.grails
 
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.service.InvalidParamException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.See
 import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper

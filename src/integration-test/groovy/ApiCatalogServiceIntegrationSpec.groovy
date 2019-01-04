@@ -7,7 +7,7 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProviderService
 import net.transitionmanager.service.SecurityService
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.See
 import test.helper.ApiCatalogTestHelper

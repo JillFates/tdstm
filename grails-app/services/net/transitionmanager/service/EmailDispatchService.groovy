@@ -5,7 +5,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.EmailDispatch
 import org.quartz.Scheduler
 import org.quartz.Trigger

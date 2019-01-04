@@ -5,7 +5,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEventStaff

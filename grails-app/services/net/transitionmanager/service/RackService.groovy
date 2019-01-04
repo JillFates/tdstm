@@ -5,7 +5,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project

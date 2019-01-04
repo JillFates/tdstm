@@ -23,7 +23,7 @@ import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
-import org.grails.databinding.bindingsource.InvalidRequestBodyException
+import org.grails.web.databinding.bindingsource.InvalidRequestBodyException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder

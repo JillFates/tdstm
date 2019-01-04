@@ -12,7 +12,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.MoveBundle
@@ -26,7 +26,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.openxml4j.util.ZipSecureFile
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.streaming.SXSSFSheet
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.core.GrailsApplication
 import org.hibernate.*
 import org.hibernate.transform.Transformers
 

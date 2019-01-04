@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import net.transitionmanager.dataImport.SearchQueryHelper
 
 /**

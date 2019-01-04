@@ -12,7 +12,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
@@ -28,7 +28,7 @@ import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

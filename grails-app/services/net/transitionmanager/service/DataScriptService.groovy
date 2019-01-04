@@ -10,7 +10,7 @@ import getl.data.Field
 import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat

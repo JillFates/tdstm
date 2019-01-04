@@ -4,13 +4,13 @@ import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
 
 @Slf4j
