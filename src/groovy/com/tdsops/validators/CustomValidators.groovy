@@ -141,9 +141,7 @@ class CustomValidators {
 
 		new Validator ( fieldSpec ) {
 			void validate() {
-				if (isRequired()) {
-					addErrors( controlNotEmptyValidator( value, fieldSpec, domain ).apply() )
-				}
+				addErrors( controlNotEmptyValidator( value, fieldSpec, domain ).apply() )
 
 				if ( value && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )

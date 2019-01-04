@@ -263,6 +263,7 @@ class CustomValidatorsSpec extends Specification{
 						required : 1
 				]
 			]
+
 		when: "the value Yes is passed"
 			def validator = CustomValidators.controlYesNoControlValidator("Yes", fieldSpec, mockDomain)
 			validator.apply()
@@ -303,23 +304,8 @@ class CustomValidatorsSpec extends Specification{
 						required : 0
 				]
 			]
-		when: "the value Yes is passed"
-			def validator = CustomValidators.controlYesNoControlValidator("Yes", fieldSpec, mockDomain)
-			validator.apply()
-		then: 'no error should be reported'
-			!validator.hasErrors()
-		when: "the value No is passed"
-			validator = CustomValidators.controlYesNoControlValidator("No", fieldSpec, mockDomain)
-			validator.apply()
-		then: 'no error should be reported'
-			!validator.hasErrors()
-		when: 'a value other than Yes/No is passed'
-			validator = CustomValidators.controlYesNoControlValidator("maybe", fieldSpec, mockDomain)
-			errors = validator.apply()
-		then: 'a "field.invalid.notInListOrBlank" error should be reported'
-			validator.hasErrors()
-			1 == errors.size()
-			'field.invalid.notInListOrBlank' == errors[0].i18nMessageId
+			def validator
+
 		when: 'a blank value is passed'
 			validator = CustomValidators.controlYesNoControlValidator("", fieldSpec, mockDomain)
 			validator.apply()
