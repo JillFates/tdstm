@@ -4,7 +4,7 @@ import net.transitionmanager.domain.Dataview
 import net.transitionmanager.service.DatabaseMigrationService
 
 databaseChangeLog = {
-	changeSet(author: 'slopez', id: '20181211-TM-13084-1') {
+	changeSet(author: 'slopez', id: '20181211-TM-13084-2') {
 		comment('Make usability and style changes to the current set of new System Views - part 1')
 		grailsChange {
 			change {
@@ -30,7 +30,10 @@ databaseChangeLog = {
 					def columns = []
 					reportSchema.columns.each { col ->
 						if (col && col.property) {
-							if (col.property != 'tagAssets') {
+							// The Name, Description and Tags columns will be wider than all others
+							if ( ['tagAssets', 'assetName', 'description'].contains(col.property) ) {
+								col.width = 220
+							} else {
 								col.width = 140
 							}
 							columns << col
