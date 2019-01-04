@@ -1,17 +1,18 @@
 package com.tdsops.common.security.spring
 
-import com.tdsops.common.security.SecurityUtil
-import groovy.transform.CompileStatic
-import net.transitionmanager.service.SecurityService
-import org.springframework.security.authentication.encoding.PasswordEncoder
 
+import com.tdsops.common.security.SecurityUtil
+import grails.core.GrailsApplication
+import groovy.transform.CompileStatic
+import net.transitionmanager.service.PasswordService
+import org.springframework.security.authentication.encoding.PasswordEncoder
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
 @CompileStatic
 class TdsPasswordEncoder implements PasswordEncoder {
-
-	SecurityService securityService
+	GrailsApplication grailsApplication
+	PasswordService passwordService
 
 	String encodePassword(String rawPass, salt) {
 		SecurityUtil.encrypt rawPass, salt as String
@@ -31,8 +32,8 @@ class TdsPasswordEncoder implements PasswordEncoder {
 
 		// checkLegacyPassword
 
-		if (securityService.userLocalConfig.forceUseNewEncryption) {
-			securityService.forcePasswordChange()
+		if (grailsApplication.config.getProperty('tdstm.security.localUser.forceUseNewEncryption', Boolean)) {
+			passwordService.forcePasswordChange()
 		}
 
 		true

@@ -1,18 +1,19 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.HtmlUtil
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
+import grails.plugin.springsecurity.SpringSecurityService
 import net.transitionmanager.UserAudit
 import org.springframework.beans.factory.InitializingBean
-
 /**
  * Logs audit information
  *
  * @author Diego Scarpa
  */
-@Slf4j(value='logger')
-class AuditService implements InitializingBean, ServiceMethods {
+class AuditService implements InitializingBean {
+	GrailsApplication grailsApplication
+	SpringSecurityService springSecurityService
 
 	private static final String AUDIT_TYPE_ACCESS = 'access'
 	private static final String AUDIT_TYPE_ACTIVITY = 'activity'
@@ -46,9 +47,9 @@ class AuditService implements InitializingBean, ServiceMethods {
 			params = filterParams(params)
 
 			String paramsMsg = params.size() ? params.toString() + ' :' : ''
-			String user = securityService.currentUsername ?: 'ANONYMOUS_USER'
+			String user = springSecurityService.principal.name ?: 'ANONYMOUS_USER'
 			String remoteIp = HtmlUtil.getRemoteIp(request)
-			logger.info 'USER_ACTIVITY: {} invoked {} {} {}', 
+			log.info 'USER_ACTIVITY: {} invoked {} {} {}', 
 				user, request.method, auditUri, remoteIp
 		}
 	}
@@ -89,17 +90,17 @@ class AuditService implements InitializingBean, ServiceMethods {
 
 	void logSecurityViolation(String username = null, message) {
 		if (username == null) {
-			username = securityService.currentUsername
+			username = springSecurityService.principal.name ?: 'ANONYMOUS_USER'
 		}
-		logger.info 'SECURITY_VIOLATION: {} by {}', message, username
+		log.info 'SECURITY_VIOLATION: {} by {}', message, username
 	}
 
 	void logMessage(message) {
-		logger.info 'USER_ACTIVITY: {}', message
+		log.info 'USER_ACTIVITY: {}', message
 	}
 
 	void logWarning(message) {
-		logger.warn 'USER_ACTIVITY: {}', message
+		log.warn 'USER_ACTIVITY: {}', message
 	}
 
 	/**
@@ -113,7 +114,7 @@ class AuditService implements InitializingBean, ServiceMethods {
 
 	@Transactional
 	void saveUserAudit(UserAudit userAudit) {
-		save userAudit
+		userAudit.save()
 		// TODO : JPM 9/2015 : Record message to log file too
 	}
 }

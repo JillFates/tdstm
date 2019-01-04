@@ -1,14 +1,14 @@
 package com.tdsops.common.security.spring
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.PasswordService
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsChecker
-
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
@@ -18,7 +18,8 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 
 	private static final int MILLIS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
-	SecurityService securityService
+	GrailsApplication grailsApplication
+	PasswordService   passwordService
 
 	@Transactional
 	void check(UserDetails user) {
@@ -33,16 +34,16 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 				userLogin.passwordExpirationDate.time <= System.currentTimeMillis()
 		if (passwordExpired) {
 			// no exception, just set the flag to force a password update
-			securityService.forcePasswordChange(userLogin)
+			passwordService.forcePasswordChange(userLogin)
 		}
 		// checkPasswordAge
 
-		Long maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays
+		Long maxAgeDays = grailsApplication.config.getProperty('tdstm.security.localUser.maxPasswordAgeDays', Long)
 		if (!userLogin.passwordNeverExpires && maxAgeDays && userLogin.passwordChangedDate &&
 				userLogin.passwordChangedDate.time + maxAgeDays * MILLIS_IN_ONE_DAY < System.currentTimeMillis()) {
 
 			// no exception, just set the flag to force a password update
-			securityService.forcePasswordChange(userLogin)
+			passwordService.forcePasswordChange(userLogin)
 		}
 
 		// checkIfUserHasRoles

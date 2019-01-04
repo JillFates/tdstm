@@ -7,8 +7,9 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
-import groovy.transform.TypeCheckingMode
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
+import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -17,6 +18,12 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
+import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.util.WebUtils
+import org.springframework.web.context.request.RequestContextHolder
+
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_BUNDLE
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_DT_FORMAT
@@ -30,7 +37,8 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 @Slf4j
 @GrailsCompileStatic(TypeCheckingMode.SKIP)
 // @GrailsCompileStatic
-class UserPreferenceService implements ServiceMethods {
+class UserPreferenceService {
+	SpringSecurityService springSecurityService
 
 	/*
 	 * Preferences that are unremovable
@@ -153,7 +161,7 @@ class UserPreferenceService implements ServiceMethods {
 
 		userLogin = resolveUserLogin(userLogin)
 
-		boolean isCurrent = (userLogin != null && userLogin.id == securityService.currentUserLoginId)
+		boolean isCurrent = (userLogin != null && userLogin.id == currentUserLoginId)
 
 		// If the userLogin is that of the current user then look in the session first as it maybe cached already
 		if (isCurrent && session) {
@@ -244,10 +252,9 @@ class UserPreferenceService implements ServiceMethods {
      * @return Success Structure with preferences property containing List<Map>
      */
 	@GrailsCompileStatic
-	@Transactional
+	@Transactional(readOnly=true)
     List<Map> preferenceListForEdit(UserLogin userLogin) {
 		List<Map> preferences = []
-		List brokenPreferences = []
 
 		List prefList = UserPreference.where {
 			userLogin == userLogin
@@ -258,12 +265,9 @@ class UserPreferenceService implements ServiceMethods {
 
 		// Convert the list to a List<Map>
 		for (pref in prefList) {
-			try {
-				preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
-			} catch (InvalidParamException e) {
-				brokenPreferences << pref[0] // the preference is invalid/broken, so stage for deletion
-			}
+			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfNameOrValue(pref[0]).toString() ]
 		}
+
 		// Sort into an alphabetical list by the Label
 		preferences = preferences.sort { a, b -> a.label.toLowerCase() <=> b.label.toLowerCase() }
 
@@ -278,7 +282,7 @@ class UserPreferenceService implements ServiceMethods {
 		// Transform the value of the preferences that reference domains to display the name of the domain
 		// instead of the ID to improve the user experience.
 		for (pref in preferences) {
-			switch (PREF.valueOfName(pref.code)) {
+			switch (PREF.valueOfNameOrValue(pref.code)) {
 				case PREF.MOVE_EVENT:
 					setValueToReferenceName(MoveEvent.class, pref)
 					break
@@ -298,30 +302,8 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		}
 
-	 // if any, remove broken/old preferences remaining in the database
-		for (brokePref in brokenPreferences) {
-			UserPreference.where {
-				userLogin == userLogin
-				preferenceCode == brokePref
-			}.deleteAll()
-			log.warn 'Invalid User preference {} for user {} was deleted', brokePref, userLogin
-		}
-
 		return preferences
 	}
-
-    /**
-     * Sets a list of user preferences defined via map.
-	 * @param userLogin - the user to set the preference for
-	 * @param preferences - a map containing the preference code and values
-     */
-    @Transactional
-    boolean setPreferences(UserLogin userLogin = null, Map preferences) {
-        preferences.each {
-            key, value ->
-                setPreference(userLogin, key, value)
-        }
-    }
 
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
@@ -357,7 +339,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		userLogin = resolveUserLogin(userLogin)
-		PREF userPreferenceEnum = PREF.valueOfName(preferenceCode)
+		PREF userPreferenceEnum = PREF.valueOfNameOrValue(preferenceCode)
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
@@ -419,7 +401,7 @@ class UserPreferenceService implements ServiceMethods {
 		if (isNew || userPreference.value != value) {
 			log.debug 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
 			userPreference.value = value
-			save(userPreference, true)
+			userPreference.save(flush:true, failOnError:true)
 		}
 		return userPreference
 	}
@@ -658,8 +640,8 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return the passed in userLogin if already assigned otherwise looks up the current thread's UserLogin object
 	 */
 	private UserLogin resolveUserLogin(UserLogin userLogin=null) {
-		if (!userLogin && securityService.loggedIn) {
-			return securityService.loadCurrentUserLogin()
+		if (!userLogin && springSecurityService.loggedIn) {
+			return loadCurrentUserLogin()
 		} else {
 			return userLogin
 		}
@@ -681,11 +663,9 @@ class UserPreferenceService implements ServiceMethods {
 	 */
 	private Map<String, String> getPreferencesMap(Collection<PREF> preferenceKeys) {
 		Map<String, String> valuesByCode = [:]
-		if (securityService.loggedIn && preferenceKeys) {
+		if (springSecurityService.loggedIn&& preferenceKeys) {
 			def userPreferences = UserPreference.findAllByUserLoginAndPreferenceCodeInList(
-					securityService.loadCurrentUserLogin(),
-					preferenceKeys*.name()
-			)
+					loadCurrentUserLogin(), preferenceKeys*.value())
 
 			for (preferenceCode in userPreferences) {
 				valuesByCode[preferenceCode.preferenceCode] = preferenceCode.value
@@ -706,6 +686,49 @@ class UserPreferenceService implements ServiceMethods {
 			// Load the default preference value into the session?
 			getPreference(userLogin, pref)
 		}
+	}
+
+	/**
+	 * Used to gain access to the HttpSession request object when there is an HTTP Request.
+	 * For calls when there is no HTTP Session (e.g. Quartz jobs) a null value will be returned.
+	 * @return the Http Request session object
+	 */
+	HttpSession getSession() {
+		HttpSession session = null
+		if (RequestContextHolder.getRequestAttributes()) {
+			GrailsWebRequest grailsWebRequest = WebUtils.retrieveGrailsWebRequest()
+			if (grailsWebRequest) {
+				HttpServletRequest request = grailsWebRequest.currentRequest
+				session = request.session
+			}
+		}
+		return session
+	}
+
+	/**
+	 * The cached UserLogin id of the authenticated user or null if not authenticated.
+	 */
+	private Long getCurrentUserLoginId() {
+		(Long) springSecurityService.currentUserId
+	}
+
+	/**
+	 * Creates a proxy UserLogin instance for the currently logged in user's UserLogin for use where
+	 * the instance data isn't used, e.g. in a dynamic finder or to set an object reference using the FK.
+	 * @return the proxy
+	 */
+	private UserLogin loadCurrentUserLogin() {
+		if (loggedIn) {
+			UserLogin.load currentUserLoginId
+		}
+	}
+
+	/**
+	 * Quick check to see if the current user is logged in.
+	 * @return true if authenticated and not anonymous
+	 */
+	boolean isLoggedIn() {
+		springSecurityService.loggedIn
 	}
 
 }

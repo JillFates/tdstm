@@ -1,14 +1,15 @@
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
+import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.common.security.spring.TdsPasswordEncoder
 import com.tdsops.common.security.spring.TdsPermissionEvaluator
 import com.tdsops.common.security.spring.TdsPostAuthenticationChecks
 import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
 import com.tdsops.common.security.spring.TdsSaltSource
 import com.tdsops.common.security.spring.TdsUserDetailsService
-import com.tdsops.ldap.TdsLdapUserDetailsMapper
 import com.tdsops.ldap.TdsBindAuthenticator
 import com.tdsops.ldap.TdsLdapAuthenticationProvider
+import com.tdsops.ldap.TdsLdapUserDetailsMapper
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
@@ -21,7 +22,6 @@ import org.springframework.security.ldap.DefaultSpringSecurityContextSource
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator
 import org.springframework.security.web.access.ExceptionTranslationFilter
-import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 
 beans = {
 	// uses the grails dataSource from DataSource.groovy
@@ -38,23 +38,24 @@ beans = {
 
 	permissionEvaluator(TdsPermissionEvaluator)
 
+	userDetailsService(TdsUserDetailsService)
+	tdsSaltSource(TdsSaltSource)
+
 	preAuthenticationChecks(TdsPreAuthenticationChecks) {
 		auditService = ref('auditService')
-		securityService = ref('securityService')
+		grailsApplication = ref('grailsApplication')
 		userPreferenceService = ref('userPreferenceService')
 	}
 
 	postAuthenticationChecks(TdsPostAuthenticationChecks) {
-		securityService = ref('securityService')
+		grailsApplication = ref('grailsApplication')
+		passwordService = ref('passwordService')
 	}
 
 	passwordEncoder(TdsPasswordEncoder) {
-		securityService = ref('securityService')
+		grailsApplication = ref('grailsApplication')
+		passwordService = ref('passwordService')
 	}
-
-	saltSource(TdsSaltSource)
-
-	userDetailsService(TdsUserDetailsService)
 
 	// See: SpringSecurityCoreGrailsPlugin for reference
 	requestCache(TdsHttpSessionRequestCache) {

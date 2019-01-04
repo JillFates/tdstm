@@ -1,12 +1,12 @@
 package com.tdsops.common.security.spring
 
 import com.tdssrc.grails.TimeUtil
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.eclipse.jdt.internal.core.Assert
 import org.springframework.beans.factory.InitializingBean
@@ -14,9 +14,6 @@ import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.LockedException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsChecker
-
-import java.text.DateFormat
-
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
@@ -24,8 +21,8 @@ import java.text.DateFormat
 @Slf4j(value='logger')
 class TdsPreAuthenticationChecks implements UserDetailsChecker, InitializingBean {
 
-	AuditService auditService
-	SecurityService securityService
+	AuditService          auditService
+	GrailsApplication     grailsApplication
 	UserPreferenceService userPreferenceService
 
 	@Transactional
@@ -53,7 +50,7 @@ class TdsPreAuthenticationChecks implements UserDetailsChecker, InitializingBean
 			else {
 				auditService.logMessage("User $user.username attempted access while account is locked")
 
-				if (securityService.userLocalConfig.failedLoginLockoutPeriodMinutes == 0) {
+				if (grailsApplication.config.getProperty('tdstm.security.localUser.failedLoginLockoutPeriodMinutes', Integer) == 0) {
 					throw new LockedException('Your account is presently locked. Please contact support to unlock your account.')
 				}
 
@@ -78,7 +75,6 @@ class TdsPreAuthenticationChecks implements UserDetailsChecker, InitializingBean
 
 	void afterPropertiesSet() {
 		Assert.isNotNull auditService, 'auditService is required'
-		Assert.isNotNull securityService, 'securityService is required'
 		Assert.isNotNull userPreferenceService, 'userPreferenceService is required'
 	}
 }
