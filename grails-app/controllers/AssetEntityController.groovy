@@ -1425,7 +1425,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * Render Summary of assigned and unassgined assets.
+	 * Render Summary of assigned and unassigned assets.
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetSummary() {
@@ -1434,44 +1434,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String justPlanningPref = userPreferenceService.getPreference(null, PREF.ASSET_JUST_PLANNING, "false")
 		Boolean justPlanning = BooleanUtils.toBoolean(justPlanningPref)
 
-		int totalAsset = 0
-		int totalPhysical = 0
-		int totalApplication = 0
-		int totalDatabase = 0
-		int totalFiles = 0
-
-		def moveBundles = MoveBundle.withCriteria {
-			eq('project', project)
-			order('name', 'asc')
-		}
-		List assetSummaryList = []
-
-		for (MoveBundle moveBundle in moveBundles) {
-
-			Map<String, Integer> summaryMap = AssetUtils.getAssetSummary(project, moveBundle, justPlanning)
-
-			Integer physicalCount = summaryMap['physical']
-			Integer serverCount = summaryMap['servers']
-			Integer applicationCount = summaryMap['applications']
-			Integer databaseCount = summaryMap['databases']
-			Integer filesCount = summaryMap['files']
-
-			totalAsset += serverCount
-			totalPhysical += physicalCount
-			totalApplication += applicationCount
-			totalDatabase += databaseCount
-			totalFiles += filesCount
-
-			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
-				assetSummaryList << [name: moveBundle, assetCount: serverCount, applicationCount: applicationCount, physicalCount: physicalCount,
-									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
-			}
-
-		}
-
-		moveBundles = null
-		[assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
-		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
+		return assetEntityService.getAssetSummary(project, justPlanning)
 	}
 
 	/**

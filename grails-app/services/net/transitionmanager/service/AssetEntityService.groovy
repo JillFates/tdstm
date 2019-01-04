@@ -30,6 +30,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.CloneAssetCommand
@@ -3085,6 +3086,59 @@ class AssetEntityService implements ServiceMethods {
 		commonModel.standardFieldSpecs.environment.constraints.put('values', getAssetEnvironmentOptions())
 
 		return commonModel
+	}
+
+	/**
+	 * This method fetches the content for the Asset Summary Table, which contains
+	 * the total number of assets and also totals by MoveBundle.
+	 *
+	 * @param project - user's current project
+	 * @param justPlanning - user preference value
+	 * @return a Map with the information broken down accordingly.
+	 */
+	Map getAssetSummary(Project project, boolean justPlanning) {
+
+		if (!project) {
+			throw new RuntimeException("Unable to retrieve the asset summary without a project.")
+		}
+
+		Integer totalAsset = 0
+		Integer totalPhysical = 0
+		Integer totalApplication = 0
+		Integer totalDatabase = 0
+		Integer totalFiles = 0
+
+		def moveBundles = MoveBundle.withCriteria {
+			eq('project', project)
+			order('name', 'asc')
+		}
+		List assetSummaryList = []
+
+		for (MoveBundle moveBundle in moveBundles) {
+
+			Map<String, Integer> summaryMap = AssetUtils.getAssetSummary(project, moveBundle, justPlanning)
+
+			Integer physicalCount = summaryMap['physical']
+			Integer serverCount = summaryMap['servers']
+			Integer applicationCount = summaryMap['applications']
+			Integer databaseCount = summaryMap['databases']
+			Integer filesCount = summaryMap['files']
+
+			totalAsset += serverCount
+			totalPhysical += physicalCount
+			totalApplication += applicationCount
+			totalDatabase += databaseCount
+			totalFiles += filesCount
+
+			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
+				assetSummaryList << [name: moveBundle, assetCount: serverCount, applicationCount: applicationCount, physicalCount: physicalCount,
+				                     databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+			}
+
+		}
+
+		return [assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
+		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
 	}
 
 }
