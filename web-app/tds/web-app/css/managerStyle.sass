@@ -1,0 +1,48 @@
+// USING A CUSTOM BEM http://getbem.com/introduction/
+// .block {}
+// .block-element {}
+// .block--modifier {}
+// .block-element--modifier {}
+
+// Include all basic elements for UI.
+@import "base/managerColor.scss"
+@import "base/palette"
+
+/* General Elements */
+// TODO:  these elements below should be placed in the elements/index.sass
+@import "elements/forms/forms"
+@import "elements/forms/horizontal-layout"
+@import "elements/general/alerts"
+@import "elements/general/loader"
+@import "elements/general/button"
+@import "elements/general/icon"
+@import "elements/general/dialog"
+@import "elements/general/dialog_buttons"
+@import "elements/general/popup"
+@import "elements/general/modal"
+@import "elements/general/checkbox"
+@import "elements/general/code-mirror-component"
+@import "elements/general/flexbox"
+
+@import "elements/general/grid"
+@import "shared/components/combo-box-group"
+@import "shared/components/tds-asset-tag-selector"
+@import "shared/components/header.component"
+@import "shared/components/password-change.component"
+@import "shared/components/number-control.component"
+@import "shared/components/button.component"
+// Specific Module Layout/Components
+@import "shared/directives/tds-ui-prompt"
+@import "shared/directives/tds-ui-modal-decorator"
+@import "page/index"
+// Legacy ONLY
+@import "legacy/support/index"
+// Only General Layout for the Template
+@import "layout/top-nav"
+@import "layout/left-nav"
+@import "layout/header_top"
+@import "layout/main-content"
+@import "layout/footer-content"
+
+// Kendo Customization
+@import "kendo/kendo"

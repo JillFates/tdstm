@@ -19,6 +19,13 @@ gulp.task('sass-compiler', function () {
 		.pipe(gulp.dest('./web-app/css'));
 });
 
+gulp.task('sass-compiler-manager', function () {
+	return gulp.src('./web-app/css/managerStyle.sass')
+		.pipe(sass({errLogToConsole: true}))
+		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
+		.pipe(gulp.dest('./web-app/css'));
+});
+
 /**
  * Execute watch task to compile css automatically on Development mode
  * from command line: gulp sass:watch

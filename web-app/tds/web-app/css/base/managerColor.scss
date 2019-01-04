@@ -1,0 +1,91 @@
+/* The color base for the manager color is Burnt Orange */
+$baseColor: #BF5700;
+
+$grey: #ddd;
+$c_grey2: #ebebeb;
+$c_grey3: #F4F4F4;
+$darkgray : darkgray;
+
+$white: #fff;
+$c_white1: #f7f7f7;
+$c_white2: #fafafa;
+
+$black: #000;
+$c_black2: #333;
+$c_black3: #444;
+
+$fontDisabledGray: #ccc;
+$c_menuSelected: #e1e3e9;
+$red: red;
+$c_red2: #CD3333;
+$urlElement: #2C61AA;
+
+
+/*KENDO MATERIAL BASE COLORS */
+$material_c_blue1: #BC6013;
+$material_c_blue2: $baseColor;
+$material_c_blue3: #783600; /*KENDO DATE */
+$material_c_blue1_action_toolbar_btn: #783600;
+$material_c_blue1_header_text: #4D2300;
+
+/* Alert MSG */
+$info_c_blue: #5f9fcf;
+$messageError: red;
+
+/* LOGIN */
+/* Prelogin Message */
+$warning: #c87f0a;
+$warningLicense: #FFCC00;
+
+$color-base--blue: #3c8dbc;
+
+// BLUE
+$color-url-element--blue: #2C61AA;
+$color-material--blue1: #5f9fcf;
+$color-material--blue2: #3c8dbc;
+$color-material--blue3: #3f51b5;
+$color-action-toolbar--blue: #2C61AA;
+$color-header-text--blue: #1c94c4;
+$color-info--blue: #5f9fcf;
+$color-success--blue: #00a7d0;
+
+// GRAY
+$color--grey: #ddd;
+$color--grey2: #ebebeb;
+$color--grey3: #F4F4F4;
+$color--grey4: #EEE;
+$color--darkgray : darkgray;
+$color-font-disabled--gray: #ccc;
+$color-menuSelected: #e1e3e9;
+$color--grey-kendo-header: #f6f6f6;
+$color--grey-kendo-border: #c5c5c5;
+
+// GREEN
+$color--green: #dff0d8;
+$color--green2: #3c763d;
+$color--green3: LightGreen;
+
+// WHITE
+$color--white: #fff;
+$color--white1: #f7f7f7;
+$color--white2: #fafafa;
+$color--white3: #f9f9f9;
+
+$color--black: #000;
+$color--black2: #333;
+$color--black3: #444;
+
+// RED
+$color-message-error--red: red;
+$color--red: red;
+$color--red2: #f2dede;
+$color--red3: #a94442;
+$color-danger--red: #d9534f;
+
+// PINK
+$color-lightpink: LightPink;
+
+// YELLOW
+$color-warning--yellow: #c87f0a;
+$color-warning-license--yellow: #FFCC00;
+$color--yellow: #F9FF90;
