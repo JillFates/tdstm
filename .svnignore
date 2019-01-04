@@ -1,8 +1,0 @@
-target
-target-eclipse
-plugins
-.classpath
-.project
-.settings
-headerSvg_*
-.DS_Store
