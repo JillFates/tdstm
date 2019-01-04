@@ -1,21 +1,17 @@
 package com.tdsops.common.grails
 
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextAware
-import groovy.transform.CompileStatic
-
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.GrailsPluginManager
+import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
-
 /**
  * An ApplicationContext holder to gain access to various components within
  * the application at runtime where IoC is not possible.
  *
  * This was taken directly from a Burt Beckwith blog posting:
- * @see http://burtbeckwith.com/blog/?p=1017
+ * http://burtbeckwith.com/blog/?p=1017
  */
 @CompileStatic
 @Singleton
@@ -40,7 +36,7 @@ class ApplicationContextHolder implements ApplicationContextAware {
 	}
 
 	static ConfigObject getConfig() {
-		getGrailsApplication().config
+		(ConfigObject)getGrailsApplication().config
 	}
 
 	/**

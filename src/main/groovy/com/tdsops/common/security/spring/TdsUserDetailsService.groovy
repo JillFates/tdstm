@@ -34,10 +34,10 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 		if (loadRoles) {
 			Collection<String> roleNames = (Collection) UserLogin.executeQuery('''
 				select roleType.id from PartyRole
-				where party.id=:pid''', [pid: userLogin.person.Id])
+				where party.id=:pid''', [pid: userLogin.person.id])
 
 			if (roleNames) {
-				authorities = (Collection) roleNames.collect { new SimpleGrantedAuthority(it) }
+				authorities = (Collection) roleNames.collect {Object role-> new SimpleGrantedAuthority((String)role) }
 
 				String query = '''
 					select distinct permissionItem from Permissions
@@ -61,7 +61,7 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 			!userLogin.isLockedOut(), // accountNonLocked
 			authorities,
 			(long) userLogin.id,
-			(long) userLogin.person.Id,
+			(long) userLogin.person.id,
 			userLogin.saltPrefix,
 			permissions)
 	}
