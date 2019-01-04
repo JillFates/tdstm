@@ -357,7 +357,7 @@ class MetricReportingService {
 					metricCode: metricCode,
 					date      : date,
 					label     : 'count',
-					value     : RandomUtils.nextInt(499) + 1
+					value     : RandomUtils.nextInt(0, 499) + 1
 			]
 		}
 	}
