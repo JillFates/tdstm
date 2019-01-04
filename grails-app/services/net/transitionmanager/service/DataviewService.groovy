@@ -301,18 +301,6 @@ class DataviewService implements ServiceMethods {
 			throw new InvalidRequestException('Dataview JSON object was missing from request')
 		}
 	}
-    /**
-     * Perform a query against one or domains specified in the DataviewSpec passed into the method
-     *
-     * @param project - the project that the data should be isolated to
-     * @param dataviewId - the specifications for the view/query
-     * @param userParams - parameters from the user for filtering and sort order
-     * @return a Map with data as a List of Map values and pagination
-     */
-    // TODO : Annotate READONLY
-    Map query(Project project, Dataview dataview, DataviewUserParamsCommand userParams) {
-        return previewQuery(project, userParams)
-    }
 
 	/**
 	 * Perform a query against one or domains specified in the DataviewSpec passed into the method
@@ -324,8 +312,9 @@ class DataviewService implements ServiceMethods {
 	 */
 	// TODO : Annotate READONLY
 	Map query(Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand) {
-		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview)
-		return previewQuery(project, dataviewSpec)
+		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview, fieldSpecCache)
+		previewQuery(project, dataviewSpec)
 	}
 
 	/**
@@ -358,7 +347,13 @@ class DataviewService implements ServiceMethods {
 		return [query: query, params: whereInfo.params]
 	}
 
-    /**
+	Map previewQuery(Project project, Dataview dataview, DataviewUserParamsCommand dataviewUserParamsCommand) {
+		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(dataviewUserParamsCommand, dataview, fieldSpecCache)
+		previewQuery(project, dataviewSpec)
+	}
+
+	/**
      * Perform a query against one or domains specified in the DataviewSpec passed into the method
 	 *
      * @param project - the project that the data should be isolated to
@@ -394,10 +389,7 @@ class DataviewService implements ServiceMethods {
      * 		]
      */
     // TODO : Annotate READONLY
-    Map previewQuery(Project project, DataviewUserParamsCommand dataviewUserParamsCommand) {
-
-		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
-		DataviewSpec dataviewSpec = new DataviewSpec(dataviewUserParamsCommand, null, fieldSpecCache)
+    Map previewQuery(Project project, DataviewSpec dataviewSpec) {
 
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 

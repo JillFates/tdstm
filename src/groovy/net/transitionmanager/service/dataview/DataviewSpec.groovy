@@ -62,7 +62,7 @@ class DataviewSpec {
     private Map<String, String> order
     private Boolean justPlanning
 
-	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview) {
+	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview, FieldSpecCache fieldSpecCache = null) {
 
 		spec = [
 			domains: [],
@@ -92,6 +92,12 @@ class DataviewSpec {
 			} else {
 				throw new RuntimeException('Non-unique field specified in filter parameter. Add domain prefix to uniquely identify field (e.g. device.custom1).')
 			}
+		}
+
+		this.spec.columns = this.spec.columns.collect {
+			Map map = it as Map
+			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))
+			map
 		}
 	}
 
