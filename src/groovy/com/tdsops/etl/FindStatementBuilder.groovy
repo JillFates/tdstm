@@ -63,7 +63,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' eq aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -88,7 +88,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' ne aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -113,7 +113,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' nseq aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -138,7 +138,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' lt aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -163,7 +163,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' le aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -188,7 +188,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' gt aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -213,7 +213,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' ge aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -238,7 +238,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' like aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -263,7 +263,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' notLike aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -288,7 +288,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' contains aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -313,7 +313,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' notContains aBogusVariableNameVar into 'id'
 	 * </pre>
@@ -338,7 +338,7 @@ class FindStatementBuilder {
 	}
 
 	/**
-	 * It throws an Exception because it validates
+	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	find Device by 'Name' inList [aBogusVariableNameVar] into 'id'
 	 * </pre>

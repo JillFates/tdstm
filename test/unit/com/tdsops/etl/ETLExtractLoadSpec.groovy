@@ -2743,15 +2743,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'firstname' set firstNameVar
 					assert firstNameVar == 'Tony'
-					
+
 					extract 'lastname' set lastNameVar
 					assert lastNameVar == 'Baker'
-					
+
 					set fullNameVar with firstNameVar + ' ' + lastNameVar
 					assert firstNameVar == 'Tony'
 					assert lastNameVar == 'Baker'
 					assert fullNameVar == 'Tony Baker'
-					
+
 					load 'description' with fullNameVar
 				}
 				""".stripIndent())
@@ -3111,7 +3111,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
 				domain Device
@@ -3120,7 +3120,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			""".stripIndent())
 
-		then: 'It throws an Exception because comments command is incorrect'
+		then: 'it throws an Exception because comments command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
@@ -3151,7 +3151,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
 				domain Device
@@ -3160,7 +3160,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			""".stripIndent())
 
-		then: 'It throws an Exception because comments command is incorrect'
+		then: 'it throws an Exception because comments command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.missingPropertyException('aBogusVariableName').message} at line 5".toString()
@@ -3186,7 +3186,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
 				domain Device
@@ -3195,7 +3195,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			""".stripIndent())
 
-		then: 'It throws an Exception because comments command is incorrect'
+		then: 'it throws an Exception because comments command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.missingPropertyException(variableName).message} at line 5".toString()
@@ -3238,7 +3238,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
 				domain Device
@@ -3249,7 +3249,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			""".stripIndent())
 
-		then: 'It throws an Exception because comments command is incorrect'
+		then: 'it throws an Exception because comments command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.missingPropertyException(variableName).message} at line 9".toString()
@@ -3261,9 +3261,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		where:
-			statement                                                                                                               || variableName
-			"whenNotFound 'id' create {\n\t\t\t\t\t\tassetName nameVar\n\t\t\t\t\t\tdescription aBogusVariableNameVar\n\t\t\t\t\t}" || 'aBogusVariableNameVar'
-			"whenFound 'id' update {\n\t\t\t\t\t\tassetName nameVar\n\t\t\t\t\t\tdescription aBogusVariableNameVar\n\t\t\t\t\t}"    || 'aBogusVariableNameVar'
+			statement                                                                             || variableName
+			"whenNotFound 'id' create {\nassetName nameVar\ndescription aBogusVariableNameVar\n}" || 'aBogusVariableNameVar'
+			"whenFound 'id' update {\nassetName nameVar\ndescription aBogusVariableNameVar\n}"    || 'aBogusVariableNameVar'
 	}
 
 }
