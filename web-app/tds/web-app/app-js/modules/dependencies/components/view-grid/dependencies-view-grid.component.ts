@@ -33,6 +33,7 @@ import {
 	DataStateChangeEvent
 } from '@progress/kendo-angular-grid';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+// import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {
 	DependenciesService,
 	DependenciesRequestParams
@@ -55,6 +56,7 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
 import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -92,6 +94,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService,
 		private openAssetDependenciesService: OpenAssetDependenciesService,
+		private translatePipe: TranslatePipe,
 		protected assetService: DependecyService) {
 	}
 
@@ -270,11 +273,20 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Get the current selected items counter
-	 * @returns {number}
+	 * Get the current selected items info
+	 * @returns {any} Object containing the selected count number and the proper plural/singular entity name
 	 */
-	protected getSelectedItemsCount(): number {
-		return this.bulkCheckboxService.getSelectedItemsCount(this.state.gridData.total)
+	protected getSelectedItemsCount(): any {
+		const selectedCount = this.bulkCheckboxService.getSelectedItemsCount(this.state.gridData.total);
+
+		const counterInformation = {
+			count: selectedCount,
+			entityName: selectedCount === 1 ?
+				this.translatePipe.transform('DEPENDENCIES.SINGLE_NAME') :
+				this.translatePipe.transform('DEPENDENCIES.PLURAL_NAME')
+		};
+
+		return selectedCount > 0 ? counterInformation : null;
 	}
 
 	/**

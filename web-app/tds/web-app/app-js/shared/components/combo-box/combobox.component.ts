@@ -89,8 +89,12 @@ export class TDSComboBoxComponent implements OnChanges {
 		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
 			this.firstChange = changes['model'].firstChange;
+			let model = changes['model'].currentValue;
 			if (this.firstChange || this.updateOnChanges) {
-				let model = changes['model'].currentValue;
+				this.addToDataSource(model);
+			} else {
+				// Found in TM-13710 the unshift operation can displace the component without recreate it from scratch
+				// By the inclusion on the ng-repeat operation, this ensure the current value it is always in the datasource as selectable element
 				this.addToDataSource(model);
 			}
 		}
