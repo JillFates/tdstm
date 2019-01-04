@@ -19,7 +19,7 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.PartyGroup
 
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 import groovy.time.TimeCategory
 import spock.lang.Specification
 

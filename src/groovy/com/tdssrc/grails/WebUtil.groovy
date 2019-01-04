@@ -2,7 +2,7 @@ package com.tdssrc.grails
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.transform.CompileStatic
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 
