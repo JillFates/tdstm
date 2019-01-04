@@ -13,7 +13,8 @@ import {
 } from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {IMPORT_BATCH_PREFERENCES, PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
@@ -32,6 +33,7 @@ export class ImportBatchListComponent implements OnDestroy {
 
 	protected BatchStatus = BatchStatus;
 	protected columnsModel: ImportBatchColumnsModel;
+	protected importBatchPreferences = {};
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
@@ -77,8 +79,15 @@ export class ImportBatchListComponent implements OnDestroy {
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
 		}
-		this.userPreferenceService.getImportBatchListSizePreference().subscribe( (pageSize: number) => {
+		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe( res => {
 			this.getUnarchivedBatches().then( batchList => {
+				let pageSize;
+				if (res) {
+					this.importBatchPreferences = JSON.parse(res);
+					pageSize = parseInt(this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.LIST_SIZE], 0);
+				} else {
+					pageSize = GRID_DEFAULT_PAGE_SIZE;
+				}
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig, pageSize);
 				this.preSelectBatch();
 				this.setRunningLoop();
@@ -596,7 +605,8 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * @param {PageChangeEvent} $event
 	 */
 	protected onPageChange($event: PageChangeEvent): void {
-		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE, $event.take.toString()).subscribe( result => {
+		this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.LIST_SIZE] = $event.take.toString();
+		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( result => {
 			// nothing to do here ..
 		});
 		this.dataGridOperationsHelper.pageChange($event)

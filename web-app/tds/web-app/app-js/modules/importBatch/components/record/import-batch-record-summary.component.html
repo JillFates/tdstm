@@ -1,15 +1,14 @@
 <div class="summary-header">
-    <label> Batch Summary <span *ngIf="summaryCollapsed">...</span>
-        <button data-toggle="collapse" data-target=".collapsible"
-                (click)="toggleSummary()"
+    <label> Batch Summary <span *ngIf="importBatchPreferences[importBatchPrefEnum.TWISTIE_COLLAPSED]">...</span>
+        <button (click)="toggleSummary()"
                 class="btn btn-default pull-right">
-            <i [ngClass]="{'fa-angle-double-right': !summaryCollapsed, 'fa-angle-double-down': summaryCollapsed}"
+            <i [ngClass]="{'fa-angle-double-right': !importBatchPreferences[importBatchPrefEnum.TWISTIE_COLLAPSED], 'fa-angle-double-down': importBatchPreferences[importBatchPrefEnum.TWISTIE_COLLAPSED]}"
                class="fa"></i>
         </button>
     </label>
 </div>
 
-<div class="collapse in collapsible">
+<div class="{{importBatchPreferences[importBatchPrefEnum.TWISTIE_COLLAPSED] ? 'collapse':'collapse in'}} collapsible">
         <div class="row header">
             <div class="col-sm-1">Batch ID</div>
             <div class="col-sm-1">Status</div>
@@ -31,7 +30,7 @@
             <div class="col-sm-2">{{importBatch.dataScript?.name}}</div>
         </div>
     </div>
-<div class="collapse in collapsible">
+<div class="{{importBatchPreferences[importBatchPrefEnum.TWISTIE_COLLAPSED] ? 'collapse':'collapse in'}} collapsible">
         <label> Record Summary </label>
         <div class="row header">
             <div class="col-sm-1">Status</div>
