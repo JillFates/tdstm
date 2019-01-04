@@ -1,9 +1,10 @@
 package net.transitionmanager.service
 
-import com.tdsops.event.ImportBatchJobSchedulerEvent
-import groovy.util.logging.Slf4j
-import org.springframework.context.ApplicationListener
 
+import com.tdsops.event.ImportBatchJobSchedulerEventDetails
+import grails.events.annotation.Subscriber
+import grails.events.bus.EventBusAware
+import groovy.util.logging.Slf4j
 /**
  * This service class is in charge of attend import batch jobs application events.
  * When an ImportBatchJobSchedulerEvent event is received, it calls ImportBatchService.scheduleJob(...)
@@ -13,17 +14,16 @@ import org.springframework.context.ApplicationListener
  * http://grails.org/plugin/spring-events
  */
 @Slf4j
-class ImportBatchJobSchedulerResponderService implements ApplicationListener<ImportBatchJobSchedulerEvent> {
-
+class ImportBatchJobSchedulerResponderService implements EventBusAware {
 	SecurityService securityService
 	ImportBatchService importBatchService
 
-	@Override
-	void onApplicationEvent(ImportBatchJobSchedulerEvent event) {
+	@Subscriber('NEXT_BATCH_READY')
+	void onApplicationEvent(ImportBatchJobSchedulerEventDetails event) {
 		log.info('Want to schedule a new job: {}', event)
 
-		securityService.assumeUserIdentity(event.source.username, true)
-		importBatchService.scheduleJob(event.source.projectId, event.source.batchId)
+		securityService.assumeUserIdentity(event.username, true)
+		importBatchService.scheduleJob(event.projectId, event.batchId)
 	}
 
 }

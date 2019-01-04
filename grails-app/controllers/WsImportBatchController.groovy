@@ -1,6 +1,6 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.event.ImportBatchJobSchedulerEvent
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
+import grails.events.EventPublisher
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.IdsCommand
@@ -18,7 +18,7 @@ import net.transitionmanager.service.ImportBatchService
 
 @Secured("isAuthenticated()")
 @Slf4j
-class WsImportBatchController implements ControllerMethods {
+class WsImportBatchController implements EventPublisher, ControllerMethods {
 
 	ImportBatchService importBatchService
 	DataImportService dataImportService
@@ -95,9 +95,7 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails =
-						new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername)
-				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
+				notify(ImportBatchJob.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername))
 				impacted = 1
 				break
 

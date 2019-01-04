@@ -1,23 +1,19 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.event.ImportBatchJobSchedulerEvent
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import com.tdssrc.grails.GormUtil
-import grails.plugin.springevents.AsyncEventPublisher
+import grails.events.EventPublisher
 import grails.transaction.NotTransactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataImportService
 import org.quartz.JobExecutionContext
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationEventPublisher
 
 @Slf4j
-class ImportBatchJob extends SecureJob implements ApplicationEventPublisher {
+class ImportBatchJob extends SecureJob implements EventPublisher {
+	static final String NEXT_BATCH_READY = 'NEXT_BATCH_READY'
 	String group = 'tdstm-import-batch'
 	static triggers = {}
 
-	AsyncEventPublisher asyncEventPublisher
 	DataImportService dataImportService
 
 	/**
@@ -53,18 +49,11 @@ class ImportBatchJob extends SecureJob implements ApplicationEventPublisher {
 			Map<String, ?> nextBatch = dataImportService.getNextBatchToProcess(projectId)
 			if (nextBatch) {
 				// if there is a next batch to process, then trigger an application event to schedule it
-				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails =
-						new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy)
-				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
+				notify(NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy))
 			}
 
 			GormUtil.releaseLocalThreadMemory()
 		}
-	}
-
-	@Override
-	void publishEvent(ApplicationEvent applicationEvent) {
-		asyncEventPublisher.publishEvent(applicationEvent)
 	}
 
 }
