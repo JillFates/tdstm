@@ -1,0 +1,116 @@
+<div tds-autofocus class="modal-content data-script-view-edit-component" >
+	<div class="modal-header">
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<h4 class="modal-title">{{ 'LICENSE.LICENSE_DETAIL' | translate }}</h4>
+	</div>
+	<div class="modal-body">
+		<form name="licenseRequestForm" role="form" data-toggle="validator" #licenseRequestForm='ngForm' class="form-horizontal left-alignment">
+			<div class="box-body">
+				<div class="row">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Project: </label>
+							<div class="col-sm-9">
+								<label class="control-label " style="text-transform: capitalize;">{{licenseModel.project.name}}</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-4 control-label">Email contact: </label>
+							<div class="col-sm-8">
+								<label class="control-label ">{{licenseModel.email}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" ng-if="licenseModel.clientName">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Client: </label>
+							<div class="col-sm-9">
+								<label class="control-label ">{{licenseModel.client.name}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab_1" data-toggle="tab">Details</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab_1">
+							<div class="form-group">
+								<label for="radioGroupMethod" class="col-sm-1 control-label">Method:</label>
+								<div class="col-sm-11" id="radioGroupMethod">
+									<label class="radio-inline" *ngFor="let methodOption of methodOptions">
+										<input type="radio" name="inlineRadioOptions" value="servers" [(ngModel)]="licenseModel.method.name" [value]="methodOption.name" disabled> {{methodOption.text}}
+									</label>
+								</div>
+							</div>
+							<div class="form-group sub-option-50" *ngIf="licenseModel.method.name === 'MAX_SERVERS'">
+								<label class="col-sm-2 control-label">Max Server:</label>
+								<div class="col-sm-10" >
+									<label class="control-label ">{{licenseModel.method.max}}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Environment:</label>
+								<div class="col-sm-10">
+									<label class="control-label" style="text-transform: capitalize;">{{licenseModel.environment | lowercase}}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Inception:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseModel.activationDate | date: dateFormat }}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Expiration:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseModel.expirationDate | date: dateFormat }}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="selectSpecialInstructions" class="col-sm-12 control-label">Special Instructions and/or PO# reference:</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea id="selectSpecialInstructions" name="selectSpecialInstructions" class="form-control" rows="3" placeholder="" [(ngModel)]="licenseModel.requestNote" [disabled]="true"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-1"></label>
+								<label class="col-sm-2 control-label text-right element-width-50">Id:</label>
+								<div class="col-sm-9">
+									<label class="control-label">{{licenseModel.id}}</label>
+								</div>
+							</div>
+							<div class="form-group" *ngIf="licenseModel.replaced">
+								<label class="col-sm-2 control-label text-right element-width-100">Replaced:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseModel.replaced.date | date}}</label>
+									<label class="control-label pad-left-20">Server <a href="{{licenseModel.replaced.url}}">{{licenseModel.replaced.name}}</a></label>
+								</div>
+							</div>
+						</div><!-- /.tab-pane -->
+						<div class="tab-pane" id="tab_2">
+
+						</div><!-- /.tab-pane -->
+					</div><!-- /.tab-content -->
+				</div>
+			</div><!-- /.box-body -->
+		</form>
+	</div>
+	<div class="modal-footer form-group-center">
+        <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="applyLicenseKey()"><i class="fa fa-fw fa-key"></i> Apply License Key</button>
+        <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="resubmitLicenseRequest()"><span class="glyphicon glyphicon-share-alt"></span> Resubmit Request</button>
+        <button *ngIf="licenseModel.status !== licenseStatus.ACTIVE" type="button" class="btn btn-primary pull-left" (click)="manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Manually Submit Request</button>
+        <button type="button" class="btn btn-danger" [ngClass]="{'pull-left': licenseModel.status === licenseStatus.ACTIVE}" (click)="onDelete()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
+		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+			<span class="glyphicon glyphicon-ban-circle"></span>
+			<span>{{'GLOBAL.CANCEL' | translate }}</span>
+		</button>
+	</div>
+</div>

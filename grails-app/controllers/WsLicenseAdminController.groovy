@@ -83,8 +83,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.LicenseView)
-	def getLicense(){
-		Long id = params.id
+	def getLicense(String id){
 		License lic
 		if (id) {
 			lic = License.get(id)

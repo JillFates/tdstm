@@ -82,7 +82,7 @@ export class PreferenceService {
 	}
 
 	/**
-	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
+	 * Used to retrieve the format to use for Date properties based on user's preference (e.g. MM/dd/YYYY)
 	 */
 	getUserDateFormat(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
@@ -94,7 +94,10 @@ export class PreferenceService {
 
 	getUserDateFormatForMomentJS(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		return currentUserDateFormat
+		if (currentUserDateFormat) {
+			return currentUserDateFormat;
+		}
+		return DateUtils.PREFERENCE_MIDDLE_ENDIAN;
 	}
 
 	getUserDateFormatForKendo(): string {
@@ -107,7 +110,11 @@ export class PreferenceService {
 	 * based on user's preference in TM instead of the TimeZone of their computer.
 	 */
 	getUserTimeZone(): string {
-		return this.preferences[PREFERENCES_LIST.CURR_TZ];
+		const currentUserTimeZone = this.preferences[PREFERENCES_LIST.CURR_TZ];
+		if (currentUserTimeZone) {
+			return currentUserTimeZone;
+		}
+		return DateUtils.TIMEZONE_GMT;
 	}
 
 	/**
