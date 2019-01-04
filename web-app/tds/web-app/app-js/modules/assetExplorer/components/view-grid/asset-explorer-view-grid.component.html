@@ -153,14 +153,14 @@
 				*ngFor="let column of model.columns; let i = index"
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
-				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH"
+				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
 				[width]="column.width"
 				[class]="column.domain"
 		>
 			<ng-template kendoGridHeaderTemplate>
 				<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 					<div [ngClass]="{'field-not-found': column?.notFound }">
-						<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+						<label> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 					</div>
 				</div>
 			</ng-template>

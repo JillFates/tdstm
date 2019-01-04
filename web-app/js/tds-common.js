@@ -533,6 +533,10 @@ var tdsCommon = {
 		return result;
 	},
 
+	/**
+	 * Used to get the user's selected TimeZone
+	 * This grabs the value from the Timezone form in the menu header (such a hack...)
+	 */
 	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;

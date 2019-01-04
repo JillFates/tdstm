@@ -364,7 +364,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	 * 	saved into the target domain object.
 	 */
 	void 'test can extract a field value over all rows based on column ordinal position'() {
-
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
@@ -2984,4 +2983,75 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	void 'test can trim whitespaces after backslash character'() {
+
+		given:
+			ETLFieldsValidator validator = new ETLFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+
+			String script = "read labels\n" +
+				"domain Application\n" +
+				"iterate {\n" +
+				"\textract 'vendor name'  \\ \t\t  \n" +
+				"\tload 'Vendor'\n" +
+				"\textract 'technology'  \\  \t  \r" +
+				"\tload 'appTech'\n \r\n" +
+				"}\n"
+
+			etlProcessor.evaluate(script)
+
+		then: 'Results should contain domain results associated'
+			with (etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'appTech'] as Set
+					with(fieldLabelMap) {
+						appVendor == 'Vendor'
+						appTech == 'Technology'
+					}
+
+					data.size() == 2
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						fields.keySet().size() == 2
+						with(fields.appVendor, FieldResult) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == null
+						}
+						with(fields.appTech, FieldResult) {
+							value == '(xlsx updated)'
+							originalValue == '(xlsx updated)'
+							init == null
+						}
+					}
+
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						fields.keySet().size() == 2
+						with(fields.appVendor, FieldResult) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
+						with(fields.appTech, FieldResult) {
+							value == 'NGM'
+							originalValue == 'NGM'
+							init == null
+						}
+					}
+				}
+			}
+	}
 }
