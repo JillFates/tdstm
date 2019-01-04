@@ -90,7 +90,7 @@ class BootStrap {
 
 		Logger.rootLogger.allAppenders.each { appender ->
 			ExceptionLoggerFilter filter = new ExceptionLoggerFilter()
-            filter.loggerClass = "org.codehaus.groovy.grails.web.errors.GrailsExceptionResolver"
+            filter.loggerClass = "org.grails.web.errors.GrailsExceptionResolver"
             filter.activateOptions()
             appender.addFilter(filter)
 		}
