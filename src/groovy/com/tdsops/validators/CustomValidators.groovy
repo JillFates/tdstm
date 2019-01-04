@@ -128,7 +128,7 @@ class CustomValidators {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					addError('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 				}
 			}
 		}
@@ -145,10 +145,9 @@ class CustomValidators {
 
 		new Validator ( fieldSpec ) {
 			void validate() {
-				// value = StringUtils.defaultString(value)
-				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
+				addErrors( controlNotEmptyValidator( value, fieldSpec, domain ).apply() )
 
-				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
+				if ( value && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -375,7 +374,7 @@ class CustomValidators {
 		 * @param errors
 		 */
 		void addErrors(Collection<ErrorHolder> errors) {
-			errors.addAll(errors ?: [])
+			this.errors.addAll(errors ?: [])
 		}
 
 		/*
