@@ -43,7 +43,7 @@ gulp.task('build-app', ['clean-app', 'validate-js'], function () {
     console.error('Compiling App.js file.');
 
     browserifyProcesor = browserify({
-        entries: ['./web-app/app-js/main.js'],
+        entries: ['./src/main/webapp/app-js/main.js'],
         debug: true, // SourceMapping
     }).transform(babelify.configure());
 
@@ -59,14 +59,14 @@ gulp.task('build-app', ['clean-app', 'validate-js'], function () {
         .pipe(source('App.js'))
         .pipe(gulpif(true, buffer()))
         .pipe(gulpif(false, uglify()))
-        .pipe(gulp.dest('./web-app/dist/'));
+        .pipe(gulp.dest('./src/main/webapp/dist/'));
 
     return stream;
 
 });
 
 gulp.task('build-vendor', ['clean-vendor',], function () {
-    var generatedFile = 'web-app/dist/Vendors.js',
+    var generatedFile = 'src/main/webapp/dist/Vendors.js',
         b;
 
     console.error('Compiling Vendors.js file.');
@@ -87,7 +87,7 @@ gulp.task('build-vendor', ['clean-vendor',], function () {
         .pipe(source('Vendors.js'))
         .pipe(gulpif(true, buffer()))
         .pipe(gulpif(false, uglify()))
-        .pipe(gulp.dest('./web-app/dist/'));
+        .pipe(gulp.dest('./src/main/webapp/dist/'));
 
     return stream;
 });
@@ -99,9 +99,9 @@ gulp.task('build-vendor', ['clean-vendor',], function () {
  * PROD mode will remove the sourcemapping
  */
 gulp.task('watch-build', ['validate-js'], function () {
-    var generatedFile = 'web-app/dist/App.js',
+    var generatedFile = 'src/main/webapp/dist/App.js',
         b = browserify({
-            entries: ['./web-app/app-js/main.js'],
+            entries: ['./src/main/webapp/app-js/main.js'],
             debug: true,
         })
             .transform(babelify.configure());
@@ -119,14 +119,14 @@ gulp.task('watch-build', ['validate-js'], function () {
     // wait until any change is triggered to recreate the App.js file
         .on('update', ['validate-js'], function () {
             var updateStart = Date.now();
-            console.log('Building ./web-app/dist/App.js');
+            console.log('Building ./src/main/webapp/dist/App.js');
             watcher.bundle()
                 .on("error", function (error) {
                     onBuildError(error, generatedFile);
                     this.emit("end");
                 })
                 .pipe(source('App.js'))
-                .pipe(gulp.dest('./web-app/dist/'));
+                .pipe(gulp.dest('./src/main/webapp/dist/'));
             console.log('Build success! in ', (Date.now() - updateStart) + 'ms');
         })
         .bundle()
@@ -135,7 +135,7 @@ gulp.task('watch-build', ['validate-js'], function () {
             this.emit("end");
         })
         .pipe(source('App.js'))
-        .pipe(gulp.dest('./web-app/dist/'));
+        .pipe(gulp.dest('./src/main/webapp/dist/'));
 });
 
 /**
@@ -167,7 +167,7 @@ gulp.task('sass-compiler-manager', function () {
  * it will run until stop, searching for changes on any SASS file, compiles and ready to use
  */
 gulp.task('sass:watch', function () {
-    return gulp.watch('web-app/css/**/*.sass', ['sass-compiler', 'sass-compiler-manager']);
+    return gulp.watch('src/main/webapp/css/**/*.sass', ['sass-compiler', 'sass-compiler-manager']);
 });
 
 /**
@@ -178,9 +178,9 @@ gulp.task('sass:watch', function () {
  */
 gulp.task('validate-js', function() {
 	console.log('Running Quality Code Checker');
-	var src = 'web-app/app-js/**/*.js';
+	var src = 'src/main/webapp/app-js/**/*.js';
 	var filter = gulpFilter(['**/*.*', '!**/vendors/**']);
-	return gulp.src([src], {base: 'web-app'})
+	return gulp.src([src], {base: 'src/main/webapp'})
 		.pipe(filter)
 		.pipe(jshint())
 		.pipe(jshint.reporter('default', {verbose: true}))
@@ -195,7 +195,7 @@ gulp.task('validate-js', function() {
  */
 gulp.task('clean-app', function () {
 	console.log('Cleaning previous compiled App.js file.');
-	return gulp.src('web-app/dist/App.js', {read: false})
+	return gulp.src('src/main/webapp/dist/App.js', {read: false})
 		.pipe(clean());
 });
 
@@ -204,7 +204,7 @@ gulp.task('clean-app', function () {
  */
 gulp.task('clean-vendor', function () {
 	console.log('Cleaning previous compiled Vendor.js file.');
-	return gulp.src('web-app/dist/Vendors.js', {read: false})
+	return gulp.src('src/main/webapp/dist/Vendors.js', {read: false})
 		.pipe(clean());
 });
 
