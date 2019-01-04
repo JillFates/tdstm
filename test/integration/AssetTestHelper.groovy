@@ -43,6 +43,27 @@ class AssetTestHelper {
 		assert (securityService instanceof SecurityService)
 	}
 
+	/**
+	 * Simple method for creating a Device with a bare minimum fields set.
+	 * @param project - the project the device will belong to
+	 * @param moveBundle - the bundle the device will be assigned to.
+	 * @param assetType - the asset type for the device.
+	 * @return a device instance
+	 */
+	AssetEntity createDevice(Project project, MoveBundle moveBundle, AssetType assetType) {
+		AssetEntity device = new AssetEntity(
+			assetName: RandomStringUtils.randomAlphabetic(15),
+			project: project,
+			moveBundle: moveBundle,
+			assetType: assetType.toString()
+		)
+
+		if (!device.save(flush: true)) {
+			throw new RuntimeException("createDevice() failed because " + GormUtil.allErrorsString(device))
+		}
+		return device
+	}
+
 
 	/**
 	 * Creates, saves and return a new Database with some basic configuration.
@@ -139,7 +160,6 @@ class AssetTestHelper {
 		Map defaultValues = [
 			assetName          : RandomStringUtils.randomAlphabetic(15),
 			currentAssetType   : assetType,
-			assetType          : assetType,
 			moveBundle         : project.projectDefaultBundle,
 			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
 			roomSourceId       : "-1",
@@ -166,15 +186,12 @@ class AssetTestHelper {
 
 		]
 
-		Map assetParams = [:]
-		assetParams.putAll(params)
-
 		 defaultValues.each{ key, val->
 			 if(!params.containsKey(key)) {
-				 assetParams[key] = val
+				 params[key] = val
 			 }
 		 }
-		AssetEntity asset = new AssetEntity(assetParams)
+		AssetEntity asset = new AssetEntity(params)
 
 		return asset.save(flush: true, failOnError: true)
 	 }

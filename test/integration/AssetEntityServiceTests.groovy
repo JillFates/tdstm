@@ -279,8 +279,8 @@ class AssetEntityServiceTests extends IntegrationSpec {
 				assetHelper.createApplication(person, project, moveBundle)
 				assetHelper.createDatabase(project, moveBundle)
 				assetHelper.createStorage(project, moveBundle)
-				assetHelper.createDevice(project, AssetType.BLADE, bundleInfo)
-				assetHelper.createDevice(project, AssetType.VM, bundleInfo)
+				assetHelper.createDevice(project, moveBundle, AssetType.BLADE)
+				assetHelper.createDevice(project, moveBundle, AssetType.VM)
 			}
 			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, true)
 		then: 'There should be one element and totals should be 1, except for servers, which should be 2'
@@ -292,8 +292,8 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			assetSummaryProject1['totalFiles'] == 1
 		when: 'Retrieving the Asset Summary Table for planning and non-planning bundles'
 			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, false)
-		then: 'There should be 3 bundles (TBD being the third) and the totals should be 2, except for servers, which should be 4'
-			assetSummaryProject1['assetSummaryList'].size() == 3
+		then: 'There should be 3 bundles and the totals should be 2, except for servers, which should be 4'
+			assetSummaryProject1['assetSummaryList'].size() == 2
 			assetSummaryProject1['totalAsset'] == 4
 			assetSummaryProject1['totalApplication'] == 2
 			assetSummaryProject1['totalDatabase'] == 2
