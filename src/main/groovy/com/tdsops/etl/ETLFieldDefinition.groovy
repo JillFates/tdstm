@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 import com.tdsops.tm.enums.ControlType
 import net.transitionmanager.domain.Person
-import grails.core.GrailsDomainClassProperty
+import org.grails.datastore.mapping.model.PersistentProperty
 
 class ETLFieldDefinition {
 
@@ -43,7 +43,7 @@ class ETLFieldDefinition {
 	 * @param domainProperty an instance of GrailsDomainClassProperty
 	 * @see ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
-	ETLFieldDefinition(GrailsDomainClassProperty domainProperty) {
+	ETLFieldDefinition(PersistentProperty domainProperty) {
 		this.name = domainProperty.getName()
 		// The label will be the same as the field name until the domain has a field specification like that of assets
 		this.label = this.name

@@ -1,6 +1,14 @@
 package com.tdssrc.grails
 
+
 import com.tdsops.common.grails.ApplicationContextHolder
+import grails.core.GrailsApplication
+import grails.core.GrailsDomainClassProperty
+import grails.gorm.validation.ConstrainedProperty
+import grails.gorm.validation.Constraint
+import grails.util.GrailsClassUtils
+import grails.util.Holders
+import grails.web.databinding.DataBindingUtils
 import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
@@ -9,29 +17,29 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
-import org.grails.core.DefaultGrailsDomainClass
 import org.grails.core.artefact.DomainClassArtefactHandler
-import grails.core.GrailsApplication
-import grails.util.GrailsClassUtils
-import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
+import org.grails.core.exceptions.InvalidPropertyException
+import org.grails.datastore.mapping.config.Property
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.OneToOne
 import org.grails.orm.hibernate.cfg.CompositeIdentity
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
+import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.plugins.domain.DomainClassGrailsPlugin
-import grails.gorm.validation.ConstrainedProperty
-import grails.gorm.validation.Constraint
-import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.transform.Transformers
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
+import org.springframework.validation.BindingResult
 
 @Slf4j(value='logger')
-class GormUtil {
+class GormUtil{
 
 	// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
     // Used to control how some functions will perform comparisons with multiple where criteria
@@ -350,19 +358,6 @@ class GormUtil {
 	}
 
 	/**
-	 * Used to get the Uniqueness Group or list of properties that combined make up the uniques of
-	 * a domain class for the given propertyName.
-	 * @param domainClass - the Domain class to access the property on
-	 * @param propertyName - the name of the property to get the maxSize constraint of
-	 * @return a list of the property names
-	 */
-	@Memoized
-	static List getConstraintUniqueProperties(Class domainClass, String propertyName) {
-		Constraint cp = GormUtil.getConstraint(domainClass, propertyName, 'unique')
-		return cp.getUniquenessGroup()
-	}
-
-	/**
 	 * Used to retrieve the value specified for a particular property constraint
 	 * @param clazz - the Class object of the domain being inspected
 	 * @param propertyName - the property name to inspect
@@ -371,7 +366,7 @@ class GormUtil {
 	 */
 	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
-		Map<String, ConstrainedProperty> constraints = getDomainClass(clazz).constrainedProperties
+		Map<String, ConstrainedProperty> constraints = clazz.constrainedProperties
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
 		// 'blank' is only supported for String properties and defaults to true, but there won't
@@ -416,7 +411,7 @@ class GormUtil {
 	 */
 	@Memoized
 	static Collection<GrailsDomainClassProperty> updatablePersistentProperties(Class clazz, Collection<String> notToUpdateNames) {
-		getDomainClass(clazz).persistentProperties.findAll { it.isPersistent() && !notToUpdateNames.contains(it.name) }
+		getDomainClass(clazz).persistentProperties.findAll { !notToUpdateNames.contains(it.name) }
 	}
 
 	// TODO : JPM copyUnsetValues - reverse the from/to parameters
@@ -447,7 +442,7 @@ class GormUtil {
 	 */
 	@Memoized
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
-		getDomainClass(clazz)?.identifier.name == propertyName
+		getDomainClass(clazz)?.identity.name == propertyName
 	}
 
 	/**
@@ -462,7 +457,7 @@ class GormUtil {
 
 	@Memoized
 	static boolean hasStringId(Class clazz) {
-		getDomainClass(clazz).identifier.type == String
+		getDomainClass(clazz).identity.type == String
 	}
 
 	/**
@@ -473,25 +468,34 @@ class GormUtil {
 	 * @return
 	 */
 	@Memoized
-	static GrailsDomainClass getDomainClass(Class domainClass) {
+	static PersistentEntity getDomainClass(Class domainClass) {
 		if (domainClass == null) {
 			throw new RuntimeException('getDomainClass() called with null class argument')
 		}
-		def ctx = ApplicationContextHolder.getApplicationContext()
-		if (ctx) {
-			try {
-				String name = domainClass.getName() + 'DomainClass'
-				return ctx.getBean(name)
-			} catch (e) {
+
+		PersistentEntity persistentEntity
+
+		try {
+			persistentEntity = mappingContext().getPersistentEntity(domainClass.name)
+
+			if(!persistentEntity){
 				throw new InvalidParamException("Invalid domain name (${domainClass.getName()}) specified for getDomainClass()")
 			}
+		} catch (e) {
+			throw new InvalidParamException("Invalid domain name (${domainClass.getName()}) specified for getDomainClass()")
 		}
-		return new DefaultGrailsDomainClass(domainClass)
+
+		return persistentEntity
 	}
 
 	@Memoized
 	private static GrailsApplication getGrailsApplication() {
 		ApplicationContextHolder.grailsApplication
+	}
+
+	@Memoized
+	private static HibernateMappingContext mappingContext() {
+		return Holders.applicationContext.getBean('grailsDomainClassMappingContext')
 	}
 
 	/**
@@ -514,9 +518,9 @@ class GormUtil {
 	 */
 	@Memoized
 	static boolean isDomainProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
-		return grailsDomainClass.hasPersistentProperty(propertyName) ||
-			grailsDomainClass.identifier.name == propertyName
+		PersistentEntity persistentEntity = mappingContext().getPersistentEntity(domainClass.name)
+
+		return persistentEntity && (persistentEntity.persistentPropertyNames.contains(propertyName) || persistentEntity.identity.name == propertyName)
 	}
 
 	/**
@@ -548,7 +552,22 @@ class GormUtil {
 			throw new RuntimeException('persistentProperties called with non-domain object')
 		}
 
-		return getDomainClass(domain.class).persistentProperties.name
+		List<String> persistentProperties = []
+		PersistentEntity persistentEntity = mappingContext().getPersistentEntity(domain.class.name)
+		persistentProperties.addAll(persistentEntity.persistentProperties.name)
+
+		PersistentProperty id = persistentEntity.getIdentity()
+		List<PersistentProperty> ids = persistentEntity.getCompositeIdentity()
+
+		if (id) {
+			persistentProperties.add(id.name)
+		}
+
+		if (ids) {
+			persistentProperties.addAll(ids.name)
+		}
+
+		return  persistentProperties
 	}
 
 	/**
@@ -559,13 +578,16 @@ class GormUtil {
 	 * @return
 	 */
 	@Memoized
-	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
-		List<GrailsDomainClassProperty> domainProperties = []
+	static List<PersistentProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
+		List<PersistentProperty> domainProperties = []
 		boolean allProperties = false
-		DefaultGrailsDomainClass dfdc = getDomainClass(domainClass)
+		PersistentEntity dfdc = getDomainClass(domainClass)
+		Property identity = GrailsDomainBinder.getMapping(domainClass).identity
+
 		if (properties) {
 			for (String property in properties) {
-				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
+				PersistentProperty domainProperty = dfdc.persistentProperties.find{ it.name == property}
+
 				if (domainProperty) {
 					domainProperties << domainProperty
 				} else {
@@ -582,9 +604,10 @@ class GormUtil {
 		if (allProperties) {
 			domainProperties = dfdc.getPersistentProperties()
 			// Grails won't fetch the Id property if it's not properly defined as a field
-			GrailsDomainClassProperty idProperty = dfdc.getPersistentProperty("id")
+			PersistentProperty idProperty = dfdc.persistentProperties.find{ it.name == 'id'}
+
 			if (idProperty) {
-				domainProperties << idProperty
+				domainProperties.addAll(dfdc.identity)
 			}
 		}
 
@@ -601,8 +624,8 @@ class GormUtil {
 	 * @return names of all properties of a domain
 	 */
 	static List<String> getDomainPropertyNames(Class domainClass) {
-		def dc = getDomainClass(domainClass)
-		List gdcProperties = dc.getPersistantProperties()
+		PersistentEntity dc = getDomainClass(domainClass)
+		List gdcProperties = dc.persistentProperties
 		return gdcProperties.collect { it.getName() }
 	}
 
@@ -612,7 +635,7 @@ class GormUtil {
 	 * @param propertyName - the name of a property to retrieve
 	 * @return The GrailsDomainClassProperty object
 	 */
-	static GrailsDomainClassProperty getDomainProperty(Object domainInst, String propertyName) {
+	static PersistentProperty getDomainProperty(Object domainInst, String propertyName) {
 		return getDomainProperty(domainInst.getClass(), propertyName)
 	}
 
@@ -623,12 +646,18 @@ class GormUtil {
 	 * @return The GrailsDomainClassProperty object
 	 */
 	@Memoized
-	static GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
+	static PersistentProperty getDomainProperty(Class domainClass, String propertyName) {
 		if (!isDomainClass(domainClass)) {
 			throw new RuntimeException('Called with non-domain class parameter')
 		}
-		def d = getDomainClass(domainClass)
-		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
+
+		PersistentEntity d = getDomainClass(domainClass)
+		PersistentProperty cp = d.getPropertyByName(propertyName)
+
+		if (!cp) {
+			throw new InvalidPropertyException("$propertyName is an invalid property for $PersistentEntity.name")
+		}
+
 		return cp
 	}
 
@@ -641,11 +670,8 @@ class GormUtil {
 		if (!isDomainClass(domainClass)) {
 			throw new RuntimeException('a Grails domain class parameter is required')
 		}
-		Mapping binderMapping = new GrailsDomainBinder().getMapping(domainClass)
-		//if (!binderMapping) {
-		//	throw new RuntimeException('Failed to load Grails domain mapping for ' + getDomainNameForClass(domainClass))
-		//}
-		return binderMapping
+
+		return GrailsDomainBinder.getMapping(domainClass)
 	}
 
 	/**
@@ -669,9 +695,28 @@ class GormUtil {
 			}
 		}
 
- 		BindDynamicMethod bind = new BindDynamicMethod()
-		List args = [domainObject, fieldsValues, [exclude: excludeFields]]
-		bind.invoke(domainObject,'bind',(Object[]) args)
+		bindData(domainObject, fieldsValues, excludeFields)
+	}
+
+	static BindingResult bindData(target, bindingSource, List excludes) {
+		bindData target, bindingSource, [exclude: excludes], null
+	}
+
+	static BindingResult bindData(target, bindingSource, Map includeExclude, String filter) {
+		List includeList = convertToListIfCharSequence(includeExclude?.include)
+		List excludeList = convertToListIfCharSequence(includeExclude?.exclude)
+		DataBindingUtils.bindObjectToInstance target, bindingSource, includeList, excludeList, filter
+	}
+
+	static private List convertToListIfCharSequence(value) {
+		List result
+		if (value instanceof CharSequence) {
+			result = []
+			result << (value instanceof String ? value : value.toString())
+		} else if (value instanceof List) {
+			result = (List) value
+		}
+		result
 	}
 
 	/**
@@ -695,7 +740,7 @@ class GormUtil {
 	static List<String> getCompositeKeyProperties(Class domainClass) {
 		List props = []
 		if (hasCompositeKey(domainClass)) {
-			def binder = new GrailsDomainBinder().getMapping(domainClass)
+			def binder = getDomainBinderMapping(domainClass)
 			props = binder.identity.propertyNames as List
 		}
 		return props
@@ -709,7 +754,7 @@ class GormUtil {
 	 */
 	@Memoized
 	static boolean isCompositeProperty(Class domainClass, String propertyName) {
-		GrailsDomainClassProperty property = getDomainProperty(domainClass, propertyName)
+		PersistentProperty property = getDomainProperty(domainClass, propertyName)
 		return isCompositeProperty(domainClass, property)
 	}
 
@@ -720,9 +765,14 @@ class GormUtil {
 	 * @return true if property is part of a composite key otherwise false
 	 */
 	@Memoized
-	static boolean isCompositeProperty(Class domainClass, GrailsDomainClassProperty property) {
+	static boolean isCompositeProperty(Class domainClass, PersistentProperty property) {
 		Mapping mapping = getDomainBinderMapping(domainClass)
-		return new GrailsDomainBinder().isCompositeIdProperty(mapping, property)
+		Property identity = mapping?.identity
+		if(identity instanceof  CompositeIdentity){
+			return property.name in ((CompositeIdentity)identity).propertyNames && identity.class == org.grails.orm.hibernate.cfg.CompositeIdentity
+		}
+
+		return false
 	}
 
 	/**
@@ -740,13 +790,16 @@ class GormUtil {
 	 * or users for instance. It will verify if the propert(y|ies) is part of the composite key.
 	 * @param domainClass - the class to check
 	 * @param propertyNames - a list of the
+	 *
+	 *
 	 */
 	static boolean canDomainPropertiesBeReplaced(Class domainClass, List propertyNames) {
 		boolean replaceable=true
 		for (propName in propertyNames) {
 			if (replaceable) {
-				GrailsDomainClassProperty dp = getDomainProperty(domainClass, propName)
-				if (dp.isIdentity()) {
+				PersistentProperty dp = getDomainProperty(domainClass, propName)
+
+				if (isIdentity(domainClass, propName)) {
 					replaceable=false
 				} else {
 					if (isCompositeProperty(domainClass, dp)) {
@@ -774,6 +827,11 @@ class GormUtil {
 			}
 		}
 		return replaceable
+	}
+
+	static boolean isIdentity(Class domainClass, String propertyName){
+		PersistentProperty domain = getDomainClass(domainClass).identity
+		domain && domain.getName() == propertyName
 	}
 
 	/**
@@ -830,6 +888,10 @@ class GormUtil {
 
 		// Iterate over all of the properties and assign to the new domain object
 		for (p in props) {
+			if(p=='id'){
+				break
+			}
+
 			// Skip over properties that are of Collection type (TM-6879)
 			if (originDomain[p] instanceof Collection) {
 				continue
@@ -1014,12 +1076,20 @@ class GormUtil {
 	 * @param domain the class of the domain to check
 	 * @param propName the name of the property to check
 	 * @return true if the property can be merged
+	 *
 	 */
 	static boolean canMergeDomainProperty(Class domainClass, String propName) {
-		GrailsDomainClassProperty domainProp =  getDomainProperty(domainClass, propName)
-		boolean isAssoc = domainProp.isAssociation()
-		boolean isOwning = domainProp.isOwningSide()
-		boolean isOne = domainProp.isOneToOne()
+		PersistentProperty domainProp =  getDomainProperty(domainClass, propName)
+		Mapping mapping = getDomainBinderMapping(domainClass)
+		mapping
+		boolean isAssoc = domainProp instanceof Association
+		boolean isOwning = false
+
+		if (domainProp.hasProperty('owningSide')) {
+			isOwning = domainProp?.owningSide
+		}
+
+		boolean isOne = domainProp instanceof OneToOne
 		return ! (isAssoc && isOwning && isOne)
 	}
 
@@ -1094,9 +1164,8 @@ class GormUtil {
 
 		// After replacing references we can look to delete the original domain
 		if (deleteFrom) {
-			logger.debug("Deleting {} {}", fromDomain.getClass().getName(), fromDomain)
-			domainClass.executeUpdate("delete $domainName x where x.id=:id", [id:fromDomain.id])
-			//fromDomain.delete(flush:true)
+			logger.error("Deleting {} {}", fromDomain.getClass().getName(), fromDomain)
+			domainClass.executeUpdate("delete $domainName x where x.id=:id".toString(), [id:fromDomain.id])
 		}
 	}
 
@@ -1247,11 +1316,12 @@ class GormUtil {
 	 * @param domainClazz - the class of the Domain object to examine
 	 * @param propertyName
 	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
+	 *
 	 */
 	@Memoized
 	static boolean isReferenceProperty(Class domainClazz, String propertyName) {
-		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
-		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
+		PersistentProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
+		return grailsDomainClassProperty instanceof Association
 	}
 
 	/**
@@ -1273,10 +1343,10 @@ class GormUtil {
 		Class domainClass = GrailsHibernateUtil.unwrapIfProxy(domainObject).class
 		if (isDomainClass(domainClass)) {
 			// Get all the domain properties.
-			List<GrailsDomainClassProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
+			List<PersistentProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
 
 			// Iterate over all the domain properties
-			for (GrailsDomainClassProperty property : domainProperties) {
+			for (PersistentProperty property : domainProperties) {
 				// if the property is an enum, copy its .name()
 				if (property.type.isEnum()) {
 					if (domainObject[property.name]) {
@@ -1299,6 +1369,10 @@ class GormUtil {
 					// If it's a regular property, just copy its value.
 					domainMap[property.name] = domainObject[property.name]
 				}
+			}
+
+			if(!properties || (properties && 'id' in properties)) {
+				domainMap.id = domainObject.id
 			}
 		}
 

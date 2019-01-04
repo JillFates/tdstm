@@ -4,6 +4,7 @@ import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import grails.core.GrailsDomainClassProperty
+import org.grails.datastore.mapping.model.PersistentProperty
 
 /**
  *
@@ -124,7 +125,7 @@ class DependencyBuilder extends DomainBuilder {
 	 * @return an instance of {@code ETLFieldDefinition}
 	 */
 	private ETLFieldDefinition createFieldDefinition(String fieldName) {
-		GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(ETLDomain.Dependency.clazz, fieldName)
+		PersistentProperty domainProperty = GormUtil.getDomainProperty(ETLDomain.Dependency.clazz, fieldName)
 		return new ETLFieldDefinition(domainProperty)
 	}
 

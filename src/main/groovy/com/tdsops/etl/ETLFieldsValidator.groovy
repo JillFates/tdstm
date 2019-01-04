@@ -1,7 +1,7 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
-import grails.core.GrailsDomainClassProperty
+import org.grails.datastore.mapping.model.PersistentProperty
 
 class ETLFieldsValidator {
 
@@ -54,7 +54,8 @@ class ETLFieldsValidator {
 
 
 		} else {
-			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, fieldNameOrLabel)
+			PersistentProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, fieldNameOrLabel)
+
 			if (domainProperty) {
 				fieldDefinition = new ETLFieldDefinition(domainProperty)
 			}
