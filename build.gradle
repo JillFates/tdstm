@@ -1,131 +1,192 @@
-grails.servlet.version = '3.0'
-grails.project.work.dir = 'target'
-grails.project.target.level = 1.7
-grails.project.source.level = 1.7
-
-grails.project.dependency.resolver = 'maven'
-grails.project.dependency.resolution = {
-	inherits('global') {
-		excludes 'grails-docs' // gdocs are not used, and the dependency brings in an older iText jar in build scope
-	}
-	log 'warn'
-	checksums true
-	legacyResolve false
-
+buildscript {
 	repositories {
-		inherits true
 		mavenLocal()
-
-		// TDS Private Repository
-		mavenRepo 'https://tm-nexus.transitionmanager.net/repository/TransitionManager-Application-Libraries'
-
-		grailsCentral()
-		mavenCentral()
+		maven { url "https://repo.grails.org/grails/core" }
 	}
-
 	dependencies {
-		compile 'com.google.guava:guava:19.0'
-		compile 'net.sf.jasperreports:jasperreports:4.5.1'
-		compile 'org.apache.poi:poi-ooxml:3.14'
-		compile 'org.apache.poi:ooxml-schemas:1.1'
-		compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
-		compile 'org.apache.poi:poi:3.14'
-		compile 'xml-apis:xml-apis:1.4.01'
-
-		compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20180219.1'
-
-		// LIB JARS
-		compile 'net.sourceforge.barbecue:barbecue:jar:1.5-beta1'
-		compile 'org.codelibs:jcifs:1.3.18.3'
-		compile 'net.nicholaswilliams.java.licensing:licensing-core:1.1.0'
-		compile 'net.nicholaswilliams.java.licensing:licensing-licensor-base:1.1.0'
-
-		// From the Private Repo TM-NEXUS
-		compile 'com.barcodelib:barcode:1.0'
-
-		compile 'org.glassfish.external:ant:3.0-b29'
-		runtime 'mysql:mysql-connector-java:5.1.40'
-		runtime 'org.apache.commons:commons-lang3:3.1'
-
-		// HTTP Client used on integration agents e.g. HttpAgent, ServiceNow, VMware
-		runtime 'org.apache.httpcomponents:httpclient:4.5.5'
-		runtime 'commons-httpclient:commons-httpclient:3.1'
-
-		// CSV Parser - https://github.com/xlson/groovycsv
-		runtime 'com.xlson.groovycsv:groovycsv:1.2'
-
-		/*
-		 * GETL Groovy ETL - https://github.com/ascrus/getl/
-		 * NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
-		 * TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
-		 */
-		runtime ('net.sourceforge.getl:getl:1.2.11') {
-			excludes 'org.apache.hadoop:hadoop-hdfs'
-			excludes 'org.apache.hadoop:hadoop-common'
-		}
-
-		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
-		test ('com.stehno.ersatz:ersatz:1.7.0') {
-			excludes 'ch.qos.logback:logback-classic'
-		}
+		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+		classpath "org.grails.plugins:hibernate5:${gormVersion - ".RELEASE"}"
+		classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.8"
+		classpath 'org.grails.plugins:database-migration:3.0.4'
 	}
-
-	plugins {
-		build ':tomcat:8.0.33'
-
-		compile ':jasper:1.11.0'
-		compile ':quartz:1.0.2'
-		compile ':scaffolding:2.1.2'
-		compile ':spring-security-core:2.0.0'
-		compile ':spring-security-ldap:2.0.1'
-		compile ':spring-events:1.2'
-
-		/*
-		 * TODO: (oluna@tdsi.com) We have a compilation dependency for the Following plugin in the UnitTest,
-		 *       it is safe to build the war file ignoring the test cases???
-		 */
-		compile ':greenmail:1.3.4'
-
-		compile (':spring-security-rest:1.5.4') {
-			// Remove old Guava files packed in spring-security-rest plugin
-			excludes 'guava-io'
-			/*
-			 * removing the library that can cause a loop in the Log4J configuration
-			 * @see  http://www.slf4j.org/legacy.html#log4j-over-slf4j
-			 */
-			excludes 'org.slf4j:log4j-over-slf4j'
-		}
-
-		compile ":rest-client-builder:2.1.0"
-
-		compile "org.grails.plugins:cascade-validation:0.1.5"
-		runtime "org.grails.plugins:asset-pipeline:2.14.1.1"
-
-		runtime ':database-migration:1.4.0'
-		runtime ':grails-melody:1.54.0'
-		runtime ':hibernate4:4.3.10'
-//		runtime ':jqgrid:3.8.0.1'
-//		runtime ':jquery-ui:1.10.4'
-		runtime ':jquery:1.11.1'
-		runtime ':mail:1.0.7'
-		runtime ':xss-sanitizer:0.4.0'
-
-		test ':functional-test:1.2.7'
-
-		// don't include plugins in production
-		if ( Environment.current != Environment.PRODUCTION ) {
-			compile ":console:1.5.12"
-		}
-	}
-
-
 }
 
-grails.war.resources = { stagingDir ->
-	echo message: "StagingDir: $stagingDir"
-	delete(verbose: true) {
-		fileset(dir: stagingDir) {
-			include name: '**/node_modules/**'
-		}
+version "0.1"
+group "tdstm"
+
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "war"
+apply plugin: "org.grails.grails-web"
+apply plugin: "asset-pipeline"
+apply plugin: "org.grails.grails-gsp"
+
+repositories {
+	mavenLocal()
+	// TDS Private Repository
+	maven {url 'https://tm-nexus.transitionmanager.net/repository/TransitionManager-Application-Libraries'}
+	mavenCentral()
+	maven { url "https://repo.grails.org/grails/core" }
+}
+
+configurations {
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
+
+dependencies {
+	compile "org.springframework.boot:spring-boot-starter-logging"
+	compile "org.springframework.boot:spring-boot-autoconfigure"
+	compile "org.grails:grails-core"
+	compile "org.springframework.boot:spring-boot-starter-actuator"
+	compile "org.springframework.boot:spring-boot-starter-tomcat"
+	compile "org.grails:grails-web-boot"
+	compile "org.grails:grails-logging"
+	compile "org.grails:grails-plugin-rest"
+	compile "org.grails:grails-plugin-databinding"
+	compile "org.grails:grails-plugin-i18n"
+	compile "org.grails:grails-plugin-services"
+	compile "org.grails:grails-plugin-url-mappings"
+	compile "org.grails:grails-plugin-interceptors"
+	compile "org.grails.plugins:cache"
+	compile "org.grails.plugins:async"
+	compile "org.grails.plugins:scaffolding"
+	compile "org.grails.plugins:events"
+	compile "org.grails.plugins:hibernate5"
+	compile "org.hibernate:hibernate-core:5.1.5.Final"
+	compile "org.hibernate:hibernate-ehcache"
+	compile "org.grails.plugins:gsp"
+	compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
+	compile 'org.apache.httpcomponents:httpclient:4.5.5'
+
+	compile 'org.apache.commons:commons-lang3:3.8.1'
+	compile 'com.google.guava:guava:19.0'
+	compile 'net.sf.jasperreports:jasperreports:4.5.1'
+	compile 'org.apache.poi:poi-ooxml:3.14'
+	compile 'org.apache.poi:ooxml-schemas:1.1'
+	compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
+	compile 'org.apache.poi:poi:3.14'
+	compile 'xml-apis:xml-apis:1.4.01'
+
+	compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20180219.1'
+
+	// LIB JARS
+	compile 'net.sourceforge.barbecue:barbecue:1.5-beta1'
+	compile 'org.codelibs:jcifs:1.3.18.3'
+	compile 'net.nicholaswilliams.java.licensing:licensing-core:1.1.0'
+	compile 'net.nicholaswilliams.java.licensing:licensing-licensor-base:1.1.0'
+
+	// From the Private Repo TM-NEXUS
+	compile 'com.barcodelib:barcode:1.0'
+
+	compile 'org.glassfish.external:ant:3.0-b29'
+	runtime 'mysql:mysql-connector-java:5.1.40'
+	runtime 'org.apache.commons:commons-lang3:3.1'
+
+	// HTTP Client used on integration agents e.g. HttpAgent, ServiceNow, VMware
+	runtime 'org.apache.httpcomponents:httpclient:4.5.5'
+	runtime 'commons-httpclient:commons-httpclient:3.1'
+
+	// CSV Parser - https://github.com/xlson/groovycsv
+	compile 'com.xlson.groovycsv:groovycsv:1.2'
+
+	/*
+	 * GETL Groovy ETL - https://github.com/ascrus/getl/
+	 * NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
+	 * TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
+	 */
+	compile('net.sourceforge.getl:getl:1.2.11') {
+		exclude group: 'org.apache.hadoop:hadoop-hdfs'
+		exclude group: 'org.apache.hadoop:hadoop-common'
 	}
+
+//	testCompile('com.stehno.ersatz:ersatz:1.7.0') {
+//		exclude group: 'ch.qos.logback:logback-classic'
+//	}
+
+	compile 'org.grails.plugins:ajax-tags:1.0.0.RC1' //TODO remove once we remove the GSP UI 2018-12-1
+	compile "org.grails.plugins:converters"
+	compile 'org.grails.plugins:external-config:1.2.2'
+
+	compile 'org.grails.plugins:jasper:2.1.0.RC1'
+	compile 'org.grails.plugins:quartz:2.0.13'
+	compile 'org.grails.plugins:spring-security-core:3.2.3'
+	compile 'org.grails.plugins:spring-security-ldap:3.0.2'
+	//compile 'org.grails.plugins:greenmail:2.0.0.RC2'
+
+
+	compile ('org.grails.plugins:spring-security-rest:2.0.0.RC1') {
+		// Remove old Guava files packed in spring-security-rest plugin
+		exclude group: 'guava-io'
+		/*
+		 * removing the library that can cause a loop in the Log4J configuration
+		 * @see  http://www.slf4j.org/legacy.html#log4j-over-slf4j
+		 */
+		exclude group: 'org.slf4j:log4j-over-slf4j'
+	}
+
+	//TODO cascade validation works with 3.2. but not 3.3 the command plugin has the save constraint and more.
+	//compile 'org.grails.plugins:cascade-validation:2.0.2'
+	compile 'org.grails.plugins:command:4.0.0'
+
+	compile 'org.grails.plugins:database-migration:3.0.4'
+	compile 'org.grails.plugins:mail:2.0.0'
+	compile 'org.grails.plugins:grails-melody-plugin:1.74.0'
+
+	//TODO broken in Grails 3.3, asked the author to relase a new version.
+	//compile 'org.grails.plugins:xss-sanitizer:1.0.0'
+
+
+
+	console "org.grails:grails-console"
+
+	profile "org.grails.profiles:web"
+
+	runtime "org.glassfish.web:el-impl:2.1.2-b03"
+	runtime "com.h2database:h2"
+	runtime "org.apache.tomcat:tomcat-jdbc"
+	runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.8"
+
+	testCompile "org.grails:grails-test-mixins:3.3.0"
+	testCompile "org.grails:grails-gorm-testing-support"
+	testCompile "org.grails:grails-web-testing-support"
+	testCompile "org.grails.plugins:geb:1.1.2"
+	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:2.47.1"
+	testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+	testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+}
+
+bootRun {
+	jvmArgs('-Dspring.output.ansi.enabled=always')
+	addResources = true
+	String springProfilesActive = 'spring.profiles.active'
+	systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
+
+integrationTest.jvmArgs('-Dcom.tdsops.tm.skp=B3c00l')
+
+tasks.withType(Test) {
+	systemProperty "geb.env", System.getProperty('geb.env')
+	systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
+	systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
+	systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
+}
+
+assets {
+	minifyJs = true
+	minifyCss = true
+}
+
+[bootRun].each { runTask ->
+    configure(runTask) {
+        systemProperties System.properties
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
 }
