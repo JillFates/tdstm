@@ -1,23 +1,11 @@
 import grails.util.Environment
 import net.transitionmanager.security.Permission
 
-/**
- * WARNING! CERTAIN SECTIONS OF THIS FILE SHOULD NOT BE MODIFIED:
- * 	- log4j
- * 	- mail settings
- * 	-
- *
- * Instead do those changes in the configuration file "tdstm-config.groovy.template" of the application
- */
-
-// This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
-println()
-
 // copy binding variables into properties in the config for visibility in external scripts; as of 2.5.4 the
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
 //           grailsSettings, grailsVersion, groovyVersion, springVersion, userHome
 getBinding().variables.each { name, value -> setProperty name, value }
-String appName = this.appName ?: null
+String appName = this.appName ?: 'tdstm'
 
 grails.config.locations = []
 
@@ -80,75 +68,134 @@ if (!foundAppConfig) {
 	}
 }
 
+
 grails {
-	controllers.defaultScope = 'singleton'
-	converters.encoding = 'UTF-8'
+	profile = 'web'
+	codegen {
+		defaultPackage = 'net.transitionmanager'
+	}
+	gorm {
+		reactor {
+			events = false
+		}
+	}
+}
+
+server.contextPath = '/tdstm'
+info {
+	app {
+		name = '@info.app.name@'
+		version = '@info.app.version@'
+		grailsVersion = '@info.app.grailsVersion@'
+	}
+}
+
+spring {
+	main {
+		main['banner-mode'] = 'off'
+	}
+	groovy {
+		template {
+			template['check-template-location'] = false
+		}
+	}
+}
+
+endpoints {
+	enabled = false
+	jmx {
+		enabled = true
+	}
+}
+
+grails {
+	project.groupId = appName
 	enable.native2ascii = true
 	exceptionresolver.params.exclude = ['password']
-	hibernate {
-		cache.queries = false
-		osiv.readonly = false
-		pass.readonly = false
-	}
-	json.legacy.builder = false
-
-	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
-
-	mime {
-		disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
-		file.extensions = true // enables the parsing of file extensions from URLs into the request format
-		types = [
-			all:            '*/*',
-			atom:           'application/atom+xml',
-			css:            'text/css',
-			csv:            'text/csv',
-			form:           'application/x-www-form-urlencoded',
-			hal:           ['application/hal+json','application/hal+xml'],
-			html:          ['text/html','application/xhtml+xml'],
-			js:             'text/javascript',
-			json:          ['application/json', 'text/json'],
-			multipartForm:  'multipart/form-data',
-			rss:            'application/rss+xml',
-			svg:			'image/svg+xml',
-			text:           'text/plain',
-			xls :           'application/vnd.ms-excel',
-			xlsx:           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-			xml:           ['text/xml', 'application/xml']
-		]
-	}
 	pagination.default = "20"
 	pagination.max = "20"
+	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
+	stringchararrayaccessor.disabled = true // Eliminates warning error - see TM-3681
+	web.disable.multipart=false
+	scaffolding.templates.domainSuffix = 'Instance'
+	//spring.bean.packages = []
 
-	plugin {
-		databasemigration {
-			changelogFileName='changelog.groovy'
-			changelogLocation = 'grails-app/migrations'
-			dbDocController.enabled = true
-			updateOnStart = true
-			updateOnStartFileNames = ['changelog.groovy']
+	mime {
+		file.extensions = true // enables the parsing of file extensions from URLs into the request format
+		disable {
+			accept {
+				header {
+					userAgents = [
+						'Gecko',
+						'WebKit',
+						'Presto',
+						'Trident'
+					]
+				}
+			}
+		}
+		types {
+			all = '*/*'
+			atom = 'application/atom+xml'
+			css = 'text/css'
+			csv = 'text/csv'
+			form = 'application/x-www-form-urlencoded'
+			html = [
+				'text/html',
+				'application/xhtml+xml'
+			]
+			js = 'text/javascript'
+			json = [
+				'application/json',
+				'text/json'
+			]
+			multipartForm = 'multipart/form-data'
+			pdf = 'application/pdf'
+			rss = 'application/rss+xml'
+			text = 'text/plain'
+			hal = [
+				'application/hal+json',
+				'application/hal+xml'
+			]
+			xls = 'application/vnd.ms-excel'
+			xlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			xml = [
+				'text/xml',
+				'application/xml'
+			]
 		}
 	}
 
-	project.groupId = appName
+	urlmapping {
+		cache {
+			maxsize = 1000
+		}
+	}
 
-	scaffolding.templates.domainSuffix = 'Instance'
-	spring.bean.packages = []
-	stringchararrayaccessor.disabled = true // Eliminates warning error - see TM-3681
-	views.default.codec = 'none'
+	controllers {
+		defaultScope = 'singleton'
+	}
+
+	converters {
+		encoding = 'UTF-8'
+	}
+
 	views {
+		'default' {
+			codec = 'none'
+		}
 		gsp {
+			encoding = 'UTF-8'
+			htmlcodec = 'xml'
+			gsp.sitemesh.preprocess = true
 			codecs {
 				expression = 'html'
-				scriptlet = 'html'
-				staticparts = 'none'
+				scriptlets = 'html'
 				taglib = 'none'
+				staticparts = 'none'
 			}
-			encoding = 'UTF-8'
-			gsp.sitemesh.preprocess = true
-			htmlcodec = 'xml'
 		}
 	}
-	web.disable.multipart=false
 }
 
 environments {
@@ -218,110 +265,111 @@ environments {
 	}
 }
 
-/********************************************************
-** log4J Logging Configuration  (Basic configuration al INFO LEVEL)
-**
-** Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy
-** configuration file in order to override this closure. When running locally, the logs will reside in the target directory
-** and for Tomcat they will reside in the CATALINA_HOME/logs directory.
-*********************************************************/
-/* // THIS IS FOUND IN THE "tdstm-config.groovy.template" of the application
-log4j = {
-	// Set level for all application artifacts
-	info	'grails.app'
-
-	// enable *debug* to track security issues
-	info	'grails.plugin.springsecurity',
-			'org.springframework.security'
-
-	//   'controllers.AuthController'
-	//   'org.hibernate.SQL'
-	warn	'org.codehaus.groovy.grails.web.servlet',			// controllers
-			'org.codehaus.groovy.grails.web.pages',				// GSP
-			'org.codehaus.groovy.grails.web.sitemesh',			// layouts
-			'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
-			'org.codehaus.groovy.grails.web.mapping',			// URL mapping
-			'org.codehaus.groovy.grails.commons',				// core / classloading
-			'org.codehaus.groovy.grails.plugins',       		// plugins
-			'org.codehaus.groovy.grails.orm.hibernate',			// hibernate integration
-			'org.codehaus.groovy.grails',      					// Most of all grails code base
-			'org.apache.jasper',
-			'org.grails',
-			'grails.app.services.org.grails.plugin.resource',
-			'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
-			'grails.app.taglib.org.grails.plugin.resource',
-			'grails.app.resourceMappers.org.grails.plugin.resource',
-			'grails.spring.BeanBuilder',
-			'org.hibernate',
-			'org.quartz',
-			'grails.plugins.quartz.QuartzGrailsPlugin',
-			'org.apache.catalina',
-			'org.apache.coyote',
-			'org.apache.naming',
-			'net.sf.ehcache',
-			'net.sf.ehcache.hibernate',
-			'org.springframework',
-			'grails.plugin.databasemigration.GrailsChangeLogParser'
-
-	error	'org.hibernate.hql.internal.ast.HqlSqlWalker',
-			'grails.plugin.hibernate4',
-			'org.apache.tomcat',
-			'liquibase',
-			'net.bull.javamelody'
-
-	// ** Enable Hibernate SQL logging with param values *********
-	// trace 'org.hibernate.type'
-	// debug 'org.hibernate.SQL'
-
-	appenders {
-		String logAppName = appName ?: 'tdstm'    // If not defined (for local config)
-		String commonPattern = '%d{ISO8601} [%t] %-5p %c %x - %m%n'
-		String auditPattern = '%d{ISO8601} - %m%n'
-		String catalinaBase = System.getProperty('catalina.base')
-		String logDirectory = 'target'
-
-		if (catalinaBase) {
-			logDirectory = "${catalinaBase}/logs"
-		}
-
-		// Use this if we want to modify the default appender called 'stdout'.
-		console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
-
-		// Application log file
-		file (
-			name:'applicationLog',
-			file:"${logDirectory}/${logAppName}.log",
-			layout:pattern(conversionPattern: commonPattern)
-		)
-
-		// Audit log file
-		file (
-			name:'auditLog',
-			file:"$logDirectory/${logAppName}-audit.log",
-			layout:pattern(conversionPattern: auditPattern)
-		)
-
-		// Disable the Stacktrace
-		'null' name:'stacktrace'
+endpoints {
+	jmx {
+		jmx['unique-names'] = true
 	}
-
-	root {
-		info 'stdout', 'applicationLog'
-	}
-
-	// Send debug logging to application log (and console since additivity is true)
-	debug  applicationLog: 'grails.app', additivity: true
-
-	// Setup Audit Logging messages to go to their own log file in addition to the application log
-	info  auditLog: 'net.transitionmanager.service.AuditService', additivity: true
 }
-*/
+
+hibernate {
+	cache {
+		queries = false
+		use_second_level_cache = true
+		use_query_cache = false
+		region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+	}
+
+	flush.mode = 'manual' // OSIV session flush mode outside of transactional context
+	// format_sql = true
+	singleSession = true
+	// use_sql_comments = true
+}
+
+dataSource {
+	dbCreate = 'none'
+	dialect = 'com.tdsops.common.sql.CustomMySQLDialect'
+	driverClassName = 'com.mysql.jdbc.Driver'
+	jmxExport = true
+	pooled = true
+}
+
+environments {
+	development {
+		dataSource {
+			// url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			username = "tdstmapp"
+			password = "tdstmpswd"
+			logSql = false
+
+			// See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
+			properties {
+				defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
+				initialSize = 15
+				jdbcInterceptors = 'ConnectionState'
+				jmxEnabled = true
+				maxActive = 70
+				maxAge = 10 * 60000
+				maxIdle = 15
+				maxWait = 10000
+				minEvictableIdleTimeMillis = 1000 * 60 * 5 // Evictions set to 5 minutes of idle time
+				minIdle = 5
+				removeAbandoned = true
+				removeAbandonedTimeout = 600
+				testOnBorrow = true
+				testOnReturn = false
+				testWhileIdle = false
+				timeBetweenEvictionRunsMillis = 1000 * 60 // Run evictions on idle connections every 60 seconds (default 5 seconds)
+				validationInterval = 15000
+				validationQuery = '/* ping */'
+				validationQueryTimeout = 3
+			}
+		}
+	}
+	test {
+		dataSource {
+			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			username = "tdstmapp"
+			password = "tdstmpswd"
+			logSql = false
+		}
+	}
+	production {
+		dataSource {
+			// url = "jdbc:mysql://127.0.0.1/tdstm"
+			// username = ''
+			// password = ''
+
+			// See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
+			properties {
+				defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
+				initialSize = 15
+				jdbcInterceptors = 'ConnectionState'
+				jmxEnabled = true
+				maxActive = 70
+				maxAge = 10 * 60000
+				maxIdle = 15
+				maxWait = 10000
+				minEvictableIdleTimeMillis = (1000 * 60 * 5) // Evictions set to 5 minutes of idle time
+				minIdle = 5
+				removeAbandoned = true
+				removeAbandonedTimeout = 600
+				testOnBorrow = true
+				testOnReturn = false
+				testWhileIdle = false
+				timeBetweenEvictionRunsMillis = (1000 * 60) // Run evictions on idle connections every 60 seconds (default 5 seconds)
+				validationInterval = 15000
+				validationQuery = '/* ping */'
+				validationQueryTimeout = 3
+			}
+		}
+	}
+}
 
 //Maintenance file path
 tdsops.maintModeFile = "/tmp/tdstm-maint.txt"
 
 //Build number file path
-tdsops.buildFile = "/build.txt"
+tdsops.buildFile = "build.txt"
 
 // Audit configuration, valid options are: access and activity (default is access)
 // access: logging will include login, logout and security violations
@@ -338,9 +386,9 @@ grails {
 			// Refer to spring security REST Plugin configuration:
 			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
 			filterChain.chainMap = [
-					'/api/projects/heartbeat':'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
-					'/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter',  // Stateless chain
-					'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter' // Traditional chain
+				[pattern: '/api/projects/heartbeat', filters: 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor'],
+				[pattern: '/api/**', filters: 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter'],  // Stateless chain
+				[pattern: '/**', filters: 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'] // Traditional chain
 			]
 
 			// Refer to information on these settings please refer to:
@@ -376,33 +424,34 @@ grails {
 			//rejectIfNoRule = false
 			//fii.rejectPublicInvocations = true
 
+			//TODO fix after adding permission class
 			controllerAnnotations.staticRules = [
-					'/ws/**'              : 'isAuthenticated()',
-					'/'                   : 'permitAll',
-					'/index'              : 'permitAll',
-					'/index.gsp'          : 'permitAll',
-					'/assets/**'          : 'permitAll',        // Don't believe it is used
-					'/auth/**'            : 'permitAll',        // Authentication Controller
-					'/**/js/**'           : 'permitAll',        // Javascript
-					'/**/css/**'          : 'permitAll',
-					'/**/images/**'       : 'permitAll',
-					'/i/**'               : 'permitAll',
-					'/**/icons/**'        : 'permitAll',
-					'/**/favicon.ico'     : 'permitAll',
-					'/app-js/**'          : 'permitAll', // Angular1.6 - resources
-					'/i18n/**'            : 'permitAll', // Angular - Translate
-					'/tds/web-app/**'     : 'permitAll', // Angular2* - resources
-					'/module/**'          : 'permitAll', // Angular2  - router access
-					'/test/**'            : 'permitAll', // Angular - Test
-					'/dist/**'            : 'permitAll',
-					'/monitoring'         : "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
-					'/greenmail/**'       : 'permitAll',
-					'/components/**'      : 'permitAll',
-					'/templates/**'       : 'permitAll',
-					'/console/**'         : "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
-					'/plugins/console*/**': "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
-					'/jasper/**'          : 'permitAll',
-					'/oauth/access_token' : 'permitAll'
+				[pattern: '/ws/**'              , access: 'isAuthenticated()'],
+				[pattern: '/'                   , access: 'permitAll'],
+				[pattern: '/index'              , access: 'permitAll'],
+				[pattern: '/index.gsp'          , access: 'permitAll'],
+				[pattern: '/assets/**'          , access: 'permitAll'],        // Don't believe it is used
+				[pattern: '/auth/**'            , access: 'permitAll'],        // Authentication Controller
+				[pattern: '/**/js/**'           , access: 'permitAll'],        // Javascript
+				[pattern: '/**/css/**'          , access: 'permitAll'],
+				[pattern: '/**/images/**'       , access: 'permitAll'],
+				[pattern: '/i/**'               , access: 'permitAll'],
+				[pattern: '/**/icons/**'        , access: 'permitAll'],
+				[pattern: '/**/favicon.ico'     , access: 'permitAll'],
+				[pattern: '/app-js/**'          , access: 'permitAll'], // Angular1.6 - resource]s
+				[pattern: '/i18n/**'            , access: 'permitAll'], // Angular - Translate
+				[pattern: '/tds/web-app/**'     , access: 'permitAll'], // Angular2* - resources
+				[pattern: '/module/**'          , access: 'permitAll'], // Angular2  - router access
+				[pattern: '/test/**'            , access: 'permitAll'], // Angular - Tes]t
+				[pattern: '/dist/**'            , access: 'permitAll'],
+				[pattern: '/monitoring'         , access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
+				[pattern: '/greenmail/**'       , access: 'permitAll'],
+				[pattern: '/components/**'      , access: 'permitAll'],
+				[pattern: '/templates/**'       , access: 'permitAll'],
+				[pattern: '/console/**'         , access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
+				[pattern: '/plugins/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
+				[pattern: '/jasper/**'          , access: 'permitAll'],
+				[pattern: '/oauth/access_token' , access: 'permitAll']
 			]
 
 			ldap.active = false
@@ -439,4 +488,44 @@ xssSanitizer.enabled = true
 // grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
 grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
 
-org.codehaus.groovy.grails.validation.ConstrainedProperty.registerNewConstraint(net.transitionmanager.domain.constraint.OfSameProjectConstraint.NAME, net.transitionmanager.domain.constraint.OfSameProjectConstraint.class)
+//TODO GRAILS UPGRADE port any service that does you autowiring to use GORM events and eliminate this.
+grails.gorm.default.mapping = {
+        autowire true
+}
+
+grails.resources.pattern = '/**'
+
+/*
+The parameter disabled (false by default) just disables the monitoring.
+ */
+//javamelody.disabled = false
+
+/*
+The parameter system-actions-enabled (true by default) enables some system actions.
+ */
+//javamelody.'system-actions-enabled' = true
+
+
+/*
+Turn on Grails Service monitoring by adding 'spring' in displayed-counters parameter.
+ */
+javamelody.'displayed-counters' = 'http,sql,error,log,spring,jsp'
+
+
+
+
+/*
+The parameter url-exclude-pattern is a regular expression to exclude some urls from monitoring as written above.
+ */
+//javamelody.'url-exclude-pattern' = '/static/.*'
+
+
+
+/*
+Specify jndi name of datasource to monitor in production environment
+ */
+/*environments {
+    production {
+        javamelody.datasources = 'java:comp/env/myapp/mydatasource'
+    }
+}*/
