@@ -7,6 +7,7 @@ import com.tds.asset.AssetOptions
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -16,8 +17,8 @@ import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.WorkbookUtil
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
@@ -40,24 +41,22 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.hibernate.FlushMode
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.web.multipart.MultipartFile
 
 import java.text.DateFormat
 import java.util.regex.Matcher
 
-import static com.tdsops.tm.enums.domain.AssetClass.*
+import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
+import static com.tdsops.tm.enums.domain.AssetClass.DATABASE
+import static com.tdsops.tm.enums.domain.AssetClass.DEVICE
+import static com.tdsops.tm.enums.domain.AssetClass.STORAGE
+import static com.tdsops.tm.enums.domain.AssetClass.domainClassFor
+import static com.tdsops.tm.enums.domain.AssetClass.domainNameFor
 
-// <SL>: Commented this out due to multiple implementations of logging
-//@Slf4j
 class ImportService implements ServiceMethods {
-	private Logger log = LoggerFactory.getLogger(ImportService.class)
 
 	// The spreadsheet columns that are Date format
 	private static final List<String> importColumnsDateType = ['MaintExp', 'Retire']

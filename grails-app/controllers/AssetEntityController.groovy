@@ -17,7 +17,6 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
@@ -26,8 +25,8 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import groovy.time.TimeDuration
 import net.transitionmanager.asset.DeviceUtils
@@ -79,14 +78,13 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -269,7 +267,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		try {
 			// Get the uploaded spreadsheet file
 			MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
-			MultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
+			MultipartFile file = mpr.getFile("file")
 
 			StringBuilder message = importService.validateAndProcessWorkbookSheets(project, file, params)
 			forward action:forwardAction, params: [ message: message.toString() ]

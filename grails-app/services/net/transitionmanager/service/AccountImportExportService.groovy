@@ -1865,7 +1865,7 @@ class AccountImportExportService implements ServiceMethods {
 	 */
 	private String saveImportSpreadsheet(request, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-		MultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
+		MultipartFile xlsFile = mpr.getFile(paramName)
 
 		// Generate a random filename to store the spreadsheet between page loads
 		String filename = 'AccountImport-' + securityService.currentUserLoginId + '-' +

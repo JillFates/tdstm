@@ -313,7 +313,7 @@ class TaskImportExportService implements ServiceMethods {
 	 */
 	private String saveImportSpreadsheet(HttpServletRequest request, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-		MultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
+		MultipartFile xlsFile = mpr.getFile(paramName)
 
 		// Generate a random filename to store the spreadsheet between page loads
 		String filename = "TaskImport-${securityService.currentUserLoginId}-" + SecurityUtil.randomString(10)+'.xls'
