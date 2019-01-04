@@ -14,7 +14,7 @@
 	<asset:stylesheet href="css/cookbook.css" />
 	<asset:stylesheet href="components/comment/comment.css" />
 
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />
@@ -76,7 +76,7 @@
 
 	</div>
 
-	<g:render template="../assetEntity/initAssetEntityData"/>
+	<g:render template="/assetEntity/initAssetEntityData"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("#createEntityView").dialog({autoOpen: false});

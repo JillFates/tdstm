@@ -108,14 +108,14 @@
 		<g:else>
 			</div>
 
-			<g:render template="../layouts/responsiveStandardResources" />
+			<g:render template="/layouts/responsiveStandardResources" />
 
 			<g:javascript src="asset.tranman.js" />
 			<g:javascript src="room.rack.combined.js"/>
 			<g:javascript src="cabling.js"/>
 			<g:javascript src="entity.crud.js" />
 			<g:javascript src="model.manufacturer.js"/>
-			<g:render template="../layouts/responsiveAngularResources" />
+			<g:render template="/layouts/responsiveAngularResources" />
 			<g:javascript src="select2.js" />
 
 		</g:else>

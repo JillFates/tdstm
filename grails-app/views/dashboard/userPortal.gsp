@@ -12,7 +12,7 @@
     <g:javascript src="asset.comment.js"/>
     <g:javascript src="asset.tranman.js"/>
     <g:javascript src="entity.crud.js"/>
-    <g:render template="../layouts/responsiveAngularResources"/>
+    <g:render template="/layouts/responsiveAngularResources"/>
     <g:javascript src="model.manufacturer.js"/>
 
     <style>
@@ -170,7 +170,7 @@
 
         <div id="relatedEntitiesId"></div>
 
-        <g:render template="../assetEntity/initAssetEntityData"/>
+        <g:render template="/assetEntity/initAssetEntityData"/>
     </div>
     <script type="text/javascript">
 
@@ -206,7 +206,7 @@
                     $('#detailTdId_' + id).css('display', 'table-row')
                     //$('#detailId_'+id).css('display','block')
                     $('#taskLinkId').removeClass('mobselect')
-                    new Ajax.Request('../assetEntity/updateStatusSelect?id=' + id, {
+                    new Ajax.Request('/assetEntity/updateStatusSelect?id=' + id, {
                         asynchronous: false, evalScripts: true,
                         onComplete: function (e) {
                             var resp = e.responseText;

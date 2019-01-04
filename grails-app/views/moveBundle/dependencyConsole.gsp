@@ -14,7 +14,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="progressBar.js" />
 
 		<g:javascript src="asset.comment.js" />
@@ -224,18 +224,18 @@
 		<div style="float:left;">
 			<div id="items1" style="display: none"></div>
 			<div id="spinnerDivId" class="containsSpinner" style="display: none"></div>
-			<g:render template="../assetEntity/modelDialog" />
-			<g:render template="../assetEntity/entityCrudDivs" />
+			<g:render template="/assetEntity/modelDialog" />
+			<g:render template="/assetEntity/entityCrudDivs" />
 			<div id="createStaffDialog" style="display:none;" class="static-dialog">
-				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+				<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
 				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
 				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
-			<g:render template="../assetEntity/dependentAdd" />
-			<g:render template="../assetEntity/initAssetEntityData"/>
-			<g:render template="../layouts/error"/>
+			<g:render template="/assetEntity/dependentAdd" />
+			<g:render template="/assetEntity/initAssetEntityData"/>
+			<g:render template="/layouts/error"/>
 		</div>
 		</div>
 		<script type="text/javascript">

@@ -207,7 +207,7 @@
 			<tds:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}" tooltipDataPlacement="bottom"/>
 
 		</tr>
-		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
+		<g:render template="/assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
 		<g:render template="/comment/assetTagsShow"></g:render>
 	</tbody>
 </table>

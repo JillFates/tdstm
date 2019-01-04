@@ -39,7 +39,7 @@
 	<input type="hidden" id="currentAssetType" 		name="currentAssetType" value="${currentAssetType}"/>
 
 	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+	<g:render template="/assetEntity/dependentHidden" />
 
 	<%-- Holds original values of the various SELECTS --%>
 	<input type="hidden" id="hiddenModel"        name="modelId" value="${assetEntityInstance?.model?.id}">

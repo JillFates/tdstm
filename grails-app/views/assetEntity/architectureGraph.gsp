@@ -8,7 +8,7 @@
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="projectStaff.js" />
 
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 
 	<g:javascript src="asset.comment.js" />
 
@@ -175,15 +175,15 @@
 		<div id="spinnerDivId" style="display: none"></div>
 	</div>
 
-	<g:render template="../assetEntity/modelDialog"/>
-	<g:render template="../assetEntity/entityCrudDivs" />
-	<g:render template="../assetEntity/dependentAdd" />
-	<g:render template="../layouts/error"/>
+	<g:render template="/assetEntity/modelDialog"/>
+	<g:render template="/assetEntity/entityCrudDivs" />
+	<g:render template="/assetEntity/dependentAdd" />
+	<g:render template="/layouts/error"/>
 	<div id="createStaffDialog" style="display:none;" class="static-dialog">
-		<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+		<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 	</div>
 </div>
-<g:render template="../assetEntity/initAssetEntityData"/>
+<g:render template="/assetEntity/initAssetEntityData"/>
 
 <script type="text/javascript">
 

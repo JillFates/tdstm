@@ -10,7 +10,7 @@
 <g:if test="${flash.message}">
      <div class="message">${flash.message}</div>
 </g:if>
-<g:render template="../model/show" />
+<g:render template="/model/show" />
 </div>
   <script>
     $(document).ready(function(){

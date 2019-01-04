@@ -86,7 +86,7 @@
 	</g:each>
 </div>
 <g:if test="${flash.message}">
-	<div class="errors" style="padding-left:30px; background: url('../icons/exclamation.png') no-repeat scroll 8px 0 transparent">${flash.message}</div>
+	<div class="errors" style="padding-left:30px; background: url('/icons/exclamation.png') no-repeat scroll 8px 0 transparent">${flash.message}</div>
 	<script type="text/javascript">showOption = 'edit'</script>
 </g:if>
 <div class="required"> Fields marked ( * ) are mandatory </div>

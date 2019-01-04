@@ -324,7 +324,7 @@
 </div>
 
 <!-- Include the graph itself -->
-<g:render template="../moveBundle/force" model="${pageScope.variables}"/>
+<g:render template="/moveBundle/force" model="${pageScope.variables}"/>
 
 <!-- Call the main graph function as soon as this template is added to the DOM -->
 <script type="text/javascript">

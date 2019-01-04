@@ -7,7 +7,7 @@
 
         <asset:stylesheet href="css/progressbar.css" />
         <asset:stylesheet href="css/tds-bootstrap.css" />
-        <g:render template="../layouts/responsiveAngularResources" />
+        <g:render template="/layouts/responsiveAngularResources" />
         <g:javascript src="progressBar.js" />
         <style type="text/css">
           .block-anchor{

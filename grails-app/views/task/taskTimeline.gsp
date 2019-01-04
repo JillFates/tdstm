@@ -9,7 +9,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="d3/d3.js"/>
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
 
@@ -58,7 +58,7 @@
 							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
 						</span>
 						<div style="float: right;" class="task-timeline-progress-wrapper">
-							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 						</div>
 					</div>
 					<!-- control panel -->
@@ -121,8 +121,8 @@
 					</div>
 				</div>
 				<span id="spinnerId" style="display: none"><asset:image src="images/spinner.gif"/></span>
-				<g:render template="../assetEntity/initAssetEntityData"/>
-				<g:render template="../layouts/error"/>
+				<g:render template="/assetEntity/initAssetEntityData"/>
+				<g:render template="/layouts/error"/>
 				<div id="svgContainerId" style="display: none;"></div>
 			</div>
 		</div>

@@ -16,7 +16,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 
 		<g:javascript src="asset.comment.js" />
@@ -211,7 +211,7 @@
 	<body>
 		<tds:subHeader title="${title} ${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets', title]"/>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv">
@@ -232,9 +232,9 @@
 		<div id="manufacturersScopeId" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
 			<g:render template="modelDialog"/>
 		</div>
-		<g:render template="../assetEntity/entityCrudDivs" />
-		<g:render template="../assetEntity/dependentAdd" />
-		<g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="/assetEntity/entityCrudDivs" />
+		<g:render template="/assetEntity/dependentAdd" />
+		<g:render template="/assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			var filter = '${filter}';

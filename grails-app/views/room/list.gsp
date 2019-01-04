@@ -15,7 +15,7 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
@@ -43,7 +43,7 @@
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body fluid" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
 
 			<g:if test="${flash.error}">
 				<div class="errors">${flash.error}</div>
@@ -197,9 +197,9 @@
 			</g:form>
 		</div>
 
-		<g:render template="../assetEntity/modelDialog"/>
-		<g:render template="../assetEntity/entityCrudDivs" />
-		<g:render template="../assetEntity/dependentAdd" />
+		<g:render template="/assetEntity/modelDialog"/>
+		<g:render template="/assetEntity/entityCrudDivs" />
+		<g:render template="/assetEntity/dependentAdd" />
 
 		<input type="hidden" id="role" value="role"/>
 
@@ -320,7 +320,7 @@
 				$("#rack_"+rackId).addClass("objectSelected")
 
 				var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-				new Ajax.Request('../rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
+				new Ajax.Request('/rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
@@ -348,6 +348,6 @@
 		$(".menu-parent-data-centers").addClass('active');
 
 	</script>
-		<g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="/assetEntity/initAssetEntityData"/>
 	</body>
 </html>

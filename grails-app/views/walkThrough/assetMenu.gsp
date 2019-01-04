@@ -884,7 +884,7 @@ function checkComments(type) {
 				}
 		    }
 		}
-		xmlhttp.open("POST","../model/retrieveModelsListAsJSON?manufacturer="+manufacturerId,true);
+		xmlhttp.open("POST","/model/retrieveModelsListAsJSON?manufacturer="+manufacturerId,true);
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		xmlhttp.send();
 	}

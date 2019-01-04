@@ -10,7 +10,7 @@
 
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="d3/d3.js"/>
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
 		<g:javascript src="keyevent_constants.js" />
@@ -391,14 +391,14 @@
 
 						<!-- Refresh timer -->
 						<span style="float:right; margin-right: 12px;">
-							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 						</span>
 					</div>
 				</div>
 				<span id="spinnerId" style="display: none"><asset:image src="images/spinner.gif"/></span>
 			</div>
 		</div>
-		<g:render template="../layouts/error"/>
+		<g:render template="/layouts/error"/>
 		<script>
 			$(".menu-parent-tasks-task-graph").addClass('active');
 			$(".menu-parent-tasks").addClass('active');

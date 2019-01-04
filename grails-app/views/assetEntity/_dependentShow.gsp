@@ -43,7 +43,7 @@
 								</g:else>
 								<td class="dep-${support.status}" nowrap="nowrap" onclick="EntityCrud.showAssetDependencyEditView({ id: '${support.asset.id}' }, { id: '${support.dependent.id}' }, 'view');" >
 									${support.type} &nbsp;
-									<g:render template="../assetEntity/dependentComment" model= "[dependency:support, type:'support', forWhom:'show']"></g:render>
+									<g:render template="/assetEntity/dependentComment" model= "[dependency:support, type:'support', forWhom:'show']"></g:render>
 								</td>
 								<td class="dep-${support.status}" onclick="EntityCrud.showAssetDependencyEditView({ id: '${support.asset.id}' }, { id: '${support.dependent.id}' }, 'view');">
 									${support.status}
@@ -97,7 +97,7 @@
 								 </g:else>
 								<td class="dep-${dependent.status}" nowrap="nowrap" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
 									${dependent.type}&nbsp;
-									<g:render template="../assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
+									<g:render template="/assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
 								</td>
 								<td class="dep-${dependent.status}" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
 									${dependent.status}

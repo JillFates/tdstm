@@ -7,7 +7,7 @@
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="projectStaff.js" />
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 	<g:javascript src="asset.comment.js" />
 	<style type="text/css" media="print">
 	<%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
@@ -53,7 +53,7 @@
 						</tr>
 						<tr>
 							<td colspan="2">
-								<g:render template="../application/show"
+								<g:render template="/application/show"
 										  model="[applicationInstance:application.app, customs: customs,
 												  project:project, standardFieldSpecs: standardFieldSpecs,
 												  shutdownBy: application.shutdownBy, shutdownById: application.shutdownById,
@@ -63,7 +63,7 @@
 							</td>
 						</tr>
 						<tr id="deps">
-							<g:render template="../assetEntity/dependentShow" model="[assetEntity:application.app,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
+							<g:render template="/assetEntity/dependentShow" model="[assetEntity:application.app,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
 						</tr>
 					</tbody>
 				</table>
@@ -76,7 +76,7 @@
 		<div id="editEntityView" style="display: none;"></div>
 
 	</div>
-	<g:render template="../assetEntity/initAssetEntityData"/>
+	<g:render template="/assetEntity/initAssetEntityData"/>
 
 	<script type="application/javascript">
 		$(document).ready(function() {

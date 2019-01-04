@@ -8,7 +8,7 @@
         <g:javascript src="entity.crud.js" />
         <g:javascript src="model.manufacturer.js"/>
         <g:javascript src="projectStaff.js" />
-        <g:render template="../layouts/responsiveAngularResources" />
+        <g:render template="/layouts/responsiveAngularResources" />
         <g:javascript src="progressBar.js" />
 
         <g:javascript src="asset.comment.js" />

@@ -10,7 +10,7 @@
 			<g:if test="${flash.message}">
 				 <div class="message">${flash.message}</div>
 			</g:if>
-			<g:render template="../model/edit" />
+			<g:render template="/model/edit" />
 			<input name="id" value="${modelInstance.id}" type="hidden" id="modelId"/>
 			<input type="hidden" name="asset" id="modelAsset" value="asset"/>
 		</div>

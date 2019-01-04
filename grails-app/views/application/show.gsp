@@ -23,17 +23,17 @@
 		</td>
 	</tr>
 	<tr id="deps">
-		<g:render template="../assetEntity/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
+		<g:render template="/assetEntity/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
 	</tr>
 	<tr id="commentListId">
-		<g:render template="../assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
+		<g:render template="/assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
 	</tr>
 	<tr>
 		<td colspan="2">
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" id="applicationId" value="${applicationInstance?.id}" />
-					<g:render template="../assetEntity/showButtons" model="[assetEntity:applicationInstance]"/>
+					<g:render template="/assetEntity/showButtons" model="[assetEntity:applicationInstance]"/>
 				</g:form>
 			</div>
 		</td>

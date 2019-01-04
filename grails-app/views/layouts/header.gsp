@@ -24,7 +24,7 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <g:render template="../layouts/resources" model="[isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+    <g:render template="/layouts/resources" model="[isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
 
     <g:layoutHead />
 
@@ -82,10 +82,10 @@
                 </div>
 
                 <g:if test="${isLicenseManagerEnabled}">
-                    <g:render template="../layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+                    <g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:if>
                 <g:else>
-                    <g:render template="../layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+                    <g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                 </g:else>
 
 
@@ -183,7 +183,7 @@
 </div>
 
     <%-- DIV for editing User Profile --%>
-    <g:render template="../person/personEdit" model="[user:userLogin, minPasswordLength:minPasswordLength]" />
+    <g:render template="/person/personEdit" model="[user:userLogin, minPasswordLength:minPasswordLength]" />
 
     <%-- DIV for editing User Preferences --%>
     <div id="userPrefDivId" style="display: none;" title="${tds.currentPersonName()} Preferences"></div>

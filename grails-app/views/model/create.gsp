@@ -298,7 +298,7 @@
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
 		if(count < 51 ){
-			var connector = "<div><img src=\"../../i/cabling/"+ type +".png\"/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>";
+			var connector = "<div><img src=\"/../i/cabling/"+ type +".png\"/></div><div id='labelPositionDiv"+count+"' class='connector_Right'><span id='connectorLabelText"+count+"'>Connector"+count+"</span></div>";
 			$("#connector"+count).html(connector)
 			var modelConnector = $("#connectorTabe tbody").html()
 			$("#connectorModelBody").append(modelConnector)

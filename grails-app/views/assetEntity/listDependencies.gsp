@@ -9,7 +9,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="asset.tranman.js" />
 
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 
 		<g:javascript src="asset.comment.js" />
 
@@ -101,8 +101,8 @@
 					</div>
 				</div>
 			</g:each>
-			<g:render template="../assetEntity/entityCrudDivs" />
-			<g:render template="../assetEntity/dependentAdd" />
+			<g:render template="/assetEntity/entityCrudDivs" />
+			<g:render template="/assetEntity/dependentAdd" />
 			<g:render template="initAssetEntityData"/>
 		</div>
 		<script>

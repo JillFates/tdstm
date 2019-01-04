@@ -34,7 +34,7 @@
 	<input type="hidden" id="version" 	name="version" value="${version}"/>
 
 	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+	<g:render template="/assetEntity/dependentHidden" />
 
 	<table style="border: 0;" class="asset-entities-dialog-table-content">
 		<tr>
@@ -116,7 +116,7 @@
 							</td>
 						</tr>
 							<tbody class="customTemplate">
-							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
+							<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
 							</tbody>
 
 							<g:render template="/comment/assetTagsEdit"></g:render>
@@ -134,7 +134,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<g:render template="../assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
+					<g:render template="/assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
 				</div>
 			</td>
 		</tr>

@@ -9,7 +9,7 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="progressTimer.js" />
 </head>
@@ -92,7 +92,7 @@
 			</g:if>
 			<li>
 				<span style="float: right;margin-right: 10px;">
-					<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 180, 240, 300]]}"/>
+					<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 180, 240, 300]]}"/>
 				</span>
 			</li>
 		</ul>
@@ -126,9 +126,9 @@
 			<g:render template="tasks"/>
 		</div>
 	</div>
-	<g:render template="../assetEntity/modelDialog"/>
-	<g:render template="../assetEntity/entityCrudDivs" />
-	<g:render template="../assetEntity/dependentAdd" />
+	<g:render template="/assetEntity/modelDialog"/>
+	<g:render template="/assetEntity/entityCrudDivs" />
+	<g:render template="/assetEntity/dependentAdd" />
 	<br />
 <%--
 /*
@@ -478,7 +478,7 @@ setFocus();
 	});
 </script>
 </g:if>
-	<g:render template="../assetEntity/initAssetEntityData"/>
-	<g:render template="../layouts/error"/>
+	<g:render template="/assetEntity/initAssetEntityData"/>
+	<g:render template="/layouts/error"/>
 </body>
 </html>

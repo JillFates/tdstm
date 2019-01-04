@@ -97,7 +97,7 @@
 				</td>
 			</tr>
 
-			<g:render template="../userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength, fromDialog:true]}" />
+			<g:render template="/userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength, fromDialog:true]}" />
 		  </tbody>
 		</table>
 	  </div>

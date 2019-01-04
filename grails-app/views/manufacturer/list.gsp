@@ -3,7 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 		<title>Manufacturer List</title>
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
@@ -58,7 +58,7 @@
 	<body>
 	<tds:subHeader title="Manufacturer List" crumbs="['Admin','Manufacturer']"/>
 		<div class="body fluid" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
 			<div >
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>

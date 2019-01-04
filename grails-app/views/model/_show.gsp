@@ -242,7 +242,7 @@ $('div.connector_Left').each(function(index) {
 function validateModelDependency( modelId ){
 	var returnValue = true
 	jQuery.ajax({
-		url: "../checkModelDependency",
+		url: "/checkModelDependency",
 		data: "modelId="+modelId,
 		type:'POST',
 		async:false,

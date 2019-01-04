@@ -9,7 +9,7 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
@@ -25,7 +25,7 @@
 			}
 			function onInvokeExportAction(id) {
 				var parameterString = createParameterStringForLimit(id);
-				location.href = '../list?' + parameterString;
+				location.href = '/list?' + parameterString;
 			}
 			$(document).ready(function() {
 				$('#assetMenu').show();
@@ -91,10 +91,10 @@
 			</g:if>
 			<div>
 				<jqgrid:wrapper id="listCommentGridId" />
-				<g:render template="../assetEntity/entityCrudDivs" />
-				<g:render template="../assetEntity/dependentAdd" />
+				<g:render template="/assetEntity/entityCrudDivs" />
+				<g:render template="/assetEntity/dependentAdd" />
 			</div>
 		</div>
-        <g:render template="../assetEntity/initAssetEntityData"/>
+        <g:render template="/assetEntity/initAssetEntityData"/>
 	</body>
 </html>

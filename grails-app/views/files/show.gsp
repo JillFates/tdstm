@@ -71,7 +71,7 @@
 
 					<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 				</tr>
-				<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
+				<g:render template="/assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 				<g:render template="/comment/assetTagsShow"></g:render>
 				</tbody>
 			</table>
@@ -89,17 +89,17 @@
 		</td>
 	</tr>
 	<tr id="deps">
-		<g:render template="../assetEntity/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
+		<g:render template="/assetEntity/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 	</tr>
 	<tr id="commentListId">
-		<g:render template="../assetEntity/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]"></g:render>
+		<g:render template="/assetEntity/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]"></g:render>
 	</tr>
 	<tr>
 		<td colspan="2">
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" id="filedeleteId" value="${filesInstance?.id}" />
-					<g:render template="../assetEntity/showButtons" model="[assetEntity:filesInstance]" />
+					<g:render template="/assetEntity/showButtons" model="[assetEntity:filesInstance]" />
 				</g:form>
 			</div>
 		</td>

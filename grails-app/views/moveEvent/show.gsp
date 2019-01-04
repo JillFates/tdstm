@@ -5,7 +5,7 @@
         <meta name="layout" content="topNav" />
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
@@ -116,7 +116,7 @@
 			$("#messageDiv").show();
 			$('#messageDiv').html("Setting assets to Moved, please wait...")
      		jQuery.ajax({
-    			url: '../markEventAssetAsMoved',
+    			url: '/markEventAssetAsMoved',
     			data: {'moveEventId':moveEventId},
     			success: function(data) {
     				var text = isNaN(data) ? '' : 'assets marked as moved.'

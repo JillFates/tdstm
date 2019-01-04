@@ -9,7 +9,7 @@
 	<asset:stylesheet href="css/tabcontent.css" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="yahoo.ui.dashboard.js" />
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="progressTimer.js" />
 	<style>
@@ -79,7 +79,7 @@
 							</span>
 						</div>
 						<div>
-							<g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
+							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
 						</div>
 						<input type="hidden" id="typeId" value="${params.type}">
 						<input type="hidden" id="stateId" value="${params.state}">
@@ -711,7 +711,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
+				url:"/ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 				dataType: 'json',
 				success:updateMoveEventNews,
 				error:function (xhr, ajaxOptions, thrownError){
@@ -755,7 +755,7 @@
 			type:"POST",
 			async : true,
 			data: $('#teamTaskPercentageFormId').serialize(),
-			url:"../dashboard/taskSummary/"+moveEvent,
+			url:"/dashboard/taskSummary/"+moveEvent,
 			success:function (data){
 				$("#taskSummary").html(data);
 			},
@@ -822,7 +822,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+				url:"/ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 				dataType: 'json',
 				success:updateMoveBundleSteps,
 				error:function (xhr, ajaxOptions, thrownError){
@@ -972,14 +972,14 @@
     /* function to render the dials */
     function post_init( divId, dialInd ){
         var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
-        var src = "../i/dials/dial-"+dInd+"sm.png";
+        var src = "/i/dials/dial-"+dInd+"sm.png";
         $("#"+divId).attr("src", src);
         $("#"+divId).attr("title", dialInd);
 
     }
     function updateSummaryGauge( divId, dialInd ){
         var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
-        var src = "../i/dials/dial-"+dInd+".png";
+        var src = "/i/dials/dial-"+dInd+".png";
         $("#"+divId).attr("src", src);
         $("#"+divId).attr("title", dialInd);
         <%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
@@ -1266,6 +1266,6 @@
 	$(".menu-parent-dashboard-event-dashboard").addClass('active');
 	$(".menu-parent-dashboard").addClass('active');
 </script>
-<g:render template="../layouts/error"/>
+<g:render template="/layouts/error"/>
 </body>
 </html>

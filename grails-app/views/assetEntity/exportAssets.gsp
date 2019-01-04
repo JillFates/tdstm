@@ -6,7 +6,7 @@
 	<asset:stylesheet href="css/progressbar.css" />
 	<g:javascript src="import.export.js"/>
 
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 
 	<g:javascript src="progressBar.js" />
 

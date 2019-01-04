@@ -6,7 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title><g:layoutTitle default="Grails" /></title>
 
-		<g:render template="../layouts/standardResources" />
+		<g:render template="/layouts/standardResources" />
 
 		<g:layoutHead />
 
@@ -522,7 +522,7 @@ int minPasswordLength = tds.minPasswordLength()
 
 
 		<%-- DIV for editing User Profile --%>
-		<g:render template="../person/personEdit" model="[user: userLogin, minPasswordLength: minPasswordLength]" />
+		<g:render template="/person/personEdit" model="[user: userLogin, minPasswordLength: minPasswordLength]" />
 
 		<%-- DIV for editing User Preferences --%>
 		<div id="userPrefDivId" style="display: none;min-width:250px;" title="${tds.currentPersonName()} Preferences"></div>

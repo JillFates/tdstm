@@ -337,7 +337,7 @@
 		startprintjob({
 			onSuccess: function(){
 				jQuery.ajax({
-					url: '../task/update',
+					url: '/task/update',
 					data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
 					type:'POST',
 					success: function(data) {
@@ -377,7 +377,7 @@
 		}
 
 		jQuery.ajax({
-			url: '../task/update',
+			url: '/task/update',
 			data: params,
 			type:'POST',
 			success: function(data) {

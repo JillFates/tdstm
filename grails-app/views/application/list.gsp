@@ -16,7 +16,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="projectStaff.js" />
 
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
@@ -190,7 +190,7 @@
 	<body>
 		<tds:subHeader title="Application List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets', 'Applications']"/>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width:13.7% !important;">
@@ -211,14 +211,14 @@
 			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
 				<jqgrid:wrapper id="applicationId" />
 			</div>
-			<g:render template="../assetEntity/modelDialog"/>
-			<g:render template="../assetEntity/entityCrudDivs" />
-			<g:render template="../assetEntity/dependentAdd" />
+			<g:render template="/assetEntity/modelDialog"/>
+			<g:render template="/assetEntity/entityCrudDivs" />
+			<g:render template="/assetEntity/dependentAdd" />
 			<div id="createStaffDialog" style="display:none;" class="static-dialog">
-				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+				<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 		</div>
-            <g:render template="../assetEntity/initAssetEntityData"/>
+            <g:render template="/assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			$($(".menu-parent-assets-application-list")[1]).addClass('active');

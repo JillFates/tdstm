@@ -13,7 +13,7 @@
 		<title>Storage List</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
@@ -141,7 +141,7 @@
 	<body>
 		<tds:subHeader title="Logical Storage List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets','Logical Storage List']"/>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
             <div ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="storageId" />
             </div>
@@ -161,11 +161,11 @@
 					</div>
 				</div>
 			</g:each>
-			<g:render template="../assetEntity/entityCrudDivs" />
-			<g:render template="../assetEntity/dependentAdd" />
+			<g:render template="/assetEntity/entityCrudDivs" />
+			<g:render template="/assetEntity/dependentAdd" />
 		</div>
-		<g:render template="../assetEntity/modelDialog"/>
-        <g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="/assetEntity/modelDialog"/>
+        <g:render template="/assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			$($(".menu-parent-assets-storage-logical-list")[1]).addClass('active');

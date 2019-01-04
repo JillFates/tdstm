@@ -307,7 +307,7 @@ function showRoomObjectsDiv(rackId){
 	if( draggable.val() != 1){
 		var id=rackId.split("_")[1];
 		$.ajax({
-			url: "../room/roomObject",
+			url: "/room/roomObject",
 			data:{'id':id},
 			type:'POST',
 			datatype:'json',
@@ -455,7 +455,7 @@ function enableDraggableRack(){
 		$("#roomObjects").draggable('destroy')
 	  }
 	  jQuery.ajax({
-		  url:"../room/setDraggableRackPref",
+		  url:"/room/setDraggableRackPref",
 		  data:"prefVal="+drag
 	  });
 }

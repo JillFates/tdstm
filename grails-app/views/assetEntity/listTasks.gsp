@@ -50,7 +50,7 @@
 		}
 </style>
 
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 
 	<asset:stylesheet href="css/ui.datepicker.css" />
 	<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
@@ -360,7 +360,7 @@
                 <div class="timeline-wrapper text-right pull-right">
                     <tdsactionbutton id="graph" label="View Task Graph" icon="${assetPath(src: 'icons/tds_task_graph.png')}" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
                     <tdsactionbutton id="timeline" label="View Timeline" icon="${assetPath(src: 'icons/timeline_marker.png')}" link="/task/taskTimeline"></tdsactionbutton>
-                    <g:render template="../assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+                    <g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
                 </div>
             </div>
 			<jqgrid:wrapper id="taskListId" />
@@ -383,15 +383,15 @@
 			</div>
 		</g:each>
 
-		<g:render template="../assetEntity/modelDialog" />
-		<g:render template="../assetEntity/entityCrudDivs" />
-		<g:render template="../assetEntity/dependentAdd" />
+		<g:render template="/assetEntity/modelDialog" />
+		<g:render template="/assetEntity/entityCrudDivs" />
+		<g:render template="/assetEntity/dependentAdd" />
 
-		<g:render template="../layouts/error"/>
+		<g:render template="/layouts/error"/>
 	</div>
 	<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	<div id="createStaffDialog" style="display:none;" class="static-dialog">
-		<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+		<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 	</div>
  <g:render template="initAssetEntityData"/>
  <script type="text/javascript">

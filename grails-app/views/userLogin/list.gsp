@@ -5,7 +5,7 @@
 		<meta name="layout" content="topNav" />
 		<g:set var="isActive" value="${session.getAttribute('InActive')}" />
 		<title>User List - ${isActive =='N' ? 'Inactive' : 'Active'} Users</title>
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>

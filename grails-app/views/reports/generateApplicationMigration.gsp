@@ -7,7 +7,7 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>
-<g:render template="../layouts/responsiveAngularResources" />
+<g:render template="/layouts/responsiveAngularResources" />
 <g:javascript src="asset.comment.js" />
 <jqgrid:resources />
 <g:javascript src="jqgrid-support.js" />
@@ -73,10 +73,10 @@
 			</g:each>
 			</tbody>
 		</table>
-		<g:render template="../assetEntity/modelDialog"/>
-		<g:render template="../assetEntity/entityCrudDivs" />
-		<g:render template="../assetEntity/dependentAdd" />
-        <g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="/assetEntity/modelDialog"/>
+		<g:render template="/assetEntity/entityCrudDivs" />
+		<g:render template="/assetEntity/dependentAdd" />
+        <g:render template="/assetEntity/initAssetEntityData"/>
 	</div>
 </body>
 </html>

@@ -9,7 +9,7 @@
 		<meta name="layout" content="topNav" />
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
@@ -158,7 +158,7 @@
 	<body>
 		<tds:subHeader title="Database List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets', 'Database List']"/>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+			<g:render template="/assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
@@ -179,11 +179,11 @@
 			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="databaseId" />
 			</div>
-			<g:render template="../assetEntity/entityCrudDivs" />
-			<g:render template="../assetEntity/dependentAdd" />
+			<g:render template="/assetEntity/entityCrudDivs" />
+			<g:render template="/assetEntity/dependentAdd" />
 		</div>
-		<g:render template="../assetEntity/modelDialog"/>
-        <g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="/assetEntity/modelDialog"/>
+        <g:render template="/assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			$($(".menu-parent-assets-database-list")[1]).addClass('active');

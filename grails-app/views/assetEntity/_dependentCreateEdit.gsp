@@ -77,7 +77,7 @@
 					<%-- Dependency Type --%>
 					<td nowrap>
 						<g:select name="type_support_${support.id}" value="${support.type}" from="${dependencyType}" optionValue="value" />
-						<g:render template="../assetEntity/dependentComment" model= "[dependency:support, type:'support', forWhom:'edit']"></g:render>
+						<g:render template="/assetEntity/dependentComment" model= "[dependency:support, type:'support', forWhom:'edit']"></g:render>
 					</td>
 
 					<%-- Status --%>
@@ -177,7 +177,7 @@
 					<%-- Dependency Type --%>
 					<td nowrap>
 						<g:select name="type_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType}" optionValue="value"/>
-						<g:render template="../assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'edit']"></g:render>
+						<g:render template="/assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'edit']"></g:render>
 					</td>
 
 					<%-- Dependency Status --%>

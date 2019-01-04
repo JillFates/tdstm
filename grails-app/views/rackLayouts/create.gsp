@@ -12,7 +12,7 @@
     <g:javascript src="room.rack.combined.js"/>
     <g:javascript src="entity.crud.js"/>
     <g:javascript src="model.manufacturer.js"/>
-    <g:render template="../layouts/responsiveAngularResources"/>
+    <g:render template="/layouts/responsiveAngularResources"/>
     <asset:javascript src="select2.js"/>
 
     <title>Rack View</title>
@@ -108,10 +108,10 @@
         </div>
     </div>
 
-    <g:render template="../assetEntity/modelDialog"/>
-    <g:render template="../assetEntity/entityCrudDivs"/>
-    <g:render template="../assetEntity/dependentAdd"/>
-    <g:render template="../assetEntity/initAssetEntityData"/>
+    <g:render template="/assetEntity/modelDialog"/>
+    <g:render template="/assetEntity/entityCrudDivs"/>
+    <g:render template="/assetEntity/dependentAdd"/>
+    <g:render template="/assetEntity/initAssetEntityData"/>
 
     <%-- TODO : JPM 10/2014 : This hidden role input field is NOT in a form so it is bogus --%>
     <input type="hidden" id="role" value="role"/>
@@ -278,7 +278,7 @@
 
         function createBladeDialog(source, blade, position, manufacturer, assetType, assetEntityId, moveBundleId) {
             var redirectTo = 'rack'
-            new Ajax.Request('../assetEntity/create?redirectTo=' + redirectTo + '&assetType=' + assetType + '&manufacturer=' + manufacturer, {
+            new Ajax.Request('/assetEntity/create?redirectTo=' + redirectTo + '&assetType=' + assetType + '&manufacturer=' + manufacturer, {
                 asynchronous: true, evalScripts: true,
                 onSuccess: function (e) {
                     if (e.responseText.substr(0, 1) == '{') {

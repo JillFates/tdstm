@@ -6,7 +6,7 @@
 	<title>Server Conflicts</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 	<g:javascript src="asset.comment.js" />
 	<script>
 		var maxR

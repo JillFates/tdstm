@@ -17,7 +17,7 @@
 	<input name="showView" id="showView" type="hidden" value=""/>
 
 	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+	<g:render template="/assetEntity/dependentHidden" />
 
 	<table style="border: 0;" class="asset-entities-dialog-table-content">
 		<tr>
@@ -94,7 +94,7 @@
 							</td>
 						</tr>
 							<tbody class="customTemplate">
-							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
+							<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
 							</tbody>
 							<g:render template="/comment/assetTagsEdit"></g:render>
 						</tbody>
@@ -103,11 +103,11 @@
 			</td>
 		</tr>
 		<tr>
-			<g:render template="../assetEntity/dependentCreateEdit" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
+			<g:render template="/assetEntity/dependentCreateEdit" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<g:render template="../assetEntity/createButtons" model="[assetClass: fileInstance.assetClass]"></g:render>
+				<g:render template="/assetEntity/createButtons" model="[assetClass: fileInstance.assetClass]"></g:render>
 			</td>
 		</tr>
 	</table>

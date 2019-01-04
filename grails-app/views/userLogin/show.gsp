@@ -6,7 +6,7 @@
 		<meta name="layout" content="topNav" />
 		<title>UserLogin</title>
 
-		<g:render template="../layouts/responsiveAngularResources" />
+		<g:render template="/layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>
@@ -202,7 +202,7 @@
 					$(this).toggleClass("disableButton")
 					var id = $("[name=id]").val()
 					$.ajax({
-						url: "../sendPasswordReset?id="+id,
+						url: "/sendPasswordReset?id="+id,
 						type:'post',
 						success: function(data){
 							if(data && data.success){

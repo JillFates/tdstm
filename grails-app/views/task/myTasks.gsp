@@ -11,7 +11,7 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:render template="../layouts/responsiveAngularResources" />
+	<g:render template="/layouts/responsiveAngularResources" />
 
 <script type="text/javascript">
 	window.addEventListener('load', function(){
@@ -121,6 +121,6 @@
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
 </script>
-	<g:render template="../layouts/error"/>
+	<g:render template="/layouts/error"/>
 </body>
 </html>

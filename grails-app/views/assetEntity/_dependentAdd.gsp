@@ -39,7 +39,7 @@
 			<td nowrap="nowrap">
 				<g:select name="type_FIELD_SUFFIX" from="${dependencyType}" optionValue="value"></g:select>
 
-				<g:render template="../assetEntity/dependentComment" model="[dependency:[id:'FIELD_SUFFIX', comment:''], type:'', forWhom:'edit']"></g:render>
+				<g:render template="/assetEntity/dependentComment" model="[dependency:[id:'FIELD_SUFFIX', comment:''], type:'', forWhom:'edit']"></g:render>
 
 				<%--
 				<input type="hidden" name="comment_FIELD_SUFFIX" id="comment_FIELD_SUFFIX" value="">
