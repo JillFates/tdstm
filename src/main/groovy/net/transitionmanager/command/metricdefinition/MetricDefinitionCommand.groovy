@@ -1,13 +1,13 @@
 package net.transitionmanager.command.metricdefinition
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
 import net.transitionmanager.service.MetricReportingService.MetricMode
 
 /**
  * A Command object to bind the individual metric definition JSON, and validate it.
  */
-@Validateable
-class MetricDefinitionCommand {
+
+class MetricDefinitionCommand implements CommandObject{
 	String       metricCode
 	String       description
 	Integer      enabled
@@ -49,7 +49,7 @@ class MetricDefinitionCommand {
 	/**
 	 * Converts the Command object to a map, so that it can be serialized back to JSON.
 	 *
-	 * @return A Map of the MetricDefinition fields, without the properties introduced by @Validateable.
+	 * @return A Map of the MetricDefinition fields, without the properties introduced by Validateable.
 	 */
 	Map toMap() {
 		return [

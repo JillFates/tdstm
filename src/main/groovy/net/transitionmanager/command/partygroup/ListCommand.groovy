@@ -1,8 +1,6 @@
 package net.transitionmanager.command.partygroup
 
-import grails.validation.Validateable
-import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.command.CommandObject
 
 /**
  * Represents a list of bulk changes.
@@ -13,8 +11,8 @@ import net.transitionmanager.command.bulk.EditCommand
  * @param assetIds Optional asset Ids to to run the bulk changes on. If not set the allAssets flag, userParams, and dataviewId must be set
  * @param allAssets A flag to determine if the bulk change should be run against all assets filtered by the userParams.
  */
-@Validateable
-class ListCommand {
+
+class ListCommand implements CommandObject{
 
 	String sidx ='companyName'
 	String sord = 'asc'

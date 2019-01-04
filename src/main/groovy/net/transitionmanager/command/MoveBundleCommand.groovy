@@ -1,10 +1,10 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Room
 
-@Validateable
+
 class MoveBundleCommand implements CommandObject {
 
  	Long id

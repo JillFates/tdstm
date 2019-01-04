@@ -1,9 +1,9 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
 
-@Validateable
-class ApiCatalogCommand {
+
+
+class ApiCatalogCommand implements CommandObject{
 	Long id
 	String dictionary
 	Long version

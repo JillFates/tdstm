@@ -1,12 +1,13 @@
 package net.transitionmanager.command.task
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in creating a Task context.
  */
-@Validateable
-class TaskGenerationCommand {
+
+class TaskGenerationCommand implements CommandObject{
 
 	Long recipeId
 	Long eventId

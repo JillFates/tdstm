@@ -1,12 +1,13 @@
 package net.transitionmanager.command.task.batch
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used for retrieving a Task context.
  */
-@Validateable
-class StoredContextCommand {
+
+class StoredContextCommand implements CommandObject{
 
 	Long eventId
 	List <TagCommand> tag = []

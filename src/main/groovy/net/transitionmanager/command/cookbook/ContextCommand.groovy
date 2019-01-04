@@ -1,13 +1,12 @@
 package net.transitionmanager.command.cookbook
 
-import grails.validation.Validateable
-import net.transitionmanager.command.task.batch.TagCommand
+import net.transitionmanager.command.CommandObject
 
 /**
  * A command object used in creating a Task context.
  */
-@Validateable
-class ContextCommand {
+
+class ContextCommand implements CommandObject{
 
 	Long eventId
 	List <Long> tag = []

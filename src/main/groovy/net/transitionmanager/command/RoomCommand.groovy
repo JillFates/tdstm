@@ -6,7 +6,7 @@ import net.transitionmanager.domain.Room
 /**
  * RoomCommand is to be used with the creation and editing of Room domain
  */
-@grails.validation.Validateable
+
 class RoomCommand implements CommandObject {
 	Project  project
 	String   roomName

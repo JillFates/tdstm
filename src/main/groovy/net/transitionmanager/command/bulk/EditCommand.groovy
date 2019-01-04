@@ -1,6 +1,7 @@
 package net.transitionmanager.command.bulk
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * Represents an individual bulk change edit.
@@ -10,8 +11,8 @@ import grails.validation.Validateable
  * @param value This is the value to use to the bulk change, this could be anything from a list of number, a boolean, a number, or a string.
  * For the initial implementation  this is a json string that can be parsed into any value that we need.
  */
-@Validateable
-class EditCommand {
+
+class EditCommand implements CommandObject{
 
 	String fieldName
 	String action

@@ -1,12 +1,13 @@
 package net.transitionmanager.command.tag
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in filtering a list of tags.
  */
-@Validateable
-class SearchCommand {
+
+class SearchCommand implements CommandObject{
 
 	String     name
 	String     description

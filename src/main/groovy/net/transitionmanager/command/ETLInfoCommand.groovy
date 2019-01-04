@@ -4,10 +4,10 @@ import net.transitionmanager.command.CommandObject
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Provider
-import grails.validation.Validateable
 
 
-@Validateable
+
+
 class ETLInfoCommand implements CommandObject  {
 	// The provider Id that the was used in the ETL transformation process
 	Provider provider

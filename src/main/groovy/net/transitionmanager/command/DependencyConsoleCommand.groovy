@@ -1,7 +1,7 @@
 package net.transitionmanager.command
 
-@grails.validation.Validateable
-class DependencyConsoleCommand {
+
+class DependencyConsoleCommand implements CommandObject{
 	Long       bundle
 	List<Long> tagIds   = []
 	String     tagMatch = 'ANY'

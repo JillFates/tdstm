@@ -1,9 +1,9 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
 
-@Validateable
-class ETLDataRecordFieldsPropertyCommand {
+
+
+class ETLDataRecordFieldsPropertyCommand implements CommandObject{
 
 	// The value that will ultimately saved to the domain entity when created or updated
 	// For the time being this is a String but in the future could change
@@ -27,8 +27,8 @@ class ETLDataRecordFieldsPropertyCommand {
 }
 
 
-@Validateable
-class ETLDataRecordFieldsFindCommand {
+
+class ETLDataRecordFieldsFindCommand implements CommandObject{
 
 	Integer size = 0
 	List results = []
@@ -38,8 +38,8 @@ class ETLDataRecordFieldsFindCommand {
 
 }
 
-@Validateable
-class ETLDataRecordFieldsFindQueryCommand {
+
+class ETLDataRecordFieldsFindQueryCommand implements CommandObject{
 
 	String domain
 	Map kv

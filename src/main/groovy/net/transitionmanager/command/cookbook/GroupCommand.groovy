@@ -1,11 +1,13 @@
 package net.transitionmanager.command.cookbook
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
+
 /**
  * A command object used ...
  */
-@Validateable
-class GroupCommand {
+
+class GroupCommand implements CommandObject{
 	Long recipeVersionId
 	String sourceCode
 	ContextCommand context

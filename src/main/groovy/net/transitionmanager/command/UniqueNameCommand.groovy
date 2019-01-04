@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-class UniqueNameCommand {
+class UniqueNameCommand implements CommandObject{
 	/**
 	 * Id of the domain object.
 	 */

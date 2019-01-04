@@ -1,9 +1,9 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
 
-@Validateable
-class DataScriptNameValidationCommand {
+
+
+class DataScriptNameValidationCommand implements CommandObject{
 
 	Long providerId
 	Long dataScriptId

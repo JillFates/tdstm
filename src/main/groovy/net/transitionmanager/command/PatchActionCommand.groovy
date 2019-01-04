@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 import net.transitionmanager.service.InvalidParamException
 
 /**
@@ -13,8 +13,8 @@ import net.transitionmanager.service.InvalidParamException
  *
  *
  */
-@Validateable
-class PatchActionCommand {
+
+class PatchActionCommand implements CommandObject{
 	/**
 	 * The list of ids that the action should be performed against
 	 */

@@ -1,13 +1,14 @@
 package net.transitionmanager.command.tag
 
 import com.tdsops.tm.enums.domain.Color
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used to update tags.
  */
-@Validateable
-class UpdateCommand {
+
+class UpdateCommand implements CommandObject{
 
 	String name
 	String description

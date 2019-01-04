@@ -1,6 +1,9 @@
 package net.transitionmanager.command
 
-trait CommandObject {
+import grails.validation.Validateable
+
+
+trait CommandObject implements Validateable {
 
 	/**
 	 * Used to populate the Command Object with the properties from the domain
@@ -50,7 +53,7 @@ trait CommandObject {
 	}
 
 	/**
-	 * Used to return the property/values of the domain object excluding those that are injected by the @Validateable
+	 * Used to return the property/values of the domain object excluding those that are injected by the
 	 * @return a map of all of the property/values
 	 */
 	private Map commandProperties() {

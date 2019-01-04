@@ -1,13 +1,13 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 
 /**
  * Command object for creating/updating AssetComments.
  * All fields are required, except for the id and the status, which is null when creating a new comment.
  */
-@Validateable
-class AssetCommentSaveUpdateCommand {
+
+class AssetCommentSaveUpdateCommand implements CommandObject{
 
 	Long id
 

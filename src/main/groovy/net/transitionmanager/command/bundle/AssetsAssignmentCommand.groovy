@@ -1,6 +1,7 @@
 package net.transitionmanager.command.bundle
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in filtering a list of tags.
@@ -10,8 +11,8 @@ import grails.validation.Validateable
  * @param assets The assets to assign moveBundle,planStatus, and tags to.
  * @param tagIds The tags to apply to the assets.
  */
-@Validateable
-class AssetsAssignmentCommand {
+
+class AssetsAssignmentCommand implements CommandObject{
 	Long moveBundle
 	String planStatus
 	List<Long> assets   = []

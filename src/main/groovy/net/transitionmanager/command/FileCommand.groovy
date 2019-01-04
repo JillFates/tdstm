@@ -2,7 +2,7 @@ package net.transitionmanager.command
 
 import net.transitionmanager.service.FileSystemService
 
-trait FileCommand {
+trait FileCommand implements CommandObject{
 
     /**
      * A List of accepted file extensions for validating

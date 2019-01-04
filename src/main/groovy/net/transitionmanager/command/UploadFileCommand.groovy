@@ -1,7 +1,7 @@
 package net.transitionmanager.command
 
 import com.tdssrc.grails.FileSystemUtil
-import grails.validation.Validateable
+
 import net.transitionmanager.i18n.Message
 import org.springframework.web.multipart.MultipartFile
 
@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile
  * Command Object for handling the upload and writing of a given file
  * to the filesystem.
  */
-@Validateable
+
 class UploadFileCommand implements FileCommand{
 
     MultipartFile file

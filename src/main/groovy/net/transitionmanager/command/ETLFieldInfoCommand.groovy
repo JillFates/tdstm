@@ -1,12 +1,12 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 
 /**
  * General purpose command object for updating an individual field
  */
-@Validateable
-class ETLFieldInfoCommand{
+
+class ETLFieldInfoCommand implements CommandObject{
 
 	// Field Name
 	String fieldName

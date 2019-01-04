@@ -1,13 +1,13 @@
 package net.transitionmanager.command
-import grails.validation.Validateable
+
 
 /**
  * Command class that can be used in requests receiving a single id
  * or a list of ids, that ensures the correct data types (Long) of the given ids and that the 
  * ids are all greater than zero (0).
  */
-@Validateable
-class IdsCommand {
+
+class IdsCommand implements CommandObject{
 	/**
 	 * The list of ids.
 	 */

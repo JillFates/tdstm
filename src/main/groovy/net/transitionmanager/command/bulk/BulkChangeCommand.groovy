@@ -1,7 +1,7 @@
 package net.transitionmanager.command.bulk
 
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
 import net.transitionmanager.command.DataviewUserParamsCommand
 
 /**
@@ -13,8 +13,8 @@ import net.transitionmanager.command.DataviewUserParamsCommand
  * @param assetIds Optional asset Ids to to run the bulk changes on. If not set the allAssets flag, userParams, and dataviewId must be set
  * @param allAssets A flag to determine if the bulk change should be run against all assets filtered by the userParams.
  */
-@Validateable
-class BulkChangeCommand {
+
+class BulkChangeCommand implements CommandObject{
 
 	DataviewUserParamsCommand userParams
 	Long                      dataViewId

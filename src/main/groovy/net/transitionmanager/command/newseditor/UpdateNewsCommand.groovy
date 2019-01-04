@@ -1,12 +1,13 @@
 package net.transitionmanager.command.newseditor
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used for saving and updating news.
  */
-@Validateable
-class UpdateNewsCommand {
+
+class UpdateNewsCommand implements CommandObject{
 	Long    id
 	String  message    = ''
 	String  resolution = ''

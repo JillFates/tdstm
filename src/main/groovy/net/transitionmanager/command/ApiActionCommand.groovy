@@ -1,17 +1,15 @@
 package net.transitionmanager.command
 
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
-import grails.validation.Validateable
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Provider
-
 /**
 * Command Object for handling API Action endpoints
 */
-@Validateable
+
 class ApiActionCommand implements CommandObject {
     String name
     String description=''

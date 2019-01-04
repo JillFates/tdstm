@@ -1,17 +1,18 @@
 package net.transitionmanager.command.event
 
-import grails.validation.Validateable
 import grails.databinding.BindUsing
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in creating an Event with tags.
  */
-@Validateable
-class CreateEventCommand {
+
+class CreateEventCommand implements CommandObject{
 
 	//Using this annotation because by default if an empty string is returned for the list, that it would be bound as [null].
 	// This makes it, so that if the parameter coming is is falsy "", [], null, then [] is returned,otherwise it does the normal binding.
-	@BindUsing({obj, source ->
+	@BindUsing({ obj, source ->
 		return source['tagIds'] ?: []
 	})
 	List<Long> tagIds = []

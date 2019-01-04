@@ -1,13 +1,13 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 
 /**
  * Command Object for dealing with changes of MoveBundle in
  * dependends on /supports dropdowns.
  */
-@Validateable
-class BundleChangeCommand {
+
+class BundleChangeCommand implements CommandObject{
 
 	Long assetId
 	Long dependencyId

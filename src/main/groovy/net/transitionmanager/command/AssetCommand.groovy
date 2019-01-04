@@ -1,13 +1,13 @@
 package net.transitionmanager.command
 
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.validation.Validateable
+
 
 /**
  * Command Object to be used for when saving/updating assets.
  */
-@Validateable
-class AssetCommand {
+
+class AssetCommand implements CommandObject{
 
 	/**
 	 * The class of the asset being created/updated.

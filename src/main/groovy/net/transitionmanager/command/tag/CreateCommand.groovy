@@ -1,13 +1,14 @@
 package net.transitionmanager.command.tag
 
 import com.tdsops.tm.enums.domain.Color
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in creating a Tag.
  */
-@Validateable
-class CreateCommand {
+
+class CreateCommand implements CommandObject{
 
 	String name
 	String description = ''

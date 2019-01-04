@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
+
 
 /**
  * This class reflects the structure of the ETL JSON results for the data section
@@ -26,8 +26,8 @@ import grails.validation.Validateable
  *			}
  *
  */
-@Validateable
-class ETLDataRecordCommand {
+
+class ETLDataRecordCommand implements CommandObject{
 
 	// The type of operation to perform
 	String op
@@ -40,8 +40,9 @@ class ETLDataRecordCommand {
 	// human intervention to match properly.
 	Boolean duplicate = false
 
-	// A list of errors recorded on the individual record
-	List<String> errors = []
+	//TODO GRAILS UPGRADE this causes an issue commenting out for now...
+//	// A list of errors recorded on the individual record
+//	List<String> errors = []
 
 	// A Map that contains all of the values for each of the fields in a map structure where the key
 	// of the map is the domain property name and the data is all the juicy stuff that the ETL processor

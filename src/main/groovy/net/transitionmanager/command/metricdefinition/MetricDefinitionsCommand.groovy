@@ -1,12 +1,13 @@
 package net.transitionmanager.command.metricdefinition
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A Command object to contain a list of metric definitions(JSON), and validate them.
  */
-@Validateable
-class MetricDefinitionsCommand {
+
+class MetricDefinitionsCommand implements CommandObject{
 	List<MetricDefinitionCommand> definitions
 	String metricCodes
 

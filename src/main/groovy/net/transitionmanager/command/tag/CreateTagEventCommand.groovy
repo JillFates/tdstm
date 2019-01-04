@@ -1,12 +1,13 @@
 package net.transitionmanager.command.tag
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in creating a TagEvent.
  */
-@Validateable
-class CreateTagEventCommand {
+
+class CreateTagEventCommand implements CommandObject{
 	List<Long> tagIds
 	Long eventId
 }

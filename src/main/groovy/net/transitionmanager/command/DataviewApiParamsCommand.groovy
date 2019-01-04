@@ -5,7 +5,7 @@ import com.tdssrc.grails.StringUtil
 /**
  * The DataviewApiParamsCommand is used to filter API dataviews requests
  */
-@grails.validation.Validateable
+
 class DataviewApiParamsCommand implements CommandObject {
 
 	int offset = 0
@@ -47,8 +47,8 @@ class DataviewApiParamsCommand implements CommandObject {
  *   common_environment=Production&filter=assetName=PDV*
  * </pre>
  */
-@grails.validation.Validateable
-class DataviewApiFilterParam {
+
+class DataviewApiFilterParam implements CommandObject{
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
 	static final String FIELD_NAME_SEPARATOR_CHARACTER = '_'

@@ -1,9 +1,9 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
 
-@Validateable
-class ApiActionMethodParam {
+
+
+class ApiActionMethodParam implements CommandObject{
 	String paramName
 	String param 	// TODO : JPM 3/2018 - the param property should be renamed to paramName?
 	String desc

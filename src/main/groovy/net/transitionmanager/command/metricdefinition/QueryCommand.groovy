@@ -1,12 +1,13 @@
 package net.transitionmanager.command.metricdefinition
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A Command object to bind, and validate the Query JSON.
  */
-@Validateable
-class QueryCommand {
+
+class QueryCommand implements CommandObject{
 	String             domain
 	String             aggregation
 	List<WhereCommand> where
@@ -20,7 +21,7 @@ class QueryCommand {
 	/**
 	 * Converts the Command object to a map, so that it can be serialized back to JSON.
 	 *
-	 * @return A Map of the Query fields, without the properties introduced by @Validateable.
+	 * @return A Map of the Query fields, without the properties introduced by Validateable.
 	 */
 	Map toMap() {
 		return [

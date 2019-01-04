@@ -4,7 +4,7 @@ import net.transitionmanager.domain.Person
 /**
  * PersonCommand is to be used with the creation and editing of Person domain
  */
-@grails.validation.Validateable
+
 class PersonCommand implements CommandObject {
 
 	String firstName

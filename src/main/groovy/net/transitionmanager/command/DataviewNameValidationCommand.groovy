@@ -1,9 +1,9 @@
 package net.transitionmanager.command
 
-import grails.validation.Validateable
 
-@Validateable
-class DataviewNameValidationCommand {
+
+
+class DataviewNameValidationCommand implements CommandObject{
 
 	Long dataViewId
 	String name

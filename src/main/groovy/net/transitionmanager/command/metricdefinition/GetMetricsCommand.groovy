@@ -1,6 +1,7 @@
 package net.transitionmanager.command.metricdefinition
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object that contains the parameters to get metrics:
@@ -12,8 +13,8 @@ import grails.validation.Validateable
  * metricCodes A csv delimited list of metrics codes to filter on.
  * format The format to return the metrics results CSV/JSON, defaulting to CSV.
  */
-@Validateable
-class GetMetricsCommand {
+
+class GetMetricsCommand implements CommandObject{
 	Date startDate = new Date().clearTime() - 1
 	Date endDate = new Date().clearTime() - 1
 	String projectGuid

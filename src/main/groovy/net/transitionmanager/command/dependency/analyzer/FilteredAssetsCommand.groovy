@@ -1,6 +1,7 @@
 package net.transitionmanager.command.dependency.analyzer
 
-import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
 
 /**
  * A command object used in filtering a list of tags.
@@ -12,8 +13,8 @@ import grails.validation.Validateable
  * @param tagIds tags that should be used as a filter.
  * @param tagMatch how the tags ids should be combined in an OR(ANY) or with an AND(All).
  */
-@Validateable
-class FilteredAssetsCommand {
+
+class FilteredAssetsCommand implements CommandObject{
 
 	String     nameFilter = ''
 	boolean    isRegex = false

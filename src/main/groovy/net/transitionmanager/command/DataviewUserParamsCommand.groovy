@@ -4,7 +4,7 @@ package net.transitionmanager.command
  * The DataviewUserParamsCommand represents the various parameters that make up the properties
  * that the user can override in the view.
  */
-@grails.validation.Validateable
+
 class DataviewUserParamsCommand implements CommandObject {
 
     String sortDomain
