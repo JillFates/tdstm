@@ -327,7 +327,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected hasError(label: string) {
-		return label.trim() === '' || this.data.fields.filter(item => item.label === label.trim()).length > 1;
+		return label.trim() === '' || this.data.fields.filter(item => item.label.toLowerCase().trim() === label.toLowerCase().trim()).length > 1;
 	}
 
 	/**
