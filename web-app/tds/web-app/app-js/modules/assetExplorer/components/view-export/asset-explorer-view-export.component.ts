@@ -82,7 +82,7 @@ export class AssetExplorerViewExportComponent {
 	private getFileName(): void {
 		this.assetExpService.getFileName(this.assetExportModel.viewName)
 			.subscribe(result => {
-				this.fileName = result;
+				this.fileName = result ? result : '';
 			}, err => console.log(err));
 	}
 
