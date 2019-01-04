@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import groovy.util.logging.Slf4j
 import grails.core.GrailsApplication
-import org.codehaus.groovy.grails.plugins.codecs.MD5Codec
 
 /**
  * Created by octavio on 12/27/16.
@@ -30,8 +29,8 @@ class LicenseCommonService {
 		String hostname = getHostName()
 		String fqdn = getFQDN()
 
-		def hwkey = "${hostname}|${fqdn}"
-		def md5key = MD5Codec.encode(hwkey)
+		String hwkey = "${hostname}|${fqdn}"
+		String md5key = hwkey.encodeAsMD5()
 
 		log.debug("***************************************************************************")
 		log.debug("hwkey: $hwkey")
