@@ -1,7 +1,9 @@
 import com.tds.asset.Application
+import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.Color
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.command.CloneAssetCommand
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
@@ -17,6 +19,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 	private AssetTestHelper assetHelper = new AssetTestHelper()
 	private ProjectTestHelper projectHelper = new ProjectTestHelper()
 	private PersonTestHelper personHelper = new PersonTestHelper()
+	private MoveBundleTestHelper moveBundleHelper = new MoveBundleTestHelper()
 
 	void "1. test Entity Info Method"() {
 		setup:
@@ -241,6 +244,62 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			for (prop in props) {
 				assert app[prop] == clone[prop]
 			}
+	}
+
+	void '7. Test getAssetSummary under different scenarios'() {
+		setup: 'Create two projects, a person and some MoveBundles'
+			Project project1 = projectHelper.createProject()
+			Project project2 = projectHelper.createProject()
+			Person person = personHelper.createPerson()
+			MoveBundle planningBundle1 = moveBundleHelper.createBundle(project1)
+			MoveBundle planningBundle2 = moveBundleHelper.createBundle(project2)
+			MoveBundle nonPlanningBundle1 = moveBundleHelper.createBundle(project1, null, false)
+			List bundlesAndProjects = [[project: project1, moveBundle: planningBundle1],
+			                           [project: project1, moveBundle: nonPlanningBundle1],
+			                           [project: project2, moveBundle: planningBundle2]
+			]
+		when: 'Requesting the Asset Summary and the project has no assets'
+			Map assetSummaryProject1 = assetEntityService.getAssetSummary(project1, true)
+		then: 'The summary list is empty'
+			assetSummaryProject1['assetSummaryList'].size() == 0
+		and: 'The total number of assets is zero'
+			assetSummaryProject1['totalAsset'] == 0
+		when: 'Requesting the Asset Summary for a project with no bundles'
+			Map assetSummaryProject2 = assetEntityService.getAssetSummary(project2, true)
+		then: 'The summary list is empty'
+			assetSummaryProject2['assetSummaryList'].size() == 0
+		and: 'The total number of assets is zero'
+			assetSummaryProject2['totalAsset'] == 0
+		when: 'Requesting the Asset Summary for a project with planning and non-planning assets (justPlanning set to true)'
+			Map planningDeviceParams = ['moveBundle': planningBundle1]
+			Map nonPlanningDeviceParams = ['moveBundle': nonPlanningBundle1]
+			bundlesAndProjects.each { Map bundleInfo ->
+				Project project = bundleInfo['project']
+				MoveBundle moveBundle = bundleInfo['moveBundle']
+				assetHelper.createApplication(person, project, moveBundle)
+				assetHelper.createDatabase(project, moveBundle)
+				assetHelper.createStorage(project, moveBundle)
+				assetHelper.createDevice(project, AssetType.BLADE, bundleInfo)
+				assetHelper.createDevice(project, AssetType.VM, bundleInfo)
+			}
+			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, true)
+		then: 'There should be one element and totals should be 1, except for servers, which should be 2'
+			assetSummaryProject1['assetSummaryList'].size() == 1
+			assetSummaryProject1['totalAsset'] == 2
+			assetSummaryProject1['totalApplication'] == 1
+			assetSummaryProject1['totalDatabase'] == 1
+			assetSummaryProject1['totalPhysical'] == 1
+			assetSummaryProject1['totalFiles'] == 1
+		when: 'Retrieving the Asset Summary Table for planning and non-planning bundles'
+			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, false)
+		then: 'There should be 3 bundles (TBD being the third) and the totals should be 2, except for servers, which should be 4'
+			assetSummaryProject1['assetSummaryList'].size() == 3
+			assetSummaryProject1['totalAsset'] == 4
+			assetSummaryProject1['totalApplication'] == 2
+			assetSummaryProject1['totalDatabase'] == 2
+			assetSummaryProject1['totalPhysical'] == 2
+			assetSummaryProject1['totalFiles'] == 2
+
 	}
 
 	// Helper functions ////////////////////
