@@ -2,19 +2,15 @@ package test
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.TdsUserDetails
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.SpringSecurityService
-import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.codehaus.groovy.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
-import org.quartz.DateBuilder
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
@@ -24,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder
 import spock.lang.Specification
 
 import static org.junit.Assert.fail
-import static org.quartz.DateBuilder.newDate
 
 abstract class AbstractUnitSpec extends Specification {
 	protected static final String USERNAME = '__test_user__'
@@ -118,39 +113,6 @@ abstract class AbstractUnitSpec extends Specification {
 		SecurityContextHolder.context.authentication = new TestingAuthenticationToken(principal, null, authorities)
 
 		return userLogin
-	}
-
-	/**
-	 * This Creates a Mock Project used in Unit Test
-	 * @return a MockProject
-	 */
-	protected Project buildMockProject() {
-		String projectName = 'projectName'
-		String projectDescription = 'description'
-		long projectId = 123
-		String projectCode = 'projectCode'
-		String projectClientName = 'projectClientName'
-		long projectClientId = 321
-		int completionDateYear = 2100
-		int completionDateMonth = DateBuilder.DECEMBER
-		int completionDateDay = 15
-		Date completionDate = newDate()
-			.inYear(completionDateYear)
-			.inMonth(completionDateMonth)
-			.onDay(completionDateDay)
-			.build()
-		completionDate.clearTime()
-
-		Project project = new Project(
-			name: projectName, projectCode: projectCode,
-			completionDate: completionDate, description: projectDescription,
-			client: new PartyGroup(name: projectClientName)
-		)
-
-		project.id = projectId
-		project.client.id = projectClientId
-
-		project
 	}
 
 	protected void initAssociationIds() {
