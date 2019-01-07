@@ -6,7 +6,6 @@ class Tag {
 	String  name
 	String  description = ''
 	Color   color
-	Project project
 	Date    dateCreated
 	Date    lastUpdated
 

@@ -1,9 +1,5 @@
 package net.transitionmanager.domain
-
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.GormUtil
-
-/** 
+/**
  * Indicates what direction that the data is flowing for a data script (in or out)
  */
 enum DataScriptMode {
@@ -48,8 +44,6 @@ class DataScript {
     String target
 
     DataScriptMode mode
-
-    Provider provider
 
     // The etl will contain the source code which will be compiled and executed. Eventually the
     // source code will be broken out and revisioned like how it is done in Recipes.
