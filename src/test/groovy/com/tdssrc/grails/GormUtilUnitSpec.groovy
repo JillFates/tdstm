@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
+import grails.core.GrailsDomainClassProperty
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Memoized
@@ -17,8 +18,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
-import org.grails.core.artefact.DomainClassArtefactHandler
-import grails.core.GrailsDomainClassProperty
 import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll

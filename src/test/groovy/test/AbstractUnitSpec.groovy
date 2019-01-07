@@ -2,7 +2,6 @@ package test
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.TdsUserDetails
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.SpringSecurityService

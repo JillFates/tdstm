@@ -1,8 +1,8 @@
 package com.tdsops.etl
 
+import grails.databinding.SimpleMapDataBindingSource
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.databinding.SimpleMapDataBindingSource
 import spock.lang.Specification
 
 @TestMixin(GrailsUnitTestMixin)
