@@ -65,16 +65,16 @@ class Credential {
 	static constraints = {
 		name size: 1..255, unique: 'project'
 		description size:0..255, blank:true
-		authenticationUrl size:0..255, blank:true, validator: authenticationUrlValidator
-		renewTokenUrl size:0..255, blank: true, validator: renewTokenUrlValidator
+		authenticationUrl size:0..255, blank:true, validator: authenticationUrlValidator()
+		renewTokenUrl size:0..255, blank: true, validator: renewTokenUrlValidator()
 		terminateUrl size:0..255, blank: true
 		username size:1..255
 		password size:1..255
 		salt size:1..16
-		sessionName size:0..255, blank:true, validator: sessionNameValidator
-		validationExpression size: 0..255, blank: true, validator: validationExpressionValidator
-		httpMethod  nullable: true, validator: httpMethodValidator
-		requestMode nullable: true, validator: requestModeValidator
+		sessionName size:0..255, blank:true, validator: sessionNameValidator()
+		validationExpression size: 0..255, blank: true, validator: validationExpressionValidator()
+		httpMethod  nullable: true, validator: httpMethodValidator()
+		requestMode nullable: true, validator: requestModeValidator()
 		lastUpdated nullable: true
 		provider ofSameProject:true
 	}
@@ -125,14 +125,19 @@ class Credential {
 	 * - assert ('double-at@@json:access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
 	 * - assert ('double-colon@json::access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
 	 */
-	static Closure sessionNameValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (StringUtil.isBlank(value)) {
-				return 'default.blank.message'
-			} else {
-				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/)) {
-					return 'credential.invalid.sessionName.value'
+	static Closure sessionNameValidator() {
+		return { value, target ->
+			List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+
+			if (target.authenticationMethod in methodsThatRequireProp) {
+
+				if (StringUtil.isBlank(value)) {
+					return 'default.blank.message'
+				} else {
+
+					if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/)) {
+						return 'credential.invalid.sessionName.value'
+					}
 				}
 			}
 		}
@@ -141,18 +146,21 @@ class Credential {
 	/**
 	 * Used to validate if the validationExpression is syntactically correct
 	 */
-	static Closure validationExpressionValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (StringUtil.isBlank(value)) {
-				return 'default.blank.message'
-			}
-			else {
-				try {
-					new CredentialValidationExpression(value)
-					return true
-				} catch (e) {
-					return 'credential.invalid.validation.expression'
+	static Closure validationExpressionValidator() {
+		return { value, target ->
+			List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+
+			if (target.authenticationMethod in methodsThatRequireProp) {
+
+				if (StringUtil.isBlank(value)) {
+					return 'default.blank.message'
+				} else {
+					try {
+						new CredentialValidationExpression(value)
+						return true
+					} catch (e) {
+						return 'credential.invalid.validation.expression'
+					}
 				}
 			}
 		}
@@ -162,11 +170,15 @@ class Credential {
 	 * Used to validate if the authenticationUrl property is set for AuthenticationMethods that is require a value
 	 * based on the authentication method. This property is required for COOKIE, HEADER and JWT methods.
 	 */
-	static Closure authenticationUrlValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (StringUtil.isBlank(value)) {
-				return 'default.blank.message'
+	static Closure authenticationUrlValidator() {
+		return { value, target ->
+			List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+
+			if (target.authenticationMethod in methodsThatRequireProp) {
+
+				if (StringUtil.isBlank(value)) {
+					return 'default.blank.message'
+				}
 			}
 		}
 	}
@@ -174,14 +186,19 @@ class Credential {
 	/**
 	 * Used to validate if the renewTokenUrl property is set for AuthenticationMethods that require a value
 	 */
-	static Closure renewTokenUrlValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.JWT]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (StringUtil.isBlank(value)) {
-				return 'default.blank.message'
-			}
-			if (value == target.authenticationUrl) { // renewTokenUrl cannot be the same as authenticationUrl
-				return 'credential.invalid.url.value'
+	static Closure renewTokenUrlValidator() {
+		return { value, target ->
+			List methodsThatRequireProp = [AuthenticationMethod.JWT]
+
+			if (target.authenticationMethod in methodsThatRequireProp) {
+
+				if (StringUtil.isBlank(value)) {
+					return 'default.blank.message'
+				}
+
+				if (value == target.authenticationUrl) { // renewTokenUrl cannot be the same as authenticationUrl
+					return 'credential.invalid.url.value'
+				}
 			}
 		}
 	}
@@ -189,12 +206,14 @@ class Credential {
 	/**
 	 * Used to validate if the httpMethod property is set for AuthenticationMethods that require a value
 	 */
-	static Closure httpMethodValidator = { value, target ->
-		// TODO : JPM 2/2018 : Need to validate if JWT is always POST
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null) {
-				return 'default.null.message'
+	static Closure httpMethodValidator() {
+		return { value, target ->
+			// TODO : JPM 2/2018 : Need to validate if JWT is always POST
+			List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+			if (target.authenticationMethod in methodsThatRequireProp) {
+				if (value == null) {
+					return 'default.null.message'
+				}
 			}
 		}
 	}
@@ -202,11 +221,13 @@ class Credential {
 	/**
 	 * Used to validate if the requestMode property is set for AuthenticationMethods that require a value
 	 */
-	static Closure requestModeValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
-		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null) {
-				return 'default.null.message'
+	static Closure requestModeValidator() {
+		return { value, target ->
+			List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+			if (target.authenticationMethod in methodsThatRequireProp) {
+				if (value == null) {
+					return 'default.null.message'
+				}
 			}
 		}
 	}

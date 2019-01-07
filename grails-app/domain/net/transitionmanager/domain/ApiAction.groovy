@@ -1,19 +1,17 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
-import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.connector.CallbackMode
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiActionMethodParam
+import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.grails.web.json.JSONObject
-import groovy.transform.ToString
-import groovy.util.logging.Slf4j
-
-import java.util.regex.Matcher
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -123,8 +121,8 @@ class ApiAction {
 		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
-		credential nullable: true, validator: crossProviderValidator
-		defaultDataScript nullable: true, validator: crossProviderValidator
+		credential nullable: true, validator: crossProviderValidator()
+		defaultDataScript nullable: true, validator: crossProviderValidator()
 		description nullable: true
 		endpointUrl nullable: true, blank: true, validator: ApiAction.&endpointUrlValidator
 		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
@@ -135,8 +133,8 @@ class ApiAction {
 		pollingLapsedAfter min: 0
 		pollingStalledAfter min: 0
 		producesData range:0..1
-		provider validator: providerValidator
-		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
+		provider validator: providerValidator()
+		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator()
 		reactionScriptsValid range: 0..1
 		timeout min:0
 		useWithAsset range: 0..1
@@ -239,47 +237,50 @@ class ApiAction {
 	 * - EVALUATE and SUCCESS are present.
 	 * - DEFAULT or ERROR are present.
 	 */
-	static reactionJsonValidator = { String reactionJsonString, ApiAction apiAction ->
-		JSONObject reactionJson = null
-		try {
-			reactionJson = JsonUtil.parseJson(reactionJsonString)
-		} catch(InvalidParamException e ) {
-			return Message.InvalidFieldForDomain
-		}
+	static Closure reactionJsonValidator() {
+		return { String reactionJsonString, ApiAction apiAction ->
+			JSONObject reactionJson = null
 
-		// STATUS and SUCCESS are mandatory.
-		if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
-			// Either DEFAULT or ERROR need to be specified.
-			if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
-				apiAction.reactionScriptsValid = 0
-				return Message.ApiActionMissingDefaultAndErrorInReactionJson
+			try {
+				reactionJson = JsonUtil.parseJson(reactionJsonString)
+			} catch (InvalidParamException e) {
+				return Message.InvalidFieldForDomain
 			}
-		} else {
-			return Message.ApiActionMissingStatusOrSuccessInReactionJson
-		}
 
-		boolean errors = false
-
-		Set<String> invalidKeys = []
-		// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
-		for (key in reactionJson.keySet()) {
-			if (!ReactionScriptCode.lookup(key)) {
-				log.warn("Unrecognized key $key in reaction JSON.")
-				invalidKeys << key
-				errors = true
+			// STATUS and SUCCESS are mandatory.
+			if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
+				// Either DEFAULT or ERROR need to be specified.
+				if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
+					apiAction.reactionScriptsValid = 0
+					return Message.ApiActionMissingDefaultAndErrorInReactionJson
+				}
+			} else {
+				return Message.ApiActionMissingStatusOrSuccessInReactionJson
 			}
+
+			boolean errors = false
+
+			Set<String> invalidKeys = []
+			// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
+			for (key in reactionJson.keySet()) {
+				if (!ReactionScriptCode.lookup(key)) {
+					log.warn("Unrecognized key $key in reaction JSON.")
+					invalidKeys << key
+					errors = true
+				}
+			}
+
+			// If errors were detected update the reactionJson.
+			if (errors) {
+				reactionJson.keySet().removeAll(invalidKeys)
+				apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
+			}
+
+			apiAction.reactionScriptsValid = errors ? 0 : 1
+
+			// Set to true, otherwise the validation fails.
+			return true
 		}
-
-		// If errors were detected update the reactionJson.
-		if (errors) {
-			reactionJson.keySet().removeAll(invalidKeys)
-			apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
-		}
-
-		apiAction.reactionScriptsValid = errors ? 0 : 1
-
-		// Set to true, otherwise the validation fails.
-		return true
 	}
 
 	/**
@@ -287,23 +288,27 @@ class ApiAction {
 	 * @param value - the value to be set on a property
 	 * @param domainObject - the ApiAction domain object being created/updated
 	 */
-	static providerValidator = { Provider providerObject, ApiAction domainObject ->
-		Long providerProjectId=0
-		if (providerObject.project) {
-			providerProjectId = providerObject.project.id
-		} else {
-			// Need to use a new session to fetch the Provider so as not to mess up the current
-			// objects in the session.
-			Provider.withNewSession {
-				Provider p = Provider.read(providerObject.id)
-				if (p) {
-					providerProjectId = p.project.id
+	static Closure providerValidator() {
+		return { Provider providerObject, ApiAction domainObject ->
+			Long providerProjectId = 0
+
+			if (providerObject.project) {
+				providerProjectId = providerObject.project.id
+			} else {
+				// Need to use a new session to fetch the Provider so as not to mess up the current
+				// objects in the session.
+				Provider.withNewSession {
+					Provider p = Provider.read(providerObject.id)
+
+					if (p) {
+						providerProjectId = p.project.id
+					}
 				}
 			}
-		}
 
-		if ( providerProjectId != domainObject.project.id) {
-			return Message.InvalidFieldForDomain
+			if (providerProjectId != domainObject.project.id) {
+				return Message.InvalidFieldForDomain
+			}
 		}
 	}
 
@@ -312,28 +317,31 @@ class ApiAction {
 	 * @param value - the value to be set on a property
 	 * @param domainObject - the ApiAction domain object being created/updated
 	 */
-	static crossProviderValidator = { value, ApiAction domainObject ->
-		if (! value) {
-			return true
-		}
+	static Closure crossProviderValidator() {
+		return { value, ApiAction domainObject ->
+			if (!value) {
+				return true
+			}
 
-		Long valueProviderId = 0
+			Long valueProviderId = 0
 
-		if (value.provider) {
-			valueProviderId = value.provider.id
-		} else {
-			// Need to use a new session to fetch the Domain so as not to mess up the current
-			// objects in the session.
-			value.class.withNewSession {
-				def obj = value.class.read(value.id)
-				if (obj) {
-					valueProviderId = obj.provider.id
+			if (value.provider) {
+				valueProviderId = value.provider.id
+			} else {
+				// Need to use a new session to fetch the Domain so as not to mess up the current
+				// objects in the session.
+				value.class.withNewSession {
+					def obj = value.class.read(value.id)
+
+					if (obj) {
+						valueProviderId = obj.provider.id
+					}
 				}
 			}
-		}
 
-		if ( valueProviderId !=  domainObject.provider.id) {
-			return Message.InvalidFieldForDomain
+			if (valueProviderId != domainObject.provider.id) {
+				return Message.InvalidFieldForDomain
+			}
 		}
 	}
 

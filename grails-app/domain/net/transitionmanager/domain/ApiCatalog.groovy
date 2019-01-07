@@ -32,7 +32,7 @@ class ApiCatalog {
 
 	static constraints = {
 		name size: 1..255, unique: ['project', 'provider']
-		dictionary size: 1..65535, blank: false, validator: dictionaryJsonValidator
+		dictionary size: 1..65535, blank: false, validator: dictionaryJsonValidator()
 		dictionaryTransformed size: 1..65535, blank: false
 
 		provider ofSameProject: true
@@ -48,19 +48,22 @@ class ApiCatalog {
 	 * Custom validator for the dictionaryJson that evaluates that:
 	 * - The string is a valid JSON.
 	 */
-	static dictionaryJsonValidator = { String dictionaryJsonString, ApiCatalog domainObject ->
-		String dictionaryJson = null
-		try {
-			dictionaryJson = JsonUtil.validateJson(dictionaryJsonString)
+	static Closure dictionaryJsonValidator() {
+		return { String dictionaryJsonString, ApiCatalog domainObject ->
+			String dictionaryJson = null
 
-			// Add additional validations on dictionaryJson
-			ApiCatalogUtil.validateDictionary(dictionaryJson)
-		} catch(InvalidParamException e) {
-			return Message.InvalidFieldForDomain
+			try {
+				dictionaryJson = JsonUtil.validateJson(dictionaryJsonString)
+
+				// Add additional validations on dictionaryJson
+				ApiCatalogUtil.validateDictionary(dictionaryJson)
+			} catch(InvalidParamException e) {
+				return Message.InvalidFieldForDomain
+			}
+
+			// Set to true, otherwise the validation fails.
+			return true
 		}
-
-		// Set to true, otherwise the validation fails.
-		return true
 	}
 
 	/**

@@ -11,19 +11,19 @@ import com.tdssrc.grails.TimeUtil
 class Dataview {
 
 	Project project
-	Person person
-	String name
+	Person  person
+	String  name
 	Boolean isSystem
 	Boolean isShared
-	String reportSchema
-	Date dateCreated
-	Date lastModified
+	String  reportSchema
+	Date    dateCreated
+	Date    lastModified
 
-    static constraints = {
-			name size: 1..255, unique: 'project', validator: uniqueNameValidator
-			person nullable: true
-			lastModified nullable: true
-    }
+	static constraints = {
+		name size: 1..255, unique: 'project', validator: uniqueNameValidator()
+		person nullable: true
+		lastModified nullable: true
+	}
 
 	static mapping = {
 		name sqltype: 'varchar(255)'
@@ -37,16 +37,16 @@ class Dataview {
 	Map toMap(Long currentPersonId) {
 
 		Map data = [
-				id				: id,
-				name			: name,
-				isSystem		: isSystem,
-				isShared		: isShared,
-				isOwner			: isOwner(currentPersonId),
-				isFavorite		: isFavorite(currentPersonId),
-				schema			: JsonUtil.parseJson(reportSchema),
-				createdBy		: getOwnerName(),
-				createdOn		: TimeUtil.formatDate(dateCreated),
-				updatedOn		: TimeUtil.formatDate(lastModified)
+			id        : id,
+			name      : name,
+			isSystem  : isSystem,
+			isShared  : isShared,
+			isOwner   : isOwner(currentPersonId),
+			isFavorite: isFavorite(currentPersonId),
+			schema    : JsonUtil.parseJson(reportSchema),
+			createdBy : getOwnerName(),
+			createdOn : TimeUtil.formatDate(dateCreated),
+			updatedOn : TimeUtil.formatDate(lastModified)
 		]
 		return data
 	}
@@ -56,7 +56,7 @@ class Dataview {
 	 * @param currentPersonId current person in session.
 	 * @return boolean
 	 */
-	boolean isOwner (Long currentPersonId) {
+	boolean isOwner(Long currentPersonId) {
 		if (!person) {
 			return false
 		} else {
@@ -99,17 +99,19 @@ class Dataview {
 	/**
 	 * Used to validate that name is unique within the project
 	 */
-	static Closure uniqueNameValidator = { value, target ->
-		int count = Dataview.where {
-			project == target.project
-			name == value
-			if (id) {
-				id != target.id
-			}
-		}.count()
+	static Closure uniqueNameValidator() {
+		return { value, target ->
+			int count = Dataview.where {
+				project == target.project
+				name == value
+				if (id) {
+					id != target.id
+				}
+			}.count()
 
-		if (count > 0) {
-			return 'default.not.unique.message'
+			if (count > 0) {
+				return 'default.not.unique.message'
+			}
 		}
 	}
 }
