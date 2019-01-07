@@ -13,10 +13,10 @@ let shell = require('gulp-shell');
  * What this task do is to compile the SASS file and generate a map that can be view from modern browser
  */
 gulp.task('sass-compiler', function () {
-	return gulp.src('./web-app/css/tds-style.sass')
+	return gulp.src('./src/main/webapp/css/tds-style.sass')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
-		.pipe(gulp.dest('./web-app/css'));
+		.pipe(gulp.dest('./src/main/webapp/css'));
 });
 
 /**
@@ -25,13 +25,13 @@ gulp.task('sass-compiler', function () {
  * it will run until stop, searching for changes on any SASS file, compiles and ready to use
  */
 gulp.task('sass:watch', function () {
-	return gulp.watch('./web-app/css/**/*.sass', function () {
-		gulp.src('./web-app/css/tds-style.sass')
+	return gulp.watch('./src/main/webapp/css/**/*.sass', function () {
+		gulp.src('./src/main/webapp/css/tds-style.sass')
 			.pipe(sourceMaps.init())
 			.pipe(sass({errLogToConsole: true}))
 			.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 			.pipe(sourceMaps.write())
-			.pipe(gulp.dest('./web-app/css'))
+			.pipe(gulp.dest('./src/main/webapp/css'))
 	});
 });
 

@@ -37,7 +37,7 @@ var taskPath = "./gulp-tasks";
 gulp.task('build', ['build-app', 'build-vendor']);
 
 gulp.task('build-app', ['clean-app', 'validate-js'], function () {
-    var generatedFile = 'web-app/dist/App.js',
+    var generatedFile = './src/main/webapp/dist/App.js',
         browserifyProcesor;
 
     console.error('Compiling App.js file.');
