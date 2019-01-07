@@ -19,8 +19,9 @@ class CreateViewModule extends Module {
         previewBtn                   {$("button",text:"Preview")}
         filterBtn                    {$("button",text:"Filter")}
         clearSearchBtn               {searchField.siblings()}
-        saveBtn                      {$("button", text:"Save")}
-        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}
+        saveBtn                      {$("button", text:"Save")}//#btnSave
+        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
+        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
         saveAs                       {$("a",text:"Save As")}
         closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
