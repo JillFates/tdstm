@@ -18,6 +18,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 })
 export class LicenseDetailComponent implements OnInit {
 
+	private dataSignature: string;
 	protected environmentList: any = [];
 	protected projectList: any = [];
 	protected dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
@@ -29,6 +30,7 @@ export class LicenseDetailComponent implements OnInit {
 	protected activeShowMode = false;
 	protected range = { start: null, end: null };
 	protected licenseKey = 'Licenses has not been issued';
+	protected reloadRequired = false;
 
 	constructor(
 		public licenseModel: LicenseModel,
@@ -50,6 +52,7 @@ export class LicenseDetailComponent implements OnInit {
 
 		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
 			this.licenseModel = licenseModel;
+			this.dataSignature = JSON.stringify(this.licenseModel);
 			this.prepareControlActionButtons();
 			this.prepareLicenseKey();
 		})
@@ -65,7 +68,7 @@ export class LicenseDetailComponent implements OnInit {
 	}
 
 	private prepareLicenseKey(): void {
-		if(this.licenseModel.status === 'ACTIVE') {
+		if (this.licenseModel.status === 'ACTIVE') {
 			this.licenseManagerService.getKeyCode(this.licenseModel.id).subscribe((licenseKey: any) => {
 				this.licenseKey = licenseKey;
 			});
@@ -93,7 +96,15 @@ export class LicenseDetailComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		if (this.editMode) {
+			this.editMode = false;
+			this.licenseModel = JSON.parse(this.dataSignature);
+			this.prepareControlActionButtons();
+		} else if (this.reloadRequired) {
+			this.activeDialog.close();
+		} else {
+			this.activeDialog.dismiss();
+		}
 	}
 
 	/**
