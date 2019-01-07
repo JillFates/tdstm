@@ -14,7 +14,7 @@ import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
+import groovy.transform.Memoized
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
@@ -28,15 +28,13 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.springframework.beans.factory.InitializingBean
-import javax.management.RuntimeErrorException
 
+import javax.management.RuntimeErrorException
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
 @Transactional(readOnly = true)
-@Slf4j
-class FileSystemService implements InitializingBean {
+class FileSystemService {
 	public static final String ETL_SAMPLE_DATA_PREFIX = 'EtlSampleData_'
 	public static final String ETL_SOURCE_DATA_PREFIX = 'EtlSourceData_'
 
@@ -54,14 +52,15 @@ class FileSystemService implements InitializingBean {
     CoreService coreService
     SecurityService securityService
 
-    void afterPropertiesSet() throws Exception {
+	@Memoized
+	String getTemporaryDirectory() {
         // Load the temporary directory name and make sure that it has the
-        String appTempDirectory = coreService.getAppTempDirectory()
+		temporaryDirectory = coreService.getAppTempDirectory()
 
-        if (! appTempDirectory.endsWith(File.separator)) {
-            temporaryDirectory = appTempDirectory + File.separator
+        if (! temporaryDirectory.endsWith(File.separator)) {
+            return temporaryDirectory + File.separator
         } else {
-            temporaryDirectory = appTempDirectory
+            return temporaryDirectory
         }
     }
 
