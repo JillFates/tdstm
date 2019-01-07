@@ -185,7 +185,7 @@ declare var jQuery: any;
 							[id]="'dependent-delete-button-' + rowIndex"
 							class="command-delete"
 							[action]="ButtonActions.GenericDelete"
-							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
+							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">
 						</tds-button>
                     </div>
                 </ng-template>
