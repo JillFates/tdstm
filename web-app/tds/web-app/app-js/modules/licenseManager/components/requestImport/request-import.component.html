@@ -1,0 +1,25 @@
+<div class="modal-content data-script-view-edit-component"  #requestImportLicenseContainer>
+	<div class="modal-header">
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<h4 class="modal-title">{{ 'LICENSE.IMPORT_LICENSE_REQUEST' | translate }}</h4>
+	</div>
+	<div class="modal-body">
+		<form name="applyLicenseForm" role="form" data-toggle="validator" #applyLicenseForm='ngForm' class="form-horizontal left-alignment">
+			<div class="form-group">
+				<label class="col-md-12 control-label">{{ 'LICENSE.PASTE_LICENSE_BLOCK' | translate }}</label>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-12">
+					<textarea id="licenseKeyText" name="licenseKeyText" class="form-control" rows="8" [(ngModel)]="licenseKey" placeholder="Paste license block text here" required></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer form-group-center">
+		<button (click)="applyKey()" [disabled]="!applyLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
+		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+			<span class="glyphicon glyphicon-ban-circle"></span>
+			<span>{{'GLOBAL.CLOSE' | translate }}</span>
+		</button>
+	</div>
+</div>

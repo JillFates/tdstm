@@ -10,12 +10,18 @@ let sourceMaps = require('gulp-sourcemaps');
 let shell = require('gulp-shell');
 
 gulp.task('sass-main-style', function () {
-	return gulp.src('../web-app/css/style.sass')
+	return gulp.src('../../web-app/css/style.sass')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
-		.pipe(gulp.dest('../web-app/css'));
+		.pipe(gulp.dest('../../web-app/css'));
 });
 
+gulp.task('sass-manager-compiler', function () {
+	return gulp.src('../../web-app/css/managerStyle.scss')
+		.pipe(sass({errLogToConsole: true}))
+		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
+		.pipe(gulp.dest('../../web-app/css'));
+});
 
 gulp.task('sass-angular-compiler', function () {
 	return gulp.src('./web-app/css/style.sass')
@@ -24,13 +30,12 @@ gulp.task('sass-angular-compiler', function () {
 		.pipe(gulp.dest('./web-app/css'));
 });
 
-gulp.task('sass-manager-compiler', function () {
-	return gulp.src('../../../web-app/css/managerStyle.sass')
+gulp.task('sass-angular-manager-compiler', function () {
+	return gulp.src('./web-app/css/managerStyle.scss')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 		.pipe(gulp.dest('./web-app/css'));
 });
-
 
 gulp.task('build-test', shell.task(['karma start karma.conf.js']));
 gulp.task('build-test-report', shell.task(['karma start karma.production.conf.js']));

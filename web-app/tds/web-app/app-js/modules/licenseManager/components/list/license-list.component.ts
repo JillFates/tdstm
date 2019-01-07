@@ -2,7 +2,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Component
-// import {RequestLicenseComponent} from '../request/request-license.component';
+import {RequestImportComponent} from '../requestImport/request-import.component';
 // import {CreatedLicenseComponent} from '../created-license/created-license.component';
 // import {LicenseDetailComponent} from '../detail/license-detail.component';
 // Service
@@ -27,7 +27,7 @@ import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-license-list',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/list/license-list.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/licenseManager/components/list/license-list.component.html'
 })
 export class LicenseListComponent implements OnInit {
 
@@ -131,19 +131,16 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	/**
-	 * Request a New License
+	 * Import a new Request License
 	 */
-	protected onCreateLicense(): void {
-		// this.dialogService.open(RequestLicenseComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
-		// 	setTimeout(() => {
-		// 		this.openCreatedLicenseDialog(requestLicenseModel);
-		// 	}, 500);
-		// 	if (requestLicenseModel) {
-		// 		this.reloadData();
-		// 	}
-		// }).catch(result => {
-		// 	console.log('Dismissed Dialog');
-		// });
+	protected onImportLicenseRequest(): void {
+		this.dialogService.open(RequestImportComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
+			if (requestLicenseModel) {
+				this.reloadData();
+			}
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	/**
