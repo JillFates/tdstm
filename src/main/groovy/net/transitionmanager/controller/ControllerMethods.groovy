@@ -416,10 +416,6 @@ trait ControllerMethods {
 
 	// void validateCommand(net.transitionmanager.command.CredentialCommand co) {
 	void validateCommandObject(Object co) {
-		// TODO : JPM 2/2018 : Change validateCommandObject so that it detects and throws exception if a non-command object
-		if (! co.getClass().isAnnotationPresent(grails.validation.Validateable.class)) {
-			throw new RuntimeException('validateCommandObject with object that does not implement the grails.validation.Validateable trait')
-		}
 		if (! co.validate()) {
 			String msg = GormUtil.allErrorsString(co)
 			// Call the invalidParamExceptionHandler
