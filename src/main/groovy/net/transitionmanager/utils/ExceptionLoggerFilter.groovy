@@ -1,3 +1,5 @@
+package net.transitionmanager.utils
+
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
