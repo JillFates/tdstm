@@ -1,8 +1,6 @@
 package com.tdsops.common.security
 
-import grails.test.GrailsUnitTestCase
-
-class SecurityUtilTests extends GrailsUnitTestCase {
+class SecurityUtilTests {
 
 	/*
 	 * Tests encrypt a valid value

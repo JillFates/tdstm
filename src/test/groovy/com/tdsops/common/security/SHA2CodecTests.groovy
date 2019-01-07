@@ -1,8 +1,6 @@
 package com.tdsops.common.security
 
-import grails.test.GrailsUnitTestCase
-
-class SHA2CodecTests extends GrailsUnitTestCase {
+class SHA2CodecTests {
 
 	/*
 	 * Tests encode using system salt prefix
