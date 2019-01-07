@@ -1,20 +1,17 @@
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.EventService
-import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.service.MoveEventService
-
 /**
  * Handles WS calls of the EventService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsEventController')
 class WsEventController implements ControllerMethods {
 
 	EventService eventService

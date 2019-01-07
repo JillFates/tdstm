@@ -40,7 +40,6 @@ import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-@Slf4j(value='logger')
 @Transactional
 class MoveBundleService implements ServiceMethods {
 
@@ -91,7 +90,7 @@ class MoveBundleService implements ServiceMethods {
 				dashboardSteps << [step :it, moveBundleStep: moveBundleStep, stepSnapshot: stepSnapshot]
 			}
 		} catch(NullPointerException e) {
-			logger.error e.message, e
+			log.error e.message, e
 		}
 
 		[dashboardSteps: dashboardSteps, remainingSteps: moveBundleSteps?.transitionId]
@@ -259,7 +258,7 @@ class MoveBundleService implements ServiceMethods {
 			return "MoveBundle $moveBundle deleted"
 		}
 		catch (e) {
-			logger.error e.message, e
+			log.error e.message, e
 			transactionStatus.setRollbackOnly()
 			return "Unable to delete bundle " + moveBundle.name
 		}
@@ -482,7 +481,7 @@ class MoveBundleService implements ServiceMethods {
 			tagMatch: tagMatch
 		]
 
-		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
+		log.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
 		return map
 	}
@@ -506,7 +505,7 @@ class MoveBundleService implements ServiceMethods {
 		if(moveEvent.project.runbookOn ==1){
 			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent , dialIndicator: dialIndicator)
 			if (!moveEventSnapshot.save()){
-				logger.error('Unable to save changes to MoveEventSnapshot: {}', moveEventSnapshot)
+				log.error('Unable to save changes to MoveEventSnapshot: {}', moveEventSnapshot)
 			}
 		}
 	}
@@ -540,7 +539,7 @@ class MoveBundleService implements ServiceMethods {
 				int rowIdx = r - startRow
 				boolean isNumber=false
 				def currentTask = exportList[rowIdx]
-				// logger.debug '*** attribName isa {} {}', attribName.getClass().name, it instanceof Closure
+				// log.debug '*** attribName isa {} {}', attribName.getClass().name, it instanceof Closure
 				switch (attribName) {
 					case { it instanceof Closure }:
 						cellValue = attribName.call(currentTask)
@@ -673,20 +672,20 @@ class MoveBundleService implements ServiceMethods {
 
 			def results = searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes)
 
-			logger.info 'Dependency groups generation - Search assets and dependencies time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Search assets and dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 20I, ProgressService.STARTED, "Load asset results")
 
 			def graph = new AssetGraph()
 			graph.loadFromResults(results)
 
-			logger.info 'Dependency groups generation - Load results time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Load results time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 30I, ProgressService.STARTED, "Clean dependencies")
 
 			cleanDependencyGroupsStatus(projectId)
 
-			logger.info 'Dependency groups generation - Clean dependencies time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Clean dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 40I, ProgressService.STARTED, "Group dependencies")
 
@@ -694,26 +693,26 @@ class MoveBundleService implements ServiceMethods {
 			groups.sort { a, b -> b.size() <=> a.size() }
 
 
-			logger.info 'Dependency groups generation - Group dependencies time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Group dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 70I, ProgressService.STARTED, "Save dependencies")
 
 			saveDependencyGroups(project, groups, sqlTime)
 
-			logger.info 'Dependency groups generation - Save dependencies time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Save dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 80I, ProgressService.STARTED, "Add straggles assets")
 
 			// Last step is to put all the straggler assets that were not grouped into group 0
 			addStragglerDepsToGroupZero(projectId, moveBundleText, sqlTime)
 
-			logger.info 'Dependency groups generation - Add straggles time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Add straggles time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 90I, ProgressService.STARTED, "Finishing")
 
 			graph.destroy()
 
-			logger.info 'Dependency groups generation - Destroy graph time {}', TimeUtil.elapsed(started)
+			log.info 'Dependency groups generation - Destroy graph time {}', TimeUtil.elapsed(started)
 			started = new Date()
 			progressService.update(progressKey, 100I, ProgressService.COMPLETED, "Finished")
 
@@ -756,7 +755,7 @@ class MoveBundleService implements ServiceMethods {
 				filterOptionsCriteria  +
 				"ORDER BY assetId DESC  "
 
-		logger.info 'SQL used to find assets: {}', queryForAssets
+		log.info 'SQL used to find assets: {}', queryForAssets
 		return jdbcTemplate.queryForList(queryForAssets)
 	}
 
@@ -924,7 +923,7 @@ class MoveBundleService implements ServiceMethods {
 			return moveBundle
 		}
 
-		logger.info("Error updating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
+		log.info("Error updating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
 		throw new DomainUpdateException("Error updating MoveBundle.")
 
 	}
@@ -943,7 +942,7 @@ class MoveBundleService implements ServiceMethods {
 			return moveBundle
 		}
 
-		logger.info("Error creating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
+		log.info("Error creating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
 		throw new ServiceException("Error creating MoveBundle.")
 	}
 }

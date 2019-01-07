@@ -6,7 +6,6 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.Party
@@ -22,7 +21,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
 
-@Slf4j(value='logger')
 @Transactional
 class PartyRelationshipService implements ServiceMethods {
 
@@ -52,7 +50,7 @@ class PartyRelationshipService implements ServiceMethods {
 			}
 			return partyRelationship
 		} catch (e) {
-			logger.error 'savePartyRelationship() had exception {}: {}',
+			log.error 'savePartyRelationship() had exception {}: {}',
 				e.message, ExceptionUtil.stackTraceToString(e)
 		}
 	}
@@ -576,7 +574,7 @@ class PartyRelationshipService implements ServiceMethods {
 				companies << project.client
 			}
 		} else {
-			logger.error("PartyRelationshipService::getProjectCompanies called with no project.")
+			log.error("PartyRelationshipService::getProjectCompanies called with no project.")
 		}
 
 		return companies
@@ -860,7 +858,7 @@ class PartyRelationshipService implements ServiceMethods {
 
 		if (! functionRoleType) {
 			msg =  "Invalid role type $functionName"
-			logger.error 'AddStaffFunction() {}', msg
+			log.error 'AddStaffFunction() {}', msg
 			throw new RuntimeException(msg)
 		}
 
@@ -876,7 +874,7 @@ class PartyRelationshipService implements ServiceMethods {
 			)
 			if (! pr.save(flush:true)) {
 				msg = "Unable to create Company/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
-				logger.error 'AddStaffFunction() {}', msg
+				log.error 'AddStaffFunction() {}', msg
 				throw new RuntimeException(msg)
 			}
 		}
@@ -893,7 +891,7 @@ class PartyRelationshipService implements ServiceMethods {
 				)
 				if (! pr.save(flush:true)) {
 					msg = "Unable to create Project/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
-					logger.error 'AddStaffFunction() {}', msg
+					log.error 'AddStaffFunction() {}', msg
 					throw new RuntimeException(msg)
 				}
 			}
@@ -908,7 +906,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	void updateAssignedTeams(Person person, List<String> teamCodes) {
 
-		boolean debugEnabled = logger.debugEnabled
+		boolean debugEnabled = log.debugEnabled
 
 		List<String> allTeamCodes = getTeamCodes()
 		//if there are codes that are not part of TEAMCODES those CANNOT be assigned.
@@ -930,7 +928,7 @@ class PartyRelationshipService implements ServiceMethods {
 		List<PartyRelationship> toDelete = PartyRelationship.executeQuery(query,
 				[type: 'STAFF', typeFrom: 'COMPANY', person: person, teams: teamsToRemove])
 		if (toDelete) {
-			logger.debug 'updateAssignedTeams() for {} - removing Company Team assignments {}', person, toDelete*.roleTypeCodeTo.id
+			log.debug 'updateAssignedTeams() for {} - removing Company Team assignments {}', person, toDelete*.roleTypeCodeTo.id
 			toDelete*.delete()
 		}
 
@@ -940,7 +938,7 @@ class PartyRelationshipService implements ServiceMethods {
 		if (toDelete) {
 			if (debugEnabled) {
 				List deleteDetail = toDelete.collect { "Project: $it.partyIdFrom Team: $it.roleTypeCodeTo.id" }
-				logger.debug 'updateAssignedTeams() for {} - removing Project Team assignments {}', person, deleteDetail
+				log.debug 'updateAssignedTeams() for {} - removing Project Team assignments {}', person, deleteDetail
 			}
 			toDelete*.delete(flush:true)
 		}
@@ -952,7 +950,7 @@ class PartyRelationshipService implements ServiceMethods {
 		if (moveEventsToDelete) {
 			if (debugEnabled) {
 				List deleteDetails = moveEventsToDelete.collect { "Event: $it.moveEvent Team: $it.role.id" }
-				logger.debug 'updateAssignedTeams() for {} - removing team event assignments {}', person, deleteDetails
+				log.debug 'updateAssignedTeams() for {} - removing team event assignments {}', person, deleteDetails
 			}
 			moveEventsToDelete*.delete(flush:true)
 		}
@@ -963,7 +961,7 @@ class PartyRelationshipService implements ServiceMethods {
 			List<String> existingTeamCodes = getCompanyStaffFunctions(personCompany?.id, person.id)*.id
 			List<String> teamsToAssign = teamCodes - existingTeamCodes
 			if (teamsToAssign) {
-				logger.debug 'updateAssignedTeams() for {} - adding team assignments {}', person, teamsToAssign
+				log.debug 'updateAssignedTeams() for {} - adding team assignments {}', person, teamsToAssign
 				PartyRelationshipType coStaffPRType = PartyRelationshipType.load('STAFF')
 				RoleType coRoleType = RoleType.load('COMPANY')
 
@@ -1087,16 +1085,16 @@ class PartyRelationshipService implements ServiceMethods {
 			)"""
 
 		Set projects = PartyRelationship.executeQuery(query, args)
-		logger.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
+		log.debug 'companyProjects() for company {} : list 1 : projects {}', company, projects*.id
 		// Add to the list those that for clients
 		if (project && ! projects.contains(project) && project.client == company) {
 			projects = [project]
-			logger.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
+			log.debug 'companyProjects() for company {} : list 2 : projects {}', company, projects*.id
 		} else {
 			List clientProjects = Project.findAllByClient(company)
 			if (clientProjects) {
 				projects += clientProjects
-				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
+				log.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
 		}
 		if (projects && sortOn ) {

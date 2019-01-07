@@ -1,21 +1,16 @@
 
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyRelationshipType
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.security.Permission
@@ -24,7 +19,6 @@ import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-@Slf4j(value='logger', category='grails.app.controllers.ProjectUtilController')
 class ProjectUtilController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate

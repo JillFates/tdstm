@@ -34,7 +34,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.sql.Timestamp
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-@Slf4j(value='logger', category='grails.app.controllers.MoveEventController')
 class MoveEventController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
@@ -382,7 +381,7 @@ class MoveEventController implements ControllerMethods {
 			Map<String, ?> result = moveEventService.exportRunbookToExcel(moveEvent, updateRunbookVersion)
 			ExportUtil.sendWorkbook(result['book'] as Workbook, response, result['filename'] as String)
 		} catch(ServiceException e) {
-			logger.error('Error exporting Runbook to Excel', e)
+			log.error('Error exporting Runbook to Excel', e)
 		}
 	}
 
@@ -398,14 +397,14 @@ class MoveEventController implements ControllerMethods {
 		// 	if (params.moveEventId.isNumber()) {
 		def moveEvent = MoveEvent.get(params.moveEventId)
 		if (!moveEvent) {
-			logger.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
+			log.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
 
 			render 'An unexpected condition with the event occurred that is preventing an update.'
 			return
 		}
 
 		if (!securityService.isCurrentProjectId(moveEvent.project.id)) {
-			logger.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
+			log.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
 			render 'An unexpected condition with the event occurred that is preventing an update'
 			return
 		}

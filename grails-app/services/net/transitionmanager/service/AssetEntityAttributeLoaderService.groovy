@@ -14,7 +14,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
+import grails.util.GrailsClassUtils
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Manufacturer
@@ -27,9 +27,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Sheet
-import grails.util.GrailsClassUtils
 
-@Slf4j(value='logger')
 class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	PartyRelationshipService partyRelationshipService
@@ -70,10 +68,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		def errorConflictCount = 0
 
 		def modifiedSinceExport = (asset.lastUpdated && asset.lastUpdated >= dataTransferBatch.exportDatetime)
-		logger.info 'importValidation() asset lastUpdated={}, exportDatetime={}, modifiedSinceExport={}', asset.lastUpdated, dataTransferBatch.exportDatetime, modifiedSinceExport
+		log.info 'importValidation() asset lastUpdated={}, exportDatetime={}, modifiedSinceExport={}', asset.lastUpdated, dataTransferBatch.exportDatetime, modifiedSinceExport
 
 		if (modifiedSinceExport) {
-			logger.info 'importValidation() Asset $asset was modified at {}, after the export at {}', asset, asset.lastUpdated, dataTransferBatch.exportDatetime
+			log.info 'importValidation() Asset $asset was modified at {}, after the export at {}', asset, asset.lastUpdated, dataTransferBatch.exportDatetime
 			// If the asset has been modified, see how many of the fields are in conflict
 			dtvList.each { dtValue ->
 				String attribName = dtValue.fieldName
@@ -100,7 +98,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						}
 					} catch (Exception ex) {
 						// TODO - JM 10/2013 - nothing? really? if the parseInt fails shouldn't it be an error?
-						logger.error 'importValidation() failed parseInt most likely'
+						log.error 'importValidation() failed parseInt most likely'
 					}
 				} else {
 					if (attribName.contains('.')) {
@@ -131,7 +129,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		dtValue.hasError = 1
 		dtValue.errorText = "change conflict"
 		dtValue.save(flush:true)
-		logger.warn 'Conflict in change: {}', dtValue
+		log.warn 'Conflict in change: {}', dtValue
 	}
 
 	/* To get DataTransferValue Asset MoveBundle
@@ -202,13 +200,13 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			String dtlc = deviceType.toLowerCase()
 			if (deviceTypeMap.containsKey(dtlc)) {
 				deviceType = deviceTypeMap[dtlc]
-				logger.debug '{} Found {} in deviceTypeMap', methodName, dtlc
+				log.debug '{} Found {} in deviceTypeMap', methodName, dtlc
 				invalidDeviceType = false
 				haveDeviceType = true
 			}
 		}
 
-		logger.debug '**** {} mfgNameParam={}, modelNameParam={}, deviceType=({}/{}), deviceExists={}, haveDeviceType={}, invalidDeviceType={}',
+		log.debug '**** {} mfgNameParam={}, modelNameParam={}, deviceType=({}/{}), deviceExists={}, haveDeviceType={}, invalidDeviceType={}',
 				methodName, mfgNameParam, modelNameParam, deviceTypeParam, deviceType, deviceExists, haveDeviceType, invalidDeviceType
 
 		// Some common error/warning messages used below
@@ -228,7 +226,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			device.manufacturer = modelObj.manufacturer
 			device.assetType = modelObj.assetType
 
-			logger.debug '{}.performAssignment() model={}', methodName, modelObj
+			log.debug '{}.performAssignment() model={}', methodName, modelObj
 
 			// Add a few possible warning messages
 //			if (! device.isaBlade() && usize?.size() && usize!= modelObj.usize) {
@@ -249,7 +247,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		// @param createModelName - the name of the model to create
 		// @note This will assume the usize and deviceType from the local scope variables
 		def performCreateMfgModel = { mfgObj, createModelName, createDeviceType, createUsize ->
-			logger.debug '{}.performCreateMfgModel() mfg={}, createModelName={}, createDeviceType={}, createUsize={}',
+			log.debug '{}.performCreateMfgModel() mfg={}, createModelName={}, createDeviceType={}, createUsize={}',
 					methodName, mfgObj, createModelName, createDeviceType, createUsize
 
 			if (mfgObj instanceof String) {
@@ -264,7 +262,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						return
 					}
 
-					logger.info '{}.performCreateMfgModel() Manufacturer {} was just created (${})', methodName, mfgName, mfg.id
+					log.info '{}.performCreateMfgModel() Manufacturer {} was just created (${})', methodName, mfgName, mfg.id
 					mfgWasCreated = true
 				} else {
 					errorMsg = "You do not have permission to create manufacturer ($mfgName)"
@@ -283,7 +281,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					modelWasCreated = true
 					performAssignment(model)
 					assetOptionsService.findOrCreate(AssetOptions.AssetOptionsType.ASSET_TYPE, createDeviceType)
-					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
+					log.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
 				} catch (e) {
 					errorMsg = e.message
 				}
@@ -294,7 +292,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 		// Helper closure used to setup various variables for when we'll create/assign an Unknown Mfg/Model
 		def performUnknownAssignment = {
-			logger.debug '{}.performUnknownAssignment() modelName={}, deviceType={}', methodName, modelName, deviceType
+			log.debug '{}.performUnknownAssignment() modelName={}, deviceType={}', methodName, modelName, deviceType
 			if (! unknownMfg) {
 				errorMsg = "Unable to find the 'Unknown' manufacturer"
 			} else {
@@ -321,18 +319,18 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					if (haveDeviceType && deviceType!= device.model.assetType) {
 						warningMsg = "Specific device type ($deviceTypeParam) does not match the asset's exiting model type ($device.model.assetType})"
 					}
-					logger.debug '{} CASE 112/114', methodName
+					log.debug '{} CASE 112/114', methodName
 					cachable = false
 				} else {
 					if (haveDeviceType &&!invalidDeviceType) {
-						logger.debug '{} CASE 112', methodName
+						log.debug '{} CASE 112', methodName
 						performUnknownAssignment()
 					} else {
 						if (haveDeviceType && invalidDeviceType) {
-							logger.debug '{} CASE 114', methodName
+							log.debug '{} CASE 114', methodName
 							errorMsg = "An invalid device type ($deviceTypeParam) was specified"
 						} else {
-							logger.debug '{} CASE 111', methodName
+							log.debug '{} CASE 111', methodName
 							errorMsg = 'A Model Name plus Mfg Name or Device Type are required'
 						}
 					}
@@ -356,7 +354,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			if (mfgList.size() > 1) {
 				// Check to see if we found more than one manufacturer / model combination
 				// Note that this should be nearly impossible unless someone screws up with the aliases some how
-				logger.error 'Manufacturer name ({}) is not unique and should be corrected : {}', mfgName, mfgList
+				log.error 'Manufacturer name ({}) is not unique and should be corrected : {}', mfgName, mfgList
 				errorMsg = "Manufacturer ($mfgNameParam) must be unique"
 				break
 			}
@@ -373,21 +371,21 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			// Case when user has supplied a valid/existing Mfg
 			//
 			if (mfgList) {
-				logger.debug '{} We have manufacturer(s) {}', methodName, mfgList.size()
+				log.debug '{} We have manufacturer(s) {}', methodName, mfgList.size()
 				//
 				// Case when we don't have a model
 				//
 				if (! haveModelName) {
 					if (haveDeviceType &&!invalidDeviceType) {
 						warningMsg = StringUtil.concat(warningMsg, "Incomplete Mfg/Model/Type therefore it was set to 'Unknown/Unknown - $deviceType'", delim)
-						logger.debug '{} CASE 212', methodName
+						log.debug '{} CASE 212', methodName
 						performUnknownAssignment()
 					} else {
 						if (haveDeviceType && invalidDeviceType) {
-							logger.debug '{} CASE 214', methodName
+							log.debug '{} CASE 214', methodName
 							errorMsg = StringUtil.concat(warningMsg, "Device Type ($deviceTypeParam) is invalid", delim)
 						} else {
-							logger.debug '{} CASE 211', methodName
+							log.debug '{} CASE 211', methodName
 							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE, delim)
 						}
 					}
@@ -402,15 +400,15 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				// Case when we have no mfg / model matches
 				//
 				if (filteredCount == 0) {
-					logger.debug '{} we have ZERO models matching Mfg', methodName
+					log.debug '{} we have ZERO models matching Mfg', methodName
 					if (modelListCount==0) {
 						// No models found but we have a model name so we can create as long as we have a valid type
 						if (haveDeviceType &&! invalidDeviceType) {
-							logger.debug '{} CASE 232', methodName
+							log.debug '{} CASE 232', methodName
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
 							break
 						} else {
-							logger.debug '{} CASE 231 or 234', methodName
+							log.debug '{} CASE 231 or 234', methodName
 							if (invalidDeviceType) {
 								warningMsg = StringUtil.concat(warningMsg, DEVICE_TYPE_INVALID, delim)
 							}
@@ -420,12 +418,12 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					} else {
 						// Cases 321,322,323,324 - We have a list of existing models by name
 						if (invalidDeviceType) {
-							logger.debug '{} CASE 324', methodName
+							log.debug '{} CASE 324', methodName
 							errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID, delim)
 							break
 						}
 						if (!haveDeviceType) {
-							logger.debug '{} CASE 321', methodName
+							log.debug '{} CASE 321', methodName
 							errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK, delim)
 							break
 						}
@@ -435,32 +433,32 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						filteredCount = filteredModels.size()
 
 						if (filteredCount == 0) {
-							logger.debug '{} CASE 323', methodName
+							log.debug '{} CASE 323', methodName
 							errorMsg = StringUtil.concat(errorMsg, "Device type ($deviceTypeParam) doesn't match any existing model of same name", delim)
 						} else if (filteredCount == 1) {
-							logger.debug '{} CASE 322', methodName
+							log.debug '{} CASE 322', methodName
 							warningMsg = StringUtil.concat(warningMsg, "Mfg ($mfgNameParam) doesn't match existing model's Mfg ($filteredModels.manufacturer.name)", delim)
 							performAssignment(filteredModels[0])
 						} else {
-							logger.debug '{} CASE 322 alternate', methodName
+							log.debug '{} CASE 322 alternate', methodName
 							errorMsg = StringUtil.concat(errorMsg, "Multiple models have same name and device type but don't match specified Mfg ($mfgNameParam)", delim)
 						}
 						break
 					}
 				} else if (filteredCount==1) {
 					// We found a unique match for existing mfg/model - our favorite case!
-					logger.debug '{} CASE 232', methodName
+					log.debug '{} CASE 232', methodName
 					performAssignment(filteredModels[0])
 					break
 
 				} else {
-					logger.debug '{} fell into the mfg/model else section', methodName
+					log.debug '{} fell into the mfg/model else section', methodName
 					//
 					// Case when we found multiple mfg/models matches so we need to narrow down the deviceType to try and get unique
 					//
 					if (haveDeviceType) {
 						if (invalidDeviceType) {
-							logger.debug '{} CASE 234', methodName
+							log.debug '{} CASE 234', methodName
 							errorMsg = "Invalid device type ($deviceTypeParam) specified"
 							break
 						}
@@ -470,10 +468,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						filteredCount = filteredModels.size()
 
 						if (filteredCount == 0) {
-							logger.debug '{} CASE 232', methodName
+							log.debug '{} CASE 232', methodName
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
 						} else if (filteredCount == 1) {
-							logger.debug '{} CASE 211', methodName
+							log.debug '{} CASE 211', methodName
 							performAssignment(filteredModels[0])
 						} else {
 							// Non-unique match - bad
@@ -481,13 +479,13 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						}
 						break
 					} else {
-						logger.debug '{} CASE 231', methodName
+						log.debug '{} CASE 231', methodName
 						errorMsg = "Mfg/Model/DeviceType combination found $filteredCount matches, which must be unique"
 						break
 					}
 				}
 
-				logger.error '{} Reached condition with existing Mfg that was unhandled', methodName
+				log.error '{} Reached condition with existing Mfg that was unhandled', methodName
 				errorMsg = UNEXPECTED_CONDITION + ' for known Mfg'
 				break
 			}
@@ -498,22 +496,22 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			// TODO : JPM 11/2014 : Should add logic to compare mfg name against model aliases to see if mfg name in the model name
 			if (haveMfgName) {
 				if (! haveDeviceType) {
-					logger.debug '{} CASE 411, 421, 431', methodName
+					log.debug '{} CASE 411, 421, 431', methodName
 					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK, delim)
 					if (! haveModelName) {
 						errorMsg = StringUtil.concat(errorMsg, MODEL_BLANK, delim)
 					}
 					break
 				} else if (invalidDeviceType) {
-					logger.debug '{} CASE 414, 424, 434', methodName
+					log.debug '{} CASE 414, 424, 434', methodName
 					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID, delim)
 					break
 				} else if (!haveModelName) {
 					if (! invalidDeviceType) {
-						logger.debug '{} CASE 412', methodName
+						log.debug '{} CASE 412', methodName
 						performUnknownAssignment()
 					} else {
-						logger.error '{} reached if/else that was unexpected mfgNameParam={}, modelNameParam={}, deviceType=({}/{})',
+						log.error '{} reached if/else that was unexpected mfgNameParam={}, modelNameParam={}, deviceType=({}/{})',
 								methodName, mfgNameParam, modelNameParam, deviceTypeParam, deviceType
 						errorMsg = StringUtil.concat(errorMsg, UNEXPECTED_CONDITION + ' without Mfg name', delim)
 					}
@@ -525,14 +523,14 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				filteredCount = filteredModels.size()
 
 				if (filteredCount == 0) {
-					logger.debug '{} CASE 423', methodName
+					log.debug '{} CASE 423', methodName
 					performCreateMfgModel(mfgName, modelName, deviceType, usize)
 				} else if (filteredCount == 1) {
-					logger.debug '{} CASE 422', methodName
+					log.debug '{} CASE 422', methodName
 					warningMsg = StringUtil.concat(warningMsg, "Specified Mfg ($mfgNameParam) does not match the existing Model Mfg (${filteredModels[0].manufacturer.name})", delim)
 					performAssignment(filteredModels[0])
 				} else {
-					logger.debug '{} CASE 422 multiple matches ({})', methodName, filteredCount
+					log.debug '{} CASE 422 multiple matches ({})', methodName, filteredCount
 					errorMsg = StringUtil.concat(errorMsg, "Mfg/Model/DeviceType combination found $filteredCount matches, which must be unique", delim)
 				}
 				break
@@ -544,26 +542,26 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			if (! haveMfgName) {
 				if (!haveDeviceType) {
 					if (modelListCount == 1) {
-						logger.debug '{} CASE 121', methodName
+						log.debug '{} CASE 121', methodName
 						warningMsg = StringUtil.concat(warningMsg, "No Mfg/Type specified therefore assuming you meant Mfg (${modelList[0].manufacturer.name})/Type (${modelList[0].assetType})", delim)
 						performAssignment(modelList[0])
 					} else if (modelListCount > 0) {
-						logger.debug '{} CASE 121 multiple model matches', methodName
+						log.debug '{} CASE 121 multiple model matches', methodName
 						errorMsg = StringUtil.concat(errorMsg, "Multiple models matched by name without a type specified", delim)
 					} else {
-						logger.debug '{} CASE 121, 131', methodName
+						log.debug '{} CASE 121, 131', methodName
 						errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK, delim)
 					}
 					break
 				} else if (invalidDeviceType) {
-					logger.debug '{} CASE 124, 134', methodName
+					log.debug '{} CASE 124, 134', methodName
 					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID, delim)
 					break
 				}
 
 				if (modelListCount==0) {
 					// No Models found
-					logger.debug '{} CASE 132', methodName
+					log.debug '{} CASE 132', methodName
 					errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE, delim)
 					break
 				} else {
@@ -573,26 +571,26 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					if (filteredCount == 0) {
 						// Didn't find any matched after filtering on the device type so go back to the master model list
 						if (modelListCount == 1) {
-							logger.debug '{} CASE 123', methodName
+							log.debug '{} CASE 123', methodName
 							// We'll assign the model regardless of the deviceType but may warn
 							performAssignment(modelList[0])
 						} else {
-							logger.debug '{} CASE 123 multiple model matches', methodName
+							log.debug '{} CASE 123 multiple model matches', methodName
 							errorMsg = StringUtil.concat(errorMsg, "Multiple models matched by name but none had the specified type", delim)
 						}
 					} else if (filteredCount == 1) {
-						logger.debug '{} CASE 122', methodName
+						log.debug '{} CASE 122', methodName
 						warningMsg = StringUtil.concat(warningMsg, "No Mfg specified therefore assuming you meant Mfg (${filteredModels[0].manufacturer.name})", delim)
 						performAssignment(filteredModels[0])
 					} else {
-						logger.debug '{} CASE 122 multiple model/type matches', methodName
+						log.debug '{} CASE 122 multiple model/type matches', methodName
 					}
 					break
 				}
 			}
 
 			errorMsg = UNEXPECTED_CONDITION + ' at the end of conditions'
-			logger.error '{} {}', methodName, errorMsg
+			log.error '{} {}', methodName, errorMsg
 			break
 		} // while (true)
 
@@ -662,7 +660,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			}
 		} catch(Exception e) {
 			errorMsg = "Unable to create model $modelName - $e"
-			logger.error 'Unable to create model {} - {} : {}', modelName, e.message, ExceptionUtil.stackTraceToString(e)
+			log.error 'Unable to create model {} - {} : {}', modelName, e.message, ExceptionUtil.stackTraceToString(e)
 		}
 		return [model, errorMsg]
 	}
@@ -741,7 +739,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	String setToNullOrBlank(AssetEntity asset, String propertyName, value, List<String> nullProps, List<String> blankProps) {
 		String msg = ''
 		if (value == "NULL") {
-			logger.debug 'setToNullOrBlank() for {} {} presently {}', asset.getClass().name, propertyName, asset[propertyName]
+			log.debug 'setToNullOrBlank() for {} {} presently {}', asset.getClass().name, propertyName, asset[propertyName]
 			//If imported "NULL" and field allows blank and null updating value to null
 			Class type = GrailsClassUtils.getPropertyType(asset.getClass(), propertyName)
 			if (nullProps.contains(propertyName)) {
@@ -749,7 +747,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			} else if (type == String) {
 				asset[propertyName] = blankProps.contains(propertyName) ? '' : 'NULL'
 			} else {
-				logger.warn '''setToNullOrBlank() Imported invalid value 'NULL' which is not allowed for {} property.''', propertyName
+				log.warn '''setToNullOrBlank() Imported invalid value 'NULL' which is not allowed for {} property.''', propertyName
 				msg = "Unable to set $propertyName to NULL"
 			}
 		}
@@ -791,7 +789,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		if (assetId) {
 			asset = clazz.get(assetId)
 			if (asset) {
-				logger.debug 'findAndValidateAsset() Found {} id ({}) {}', clazzName, asset.id, asset.assetName
+				log.debug 'findAndValidateAsset() Found {} id ({}) {}', clazzName, asset.id, asset.assetName
 				if (asset.project.id == project.id) {
 					if (dataTransferBatch?.dataTransferSetId == 1L) {
 						// Validate that the AE fields are valid
@@ -801,7 +799,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 							errorCount++
 							errorConflictCount += validateResultList.errorConflictCount
 							ignoredAssets << "$asset.id $asset.assetName (row $rowNum)".toString()
-							logger.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
+							log.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
 							asset = false
 						}
 					}
@@ -823,7 +821,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				errorCount++
 				// ignoredAssets << "${idDtv.errorText} (row $rowNum)".toString()
 				ignoredAssets << "${dtvList[0].errorText} (row $rowNum)".toString()
-				// logger.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
+				// log.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
 				asset = false
 			}
 		}
@@ -834,7 +832,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset.owner = project.client
 			asset.assetType = clazzMap[clazzName]
 
-			logger.debug 'findAndValidateAsset() Created {}', clazzName
+			log.debug 'findAndValidateAsset() Created {}', clazzName
 		}
 
 		// If there were conflicts above, set the object to null
@@ -854,7 +852,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		if (asset.id) {
 			if (asset.dirtyPropertyNames) {
 				// Check to see if dirty
-				logger.info '{} Updated asset {} {} - Dirty properties: {}', methodName, asset.id, asset.assetName, asset.dirtyPropertyNames
+				log.info '{} Updated asset {} {} - Dirty properties: {}', methodName, asset.id, asset.assetName, asset.dirtyPropertyNames
 				save(asset)
 				saved = !asset.hasErrors()
 				if (saved) {
@@ -871,17 +869,17 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			if (saved) {
 				insertCount++
 				assetList << asset.id // Once asset saved to DB it will provide ID for that.
-				logger.debug '{} saved new asset id:{}, insertCount:{}', methodName, asset.id, insertCount
+				log.debug '{} saved new asset id:{}, insertCount:{}', methodName, asset.id, insertCount
 			}
 		}
 		if (! saved) {
-			logger.warn '{} Performing discard for rowNum {}', methodName, rowNum
+			log.warn '{} Performing discard for rowNum {}', methodName, rowNum
 			warnings << "Asset $asset.assetName, row $rowNum had an error and was not updated. ${GormUtil.errorsAsUL(asset)}"
 			asset.discard()
 			errorCount++
 		}
 
-		logger.debug '{} saved={}, asset={}', methodName, saved, asset
+		log.debug '{} saved={}, asset={}', methodName, saved, asset
 		return [insertCount, updateCount, errorCount]
 	}
 
@@ -932,7 +930,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		String classSimpleName = asset.getClass().name.tokenize('.')[-1]
 
 		if (value || ['assetName','assetTag'].contains(property)) {
-			logger.debug 'setCommonProperties() updating {}.{} with [{}] (row {})', classSimpleName, property, value, rowNum
+			log.debug 'setCommonProperties() updating {}.{} with [{}] (row {})', classSimpleName, property, value, rowNum
 		}
 
 		switch (property) {
@@ -960,7 +958,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				break
 			case 'maintExpDate':
 			case 'retireDate':
-				logger.debug 'setCommonProperties() Have {} with value "{}"', property, value
+				log.debug 'setCommonProperties() Have {} with value "{}"', property, value
 				if (value) {
 					try {
 						asset[property] = TimeUtil.parseDate(dtFormat, value, TimeUtil.FORMAT_DATE)
@@ -969,7 +967,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 							(asset.assetName ? ", asset '$asset.assetName'" : '') +
 							', proper format mm/dd/yyyy'
 						errorConflictCount++
-						logger.error('Cannot parse date value for property {} {}', property, e.message, e)
+						log.error('Cannot parse date value for property {} {}', property, e.message, e)
 					}
 				}
 				break
@@ -1020,7 +1018,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 								asset[property] = correctedPos
 							}
 						} catch (e) {
-							logger.error 'setCommonProperties() exception 1 : {}', e.message
+							log.error 'setCommonProperties() exception 1 : {}', e.message
 							e.printStackTrace()
 							warnings << "Unable to update $property with value [$value] on $asset.assetName (row $rowNum)"
 							errorConflictCount++
@@ -1032,7 +1030,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 						try {
 							asset[property] = dtv.correctedValue ?: dtv.importValue
 						} catch (e) {
-							logger.error e.message, e
+							log.error e.message, e
 							warnings << "Unable to update $property with value [$value] on $asset.assetName (row $rowNum)"
 							errorConflictCount++
 							dtv.hasError = 1

@@ -10,13 +10,11 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 
-@Slf4j(value='logger')
 @Transactional
 class DeviceService implements ServiceMethods {
 
@@ -40,7 +38,7 @@ class DeviceService implements ServiceMethods {
 	 * @return Null if successful otherwise a string indicating the error
 	 */
 	String assignDeviceToLocationRoomRack(AssetEntity asset, String location, String roomName, String rackName, boolean isSource) {
-		logger.debug('assignDeviceToLocationRoomRack() START {} {}/{}/{}/{}', asset, location, roomName, rackName, isSource)
+		log.debug('assignDeviceToLocationRoomRack() START {} {}/{}/{}/{}', asset, location, roomName, rackName, isSource)
 
 		if (!asset?.project) {
 			return 'Asset project property not properly set'
@@ -82,7 +80,7 @@ class DeviceService implements ServiceMethods {
     }
 
 
-		logger.debug 'assignDeviceToLocationRoomRack() END {} {}/{}/{}', asset, asset.sourceLocationName,
+		log.debug 'assignDeviceToLocationRoomRack() END {} {}/{}/{}', asset, asset.sourceLocationName,
 				asset.sourceRoomName, asset.sourceRackName
 		return null
 	}

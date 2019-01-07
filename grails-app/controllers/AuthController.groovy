@@ -1,6 +1,5 @@
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.StartPageEnum
@@ -10,7 +9,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.controller.ControllerMethods
@@ -29,7 +27,6 @@ import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 
 @Secured('permitAll')
-@Slf4j(value='logger', category='grails.app.controllers.AuthController')
 class AuthController implements ControllerMethods {
 
 	private static final int thirtyDaysInMS = 60 * 24 * 30 * 1000
@@ -121,7 +118,7 @@ class AuthController implements ControllerMethods {
 		if (securityService.loggedIn) {
 			String username = securityService.currentUsername
 			auditService.saveUserAudit(UserAuditBuilder.logout())
-			logger.info 'User {} just logged out of the application', username
+			log.info 'User {} just logged out of the application', username
 		}
 
 		// redirect to the uri that the Spring Security logout filter is configured for,

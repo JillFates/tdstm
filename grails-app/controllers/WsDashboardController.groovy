@@ -1,8 +1,7 @@
-import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -14,7 +13,6 @@ import net.transitionmanager.service.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-@Slf4j(value='logger', category='grails.app.controllers.WsDashboardController')
 class WsDashboardController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
@@ -103,12 +101,12 @@ class WsDashboardController implements ControllerMethods {
 					GROUP BY t.workflow_transition_id;
 				"""
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
-				// logger.info "bundleData() SQL = $taskStatsSql"
+				// log.info "bundleData() SQL = $taskStatsSql"
 			} else {
 
 			// def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
 			/*def offsetTZ = ( new Date().getTimezoneOffset() / 60 )
-				logger.debug "offsetTZ=$offsetTZ"*/
+				log.debug "offsetTZ=$offsetTZ"*/
 
 				/* Get the latest step_snapshot record for each step that has started */
 				def latestStepsRecordsQuery = """

@@ -1,18 +1,15 @@
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
-import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.service.QzSignService
-
 /**
  * Handles WS calls of the ApplicationService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsApplicationController')
 class WsApplicationController implements ControllerMethods {
 
 	ApplicationService applicationService

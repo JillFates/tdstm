@@ -8,8 +8,8 @@ import org.springframework.beans.factory.InitializingBean
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpSession
 
+@Slf4j()
 @CompileStatic
-@Slf4j(value='logger')
 class MaintService implements InitializingBean, ServiceMethods {
 
 	private static String MAINT_MODE_FILE_PATH = ''
@@ -35,12 +35,12 @@ class MaintService implements InitializingBean, ServiceMethods {
 		if (resource) {
 			if (!inMaintMode) {
 				inMaintMode = true
-				logger.info 'Maintenance Mode was enabled @ {}', new Date()
+				log.info 'Maintenance Mode was enabled @ {}', new Date()
 			}
 		} else {
 			if (inMaintMode) {
 				inMaintMode = false
-				logger.info 'Maintenance Mode was disabled @ {}', new Date()
+				log.info 'Maintenance Mode was disabled @ {}', new Date()
 			}
 		}
 	}
@@ -53,7 +53,7 @@ class MaintService implements InitializingBean, ServiceMethods {
 		def hasAccess = session.getAttribute(MAINT_BACKDOOR_ENTRY)
 		if (!hasAccess) {
 			session.setAttribute(MAINT_BACKDOOR_ENTRY, true)
-			logger.info 'User allowed for back door access @ {}', new Date()
+			log.info 'User allowed for back door access @ {}', new Date()
 		}
 	}
 

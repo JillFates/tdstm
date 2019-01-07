@@ -1,9 +1,8 @@
 import com.tds.asset.AssetComment
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundleStep
 import net.transitionmanager.domain.Project
@@ -18,13 +17,11 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
-
 // TODO BB all called
 
 /**
  * @author Lokanada Reddy
  */
-@Slf4j(value='logger', category='grails.app.controllers.WorkflowController')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class WorkflowController implements ControllerMethods {
 
@@ -107,7 +104,7 @@ class WorkflowController implements ControllerMethods {
 					Swimlane swimlane = new Swimlane(workflow: workflow, name: stdSwimlane.name,
 							actorId: stdSwimlane?.actorId)
 					if (swimlane.save(flush: true)) {
-						logger.debug('Swimlane "{}" created', swimlane)
+						log.debug('Swimlane "{}" created', swimlane)
 					}
 				}
 
@@ -129,7 +126,7 @@ class WorkflowController implements ControllerMethods {
 							role: stdWorkflowTransition.role ?: defaultRole)
 					saveWithWarnings workflowTransition
 					if (!workflowTransition.hasErrors()) {
-						logger.debug('Workflow step "{}" created', workflowTransition)
+						log.debug('Workflow step "{}" created', workflowTransition)
 					}
 				}
 
@@ -147,7 +144,7 @@ class WorkflowController implements ControllerMethods {
 							workflowTransition: transition, transId: map.transId, flag: map.flag)
 					saveWithWarnings workflowTransitionMap
 					if (!workflowTransitionMap.hasErrors()) {
-						logger.debug('Workflow Roles "{}" created', workflowTransitionMap)
+						log.debug('Workflow Roles "{}" created', workflowTransitionMap)
 					}
 				}
 			}
@@ -172,7 +169,7 @@ class WorkflowController implements ControllerMethods {
 			workflow = Workflow.get(workflowId)
 			workflow.updatedBy = securityService.loadCurrentPerson()
 			if (workflow.save()) {
-				logger.debug('Workflow "{}" updated', workflow)
+				log.debug('Workflow "{}" updated', workflow)
 			}
 
 			WorkflowTransition.findAllByWorkflow(workflow).each { transition ->
@@ -185,7 +182,7 @@ class WorkflowController implements ControllerMethods {
 				transition.role = RoleType.load(params['role_' + transition.id])
 				if (! transition.validate() || ! transition.save(flush:true)) {
 				} else {
-					logger.debug('Workflow step "{}" updated', transition)
+					log.debug('Workflow step "{}" updated', transition)
 				}
 			}
 			// add new steps to the workflow
@@ -209,7 +206,7 @@ class WorkflowController implements ControllerMethods {
 				if (! workflowTransition.validate() || ! workflowTransition.save(flush:true)) {
 					flash.message += 'Workflow step with code [' + workflowTransition.code + '] must be unique.'
 				} else {
-					logger.debug('Workflow step "{}" updated', workflowTransition)
+					log.debug('Workflow step "{}" updated', workflowTransition)
 				}
 			}
 			def query = """SELECT mbs.transition_id as transitionId FROM move_bundle_step mbs

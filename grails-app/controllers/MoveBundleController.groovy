@@ -20,7 +20,6 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DependencyConsoleCommand
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
@@ -52,7 +51,6 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-@Slf4j(value='logger', category='grails.app.controllers.MoveBundleController')
 class MoveBundleController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
@@ -764,7 +762,7 @@ class MoveBundleController implements ControllerMethods {
 				serverCount = assetDependentlist.findAll{ it.asset.assetType in [server, blade] }.size()
 				vmCount = assetDependentlist.findAll{ it.asset.assetType == vm }.size()
 			} catch (ObjectNotFoundException e) {
-				logger.error 'Database inconsistency: {}', e.message, e
+				log.error 'Database inconsistency: {}', e.message, e
 			}
 
 			dependencyConsoleList << [dependencyBundle: dependencyBundle.dependencyBundle, appCount: appCount,
@@ -972,7 +970,7 @@ class MoveBundleController implements ControllerMethods {
 			console.assetName
 		)
 
-		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
+		//log.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map
 	}
 
@@ -1016,7 +1014,7 @@ class MoveBundleController implements ControllerMethods {
 		progressService.create(key)
 
 		def jobName = "TM-" + baseName + "-" + project.id
-		logger.info 'Initiate Generate Dependency'
+		log.info 'Initiate Generate Dependency'
 
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
 		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000))
@@ -1040,7 +1038,7 @@ class MoveBundleController implements ControllerMethods {
 			quartzScheduler.scheduleJob(trigger)
 			progressService.update(key, 1, 'In progress')
 		}catch(ex){
-			logger.warn 'generateDependency failed to create Quartz job : {}', ex.message
+			log.warn 'generateDependency failed to create Quartz job : {}', ex.message
 			progressService.update(key, 100I, ProgressService.FAILED,
 				'It appears that someone else is currently generating dependency groups for this project. Please try again later.')
 		}

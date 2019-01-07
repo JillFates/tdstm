@@ -8,7 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.service.ModelService
 import net.transitionmanager.service.SecurityService
 
-@Slf4j(value='logger')
+@Slf4j()
 class Model {
 
 	SecurityService securityService
@@ -137,7 +137,7 @@ class Model {
 				createdBy = person
 			}
 			else {
-				logger.info('No user found to associate to the model.')
+				log.info('No user found to associate to the model.')
 			}
 		}
 
@@ -237,7 +237,7 @@ class Model {
 				sourceTDS: 0, usize: usize, createdBy: createdBy)
 		if (!model.save(flush: true)) {
 			String error = 'Unable to create model: ' + GormUtil.allErrorsString(model)
-			logger.error('Call to createModelByModelName("{}", "{}",...) by {} - {}',
+			log.error('Call to createModelByModelName("{}", "{}",...) by {} - {}',
 					modelName, manufacturer.name, createdBy, error)
 			throw new RuntimeException(error)
 		}

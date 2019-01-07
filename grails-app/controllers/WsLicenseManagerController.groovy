@@ -1,18 +1,14 @@
 import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.exceptions.ServiceException
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.service.LicenseManagerService
-
 /**
  * Created by octavio on 11/30/16.
  */
 
 @Secured('isAuthenticated()')
-@Slf4j
-@Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseManagerController implements ControllerMethods {
 	LicenseManagerService licenseManagerService
 

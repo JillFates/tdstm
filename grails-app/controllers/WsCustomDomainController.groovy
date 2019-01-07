@@ -8,7 +8,6 @@ import net.transitionmanager.domain.Project
 import grails.gorm.transactions.Transactional
 
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsCustomDomainController')
 class WsCustomDomainController implements ControllerMethods {
     CustomDomainService customDomainService
 

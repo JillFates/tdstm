@@ -13,7 +13,6 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelConnector
@@ -32,7 +31,6 @@ import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-@Slf4j(value='logger', category='grails.app.controllers.RackLayoutsController')
 class RackLayoutsController implements ControllerMethods {
 
 	AssetEntityService    assetEntityService
@@ -461,7 +459,7 @@ class RackLayoutsController implements ControllerMethods {
 					]
 					queryParams.tag = tagValue
 					overlappedAssets = AssetEntity.findAll(query, queryParams)
-					logger.debug '**** overlappedAssets = {} --- {}', overlappedAssets.getClass().name, overlappedAssets
+					log.debug '**** overlappedAssets = {} --- {}', overlappedAssets.getClass().name, overlappedAssets
 
 					// TODO : JPM 9/2014 : This block of code is 99% duplicate except for the cabling assignment
 					def overlappedAssetsSize = overlappedAssets.size()
@@ -656,7 +654,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * Used to generate the HTML widget for a single Blade Chassis's layout for RackLayouts report
 	 */
 	private String generateBladeLayout(Map bladeLayoutMap) {
-		//logger.debug 'generateBladeLayout() - bladeLayoutMap={}', bladeLayoutMap
+		//log.debug 'generateBladeLayout() - bladeLayoutMap={}', bladeLayoutMap
 
 		def assetDetails = bladeLayoutMap.asset
 		def assetEntity = bladeLayoutMap.overlappedAsset

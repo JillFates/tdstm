@@ -27,7 +27,6 @@ import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
 @Transactional
-@Slf4j
 class ScriptProcessorService {
 
 	CustomDomainService customDomainService

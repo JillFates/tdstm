@@ -12,7 +12,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.PersonCO
 import net.transitionmanager.domain.ExceptionDates
 import net.transitionmanager.domain.MoveEvent
@@ -30,7 +29,6 @@ import org.apache.commons.lang.StringUtils
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
-@Slf4j(value='logger')
 class PersonService implements ServiceMethods {
 
 	def auditService
@@ -221,9 +219,9 @@ class PersonService implements ServiceMethods {
 			query.append(' AND pr.role_type_code_to_id="STAFF"')
 			query.append(' AND p.email=:email')
 
-			logger.debug 'findByCompanyAndEmail: query {}, map {}', query, args
+			log.debug 'findByCompanyAndEmail: query {}, map {}', query, args
 			List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), args)
-			logger.debug 'findByCompanyAndEmail: query {}, map {}, found ids {}', query, args, pIds
+			log.debug 'findByCompanyAndEmail: query {}, map {}, found ids {}', query, args, pIds
 			if (pIds) {
 				persons = Person.getAll(pIds*.id).findAll()
 			}
@@ -246,7 +244,7 @@ class PersonService implements ServiceMethods {
 		if (map) {
 			map = findPerson(map, project, staffList, clientStaffOnly, checkAmbiguity)
 		}
-		logger.debug 'findPerson(String) results={}', map
+		log.debug 'findPerson(String) results={}', map
 		return map
 	}
 
@@ -287,7 +285,7 @@ class PersonService implements ServiceMethods {
 		String mn = 'findPerson()'
 		Map results = [person: null, isAmbiguous: false, partial: false]
 
-		logger.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
+		log.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
 
 		// Make sure we have a person
 		if (!nameMap || !nameMap.containsKey('first')) {
@@ -323,11 +321,11 @@ class PersonService implements ServiceMethods {
 		if (persons) {
 			persons = persons.collect({ it[1] })
 		}
-		logger.debug '{} findPerson() Initial search found {} {}', mn, persons.size(), nameMap
+		log.debug '{} findPerson() Initial search found {} {}', mn, persons.size(), nameMap
 
 		int s = persons.size()
 		if (s > 1) {
-			persons.each { person -> logger.debug '{} person {} {}', mn, person.id, person }
+			persons.each { person -> log.debug '{} person {} {}', mn, person.id, person }
 			// results.person = persons[0]
 			results.isAmbiguous = true
 		} else if (s == 1) {
@@ -350,12 +348,12 @@ class PersonService implements ServiceMethods {
 			addQueryParam('middleName', nameMap.middle)
 			addQueryParam('lastName', lastName)
 
-			logger.debug '{} partial search using {}', mn, queryParams
+			log.debug '{} partial search using {}', mn, queryParams
 			persons = Person.findAll(hql + where, queryParams)
 			if (persons) {
 				persons = persons.collect({ it[1] })
 			}
-			logger.debug '{} partial search found {}', mn, persons.size()
+			log.debug '{} partial search found {}', mn, persons.size()
 
 			s = persons.size()
 			if (s > 1) {
@@ -368,7 +366,7 @@ class PersonService implements ServiceMethods {
 			}
 		}
 
-		logger.debug '{} results={}', mn, results
+		log.debug '{} results={}', mn, results
 		return results
 	}
 
@@ -385,7 +383,7 @@ class PersonService implements ServiceMethods {
 	Map findOrCreatePerson(String name, Project project, List<Person> staffList = null, boolean clientStaffOnly = true) {
 		def nameMap = parseName(name)
 		if (nameMap == null) {
-			logger.error 'findOrCreatePersonByName() unable to parse name ({})', name
+			log.error 'findOrCreatePersonByName() unable to parse name ({})', name
 			return null
 		}
 		return findOrCreatePerson(nameMap, project, staffList, clientStaffOnly)
@@ -410,7 +408,7 @@ class PersonService implements ServiceMethods {
 			results.isNew = null
 
 			if (!results.person && nameMap.first) {
-				logger.info 'findOrCreatePerson() Creating new person ({}) as Staff for {}', nameMap, project.client
+				log.info 'findOrCreatePerson() Creating new person ({}) as Staff for {}', nameMap, project.client
 				person = new Person('firstName': nameMap.first, 'lastName': nameMap.last, 'middleName': nameMap.middle, staffType: 'Salary')
 				save(person, true)
 				if (person.hasErrors()) {
@@ -433,7 +431,7 @@ class PersonService implements ServiceMethods {
 			return results
 		} catch (e) {
 			String exMsg = e.message
-			logger.error 'findOrCreatePerson() received exception for nameMap={} : {}\n{}',
+			log.error 'findOrCreatePerson() received exception for nameMap={} : {}\n{}',
 					nameMap, e.message, ExceptionUtil.stackTraceToString(e)
 			if (person && !person.id) {
 				person.discard()
@@ -480,7 +478,7 @@ class PersonService implements ServiceMethods {
 				}
 			}
 			else {
-				logger.error 'parseName("{}") encountered multiple commas that is not handled', name
+				log.error 'parseName("{}") encountered multiple commas that is not handled', name
 				return null
 			}
 		}
@@ -903,20 +901,20 @@ class PersonService implements ServiceMethods {
 
 		// Check if the person and events are not null
 		if (!personId || !NumberUtil.isPositiveLong(personId)) {
-			logger.debug 'validateUserCanEditStaffing() user {} called with missing or invalid params (personId:{}, projectId:{}, teamCode:{})',
+			log.debug 'validateUserCanEditStaffing() user {} called with missing or invalid params (personId:{}, projectId:{}, teamCode:{})',
 					securityService.currentUsername, personId, projectId, teamCode
 			throw new InvalidParamException("The person and event were not properly identified")
 		}
 
 		Project project = Project.get(projectId)
 		if (!project) {
-			logger.warn 'validateUserCanEditStaffing() user {} called with invalid project id {}', securityService.currentUsername, projectId
+			log.warn 'validateUserCanEditStaffing() user {} called with invalid project id {}', securityService.currentUsername, projectId
 			throw new InvalidParamException("Invalid project specified")
 		}
 
 		Person person = Person.get(personId)
 		if (!person) {
-			logger.warn 'validateUserCanEditStaffing() user {} called with invalid person id {}', securityService.currentUsername, personId
+			log.warn 'validateUserCanEditStaffing() user {} called with invalid person id {}', securityService.currentUsername, personId
 			throw new InvalidParamException("Invalid person specified")
 		}
 
@@ -924,7 +922,7 @@ class PersonService implements ServiceMethods {
 		if (teamCode) {
 			teamRoleType = RoleType.get(teamCode)
 			if (!teamRoleType || !teamRoleType.isTeamRole()) {
-				logger.warn 'assignToProject() user {} called with invalid team code {}', securityService.currentUsername, teamCode
+				log.warn 'assignToProject() user {} called with invalid team code {}', securityService.currentUsername, teamCode
 				throw new InvalidParamException("The specified team code was invalid")
 			}
 		}
@@ -1039,7 +1037,7 @@ class PersonService implements ServiceMethods {
 			}
 		}
 		else {
-			logger.warn 'addToProjectTeam() called for project {}, person {}, team {} but already exists', project, person, teamCode
+			log.warn 'addToProjectTeam() called for project {}, person {}, team {} but already exists', project, person, teamCode
 		}
 	}
 
@@ -1214,12 +1212,12 @@ class PersonService implements ServiceMethods {
 		// Remove the person from the project
 		PartyRelationship prProjectStaff = getProjectReference(map.project, map.person)
 		if (prProjectStaff) {
-			logger.debug 'removeFromProject() deleting PartyRelationship {}', prProjectStaff
+			log.debug 'removeFromProject() deleting PartyRelationship {}', prProjectStaff
 			prProjectStaff.delete()
 			metrics.staffUnassigned = 1
 		}
 		else {
-			logger.warn 'removeFromProject() No Project Staff record found for project {} and person {}', projectId, personId
+			log.warn 'removeFromProject() No Project Staff record found for project {} and person {}', projectId, personId
 		}
 
 		Map qparams = [project: map.project, person: map.person]
@@ -1244,7 +1242,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		def employer = map.person.company
-		// logger.debug 'removeFromProject() project={}, employer={} ({}), project client={} ({})', map.project.id, employer, employer.id, map.project.client, map.project.client.id)
+		// log.debug 'removeFromProject() project={}, employer={} ({}), project client={} ({})', map.project.id, employer, employer.id, map.project.client, map.project.client.id)
 		if (map.project.client.id != employer.id) {
 
 			qparams.person = map.person
@@ -1287,13 +1285,13 @@ class PersonService implements ServiceMethods {
 				auditService.logMessage("assigned $map.person to project '$map.project.name' event '$event.name' as $teamCode")
 			}
 			else {
-				logger.error 'addToEvent() Unable to save MoveEventStaff record for person {}, project {}, event {}, team {}',
+				log.error 'addToEvent() Unable to save MoveEventStaff record for person {}, project {}, event {}, team {}',
 						personId, projectId, eventId, teamCode
 				throw new RuntimeException("Unable to save MoveEventStaff record : ${GormUtil.allErrorsString(mes)}")
 			}
 		}
 		else {
-			logger.warn 'addToEvent() called for project {}, person {}, team {} but already exists',
+			log.warn 'addToEvent() called for project {}, person {}, team {} but already exists',
 					map.project, map.person, map.teamRoleType
 		}
 	}
@@ -1457,8 +1455,8 @@ class PersonService implements ServiceMethods {
 		PartyGroup employer = person.company
 		List projects = partyRelationshipService.companyProjects(employer, project)
 
-		//logger.debug 'getAvailableProjects() person {} ({}), employer {}({}), # projects {}', person, person.id, employer, employer.id, projects?.size()
-		//logger.debug 'getAvailableProjects() list 1: {}', projects*.id
+		//log.debug 'getAvailableProjects() person {} ({}), employer {}({}), # projects {}', person, person.id, employer, employer.id, projects?.size()
+		//log.debug 'getAvailableProjects() list 1: {}', projects*.id
 
 		// Optionally remove the assigned projects
 		if (excludeAssigned) {
@@ -1467,7 +1465,7 @@ class PersonService implements ServiceMethods {
 				projects = projects - assignedProjects
 			}
 		}
-		// logger.debug 'getAvailableProjects() list 2: {}', projects*.id
+		// log.debug 'getAvailableProjects() list 2: {}', projects*.id
 		// Optionally remove the projects by completion date cutoff
 		if (cutoff) {
 			projects = projects.findAll { it.completionDate >= cutoff }
@@ -1480,7 +1478,7 @@ class PersonService implements ServiceMethods {
 		if (project && projects) {
 			def theProject = projects.find { it.id == project.id }
 			projects = (theProject ? [theProject] : [])
-			// logger.debug 'getAvailableProjects() list 3: {}', projects*.id
+			// log.debug 'getAvailableProjects() list 3: {}', projects*.id
 		}
 
 		return projects
@@ -1626,7 +1624,7 @@ class PersonService implements ServiceMethods {
 		Map findPersonInfo = findPerson(nameMap, project, null, false, true)
 		boolean isPersonAmbiguous = (findPersonInfo.isAmbiguous || (findPersonInfo.person && findPersonInfo.person?.id != person.id)) && !findPersonInfo.partial
 		if (isPersonAmbiguous) {
-			logger.error 'updatePerson() unable to save {} because of conflicting name.', person
+			log.error 'updatePerson() unable to save {} because of conflicting name.', person
 			throw new DomainUpdateException("The name of the person is ambiguous.")
 		}
 

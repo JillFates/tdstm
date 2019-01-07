@@ -11,7 +11,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.DictionaryItem
@@ -39,7 +38,6 @@ import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.grails.web.json.JSONObject
 
-@Slf4j
 @Transactional
 class ApiActionService implements ServiceMethods {
 	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [

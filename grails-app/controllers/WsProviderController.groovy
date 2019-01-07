@@ -1,17 +1,14 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ProviderService
-
 /**
  * Provide the endpoints for working with Providers.
  */
 @Secured("isAuthenticated()")
-@Slf4j(value='logger', category='grails.app.controllers.WsProviderController')
 class WsProviderController implements ControllerMethods{
 
     private final static DELETE_OK_MESSAGE = "Provider deleted successfully.";

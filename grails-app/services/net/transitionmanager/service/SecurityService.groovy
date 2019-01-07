@@ -22,7 +22,6 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
@@ -53,7 +52,6 @@ import static net.transitionmanager.domain.Permissions.Roles.USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
-@Slf4j(value='logger')
 class SecurityService implements ServiceMethods, InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
@@ -85,16 +83,16 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		def config = grailsApplication.config
 
-		logger.info 'Parsing Security Login setting options'
+		log.info 'Parsing Security Login setting options'
 		loginConfigMap = SecurityConfigParser.parseLoginSettings(config).asImmutable()
 
-		logger.info 'Parsing Security LDAP setting options'
+		log.info 'Parsing Security LDAP setting options'
 		ldapConfigMap = SecurityConfigParser.parseLDAPSettings(config).asImmutable()
 
-		logger.info 'Parsing Local User Configuration Settings options'
+		log.info 'Parsing Local User Configuration Settings options'
 		userLocalConfigMap = SecurityConfigParser.parseLocalUserSettings(config).asImmutable()
 
-		logger.info 'Validating Security LDAP company/party setting'
+		log.info 'Validating Security LDAP company/party setting'
 		validateLDAPCompanyProjectSettings(ldapConfigMap)
 	}
 
@@ -355,11 +353,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				username = getCurrentUsername() ?: 'UnableToDetermine'
 			}
 			catch (e) {
-				logger.error 'An exception ({}) while looking up user\n{}', e.message, ExceptionUtil.stackTraceToString(e)
+				log.error 'An exception ({}) while looking up user\n{}', e.message, ExceptionUtil.stackTraceToString(e)
 				username = 'UnknownUser'
 			}
 		}
-		logger.warn 'SECURITY_VIOLATION : {} by user {}', message, username
+		log.warn 'SECURITY_VIOLATION : {} by user {}', message, username
 		// auditService.logSecurityViolation(username, message)
 	}
 
@@ -376,7 +374,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void cleanupPasswordReset(dataMap) {
-		logger.info('Cleanup Password Reset: Started.')
+		log.info('Cleanup Password Reset: Started.')
 
 		def retainDays = userLocalConfig.forgotMyPasswordRetainHistoryDays
 		//println "retainDays: ${retainDays}"
@@ -386,7 +384,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		def now = TimeUtil.nowGMT()
 		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
-		logger.info('Cleanup Password Reset: Finished.')
+		log.info('Cleanup Password Reset: Finished.')
 	}
 
 	@Transactional
@@ -408,7 +406,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
 
 				if (!userLogin.save(failOnError: false)) {
-					logger.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
+					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
 					throw new DomainUpdateException('An error occured while trying to save your password')
 
 				} else {
@@ -425,7 +423,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			msg = "You are not allowed to change your password at this time."
 
 		} catch (e) {
-			logger.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			msg = 'An error occurred during the update process'
 		}
 
@@ -623,15 +621,15 @@ class SecurityService implements ServiceMethods, InitializingBean {
 					ed.paramsJson = emailParams as JSON
 					save ed
 					emailDispatchService.createEmailJob(ed, emailParams)
-					logger.debug 'sendResetPasswordEmail() created token "{}" for {}', token, userLogin
+					log.debug 'sendResetPasswordEmail() created token "{}" for {}', token, userLogin
 				}
 				else {
-					logger.error 'Forgot My Password request for email {} but emailDispatchService.basicEmailDispatchEntity failed', email
+					log.error 'Forgot My Password request for email {} but emailDispatchService.basicEmailDispatchEntity failed', email
 					throw new ServiceException(errMsg)
 				}
 			}
 			else {
-				logger.error 'Forgot My Password request for email {} but emailDispatchService.createEmailJob failed', email
+				log.error 'Forgot My Password request for email {} but emailDispatchService.createEmailJob failed', email
 				throw new ServiceException(errMsg)
 			}
 
@@ -652,7 +650,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			if (pr.status == PasswordResetStatus.PENDING) {
 				pr.status = PasswordResetStatus.VOIDED
 				if (!pr.save()) {
-					logger.error 'Unable to void pending password reset token for {} : {}', userLogin, GormUtil.allErrorsString(pr)
+					log.error 'Unable to void pending password reset token for {} : {}', userLogin, GormUtil.allErrorsString(pr)
 				}
 			}
 		}
@@ -668,7 +666,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				tokenTTL = getAccountActivationTTL()
 				break
 			default:
-				logger.error 'createPasswordReset() has unhandled switch for option {}', resetType
+				log.error 'createPasswordReset() has unhandled switch for option {}', resetType
 				throw new ServiceException('Unable to initiate a password reset request')
 		}
 		Date expTime = new Date(TimeUtil.nowGMT().time + tokenTTL)
@@ -749,13 +747,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		String errMsg = 'An error occurred while attempting to save your new password'
 
 		if (!pr.userLogin.save()) {
-			logger.error 'applyNewPassword() failed to update UserLogin {} : {}', pr.userLogin, GormUtil.allErrorsString(pr.userLogin)
+			log.error 'applyNewPassword() failed to update UserLogin {} : {}', pr.userLogin, GormUtil.allErrorsString(pr.userLogin)
 			throw new ServiceException(errMsg)
 		}
 
 		pr.status = PasswordResetStatus.COMPLETED
 		if (!pr.save()) {
-			logger.error 'applyNewPassword() failed to update PasswordReset.status for token {} : {}', token, GormUtil.allErrorsString(pr)
+			log.error 'applyNewPassword() failed to update PasswordReset.status for token {} : {}', token, GormUtil.allErrorsString(pr)
 			throw new ServiceException(errMsg)
 		}
 
@@ -863,7 +861,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		try {
 			GormUtil.deleteOrNullDomainReferences(userLogin, true)
 		} catch(e) {
-			logger.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
+			log.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
 		}
 	}
 
@@ -880,7 +878,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void mergePersonsUserLogin(UserLogin byWhom, Person fromPerson, Person toPerson) {
-		logger.debug "mergePersonsUserLogin() entered"
+		log.debug "mergePersonsUserLogin() entered"
 		UserLogin toUserLogin = toPerson.userLogin
 		UserLogin fromUserLogin = fromPerson.userLogin
 
@@ -1201,7 +1199,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		RoleType rt = RoleType.find('from RoleType rt where rt.id=:code and rt.type=:type',
 		                            [code: roleCode, type: RoleType.SECURITY])
 		if (!rt) {
-			logger.warn 'getSecurityRoleType() called with invalid code {}', roleCode
+			log.warn 'getSecurityRoleType() called with invalid code {}', roleCode
 		}
 		return rt
 	}
@@ -1212,7 +1210,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	String getRoleName(String roleCode) {
 		String name = ''
 		String roleType = RoleType.get(roleCode)?.description
-		// logger.error 'getRoleName: roleType={}', roleType
+		// log.error 'getRoleName: roleType={}', roleType
 		if (roleType) {
 			roleType.substring(roleType.lastIndexOf(':') + 1)
 		}
@@ -1286,11 +1284,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 					reportViolation("attempted action requiring unallowed permission $permission", user.toString())
 				}
 			} else {
-				logger.error 'hasPermission() called with unknown permission code {} by {}', permission, user
+				log.error 'hasPermission() called with unknown permission code {} by {}', permission, user
 				reportIfViolation = false 	// disabling because the error log is good enough
 			}
 		} else {
-			logger.error 'hasPermission() called by {} that has no assiged roles', user
+			log.error 'hasPermission() called by {} that has no assiged roles', user
 		}
 
 		if (reportIfViolation) {
@@ -1341,7 +1339,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				eq ('permissionItem', permission)
 			}
 			if (count[0] != 1) {
-				logger.error 'hasPermission() called with invalid permission code {}', permission
+				log.error 'hasPermission() called with invalid permission code {}', permission
 				throw new RuntimeException("Invalid permission code $permission")
 			}
 		}
@@ -1368,18 +1366,18 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			String sql = '''SELECT role_type_code_to_id
 				FROM party_relationship
 				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=? AND party_id_to_id=? AND status_code='ENABLED' '''
-			// logger.error 'getPersonRoles: sql={}', sql
+			// log.error 'getPersonRoles: sql={}', sql
 			roles = (List) jdbcTemplate.queryForList(sql, project.client.id, person.id)
 
-			logger.error 'Using getPersonRoles in unsupported manor'
-			// logger.error '*** Getting from PartyRelationship'
+			log.error 'Using getPersonRoles in unsupported manor'
+			// log.error '*** Getting from PartyRelationship'
 		}
 		else {
 			// Get the User's default role(s)
 			for (pr in PartyRole.findAllByParty(person)) {
 				roles << ((PartyRole)pr).roleType.id
 			}
-			// logger.error '*** Getting from PartyRole: roles={}', roles
+			// log.error '*** Getting from PartyRole: roles={}', roles
 		}
 		return roles
 	}
@@ -1536,7 +1534,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		// Check to see if the role has already been assigned
 		PartyRole pr = PartyRole.findByPartyAndRoleType(person, rt)
 		if (pr) {
-			logger.warn 'assignRoleCode() called to assign code {} to {} but it already exists', roleCode, person
+			log.warn 'assignRoleCode() called to assign code {} to {} but it already exists', roleCode, person
 		}
 		else {
 			pr = new PartyRole(party: person, roleType: rt)
@@ -1572,7 +1570,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		for (rc in roleCodes) {
 			RoleType rt = getSecurityRoleType(rc)
 			if (!rt) {
-				logger.warn 'removeRoleCodes() called with invalid code {} while updating person {}', rc, person
+				log.warn 'removeRoleCodes() called with invalid code {} while updating person {}', rc, person
 			}
 			else {
 				rts << rt
@@ -1584,7 +1582,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			deleted = PartyRole.executeUpdate(query, [person: person, roles: rts])
 		}
 
-		logger.info 'removeRoleCodes() deleted {} security roles for person {} {}', deleted, person.id, roleCodes
+		log.info 'removeRoleCodes() deleted {} security roles for person {} {}', deleted, person.id, roleCodes
 		return deleted
 	}
 
@@ -1719,7 +1717,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			if (!partyRole) {
 				partyRole = new PartyRole(party: person, roleType: roleType)
 				if (!partyRole.save()) {
-					logger.error 'setUserRoles() failed to add partyRole {}: {}', partyRole, GormUtil.allErrorsString(partyRole)
+					log.error 'setUserRoles() failed to add partyRole {}: {}', partyRole, GormUtil.allErrorsString(partyRole)
 					return true
 				}
 			}
@@ -1781,7 +1779,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new UnauthorizedException('Assuming User Identity is not allowed')
 		}
 
-		logger.info "SECURITY: assumeUserIdentity called for user $username"
+		log.info "SECURITY: assumeUserIdentity called for user $username"
 
 		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
 		UserCache userCache = ApplicationContextHolder.getBean("userCache")

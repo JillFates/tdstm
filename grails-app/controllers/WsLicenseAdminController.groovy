@@ -2,7 +2,6 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.PartyGroup
@@ -21,7 +20,6 @@ import net.transitionmanager.controller.ServiceResults
  * Created by octavio on 11/14/16.
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsLicenseController')
 class WsLicenseAdminController implements ControllerMethods {
 	LicenseCommonService licenseCommonService
 	LicenseAdminService licenseAdminService

@@ -1,6 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.command.cookbook.GroupCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -15,7 +14,6 @@ import net.transitionmanager.service.InvalidRequestException
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsCookbookController')
 class WsCookbookController implements ControllerMethods {
 
 	CookbookService cookbookService

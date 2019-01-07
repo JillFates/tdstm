@@ -10,7 +10,7 @@ import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 @CompileStatic
-@Slf4j(value='logger')
+@Slf4j()
 class SequenceService implements ServiceMethods {
 
 	static transactional = false
@@ -42,11 +42,11 @@ class SequenceService implements ServiceMethods {
 					return value
 				}
 			} catch (e) {
-				logger.error 'Problem obtaining next value for scontext={}, key={}, exception {}', contextId, key, e.message
+				log.error 'Problem obtaining next value for scontext={}, key={}, exception {}', contextId, key, e.message
 			}
 		}
 
-		logger.error 'Unable to retrieve next sequence number context={}, key=$key'
+		log.error 'Unable to retrieve next sequence number context={}, key=$key'
 		throw new RuntimeException('Unable to retrieve next sequence number')
 	}
 }

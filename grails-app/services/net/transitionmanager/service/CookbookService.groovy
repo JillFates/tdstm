@@ -12,7 +12,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
@@ -37,7 +36,6 @@ import static net.transitionmanager.domain.Project.DEFAULT_PROJECT_ID
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
-@Slf4j(value='logger')
 @Transactional
 class CookbookService implements ServiceMethods {
 
@@ -63,7 +61,7 @@ class CookbookService implements ServiceMethods {
 		if (! personService.hasAccessToProject(project)) {
 		// List<Long> peopleIdsInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)*.id
 		// if (project.id != DEFAULT_PROJECT_ID && !peopleIdsInProject.contains(securityService.currentPersonId)) {
-			logger.warn('CookbookService.checkAccess: Person does not have access to the project')
+			log.warn('CookbookService.checkAccess: Person does not have access to the project')
 			throw new UnauthorizedException('The current user does not have access to the project')
 		}
 	}
@@ -204,7 +202,7 @@ class CookbookService implements ServiceMethods {
 		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?', [recipe])
 
 		def rvList = RecipeVersion.findAllByRecipe(recipe)
-		logger.debug 'Found {} recipe versions to be deleted', rvList.size()
+		log.debug 'Found {} recipe versions to be deleted', rvList.size()
 		if (rvList) {
 			// Update all TaskBatch to null the reference to the recipeVersions
 			TaskBatch.executeUpdate('update TaskBatch set recipeVersionUsed=null where recipeVersionUsed in (:rvList)', [rvList:rvList])
@@ -245,12 +243,12 @@ class CookbookService implements ServiceMethods {
 		}
 
 		if (rv.recipe != recipe) {
-			logger.warn('Recipe and version does not have a common recipe')
+			log.warn('Recipe and version does not have a common recipe')
 			throw new InvalidParamException('Recipe and version does not have a common recipe')
 		}
 
 		if (recipe.releasedVersion == rv) {
-			logger.warn('Can not delete the currently published version')
+			log.warn('Can not delete the currently published version')
 			throw new InvalidParamException('Can not delete the currently published version')
 		}
 
@@ -295,7 +293,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.userCurrentProject
 		if (project == null) {
-			logger.warn 'SECURITY: User {} attempting to update a recipe without a valid project, recipe id: {}',
+			log.warn 'SECURITY: User {} attempting to update a recipe without a valid project, recipe id: {}',
 					securityService.currentUsername, recipeId
 			throw new InvalidParamException('You must select a project before being able to edit recipes')
 		}
@@ -358,7 +356,7 @@ class CookbookService implements ServiceMethods {
 		try {
 			max = jdbcTemplate.queryForObject('SELECT MAX(version_number) FROM recipe_version WHERE recipe_id=?', Integer, wip.recipeId)
 		} catch (IncorrectResultSizeDataAccessException e) {
-			logger.warn('No results when looking for a version number')
+			log.warn('No results when looking for a version number')
 		}
 
 		wip.versionNumber = max + 1
@@ -538,7 +536,7 @@ class CookbookService implements ServiceMethods {
 					projectIds.add(projectById.id)
 					break
 				default :
-					logger.info('Reach Default value. Rare case')
+					log.info('Reach Default value. Rare case')
 					return []
 			}
 		}
@@ -673,7 +671,7 @@ class CookbookService implements ServiceMethods {
 			throw new RuntimeException('Recipe contains no source code')
 		}
 
-		//logger.debug 'About to parse the recipe:\n{}', sourceCode
+		//log.debug 'About to parse the recipe:\n{}', sourceCode
 		try {
 			return Eval.me("[$sourceCode]")
 		} catch (e) {
@@ -952,7 +950,7 @@ class CookbookService implements ServiceMethods {
 		def teamCodes = []
 		if (partyRelationshipService) {
 			teamCodes = partyRelationshipService.getStaffingRoles()*.id
-			logger.debug '**** teamCodes == {} ****', teamCodes
+			log.debug '**** teamCodes == {} ****', teamCodes
 		}
 
 		try {
@@ -1241,7 +1239,7 @@ class CookbookService implements ServiceMethods {
 								}
 							}
 							if (!msg && team != false && teamCodes && !teamCodes.contains(team)) {
-								logger.debug 'validating team {}', team
+								log.debug 'validating team {}', team
 								msg = "$taskRef 'team' element references an invalid team name $task.team ${teamCodes.size()}"
 							}
 						}
@@ -1287,7 +1285,7 @@ class CookbookService implements ServiceMethods {
 								match = (ct =~ /(?i)(\d{1,}|es|ec)(\+|-)(\d{1,})(?i)(m|h|d|w)/)
 								if (match.matches()) {
 									// validate if referencing a TaskSpec, that the id exists
-									logger.debug 'match[0][1] = {}', match[0][1]
+									log.debug 'match[0][1] = {}', match[0][1]
 									if (match[0][1].isInteger()) {
 										if (!taskIds.contains(match[0][1].toInteger())) {
 											errorList << [error: 1, reason: 'Invalid syntax',
@@ -1306,7 +1304,7 @@ class CookbookService implements ServiceMethods {
 								detail: "$taskRef 'constraintTime' has invalid value ($task.constraintTime)"]
 						}
 
-						logger.debug '{} task.constraintTimeParsed={} ', taskRef, task.constraintTimeParsed
+						log.debug '{} task.constraintTimeParsed={} ', taskRef, task.constraintTimeParsed
 					} // ConstraintTime tests
 
 					// Validate duration if specified, which supports:
@@ -1357,7 +1355,7 @@ class CookbookService implements ServiceMethods {
 								}
 							}
 						}
-						logger.debug '{} - duration={}, value={}, uom={}, indirect={}',
+						log.debug '{} - duration={}, value={}, uom={}, indirect={}',
 								taskRef, d, task.durationValue, task.durationUom, task.durationIndirect
 					} // Duration tests
 
@@ -1452,7 +1450,7 @@ class CookbookService implements ServiceMethods {
 			return
 		}
 
-		logger.warn 'SECURITY: User {} illegally attempted to work with a recipe of different project, recipe id: {}, current project: {}',
+		log.warn 'SECURITY: User {} illegally attempted to work with a recipe of different project, recipe id: {}, current project: {}',
 				securityService.currentUsername, recipe.id, project
 
 		throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' +
