@@ -60,7 +60,7 @@ class BulkChangeReference implements ServiceMethods {
 		String queryForIds = BulkChangeUtil.getIdsQuery(type, ids, idsFilterQuery, params)
 		params[field] = object
 
-		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)", params)
+		AssetEntity.executeUpdate("UPDATE  $type.simpleName a SET $field = :$field WHERE a.id in($queryForIds)".toString(), params)
 	}
 
 	/**
