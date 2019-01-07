@@ -84,23 +84,45 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-2 control-label">Environment:</label>
-								<div class="col-sm-10">
-									<label class="control-label" style="text-transform: capitalize;">{{licenseModel.environment | lowercase}}</label>
+                                <label for="licenseEnvironment" class="col-sm-2 control-label">Environment:</label>
+								<div class="col-sm-3">
+                                    <kendo-dropdownlist
+                                        id="licenseEnvironment"
+                                        name="licenseEnvironment"
+                                        class="form-control"
+                                        [data]="environmentList"
+                                        [(ngModel)]="licenseModel.environment"
+                                        required
+                                        [disabled]="!editMode">
+                                        <ng-template kendoDropDownListValueTemplate let-dataItem>
+                                            <span class="template" style="text-transform: capitalize;">{{ dataItem | lowercase}}</span>
+                                        </ng-template>
+                                        <ng-template kendoDropDownListItemTemplate let-dataItem>
+                                            <span class="template" style="text-transform: capitalize;">{{ dataItem | lowercase}}</span>
+                                        </ng-template>
+                                    </kendo-dropdownlist>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-2 control-label">Inception:</label>
-								<div class="col-sm-10">
-									<label class="control-label">{{licenseModel.activationDate | date: dateFormat }}</label>
-								</div>
+                                <kendo-daterange>
+                                    <label class="col-sm-2 control-label">Valid Dates:</label>
+                                    <div class="col-sm-2" style="width: 173px;">
+                                        <kendo-dateinput kendoDateRangeStartInput [(value)]="range.start" [disabled]="!editMode"></kendo-dateinput>
+                                    </div>
+                                    <div class="col-sm-1" style="width: 10px; padding-top: 9px;">
+                                        <span><i class="fa fa-fw fa-ellipsis-v"></i></span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <kendo-dateinput kendoDateRangeEndInput [(value)]="range.end" [disabled]="!editMode"></kendo-dateinput>
+                                    </div>
+                                </kendo-daterange>
 							</div>
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Expiration:</label>
-								<div class="col-sm-10">
-									<label class="control-label">{{licenseModel.expirationDate | date: dateFormat }}</label>
-								</div>
-							</div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Request Date:</label>
+                                <div class="col-sm-10">
+                                    <label class="control-label">{{licenseModel.requestDate | date: dateFormat }}</label>
+                                </div>
+                            </div>
 							<div class="form-group">
 								<label for="selectSpecialInstructions" class="col-sm-12 control-label">Special Instructions and/or PO# reference:</label>
 							</div>
@@ -110,28 +132,69 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-1"></label>
-								<label class="col-sm-2 control-label text-right element-width-50">Id:</label>
-								<div class="col-sm-9">
-									<label class="control-label">{{licenseModel.id}}</label>
-								</div>
+								<label for="licenseManagerBanner" class="col-sm-12 control-label">License Banner Message:</label>
 							</div>
-							<div class="form-group" *ngIf="licenseModel.replaced">
-								<label class="col-sm-2 control-label text-right element-width-100">Replaced:</label>
-								<div class="col-sm-10">
-									<label class="control-label">{{licenseModel.replaced.date | date}}</label>
-									<label class="control-label pad-left-20">Server <a href="{{licenseModel.replaced.url}}">{{licenseModel.replaced.name}}</a></label>
+							<div class="form-group">
+								<div class="col-sm-8">
+									<input id="licenseManagerBanner" type="text" name="bannerMessage" [(ngModel)]="licenseModel.bannerMessage" style="width: 100%" [disabled]="!editMode">
 								</div>
 							</div>
 						</div><!-- /.tab-pane -->
 						<div class="tab-pane" id="tab_2">
-
+							<div class="form-group">
+								<label class="col-md-12 control-label">The following text block contains the details of the license information in an encrypted format.</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8">
+									<textarea id="detailedKeyText" name="detailedKeyText" class="form-control" rows="8" [(ngModel)]="licenseKey" readonly></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8">
+									<button [copy-clipboard]="licenseKey" type="submit" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
+								</div>
+							</div>
 						</div><!-- /.tab-pane -->
 						<div class="tab-pane" id="tab_3">
 
 						</div><!-- /.tab-pane -->
 						<div class="tab-pane" id="tab_4">
-
+							<div class="form-group">
+								<label class="col-sm-2 control-label text-right">License Id:</label>
+								<div class="col-sm-10">
+									<label class="control-label">{{licenseModel.id}}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label text-right">Project Name:</label>
+								<div class="col-sm-10">
+									<label class="control-label" *ngIf="!editMode" style="text-transform: capitalize;">{{licenseModel.project.name | lowercase }}</label>
+									<div class="btn-group btn-with-close-icon" *ngIf="editMode">
+										<input type="text" name="projectName" [(ngModel)]="licenseModel.project.name" style="width: 300px;" >
+										<i class="fa fa-fw fa-close"  (click)="licenseModel.project.name = '';"></i>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label text-right">Host Name:</label>
+								<div class="col-sm-10">
+									<label class="control-label" *ngIf="!editMode">{{licenseModel.hostName}}</label>
+									<div class="btn-group btn-with-close-icon" *ngIf="editMode">
+										<input  type="text" name="hostName" [(ngModel)]="licenseModel.hostName" style="width: 300px;">
+										<i class="fa fa-fw fa-close" (click)="licenseModel.hostName = ''"></i>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label text-right">Website Name:</label>
+								<div class="col-sm-10">
+									<label class="control-label" *ngIf="!editMode">{{licenseModel.websitename}}</label>
+									<div class="btn-group btn-with-close-icon" *ngIf="editMode">
+										<input  type="text" name="websitename" [(ngModel)]="licenseModel.websitename" style="width: 300px;">
+										<i class="fa fa-fw fa-close" (click)="licenseModel.websitename = ''"></i>
+									</div>
+								</div>
+							</div>
 						</div><!-- /.tab-pane -->
 					</div><!-- /.tab-content -->
 				</div>

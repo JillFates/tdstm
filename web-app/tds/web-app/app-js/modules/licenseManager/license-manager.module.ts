@@ -11,6 +11,7 @@ import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs';
+import {IntlModule} from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {LicenseListComponent} from './components/list/license-list.component';
@@ -34,6 +35,7 @@ import {LicenseManagerService} from './service/license-manager.service';
 		PopupModule,
 		InputsModule,
 		DateInputsModule,
+		IntlModule,
 		// Route
 		LicenseManagerRouteModule
 	],

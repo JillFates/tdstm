@@ -84,7 +84,19 @@ export class LicenseManagerService {
 	 * Get the possible Environment Data Source
 	 */
 	getEnvironments(): Observable<any[]> {
-		return this.http.get(`${this.licenseUrl}/environment`)
+		return this.http.get(`../ws/license/environment`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get Key associated with the License
+	 */
+	getKeyCode(id: number): Observable<any[]> {
+		return this.http.get(`${this.licenseUrl}/${id}/key`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

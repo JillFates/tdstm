@@ -27,6 +27,8 @@ export class LicenseDetailComponent implements OnInit {
 	protected pendingLicense = false;
 	protected expiredOrTerminated = false;
 	protected activeShowMode = false;
+	protected range = { start: null, end: null };
+	protected licenseKey = 'Licenses has not been issued';
 
 	constructor(
 		public licenseModel: LicenseModel,
@@ -40,6 +42,7 @@ export class LicenseDetailComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.getEnvironmentData();
 
 		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
 			this.dateFormat = dateFormat;
@@ -48,7 +51,25 @@ export class LicenseDetailComponent implements OnInit {
 		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
 			this.licenseModel = licenseModel;
 			this.prepareControlActionButtons();
+			this.prepareLicenseKey();
 		})
+	}
+
+	/**
+	 *  Get the List on Environments
+	 */
+	private getEnvironmentData(): void {
+		this.licenseManagerService.getEnvironments().subscribe((res: any) => {
+			this.environmentList = res;
+		});
+	}
+
+	private prepareLicenseKey(): void {
+		if(this.licenseModel.status === 'ACTIVE') {
+			this.licenseManagerService.getKeyCode(this.licenseModel.id).subscribe((licenseKey: any) => {
+				this.licenseKey = licenseKey;
+			});
+		}
 	}
 
 	/**
