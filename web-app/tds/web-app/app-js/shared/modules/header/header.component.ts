@@ -32,9 +32,10 @@ declare var jQuery: any;
                 </h1>
                 <ol class="breadcrumb">
                     <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}" >
-                        <a *ngIf="!last">{{(menu.text || menu) | translate}}</a>
+                        <a *ngIf="!last && menu.navigateTo" href="{{menu.navigateTo}}">{{(menu.text || menu) | translate}}</a>
+                        <a *ngIf="!last && !menu.navigateTo">{{(menu.text || menu) | translate}}</a>
                         <ng-container *ngIf="last">
-                            {{ menu | translate }}
+                            {{ menu.text || menu | translate }}
                         </ng-container>
                     </li>
                 </ol>
