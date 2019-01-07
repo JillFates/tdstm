@@ -1,8 +1,17 @@
 \!
-.idea/
+Thumbs.db
+.DS_Store
+.gradle
+build/
+out/
+.idea
 *.iml
 *.ipr
 *.iws
+.project
+.settings
+.classpath
+# from grails 2.5.x
 *.log
 target/
 plugins/
@@ -10,12 +19,12 @@ run.sh
 .slcache/
 node_modules/
 specs-dist/
-web-app/css/managerStyle.css
-web-app/css/tds-style.css
-web-app/dist/App.js
-web-app/dist/Vendors.js
-web-app/tds/web-app/dist/**
-web-app/tds/web-app/css/tds-style.css
+src/main/webapp/css/managerStyle.css
+src/main/webapp/css/tds-style.css
+src/main/webapp/dist/App.js
+src/main/webapp/dist/Vendors.js
+src/main/webapp/tds/web-app/dist/**
+src/main/webapp/tds/web-app/css/tds-style.css
 test/e2e/build
 # ignore local config file!
 tdstm-config.groovy
