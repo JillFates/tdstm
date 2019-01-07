@@ -6,7 +6,6 @@ import { HttpInterceptor } from '../providers/http-interceptor.provider';
 import {catchError, map} from 'rxjs/operators';
 
 import {DateUtils} from '../utils/date.utils';
-import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';
 
 // add constants as needed
 export const PREFERENCES_LIST = {
@@ -17,10 +16,15 @@ export const PREFERENCES_LIST = {
 	CURR_TZ: 'CURR_TZ',
 	DATA_SCRIPT_SIZE: 'DATA_SCRIPT_SIZE',
 	VIEW_UNPUBLISHED: 'VIEW_UNPUBLISHED',
-	IMPORT_BATCH_LIST_SIZE: 'IMPORT_BATCH_LIST_SIZE',
-	IMPORT_BATCH_RECORDS_FILTER: 'IMPORT_BATCH_RECORDS_FILTER',
+	IMPORT_BATCH_PREFERENCES: 'IMPORT_BATCH_PREFERENCES',
 	CURR_DT_FORMAT: 'CURR_DT_FORMAT'
 };
+
+export const IMPORT_BATCH_PREFERENCES = {
+	LIST_SIZE: 'LIST_SIZE',
+	TWISTIE_COLLAPSED: 'TWISTIE_COLLAPSED',
+	RECORDS_FILTER: 'RECORDS_FILTER'
+}
 
 @Injectable()
 export class PreferenceService {
@@ -82,7 +86,7 @@ export class PreferenceService {
 	}
 
 	/**
-	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
+	 * Used to retrieve the format to use for Date properties based on user's preference (e.g. MM/dd/YYYY)
 	 */
 	getUserDateFormat(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
@@ -94,7 +98,10 @@ export class PreferenceService {
 
 	getUserDateFormatForMomentJS(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		return currentUserDateFormat
+		if (currentUserDateFormat) {
+			return currentUserDateFormat;
+		}
+		return DateUtils.PREFERENCE_MIDDLE_ENDIAN;
 	}
 
 	getUserDateFormatForKendo(): string {
@@ -107,7 +114,11 @@ export class PreferenceService {
 	 * based on user's preference in TM instead of the TimeZone of their computer.
 	 */
 	getUserTimeZone(): string {
-		return this.preferences[PREFERENCES_LIST.CURR_TZ];
+		const currentUserTimeZone = this.preferences[PREFERENCES_LIST.CURR_TZ];
+		if (currentUserTimeZone) {
+			return currentUserTimeZone;
+		}
+		return DateUtils.TIMEZONE_GMT;
 	}
 
 	/**
@@ -153,16 +164,6 @@ export class PreferenceService {
 				return { width, height };
 			}))
 			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
-	getImportBatchListSizePreference(): Observable<number> {
-		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE)
-			.pipe(map(result => {
-				if (!result || isNaN(result)) {
-					return GRID_DEFAULT_PAGE_SIZE;
-				}
-				return parseInt(result, 0);
-			}));
 	}
 
 	/**

@@ -4,7 +4,7 @@ import grails.test.mixin.TestFor
 //import net.transitionmanager.domain.UserLogin
 //import net.transitionmanager.domain.UserPreference
 //import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import spock.lang.Ignore
 import test.AbstractUnitSpec
 import com.tdsops.tm.enums.ControlType

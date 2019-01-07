@@ -5,13 +5,14 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import grails.util.Environment
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
@@ -160,6 +161,7 @@ class AssetComment {
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
+		score nullable: true
 	}
 
 	static mapping = {

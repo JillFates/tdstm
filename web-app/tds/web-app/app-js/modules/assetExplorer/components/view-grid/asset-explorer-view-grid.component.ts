@@ -439,7 +439,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			detail: {
 				assetClass: dataItem.common_assetClass,
 				assetEntity: dataItem.common_id,
-				assetName: dataItem.common_assetName,
+				assetName: dataItem && dataItem.common_assetName || '',
 				currentUserId: this.currentUser.id
 			}
 		};

@@ -28,7 +28,7 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

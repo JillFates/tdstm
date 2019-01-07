@@ -1,4 +1,4 @@
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.InvalidParamException
@@ -80,9 +80,9 @@ class ControlTagLib {
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
-		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		sb.append(StringEscapeUtils.escapeHtml4(fieldSpec.label))
 		if (attrs.containsKey("labelSuffix")){
-            sb.append(StringEscapeUtils.escapeHtml(attrs.labelSuffix))
+            sb.append(StringEscapeUtils.escapeHtml4(attrs.labelSuffix))
         }
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
@@ -551,9 +551,9 @@ class ControlTagLib {
 
 		boolean isBlank = StringUtil.isBlank(value)
 		if (! isBlank) {
-			attrib += StringEscapeUtils.escapeHtml(value)
+			attrib += StringEscapeUtils.escapeHtml4(value)
 		} else if (defValue != null) {
-			attrib += StringEscapeUtils.escapeHtml(defValue)
+			attrib += StringEscapeUtils.escapeHtml4(defValue)
 		}
 		attrib += '"'
 
@@ -576,7 +576,7 @@ class ControlTagLib {
 
 		StringBuilder opt = new StringBuilder('<option')
 		opt.append(' value="')
-		opt.append(StringEscapeUtils.escapeHtml(option))
+		opt.append(StringEscapeUtils.escapeHtml4(option))
 		opt.append('"')
 
 		if (selected) {

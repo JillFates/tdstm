@@ -26,7 +26,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */

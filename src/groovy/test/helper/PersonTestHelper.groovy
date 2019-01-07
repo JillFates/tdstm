@@ -20,7 +20,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.RandomStringUtils
 
 class PersonTestHelper {
