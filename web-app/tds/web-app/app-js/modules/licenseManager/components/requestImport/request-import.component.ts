@@ -5,11 +5,9 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {LicenseManagerService} from '../../service/license-manager.service';
 // Model
-import {LicenseModel} from '../../model/license.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {AlertType} from '../../../../shared/model/alert.model';
 // Other
-import 'rxjs/add/operator/finally';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
@@ -49,27 +47,27 @@ export class RequestImportComponent {
 	}
 
 	/**
-	 * Apply the key and close the dialog, also send an info msg
+	 * Import the key and close the dialog, also send an info msg
 	 */
-	protected applyKey(): void {
-		// this.licenseManagerService.applyKey(this.licenseModel.id, this.licenseKey).subscribe((res: any) => {
-		// 	let message = '';
-		// 	let alertType: AlertType = null;
-		//
-		// 	if (res) {
-		// 		alertType = AlertType.INFO;
-		// 		message = 'License was successfully applied';
-		// 	} else {
-		// 		message = 'License was not applied';
-		// 		alertType = AlertType.WARNING;
-		// 	}
-		//
-		// 	this.notifierService.broadcast({
-		// 		name: alertType,
-		// 		message: message
-		// 	});
-		// 	this.activeDialog.close();
-		// });
+	protected requestImportLicense(): void {
+		this.licenseManagerService.requestImportLicense(this.licenseKey).subscribe((res: any) => {
+			let message = '';
+			let alertType: AlertType = null;
+
+			if (res) {
+				alertType = AlertType.INFO;
+				message = 'License was successfully Imported';
+			} else {
+				message = 'License was not applied. Review the provided License Key is correct.';
+				alertType = AlertType.WARNING;
+			}
+
+			this.notifierService.broadcast({
+				name: alertType,
+				message: message
+			});
+			this.activeDialog.close();
+		});
 	}
 
 	/**
@@ -79,5 +77,4 @@ export class RequestImportComponent {
 	private isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.licenseKey);
 	}
-
 }

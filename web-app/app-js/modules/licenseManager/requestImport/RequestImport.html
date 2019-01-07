@@ -16,7 +16,7 @@
         </form>
     </div>
     <div class="modal-footer form-group">
-        <button ng-click="requestImport.onImportLicense()" ng-disabled="importLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
+        <button ng-click="requestImport.onImportLicense()" [disabled]="importLicenseForm.$invalid" type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
         <button ng-click="requestImport.cancelCloseDialog()" type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>

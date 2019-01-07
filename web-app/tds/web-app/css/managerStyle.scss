@@ -77,9 +77,21 @@ div.modal-dialog {
       border-color: $border-color_orange !important;
       background-color: $border-color_orange !important;
     }
+    .nav-tabs-custom {
+      ul.nav {
+        li.active {
+          border-top-color: $border-color_orange;
+        }
+      }
+    }
     button.btn-primary {
       border-color: $border-color_orange;
       background-color: $border-color_orange;
+    }
+    button {
+      .glyphicon.glyphicon-ok {
+        color: white;
+      }
     }
   }
 }

@@ -91,6 +91,7 @@ export class LicenseModel {
 	description?: string;
 	comment?: string;
 	dateCreated?: Date;
+	status?: string;
 }
 
 export enum LicenseType {

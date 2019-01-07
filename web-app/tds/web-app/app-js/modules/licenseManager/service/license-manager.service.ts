@@ -45,10 +45,10 @@ export class LicenseManagerService {
 	}
 
 	/**
-	 * Apply the key for an specific license
+	 * Import a New License
 	 */
-	applyKey(id: number, hash: string): Observable<any> {
-		return this.http.post(`${this.licenseUrl}/${id}/load`, JSON.stringify({hash: hash}))
+	requestImportLicense(licenseKey: string): Observable<any> {
+		return this.http.post(`${this.licenseUrl}/request`, JSON.stringify({ data: licenseKey}))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

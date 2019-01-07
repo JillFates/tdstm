@@ -3,8 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Component
 import {RequestImportComponent} from '../requestImport/request-import.component';
-// import {CreatedLicenseComponent} from '../created-license/created-license.component';
-// import {LicenseDetailComponent} from '../detail/license-detail.component';
+import {LicenseDetailComponent} from '../detail/license-detail.component';
 // Service
 import {LicenseManagerService} from '../../service/license-manager.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -134,26 +133,11 @@ export class LicenseListComponent implements OnInit {
 	 * Import a new Request License
 	 */
 	protected onImportLicenseRequest(): void {
-		this.dialogService.open(RequestImportComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
-			if (requestLicenseModel) {
-				this.reloadData();
-			}
+		this.dialogService.open(RequestImportComponent, []).then(() => {
+			this.reloadData();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
-	}
-
-	/**
-	 * Opens a dialog to show to the user that the request has been created and next steps to follow
-	 */
-	private openCreatedLicenseDialog(requestLicenseModel: RequestLicenseModel): void {
-		// this.dialogService.open(CreatedLicenseComponent, [
-		// 	{provide: RequestLicenseModel, useValue: requestLicenseModel}
-		// ]).then(() => {
-		// 	console.log('Dismissed Dialog');
-		// }).catch(() => {
-		// 	console.log('Dismissed Dialog');
-		// });
 	}
 
 	/**
@@ -173,16 +157,16 @@ export class LicenseListComponent implements OnInit {
 	 * @param licenseModel
 	 */
 	private openLicenseViewEdit(licenseModel: LicenseModel): void {
-		// this.dialogService.open(LicenseDetailComponent, [
-		// 	{ provide: LicenseModel, useValue: licenseModel }
-		// ], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
-		// 	if (result && result.id) {
-		// 		//
-		// 	}
-		// }).catch(result => {
-		// 	this.reloadData();
-		// 	console.log('Dismissed Dialog');
-		// });
+		this.dialogService.open(LicenseDetailComponent, [
+			{ provide: LicenseModel, useValue: licenseModel }
+		], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
+			if (result && result.id) {
+				//
+			}
+		}).catch(result => {
+			this.reloadData();
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	/**

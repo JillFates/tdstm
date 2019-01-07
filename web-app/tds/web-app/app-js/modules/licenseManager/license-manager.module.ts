@@ -15,10 +15,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {LicenseListComponent} from './components/list/license-list.component';
 import {RequestImportComponent} from './components/requestImport/request-import.component';
-// import {CreatedLicenseComponent} from './components/created-license/created-license.component';
-// import {LicenseDetailComponent} from './components/detail/license-detail.component';
-// import {ApplyKeyComponent} from './components/apply-key/apply-key.component';
-// import {ManualRequestComponent} from './components/manual-request/manual-request.component';
+import {LicenseDetailComponent} from './components/detail/license-detail.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {LicensesResolveService} from './resolve/licenses-resolve.service';
@@ -43,10 +40,7 @@ import {LicenseManagerService} from './service/license-manager.service';
 	declarations: [
 		LicenseListComponent,
 		RequestImportComponent,
-		// CreatedLicenseComponent,
-		// LicenseDetailComponent,
-		// ApplyKeyComponent,
-		// ManualRequestComponent
+		LicenseDetailComponent
 	],
 	providers: [
 		// Resolve
@@ -58,17 +52,11 @@ import {LicenseManagerService} from './service/license-manager.service';
 	exports: [
 		LicenseListComponent,
 		RequestImportComponent,
-		// CreatedLicenseComponent,
-		// LicenseDetailComponent,
-		// ApplyKeyComponent,
-		// ManualRequestComponent
+		LicenseDetailComponent
 	],
 	entryComponents: [
 		RequestImportComponent,
-		// CreatedLicenseComponent,
-		// LicenseDetailComponent,
-		// ApplyKeyComponent,
-		// ManualRequestComponent
+		LicenseDetailComponent
 	]
 })
 

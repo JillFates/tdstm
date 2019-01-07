@@ -4,7 +4,7 @@
 		<h4 class="modal-title">{{ 'LICENSE.IMPORT_LICENSE_REQUEST' | translate }}</h4>
 	</div>
 	<div class="modal-body">
-		<form name="applyLicenseForm" role="form" data-toggle="validator" #applyLicenseForm='ngForm' class="form-horizontal left-alignment">
+		<form name="applyLicenseForm" role="form" data-toggle="validator" #requestImportLicenseForm='ngForm' class="form-horizontal left-alignment">
 			<div class="form-group">
 				<label class="col-md-12 control-label">{{ 'LICENSE.PASTE_LICENSE_BLOCK' | translate }}</label>
 			</div>
@@ -16,10 +16,10 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button (click)="applyKey()" [disabled]="!applyLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
+		<button (click)="requestImportLicense()" [disabled]="!requestImportLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span>{{'GLOBAL.CLOSE' | translate }}</span>
+			<span>{{'GLOBAL.CANCEL' | translate }}</span>
 		</button>
 	</div>
 </div>
