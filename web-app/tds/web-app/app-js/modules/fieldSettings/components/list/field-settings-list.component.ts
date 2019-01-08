@@ -106,7 +106,6 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
 
-				let nameConflicts: string[] = [];
 				// remove(delete) fields if user requested
 				for (let domain of this.domains) {
 					if (this.fieldsToDelete[domain.domain].length > 0) {
@@ -117,28 +116,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 							}
 						});
 					}
-					// TM-13505: Check if the label of any custom field is the same as the field name of any
-					// other field. If so, show a warning with the conflicting names
-
-					for (var i = 0; i < domain.fields.length; i++) {
-						// remove one by one, and compare with the rest
-						let fieldToCompare = domain.fields[i]
-						for (var k = i + 1; k < domain.fields.length; k++) {
-							let compareTo = domain.fields[k]
-							if (fieldToCompare.field.toLowerCase() === compareTo.label.toLowerCase()) {
-								nameConflicts.push(compareTo.label)
-							}
-						}
-					}
 				}
-				if (nameConflicts.length > 0) {
-					let conflicts = nameConflicts.join(", ")
-					this.notifier.broadcast({
-						name: AlertType.WARNING,
-						message: "The Label name can not be the same as other fields' name. Conflicting names: " + conflicts
-					});
-				}
-
 
 				this.domains.forEach(domain => {
 					domain.fields.filter(x => x['isNew'])

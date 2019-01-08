@@ -326,8 +326,26 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Checks if the given label is an invalid String, and returns true or false respectively.
+	 * The error conditions are:
+	 * 	- The label is an empty String
+	 * 	- The label String matches other label in the fields list.
+	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
+	 * 	  e.g. label: "Last Modified or last modified or LastModified". other label: "Last Modified". This comparisons will error.
+	 *
+	 * 	- The label String matches a fields name in the fields list.
+	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
+	 * 	  e.g. label: "Asset Name or asset Name or AssetName or assetName". some field name: "assetName". This comparisons will error.
+	 *
+	 * @See TM-13505
+	 * @param label
+	 * @returns {boolean}
+	 */
 	protected hasError(label: string) {
-		return label.trim() === '' || this.data.fields.filter(item => item.label.toLowerCase().trim() === label.toLowerCase().trim()).length > 1;
+		return label.trim() === '' || this.data.fields.filter(
+			item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim() ||
+					item.field.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
 	}
 
 	/**
