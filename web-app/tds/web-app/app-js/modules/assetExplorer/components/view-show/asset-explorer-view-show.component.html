@@ -58,7 +58,7 @@
                     (click)="onFavorite()">
             </tds-button>
 
-            <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="btnExport"></tds-button>
+            <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="'btnExport'"></tds-button>
 
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
