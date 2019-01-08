@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import grails.util.Environment
 import grails.util.Metadata
-import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
+import org.grails.core.exceptions.GrailsConfigurationException
 
 /**
  * Methods considered core to the application functionality

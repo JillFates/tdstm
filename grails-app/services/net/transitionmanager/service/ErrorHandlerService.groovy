@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.springframework.web.util.UrlPathHelper
 
 /**
@@ -96,7 +97,7 @@ class ErrorHandlerService {
 	Map model(request) {
 		def exception = getException(request)
 		if (exception) {
-			if (exception instanceof org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException) {
+			if (exception instanceof GrailsWrappedRuntimeException) {
 				// Get to the real exception wrapped in the Grails exception
 				exception = exception.cause
 				log.debug "model() in GrailsWrappedRuntimeException scenario"
