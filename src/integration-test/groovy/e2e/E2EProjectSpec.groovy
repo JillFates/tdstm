@@ -34,7 +34,7 @@ import test.helper.ProviderTestHelper
 import test.helper.RecipeTestHelper
 import test.helper.SettingTestHelper
 import test.helper.TagTestHelper
-import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 
 class E2EProjectSpec extends Specification {
 	// Set transactional false to persist at database when spec finishes

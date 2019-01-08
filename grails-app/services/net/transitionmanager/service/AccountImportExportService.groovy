@@ -19,7 +19,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory

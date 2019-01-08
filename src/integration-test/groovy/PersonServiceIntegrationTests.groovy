@@ -18,7 +18,12 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
-import org.apache.commons.lang.RandomStringUtils as RSU
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.PartyGroup
+
+import org.apache.commons.lang3.RandomStringUtils as RSU
+import groovy.time.TimeCategory
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Specification
 

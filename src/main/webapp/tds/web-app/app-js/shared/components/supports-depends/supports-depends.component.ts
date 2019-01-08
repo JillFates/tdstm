@@ -13,6 +13,7 @@ import {Observable} from 'rxjs';
 import {UIDialogService} from '../../services/ui-dialog.service';
 import {AssetComment} from '../dependent-comment/model/asset-coment.model';
 import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
+import {TDSActionsButton} from '../button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -31,9 +32,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
-                <button (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)" tabindex="401" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                </button>
+                <tds-button
+                        class="float-right button-header-grid"
+                        [action]="ButtonActions.GenericAdd"
+                        id="add-support"
+                        (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
+                </tds-button>
             </ng-template>
 
             <!-- Columns -->
@@ -51,20 +55,21 @@ declare var jQuery: any;
                 </ng-template>
 
                 <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-                    <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-                        <button (click)="onAddEditComment(dataItem)"
-                                class="btn btn-action btn-default btn-comment"
-                                title="Comments">
-                            <i class="fa fa-fw fa-comment-o"></i>
-                            <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
-                            <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
-                        </button>
-                        <button (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)"
-                                class="btn btn-action btn-default btn-delete"
-                                title="Delete">
-                            <span class="fa fa-fw fa-trash"></span>
-                        </button>
+                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
+						<tds-button
+							[id]="'create-button-' + rowIndex"
+							[action]="ButtonActions.CommentCreate"
+							(click)="onAddEditComment(dataItem)">
+                            <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
+                            <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
+						</tds-button>
+						<tds-button
+							[id]="'delete-button-' + rowIndex"
+							class="command-delete"
+							[action]="ButtonActions.GenericDelete"
+							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
+						</tds-button>
                     </div>
                 </ng-template>
 
@@ -144,9 +149,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
-                <button tabindex="404" (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)"  class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                </button>
+                <tds-button
+                        class="float-right button-header-grid"
+                        [action]="ButtonActions.GenericAdd"
+                        id="dependent-support"
+                        (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
+                </tds-button>
             </ng-template>
 
             <!-- Columns -->
@@ -164,20 +172,21 @@ declare var jQuery: any;
                 </ng-template>
 
                 <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-                    <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-                        <button (click)="onAddEditComment(dataItem)"
-                                class="btn btn-action btn-default btn-comment"
-                                title="Comments">
-                            <i class="fa fa-fw fa-comment-o"></i>
-                            <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
-                            <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
-                        </button>
-                        <button (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)"
-                                class="btn btn-action btn-default btn-delete"
-                                title="Delete">
-                            <span class="fa fa-fw fa-trash"></span>
-                        </button>
+                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
+                    	<tds-button
+							[id]="'dependent-create-button-' + rowIndex"
+							[action]="ButtonActions.CommentCreate"
+							(click)="onAddEditComment(dataItem)">
+                            <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
+                            <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
+						</tds-button>
+						<tds-button
+							[id]="'dependent-delete-button-' + rowIndex"
+							class="command-delete"
+							[action]="ButtonActions.GenericDelete"
+							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">
+						</tds-button>
                     </div>
                 </ng-template>
 
@@ -253,6 +262,7 @@ export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
+	ButtonActions = TDSActionsButton;
 
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
 	private dataGridDependsOnHelper: DataGridOperationsHelper;

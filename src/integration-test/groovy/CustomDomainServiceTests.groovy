@@ -8,9 +8,9 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectService
-import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.commons.lang3.BooleanUtils
 import org.grails.web.json.JSONObject
+import org.apache.commons.lang3.RandomStringUtils as RSU
 import spock.lang.Specification
 import spock.lang.Stepwise
 

@@ -257,16 +257,20 @@ class CustomTagLib implements InitializingBean {
 				}
 
 				label = ""
+				def targetLabel = ""
 				if (optionValue) {
 					if (optionValue instanceof Closure) {
-						label = optionValue(el).toString().encodeAsHTML()
+						targetLabel = optionValue(el).toString()
 					} else {
-						label = el[optionValue].toString().encodeAsHTML()
+						targetLabel = el[optionValue].toString()
 					}
 				} else {
-					def s = el.toString()
-					if (s) label = s.encodeAsHTML()
+					targetLabel = el.toString()
 				}
+
+				targetLabel = targetLabel.replaceAll("'", "\\\\'")
+				label = targetLabel.encodeAsHTML()
+
 
 				if (!first) {
 					out << ","

@@ -1,20 +1,5 @@
 <%@ page import="net.transitionmanager.domain.Person" %>
 <%@page import="net.transitionmanager.security.Permission"%>
-<div class="menu4">
-	<ul>
-		<li>
-			<a href="javascript:void(0)" id="generalEditHeadId" class="mobmenu mobselect" onclick="Person.switchTab('generalInfoEditId','generalEditHeadId')">Person/Contact</a>
-		</li>
-		<li>
-			<a href="javascript:void(0)" id="availEditHeadId" class="mobmenu" onclick="Person.switchTab('availabilityEditId','availEditHeadId')">Availability</a>
-		</li>
-		<tds:hasPermission permission="${Permission.PersonEditTDS}">
-			<li>
-				<a href="javascript:void(0)" id="tdsEditHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityEditId','tdsEditHeadId')">Misc</a>
-			</li>
-		</tds:hasPermission>
-	</ul>
-</div>
 <g:form name="personDialogForm" action="updatePerson">
 	<div id="generalInfoEditId" class="person">
 		<input type="hidden" name="id" value="${person.id}" />
@@ -40,14 +25,6 @@
 						</td>
 						<td valign="top" class="value" style="width: 40px">
 							<input type="text" maxlength="64" id="firstNameId" name="firstName" value="${person.firstName}" size="10" />
-						</td>
-						<td rowspan="2">
-							<g:if test="${person.personImageURL==null}">
-								<asset:image src="images/blankPerson.jpg" alt="Smiley face" height="60" width="60" />
-							</g:if>
-							<g:else>
-								<img src="${person.personImageURL}" height="60" width="60">
-							</g:else>
 						</td>
 					</tr>
 
@@ -134,6 +111,53 @@
 
 					<tr class="prop">
 						<td valign="top" class="name">
+							<label for="keyWords">Keywords:</label>
+						</td>
+						<td valign="top" class="value" >
+							<input type="text" maxlength="64" id="keyWordsId" name="keyWords" size="40" value="${person.keyWords}" />
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="tdsNote">Comments:</label>
+						</td>
+						<td valign="top" class="value" colspan="2" >
+							<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="tdsLink">Contact URL:</label>
+						</td>
+						<td valign="top" class="value" colspan="2">
+							<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="staffType">Staff Type:</label>
+						</td>
+						<td valign="top" class="value" colspan="2">
+							<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="travelOK">Can Travel:</label>
+						</td>
+						<td valign="top" class="value" colspan="2">
+							<input type="checkbox" id="travleOKId" name="travelOK"
+								   onclick="if(this.checked){this.value = 1} else {this.value = 0 }" ${person.travelOK == 1 ? 'checked="checked"' : 1 }
+								   value="${person.travelOK}" />
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name">
 							<label>Team :</label>
 						</td>
 						<td valign="top" class="value" colspan="2">
@@ -173,104 +197,6 @@
 			</div>
 		</div>
 
-	</div>
-
-	<div id="availabilityEditId" class="person" style="display: none;">
-		<div>
-			<script type="text/javascript" charset="utf-8">
-				jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
-				function showCalender(id){
-					jQuery(function($){ $(id).kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
-				}
-			</script>
-			<table class="personTable" >
-				<tbody id="blackOutDay">
-					<tr>
-						<td><span><b>Available , except for the following dates</b></span></td>
-					</tr>
-					<g:each in="${blackOutdays}" var="blackOutDay" status="i">
-						<tr id="dateTrId_${i}">
-							<td align="center"><input type="text" class="dateRange"
-								size="15" style="width: 138px;"
-								name="availability" id="availabilityId_${i}"
-								value='<tds:convertDate date="${blackOutDay.exceptionDay}" />' />
-
-								<a href="javascript:deleteFuncsRow('dateTrId_${i}')">&nbsp;&nbsp;
-									<span class='clear_filter'>X</span>
-								</a>
-							</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
-			<br />
-			<span id="" onclick="addBlackOutDay()" style="cursor: pointer;"><b> Add Date </b></span>
-			<input type="hidden" id="availableId" value="1">
-
-			<div id="dateDivId" style="display: none">
-				<input type="text" size="15" style="width: 138px;" name="available" id="availId" />
-			</div>
-		</div>
-	</div>
-
-	<div id="tdsUtilityEditId" style="display: none;" class="person">
-		<div class="dialog">
-			<div class="dialog">
-				<table class="personTable" >
-					<tbody>
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="keyWords">Keywords:</label>
-							</td>
-							<td valign="top" class="value" >
-								<input type="text" maxlength="64" id="keyWordsId" name="keyWords" size="40" value="${person.keyWords}" />
-							</td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="tdsNote">Comments:</label>
-							</td>
-							<td valign="top" class="value" colspan="2" >
-								<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />
-							</td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="tdsLink">Contact URL:</label>
-							</td>
-							<td valign="top" class="value" colspan="2">
-								<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />
-							</td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="staffType">Staff Type:</label>
-							</td>
-							<td valign="top" class="value" colspan="2">
-								<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
-							</td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="travelOK">Can Travel:</label>
-							</td>
-							<td valign="top" class="value" colspan="2">
-								<input type="checkbox" id="travleOKId" name="travelOK"
-									onclick="if(this.checked){this.value = 1} else {this.value = 0 }" ${person.travelOK == 1 ? 'checked="checked"' : 1 }
-									value="${person.travelOK}" />
-							</td>
-						</tr>
-
-
-					</tbody>
-
-				</table>
-			</div>
-		</div>
 	</div>
 </g:form>
 <tds:hasPermission permission="${Permission.PersonEdit}">

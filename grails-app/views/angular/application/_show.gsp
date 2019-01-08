@@ -19,7 +19,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}"/>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 			<td class="valueNW ${standardFieldSpecs.sme.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${asset.sme?.id},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${asset.sme?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.sme}" />
                 </span>
 			</td>
@@ -30,7 +30,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}"/>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${asset.sme2?.id},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${asset.sme?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.sme2}" />
 				</span>
 			</td>

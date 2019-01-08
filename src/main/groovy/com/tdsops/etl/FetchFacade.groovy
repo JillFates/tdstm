@@ -77,6 +77,18 @@ class FetchFacade {
 	}
 
 	/**
+	 * Validates if an ETL script is using incorrectly variable names
+	 * <pre>
+	 *		fetch 'id' set aBogusVariableName
+	 * </pre>
+	 * @param localVariableDefinition an instance of @{code LocalVariableDefinition}
+	 * @throws ETLProcessorException
+	 */
+	Map<String, Object> set(LocalVariableDefinition localVariableDefinition) {
+		return set(localVariableDefinition.name)
+	}
+
+	/**
 	 * Executes the fetch command logic.
 	 * 1. By ID
 	 * 2. By find/elseFind

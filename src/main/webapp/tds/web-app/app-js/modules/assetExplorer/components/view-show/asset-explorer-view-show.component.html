@@ -3,16 +3,23 @@
         <div>
             <div class="btn-group"
                  *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
-                <button tds-button
-                        icon="floppy-o"
-                        (click)="save()"
-                        [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
-                        [attr.id]="getSaveButtonId()">
-                    {{ (model.isOwner ? 'GLOBAL.SAVE' : 'GLOBAL.SAVE_AS') | translate }}
-                </button>
+
+                <tds-button *ngIf="model.isOwner"
+                        [action]="ButtonActions.GenericSave"
+                        (click)="onSave()"
+                        id="btnSave"
+                        [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
+                </tds-button>
+
+                <tds-button *ngIf="!model.isOwner"
+                            [action]="ButtonActions.GenericSaveAs"
+                            (click)="onSaveAs()"
+                            id="btnSaveAs"
+                            [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
+                </tds-button>
 
                 <button type="button" class="btn dropdown-toggle"
-                        [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable()}"
+                        [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable(), 'pull-right': true}"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
@@ -28,45 +35,41 @@
                 </ul>
             </div>
             <ng-template #saveButton>
-                <button tds-button
-                    icon="floppy-o"
-                    id="btnSave"
-                    *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
-                    [disabled]="!isSaveAvailable()"
-                    [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
-                    (click)="onSave()">
-                    {{ 'GLOBAL.SAVE' | translate }}
-                </button>
+                <tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+                            [action]="ButtonActions.GenericSave"
+                            id="btnSave"
+                            [disabled]="!isSaveAvailable()"
+                            [ngClass]="{'btn-success':isDirty()}"
+                            (click)="onSave()">
+                </tds-button>
 
-                <button tds-button
-                    icon="floppy-o"
-                    id="btnSaveAs"
-                    *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
-                    [disabled]="!isSaveAsAvailable()"
-                    [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty()}"
-                    (click)="onSaveAs()">
-                    {{ 'GLOBAL.SAVE_AS' | translate }}
-                </button>
+                <tds-button *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+                            [action]="ButtonActions.GenericSaveAs"
+                            id="btnSaveAs"
+                            [disabled]="!isSaveAsAvailable()"
+                            [ngClass]="{'btn-success':isDirty()}"
+                            (click)="onSaveAs()">
+                </tds-button>
             </ng-template>
-            <button tds-button
-                    [icon]="model.isFavorite? 'star' : 'star-o'"
-                    class="text-yellow tds-button-icon"
+
+            <tds-button [action]="model.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
+                    class="text-yellow"
+                    isIconButton="true"
                     (click)="onFavorite()">
-            </button>
-            <button tds-button
-                    icon="download"
-                    class="btn btn-default"
-                    (click)="onExport()"
-                    id="btnExport">Export</button>
+            </tds-button>
+
+            <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="btnExport"></tds-button>
+
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
-            <button tds-button
-                    icon="cog"
-                    class="tds-button-icon pull-right"
-                    *ngIf="isEditAvailable()"
-                    (click)="onEdit()">
-            </button>
+
+            <tds-button *ngIf="isEditAvailable()"
+                        isIconButton="true"
+                        [action]="ButtonActions.GenericConfiguration"
+                        class="pull-right"
+                        (click)="onEdit()">
+            </tds-button>
         </div>
         <div class="box-body">
                 <asset-explorer-view-grid

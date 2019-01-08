@@ -34,7 +34,7 @@ import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat

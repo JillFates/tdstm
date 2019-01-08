@@ -49,9 +49,9 @@ import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
-import org.apache.commons.lang.StringEscapeUtils as SEU
+import org.apache.commons.text.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
@@ -2092,7 +2092,7 @@ class AssetEntityService implements ServiceMethods {
 	def getEscapedName(assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
 		if (assetEntity.assetName) {
-			name = SEU.escapeHtml(SEU.escapeJavaScript(assetEntity.assetName))
+			name = SEU.escapeHtml4(SEU.escapeEcmaScript(assetEntity.assetName))
 		}
 		return name
 	}

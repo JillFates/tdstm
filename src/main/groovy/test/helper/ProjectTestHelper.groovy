@@ -11,7 +11,8 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
+
 /**
  * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting
  * for the ITs so that they an focus on the good stuff.

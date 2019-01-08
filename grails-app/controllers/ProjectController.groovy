@@ -30,7 +30,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -685,7 +685,7 @@ class ProjectController implements ControllerMethods {
 		if (!project) return
 
 		[project: project.name, client: project.client.name,
-		 defaultEmail: StringEscapeUtils.escapeHtml(grailsApplication.config.grails.mail.default.from),
+		 defaultEmail: StringEscapeUtils.escapeHtml4(grailsApplication.config.grails.mail.default.from),
 		 accounts: projectService.getAccountActivationUsers(project), adminEmail: securityService.userLoginPerson.email]
 	}
 
@@ -707,7 +707,7 @@ class ProjectController implements ControllerMethods {
 				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
 					def fromEmail = grailsApplication.config.grails.mail.default.from
-					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
+					fromEmail = StringEscapeUtils.escapeHtml4(fromEmail)
 					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params.customMessage, fromEmail, request.getRemoteAddr())
 					message = "The Account Activation Notification has been sent out to the users."
 				}else{

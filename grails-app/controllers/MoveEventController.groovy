@@ -26,7 +26,7 @@ import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate

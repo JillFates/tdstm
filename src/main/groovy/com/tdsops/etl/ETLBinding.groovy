@@ -41,7 +41,7 @@ class ETLBinding extends Binding {
 	        // Now set command is working with:
 	        // set environmentVar with 'Production'
 	        if(isValidETLVariableName(name)){
-		        result = name
+		        result = new LocalVariableDefinition(name)
 	        } else {
 		        throw ETLProcessorException.missingPropertyException(name)
 	        }

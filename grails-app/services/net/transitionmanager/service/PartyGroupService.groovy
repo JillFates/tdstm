@@ -8,7 +8,7 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

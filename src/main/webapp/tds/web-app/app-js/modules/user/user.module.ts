@@ -22,6 +22,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {UserService} from './service/user.service';
+import {UserManageStaffComponent} from './components/manage-staff/user-manage-staff.component';
 
 @NgModule({
 	imports: [
@@ -45,18 +46,21 @@ import {UserService} from './service/user.service';
 		UserDateTimezoneComponent,
 		UserListComponent,
 		UserPreferencesComponent,
-		UserEditPersonComponent
+		UserEditPersonComponent,
+		UserManageStaffComponent
 	],
 	exports: [
 		UserDateTimezoneComponent,
 		UserListComponent,
 		UserPreferencesComponent,
-		UserEditPersonComponent
+		UserEditPersonComponent,
+		UserManageStaffComponent
 	],
 	entryComponents: [
 		UserPreferencesComponent,
 		UserEditPersonComponent,
-		UserDateTimezoneComponent
+		UserDateTimezoneComponent,
+		UserManageStaffComponent
 	]
 })
 

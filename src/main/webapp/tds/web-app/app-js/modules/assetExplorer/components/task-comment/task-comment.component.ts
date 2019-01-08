@@ -16,6 +16,7 @@ import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {clone} from 'ramda';
 
 @Component({
@@ -48,6 +49,7 @@ export class TaskCommentComponent implements OnInit {
 	private showAllComments: boolean;
 	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
+	protected ButtonActions = TDSActionsButton;
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
 		this.getPreferences();
