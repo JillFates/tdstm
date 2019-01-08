@@ -730,10 +730,12 @@ class DataviewService implements ServiceMethods {
 				// Trigger the parsing of the parameter.
 				SqlUtil.parseParameter(fieldSearchData)
 
-				// Add the condition and its parameters only if there are parameters for the query.
-				if (fieldSearchData.sqlSearchParameters) {
+				if (fieldSearchData.sqlSearchExpression) {
 					// Append the where clause to the list of conditions.
 					whereConditions << fieldSearchData.sqlSearchExpression
+				}
+
+				if (fieldSearchData.sqlSearchParameters) {
 					// Add the parameters required for this field.
 					whereParams += fieldSearchData.sqlSearchParameters
 				}

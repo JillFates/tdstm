@@ -5,8 +5,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
-import org.apache.commons.text.StringEscapeUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.text.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 
 class SqlUtil {
@@ -274,7 +274,10 @@ class SqlUtil {
 			return
 		}
 
-		Boolean isEnumerationField = isEnumerationField(fieldSearchData)
+		if (isEnumerationField(fieldSearchData)) {
+			handleEnumerationField(fieldSearchData)
+			return
+		}
 
 		/* We're handling 1-char long filters individually because the
 		* switch below has cases where it asks for the second char, which
@@ -391,6 +394,41 @@ class SqlUtil {
 	}
 
 	/**
+	 * <p>It handles Enumeration filtering in Asset views.</p>
+	 * <p>Using an instance of {@code FieldSearchData} it can prepare the HQL part that manages enumeration filters.</p>
+	 * After calculate several scenarios, it can save that result in {@code fieldSearchData.sqlSearchExpression}
+	 *
+	 * @param fieldSearchData an instance of {@code FieldSearchData}
+	 */
+	private static void handleEnumerationField(FieldSearchData fieldSearchData) {
+
+		String operator = 'IN'
+
+		switch (fieldSearchData.filter) {
+			/* Scenario 1: Starts with '=' */
+			case ~/^(=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				operator = 'IN'
+				break
+
+			/* Starts with '-' or '!' */
+			case ~/^(-|!).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				operator = 'NOT IN'
+				break
+		}
+
+		Object paramValue = parseEnumParameter(fieldSearchData)
+		if (!paramValue) {
+			fieldSearchData.sqlSearchExpression = " 1 = 0"
+		} else {
+			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
+			fieldSearchData.sqlSearchExpression = expression
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+		}
+	}
+
+	/**
 	 * Constructs simple not like/not equal expressions for number and string parameters.
 	 *
 	 * - When handling numbers the resulting expression will be column <> aNumber.
@@ -476,8 +514,6 @@ class SqlUtil {
 			if (fieldSearchData.filter.isNumber()) {
 				paramValue = parseNumberParameter(fieldSearchData)
 			}
-		} else if (isEnumerationField(fieldSearchData)) {
-			paramValue = parseEnumParameter(fieldSearchData)
 		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
@@ -505,7 +541,6 @@ class SqlUtil {
 	 * @return a list of values to be used filtering {@code Enum} values
 	 */
 	private static List parseEnumParameter(FieldSearchData fsd) {
-
 		Class type = fsd.getType()
 		String filter = fsd.getFilter()
 		return type.values().findAll { it.value.toLowerCase() =~ /${filter.toLowerCase()}/}?:null
