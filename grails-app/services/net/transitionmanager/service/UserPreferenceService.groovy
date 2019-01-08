@@ -255,6 +255,7 @@ class UserPreferenceService {
 	@Transactional(readOnly=true)
     List<Map> preferenceListForEdit(UserLogin userLogin) {
 		List<Map> preferences = []
+		List brokenPreferences = []
 
 		List prefList = UserPreference.where {
 			userLogin == userLogin
@@ -265,8 +266,12 @@ class UserPreferenceService {
 
 		// Convert the list to a List<Map>
 		for (pref in prefList) {
-			preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfNameOrValue(pref[0]).toString() ]
-		}
+				try {
+					preferences << [ code: pref[0], value: pref[1], label:  PREF.valueOfName(pref[0]).value() ]
+				} catch (InvalidParamException e) {
+					brokenPreferences << pref[0] // the preference is invalid/broken, so stage for deletion
+				}
+			}
 
 		// Sort into an alphabetical list by the Label
 		preferences = preferences.sort { a, b -> a.label.toLowerCase() <=> b.label.toLowerCase() }
@@ -282,7 +287,7 @@ class UserPreferenceService {
 		// Transform the value of the preferences that reference domains to display the name of the domain
 		// instead of the ID to improve the user experience.
 		for (pref in preferences) {
-			switch (PREF.valueOfNameOrValue(pref.code)) {
+			switch (PREF.valueOfName(pref.code)) {
 				case PREF.MOVE_EVENT:
 					setValueToReferenceName(MoveEvent.class, pref)
 					break
@@ -302,7 +307,29 @@ class UserPreferenceService {
 			}
 		}
 
+		// if any, remove broken/old preferences remaining in the database
+		for (brokePref in brokenPreferences) {
+			UserPreference.where {
+				userLogin == userLogin
+				preferenceCode == brokePref
+			}.deleteAll()
+			log.warn 'Invalid User preference {} for user {} was deleted', brokePref, userLogin
+		}
+		
 		return preferences
+	}
+
+	/**
+	 * Sets a list of user preferences defined via map.
+	 * @param userLogin - the user to set the preference for
+	 * @param preferences - a map containing the preference code and values
+	 */
+	@Transactional
+	boolean setPreferences(UserLogin userLogin = null, Map preferences) {
+		preferences.each {
+			key, value ->
+				setPreference(userLogin, key, value)
+		}
 	}
 
 	/**
@@ -339,7 +366,7 @@ class UserPreferenceService {
 		}
 
 		userLogin = resolveUserLogin(userLogin)
-		PREF userPreferenceEnum = PREF.valueOfNameOrValue(preferenceCode)
+		PREF userPreferenceEnum = PREF.valueOfName(preferenceCode)
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
