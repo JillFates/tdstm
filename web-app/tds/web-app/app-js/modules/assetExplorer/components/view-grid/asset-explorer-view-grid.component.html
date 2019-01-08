@@ -22,16 +22,14 @@
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
 
-					<button tds-button
-					        icon=""
-					        [disabled]="!canCreateAssets()"
+					<button [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
-					        class="btn btn-default dropdown-toggle"
+					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
 						{{ 'GLOBAL.CREATE' | translate }}
 					</button>
 
-					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!canCreateAssets()"
 					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
@@ -69,20 +67,17 @@
 			</div>
 			<div class="col-sm-6 filters-section">
 				<div>
-					<button tds-button
-					        icon="times"
-					        class="btn btn-default component-action-clear-filters"
-					        id="btnClear"
+					<tds-button [action]="ButtonActions.FilterClear"
+							class="component-action-clear-filters"
+					        id="btnClean"
 					        [disabled]="!hasFilterApplied()"
 					        (click)="onClearFilters()">
-						{{'GLOBAL.CLEAR_FILTERS' | translate}}
-					</button>
+					</tds-button>
 				</div>
-				<button tds-button
-				        icon="refresh"
-				        class="tds-button-icon component-action-reload pull-right"
-				        (click)="onReload()">
-				</button>
+				<tds-button [action]="ButtonActions.GenericRefresh"
+				            isIconButton="true"
+				            class="component-action-reload pull-righ"
+				            (click)="onReload()"></tds-button>
 			</div>
 		</ng-template>
 
@@ -119,31 +114,13 @@
 			             let-rowIndex="rowIndex"
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
-				<div class="tds-button-set">
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="showAssetEditView(dataItem, rowIndex)"
-					        icon="edit"
-					        title="Edit Asset">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)"
-					        [icon]="isIssue ? 'list-alt' : 'file-text-o'"
-					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)"
-					        [icon]="isComment ? 'comments' : 'comment'"
-					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="showAssetCloneView(dataItem, rowIndex)"
-					        icon="clone"
-					        title="Clone Asset">
-					</button>
+				<div class="tds-action-button-set">
+					<tds-button [action]="ButtonActions.AssetEdit" (click)="showAssetEditView(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.TaskCreate" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.TaskList" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.CommentCreate" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.CommentList" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button>
+					<tds-button [action]="ButtonActions.AssetClone" (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>

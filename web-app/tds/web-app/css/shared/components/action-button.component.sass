@@ -1,0 +1,63 @@
+$tds-action-button-icon-flat-color: #666
+
+.tds-action-button-set
+  align-items: center
+  display: flex
+  justify-content: center
+  position: relative
+  .tds-action-button--just-icon
+    i
+      font-size: 16px
+  .tds-action-button
+    border: 0;
+    background-color: transparent;
+    outline: 0;
+    padding: 0 2px;
+    i
+      color: $tds-action-button-icon-flat-color
+    span.title
+      display: none
+
+tds-button[class^="btn-"],
+tds-button[class^="btn-"]:hover
+  background-color: unset
+
+.tds-action-button
+  i
+    font-size: 16px
+
+.tds-action-button--disabled
+  pointer-events: none
+
+.tds-action-button--just-icon
+  border: 0
+  background-color: transparent
+  outline: 0
+  vertical-align: middle
+  margin: 0 10px
+  span.title
+    display: none
+  i
+    font-size: 22px
+
+
+// button on toolbar
+.k-grid-toolbar
+  .tds-action-button,
+  button
+    padding: 5px 11px
+  .button-header-grid
+    padding: 2px 8px
+
+// Match the first tds-button with an icon set belonging to a btn-group
+.btn-group > tds-button:not([icon=""]) button:first-child()
+  padding-top: 5px
+
+.btn-group
+  tds-button + .dropdown-toggle
+    width: 31px
+    margin-left: -1px
+
+.modal-footer
+  .asset-commands
+    display: inline

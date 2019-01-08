@@ -23,6 +23,7 @@ import { WindowService } from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
+import {ButtonsFactoryService} from './services/buttons-factory.service';
 import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
 import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
 // Shared Directives
@@ -71,10 +72,10 @@ import { TDSDateControlComponent } from './components/custom-control/date-time/d
 import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
 import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
-import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
+import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 
 // Dictionary
@@ -135,11 +136,11 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
+		TDSActionButton,
 		TDSCustomValidationErrorsComponent
 	],
 	exports: [
@@ -183,11 +184,11 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
+		TDSActionButton,
 		TDSCustomValidationErrorsComponent
 	],
 	entryComponents: [
@@ -228,6 +229,8 @@ export class SharedModule {
 				BulkChangeService,
 				BulkCheckboxService,
 				UserService,
+				TranslatePipe,
+				ButtonsFactoryService,
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY

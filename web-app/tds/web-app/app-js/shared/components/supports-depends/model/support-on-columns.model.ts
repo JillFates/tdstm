@@ -12,7 +12,7 @@ export class SupportOnColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 92,
+				width: 80,
 				locked: true
 			},
 			{

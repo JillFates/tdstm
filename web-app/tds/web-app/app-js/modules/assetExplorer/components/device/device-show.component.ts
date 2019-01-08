@@ -18,6 +18,8 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
+import {WindowService} from '../../../../shared/services/window.service';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -25,7 +27,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		template: template
 	})
 	class DeviceShowComponent extends AssetCommonShow {
-
+		protected ButtonActions = TDSActionsButton;
 		protected manufacturerName: string;
 
 		constructor(
@@ -37,8 +39,9 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			prompt: UIPromptService,
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
-			preferenceService: PreferenceService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService);
+			preferenceService: PreferenceService,
+			windowService: WindowService) {
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService, windowService);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
 				this.manufacturerName = null;
