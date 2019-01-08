@@ -2,88 +2,65 @@
     <section class="page-asset-explorer-config">
         <div>
             <div class="btn-group"
-                 *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
-
-                <tds-button *ngIf="model.isOwner"
-                        [action]="ButtonActions.GenericSave"
-                        (click)="onSave()"
-                        id="btnSave"
-                        [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
-                </tds-button>
-
-                <tds-button *ngIf="!model.isOwner"
-                            [action]="ButtonActions.GenericSaveAs"
-                            (click)="onSaveAs()"
-                            id="btnSaveAs"
-                            [ngClass]="{'btn-success':isDirty() && isSaveAsAvailable()}">
-                </tds-button>
+                 *ngIf="canShowSaveButton()">
+                <button tds-button
+                        icon="floppy-o" class="btn"
+                        (click)="save(getSaveButtonId())"
+                        [ngClass]="{'btn-default':!isDirty(),'btn-success':isDirty()}"
+                        [attr.id]="getSaveButtonId()">
+                    {{ canSave() ? 'GLOBAL.SAVE' : 'GLOBAL.SAVE_AS' | translate }}
+                </button>
 
                 <button type="button" class="btn dropdown-toggle"
-                        [ngClass]="{'btn': true, 'btn-default':!isDirty() || !isSaveAsAvailable(),'btn-success':isDirty() && isSaveAsAvailable(), 'pull-right': true}"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        [ngClass]="{'btn-default':!isDirty(),'btn-success':isDirty()}"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
 
                 <ul class="dropdown-menu">
-                    <li *ngIf="isSystemSaveAvailable(true)">
+                    <!-- Save Button -->
+                    <li *ngIf="canSave()">
                         <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
                     </li>
-                    <li>
+                    <li *ngIf="canSaveAs()">
                         <a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
                     </li>
                 </ul>
             </div>
-            <ng-template #saveButton>
-                <tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
-                            [action]="ButtonActions.GenericSave"
-                            id="btnSave"
-                            [disabled]="!isSaveAvailable()"
-                            [ngClass]="{'btn-success':isDirty()}"
-                            (click)="onSave()">
-                </tds-button>
-
-                <tds-button *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
-                            [action]="ButtonActions.GenericSaveAs"
-                            id="btnSaveAs"
-                            [disabled]="!isSaveAsAvailable()"
-                            [ngClass]="{'btn-success':isDirty()}"
-                            (click)="onSaveAs()">
-                </tds-button>
-            </ng-template>
-
-            <tds-button [action]="model.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
-                    class="text-yellow"
-                    isIconButton="true"
+            <button tds-button
+                    [attr.icon]="model.isFavorite? 'star' : 'star-o'"
+                    class="text-yellow tds-button-icon"
                     (click)="onFavorite()">
-            </tds-button>
-
-            <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="btnExport"></tds-button>
-
+            </button>
+            <button tds-button
+                    icon="download"
+                    class="btn btn-default"
+                    (click)="onExport()"
+                    id="btnExport">Export</button>
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
-
-            <tds-button *ngIf="isEditAvailable()"
-                        isIconButton="true"
-                        [action]="ButtonActions.GenericConfiguration"
-                        class="pull-right"
-                        (click)="onEdit()">
-            </tds-button>
+            <button tds-button
+                    icon="cog"
+                    class="tds-button-icon pull-right"
+                    *ngIf="isEditAvailable()"
+                    (click)="onEdit()">
+            </button>
         </div>
         <div class="box-body">
-                <asset-explorer-view-grid
-                                          [data]=data
-                                          (modelChange)="onQuery()"
-                                          (justPlanningChange)="onJustPlanningChange($event)"
-                                          [gridState]="gridState"
-                                          (gridStateChange)="onGridStateChange($event)"
-                                          [fields]="fields"
-                                          [edit]="false"
-                                          [model]="model.schema"
-                                          [viewId]="model.id"
-                                          [metadata]="metadata">
-                </asset-explorer-view-grid>
+            <asset-explorer-view-grid
+                    [data]=data
+                    (modelChange)="onQuery()"
+                    (justPlanningChange)="onJustPlanningChange($event)"
+                    [gridState]="gridState"
+                    (gridStateChange)="onGridStateChange($event)"
+                    [fields]="fields"
+                    [edit]="false"
+                    [model]="model.schema"
+                    [viewId]="model.id"
+                    [metadata]="metadata">
+            </asset-explorer-view-grid>
         </div>
     </section>
 </div>

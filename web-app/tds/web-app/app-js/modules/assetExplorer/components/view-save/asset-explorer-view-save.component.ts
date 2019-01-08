@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { ViewModel, ViewGroupModel } from '../../model/view.model';
@@ -11,7 +11,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 	selector: 'asset-explorer-view-save',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-save/asset-explorer-view-save.component.html'
 })
-export class AssetExplorerViewSaveComponent {
+export class AssetExplorerViewSaveComponent implements AfterViewInit {
 	model: ViewModel;
 	private isUnique = true;
 
@@ -32,6 +32,12 @@ export class AssetExplorerViewSaveComponent {
 		}
 		if (this.model.isSystem) {
 			this.model.isShared = false;
+		}
+	}
+
+	ngAfterViewInit(): void {
+		if (this.model.name) {
+			this.validateUniquenessDataViewByName(this.model.name);
 		}
 	}
 
