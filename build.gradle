@@ -33,6 +33,9 @@ configurations {
     all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 }
 
+war {
+   archiveName = "tdstm.war"
+}
 
 dependencies {
 	compile "org.springframework.boot:spring-boot-starter-logging"
