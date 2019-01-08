@@ -30,10 +30,23 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 	/**
-	 * Used to retrieve all of the model data that will be used by the component
+	 * Used to retrieve all of the model data that will be used by the user preferences component
 	 */
 	fetchComponentModel() {
 		return this.http.get(`${this.userPreferenceUrl}/modelForPreferenceManager`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Used to retrieve all of the model data that will be used by the manage staff component
+	 */
+	fetchModelForStaffViewEdit(id) {
+		return this.http.get(`${this.userPreferenceUrl}/modelForStaffViewEdit/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
@@ -70,8 +83,23 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Used to save account info from the edit person module (No admin privileges)
+	 */
 	updateAccount(params) {
 		return this.http.post(`${this.userPreferenceUrl}/updateAccount`, params)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Used to save account info from the manage staff module (With admin privileges)
+	 */
+	updateAccountAdmin(params) {
+		return this.http.post(`${this.userPreferenceUrl}/updateAccountAdmin`, params)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

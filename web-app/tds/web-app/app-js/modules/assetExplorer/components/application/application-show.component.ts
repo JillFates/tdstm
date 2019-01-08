@@ -14,6 +14,8 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {AssetCommonHelper} from '../asset/asset-common-helper';
 import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {WindowService} from '../../../../shared/services/window.service';
+import {UserManageStaffComponent} from '../../../user/components/manage-staff/user-manage-staff.component';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 
 declare var jQuery: any;
 
@@ -47,6 +49,21 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 
 			return this.dialogService
 				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		}
+
+		launchManageStaff(id): void {
+			if (id) {
+				this.dialogService.extra(UserManageStaffComponent, [
+					{provide: 'id', useValue: id},
+					{provide: PersonModel, useValue: {}}
+				], false, false).then( (result: any)  => {
+					console.log(result);
+				}).catch(result => {
+					if (result) {
+						console.error(result);
+					}
+				});
+			}
 		}
 
 		/**

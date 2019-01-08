@@ -31,6 +31,15 @@ class TaskManagerPage extends Page{
         tmTaskDetailBtn (wait:true, required:false)   { $("a", "ng-click":"doAction(button)").find("span",text:"Details...")}
         tmTaskAssignMeBtn (wait:true, required:false) { $("a", "ng-click":"doAction(button)").find("span",text:"Assign To Me")}
         tasksModule { module TasksModule}
+        moveEvent {$("#moveEventId")}
+    }
+
+    def selectEvent(evt){
+        moveEvent = evt
+    }
+
+    def clickCreateTask(){
+        waitFor{tmCreateTaskBtn.click()}
     }
 }
 

@@ -434,6 +434,11 @@ class UrlMappings {
 			action = [ GET: "modelForPreferenceManager" ]
 		}
 
+		"/ws/user/modelForStaffViewEdit/$id" {
+			controller = "wsUser"
+			action = [ GET: "modelForStaffViewEdit" ]
+		}
+
         "/ws/user/mapAreas" {
             controller = "wsUser"
             action = [GET: "getMapAreas"]
@@ -480,6 +485,11 @@ class UrlMappings {
 		"/ws/user/updateAccount" {
 			controller = "wsUser"
 			action = [POST:"updateAccount"]
+		}
+
+		"/ws/user/updateAccountAdmin" {
+			controller = "wsUser"
+			action = [POST:"updateAccountAdmin"]
 		}
 
 		"/ws/progress" {
