@@ -274,6 +274,8 @@ class SqlUtil {
 			return
 		}
 
+		Boolean isEnumerationField = isEnumerationField(fieldSearchData)
+
 		/* We're handling 1-char long filters individually because the
 		* switch below has cases where it asks for the second char, which
 		* would break the app. */
@@ -302,12 +304,12 @@ class SqlUtil {
 					buildSingleValueParameter(fieldSearchData, operator)
 
 					/* Scenario 3: Starts with '<>' */
-				}else if (originalFilter ==~ /^<>.*/) {
+				} else if (originalFilter ==~ /^<>.*/) {
 					fieldSearchData.filter = originalFilter.substring(2)
 					buildDistinctParameter(fieldSearchData)
 
 					/* Scenario 4: Starts with '<' or '>' and any literal follows. */
-				}else{
+				} else {
 					fieldSearchData.filter = originalFilter.substring(1)
 					String operator = originalFilter[0]
 					buildSingleValueParameter(fieldSearchData, operator)
@@ -376,7 +378,11 @@ class SqlUtil {
 				/* Scenario 13: Default scenario (overriding may be required). */
 					default:
 						fieldSearchData.useWildcards = true
-						buildSingleValueParameter(fieldSearchData, 'LIKE')
+						if (isEnumerationField(fieldSearchData)) {
+							buildSingleValueParameter(fieldSearchData, 'IN')
+						} else {
+							buildSingleValueParameter(fieldSearchData, 'LIKE')
+						}
 						break
 				}
 				break
@@ -470,6 +476,8 @@ class SqlUtil {
 			if (fieldSearchData.filter.isNumber()) {
 				paramValue = parseNumberParameter(fieldSearchData)
 			}
+		} else if (isEnumerationField(fieldSearchData)) {
+			paramValue = parseEnumParameter(fieldSearchData)
 		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
@@ -488,6 +496,19 @@ class SqlUtil {
 	 */
 	static String escapeStringParameter(String parameter) {
 		return StringEscapeUtils.escapeJava(parameter.toString().trim())
+	}
+
+	/**
+	 * Parse Enum parameters from {@code FieldSearchData}
+	 * @param value
+	 * @param useWildcards
+	 * @return a list of values to be used filtering {@code Enum} values
+	 */
+	private static List parseEnumParameter(FieldSearchData fsd) {
+
+		Class type = fsd.getType()
+		String filter = fsd.getFilter()
+		return type.values().findAll { it.value.toLowerCase() =~ /${filter.toLowerCase()}/}?:null
 	}
 
 	/**
@@ -551,6 +572,14 @@ class SqlUtil {
 	}
 
 	/**
+	 * Determine if the field being used for filtering is Enumeration.
+	 * @param fsd an instance of {@code FieldSearchData}
+	 * @return true if {@code FieldSearchData#domain} is Enum type
+	 */
+	private static boolean isEnumerationField(FieldSearchData fsd) {
+		return fsd.type.isEnum()
+	}
+	/**
 	 * Determine if the field being used for filtering is numeric.
 	 * @param fsd
 	 * @return
@@ -563,8 +592,6 @@ class SqlUtil {
 		if(fieldSpec?.isCustom()){
 			isNumeric = fieldSpec.isNumeric()
 		} else {
-
-
 
 			def properties = fsd.domain.metaClass.properties
 			// Look up the field type using the column.
