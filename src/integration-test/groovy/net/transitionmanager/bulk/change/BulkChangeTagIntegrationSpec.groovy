@@ -5,7 +5,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -17,10 +18,13 @@ import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveEventTestHelper
 
-class BulkChangeTagIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class BulkChangeTagIntegrationSpec extends Specification{
 	TagAssetService tagAssetService
 
 	@Shared
@@ -39,10 +43,10 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -117,6 +121,9 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 	Date now
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 

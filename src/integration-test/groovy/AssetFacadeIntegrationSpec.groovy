@@ -1,6 +1,8 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.MoveBundle
@@ -10,6 +12,8 @@ import test.helper.ProjectTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.AssetEntityTestHelper
 
+@Integration
+@Rollback
 class AssetFacadeIntegrationSpec extends Specification {
 
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()

@@ -1,12 +1,15 @@
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
+import spock.lang.Specification
 
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
-class SequenceServiceTests extends IntegrationSpec {
+@Integration
+@Rollback
+class SequenceServiceTests extends  Specification{
 
 	def sequenceService
 

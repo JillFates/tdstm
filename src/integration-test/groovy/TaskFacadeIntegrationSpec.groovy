@@ -1,5 +1,7 @@
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
@@ -11,6 +13,8 @@ import spock.lang.Specification
 import test.helper.AssetCommentTestHelper
 import test.helper.MoveEventTestHelper
 
+@Integration
+@Rollback
 class TaskFacadeIntegrationSpec extends Specification {
 
 	@Shared

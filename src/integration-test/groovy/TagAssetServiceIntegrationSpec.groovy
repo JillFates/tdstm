@@ -2,7 +2,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -11,16 +12,18 @@ import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TagEvent
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import net.transitionmanager.service.TagEventService
 import net.transitionmanager.service.TagService
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveEventTestHelper
 
-class TagAssetServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class TagAssetServiceIntegrationSpec extends Specification{
 	TagService      tagService
 	TagAssetService tagAssetService
 	TagEventService tagEventService
@@ -41,10 +44,10 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -119,6 +122,9 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	Date now
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -162,8 +168,8 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'a list of tagAssets are returned for the asset'
 			tagAssets.size() == 2
-			tagAssets[0].tag == tag1
-			tagAssets[1].tag == tag2
+			tagAssets[0].tag.id == tag1.id
+			tagAssets[1].tag.id == tag2.id
 	}
 
 	void 'Test list with asset from another project'() {
@@ -180,8 +186,8 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'a list of tags is returned'
 			tagAssets.size() == 2
-			tagAssets[0] == tag1
-			tagAssets[1] == tag2
+			tagAssets[0].id == tag1.id
+			tagAssets[1].id == tag2.id
 	}
 
 	void 'Test getTags with asset from another project'() {
@@ -198,7 +204,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'a list of tagAssets is returned'
 			tagAssets.size() == 1
-			tagAssets[0].tag == tag2
+			tagAssets[0].tag.id == tag2.id
 	}
 
 	void 'Test add tag from another project'() {
@@ -221,7 +227,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			List<TagAsset> tagAssets = tagAssetService.list(project, device2.id)
 		then: 'The list of tagAssets will not contain the delete tagAsset'
 			tagAssets.size() == 1
-			tagAssets[0].tag == tag1
+			tagAssets[0].tag.id == tag1.id
 	}
 
 	void 'Test remove tags from another project'() {
@@ -259,8 +265,8 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the tag is deleted and all the tagAssets are updated with that tag'
 			!tag
-			tagAssets[0].tag == tag2
-			tagAssets[0].asset == device
+			tagAssets[0].tag.id == tag2.id
+			tagAssets[0].asset.id == device.id
 			eventTags.size() == 1
 			event2Tags.size() == 1
 	}

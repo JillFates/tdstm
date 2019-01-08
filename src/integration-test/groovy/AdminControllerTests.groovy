@@ -1,10 +1,12 @@
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.SecurityService
 import spock.lang.See
 import net.transitionmanager.domain.Project
-import grails.test.spock.IntegrationSpec
+import spock.lang.Specification
 import test.helper.PersonTestHelper
 
 
@@ -13,7 +15,9 @@ import test.helper.PersonTestHelper
  * Note that in order to test with the HttpSession that this test spec is using the AdminController not for any thing in particular
  * but it allows the tests to access the session and manipulate it appropriately.
  */
-class AdminControllerTests extends IntegrationSpec {
+@Integration
+@Rollback
+class AdminControllerTests extends Specification{
 
     def controller = new AdminController()
     SecurityService securityService
@@ -29,7 +33,7 @@ class AdminControllerTests extends IntegrationSpec {
         projectHelper = new ProjectTestHelper()
         adminPerson = personHelper.getAdminPerson()
 
-        UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+        UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
         securityService.assumeUserIdentity(adminUser.username, false)
         assert securityService.isLoggedIn()
     }

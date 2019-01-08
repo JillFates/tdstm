@@ -8,18 +8,16 @@ import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
-import com.tdsops.etl.QueryResult
 import com.tdsops.tm.enums.domain.AssetClass
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
-import getl.utils.FileUtils
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 
+@Integration
+@Rollback
 class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 	String assetDependencyDataSetContent

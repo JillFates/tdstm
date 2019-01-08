@@ -3,17 +3,19 @@ package net.transitionmanager.bulk.change
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
-import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.ApplicationTestHelper
-import test.helper.AssetEntityTestHelper
 
-class BulkChangeListIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class BulkChangeListIntegrationSpec extends Specification  {
 
 	@Shared
 	ApplicationTestHelper applicationTestHelper = new ApplicationTestHelper()
@@ -28,22 +30,22 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
+	MoveBundle moveBundle
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+	MoveBundle moveBundle2
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -64,6 +66,10 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 		device = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device2 = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device3 = applicationTestHelper.createApplication(AssetClass.DEVICE, otherProject, moveBundle2)

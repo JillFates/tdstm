@@ -2,6 +2,8 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.PartyGroup
@@ -19,7 +21,8 @@ import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
 import test.helper.DataviewTestHelper
 
-
+@Integration
+@Rollback
 class ProjectServiceIntegrationSpec extends Specification {
 
 	// IOC
@@ -43,7 +46,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 		// Assign the admin to the project
 		projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
 		assert adminUser.username
 
@@ -306,7 +309,7 @@ class ProjectServiceIntegrationSpec extends Specification {
         when: 'creating a new person'
 			Person userPerson = personHelper.createStaff(project.owner)
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
 		then: 'a person should have been created'
 			userPerson
@@ -326,7 +329,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 		setup: 'Given a project is created'
 			Person userPerson = personHelper.createStaff(project.owner)
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
 		and: 'Dataview is created for the project'
 

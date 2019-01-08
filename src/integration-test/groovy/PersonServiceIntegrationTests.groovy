@@ -1,28 +1,29 @@
-import net.transitionmanager.command.PersonCO
-import grails.web.servlet.mvc.GrailsParameterMap
-import org.springframework.mock.web.MockHttpServletRequest
-import spock.lang.*
 import com.tds.asset.Application
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdssrc.grails.GormUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
+import grails.web.servlet.mvc.GrailsParameterMap
+import groovy.time.TimeCategory
+import net.transitionmanager.command.PersonCO
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.RoleType
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.MoveEventService
+import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
-import com.tdsops.tm.enums.domain.SecurityRole
-import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.PartyGroup
-
 import org.apache.commons.lang.RandomStringUtils as RSU
-import groovy.time.TimeCategory
+import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class PersonServiceIntegrationTests extends Specification {
 
 	UserLogin adminUser
@@ -48,9 +49,9 @@ class PersonServiceIntegrationTests extends Specification {
 		adminPerson = personHelper.createStaff(project.owner)
 		assert adminPerson
 
-		projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		// adminUser = UserLogin.findByUsername('tdsadmin')
 		assert adminUser
 		assert adminUser.username
@@ -78,7 +79,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'creating a person and user as staff for the project owner with USER role'
 			Person newPerson = personHelper.createPerson(adminPerson, project.owner)
-			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.USER}"])
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the person and the accompaning userlogin are created and associated to the project owner'
 			newPerson
 			newPerson.id
@@ -108,7 +109,7 @@ class PersonServiceIntegrationTests extends Specification {
 			!personService.isAssignedToProject(newProject, newPerson)
 
 		when: 'the newPerson is given the ADMIN security role'
-			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		then: 'the newPerson should have access to the new project'
 			personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson should still NOT be assigned to the project'
@@ -129,7 +130,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'creating a person and their userlogin as staff for the project client with USER role'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
-			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.USER}"])
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the person and userlogin are created'
 			newPerson
 			newPerson.userLogin
@@ -156,7 +157,7 @@ class PersonServiceIntegrationTests extends Specification {
 			!personService.isAssignedToProject(newProject, newPerson)
 
 		when: 'the newPerson is given the ADMIN security role'
-			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		then: 'the newPerson should have access to the new project'
 			personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson should still NOT be assigned to the project'
@@ -176,7 +177,7 @@ class PersonServiceIntegrationTests extends Specification {
 		when: 'a partner and partnerStaff with USER role are created '
 			PartyGroup partner = projectHelper.createPartner(project.owner, project)
 			Person newPerson = personHelper.createPerson(adminPerson, partner)
-			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.USER}"])
+			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the partnerStaff should NOT have access to any projects'
 			!personService.hasAccessToProject(newPerson, project)
 		when: 'the partner is added to the default project'
@@ -202,7 +203,7 @@ class PersonServiceIntegrationTests extends Specification {
 		then: 'the partnerStaff should NOT have access to the partnerProject'
 			!personService.hasAccessToProject(newPerson, partnerProject)
 		when: 'the partnerStaff is given the ADMIN security role'
-			securityService.assignRoleCode(newPerson, "${SecurityRole.ADMIN}")
+			securityService.assignRoleCode(newPerson, "${SecurityRole.ROLE_ADMIN}")
 		then: 'the partnerStaff should still NOT have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 		//and: 'the partnerStaff should now have access to the partnerProject'
@@ -287,8 +288,8 @@ class PersonServiceIntegrationTests extends Specification {
 				[lastName:'Buster', firstName:'Brock'],
 				['SYS_ADMIN', 'DB_ADMIN'], ['editor'])
 
-			personService.addToTeam(person, 'SYS_ADMIN')
-			personService.addToTeam(person, 'DB_ADMIN')
+			personService.addToTeam(person, 'ROLE_SYS_ADMIN')
+			personService.addToTeam(person, 'ROLE_DB_ADMIN')
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
@@ -296,21 +297,21 @@ class PersonServiceIntegrationTests extends Specification {
 			teams.contains('DB_ADMIN')
 			teams[0] == 'DB_ADMIN'   // Should be sorted alphabetical
 			// Check individually
-			personService.isAssignedToTeam(person, 'SYS_ADMIN')
-			personService.isAssignedToTeam(person, 'DB_ADMIN')
-			!personService.isAssignedToTeam(person, 'PROJ_MGR')
+			personService.isAssignedToTeam(person, 'ROLE_SYS_ADMIN')
+			personService.isAssignedToTeam(person, 'ROLE_DB_ADMIN')
+			!personService.isAssignedToTeam(person, 'ROLE_PROJ_MGR')
 
 		// Add a new team to the person's repertoire
 		when:
 			Map results = [:]
-			personService.addToProjectTeam(project.id.toString(), person.id.toString(), 'PROJ_MGR', results)
+			personService.addToProjectTeam(project.id.toString(), person.id.toString(), 'ROLE_PROJ_MGR', results)
 			teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 3
-			teams.contains('PROJ_MGR')
-			personService.isAssignedToTeam(person, 'PROJ_MGR')
-			personService.isAssignedToProjectTeam(project, person, 'PROJ_MGR')
-			!personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
+			teams.contains('ROLE_PROJ_MGR')
+			personService.isAssignedToTeam(person, 'ROLE_PROJ_MGR')
+			personService.isAssignedToProjectTeam(project, person, 'ROLE_PROJ_MGR')
+			!personService.isAssignedToProjectTeam(project, person, 'ROLE_SYS_ADMIN')
 	}
 
 	def '08. Test assigning a person to a move event team directly by an admin user'() {
@@ -335,15 +336,15 @@ class PersonServiceIntegrationTests extends Specification {
 			String meId = moveEvent.id.toString()
 			String personId = person.id.toString()
 		then: 'no error message should be returned'
-			personService.assignToProjectEvent(personId, meId, 'SYS_ADMIN', '1') == ''
+			personService.assignToProjectEvent(personId, meId, 'ROLE_SYS_ADMIN', '1') == ''
 		and: 'the person should be assigned to the project'
-			personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
+			personService.isAssignedToProjectTeam(project, person, 'ROLE_SYS_ADMIN')
 		and: 'the person should be assigned to the event'
-			personService.isAssignedToEventTeam(moveEvent, person, 'SYS_ADMIN')
+			personService.isAssignedToEventTeam(moveEvent, person, 'ROLE_SYS_ADMIN')
 		and: 'the person DB_ADMIN role was not assigned to the project'
-			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
+			! personService.isAssignedToProjectTeam(project, person, 'ROLE_DB_ADMIN')
 		and: 'the person DB_ADMIN role was not assigned to the event'
-			! personService.isAssignedToEventTeam(moveEvent, person, 'DB_ADMIN')
+			! personService.isAssignedToEventTeam(moveEvent, person, 'ROLE_DB_ADMIN')
 	}
 
 	/*
@@ -447,7 +448,7 @@ class PersonServiceIntegrationTests extends Specification {
 		when: 'creating a new person with a user account'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
 			Long newPID = newPerson.id
-			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			Long userId = user.id
 			Application app = assetHelper.createApplication(newPerson, project)
 			app.sme = newPerson
@@ -671,7 +672,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		setup: 'create a person and user as staff with ADMIN role for the project client so that'
 			Person newPerson = personHelper.createPerson(adminPerson, project.client)
-			UserLogin newUser = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ADMIN}"])
+			UserLogin newUser = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_ADMIN}"])
 
 		when: 'the newUser logs into the system'
 			securityService.assumeUserIdentity(newUser.username, false)

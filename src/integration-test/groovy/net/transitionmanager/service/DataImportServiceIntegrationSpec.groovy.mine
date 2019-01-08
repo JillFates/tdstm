@@ -4,9 +4,9 @@ import spock.lang.Unroll
 import spock.lang.Ignore
 import spock.lang.Shared
 
-import grails.test.spock.IntegrationSpec
+
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
@@ -25,7 +25,8 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.etl.ETLDomain
 import org.apache.commons.lang3.RandomStringUtils
 
-class DataImportServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+class DataImportServiceIntegrationSpec {
 	@Shared
     DataImportService dataImportService
     //GrailsApplication grailsApplication

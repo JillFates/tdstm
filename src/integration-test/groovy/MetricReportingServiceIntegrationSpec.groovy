@@ -5,7 +5,8 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.ValidationType
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.MoveBundle
@@ -17,10 +18,13 @@ import org.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared
 import spock.lang.See
+import spock.lang.Specification
 import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
 
-class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class MetricReportingServiceIntegrationSpec extends Specification {
 	MetricReportingService metricReportingService
 	@Shared
 	AssetEntityTestHelper  assetEntityTestHelper = new AssetEntityTestHelper()
@@ -41,10 +45,10 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -113,6 +117,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	AssetDependency dependency3
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
 

@@ -1,25 +1,22 @@
-import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.SettingType
-import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.StringUtil
+import com.tdsops.tm.enums.domain.SettingType
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.SettingService
+import net.transitionmanager.service.ProjectService
+import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.commons.lang3.BooleanUtils
 import org.grails.web.json.JSONObject
-import groovy.json.JsonSlurper
-import org.apache.commons.lang.RandomStringUtils as RSU
-
 import spock.lang.Specification
 import spock.lang.Stepwise
 
 @Stepwise
+@Integration
+@Rollback
 class CustomDomainServiceTests extends Specification {
 
     CustomDomainService customDomainService

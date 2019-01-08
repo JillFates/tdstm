@@ -1,6 +1,7 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
@@ -11,8 +12,11 @@ import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
+import spock.lang.Specification
 
-class DataviewServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class DataviewServiceIntegrationSpec extends Specification{
 
 	DataviewService               dataviewService
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()

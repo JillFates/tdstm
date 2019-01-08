@@ -4,7 +4,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.dependency.analyzer.FilteredAssetsCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
@@ -16,9 +17,12 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import net.transitionmanager.service.TagService
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 
-class DependencyAnalyzerServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class DependencyAnalyzerServiceIntegrationSpec extends  Specification{
 	TagService                tagService
 	TagAssetService           tagAssetService
 	DependencyAnalyzerService dependencyAnalyzerService

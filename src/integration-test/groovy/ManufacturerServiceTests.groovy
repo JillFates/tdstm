@@ -1,14 +1,12 @@
-import net.transitionmanager.domain.Model
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ManufacturerAlias
-import com.tdsops.metaclass.CustomMethods
-import grails.test.mixin.TestFor
 import net.transitionmanager.service.ManufacturerService
 import spock.lang.Specification
 
-
-
+@Integration
+@Rollback
 class ManufacturerServiceTests extends Specification {
 
 	ManufacturerService manufacturerService

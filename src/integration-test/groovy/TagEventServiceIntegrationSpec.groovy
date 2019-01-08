@@ -1,6 +1,7 @@
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -12,9 +13,12 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagEventService
 import net.transitionmanager.service.TagService
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.MoveEventTestHelper
 
-class TagEventServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class TagEventServiceIntegrationSpec extends Specification{
 	TagService      tagService
 	TagEventService tagEventService
 

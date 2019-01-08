@@ -1,6 +1,6 @@
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.SecurityRole
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
@@ -9,8 +9,11 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ModelService
 import net.transitionmanager.service.SecurityService
+import spock.lang.Specification
 
-class ModelServiceTests extends IntegrationSpec {
+@Integration
+@Rollback
+class ModelServiceTests extends Specification{
 	
 	ModelService modelService
 	private Project project
@@ -27,7 +30,7 @@ class ModelServiceTests extends IntegrationSpec {
 		adminPerson = personHelper.createStaff(project.owner)
 		assert adminPerson
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 
 		assert adminUser
 		assert adminUser.username

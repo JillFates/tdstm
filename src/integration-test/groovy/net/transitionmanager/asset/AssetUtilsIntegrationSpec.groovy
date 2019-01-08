@@ -1,11 +1,13 @@
 package net.transitionmanager.asset
 
 import com.tds.asset.AssetOptions
-import grails.test.spock.IntegrationSpec
-import spock.lang.Ignore
-import spock.lang.Shared
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
+import spock.lang.Specification
 
-class AssetUtilsIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class AssetUtilsIntegrationSpec extends Specification {
 
 	void '1 Test getEnvironmentOptions'() {
 		given:

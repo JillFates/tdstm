@@ -1,4 +1,6 @@
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
@@ -10,6 +12,8 @@ import net.transitionmanager.service.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class PartyGroupServiceIntegrationSpec extends Specification {
 
 	PartyGroupService partyGroupService
@@ -35,9 +39,9 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 		assert adminPerson
 
 		// Assign the admin to the project
-		projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
 		assert adminUser.username
 

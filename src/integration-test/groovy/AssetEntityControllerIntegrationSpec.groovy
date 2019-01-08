@@ -1,27 +1,24 @@
-import grails.test.mixin.TestFor
-import grails.test.spock.IntegrationSpec
-import spock.lang.Ignore
-import spock.lang.Specification
-import spock.lang.Shared
-import spock.lang.Unroll
-
+import com.tdsops.common.ui.Pagination
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
-import com.tdsops.tm.enums.domain.SecurityRole
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.ui.Pagination
-
-
+import spock.lang.Shared
+import spock.lang.Specification
+import spock.lang.Unroll
 /**
  * Integration tests for the CommonController
 */
 
-class AssetEntityControllerIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class AssetEntityControllerIntegrationSpec extends Specification {
 
 	@Shared
 	PersonService personService
@@ -38,7 +35,7 @@ class AssetEntityControllerIntegrationSpec extends IntegrationSpec {
 	static Project project
 	static UserLogin adminUser
 	static Person adminPerson
-	
+
 	static PersonTestHelper personHelper = new PersonTestHelper()
 	static ProjectTestHelper projectHelper = new ProjectTestHelper()
 	static AssetTestHelper assetHelper = new AssetTestHelper()
@@ -47,14 +44,13 @@ class AssetEntityControllerIntegrationSpec extends IntegrationSpec {
 	 * Used to create a test project and user that is logged in
 	 */
 	def setupSpec() {
-		
 		project = projectHelper.createProject()
 
 		adminPerson = personHelper.createStaff(project.owner)
 		assert adminPerson
 
 		// projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
 		assert adminUser.username
 

@@ -3,18 +3,22 @@ package net.transitionmanager.bulk.change
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangeStringIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class BulkChangeStringIntegrationSpec extends Specification{
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
@@ -26,22 +30,22 @@ class BulkChangeStringIntegrationSpec extends IntegrationSpec {
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
+	MoveBundle moveBundle
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+	MoveBundle moveBundle2
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -62,6 +66,12 @@ class BulkChangeStringIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)

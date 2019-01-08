@@ -1,5 +1,7 @@
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
@@ -13,6 +15,8 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 
 @Stepwise
+@Integration
+@Rollback
 class SettingServiceTests extends Specification {
 
     SettingService settingService

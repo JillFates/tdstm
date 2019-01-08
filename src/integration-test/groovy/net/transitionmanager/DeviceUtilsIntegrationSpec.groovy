@@ -1,7 +1,8 @@
 package net.transitionmanager
 
 import com.tds.asset.AssetEntity
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -12,9 +13,12 @@ import net.transitionmanager.domain.Room
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.MoveBundleTestHelper
 
-class DeviceUtilsIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class DeviceUtilsIntegrationSpec extends Specification{
 
 	@Shared
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
@@ -22,11 +26,14 @@ class DeviceUtilsIntegrationSpec extends IntegrationSpec {
 	MoveBundleTestHelper bundleHelper = new MoveBundleTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 	@Shared
-	MoveBundle moveBundle = bundleHelper.createBundle(project)
+	MoveBundle moveBundle
 
 	def setup() {
+		project = projectTestHelper.createProject()
+		bundleHelper.createBundle(project)
+
 		Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
 		Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
 

@@ -2,6 +2,8 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import groovy.time.TimeCategory
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
@@ -17,13 +19,15 @@ import spock.lang.Stepwise
 import spock.util.mop.ConfineMetaClassChanges
 
 @Stepwise
+@Integration
+@Rollback
 class SecurityServiceTests extends Specification {
 
 	// IOC
 	SecurityService securityService
 
-	private static final List<String> privRoles = ["${SecurityRole.ADMIN}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
-	private static final List<String> userRole = ["${SecurityRole.USER}"]
+	private static final List<String> privRoles = ["${SecurityRole.ROLE_ADMIN}", "${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
+	private static final List<String> userRole = ["${SecurityRole.ROLE_USER}"]
 
 	private PersonTestHelper personHelper = new PersonTestHelper()
 	private Person privPerson
@@ -68,46 +72,46 @@ class SecurityServiceTests extends Specification {
 			int count
 
 		when: 'assigning the first role there should then be one role assigned to the person'
-			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.USER}")
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_USER}")
 		then:
 			pr != null
 			securityService.getAssignedRoleCodes(unPrivPerson).size() == 1
 
 		when: 'after assigning a second role there should be two assigned roles'
-			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.EDITOR}")
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_EDITOR}")
 			roles = securityService.getAssignedRoleCodes(unPrivPerson)
 		then:
 			pr != null
-			roles == ["${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
+			roles == ["${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 
 		when: 'assigning the same role twice it should make not difference'
-			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.EDITOR}")
+			pr = securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_EDITOR}")
 			list = securityService.getAssignedRoleCodes(unPrivPerson)
 		then:
 			pr != null
 			list.size() == 2
-			list == ["${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
+			list == ["${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 
 		when: 'unassigning a role from the user should return a 1 indicating that it was deleted'
-			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.EDITOR}"])
+			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.ROLE_EDITOR}"])
 		then:
 			count == 1
 		and: 'the person should only have one role (USER) remaining if I did the math correctly'
-			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.USER}"]
+			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.ROLE_USER}"]
 
 		when: 'adding roles in bulk it should not complain and should then return the complete list of roles'
-			rolesAdded = securityService.assignRoleCodes(unPrivPerson, ["${SecurityRole.SUPERVISOR}", "${SecurityRole.ADMIN}"])
+			rolesAdded = securityService.assignRoleCodes(unPrivPerson, ["${SecurityRole.ROLE_SUPERVISOR}", "${SecurityRole.ROLE_ADMIN}"])
 		then:
 			rolesAdded.size() == 2
 		and: 'the list should have the 3 unPrivPerson roles and the list should be ordered by the security level descending'
-			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.ADMIN}", "${SecurityRole.SUPERVISOR}", "${SecurityRole.USER}"]
+			securityService.getAssignedRoleCodes(unPrivPerson) == ["${SecurityRole.ROLE_ADMIN}", "${SecurityRole.ROLE_SUPERVISOR}", "${SecurityRole.ROLE_USER}"]
 
 		when: 'unassigning roles in bulk'
-			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.SUPERVISOR}", "${SecurityRole.USER}"])
+			count = securityService.unassignRoleCodes(unPrivPerson, ["${SecurityRole.ROLE_SUPERVISOR}", "${SecurityRole.ROLE_USER}"])
 		then: 'it should return that 2 were removed'
 			count == 2
 		and: 'there should only be one role left and while we are at it we will look it up by the UserLogin this time'
-		securityService.getAssignedRoleCodes(unPrivUser) == ["${SecurityRole.ADMIN}"]
+		securityService.getAssignedRoleCodes(unPrivUser) == ["${SecurityRole.ROLE_ADMIN}"]
 
 		when: 'passing in an invalid role code'
 			securityService.assignRoleCode(unPrivPerson, 'BOGUS')
@@ -129,12 +133,12 @@ class SecurityServiceTests extends Specification {
 		then:
 			roles == privRoles
 		and: 'the top privileged role should be ADMIN'
-		"${SecurityRole.ADMIN}" == securityService.getMaxAssignedRole(privPerson)?.id
+			"${SecurityRole.ROLE_ADMIN}" == securityService.getMaxAssignedRole(privPerson)?.id
 
 		when: 'deleting the ADMIN role we can expect that the next role up will be EDITOR'
-			securityService.unassignRoleCodes(privPerson, ["${SecurityRole.ADMIN}"])
+			securityService.unassignRoleCodes(privPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		then:
-		"${SecurityRole.EDITOR}" == securityService.getMaxAssignedRole(privPerson)?.id
+			"${SecurityRole.ROLE_EDITOR}" == securityService.getMaxAssignedRole(privPerson)?.id
 
 		when: 'deleting the remaining roles the next call to getMaxAssignedRole should just return a null'
 			securityService.unassignRoleCodes(privPerson, privRoles)
@@ -144,12 +148,12 @@ class SecurityServiceTests extends Specification {
 
 	void '3 - Test the max role to see that ADMIN is still the top dog'() {
 		expect:
-		"${SecurityRole.ADMIN}" == securityService.getAllRoles()[0]?.id
+			"${SecurityRole.ROLE_ADMIN}" == securityService.getAllRoles()[0]?.id
 	}
 
 	void '4 - Test the getAssignableRoles and getAssignableRoleCodes method'() {
 		setup:
-			List expectedRoles = ["${SecurityRole.SUPERVISOR}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
+			List expectedRoles = ["${SecurityRole.ROLE_SUPERVISOR}", "${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 			List results
 
 		when: 'creating the unprivileged account that has no roles one would expect that they can not assign roles'
@@ -158,12 +162,12 @@ class SecurityServiceTests extends Specification {
 			0 == securityService.getAssignableRoles(unPrivPerson).size()
 
 		when: 'the unprivileged account is assigned a role but still does not have necessary permission'
-			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.SUPERVISOR}")
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_SUPERVISOR}")
 		then: 'it should fail to get the roles'
 			!securityService.getAssignableRoles(unPrivPerson)
 
 		when: 'the unprivileged account is assigned ADMIN role'
-			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ADMIN}")
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_ADMIN}")
 			results = securityService.getAssignableRoles(unPrivPerson)
 		then: 'number of roles returned will have increased'
 			results.size() >= 6
@@ -177,21 +181,21 @@ class SecurityServiceTests extends Specification {
 			list = securityService.getAllRoles()
 		then: 'it should return all roles'
 			list.size() >= 6
-			list.find { it.id == "${SecurityRole.ADMIN}" }
-			list.find { it.id == "${SecurityRole.USER}" }
+			list.find { it.id == "${SecurityRole.ROLE_ADMIN}" }
+			list.find { it.id == "${SecurityRole.ROLE_USER}" }
 
 		when: 'calling getAllRoles with a the maxLevel of 30 getAllRoles'
 			list = securityService.getAllRoles(30)
 		then: 'it should return 3 roles'
 			list.size() == 3
-			list*.id == ["${SecurityRole.SUPERVISOR}", "${SecurityRole.EDITOR}", "${SecurityRole.USER}"]
+			list*.id == ["${SecurityRole.ROLE_SUPERVISOR}", "${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 	}
 
 	void '6 - Test the hasPermission for different user scenarios'() {
 		setup:
 			createPrivAccount()
 			createUnPrivAccount()
-			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.USER}")
+			assert securityService.assignRoleCode(unPrivPerson, "${SecurityRole.ROLE_USER}")
 			String privPerm = 'ApplicationRestart'
 
 		expect: 'that calling hasPermission for privileged user with the ADMIN role returns true'

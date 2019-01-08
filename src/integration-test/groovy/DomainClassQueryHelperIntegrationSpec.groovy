@@ -5,7 +5,8 @@ import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
@@ -18,14 +19,16 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveEventTestHelper
 import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
-class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class DomainClassQueryHelperIntegrationSpec extends Specification{
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()

@@ -12,7 +12,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
@@ -31,9 +32,12 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 
-class DataImportServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class DataImportServiceIntegrationSpec extends Specification {
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
 
@@ -62,9 +66,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 	@Shared
 	MoveBundle moveBundle
 	@Shared
@@ -83,15 +87,15 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	}
 	void setup() {
-		// project = projectTestHelper.createProject(null)
-		// otherProject = projectTestHelper.createProject()
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
 			moveBundleTestHelper.createBundle(otherProject, null))
 
-		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ADMIN}"])
+		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
         securityService.assumeUserIdentity(adminUser.username, false)
 
 		context = dataImportService.initContextForProcessBatch( project, ETLDomain.Dependency )

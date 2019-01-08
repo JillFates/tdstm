@@ -1,12 +1,10 @@
 import asset.pipeline.grails.AssetProcessorService
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
-import net.transitionmanager.service.UserPreferenceService
-import org.codehaus.groovy.grails.web.mapping.DefaultLinkGenerator
+import org.grails.web.mapping.DefaultLinkGenerator
 import test.AbstractUnitSpec
 
 import java.text.SimpleDateFormat

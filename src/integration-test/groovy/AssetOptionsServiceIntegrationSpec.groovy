@@ -1,10 +1,14 @@
 import com.tds.asset.AssetOptions
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.service.AssetOptionsService
 import spock.lang.Specification
 
 import static com.tds.asset.AssetOptions.*
 
+@Integration
+@Rollback
 class AssetOptionsServiceIntegrationSpec extends Specification {
 
 	AssetOptionsService assetOptionsService

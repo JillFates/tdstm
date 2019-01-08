@@ -1,14 +1,16 @@
 import com.tdssrc.grails.FileSystemUtil
-import grails.validation.ValidationException
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
+import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidRequestException
 
+@Integration
+@Rollback
 class FileSystemServiceIntegrationSpec extends Specification {
 
 	// IOC

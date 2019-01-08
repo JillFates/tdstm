@@ -1,5 +1,8 @@
 import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -7,7 +10,6 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.SecurityService
-import grails.core.GrailsApplication
 import org.apache.commons.codec.binary.Base64
 import spock.lang.Narrative
 import spock.lang.See
@@ -29,12 +31,13 @@ This unit test class is intended to test the License Admin Process in the follow
 ''')
 
 @See('https://support.transitionmanager.com/browse/TM-5965')
-
+@Integration
+@Rollback
 class LicenseAdminServiceIntegrationTests extends Specification {
 
     LicenseAdminService licenseAdminService
-    SecurityService securityService
-    GrailsApplication grailsApplication
+    SecurityService     securityService
+    GrailsApplication   grailsApplication
 
     private String testEmail = 'sample@sampleEmail.com'
     private String testRequestNote = 'Test request note'
@@ -56,7 +59,7 @@ class LicenseAdminServiceIntegrationTests extends Specification {
         // Create and admin user to be able to login
         project = projectTestHelper.createProject()
         adminPerson = personTestHelper.createStaff(project.owner)
-        adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+        adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
     }
 
     def '01. Test the AdminPerson and AdminUser are setup correctly, and that the License Admin module is enabled'() {

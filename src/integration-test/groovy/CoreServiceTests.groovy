@@ -1,7 +1,12 @@
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.service.CoreService
-import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
+import org.grails.core.exceptions.GrailsConfigurationException
+import org.grails.config.NavigableMap
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class CoreServiceTests extends Specification {
 
 	CoreService coreService
@@ -19,7 +24,7 @@ class CoreServiceTests extends Specification {
 		coreService.getAppConfig('bogusAppName')
 
 		then:
-		GrailsConfigurationException ex = thrown()
+			GrailsConfigurationException ex = thrown()
 		ex.message.contains('configuration not found')
 	}
 
@@ -28,7 +33,7 @@ class CoreServiceTests extends Specification {
 		def setting = coreService.getConfigSetting('dataSource')
 
 		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
-		setting instanceof ConfigObject
+		setting instanceof NavigableMap
 
 		when:
 		setting = coreService.getConfigSetting('dataSource.driverClassName')

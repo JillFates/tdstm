@@ -8,7 +8,8 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeTag
@@ -28,10 +29,13 @@ import net.transitionmanager.bulk.change.BulkChangeYesNo
 import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.PersonTestHelper
 
-class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 	BulkAssetChangeService bulkAssetChangeService
 
 	@Shared
@@ -50,10 +54,10 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	PersonTestHelper personHelper = new PersonTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -128,6 +132,9 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	Person person
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
 		params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 		query = """
 			SELECT AE.id
@@ -183,7 +190,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		)
 
 		person = personHelper.createPerson(null, project.client, project)
-		personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
+		personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 	}
 
 	void 'Test bulkChange add'() {

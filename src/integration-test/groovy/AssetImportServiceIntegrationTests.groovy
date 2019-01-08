@@ -1,8 +1,12 @@
 import com.tds.asset.AssetEntity
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.service.ImportService
 
 import spock.lang.*
 
+@Integration
+@Rollback
 class AssetImportServiceIntegrationTests extends Specification {
 
 	ImportService importService

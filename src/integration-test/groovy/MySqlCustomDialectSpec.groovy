@@ -1,8 +1,14 @@
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Manufacturer
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class MySqlCustomDialectSpec extends Specification {
-
+	void setup() {
+		System.setProperty('com.tdsops.tm.skp','B3c00l')
+	}
 	void 'Test custom MySQL dialect concat_ws'() {
 		when: 'Executing a HQL query with concst_ws, with a separator of a comma, and the id and name columns'
 			List<Map> results = Manufacturer.executeQuery("""

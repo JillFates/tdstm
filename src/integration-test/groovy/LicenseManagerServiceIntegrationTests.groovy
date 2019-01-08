@@ -1,4 +1,7 @@
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.domain.Person
@@ -7,7 +10,6 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseManagerService
 import org.apache.commons.lang3.StringUtils
-import grails.core.GrailsApplication
 import org.joda.time.DateTime
 import spock.lang.Narrative
 import spock.lang.See
@@ -28,10 +30,12 @@ This unit test class is intended to test the License MAnager Process in the foll
 ''')
 
 @See('https://support.transitionmanager.com/browse/TM-5966')
+@Integration
+@Rollback
 class LicenseManagerServiceIntegrationTests extends Specification {
-	GrailsApplication		grailsApplication
-	LicenseAdminService  	licenseAdminService
-	LicenseManagerService	licenseManagerService
+	GrailsApplication     grailsApplication
+	LicenseAdminService   licenseAdminService
+	LicenseManagerService licenseManagerService
 
 	private String testEmail = 'sample@sampleEmail.com'
 	private String testRequestNote = 'Test request note'
@@ -54,7 +58,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 
 		project = projectTestHelper.createProject()
 		adminPerson = personTestHelper.createStaff(project.owner)
-		adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 
 	}
 

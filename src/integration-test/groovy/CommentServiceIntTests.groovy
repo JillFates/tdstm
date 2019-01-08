@@ -1,5 +1,7 @@
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang.RandomStringUtils
@@ -7,6 +9,8 @@ import spock.lang.Specification
 import test.helper.AssetCommentTestHelper
 import test.helper.MoveEventTestHelper
 
+@Integration
+@Rollback
 class CommentServiceIntTests extends Specification {
 
     AssetCommentTestHelper assetCommentTestHelper

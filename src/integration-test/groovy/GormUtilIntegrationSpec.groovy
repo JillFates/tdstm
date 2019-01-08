@@ -1,28 +1,32 @@
 import com.tds.asset.Application
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import org.apache.commons.lang3.RandomStringUtils
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.Ignore
-
-import grails.core.GrailsDomainClassProperty
+import grails.gorm.transactions.Rollback
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
-import com.tds.asset.AssetDependency
-import net.transitionmanager.domain.PartyRelationship
+import grails.test.mixin.integration.Integration
+import grails.validation.Validateable
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Notice
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Workflow
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import grails.validation.Validateable
-import spock.lang.Stepwise
+import org.apache.commons.lang3.RandomStringUtils
+import org.grails.core.exceptions.InvalidPropertyException
+import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint
+import org.grails.datastore.mapping.model.PersistentProperty
+import spock.lang.Ignore
+import spock.lang.Shared
+import spock.lang.Specification
 
+@Integration
+@Rollback
 class GormUtilIntegrationSpec extends Specification {
 
 	// IOC variables
@@ -208,24 +212,13 @@ class GormUtilIntegrationSpec extends Specification {
 			cp = GormUtil.getConstraint(AssetDependency, 'asset', 'unique')
 		then:
 			cp != null
-			List props = cp.getUniquenessGroup()
-			props.contains('dependent')
-			props.contains('type')
+			cp instanceof UniqueConstraint
 
 		when: 'Checking the maxSize Constraint'
 			cp = GormUtil.getConstraint(Notice, 'rawText', 'maxSize')
 		then:
 			cp != null
 			cp.getMaxSize() == 65535
-	}
-
-	def '11. Test getConstraintUniqueProperties'() {
-		when:
-			List props = GormUtil.getConstraintUniqueProperties(AssetDependency, 'asset')
-		then:
-			props.size() == 2
-			props.contains('dependent')
-			props.contains('type')
 	}
 
 
@@ -253,29 +246,29 @@ class GormUtilIntegrationSpec extends Specification {
 
 	def '14. Test getDomainProperty'() {
 		when:
-			GrailsDomainClassProperty prop = GormUtil.getDomainProperty(Person, 'firstName')
+			PersistentProperty prop = GormUtil.getDomainProperty(Person, 'firstName')
 		then:
 			prop != null
-			prop.isPersistent()
-			! prop.isIdentity()
+			//prop.isPersistent()
+			! GormUtil.isIdentity(Person, 'firstName')
 
 		when:
 			prop = GormUtil.getDomainProperty(Person, 'id')
 		then:
 			prop != null
-			prop.isPersistent()
-			prop.isIdentity()
+			//prop.isPersistent()
+			GormUtil.isIdentity(Person, 'id')
 
 		when:
 			prop = GormUtil.getDomainProperty(PartyRelationship, 'partyIdFrom')
 		then:
 			prop != null
-			prop.isPersistent()
+			//prop.isPersistent()
 
 		when: 'Test for invalid property'
 			prop = GormUtil.getDomainProperty(Person, 'bogus')
 		then:
-			org.codehaus.groovy.grails.exceptions.InvalidPropertyException e = thrown()
+			InvalidPropertyException e = thrown()
 	}
 
 	def '15. Testing isCompositeProperty'() {
@@ -284,7 +277,7 @@ class GormUtilIntegrationSpec extends Specification {
 			GormUtil.isCompositeProperty(PartyRelationship, 'partyIdFrom')
 
 		when: 'Check when passing property object instead of the name'
-			GrailsDomainClassProperty property = GormUtil.getDomainProperty(PartyRelationship, 'partyIdFrom')
+			PersistentProperty property = GormUtil.getDomainProperty(PartyRelationship, 'partyIdFrom')
 		then:
 			GormUtil.isCompositeProperty(PartyRelationship, property)
 
@@ -345,7 +338,7 @@ class GormUtilIntegrationSpec extends Specification {
 			Person adminPerson = personHelper.getAdminPerson()
 			Map results = [:]
 			Map personMap = [lastName:'Bullafarht']
-			String extraTeam = 'DB_ADMIN'
+			String extraTeam = 'ROLE_DB_ADMIN'
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'From'])
 
@@ -607,14 +600,14 @@ class GormUtilIntegrationSpec extends Specification {
 		when: 'getDomainClass is called for a domain class'
 			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
-			'org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass' == dc.getClass().getName()
+			'org.grails.orm.hibernate.cfg.HibernatePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
-			'AssetEntity' == dc.name
+			'com.tds.asset.AssetEntity' == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)
 		then: 'an exception should occur'
-			thrown RuntimeException
+			thrown InvalidParamException
 
 		when: 'getDomainClass is called with a null value'
 			GormUtil.getDomainClass(null)
@@ -802,8 +795,7 @@ class GormUtilIntegrationSpec extends Specification {
 /**
  * used in conjunction with the validation function tests
  */
-@Validateable
-class TestValidatableCommand {
+class TestValidatableCommand implements Validateable{
     String name
 	String title
     Integer age

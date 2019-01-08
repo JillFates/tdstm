@@ -1,6 +1,7 @@
 import com.tds.asset.Application
 import com.tdsops.tm.enums.domain.Color
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -8,8 +9,11 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.TagAssetService
 import spock.lang.See
+import spock.lang.Specification
 
-class AssetEntityServiceTests extends IntegrationSpec {
+@Integration
+@Rollback
+class AssetEntityServiceTests extends Specification{
 
 	AssetEntityService assetEntityService
 	TagAssetService tagAssetService

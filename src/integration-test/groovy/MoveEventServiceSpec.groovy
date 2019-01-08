@@ -1,3 +1,5 @@
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -10,6 +12,8 @@ import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class MoveEventServiceSpec extends Specification {
 
 	MoveEventService moveEventService

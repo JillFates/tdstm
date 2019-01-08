@@ -1,6 +1,8 @@
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
@@ -10,7 +12,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper
 
-
+@Integration
+@Rollback
 class AssetCommentSpec extends Specification {
 
     @Shared

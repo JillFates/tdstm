@@ -1,15 +1,19 @@
 import com.tdsops.tm.enums.domain.AuthenticationMethod as am
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode as arm
 import com.tdsops.tm.enums.domain.CredentialHttpMethod as chm
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.ProjectTestHelper
 import test.helper.ProviderTestHelper
 
-class CredentialSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class CredentialSpec extends  Specification{
 
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 	ProviderTestHelper providerTestHelper = new ProviderTestHelper()

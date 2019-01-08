@@ -1,4 +1,6 @@
-import grails.test.spock.IntegrationSpec
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
@@ -7,16 +9,18 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProviderService
 import net.transitionmanager.service.SecurityService
-import grails.core.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.See
+import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper
 
-class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class ApiCatalogServiceIntegrationSpec extends Specification{
 	ApiCatalogService apiCatalogService
-	ProviderService providerService
+	ProviderService   providerService
 	GrailsApplication grailsApplication
-	SessionFactory sessionFactory
+	SessionFactory    sessionFactory
 
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 

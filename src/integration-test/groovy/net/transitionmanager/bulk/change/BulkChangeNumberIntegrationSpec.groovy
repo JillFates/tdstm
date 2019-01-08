@@ -4,20 +4,23 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
-import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class BulkChangeNumberIntegrationSpec extends Specification {
 
 	CustomDomainService customDomainService
 
@@ -31,22 +34,22 @@ class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
+	MoveBundle moveBundle
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+	MoveBundle moveBundle2
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -79,6 +82,12 @@ class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
 
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+
 		application = assetEntityTestHelper.createAssetEntity(AssetClass.APPLICATION, project, moveBundle)
 	}
 

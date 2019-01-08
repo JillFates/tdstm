@@ -1,6 +1,8 @@
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
-import grails.test.spock.IntegrationSpec
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.domain.Credential
@@ -10,15 +12,17 @@ import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
-import grails.core.GrailsApplication
 import org.hibernate.SessionFactory
+import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.ProviderTestHelper
 
-class CredentialServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class CredentialServiceIntegrationSpec extends Specification{
     CredentialService credentialService
     GrailsApplication grailsApplication
-    SessionFactory sessionFactory
+    SessionFactory    sessionFactory
 
     ProjectTestHelper projectTestHelper = new ProjectTestHelper()
     ProviderTestHelper providerTestHelper = new ProviderTestHelper()

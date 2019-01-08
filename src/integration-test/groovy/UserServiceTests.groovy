@@ -1,4 +1,6 @@
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.SecurityService
@@ -7,6 +9,8 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 
 @Stepwise
+@Integration
+@Rollback
 class UserServiceTests extends Specification {
     private static final int INACTIVITY_DAYS_OFFSET = 10
     SecurityService securityService

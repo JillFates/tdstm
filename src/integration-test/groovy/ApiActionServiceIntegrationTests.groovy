@@ -1,6 +1,7 @@
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.JsonUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
@@ -25,12 +26,15 @@ import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
+import spock.lang.Specification
 import spock.lang.Title
 import test.helper.ApiCatalogTestHelper
 import test.helper.ProviderTestHelper
 
+@Integration
+@Rollback
 @Title('Tests for the ApiActionService class')
-class ApiActionServiceIntegrationTests extends IntegrationSpec {
+class ApiActionServiceIntegrationTests extends Specification{
 
 	ApiActionService apiActionService
 	ApiActionTestHelper apiActionHelper = new ApiActionTestHelper()

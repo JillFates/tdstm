@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.SecurityRole
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -7,12 +8,15 @@ import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.PersonTestHelper
 import test.helper.ProjectTestHelper
 import test.helper.ProviderTestHelper
 
-class CredentialIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class CredentialIntegrationSpec extends Specification{
 
 	ProjectService projectService
 	SecurityService securityService
@@ -28,7 +32,7 @@ class CredentialIntegrationSpec extends IntegrationSpec {
 			Person adminPerson = personHelper.createStaff(project.owner)
 			projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
 
-			UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+			UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			securityService.assumeUserIdentity(adminUser.username, false)
 
 			Provider provider = providerTestHelper.createProvider(project)

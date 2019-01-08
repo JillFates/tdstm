@@ -1,23 +1,23 @@
-import spock.lang.Specification
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
-import spock.lang.See
-
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
-import com.tdsops.tm.enums.domain.SecurityRole
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
 
+@Integration
+@Rollback
 class UserPreferenceServiceIntegrationSpec extends Specification {
 
 	// IOC
+	@Autowired
 	SecurityService securityService
+
+	@Autowired
 	UserPreferenceService userPreferenceService
 
 	// Shared variables
@@ -33,7 +33,7 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 
 	void setup() {
 		person = personHelper.createPerson()
-		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"])
+		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"])
 		securityService.assumeUserIdentity(userLogin.username, false)
     }
 

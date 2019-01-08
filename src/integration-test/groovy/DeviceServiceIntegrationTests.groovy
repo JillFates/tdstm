@@ -1,15 +1,16 @@
-import grails.test.spock.IntegrationSpec
-import spock.lang.*
-import spock.lang.Specification
-
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdssrc.grails.GormUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
+import spock.lang.Specification
 
-class DeviceServiceIntegrationTests extends IntegrationSpec {
+@Integration
+@Rollback
+class DeviceServiceIntegrationTests extends Specification{
 
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
 	private AssetTestHelper assetHelper = new AssetTestHelper()

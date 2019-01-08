@@ -7,39 +7,32 @@
  * that's the idea...
  */
 
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.SettingService
-import org.apache.commons.lang3.RandomStringUtils
+
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import org.springframework.jdbc.core.JdbcTemplate
+import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 class AssetTestHelper {
+	@Autowired
 	DeviceService deviceService
+
+	@Autowired
 	PersonService personService
+
+	@Autowired
 	SecurityService securityService
 
 	Long adminPersonId = 100
-
-	AssetTestHelper() {
-		deviceService = ApplicationContextHolder.getService('deviceService')
-		personService = ApplicationContextHolder.getService('personService')
-		securityService = ApplicationContextHolder.getService('securityService')
-		assert (personService instanceof PersonService)
-		assert (securityService instanceof SecurityService)
-	}
-
-
 
 	/**
 	 * Used to create an application and reference the person in all possible properties

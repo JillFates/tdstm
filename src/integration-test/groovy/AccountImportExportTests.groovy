@@ -1,5 +1,7 @@
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
@@ -11,6 +13,8 @@ import spock.lang.Specification
 
 import java.sql.Timestamp
 
+@Integration
+@Rollback
 class AccountImportExportTests extends Specification {
 
 	// IOC
@@ -29,54 +33,56 @@ class AccountImportExportTests extends Specification {
 	UserLogin user2
 	UserLogin user3
 	UserLogin user4
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper
+	private ProjectTestHelper projectHelper
 
 	def setup() {
+		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 
 		// Create a user/person with all role codes ['USER', 'SUPERVISOR', 'EDITOR', 'CLIENT_MGR', 'CLIENT_ADMIN', 'ADMIN']
 		adminPerson = personHelper.createStaff(project.owner)
 		assert adminPerson
-		List allRoleCodes = ['USER', 'SUPERVISOR', 'EDITOR', 'CLIENT_MGR', 'CLIENT_ADMIN', 'ADMIN']
+		List allRoleCodes = ['ROLE_USER', 'ROLE_SUPERVISOR', 'ROLE_EDITOR', 'ROLE_CLIENT_MGR', 'ROLE_CLIENT_ADMIN', 'ROLE_ADMIN']
 		projectService.addTeamMember(project, adminPerson, allRoleCodes)
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
 		assert adminUser.username
 
 		// Create a user1/person1 with role codes ['USER', 'SUPERVISOR', 'EDITOR']
 		person1 = personHelper.createStaff(project.owner)
 		assert person1
-		List userSupervisorEditorRoleCodes = ['USER', 'SUPERVISOR', 'EDITOR']
+		List userSupervisorEditorRoleCodes = ['ROLE_USER', 'ROLE_SUPERVISOR', 'ROLE_EDITOR']
 		projectService.addTeamMember(project, person1, userSupervisorEditorRoleCodes)
-		user1 = personHelper.createUserLoginWithRoles(person1, ["${SecurityRole.ADMIN}"])
+		user1 = personHelper.createUserLoginWithRoles(person1, ["${SecurityRole.ROLE_ADMIN}"])
 		assert user1
 		assert user1.username
 
 		// Create a user2/person2 with role codes ['SUPERVISOR', 'CLIENT_ADMIN']
 		person2 = personHelper.createStaff(project.owner)
 		assert person2
-		List supervisorClientAdminRoleCodes = ['SUPERVISOR', 'CLIENT_ADMIN']
+		List supervisorClientAdminRoleCodes = ['ROLE_SUPERVISOR', 'ROLE_CLIENT_ADMIN']
 		projectService.addTeamMember(project, person2, supervisorClientAdminRoleCodes)
-		user2 = personHelper.createUserLoginWithRoles(person2, ["${SecurityRole.ADMIN}"])
+		user2 = personHelper.createUserLoginWithRoles(person2, ["${SecurityRole.ROLE_ADMIN}"])
 		assert user2
 		assert user2.username
 
 		// Create a user3/person3 with role codes ['SUPERVISOR', 'ADMIN']
 		person3 = personHelper.createStaff(project.owner)
 		assert person3
-		List supervisorAdminRoleCodes = ['SUPERVISOR', 'ADMIN']
+		List supervisorAdminRoleCodes = ['ROLE_SUPERVISOR', 'ROLE_ADMIN']
 		projectService.addTeamMember(project, person3, supervisorAdminRoleCodes)
-		user3 = personHelper.createUserLoginWithRoles(person3, ["${SecurityRole.ADMIN}"])
+		user3 = personHelper.createUserLoginWithRoles(person3, ["${SecurityRole.ROLE_ADMIN}"])
 		assert user3
 		assert user3.username
 
 		// Create a user4/person4 with role codes ['USER', 'EDITOR', 'SUPERVISOR', 'CLIENT_MGR', 'CLIENT_ADMIN']
 		person4 = personHelper.createStaff(project.owner)
 		assert person4
-		List missingAdminRoleCodes = ['USER', 'EDITOR', 'SUPERVISOR', 'CLIENT_MGR', 'CLIENT_ADMIN']
+		List missingAdminRoleCodes = ['ROLE_USER', 'ROLE_EDITOR', 'ROLE_SUPERVISOR', 'ROLE_CLIENT_MGR', 'ROLE_CLIENT_ADMIN']
 		projectService.addTeamMember(project, person4, missingAdminRoleCodes)
-		user4 = personHelper.createUserLoginWithRoles(person4, ["${SecurityRole.ADMIN}"])
+		user4 = personHelper.createUserLoginWithRoles(person4, ["${SecurityRole.ROLE_ADMIN}"])
 		assert user4
 		assert user4.username
 	}
@@ -188,19 +194,19 @@ class AccountImportExportTests extends Specification {
 			assert securityService.isLoggedIn()
 
 			List allRoles = securityService.getAllRoleCodes()
-			List currentRoles = ['ADMIN', 'SUPERVISOR', 'USER']
-			List changes = ['EDITOR', '-ADMIN', '-CLIENT_MGR']
+			List currentRoles = ['ROLE_ADMIN', 'ROLE_SUPERVISOR', 'ROLE_USER']
+			List changes = ['ROLE_EDITOR', '-ROLE_ADMIN', '-ROLE_CLIENT_MGR']
 		when: 'calling determineSecurityRoleChanges'
 			Map map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then: 'it should return with a valid results map'
 			!map.error
 			map.hasChanges
-			map.add == ['EDITOR']
-			map.delete == ['ADMIN']
-			map.results == ['EDITOR', 'SUPERVISOR', 'USER']
+			map.add == ['ROLE_EDITOR']
+			map.delete == ['ROLE_ADMIN']
+			map.results == ['ROLE_EDITOR', 'ROLE_SUPERVISOR', 'ROLE_USER']
 		when: 'attempting to remove all of the adminUser roles it should report an error'
-			currentRoles = ['EDITOR']
-			changes = ['-EDITOR']
+			currentRoles = ['ROLE_EDITOR']
+			changes = ['-ROLE_EDITOR']
 			map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then:
 			map.error
@@ -233,7 +239,7 @@ class AccountImportExportTests extends Specification {
 			securityService.logoutCurrentUser()
 			securityService.assumeUserIdentity(user3.username, false) // ['SUPERVISOR', 'ADMIN']
 			changes = []
-			currentRoles = ['EDITOR', 'SUPERVISOR']
+			currentRoles = ['ROLE_EDITOR', 'ROLE_SUPERVISOR']
 			map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then:
 			!map.error
@@ -242,24 +248,24 @@ class AccountImportExportTests extends Specification {
 		when: 'the ADMIN role not in the authorizedRoleCodes it should still be able to manage roles without affecting ADMIN'
 			securityService.logoutCurrentUser()
 			securityService.assumeUserIdentity(user4.username, false) // ['USER', 'EDITOR', 'SUPERVISOR', 'CLIENT_MGR', 'CLIENT_ADMIN']
-			currentRoles = ['SUPERVISOR', 'USER', 'ADMIN']
-			changes = ['-USER', 'CLIENT_MGR']
+			currentRoles = ['ROLE_SUPERVISOR', 'ROLE_USER', 'ROLE_ADMIN']
+			changes = ['-ROLE_USER', 'ROLE_CLIENT_MGR']
 			map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then:
 			!map.error
-			map.results == ['ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+			map.results == ['ROLE_ADMIN', 'ROLE_CLIENT_MGR', 'ROLE_SUPERVISOR']
 		when: 'there is a bad code references in the currentRolls it should result in an error'
 			securityService.assumeUserIdentity(user2.username, false)  // ['SUPERVISOR', 'CLIENT_ADMIN']
-			currentRoles = ['BAD', 'ADMIN']
-			changes = ['-USER', 'CLIENT_MGR']
+			currentRoles = ['BAD', 'ROLE_ADMIN']
+			changes = ['-ROLE_USER', 'ROLE_CLIENT_MGR']
 			map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then:
 			map.error
 			map.error.contains('invalid security role')
 			map.error.contains('BAD')
 		when: 'there is a bad code references in the changes it should result in an error'
-			currentRoles = ['ADMIN']
-			changes = ['WTF', '-USER', 'CLIENT_MGR']
+			currentRoles = ['ROLE_ADMIN']
+			changes = ['WTF', '-ROLE_USER', 'ROLE_CLIENT_MGR']
 			map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes)
 		then:
 			map.error

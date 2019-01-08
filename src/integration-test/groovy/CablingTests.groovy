@@ -1,11 +1,13 @@
 import com.tdssrc.grails.GormUtil
-import grails.test.spock.IntegrationSpec
-
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
+import spock.lang.Specification
 
-
-class CablingTests extends IntegrationSpec {
+@Integration
+@Rollback
+class CablingTests extends Specification{
     /***********************************
      * Test model create functionality
      **********************************/

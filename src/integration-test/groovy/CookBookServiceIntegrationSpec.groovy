@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.Color
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -10,8 +11,11 @@ import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Shared
+import spock.lang.Specification
 
-class CookBookServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class CookBookServiceIntegrationSpec extends Specification{
 	@Shared
 	CookbookService cookbookService
 

@@ -6,12 +6,16 @@ import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
+import spock.lang.Specification
 
-abstract class ETLBaseIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+abstract class ETLBaseIntegrationSpec extends Specification{
 
 	/**
 	 * Builds a list of Mock Room using this fields order

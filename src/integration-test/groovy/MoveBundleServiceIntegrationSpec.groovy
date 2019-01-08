@@ -8,7 +8,8 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -28,7 +29,9 @@ import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
 
-class MoveBundleServiceIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class MoveBundleServiceIntegrationSpec extends Specification{
 
 	MoveBundleService moveBundleService
 	MoveEventService  moveEventService
@@ -190,7 +193,7 @@ class MoveBundleServiceIntegrationSpec extends IntegrationSpec {
 		person = personHelper.createPerson(null, project.client, project)
 
 		// 'a user associated to the project'
-		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
+		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 
 		// 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
 		pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)

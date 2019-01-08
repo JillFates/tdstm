@@ -1,5 +1,7 @@
 import com.tdsops.etl.ETLDomain
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
@@ -8,6 +10,8 @@ import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ImportBatchService
 import spock.lang.Specification
 
+@Integration
+@Rollback
 class ImportBatchServiceIntegrationTests extends Specification {
 
 	ImportBatchTestHelper importBatchTestHelper
