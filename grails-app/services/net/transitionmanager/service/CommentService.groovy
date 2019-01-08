@@ -464,7 +464,9 @@ class CommentService implements ServiceMethods {
 	 * @param task - the task to check if a notification is warranted
 	 * @param triggeredByWhom - the person that created/modified the task
 	 * @param isNew - a flag that indicates if the task was just created
-	 * @return true if a notification should be sent
+	 * @param addingNote - a flag indicating that note was added to the task and should send out the email
+	 * @param ignoreDirty - a flag used to send an email excluding the concern if certain fields are dirty
+     * @return true if a notification should be sent
 	 */
 	boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote, boolean ignoreDirty=false) {
 		boolean shouldNotify = (
