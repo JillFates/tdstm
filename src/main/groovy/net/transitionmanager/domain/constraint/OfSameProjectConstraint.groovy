@@ -1,6 +1,8 @@
 package net.transitionmanager.domain.constraint
 
+import net.transitionmanager.domain.Project
 import org.grails.datastore.gorm.validation.constraints.AbstractConstraint
+import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
 
 /**
@@ -10,6 +12,10 @@ import org.springframework.validation.Errors
 class OfSameProjectConstraint extends AbstractConstraint  {
 	static final NAME = 'ofSameProject'
 	static final String OF_SAME_PROJECT_CODE_MESSAGE_CODE = "of.same.project.constraint.message"
+
+	OfSameProjectConstraint(Class<?> constraintOwningClass, String constraintPropertyName, Object constraintParameter, MessageSource messageSource) {
+		super(constraintOwningClass, constraintPropertyName, constraintParameter, messageSource)
+	}
 
 	/**
 	 * Processes the validation of the target domain making sure that it's project is the same
@@ -22,6 +28,11 @@ class OfSameProjectConstraint extends AbstractConstraint  {
 	 * @param errors An object that holds errors from the constraint that gets populated if the target
 	 * project doesn't equal the propertyValue project.
 	 */
+	@Override
+	protected Object validateParameter(Object constraintParameter) {
+		return constraintParameter instanceof Project
+	}
+
 	protected void processValidate(Object target, Object propertyValue, Errors errors) {
 		if(parameter && target?.project?.id != propertyValue?.project?.id){
 			super.rejectValue(target,errors,OF_SAME_PROJECT_CODE_MESSAGE_CODE, 'OF_SAME_PROJECT_CODE_MESSAGE_CODE', [])
