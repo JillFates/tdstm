@@ -430,7 +430,7 @@ class TaskService implements ServiceMethods {
 	 */
 	AssetComment setTaskStatus(AssetComment task, String status) {
 		def currentPerson = securityService.getUserLoginPerson()
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'ROLE_PROJ_MGR')
 		return setTaskStatus(task, status, currentPerson, isPM)
 	}
 
@@ -722,7 +722,7 @@ class TaskService implements ServiceMethods {
 		} else {
 			if (whom == null) {
 				whom = securityService.userLoginPerson
-				isPM = securityService.hasRole("PROJ_MGR")
+				isPM = securityService.hasRole("ROLE_PROJ_MGR")
 			}
 			long startTime = System.currentTimeMillis() + (2000L)
 			Trigger trigger = new SimpleTriggerImpl('tm-updateTaskSuccessors-' + taskId + System.currentTimeMillis(), null, new Date(startTime))

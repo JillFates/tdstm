@@ -41,7 +41,7 @@ class EnumTests extends Specification {
 
 	void testSecurityRole() {
 		expect:
-		enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
+		enumTest SecurityRole, SecurityRole.ROLE_ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
 	}
 
 	/**

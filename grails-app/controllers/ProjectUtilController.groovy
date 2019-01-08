@@ -93,9 +93,9 @@ class ProjectUtilController implements ControllerMethods {
 	 */
 	def copyBundleTeams(moveBundle, oldBundle){
 		def tempBundleTeams = partyRelationshipService.getBundleTeamInstanceList(oldBundle)
-		PartyRelationshipType teamRelationshipType = PartyRelationshipType.load("PROJ_TEAM")
-		RoleType teamRole = RoleType.load("TEAM")
-		RoleType teamMemberRole = RoleType.load("TEAM_MEMBER")
+		PartyRelationshipType teamRelationshipType = PartyRelationshipType.load("ROLE_PROJ_TEAM")
+		RoleType teamRole = RoleType.load("ROLE_TEAM")
+		RoleType teamMemberRole = RoleType.load("ROLE_TEAM_MEMBER")
 		for (obj in tempBundleTeams) {
 			def bundleTeam = new ProjectTeam(name: obj.projectTeam?.name, comment: obj.projectTeam?.comment,
 					teamCode: obj.projectTeam?.teamCode, currentLocation: obj.projectTeam?.currentLocation,

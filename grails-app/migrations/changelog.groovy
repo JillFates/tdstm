@@ -1,5 +1,3 @@
-import version.*
-
 databaseChangeLog = {
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
@@ -290,4 +288,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_0/20181130-validated-should-only-have-replace.groovy'
 	include file: 'version/v4_6_0/20181205-validation-should-only-have-replace.groovy'
 	include file: 'version/v4_6_0/20181203-maintence-retire-date-times-to-dates.groovy'
+	include file: 'version/v4_7_0/20181219-Updating-role-prefix.groovy'
 }

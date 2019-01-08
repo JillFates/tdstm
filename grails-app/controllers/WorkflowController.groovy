@@ -110,7 +110,7 @@ class WorkflowController implements ControllerMethods {
 
 				/* create Standard Workflow transitions to the workflow */
 				def stdWorkflowTransitions = WorkflowTransition.findAllByWorkflow(stdWorkflow)
-				def defaultRole = RoleType.read('PROJ_MGR')
+				def defaultRole = RoleType.read('ROLE_PROJ_MGR')
 				for (stdWorkflowTransition in stdWorkflowTransitions) {
 					def workflowTransition = new WorkflowTransition(
 							workflow: workflow,

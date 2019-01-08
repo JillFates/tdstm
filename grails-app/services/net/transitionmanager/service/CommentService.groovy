@@ -171,7 +171,7 @@ class CommentService implements ServiceMethods {
 								break
 							case AssetCommentStatus.STARTED:
 								// Check to see if this is an project admin because they can update a task for users
-								def isPM = partyRelationshipService.staffHasFunction(project, currentPerson.id, 'PROJ_MGR')
+								def isPM = partyRelationshipService.staffHasFunction(project, currentPerson.id, 'ROLE_PROJ_MGR')
 
 								log.debug "Task Already STARTED - isPM? $isPM, whoDidIt=$whoDidIt, person=$currentUsername"
 								// We'll allow the same user to click Start and Done

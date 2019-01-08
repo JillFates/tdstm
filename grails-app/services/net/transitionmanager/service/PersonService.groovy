@@ -1029,7 +1029,7 @@ class PersonService implements ServiceMethods {
 		addToTeam(person, teamCode)
 
 		if (!isAssignedToProjectTeam(project, person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project '$project.name' on team $teamCode")
 			}
 			else {
@@ -1048,7 +1048,7 @@ class PersonService implements ServiceMethods {
 	 */
 	void addToTeam(Person person, String teamCode) {
 		if (!isAssignedToTeam(person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "COMPANY", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "ROLE_COMPANY", person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to team $teamCode")
 			}
 			else {
@@ -1090,7 +1090,7 @@ class PersonService implements ServiceMethods {
 	private void addToProjectSecured(Project project, Person person) {
 		// Add to the project if not assigned already
 		if (!isAssignedToProject(project, person)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, 'STAFF')) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, 'ROLE_STAFF')) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
 			} else {
 				throw new DomainUpdateException("An error occurred while attempting to assign the person to the project")
@@ -1429,9 +1429,9 @@ class PersonService implements ServiceMethods {
 		assert person != null
 
 		PartyRelationship.createCriteria().list {
-			eq('partyRelationshipType', PartyRelationshipType.load('PROJ_STAFF'))
+			eq('partyRelationshipType', PartyRelationshipType.load('ROLE_PROJ_STAFF'))
 			and {
-				eq('roleTypeCodeFrom', RoleType.load('PROJECT'))
+				eq('roleTypeCodeFrom', RoleType.load('ROLE_PROJECT'))
 				eq('partyIdTo', person)
 				if (project) {
 					eq('partyIdFrom', project)

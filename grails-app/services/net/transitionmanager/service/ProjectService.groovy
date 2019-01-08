@@ -249,7 +249,7 @@ class ProjectService implements ServiceMethods {
 	 * @return List of Person instances
 	 */
 	List<Person> getProjectManagers(Project project) {
-		getStaff(project, 'PROJ_MGR')
+		getStaff(project, 'ROLE_PROJ_MGR')
 	}
 
 	/**
@@ -823,17 +823,17 @@ class ProjectService implements ServiceMethods {
 				log.debug "Check partner type failed $partnerParty where type is ${partnerParty?.partyType}"
 				throw new InvalidParamException("Partner id specified is not a company ($partnerId)")
 			}
-			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER")
+			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "ROLE_PROJECT", partnerParty, "ROLE_PARTNER")
 			log.info "updateProjectPartners() Added partner $partnerParty to project $projectInstance"
 		}
 
 		// Delete partners from the relationship
 		String findPartnerStaff = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
 			"and p.partyIdFrom = :partner and " +
-			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
+			"p.roleTypeCodeFrom = 'ROLE_COMPANY' and p.roleTypeCodeTo = 'ROLE_STAFF'"
 
 		String deleteProjectStaff = "DELETE FROM PartyRelationship pr WHERE pr.partyRelationshipType='PROJ_STAFF' " +
-			"AND pr.partyIdFrom = :project AND pr.roleTypeCodeFrom = 'PROJECT' " +
+			"AND pr.partyIdFrom = :project AND pr.roleTypeCodeFrom = 'ROLE_PROJECT' " +
 			"AND pr.partyIdTo IN (:staff)"
 
 		String unassignStaffTasks = "UPDATE AssetComment task SET task.assignedTo=NULL WHERE task.project = :project " +
@@ -905,7 +905,7 @@ class ProjectService implements ServiceMethods {
 			}
 
 			// For Project to Company PartyRelationship
-			partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY")
+			partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "ROLE_PROJECT", companyParty, "ROLE_COMPANY")
 
 			List partnersIds = CollectionUtils.asList(projectPartners)
 			updateProjectPartners(projectInstance, partnersIds)
@@ -914,7 +914,7 @@ class ProjectService implements ServiceMethods {
 
 				def projectManagerParty = Party.get(projectManager)
 				//	For Project to ProjectManager PartyRelationship
-				partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR")
+				partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "ROLE_PROJECT", projectManagerParty, "ROLE_PROJ_MGR")
 			}
 
 			userPreferenceService.setCurrentProjectId(projectInstance.id)
@@ -1179,8 +1179,8 @@ class ProjectService implements ServiceMethods {
 		Party.executeQuery('''
 			select pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType = 'PROJ_COMPANY'
-			  and pr.roleTypeCodeFrom = 'PROJECT'
-			  and pr.roleTypeCodeTo = 'COMPANY'
+			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
+			  and pr.roleTypeCodeTo = 'ROLE_COMPANY'
 			  and pr.partyIdFrom = :project
 		''', [project: project], [max: 1])[0]
 	}
@@ -1196,7 +1196,7 @@ class ProjectService implements ServiceMethods {
 		assert owner
 		assert owner.partyType.id == 'COMPANY'
 
-		partyRelationshipService.savePartyRelationship("PROJ_COMPANY", project, "PROJECT", owner, "COMPANY")
+		partyRelationshipService.savePartyRelationship("PROJ_COMPANY", project, "ROLE_PROJECT", owner, "ROLE_COMPANY")
 
 		return project
 	}
@@ -1689,8 +1689,8 @@ class ProjectService implements ServiceMethods {
 		}
 
 		PartyRelationshipType prtProjectStaff = PartyRelationshipType.read('PROJ_STAFF')
-		RoleType rtProject = RoleType.read('PROJECT')
-		RoleType rtStaff = RoleType.read('STAFF')
+		RoleType rtProject = RoleType.read('ROLE_PROJECT')
+		RoleType rtStaff = RoleType.read('ROLE_STAFF')
 
 		assert prtProjectStaff
 		assert rtProject

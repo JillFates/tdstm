@@ -1,9 +1,14 @@
 package test.helper
 
-import com.tdsops.common.grails.ApplicationContextHolder
+
 import com.tdssrc.grails.GormUtil
+import grails.util.Holders
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.PartyRelationshipService
 
 /**
  * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other
@@ -13,10 +18,7 @@ import net.transitionmanager.domain.PartyGroup
  * These helpers should not rely on any pre-existing data and will generate anything that is necessary. At least
  * that's the idea...
  */
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.PartyRelationshipService
+
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
@@ -32,14 +34,10 @@ class PersonTestHelper {
 	Long adminPersonId = 100
 
 	PersonTestHelper() {
-		personService = ApplicationContextHolder.getService('personService')
-		securityService = ApplicationContextHolder.getService('securityService')
-		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
-		userPreferenceService = ApplicationContextHolder.getService('userPreferenceService')
-		assert (personService instanceof PersonService)
-		assert (securityService instanceof SecurityService)
-		assert (partyRelationshipService instanceof PartyRelationshipService)
-		assert (userPreferenceService instanceof UserPreferenceService)
+		personService = Holders.applicationContext.getBean('personService')
+		securityService = Holders.applicationContext.getBean('securityService')
+		partyRelationshipService = Holders.applicationContext.getBean('partyRelationshipService')
+		userPreferenceService = Holders.applicationContext.getBean('userPreferenceService')
 	}
 
 	/**
@@ -219,7 +217,7 @@ class PersonTestHelper {
 
 		assert admin
 
-		this.createUserLoginWithRoles(admin, ['ADMIN'])
+		this.createUserLoginWithRoles(admin, ['ROLE_ADMIN'])
 
 		return admin
 	}

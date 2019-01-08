@@ -4,6 +4,8 @@ import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.web.mapping.LinkGenerator
 import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.PartyGroup
@@ -20,9 +22,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
-import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
-import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class UserLoginController implements ControllerMethods {
@@ -92,8 +92,8 @@ class UserLoginController implements ControllerMethods {
 			FROM person p
 			LEFT OUTER JOIN party_role pr on p.person_id=pr.party_id
 			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='ROLE_STAFF'
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE u.active = '$active'""")
 		if (active=='Y')

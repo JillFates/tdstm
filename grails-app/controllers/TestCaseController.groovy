@@ -16,11 +16,11 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 
-import static net.transitionmanager.domain.Permissions.Roles.ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
-import static net.transitionmanager.domain.Permissions.Roles.SUPERVISOR
-import static net.transitionmanager.domain.Permissions.Roles.USER
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_SUPERVISOR
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
 
 /*
  * This controller just allows us to do some testing of things until we can move them into an integrated testcase
@@ -122,9 +122,9 @@ class TestCaseController implements ControllerMethods {
 	def securityRoleChanges() {
 		List<String> allRoles = securityService.getAllRoleCodes()
 		// List currentRoles = [ADMIN.name(), SUPERVISOR.name(), USER.name()]
-		List<String> currentRoles = ['WHAT', USER.name(), ADMIN.name()]
-		List<String> authorizedRoles = [SUPERVISOR.name(), CLIENT_ADMIN.name()]
-		List<String> changes = [CLIENT_MGR.name()]
+		List<String> currentRoles = ['WHAT', ROLE_USER.name(), ROLE_ADMIN.name()]
+		List<String> authorizedRoles = [ROLE_SUPERVISOR.name(), ROLE_CLIENT_ADMIN.name()]
+		List<String> changes = [ROLE_CLIENT_MGR.name()]
 
 		Map map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoles)
 		String out = "Results were:<br> <pre>current: $currentRoles\nchanges:$changes\nauthorized:$authorizedRoles\n$map</pre>"

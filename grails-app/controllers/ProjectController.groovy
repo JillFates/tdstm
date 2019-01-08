@@ -2,7 +2,6 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -407,7 +406,7 @@ class ProjectController implements ControllerMethods {
 			// Deal with the Project Manager if one is supplied
 			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
 			if (projectManagerId > 0) {
-				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), "PROJ_MGR")
+				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), "ROLE_PROJ_MGR")
 			}
 
 			// Deal with the adding the project logo if one was supplied

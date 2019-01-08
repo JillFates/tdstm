@@ -1,12 +1,17 @@
 package test.helper
 
-import com.tdsops.common.grails.ApplicationContextHolder
+
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.domain.*
+import grails.util.Holders
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang.RandomStringUtils as RSU
-
 /**
  * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting
  * for the ITs so that they an focus on the good stuff.
@@ -22,8 +27,8 @@ class ProjectTestHelper {
 
 	// Initialize
 	ProjectTestHelper() {
-		projectService = ApplicationContextHolder.getService('projectService')
-		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
+		projectService = Holders.applicationContext.getBean('projectService')
+		partyRelationshipService = Holders.applicationContext.getBean('partyRelationshipService')
 	    bundleHelper = new MoveBundleTestHelper()
 	}
 
@@ -88,7 +93,7 @@ class ProjectTestHelper {
 
 		// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
 		project.owner = company
-		project.save(failOnError:true)
+		project.save(failOnError:true, flush: true)
 
 		projectService.cloneDefaultSettings(project)
 		return project

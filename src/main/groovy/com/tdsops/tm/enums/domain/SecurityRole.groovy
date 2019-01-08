@@ -8,10 +8,10 @@ import groovy.transform.CompileStatic
 @CompileStatic
 enum SecurityRole {
 
-	USER('User'),             // Limited access
-	EDITOR('Editor'),         // Client user with moderate access
-	SUPERVISOR('Supervisor'),
-	ADMIN('Administrator')    // All rights
+	ROLE_USER('User'),             // Limited access
+	ROLE_EDITOR('Editor'),         // Client user with moderate access
+	ROLE_SUPERVISOR('Supervisor'),
+	ROLE_ADMIN('Administrator')    // All rights
 
 	final String value
 

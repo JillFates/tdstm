@@ -33,7 +33,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RolePermissions
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -46,8 +45,8 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
 
-import static net.transitionmanager.domain.Permissions.Roles.ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.USER
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
 
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
@@ -59,7 +58,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	/**
 	 * The default security code that should be assigned to individuals if not is specified.
 	 */
-	static final String DEFAULT_SECURITY_ROLE_CODE = USER.name()
+	static final String DEFAULT_SECURITY_ROLE_CODE = ROLE_USER.name()
 
 	def auditService
 	def emailDispatchService
@@ -1659,7 +1658,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	boolean checkAccess(String controllerName, String actionName) {
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
 		if (controllerName in PARTY_CRUD_CONTROLLERS && actionName in PARTY_CRUD_ACTIONS) {
-			if (!hasRole(ADMIN)) {
+			if (!hasRole(ROLE_ADMIN)) {
 				// TODO BB do the same as the annotations
 				return false
 			}
@@ -1667,7 +1666,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		// for delete require ADMIN role
 		if (actionName == 'delete' && !CRUD_DELETE_CONTROLLER_EXCEPTIONS.contains(controllerName)) {
-			if (!hasRole(ADMIN)) {
+			if (!hasRole(ROLE_ADMIN)) {
 				// TODO BB do the same as the annotations
 				return false
 			}

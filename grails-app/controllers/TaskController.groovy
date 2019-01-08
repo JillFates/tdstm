@@ -46,9 +46,9 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
-import static net.transitionmanager.domain.Permissions.Roles.ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_ADMIN
+import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_MGR
 
 import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.context.MessageSource
@@ -1518,7 +1518,7 @@ function goBack() { window.history.back() }
 		boolean assignmentPerm
 		boolean categoryPerm = false
 
-		if (securityService.hasRole([ADMIN, CLIENT_ADMIN, CLIENT_MGR])) {
+		if (securityService.hasRole([ROLE_ADMIN, ROLE_CLIENT_ADMIN, ROLE_CLIENT_MGR])) {
 			assignmentPerm = categoryPerm = true
 		} else {
 			// AssignmentPerm can be changed if task is not completed/terminated

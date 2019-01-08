@@ -311,12 +311,12 @@ class MoveBundleController implements ControllerMethods {
 				MoveBundle moveBundle = moveBundleService.save(command)
 
 				if (projectManagerId) {
-					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
 							Party.load(projectManager), "PROJ_MGR")
 				}
 				if (moveManagerId) {
-					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE",
-							Party.load(moveManager), "MOVE_MGR")
+					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
+							Party.load(moveManager), "ROLE_MOVE_MGR")
 				}
 
 				flash.message = "MoveBundle $moveBundle created"

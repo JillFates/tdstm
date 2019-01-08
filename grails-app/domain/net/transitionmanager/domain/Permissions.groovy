@@ -6,12 +6,12 @@ class Permissions {
 
 	@CompileStatic
 	static enum Roles {
-		ADMIN,
-		CLIENT_ADMIN,
-		CLIENT_MGR,
-		SUPERVISOR,
-		EDITOR,
-		USER
+		ROLE_ADMIN,
+		ROLE_CLIENT_ADMIN,
+		ROLE_CLIENT_MGR,
+		ROLE_SUPERVISOR,
+		ROLE_EDITOR,
+		ROLE_USER
 
 		static final List<String> NAMES = values()*.name()
 	}
