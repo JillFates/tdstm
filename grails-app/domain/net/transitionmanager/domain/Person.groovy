@@ -275,4 +275,36 @@ class Person extends Party {
 			throw new UnsupportedOperationException(msg)
 		}
 	}
+
+	/**
+	 * Converts this person object to a map
+	 * @return
+	 */
+	Map toMap(Project project) {
+		def teams = getTeamsCanParticipateIn()
+		Map data = [
+				id: id,
+				firstName: firstName,
+				middleName: middleName,
+				lastName: lastName,
+				nickName: nickName,
+				title: title,
+				email: email,
+				department: department,
+				location: location,
+				workPhone: workPhone,
+				mobilePhone: mobilePhone,
+				active: active,
+				company: company.toString(),
+				country: country,
+				stateProv: stateProv,
+				keyWords: keyWords,
+				tdsNote: tdsNote,
+				tdsLink: tdsLink,
+				travelOK: travelOK,
+				teams: teams,
+				staffType: staffType
+		]
+		return data.asImmutable()
+	}
 }

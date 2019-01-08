@@ -47,7 +47,6 @@ export class UserEditPersonComponent {
 		} else {
 			this.activeDialog.dismiss();
 		}
-
 	}
 
 	private loadComponentModel() {
@@ -64,12 +63,15 @@ export class UserEditPersonComponent {
 					workPhone: '',
 					mobilePhone: '',
 					active: 'Y',
-					staffTypeId: '',
 					company: '',
-					companies: [],
+					country: '',
+					stateProv: '',
+					keyWords: '',
+					tdsNote: '',
+					tdsLink: '',
+					travelOK: 0,
 					teams: [] ,
 					staffType: [],
-					selectedTeams: []
 				};
 				this.personModel = Object.assign({},  defaultPerson, this.personModel);
 

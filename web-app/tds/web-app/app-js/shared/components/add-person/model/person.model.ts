@@ -14,6 +14,12 @@ export class PersonModel {
 	public company: any;
 	public staffTypeId: string;
 	public active: string;
+	public country: string;
+	public stateProv: string;
+	public keyWords: string;
+	public tdsNote: string;
+	public tdsLink: string;
+	public travelOK: number;
 	public companies: any[];
 	public teams: any[];
 	public staffType: any[];
