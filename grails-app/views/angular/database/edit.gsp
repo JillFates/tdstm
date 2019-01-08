@@ -48,24 +48,27 @@
 											</td>
 											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
-												<kendo-dropdownlist
-														[tabIndex]="15"
-														class="tm-input-control"
-														name="modelAssetScaleName"
-														[data]="${SizeScale.getAsJsonList() as JSON}"
-														[(ngModel)]="model.asset.scale"
-														[textField]="'text'"
-														[valueField]="'value'">
-												</kendo-dropdownlist>
+												<div>
+													<kendo-dropdownlist
+															[tabIndex]="15"
+															class="tm-input-control"
+															name="modelAssetScaleName"
+															[data]="${SizeScale.getAsJsonList() as JSON}"
+															[(ngModel)]="model.asset.scale"
+															[textField]="'text'"
+															[valueField]="'value'">
+													</kendo-dropdownlist>
+												</div>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
 											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                                 <tds-date-control
+													[(ngModel)]="model.asset.retireDate"
 													class="tm-input-control"
 													name="modelAssetRetireDate"
 													[tabindex]="18"
-                                                    [(value)]="model.asset.retireDate">
+                                                    [value]="model.asset.retireDate">
                                                 </tds-date-control>
 											</td>
 
@@ -91,10 +94,11 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
                                                 <tds-date-control
+													[(ngModel)]="model.asset.maintExpDate"
 													class="tm-input-control"
 													name="modelAssetMainExpDate"
 													[tabindex]="19"
-                                                    [(value)]="model.asset.maintExpDate">
+                                                    [value]="model.asset.maintExpDate">
                                                 </tds-date-control>
 											</td>
 
