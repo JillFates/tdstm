@@ -61,7 +61,7 @@ class TagsEditionSpec extends GebReportingSpec {
 
     def "2. The User edits a custom tag"(){
         when: 'The User clicks on Edit button'
-            clickOnEditButton()
+            waitFor {clickOnEditButton()}
         and: 'The user fills Name, Description and selects Color'
             customTag.name = customTag.name + " Edited"
             customTag.description = customTag.description + " Edited"
