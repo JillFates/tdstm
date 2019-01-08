@@ -88,6 +88,7 @@ export class FieldReferencePopupComponent implements OnInit {
 	 */
 	protected onClose($event): void {
 		this.onCloseEvent.emit($event);
+		$event.stopPropagation();
 	}
 
 	/**

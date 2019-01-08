@@ -25,7 +25,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

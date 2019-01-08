@@ -663,10 +663,10 @@ class ETLDependencySpec extends ETLBaseSpec {
 					extract 'server_guid' load 'externalRefId' set extRefIdVar
 				
 					find Device by 'externalRefId' eq extRefIdVar into 'id' 
-					elseFind Device by 'Name' eq vmNameVar and 'Manufacturer' eq mfgNameVar and 'Model' eq modelNameVar into 'id'
-					elseFind Device by 'Name' eq vmNameVar and 'Manufacturer' eq mfgNameVar into 'id'
-					elseFind Device by 'Name' eq vmNameVar and 'Model' eq modelNameVar into 'id'
-					elseFind Device by 'Name' eq vmNameVar into 'id'
+					elseFind Device by 'Name' eq srvNameVar and 'Manufacturer' eq mfgNameVar and 'Model' eq modelNameVar into 'id'
+					elseFind Device by 'Name' eq srvNameVar and 'Manufacturer' eq mfgNameVar into 'id'
+					elseFind Device by 'Name' eq srvNameVar and 'Model' eq modelNameVar into 'id'
+					elseFind Device by 'Name' eq srvNameVar into 'id'
 				
 					set dependentResultVar with DOMAIN
 				

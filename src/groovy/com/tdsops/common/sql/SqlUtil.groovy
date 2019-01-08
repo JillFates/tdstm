@@ -5,8 +5,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
-import org.apache.commons.lang.StringEscapeUtils
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.text.StringEscapeUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 
 class SqlUtil {

@@ -8,6 +8,7 @@ import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.SecurityService
 import test.AbstractUnitSpec
+import test.helper.mock.ProjectMock
 
 @Mock([UserLogin, UserPreference, SecurityService])
 @TestMixin(ControllerUnitTestMixin)
@@ -16,7 +17,7 @@ class CookbookServiceTests extends AbstractUnitSpec { //Specification {
 
 	void setup() {
 		login()
-		Project project = buildMockProject()
+		Project project = ProjectMock.create()
 
 		//Mocking up the Users Current Project
 		service.securityService.metaClass.getUserCurrentProject = {

@@ -17,7 +17,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import org.apache.commons.lang.math.RandomUtils
+import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate

@@ -4,7 +4,7 @@ import com.tdssrc.grails.ApiCatalogUtil
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 
 class ApiCatalogTestHelper {
 

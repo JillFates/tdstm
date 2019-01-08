@@ -20,6 +20,19 @@ import java.text.ParseException
 @Slf4j
 class CustomValidators {
 
+	static private Map<String, Closure> VALIDATOR_HANDLERS
+
+	static {
+		VALIDATOR_HANDLERS = [
+				  (ControlType.YES_NO.toString())    : CustomValidators.&controlYesNoControlValidator,
+				  (ControlType.LIST.toString())      : CustomValidators.&controlListValidator,
+				  (ControlType.NUMBER.toString())    : CustomValidators.&controlNumberValidator,
+				  (ControlType.STRING.toString())    : CustomValidators.&controlDefaultValidator,
+				  (ControlType.DATE.toString())      : CustomValidators.&controlDateValidator,
+				  (ControlType.DATETIME.toString())  : CustomValidators.&controlDateTimeValidator,
+		].asImmutable()
+	}
+
 	/**
 	 * Creates a custom validator for a inList that is lazy computed
 	 *
@@ -75,15 +88,6 @@ class CustomValidators {
 			CustomDomainService customDomainService = ApplicationContextHolder.getBean('customDomainService', CustomDomainService)
 			List<Map> customFieldSpecs = customDomainService.customFieldsList(object.project, object.assetClass.toString())
 
-			// Initializing Validators list
-			Map<String, Closure> validatorHandlers = [:]
-			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
-			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
-			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberValidator
-			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
-			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateValidator
-			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeValidator
-
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
 				String field = fieldSpec.field
@@ -92,7 +96,7 @@ class CustomValidators {
 				String control = fieldSpec.control
 
 				// don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
-				Closure validator = validatorHandlers[control]
+				Closure validator = VALIDATOR_HANDLERS[control]
 
 				if(!validator) {
 					log.error("No validator defined for '{}' Custom Control", control)
@@ -124,7 +128,7 @@ class CustomValidators {
 		new Validator ( fieldSpec ) {
 			void validate() {
 				if ( isRequired() && ! value ) {
-					addError ('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					addError('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
 				}
 			}
 		}
@@ -141,10 +145,9 @@ class CustomValidators {
 
 		new Validator ( fieldSpec ) {
 			void validate() {
-				// value = StringUtils.defaultString(value)
-				addErrors( controlNotEmptyValidator ( value, fieldSpec, domain ).apply() )
+				addErrors( controlNotEmptyValidator( value, fieldSpec, domain ).apply() )
 
-				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
+				if ( value && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -239,6 +242,7 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
+	@CompileStatic
 	static controlNumberValidator ( String value, Map fieldSpec, Object domain) {
 		new Validator ( fieldSpec ) {
 			void validate() {
@@ -250,26 +254,21 @@ class CustomValidators {
 					}
 					return // with or without error, as the value is empty, just return
 				}
-                // try to convert to numeric
-				Long number
-				try {
-					NumberFormat nf = NumberFormat.getInstance()
-					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). Anyway that is not a valid
-					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
-					if(value.charAt(value.size()-1) == '-') {
-						throw new ParseException('The number format is incorrect', 0)
-					}
-					number = nf.parse(value)
-				} catch (ParseException e) {
-					// If it's not a number there is not much to do, so return
+
+				if ( !(value ==~ /^(-)?\d*(\.\d+)?$/)) {
+					// If it's not a valid number format there is not much to do, so return
 					addError ('typeMismatch.java.lang.Long', [getLabel()])
 					return
 				}
+				// Now parsing is safe, convert to numeric
+				NumberFormat nf = NumberFormat.getInstance()
+				Long number = nf.parse(value)
+
 			    // finally, validate the constraints in the fieldSpec
-				def minRange = fieldSpec.constraints?.minRange ?: null
-				def maxRange = fieldSpec.constraints?.maxRange ?: null
-				def precision = fieldSpec.constraints?.precision ?: null
-				def allowNegative = fieldSpec.constraints?.allowNegative
+				Integer minRange = fieldSpec.constraints?.minRange ?: null
+				Integer maxRange = fieldSpec.constraints?.maxRange ?: null
+				Integer precision = fieldSpec.constraints?.precision ?: null
+				boolean allowNegative = fieldSpec.constraints?.allowNegative
 
 				// if 'minRange' or 'maxRange' fields are present, validate the value range
 				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
@@ -375,7 +374,7 @@ class CustomValidators {
 		 * @param errors
 		 */
 		void addErrors(Collection<ErrorHolder> errors) {
-			errors.addAll(errors ?: [])
+			this.errors.addAll(errors ?: [])
 		}
 
 		/*

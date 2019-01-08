@@ -9,7 +9,7 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, IMPORT_BATCH_PREFERENCES, PreferenceService} from '../../../../shared/services/preference.service';
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
@@ -50,6 +50,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	private batchRecordsUpdatedFlag = false;
 	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
 	public dateTimeFormat: string;
+	private importBatchPreferences = {};
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
@@ -67,9 +68,10 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 */
 	private onLoad(): void {
 		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
-		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_RECORDS_FILTER).subscribe( res => {
+		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe( res => {
 			if (res) {
-				const match = this.batchRecordsFilter.options.find( item => item.name === res);
+				this.importBatchPreferences = JSON.parse(res);
+				const match = this.batchRecordsFilter.options.find( item => item.name === this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER]);
 				if (match) {
 					this.batchRecordsFilter.selected = match;
 				}
@@ -206,23 +208,24 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 * @param avoidPreferenceSave used when we want to stop saving the filter in user preferences.
 	 */
-	private onStatusFilter($event, avoidPreferenceSave = false) {
+	private onStatusFilter(event, avoidPreferenceSave = false) {
 		for (const columnProperty of ['status.label', 'errorCount']) {
 			let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
 			foundMatch.filter = null;
 			this.dataGridOperationsHelper.clearValue(foundMatch);
 		}
-		if ($event.id !== 1) {
-			for (const filter of $event.filters) {
+		if (event.id !== 1) {
+			for (const filter of event.filters) {
 				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
 				if (foundMatch) {
 					foundMatch.filter = filter.value;
-					this.dataGridOperationsHelper.onFilter(foundMatch, $event.id === 3 ? 'gte' : null);
+					this.dataGridOperationsHelper.onFilter(foundMatch, event.id === 3 ? 'gte' : null);
 				}
 			}
 		}
 		if (!avoidPreferenceSave) {
-			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_RECORDS_FILTER, $event.name).subscribe( r => { /**/});
+			this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER] = event.name;
+			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( r => { /**/});
 		}
 	}
 

@@ -18,7 +18,7 @@ import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserLoginProjectAccess
-import org.apache.commons.lang.math.RandomUtils
+import org.apache.commons.lang3.RandomUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -357,7 +357,7 @@ class MetricReportingService {
 					metricCode: metricCode,
 					date      : date,
 					label     : 'count',
-					value     : RandomUtils.nextInt(499) + 1
+					value     : RandomUtils.nextInt(0, 499) + 1
 			]
 		}
 	}

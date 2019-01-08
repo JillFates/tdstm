@@ -6,7 +6,9 @@ export const en_DICTIONARY: Object = {
 	'GLOBAL': {
 		'OK': 'Ok',
 		'ADD': 'Add',
+		'ADMIN': 'Admin',
 		'ACTION': 'Action',
+		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
 		'CREATE': 'Create',
@@ -31,6 +33,7 @@ export const en_DICTIONARY: Object = {
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
+		'PENDING': 'Pending',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
@@ -50,6 +53,11 @@ export const en_DICTIONARY: Object = {
 		'STORAGE': 'Storage',
 		'ASSETS': 'Assets',
 		'COMMON': 'Common'
+	},
+	'API_ACTION': {
+		'CREATE_ACTION': 'Create Action',
+		'API_ACTION': 'API Action',
+		'API_ACTIONS': 'API Actions',
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'View Manager',
@@ -101,17 +109,6 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
-	'DEPENDENCIES': {
-		'MENU_TITLE': 'Dependencies',
-		'LIST_TITLE': 'Dependencies List',
-		'SINGLE_NAME': 'Dependency',
-		'PLURAL_NAME': 'Dependencies'
-	},
-	'API_ACTION': {
-		'CREATE_ACTION': 'Create Action',
-		'API_ACTION': 'API Action',
-		'API_ACTIONS': 'API Actions',
-	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
 		'MANAGE_TAGS': 'Manage Tags',
@@ -127,11 +124,6 @@ export const en_DICTIONARY: Object = {
 		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREDENTIAL': 'Credential',
 		'CREDENTIALS': 'Credentials',
-	},
-	'PROVIDER': {
-		'CREATE_PROVIDER': 'Create Provider',
-		'PROVIDER': 'Provider',
-		'PROVIDERS': 'Providers',
 	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
@@ -175,6 +167,12 @@ export const en_DICTIONARY: Object = {
 		},
 		'PROJECT': 'Project'
 	},
+	'DEPENDENCIES': {
+		'MENU_TITLE': 'Dependencies',
+		'LIST_TITLE': 'Dependencies List',
+		'SINGLE_NAME': 'Dependency',
+		'PLURAL_NAME': 'Dependencies'
+	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
@@ -188,6 +186,20 @@ export const en_DICTIONARY: Object = {
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		}
+	},
+	'LICENSE': {
+		'ADMIN': 'License Admin',
+		'DEMO': 'Demo',
+		'CREATE_LICENSE': 'Create License',
+		'GLOBAL': 'Global',
+		'SINGLE': 'Single',
+		'MANAGER': 'License Manager',
+		'ENGINEERING': 'Engineering',
+		'REQUEST_NEW_LICENSE': 'Request New License',
+		'LICENSE_REQUEST_COMPLETED': 'License Request Completed',
+		'LICENSE_DETAIL': 'License Detail',
+		'TRAINING': 'Training',
+		'PRODUCTION': 'Production',
 	},
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
@@ -226,21 +238,6 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
-	'TASK_MANAGER': {
-		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
-		'CREATE': 'Create',
-		'CREATE_TASK': 'Create Task',
-		'TASK': 'Task',
-		'TASK_MANAGER': 'Task Manager',
-		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
-		'EDIT': {
-			'REQUIRED_FIELD': 'Field is required',
-			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',
-			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
-			'SELECT_START_DATE': 'Select a start date',
-			'SELECT_END_DATE': 'Select an end date'
-		}
-	},
 	'NOTICE_MANAGER': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',
@@ -255,5 +252,25 @@ export const en_DICTIONARY: Object = {
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
 		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.'
+	},
+	'PROVIDER': {
+		'CREATE_PROVIDER': 'Create Provider',
+		'PROVIDER': 'Provider',
+		'PROVIDERS': 'Providers',
+	},
+	'TASK_MANAGER': {
+		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
+		'CREATE': 'Create',
+		'CREATE_TASK': 'Create Task',
+		'TASK': 'Task',
+		'TASK_MANAGER': 'Task Manager',
+		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
+		'EDIT': {
+			'REQUIRED_FIELD': 'Field is required',
+			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',
+			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
+			'SELECT_START_DATE': 'Select a start date',
+			'SELECT_END_DATE': 'Select an end date'
+		}
 	}
 };

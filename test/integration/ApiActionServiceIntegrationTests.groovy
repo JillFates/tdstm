@@ -22,7 +22,7 @@ import net.transitionmanager.service.AwsService
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.service.ProviderService
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Title
