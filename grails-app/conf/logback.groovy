@@ -100,4 +100,4 @@ logger 'net.bull.javamelody', ERROR, appenderList, false
 // Setup Audit Logging messages to go to their own log file in addition to the application log
 logger 'net.transitionmanager.service.AuditService', ERROR, ['AUDIT_LOG'], true
 
-root(DEBUG, appenderList)
+root(INFO, appenderList)
