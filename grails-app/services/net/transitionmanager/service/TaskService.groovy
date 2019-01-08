@@ -696,6 +696,7 @@ class TaskService implements ServiceMethods {
 				break
 		}
 
+		task.save()
 		return task
 	}
 
