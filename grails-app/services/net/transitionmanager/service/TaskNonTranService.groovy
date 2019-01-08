@@ -38,7 +38,7 @@ class TaskNonTranService implements ServiceMethods {
 			return	'failed'
 		}
 
-		AssetComment task = AssetComment.read(taskId)
+		AssetComment task = AssetComment.get(taskId)
 
 		log.info "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) invoked by $whom, isPM $isPM, $tries tries"
 
@@ -100,7 +100,7 @@ class TaskNonTranService implements ServiceMethods {
 							// log.info "taskStatusChangeEvent: successorTask($successorTask.id) Making READY - Successful"
 							msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id)"
 							// Validates whether a notification should be issued. This should done before validate() because of the implementation of shouldSendNotification
-							boolean notificationRequired = commentService.shouldSendNotification(successorTask, whom, false, false)
+							boolean notificationRequired = commentService.shouldSendNotification(successorTask, whom, false, false, true)
 							msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id)"
 							if ( ! successorTask.validate() ) {
 								msg = "$msg failed READY of successor task(#:$successorTask.taskNumber Id:$successorTask.id) - $whom : ${GormUtil.allErrorsString(successorTask)}"
