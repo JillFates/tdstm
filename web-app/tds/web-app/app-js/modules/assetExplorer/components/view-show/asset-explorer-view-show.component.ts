@@ -21,6 +21,7 @@ import { AssetQueryParams } from '../../model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { AssetExportModel } from '../../model/asset-export-model';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
@@ -56,7 +57,8 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private notifier: NotifierService) {
+		private notifier: NotifierService,
+		protected translateService: TranslatePipe) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
