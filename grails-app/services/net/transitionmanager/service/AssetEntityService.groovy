@@ -49,7 +49,7 @@ import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
-import org.apache.commons.text.StringEscapeUtils as SEU
+import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell

@@ -30,7 +30,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-import org.apache.commons.text.StringEscapeUtils
+import org.apache.commons.lang.StringEscapeUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl

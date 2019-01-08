@@ -1,7 +1,7 @@
 import com.tds.asset.AssetEntity
 import grails.converters.JSON
 import groovy.json.JsonOutput
-import org.apache.commons.text.StringEscapeUtils
+import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.InvalidParamException

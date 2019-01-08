@@ -75,7 +75,7 @@ import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
-import org.apache.commons.text.StringEscapeUtils as SEU
+import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
 import org.hibernate.criterion.Order

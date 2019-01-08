@@ -5,14 +5,15 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
+import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
@@ -20,18 +21,17 @@ import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.text.StringEscapeUtils
+import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ApplicationController implements ControllerMethods {
 
