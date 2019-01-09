@@ -258,6 +258,7 @@ environments {
 		}
 	}
 	test {
+		grails.plugin.springsecurity.rest.token.storage.jwt.secret = 'Some secret key to dev, hope this is long enough.'
 		dataSource {
 			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			username = "tdstmapp"
