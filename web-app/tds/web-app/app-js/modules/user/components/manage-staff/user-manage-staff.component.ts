@@ -28,7 +28,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		@Inject('id') private id) {
 		super('#user-manage-staff-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
-		this.salaryOptions = ['Contractor','Hourly','Salary'];
+		this.salaryOptions = ['Contractor', 'Hourly', 'Salary'];
 		this.activeOptions = ['Y', 'N'];
 		this.loadComponentModel();
 		this.editing = false;
