@@ -1439,19 +1439,27 @@
                 }
             },
             {
-                "field": "custom8",
-                "label": "Wave",
-                "tip": "This field is the Wave",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 108,
-                "imp": "I",
+                "bulkChangeActions": [
+                    "replace",
+                    "clear"
+                ],
                 "constraints": {
-                    "required": 0
-                }
+                    "allowNegative": false,
+                    "format": "0",
+                    "maxRange": 1000,
+                    "minRange": 0,
+                    "precision": 0,
+                    "required": 0,
+                    "separator": false
+                },
+                "control": "Number",
+                "field": "custom8",
+                "imp": "N",
+                "label": "Number test",
+                "order": 124,
+                "shared": null,
+                "show": 1,
+                "udf": 1
             },
             {
                 "field": "custom9",

@@ -1,6 +1,6 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.Application
+
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
@@ -12,6 +12,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -22,6 +23,7 @@ import test.helper.ProjectTestHelper
 @Rollback
 class BulkChangeNumberIntegrationSpec extends Specification {
 
+	@Autowired
 	CustomDomainService customDomainService
 
 	@Shared
@@ -55,11 +57,11 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 	 * a device in moveBundle(usedForPlanning = 1)
 	 */
 	@Shared
-	AssetEntity application
+	AssetEntity device
 
 	// Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
 	// After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
-	// as a resource for the application.
+	// as a resource for the device.
 	private static final String fieldSpecDefinitionJson = '/CustomDomainServiceTests_FieldSpec.json'
 
 	/**
@@ -88,7 +90,7 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
-		application = assetEntityTestHelper.createAssetEntity(AssetClass.APPLICATION, project, moveBundle)
+		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 	}
 
 
@@ -98,10 +100,10 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 			JSONObject fieldSpec = loadFieldSpecJson()
 			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 		when: 'clear is called with a list of assets'
-			BulkChangeNumber.clear(Application.class, null, 'custom8', [application.id], null)
+			BulkChangeNumber.clear(AssetEntity.class, null, 'custom8', [device.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
-			[application].each {
+			[device].each {
 				it.refresh()
 				null == it.custom8
 			}
@@ -117,45 +119,45 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 		when: 'replace is called with a random integer, and a list of assets'
 			testNumber = NumberUtil.toPositiveInteger(RandomStringUtils.randomNumeric(5))
-			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+			BulkChangeNumber.replace(AssetEntity.class, testNumber, 'custom8', [device.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
-			[application].each {
+			[device].each {
 				it.refresh()
 				testNumber == it.custom8
 			}
 		when: 'replace is called with an integer and, list of assets'
 			testNumber = 15644321
-			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+			BulkChangeNumber.replace(AssetEntity.class, testNumber, 'custom8', [device.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
-			[application].each {
+			[device].each {
 				it.refresh()
 				testNumber == it.custom8
 			}
 
 		when: 'replace is called with a decimal number and, list of assets'
 			testNumber = 1.59876864
-			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+			BulkChangeNumber.replace(AssetEntity.class, testNumber, 'custom8', [device.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
-			[application].each {
+			[device].each {
 				it.refresh()
 				testNumber == it.custom8
 			}
 
 		when: 'replace is called with a negative number, and a list of assets'
 			testNumber = -126.321
-			BulkChangeNumber.replace(Application.class, testNumber, 'custom8', [application.id], null)
+			BulkChangeNumber.replace(AssetEntity.class, testNumber, 'custom8', [device.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
-			[application].each {
+			[device].each {
 				it.refresh()
 				testNumber == it.custom8
 			}
 
 		when: 'replace is called with a null replacement value'
-			BulkChangeNumber.replace(Application.class, null, 'custom8', [application.id], null)
+			BulkChangeNumber.replace(AssetEntity.class, null, 'custom8', [device.id], null)
 
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException
