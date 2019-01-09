@@ -41,7 +41,7 @@ class AdminControllerTests extends Specification{
     def 'Test the AccountImportExport controller methods for permissions'() {
         setup:
         project = projectHelper.createProject(adminPerson.company)
-        unPrivPerson = personHelper.createPerson(adminPerson, project.client, project, null, null, 'USER')
+        unPrivPerson = personHelper.createPerson(adminPerson, project.client, project, null, null, 'ROLE_USER')
 
         when:
         def x = 1

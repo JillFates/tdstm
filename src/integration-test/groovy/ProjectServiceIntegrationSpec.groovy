@@ -44,7 +44,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 		assert adminPerson
 
 		// Assign the admin to the project
-		projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
 		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
@@ -308,7 +308,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
         when: 'creating a new person'
 			Person userPerson = personHelper.createStaff(project.owner)
-			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
+			projectService.addTeamMember(project, userPerson, ['ROLE_PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
 		then: 'a person should have been created'
