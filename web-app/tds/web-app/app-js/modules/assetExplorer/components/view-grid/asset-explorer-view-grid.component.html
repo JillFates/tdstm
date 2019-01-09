@@ -22,7 +22,7 @@
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
 
-					<button [disabled]="!canCreateAssets()"
+					<button type="button" [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
 					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
