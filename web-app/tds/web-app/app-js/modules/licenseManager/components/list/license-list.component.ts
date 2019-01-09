@@ -18,14 +18,14 @@ import {
 	LicenseType,
 	LicenseStatus,
 	LicenseEnvironment,
-	LicenseModel, RequestLicenseModel
+	LicenseModel
 } from '../../model/license.model';
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 @Component({
-	selector: 'tds-license-list',
+	selector: 'tds-license-manager-list',
 	templateUrl: '../tds/web-app/app-js/modules/licenseManager/components/list/license-list.component.html'
 })
 export class LicenseListComponent implements OnInit {
