@@ -23,6 +23,7 @@ import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -52,6 +53,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected isEventLocked: boolean;
 	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
+	protected ButtonActions = TDSActionsButton;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
