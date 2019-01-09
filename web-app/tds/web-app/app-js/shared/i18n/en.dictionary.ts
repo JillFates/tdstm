@@ -71,7 +71,9 @@ export const en_DICTIONARY: Object = {
 		'DEVICE': 'Device',
 		'STORAGE': 'Storage',
 		'ASSETS': 'Assets',
-		'COMMON': 'Common'
+		'COMMON': 'Common',
+		'SINGLE_NAME': 'Asset',
+		'PLURAL_NAME': 'Assets'
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
@@ -111,13 +113,12 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'EFFECTED_ASSETS': 'This action will affect {param1} Asset(s)',
-				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel',
-				'EFFECTED_DEPENDENCIES': 'This action will affect {param1} {params2}',
-				'CONFIRM_UPDATE_DEPENDENCIES': 'You are about to update {param1} Dependency(s). There is no undo for this action. Click confirm to update the dependencies, otherwise click Cancel'
+				'EFFECTED_ASSETS': 'This action will affect {param1} {param2}',
+				'CONFIRM_UPDATE': 'You are about to update {param1} {param2}. There is no undo for this action. Click confirm to update the {param3}, otherwise click Cancel',
+				'EFFECTED_DEPENDENCIES': 'This action will affect {param1} {params2}'
 			},
 			'DELETE': {
-				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} Asset(s). There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel',
+				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
 			},
 			'ACTIONS': {
