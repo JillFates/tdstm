@@ -66,7 +66,7 @@ export class RequestImportComponent {
 				name: alertType,
 				message: message
 			});
-			this.activeDialog.close();
+			this.activeDialog.close(res);
 		});
 	}
 

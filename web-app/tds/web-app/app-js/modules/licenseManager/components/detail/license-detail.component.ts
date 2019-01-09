@@ -119,6 +119,70 @@ export class LicenseDetailComponent implements OnInit {
 	}
 
 	/**
+	 * Does the activation of the current license if this is not active
+	 */
+	protected activateLicense(): void {
+		this.licenseManagerService.activateLicense(this.licenseModel.id).subscribe((res: any) => {
+			let message = '';
+			let alertType: AlertType = null;
+
+			if (res === 'Ok') {
+				alertType = AlertType.INFO;
+				message = 'The license was activated and the license was emailed.';
+
+				this.licenseModel.status = 'ACTIVE';
+				this.prepareControlActionButtons();
+				this.prepareLicenseKey();
+			} else {
+				message = 'License was not activated. ' + res;
+				alertType = AlertType.WARNING;
+			}
+
+			this.notifierService.broadcast({
+				name: alertType,
+				message: message
+			});
+		});
+	}
+
+	/**
+	 * Manually Invoke the request
+	 */
+	protected manuallyRequest(): void {
+		this.licenseManagerService.activateLicense(this.licenseModel.id).subscribe((res: any) => {
+			let message = '';
+			let alertType: AlertType = null;
+
+			if (res === 'Ok') {
+				alertType = AlertType.INFO;
+				message = 'Email License was successfully';
+			} else {
+				message = res;
+				alertType = AlertType.WARNING;
+			}
+
+			this.notifierService.broadcast({
+				name: alertType,
+				message: message
+			});
+		})
+	}
+
+	/**
+	 * Revoke the License
+	 */
+	protected revokeLicense(): void {
+		this.prompt.open('Confirmation Required', 'Are you sure you want to revoke it? This action cannot be undone.', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.licenseManagerService.revokeLicense(this.licenseModel.id).subscribe((res: any) => {
+						this.activeDialog.close();
+					});
+				}
+			});
+	}
+
+	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
@@ -137,7 +201,7 @@ export class LicenseDetailComponent implements OnInit {
 	 * Delete the current License
 	 */
 	protected onDelete(): void {
-		this.prompt.open('Confirmation Required', 'You are about to delete the license. Do you want to proceed?', 'Yes', 'No')
+		this.prompt.open('Confirmation Required', 'You are about to delete the selected license. Are you sure? Click Confirm to delete otherwise press Cancel.', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
 					this.licenseManagerService.deleteLicense(this.licenseModel.id).subscribe(

@@ -58,6 +58,44 @@ export class LicenseManagerService {
 	}
 
 	/**
+	 * Does the activation of the current license if this is not active
+	 * @param id
+	 */
+	activateLicense(id: number): Observable<any> {
+		return this.http.post(`${this.licenseUrl}/${id}/activate`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Revoke the License
+	 * @param id
+	 */
+	revokeLicense(id: number): Observable<any> {
+		return this.http.delete(`${this.licenseUrl}/${id}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * If by some reason the License was not applied at first time, this will do a request for it
+	 */
+	manuallyRequest(id: number): Observable<any> {
+		return this.http.post(`${this.licenseUrl}/${id}/email/send`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Save the Entire License
 	 */
 	saveLicense(licenseModel: any): Observable<any> {
@@ -76,7 +114,7 @@ export class LicenseManagerService {
 			},
 			bannerMessage: licenseModel.bannerMessage,
 			gracePeriodDays: licenseModel.gracePeriodDays,
-			websitename: licenseModel.websiteName,
+			websitename: licenseModel.websitename,
 			hostName: licenseModel.hostName
 		};
 		if (licenseModel.method.name !== 'CUSTOM') {
@@ -145,7 +183,7 @@ export class LicenseManagerService {
 	 * @param id
 	 */
 	deleteLicense(id: number): Observable<string> {
-		return this.http.delete(`${this.licenseUrl}/${id}`)
+		return this.http.delete(`${this.licenseUrl}/${id}/delete`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

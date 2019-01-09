@@ -239,10 +239,10 @@
 		<button *ngIf="editMode" [disabled]="licenseEditForm.$invalid" type="submit" class="btn btn-primary pull-left" (click)="saveLicense()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
 		<button *ngIf="pendingLicense" [disabled]="licenseEditForm.$invalid" type="submit" class="btn btn-primary pull-left" (click)="enterEditMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		<button *ngIf="pendingLicense" type="submit" class="btn btn-primary pull-left" (click)="activateLicense()"><i class="fa fa-fw fa-key"></i> Activate License</button>
-		<button *ngIf="activeShowMode" type="submit" class="btn btn-primary pull-left" (click)="modifyLicense()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
+		<button *ngIf="activeShowMode" type="submit" class="btn btn-primary pull-left" (click)="enterEditMode()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
 		<button *ngIf="activeShowMode" type="submit" class="btn btn-primary pull-left" (click)="manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
 		<button *ngIf="activeShowMode || pendingLicense || licenseModel.status === 'CORRUPT'" type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseModel.applied}" (click)="revokeLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
-        <button type="button" class="btn btn-danger" [ngClass]="{'pull-left': licenseModel.status === licenseStatus.ACTIVE}" (click)="onDelete()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
+        <button type="button" class="btn btn-danger" (click)="onDelete()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span *ngIf="!editMode">{{'GLOBAL.CLOSE' | translate }}</span>
