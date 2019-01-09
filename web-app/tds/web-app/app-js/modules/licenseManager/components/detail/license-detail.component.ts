@@ -7,10 +7,12 @@ import {LicenseManagerService} from '../../service/license-manager.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 // Model
-import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
+import {LicenseModel, MethodOptions, LicenseStatus, LicenseActivityColumnModel} from '../../model/license.model';
 // Other
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
 
 @Component({
 	selector: 'tds-license-manager-detail',
@@ -31,6 +33,10 @@ export class LicenseDetailComponent implements OnInit {
 	protected range = { start: null, end: null };
 	protected licenseKey = 'Licenses has not been issued';
 	protected reloadRequired = false;
+	protected activityLog = [];
+	protected licenseActivityColumnModel = new LicenseActivityColumnModel();
+	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	protected userTimeZone: string;
 
 	constructor(
 		public licenseModel: LicenseModel,
@@ -48,14 +54,18 @@ export class LicenseDetailComponent implements OnInit {
 
 		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
 			this.dateFormat = dateFormat;
+			this.userTimeZone = this.preferenceService.getUserTimeZone();
 		});
 
-		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
+		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: any) => {
 			this.licenseModel = licenseModel;
+			this.licenseModel.activationDate = DateUtils.toDateUsingFormat(licenseModel.activationDate, DateUtils.SERVER_FORMAT_DATE);
+			this.licenseModel.expirationDate = DateUtils.toDateUsingFormat(licenseModel.expirationDate, DateUtils.SERVER_FORMAT_DATE);
 			this.dataSignature = JSON.stringify(this.licenseModel);
 			this.prepareControlActionButtons();
 			this.prepareLicenseKey();
-		})
+			this.getActivityLog();
+		});
 	}
 
 	/**
@@ -73,6 +83,22 @@ export class LicenseDetailComponent implements OnInit {
 				this.licenseKey = licenseKey;
 			});
 		}
+	}
+
+	private getActivityLog(): void {
+		this.licenseManagerService.getActivityLog(this.licenseModel.id).subscribe((activityLog: any) => {
+			this.activityLog = activityLog.sort((a, b) => SortUtils.compareByProperty(a, b, 'dateCreated'));
+		});
+	}
+
+	/**
+	 * Save the current status of the License
+	 */
+	protected saveLicense(): void {
+		this.licenseManagerService.saveLicense(this.licenseModel).subscribe((license: any) => {
+			this.editMode = false;
+			this.prepareControlActionButtons();
+		});
 	}
 
 	/**
@@ -105,50 +131,6 @@ export class LicenseDetailComponent implements OnInit {
 		} else {
 			this.activeDialog.dismiss();
 		}
-	}
-
-	/**
-	 * Validate interger only
-	 * @param event
-	 * @param model
-	 */
-	protected validateIntegerOnly(event: any, model: any): void {
-		try {
-			let newVal = parseInt(model, 2);
-			if (!isNaN(newVal)) {
-				model = newVal;
-			} else {
-				model = 0;
-			}
-			if (event && event.currentTarget) {
-				event.currentTarget.value = model;
-			}
-		} catch (e) {
-			console.warn('Invalid Number Exception', model);
-		}
-	}
-
-	/**
-	 * Submit again the License in case there was an error on the original creation
-	 */
-	protected resubmitLicenseRequest(): void {
-		this.licenseManagerService.resubmitLicenseRequest(this.licenseModel.id).subscribe(
-			(result) => {
-				let message = '';
-				let alertType: AlertType = null;
-				if (result) {
-					alertType = AlertType.INFO;
-					message = 'Request License was successfully';
-				} else {
-					message = 'There was an error on the request';
-					alertType = AlertType.WARNING;
-				}
-				this.notifierService.broadcast({
-					name: alertType,
-					message: message
-				});
-			},
-			(err) => console.log(err));
 	}
 
 	/**

@@ -76,6 +76,31 @@ export class LicenseColumnModel {
 	}
 }
 
+export class LicenseActivityColumnModel {
+	columns: any[];
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Date',
+				property: 'dateCreated',
+				type: 'date',
+				width: 80,
+			}, {
+				label: 'Whom',
+				property: 'author.personName',
+				type: 'text',
+				width: 80,
+			}, {
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 200
+			},
+		];
+	}
+}
+
 export class RequestLicenseModel {
 	email: string;
 	environment?: LicenseEnvironment;
@@ -91,6 +116,8 @@ export class LicenseModel {
 	description?: string;
 	comment?: string;
 	dateCreated?: Date;
+	expirationDate?: Date;
+	activationDate?: Date;
 	status?: string;
 }
 

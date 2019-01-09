@@ -158,11 +158,9 @@ export class LicenseListComponent implements OnInit {
 	 */
 	private openLicenseViewEdit(licenseModel: LicenseModel): void {
 		this.dialogService.open(LicenseDetailComponent, [
-			{ provide: LicenseModel, useValue: licenseModel }
-		], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
-			if (result && result.id) {
-				//
-			}
+			{provide: LicenseModel, useValue: licenseModel}
+		], DIALOG_SIZE.LG, false).then((result: LicenseModel) => {
+			this.reloadData();
 		}).catch(result => {
 			this.reloadData();
 			console.log('Dismissed Dialog');

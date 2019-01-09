@@ -6,6 +6,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {LicensesResolveService} from './resolve/licenses-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 // Components
 import {LicenseListComponent} from './components/list/license-list.component';
 
@@ -31,7 +32,7 @@ export const LicenseManagerRoute: Routes = [
 		resolve: {
 			licenses: LicensesResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
 ];
 

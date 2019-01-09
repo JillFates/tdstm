@@ -6,6 +6,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import * as moment from 'moment';
 
 @Injectable()
 export class LicenseManagerService {
@@ -57,10 +58,32 @@ export class LicenseManagerService {
 	}
 
 	/**
-	 * Resubmit the License
+	 * Save the Entire License
 	 */
-	resubmitLicenseRequest(id: number): Observable<any> {
-		return this.http.post(`${this.licenseUrl}/${id}/email/request`, null)
+	saveLicense(licenseModel: any): Observable<any> {
+
+		let licenseModified: any = {
+			environment: licenseModel.environment,
+			method: {
+				name: licenseModel.method.name
+			},
+			activationDate: licenseModel.activationDate ? moment(licenseModel.activationDate).format('YYYY-MM-DD') : '',
+			expirationDate: licenseModel.expirationDate ? moment(licenseModel.expirationDate).format('YYYY-MM-DD') : '',
+			status: licenseModel.status,
+			project: {
+				id: (licenseModel.project.id !== 'all') ? parseInt(licenseModel.project.id, 10) : licenseModel.project.id,  // We pass 'all' when is multiproject
+				name: licenseModel.project.name
+			},
+			bannerMessage: licenseModel.bannerMessage,
+			gracePeriodDays: licenseModel.gracePeriodDays,
+			websitename: licenseModel.websiteName,
+			hostName: licenseModel.hostName
+		};
+		if (licenseModel.method.name !== 'CUSTOM') {
+			licenseModified.method.max = parseInt(licenseModel.method.max, 10);
+		}
+
+		return this.http.put(`${this.licenseUrl}/${licenseModel.id}`, JSON.stringify(licenseModified))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -69,10 +92,11 @@ export class LicenseManagerService {
 	}
 
 	/**
-	 * Get the Email Content for this request
+	 * Get the list of activity actions associated to the license
+	 * @param id
 	 */
-	getEmailContent(id: number): Observable<any> {
-		return this.http.get(`${this.licenseUrl}/${id}/email/request`)
+	getActivityLog(id: number): Observable<any[]> {
+		return this.http.get(`${this.licenseUrl}/${id}/activitylog`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -122,26 +146,6 @@ export class LicenseManagerService {
 	 */
 	deleteLicense(id: number): Observable<string> {
 		return this.http.delete(`${this.licenseUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	/**
-	 * Get the possible Projects Data Source
-	 */
-	createRequestLicense(requestLicense: any): Observable<any[]> {
-		let postRequest = {
-			clientName: requestLicense.clientName,
-			email: requestLicense.email,
-			environment: requestLicense.environment,
-			projectId: requestLicense.project.id,
-			requestNote: requestLicense.specialInstruction,
-		};
-
-		return this.http.post(`${this.licenseUrl}/request`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

@@ -92,6 +92,11 @@ div.modal-dialog {
       .glyphicon.glyphicon-ok {
         color: white;
       }
+      &.btn-danger {
+        .glyphicon-remove {
+          color: white;
+        }
+      }
     }
   }
 }

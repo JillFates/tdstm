@@ -107,13 +107,13 @@
                                 <kendo-daterange>
                                     <label class="col-sm-2 control-label">Valid Dates:</label>
                                     <div class="col-sm-2" style="width: 173px;">
-                                        <kendo-dateinput kendoDateRangeStartInput [(value)]="licenseModel.start" [disabled]="!editMode"></kendo-dateinput>
+                                        <kendo-dateinput kendoDateRangeStartInput [(value)]="licenseModel.activationDate" [disabled]="!editMode"></kendo-dateinput>
                                     </div>
                                     <div class="col-sm-1" style="width: 10px; padding-top: 9px;">
                                         <span><i class="fa fa-fw fa-ellipsis-v"></i></span>
                                     </div>
                                     <div class="col-sm-2">
-                                        <kendo-dateinput kendoDateRangeEndInput [(value)]="licenseModel.end" [disabled]="!editMode"></kendo-dateinput>
+                                        <kendo-dateinput kendoDateRangeEndInput [(value)]="licenseModel.expirationDate" [disabled]="!editMode"></kendo-dateinput>
                                     </div>
                                 </kendo-daterange>
 							</div>
@@ -156,7 +156,41 @@
 							</div>
 						</div><!-- /.tab-pane -->
 						<div class="tab-pane" id="tab_3">
+							<kendo-grid [data]="activityLog" *ngIf="licenseActivityColumnModel" [height]="410">
+								<kendo-grid-column *ngFor="let column of licenseActivityColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+									<ng-template kendoGridHeaderTemplate>
+										<div class="sortable-column">
+											<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
+										</div>
+									</ng-template>
 
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'dateCreated'" let-dataItem>
+										{{ dataItem.dateCreated | tdsDateTime: userTimeZone }}
+									</ng-template>
+
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem>
+										<table class="inner-activity_table">
+											<tbody>
+											<tr>
+												<td></td>
+												<td class="col-action_td"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></td>
+												<td class="col-action_td"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></td>
+											</tr>
+											<tr *ngFor="let column of dataItem.changes; let i = index;">
+												<td style="font-weight: bold;">{{dataItem.changes[i].field}}</td>
+
+												<td *ngIf="dataItem.changes[i].field !== 'activationDate' && dataItem.changes[i].field !== 'expirationDate'" class="col-value_td"><span class="activity-list-old-val" style="color:darkred; font-weight: bold;">{{ (dataItem.changes[i].oldValue !== 'null' )? dataItem.changes[i].oldValue : ''}}</span></td>
+												<td *ngIf="dataItem.changes[i].field !== 'activationDate' && dataItem.changes[i].field !== 'expirationDate'" class="col-value_td"><span class="activity-list-new-val" style="color: green; font-weight: bold;">{{ (dataItem.changes[i].newValue !== 'null')? dataItem.changes[i].newValue : '' }}</span></td>
+
+												<td *ngIf="(dataItem.changes[i].field === 'activationDate' || dataItem.changes[i].field === 'expirationDate')" class="col-value_td"><span class="activity-list-old-val" style="color:darkred; font-weight: bold;">{{ (dataItem.changes[i].oldValue !== 'null'? dataItem.changes[i].oldValue : '') | date: dateFormat }}</span></td>
+												<td *ngIf="(dataItem.changes[i].field === 'activationDate' || dataItem.changes[i].field === 'expirationDate')" class="col-value_td"><span class="activity-list-new-val" style="color: green; font-weight: bold;">{{ (dataItem.changes[i].newValue !== 'null'? dataItem.changes[i].newValue : '') | date: dateFormat }}</span></td>
+											 </tr>
+											</tbody>
+										</table>
+									</ng-template>
+
+								</kendo-grid-column>
+							</kendo-grid>
 						</div><!-- /.tab-pane -->
 						<div class="tab-pane" id="tab_4">
 							<div class="form-group">
@@ -204,6 +238,10 @@
 	<div class="modal-footer form-group-center">
 		<button *ngIf="editMode" [disabled]="licenseEditForm.$invalid" type="submit" class="btn btn-primary pull-left" (click)="saveLicense()"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
 		<button *ngIf="pendingLicense" [disabled]="licenseEditForm.$invalid" type="submit" class="btn btn-primary pull-left" (click)="enterEditMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button *ngIf="pendingLicense" type="submit" class="btn btn-primary pull-left" (click)="activateLicense()"><i class="fa fa-fw fa-key"></i> Activate License</button>
+		<button *ngIf="activeShowMode" type="submit" class="btn btn-primary pull-left" (click)="modifyLicense()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
+		<button *ngIf="activeShowMode" type="submit" class="btn btn-primary pull-left" (click)="manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
+		<button *ngIf="activeShowMode || pendingLicense || licenseModel.status === 'CORRUPT'" type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseModel.applied}" (click)="revokeLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
         <button type="button" class="btn btn-danger" [ngClass]="{'pull-left': licenseModel.status === licenseStatus.ACTIVE}" (click)="onDelete()"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
