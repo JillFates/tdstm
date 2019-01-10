@@ -40,7 +40,7 @@ declare var jQuery: any;
 		            (valueChange)="onTagValueChange($event)"
 		            (open)="onOpen()">
 		        <ng-template kendoMultiSelectTagTemplate let-dataItem>
-		            <div class="{{dataItem.css}}">{{ dataItem.name }}</div>
+		            <div class="{{dataItem.css}}" [title]="dataItem.name">{{ dataItem.name }}</div>
 		        </ng-template>
 		        <ng-template kendoMultiSelectItemTemplate let-dataItem>
 		            <div class="asset-tag-selector-single-container">
