@@ -34,7 +34,7 @@ declare var jQuery: any;
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
                 <tds-button
                         class="float-right button-header-grid"
-                        [action]="ButtonActions.GenericAdd"
+                        [action]="ButtonActions.Add"
 						[tooltip]="'Add Support Asset'"
                         id="add-support"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
@@ -60,7 +60,9 @@ declare var jQuery: any;
                     <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
 						<tds-button
 							[id]="'create-button-' + rowIndex"
-							[action]="ButtonActions.CommentCreate"
+							icon="comment-o"
+							tooltip="Create Comment"
+							[action]="ButtonActions.Custom"
 							(click)="onAddEditComment(dataItem)">
                             <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
@@ -68,7 +70,7 @@ declare var jQuery: any;
 						<tds-button
 							[id]="'delete-button-' + rowIndex"
 							class="command-delete"
-							[action]="ButtonActions.GenericDelete"
+							[action]="ButtonActions.Delete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
 						</tds-button>
                     </div>
@@ -152,7 +154,7 @@ declare var jQuery: any;
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
                 <tds-button
                         class="float-right button-header-grid"
-                        [action]="ButtonActions.GenericAdd"
+                        [action]="ButtonActions.Add"
                         [tooltip]="'Add Dependent Asset'"
                         id="dependent-support"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
@@ -178,7 +180,9 @@ declare var jQuery: any;
                     <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
                     	<tds-button
 							[id]="'dependent-create-button-' + rowIndex"
-							[action]="ButtonActions.CommentCreate"
+							icon="comment-o"
+							tooltip="Create Comment"
+							[action]="ButtonActions.Custom"
 							(click)="onAddEditComment(dataItem)">
                             <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
@@ -186,7 +190,7 @@ declare var jQuery: any;
 						<tds-button
 							[id]="'dependent-delete-button-' + rowIndex"
 							class="command-delete"
-							[action]="ButtonActions.GenericDelete"
+							[action]="ButtonActions.Delete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">
 						</tds-button>
                     </div>

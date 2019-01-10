@@ -355,7 +355,8 @@
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
                                                         <tds-button class="button-header-grid float-right"
                                                                     [tooltip]="'Add Predecessor'"
-                                                                    [action]="ButtonActions.GenericAdd"
+                                                                    [id]="'btnAddPredecessor'"
+                                                                    [action]="ButtonActions.Add"
                                                                     (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
                                                         </tds-button>
                                                     </ng-template>
@@ -403,7 +404,8 @@
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
                                                     <tds-button class="button-header-grid float-right"
                                                                 [tooltip]="'Add Successor'"
-                                                                [action]="ButtonActions.GenericAdd"
+                                                                [id]="'btnAddSuccessor'"
+                                                                [action]="ButtonActions.Add"
                                                                 (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
                                                     </tds-button>
                                                 </ng-template>

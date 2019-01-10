@@ -99,32 +99,36 @@
     <div class="modal-footer form-group-center">
         <div class="asset-commands pull-left">
             <tds-button
-                    [action]="ButtonActions.AssetEdit"
+                    [action]="ButtonActions.Edit"
+                    tooltip="Edit Asset"
                     class="btn-primary"
                     (click)="showAssetEditView()">
             </tds-button>
 
             <tds-button
-                    [action]="ButtonActions.AssetClone"
+                    [action]="ButtonActions.Clone"
                     (click)="onCloneAsset()">
             </tds-button>
 
             <tds-button
-                    [action]="ButtonActions.ArchitectureGraphShow"
+                    [action]="ButtonActions.Custom"
+                    icon="sitemap"
+                    title="Arch Graph"
                     (click)="openGraphUrl()">
             </tds-button>
         </div>
 
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <tds-button
-                    [action]="ButtonActions.AssetDelete"
+                    [action]="ButtonActions.Delete"
+                    tooltip="Delete Asset"
                     class="btn-danger"
                     (click)="onDeleteAsset()">
             </tds-button>
         </tds:hasPermission>
 
         <tds-button
-                [action]="ButtonActions.AssetClose"
+                [action]="ButtonActions.Close"
                 class="pull-right"
                 (click)="cancelCloseDialog()">
         </tds-button>

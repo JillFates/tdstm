@@ -25,7 +25,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[id]="id"
 			[title]="tooltip || button.tooltip || titleButton"
 			[ngClass]="buttonClasses">
-				<i class="{{iconPrefixVendor + button.icon}}"></i>
+				<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
 				<span class="title">{{titleButton}}</span>
 				<ng-content></ng-content>
 		</button>
@@ -35,9 +35,10 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 	}
 })
 export class TDSActionButton implements OnInit, OnChanges {
-	@Input() action: TDSActionsButton ;
+	@Input() action: TDSActionsButton;
 	@Input() title = '';
 	@Input() tooltip = '';
+	@Input() icon = '';
 	@Input() id = '';
 	@Input() disabled = false;
 	@Input() isIconButton = false;
@@ -56,6 +57,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 
 	ngOnChanges(changes: SimpleChanges) {
 		const action = pathOr(null, ['action', 'currentValue'], changes);
+		const title = pathOr(null, ['title', 'currentValue'], changes);
 
 		if (action !== null) {
 			this.button = this.buttonsFactoryService.create(action);
@@ -63,6 +65,10 @@ export class TDSActionButton implements OnInit, OnChanges {
 			if (!this.button) {
 				throw new Error(`Unable to create button ${action}`);
 			}
+			this.titleButton = this.title || this.button.title;
+		}
+
+		if (title !== null) {
 			this.titleButton = this.title || this.button.title;
 		}
 	}

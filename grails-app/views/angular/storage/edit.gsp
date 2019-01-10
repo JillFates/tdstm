@@ -126,7 +126,8 @@
     </div>
     <div class="modal-footer form-group-center">
         <tds-button
-                [action]="ButtonActions.AssetUpdate"
+                [action]="ButtonActions.Save"
+                tooltip="Update Asset"
                 class="btn-primary pull-left component-action-update" tabindex="501"
                 [disabled]="!isDependenciesValidForm"
                 (click)="submitForm($event)">
@@ -134,14 +135,16 @@
 
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <tds-button
-                    [action]="ButtonActions.AssetDelete"
+                    [action]="ButtonActions.Delete"
                     class="btn-danger component-action-delete" tabindex="502"
+                    tooltip="Delete Asset"
                     (click)="onDeleteAsset()">
             </tds-button>
         </tds:hasPermission>
 
         <tds-button
-                [action]="ButtonActions.AssetCancel"
+                [action]="ButtonActions.Cancel"
+                tooltip="Cancel Edit"
                 class="pull-right component-action-cancel"
                 tabindex="503"
                 (click)="onCancelEdit()">

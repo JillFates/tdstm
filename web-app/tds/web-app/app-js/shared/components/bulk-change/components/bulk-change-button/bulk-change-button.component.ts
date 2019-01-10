@@ -9,7 +9,9 @@ import {TDSActionsButton} from '../../../button/model/action-button.model';
 	selector: 'tds-bulk-change-button',
 	template: `
 		<tds-button
-			[action]="ButtonActions.BulkEdit"
+			[action]="ButtonActions.Custom"
+			icon="ellipsis-v"
+			title="Bulk Change"
 			[id]="'bntBulkChange'"
             (click)="onClick()"
             class="btnBulkChange pull-left"

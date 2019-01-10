@@ -42,9 +42,17 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="submit" (click)="confirmCloseDialog()" [disabled]="!isValid()" class="btn btn-primary pull-left">
-			<span class="glyphicon glyphicon-ok"></span> {{ 'GLOBAL.SAVE' | translate }}</button>
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
+		<tds-button
+			class="btn-primary pull-left"
+			(click)="confirmCloseDialog()"
+			[disabled]="!isValid()"
+			[action]="ButtonActions.Save">
+		</tds-button>
+
+		<tds-button
+				(click)="cancelCloseDialog()"
+				[action]="ButtonActions.Cancel"
+				class="pull-right">
+		</tds-button>
 	</div>
 </div>

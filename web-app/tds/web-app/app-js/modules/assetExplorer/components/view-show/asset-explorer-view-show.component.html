@@ -4,7 +4,7 @@
             <div class="btn-group"
                  *ngIf="canShowSaveButton()">
                 <tds-button
-                        [action]="ButtonActions.GenericSave"
+                        [action]="ButtonActions.Save"
                         (click)="save(getSaveButtonId())"
                         [ngClass]="{'btn-default':!isDirty(),'btn-success':isDirty()}"
                         [title]="canSave() ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
@@ -29,20 +29,24 @@
                 </ul>
             </div>
 
-            <tds-button [action]="model.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
+            <tds-button [action]="ButtonActions.Custom"
+                        [icon]="model.isFavorite ? 'star' : 'star-o'"
+                        [title]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
                         class="text-yellow"
                         isIconButton="true"
                         (click)="onFavorite()">
             </tds-button>
 
-            <tds-button [action]="ButtonActions.GenericExport" (click)="onExport()" [id]="'btnExport'"></tds-button>
+            <tds-button [action]="ButtonActions.Export" (click)="onExport()" [id]="'btnExport'"></tds-button>
 
             <asset-explorer-view-selector
                     #select="assetExplorerViewSelector">
             </asset-explorer-view-selector>
             <tds-button *ngIf="isEditAvailable()"
                         isIconButton="true"
-                        [action]="ButtonActions.GenericConfiguration"
+                        [action]="ButtonActions.Custom"
+                        icon="cog"
+                        tooltip="Configure"
                         class="pull-right"
                         (click)="onEdit()">
             </tds-button>

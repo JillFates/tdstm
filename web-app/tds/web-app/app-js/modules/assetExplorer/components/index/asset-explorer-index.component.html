@@ -28,7 +28,8 @@
 						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
                         <div class="box-tools-actions" *ngIf="isCreateAvailable()" style="vertical-align: super;">
 	                        <tds-button
-			                        [action]="ButtonActions.ViewCreate"
+			                        [action]="ButtonActions.Create"
+			                        tooltip="Create View"
 			                        class="btn-primary"
 			                        (click)="onCreateReport()">
 	                        </tds-button>
@@ -61,19 +62,23 @@
 										<td class="asset-explorer-td-actions">
 											<div class="tds-action-button-set">
 												<tds-button [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
-												    [action]="ButtonActions.ViewEdit"
+												    [action]="ButtonActions.Edit"
+												    tooltip="Edit View"
 											        (click)="onEditReport(report)">
 												</tds-button>
 
 												<tds-button [style.visibility]="isDeleteAvailable(report) && !report.isSystem ? 'visible' : 'hidden'"
-													[action]="ButtonActions.ViewDelete"
+													[action]="ButtonActions.Delete"
+												    tooltip="Delete View"
 													(click)="onDeleteReport(report)">
 												</tds-button>
 											</div>
 										</td>
 
 										<td class="asset-explorer-td-favorite text-center tds-action-button-set">
-											<tds-button [action]="report.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
+											<tds-button [action]="ButtonActions.Custom"
+											            [icon]="report.isFavorite ? 'star' : 'star-o' "
+											            [title]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
 											            class="text-yellow"
 											            isIconButton="true"
 											            (click)="toggleFavorite(report)">
