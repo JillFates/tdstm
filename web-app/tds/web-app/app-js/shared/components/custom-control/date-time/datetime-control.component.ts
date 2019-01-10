@@ -19,26 +19,20 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 @Component({
 	selector: 'tds-datetime-control',
 	template: `
-		<table>
-			<tr>
-				<td>
-                    <kendo-datepicker
-                            [(ngModel)]="dateValue"
-                            (blur)="onTouched()"
-                            [format]="displayFormat"
-                            [tabindex]="tabindex"
-                            (valueChange)="onDateChange($event)"
-                            class="form-control datepicker">
-                    </kendo-datepicker>
-				</td>
-				<td>
-					<kendo-timepicker
-						[value]="dateValue"
-						(valueChange)="onTimeChange($event)">
-					</kendo-timepicker>
-				</td>
-			</tr>
-		</table>
+		<div class="tds-datetime-control-component">
+            <kendo-datepicker
+                    [(ngModel)]="dateValue"
+                    (blur)="onTouched()"
+                    [format]="displayFormat"
+                    [tabindex]="tabindex"
+                    (valueChange)="onDateChange($event)"
+                    class="form-control datepicker">
+            </kendo-datepicker>
+			<kendo-timepicker
+				[value]="dateValue"
+				(valueChange)="onTimeChange($event)">
+			</kendo-timepicker>
+		</div>
 	`,
 	providers: [
 		{
