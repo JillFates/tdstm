@@ -5,6 +5,8 @@ $tds-action-button-icon-flat-color: #666
   display: flex
   justify-content: center
   position: relative
+  .not-has-all-permissions
+    visibility: hidden
   .tds-action-button--just-icon
     i
       font-size: 16px
@@ -25,6 +27,9 @@ tds-button[class^="btn-"]:hover
 .tds-action-button
   i
     font-size: 16px
+
+.tds-action-button.not-has-all-permissions
+  display: none
 
 .tds-action-button--disabled
   pointer-events: none

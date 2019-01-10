@@ -42,6 +42,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 	@Input() id = '';
 	@Input() disabled = false;
 	@Input() isIconButton = false;
+	@Input() permissionsList: string[] = [];
 	button: TDSButton;
 	titleButton: string;
 	hostClasses: any = [];
@@ -60,7 +61,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 		const title = pathOr(null, ['title', 'currentValue'], changes);
 
 		if (action !== null) {
-			this.button = this.buttonsFactoryService.create(action);
+			this.button = this.buttonsFactoryService.create(action, this.permissionsList);
 
 			if (!this.button) {
 				throw new Error(`Unable to create button ${action}`);
@@ -81,7 +82,8 @@ export class TDSActionButton implements OnInit, OnChanges {
 		let buttonClasses =  {
 			'btn': true,
 			'btn-action': true,
-			'tds-action-button': true
+			'tds-action-button': true,
+			'not-has-all-permissions': !this.button.hasAllPermissions
 		};
 
 		const hostClasses = this.getHostClasses();

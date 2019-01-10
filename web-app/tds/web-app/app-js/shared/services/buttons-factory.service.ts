@@ -2,13 +2,18 @@ import {Injectable} from '@angular/core';
 import {TDSButton} from '../components/button/model/action-button.model';
 import {TDSActionsButton} from '../components/button/model/action-button.model';
 import {TranslatePipe} from '../pipes/translate.pipe';
+import {PermissionService} from './permission.service';
 
 @Injectable()
 export class ButtonsFactoryService {
 	private registeredButtons: {[key: string]: TDSButton};
+	private permissions: any = {};
 
-	constructor(private translateService: TranslatePipe) {
+	constructor(private translateService: TranslatePipe, private permissionService: PermissionService) {
 		const translate = this.translateService.transform.bind(this.translateService);
+
+		this.permissionService.getPermissions()
+			.subscribe((permissions: any) => this.permissions = permissions);
 
 		this.registeredButtons = {
 			[TDSActionsButton.Add]: { icon: 'plus-circle', title: translate('GLOBAL.ADD') },
@@ -24,7 +29,22 @@ export class ButtonsFactoryService {
 		};
 	}
 
-	create(key: TDSActionsButton): TDSButton {
-		return this.registeredButtons[key] || null;
+	create(key: TDSActionsButton, permissionsList =  []): TDSButton {
+		const button =  this.registeredButtons[key] || null;
+
+		button.hasAllPermissions = this.hasAllPermissions(permissionsList);
+
+		return button;
 	}
+
+	private hasAllPermissions(permissionsList: string[]): boolean {
+		if (permissionsList.length === 0) {
+			return true;
+		}
+
+		return permissionsList.every((permission: string) => {
+			return this.permissions[permission] === 1;
+		});
+	}
+
 }
