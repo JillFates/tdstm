@@ -248,14 +248,53 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters?.scale == sqlSearchParameters
 
 		where:
-			filter      || sqlSearchExpression      || sqlSearchParameters
-			'Mega'      || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'=Mega'     || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'!Mega'     || 'AE.scale NOT IN :scale' || [SizeScale.MB]
-			'-Mega'     || 'AE.scale NOT IN :scale' || [SizeScale.MB]
-			'Mega|Peta' || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.PB]
-			'byte'      || 'AE.scale IN :scale'     || [SizeScale.KB, SizeScale.MB, SizeScale.GB, SizeScale.TB, SizeScale.PB]
-			'FUBAR'     || ' 1 = 0'                 || null
-
+			filter           || sqlSearchExpression      || sqlSearchParameters
+			'Mega'           || 'AE.scale IN :scale'     || [SizeScale.MB]
+			'%Mega%'         || 'AE.scale IN :scale'     || [SizeScale.MB]
+			'=Mega'          || 'AE.scale IN :scale'     || [SizeScale.MB]
+			'!Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
+			'-Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
+			'Mega|Peta|Giga' || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.GB, SizeScale.PB]
+			'Mega:Peta'      || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.PB]
+			'Mega&Peta'      || ' 1 = 0'                 || null
+			'byte'           || 'AE.scale IN :scale'     || [SizeScale.KB, SizeScale.MB, SizeScale.GB, SizeScale.TB, SizeScale.PB]
+			'FUBAR'          || ' 1 = 0'                 || null
+			'%ga%'           || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.GB]
+			'*FUBAR*'        || ' 1 = 0'                 || null
+			'Peta&by'        || 'AE.scale IN :scale'     || [SizeScale.PB]
+			'P%'             || 'AE.scale IN :scale'     || [SizeScale.PB] // starts with P
+			'%obyte'         || 'AE.scale IN :scale'     || [SizeScale.KB] // ends with obyte
+			'%obyt*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains obyt
+			'%ob*t*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains ob*t
 	}
+
+	@Unroll
+	void 'test can convert filter {#filter} to regex content {#regexPattern}'() {
+
+		expect:
+			SqlUtil.convertFilterToRegex(filter) == regexPattern
+
+		where:
+			filter           || regexPattern
+			'Mega'           || '.*Mega.*'
+			'P%'             || '^P.*'
+			'P$'             || '^P\\$'
+			'(Mega)'         || '\\(Mega\\)'
+			'[Mega]'         || '\\[Mega\\]'
+			'{Mega}'         || '\\{Mega\\}'
+			'P?'             || '^P\\?'
+			'%obyte'         || '.*obyte$'
+			'%obyte%'        || '.*obyte.*'
+			'%obyte*'        || '.*obyte.*'
+			'%ob%te%'        || '.*ob.*te.*'
+			'%ob*te*'        || '.*ob.*te.*'
+			'Mega|Peta'      || '.*(Mega|Peta).*'
+			'Mega|Peta|Giga' || '.*(Mega|Peta|Giga).*'
+			'Mega:Peta'      || '.*(Mega|Peta).*'
+			'Mega:Peta:Giga' || '.*(Mega|Peta|Giga).*'
+			'Mega&Peta'      || '(?=.*Mega)(?=.*Peta).*'
+			'Peta&by'        || '(?=.*Peta)(?=.*by).*'
+			'by&Peta'        || '(?=.*by)(?=.*Peta).*'
+	}
+
 }

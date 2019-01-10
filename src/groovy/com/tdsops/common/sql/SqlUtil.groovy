@@ -381,11 +381,7 @@ class SqlUtil {
 				/* Scenario 13: Default scenario (overriding may be required). */
 					default:
 						fieldSearchData.useWildcards = true
-						if (isEnumerationField(fieldSearchData)) {
-							buildSingleValueParameter(fieldSearchData, 'IN')
-						} else {
-							buildSingleValueParameter(fieldSearchData, 'LIKE')
-						}
+						buildSingleValueParameter(fieldSearchData, 'LIKE')
 						break
 				}
 				break
@@ -419,12 +415,15 @@ class SqlUtil {
 		}
 
 		Object paramValue = parseEnumParameter(fieldSearchData)
-		if (!paramValue) {
-			fieldSearchData.sqlSearchExpression = " 1 = 0"
-		} else {
+		if (paramValue) {
 			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+		} else {
+			// Particular Scenario. Because we are filtering here and not in the SQL sentence directly,
+			// we need to solve those cases where filter does not match with any of the enumeration values.
+			// Then, to manage this case, we simply add a false where clause, expecting an empty list of results.
+			fieldSearchData.sqlSearchExpression = " 1 = 0"
 		}
 	}
 
@@ -542,8 +541,65 @@ class SqlUtil {
 	 */
 	private static List parseEnumParameter(FieldSearchData fsd) {
 		Class type = fsd.getType()
-		String filter = fsd.getFilter()
-		return type.values().findAll { it.value.toLowerCase() =~ /${filter.toLowerCase()}/}?:null
+		String regex = convertFilterToRegex(fsd.getFilter().toLowerCase())
+		List coincidences = type.values().findAll { enumeration ->
+			enumeration.value.toLowerCase() =~ /$regex/
+		}
+		return coincidences?:null
+	}
+
+	/**
+	 * Transform a String filter typed by user in a valid regular expression
+	 * <pre>
+	 *     'P%'      ^P.*
+	 *     '%obyte'  .*obyte$
+	 *     '%obyt*'  .*obyte.*
+	 *     '%ob*t*'  .*ob.*te.*
+	* </pre>
+	 * @param filter
+	 * @return
+	 */
+	static String convertFilterToRegex(String filter) {
+
+		// 1) Check if filter contains only characters.
+		// If this is the case, we can filter using the most generic expression
+		// e.g.: Mega --> .*Mega.*
+		if (filter.matches(/^[A-Za-z0-9]+/)) {
+			return '.*' + filter + '.*'
+		}
+		// 2) Check if user type an 'Or' expression using '|' character
+		if (filter.contains('|')) {
+			return '.*(' + filter + ').*'
+		}
+		// 3) Check if user type an 'OR' expression using ':' character
+		// 'Petabyte'.matches(/.*(by|Peta).*/)
+		if (filter.contains(':')) {
+			return '.*(' + filter.replaceAll(':', '|') + ').*'
+		}
+		// 4) Check if user type an 'AND' expression using '&' character
+		// 'Petabyte'.matches(/(?=.*by)(?=.*Peta).*/)
+		if (filter.contains('&')) {
+			List<String> parts = filter.split('&').collect { "(?=.*$it)" }
+			return parts.join() + '.*'
+		}
+		// 5) Escape  regular expression characters / ' () ? .* $ {}
+		String specialCharRegex = /[\$\?\.\{\}\(\)\[\]]/
+		String regex = filter.replaceAll(specialCharRegex, '\\\\$0')
+
+		// 6) Translate % or * characters for the .* - any character sequence
+		regex = regex.replace('*', '.*')
+		regex = regex.replace('%', '.*')
+
+		// 7) check if filter starts with a word character, short for [a-zA-Z_0-9]
+		if (regex.matches(/^\w.*/)) {
+			regex = '^' + regex
+		}
+
+		// 8) Check if filter ends with a word character, short for [a-zA-Z_0-9]
+		if (regex.matches(/.*\w$/)) {
+			regex = regex + '$'
+		}
+		return regex
 	}
 
 	/**
@@ -612,7 +668,7 @@ class SqlUtil {
 	 * @return true if {@code FieldSearchData#domain} is Enum type
 	 */
 	private static boolean isEnumerationField(FieldSearchData fsd) {
-		return fsd.type.isEnum()
+		return fsd.type?.isEnum()
 	}
 	/**
 	 * Determine if the field being used for filtering is numeric.
