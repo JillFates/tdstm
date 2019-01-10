@@ -35,6 +35,7 @@ declare var jQuery: any;
                 <tds-button
                         class="float-right button-header-grid"
                         [action]="ButtonActions.GenericAdd"
+						[tooltip]="'Add Support Asset'"
                         id="add-support"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                 </tds-button>
@@ -152,6 +153,7 @@ declare var jQuery: any;
                 <tds-button
                         class="float-right button-header-grid"
                         [action]="ButtonActions.GenericAdd"
+                        [tooltip]="'Add Dependent Asset'"
                         id="dependent-support"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                 </tds-button>
