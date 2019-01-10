@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5ff4e032-f8e4-4cd8-8857-3db06a936f5a",
+		"_postman_id": "87bc4a02-caaf-4435-aded-974b76a3c701",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -197,7 +197,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"{{updatedName}}{{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
+					"raw": "{\n\t\"name\": \"updatedName {{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
