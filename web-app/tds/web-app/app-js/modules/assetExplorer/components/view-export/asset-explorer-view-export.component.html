@@ -14,11 +14,11 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<tds-button class="btn-primary pull-left" [action]="ButtonActions.Export" (click)="getExportData()" [disabled]="!exportForm.form.valid">
-		</tds-button>
+		<tds-button-export class="btn-primary pull-left" (click)="getExportData()" [disabled]="!exportForm.form.valid">
+		</tds-button-export>
 		<kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
 			<kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title" [locked]="column.locked" [cellOptions]="column.cell"></kendo-excelexport-column>
 		</kendo-excelexport>
-		<tds-button class="pull-right" [action]="ButtonActions.Cancel" (click)="cancelCloseDialog()"></tds-button>
+		<tds-button-cancel class="pull-right"  (click)="cancelCloseDialog()"></tds-button-cancel>
 	</div>
 </div>

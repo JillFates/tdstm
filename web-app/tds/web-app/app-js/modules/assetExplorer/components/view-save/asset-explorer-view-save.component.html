@@ -42,17 +42,15 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<tds-button
+		<tds-button-save
 			class="btn-primary pull-left"
 			(click)="confirmCloseDialog()"
-			[disabled]="!isValid()"
-			[action]="ButtonActions.Save">
-		</tds-button>
+			[disabled]="!isValid()">
+		</tds-button-save>
 
-		<tds-button
+		<tds-button-cancel
 				(click)="cancelCloseDialog()"
-				[action]="ButtonActions.Cancel"
 				class="pull-right">
-		</tds-button>
+		</tds-button-cancel>
 	</div>
 </div>

@@ -23,13 +23,12 @@
                     View Unpublished Tasks
                 </label>
 
-                <tds-button
+                <tds-button-add
                         class="float-right button-header-grid"
                         title="Add"
-                        [action]="ButtonActions.Add"
                         tooltip="Add Task"
                         (click)="openTaskCreate()">
-                </tds-button>
+                </tds-button-add>
 
                 <!--
                 <button (click)="openTaskCreate()"
@@ -59,8 +58,8 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <!--[ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}"-->
                     <div class="tds-action-button-set" style="cursor: default;">
-                        <tds-button [action]="ButtonActions.Edit" (click)="openTaskEdit(dataItem)" tooltip="Edit Task"></tds-button>
-                        <tds-button [action]="ButtonActions.Delete" (click)="onDelete(dataItem)" tooltip="Delete Task"></tds-button>
+                        <tds-button-edit (click)="openTaskEdit(dataItem)" tooltip="Edit Task"></tds-button-edit>
+                        <tds-button-delete (click)="onDelete(dataItem)" tooltip="Delete Task"></tds-button-delete>
                     </div>
                 </ng-template>
 
@@ -107,13 +106,12 @@
                     View All Comments
                 </label>
 
-                <tds-button
+                <tds-button-add
                         class="float-right button-header-grid"
                         title="Add"
                         tooltip="Add Comment"
-                        [action]="ButtonActions.Add"
                         (click)="createComment()">
-                </tds-button>
+                </tds-button-add>
             </ng-template>
 
             <!-- Columns -->
@@ -134,8 +132,8 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <!--[ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}"-->
                     <div class="tds-action-button-set" style="cursor: default;">
-                        <tds-button [action]="ButtonActions.Edit" (click)="openTaskComment(dataItem)" tooltip="Edit Comment"></tds-button>
-                        <tds-button [action]="ButtonActions.Delete" (click)="onDelete(dataItem)" tooltip="Delete Comment"></tds-button>
+                        <tds-button-edit  (click)="openTaskComment(dataItem)" tooltip="Edit Comment"></tds-button-edit>
+                        <tds-button-delete (click)="onDelete(dataItem)" tooltip="Delete Comment"></tds-button-delete>
                     </div>
                 </ng-template>
 

@@ -15,7 +15,6 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -28,7 +27,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DatabaseShowComponent extends AssetCommonEdit implements OnInit {
-		ButtonActions = TDSActionsButton;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,

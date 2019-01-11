@@ -5,8 +5,6 @@ import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {Observable} from 'rxjs';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
-
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	DIALOG_SIZE,
@@ -108,8 +106,6 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	private currentUser: any;
 	protected fieldPipeMap: {pipe: any, metadata: any};
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
-	ButtonActions = TDSActionsButton;
-
 	constructor(
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,

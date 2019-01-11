@@ -353,12 +353,11 @@
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
-                                                        <tds-button class="button-header-grid float-right"
+                                                        <tds-button-add class="button-header-grid float-right"
                                                                     [tooltip]="'Add Predecessor'"
                                                                     [id]="'btnAddPredecessor'"
-                                                                    [action]="ButtonActions.Add"
                                                                     (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
-                                                        </tds-button>
+                                                        </tds-button-add>
                                                     </ng-template>
                                                     <!-- Columns -->
                                                     <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
@@ -402,12 +401,11 @@
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
-                                                    <tds-button class="button-header-grid float-right"
+                                                    <tds-button-add class="button-header-grid float-right"
                                                                 [tooltip]="'Add Successor'"
                                                                 [id]="'btnAddSuccessor'"
-                                                                [action]="ButtonActions.Add"
                                                                 (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
-                                                    </tds-button>
+                                                    </tds-button-add>
                                                 </ng-template>
                                                 <!-- Columns -->
                                                 <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
@@ -498,26 +496,23 @@
                 </form>
             </div>
             <div class="modal-footer form-group-center">
-                <tds-button
-                        [action]="ButtonActions.Save"
+                <tds-button-save
                         class="btn-primary pull-left"
                         title="Update"
                         [disabled]="isFormInvalid() || !hasEditTaskPermission"
                         (click)="onSave()">
-                </tds-button>
+                </tds-button-save>
 
-                <tds-button
-                        [action]="ButtonActions.Delete"
+                <tds-button-delete
                         class="btn-danger component-action-delete"
                         [disabled]="!hasDeleteTaskPermission"
                         (click)="deleteTask()">
-                </tds-button>
+                </tds-button-delete>
 
-                <tds-button
-                        [action]="ButtonActions.Cancel"
+                <tds-button-cancel
                         class="component-action-cancel pull-right"
                         (click)="cancelCloseDialog()">
-                </tds-button>
+                </tds-button-cancel>
             </div>
         </div>
     </div>

@@ -10,14 +10,24 @@ import {
 import {pathOr} from 'ramda';
 
 import {
-	TDSActionsButton,
 	TDSButton
 } from './model/action-button.model';
 
 import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 
 @Component({
-	selector: 'tds-button',
+	selector: `
+		tds-button-add,
+		tds-button-cancel,
+		tds-button-clone,
+		tds-button-close,
+		tds-button-create,
+		tds-button-custom,
+		tds-button-delete,
+		tds-button-edit,
+		tds-button-export,
+		tds-button-save
+	`,
 	template: `
 		<button *ngIf="button"
 			type="button"
@@ -31,11 +41,11 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		</button>
 	`,
 	host: {
-		'[class.tds-action-button--disabled]': 'disabled || !hasAllPermissions'
+		'[class.tds-action-button--disabled]': 'disabled || !hasAllPermissions',
+		'[class.tds-generic-button]': 'true'
 	}
 })
 export class TDSActionButton implements OnInit, OnChanges {
-	@Input() action: TDSActionsButton;
 	@Input() title = '';
 	@Input() tooltip = '';
 	@Input() icon = '';
@@ -56,24 +66,22 @@ export class TDSActionButton implements OnInit, OnChanges {
 
 	ngOnInit() {
 		this.hostClasses = this.elementRef.nativeElement.classList;
+
+		const buttonSelector = this.elementRef.nativeElement.localName;
+		this.button = this.buttonsFactoryService.create(buttonSelector, this.permissions || []);
+		this.hasAllPermissions = this.button.hasAllPermissions;
+
+		if (!this.button) {
+			throw new Error(`Unable to create button ${buttonSelector}`);
+		}
+		this.titleButton = this.title || this.button.title;
 	}
 
 	/**
 	 * On input changes set the corresponding button title and flag permissions
 	 */
 	ngOnChanges(changes: SimpleChanges) {
-		const action = pathOr(null, ['action', 'currentValue'], changes);
 		const title = pathOr(null, ['title', 'currentValue'], changes);
-
-		if (action !== null) {
-			this.button = this.buttonsFactoryService.create(action, this.permissions || []);
-			this.hasAllPermissions = this.button.hasAllPermissions;
-
-			if (!this.button) {
-				throw new Error(`Unable to create button ${action}`);
-			}
-			this.titleButton = this.title || this.button.title;
-		}
 
 		if (title !== null) {
 			this.titleButton = this.title || this.button.title;

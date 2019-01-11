@@ -6,7 +6,6 @@ import {FieldImportance} from '../../../fieldSettings/model/field-settings.model
 import {AssetExportModel} from '../../model/asset-export-model';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -23,8 +22,6 @@ export class AssetExplorerViewExportComponent {
 	protected exportFileName = '';
 	protected dataToExport: any[] = [];
 	private allProperties = false;
-	protected ButtonActions = TDSActionsButton;
-
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {

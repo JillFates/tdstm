@@ -11,8 +11,6 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
-
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
@@ -40,7 +38,6 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	protected navigationSubscription;
 	protected justPlanning: boolean;
 	protected data: any;
-	protected ButtonActions = TDSActionsButton;
 	protected gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,

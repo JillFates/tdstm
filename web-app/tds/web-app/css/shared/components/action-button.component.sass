@@ -20,8 +20,8 @@ $tds-action-button-icon-flat-color: #666
     span.title
       display: none
 
-tds-button[class^="btn-"],
-tds-button[class^="btn-"]:hover
+.tds-generic-button[class^="btn-"],
+.tds-generic-button[class^="btn-"]:hover
   background-color: unset
 
 .tds-action-button
@@ -54,12 +54,12 @@ tds-button[class^="btn-"]:hover
   .button-header-grid
     padding: 2px 8px
 
-// Match the first tds-button with an icon set belonging to a btn-group
-.btn-group > tds-button:not([icon=""]) button:first-child()
+// Match the first tds-generic-button with an icon set belonging to a btn-group
+.btn-group > .tds-generic-button:not([icon=""]) button:first-child()
   padding-top: 5px
 
 .btn-group
-  tds-button + .dropdown-toggle
+  .tds-generic-button + .dropdown-toggle
     width: 31px
     margin-left: -1px
 

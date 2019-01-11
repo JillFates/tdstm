@@ -6,8 +6,6 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
-
 @Component({
 	selector: 'asset-explorer-view-save',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-save/asset-explorer-view-save.component.html'
@@ -15,8 +13,6 @@ import {TDSActionsButton} from '../../../../shared/components/button/model/actio
 export class AssetExplorerViewSaveComponent implements AfterViewInit {
 	model: ViewModel;
 	private isUnique = true;
-	protected ButtonActions = TDSActionsButton;
-
 	constructor(
 		model: ViewModel,
 		private favorites: ViewGroupModel,

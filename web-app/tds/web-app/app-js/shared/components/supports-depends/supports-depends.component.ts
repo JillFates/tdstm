@@ -13,7 +13,6 @@ import {Observable} from 'rxjs';
 import {UIDialogService} from '../../services/ui-dialog.service';
 import {AssetComment} from '../dependent-comment/model/asset-coment.model';
 import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
-import {TDSActionsButton} from '../button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -32,13 +31,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
-                <tds-button
+                <tds-button-add
                         class="float-right button-header-grid"
-                        [action]="ButtonActions.Add"
 						[tooltip]="'Add Support Asset'"
                         id="add-support"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
-                </tds-button>
+                </tds-button-add>
             </ng-template>
 
             <!-- Columns -->
@@ -58,21 +56,19 @@ declare var jQuery: any;
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
                     <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
-						<tds-button
+						<tds-button-custom
 							[id]="'create-button-' + rowIndex"
 							icon="comment-o"
 							tooltip="Create Comment"
-							[action]="ButtonActions.Custom"
 							(click)="onAddEditComment(dataItem)">
                             <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
-						</tds-button>
-						<tds-button
+						</tds-button-custom>
+						<tds-button-delete
 							[id]="'delete-button-' + rowIndex"
 							class="command-delete"
-							[action]="ButtonActions.Delete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
-						</tds-button>
+						</tds-button-delete>
                     </div>
                 </ng-template>
 
@@ -152,13 +148,12 @@ declare var jQuery: any;
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
-                <tds-button
+                <tds-button-add
                         class="float-right button-header-grid"
-                        [action]="ButtonActions.Add"
                         [tooltip]="'Add Dependent Asset'"
                         id="dependent-support"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
-                </tds-button>
+                </tds-button-add>
             </ng-template>
 
             <!-- Columns -->
@@ -178,21 +173,19 @@ declare var jQuery: any;
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
                     <div class="k-grid-ignore-click tds-action-button-set" style="cursor: default;">
-                    	<tds-button
+                    	<tds-button-custom
 							[id]="'dependent-create-button-' + rowIndex"
 							icon="comment-o"
 							tooltip="Create Comment"
-							[action]="ButtonActions.Custom"
 							(click)="onAddEditComment(dataItem)">
                             <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0, 'icon-action': true}"></span>
                             <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0, 'icon-action': true}"></span>
-						</tds-button>
-						<tds-button
+						</tds-button-custom>
+						<tds-button-delete
 							[id]="'dependent-delete-button-' + rowIndex"
 							class="command-delete"
-							[action]="ButtonActions.Delete"
 							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">
-						</tds-button>
+						</tds-button-delete>
                     </div>
                 </ng-template>
 
@@ -268,8 +261,6 @@ export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
-	ButtonActions = TDSActionsButton;
-
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
 	private dataGridDependsOnHelper: DataGridOperationsHelper;
 	private supportOnColumnModel: SupportOnColumnsModel;
