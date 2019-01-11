@@ -56,8 +56,22 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	// Decide what to do when the cancel button is clicked
 	protected handleCancelButton() {
 		if (this.editing) {
-			this.personModel = Object.assign({}, this.savedPersonModel);
-			this.editing = false;
+			if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
+				this.promptService.open(
+					'Confirmation Required',
+					'You have changes that have not been saved. Do you want to continue and lose those changes?',
+					'Confirm', 'Cancel')
+					.then(confirm => {
+						if (confirm) {
+							this.personModel = Object.assign({}, this.savedPersonModel);
+							this.editing = false;
+						}
+					})
+					.catch((error) => console.log(error));
+			} else {
+				this.personModel = Object.assign({}, this.savedPersonModel);
+				this.editing = false;
+			}
 		} else {
 			this.cancelCloseDialog();
 		}
