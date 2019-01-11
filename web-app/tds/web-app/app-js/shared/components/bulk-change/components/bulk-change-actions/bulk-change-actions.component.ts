@@ -42,7 +42,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			this.showEdit = this.bulkChangeModel.showEdit;
 			this.bulkChangeType = this.bulkChangeModel.bulkChangeType;
 			this.itemType =  this.bulkChangeType === BulkChangeType.Assets ?
-				'Assets' : this.getSinglePluralDependenceName()
+				this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
@@ -86,7 +86,9 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			? 'ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE_ASSETS'
 			: 'ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE_DEPENDENCIES';
 
-		const singleOrPluralName = this.getSinglePluralDependenceName();
+		const singleOrPluralName = this.bulkChangeType === BulkChangeType.Assets ?
+			this.getSinglePluralAssetName() : this.getSinglePluralDependenceName();
+
 		const message = this.translatePipe.transform(translationKey,
 			[this.affected, singleOrPluralName, singleOrPluralName]);
 		return new Promise((resolve, reject) =>  {
@@ -125,6 +127,16 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	protected getSinglePluralDependenceName() {
 		const targetKey = this.affected === 1 ?
 			'DEPENDENCIES.SINGLE_NAME' : 'DEPENDENCIES.PLURAL_NAME';
+
+		return this.translatePipe.transform(targetKey);
+	}
+
+	/*
+	* Based on effected elements, get the single/plural asset name
+	 */
+	protected getSinglePluralAssetName() {
+		const targetKey = this.affected === 1 ?
+			'ASSETS.SINGLE_NAME' : 'ASSETS.PLURAL_NAME';
 
 		return this.translatePipe.transform(targetKey);
 	}
