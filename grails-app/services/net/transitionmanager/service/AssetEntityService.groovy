@@ -80,7 +80,7 @@ class AssetEntityService implements ServiceMethods {
 			(AssetClass.APPLICATION): [ 'assetName' ],
 			(AssetClass.DATABASE): [ 'assetName' ],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName',
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'locationSource',
 				// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
 				'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
 				'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
@@ -2503,7 +2503,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS sourceLocationName ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
