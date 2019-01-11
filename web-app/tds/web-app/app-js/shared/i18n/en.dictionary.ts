@@ -212,6 +212,8 @@ export const en_DICTIONARY: Object = {
 		'DEMO': 'Demo',
 		'CREATE_LICENSE': 'Create License',
 		'GLOBAL': 'Global',
+		'IMPORT_LICENSE_REQUEST': 'Import License Request',
+		'PASTE_LICENSE_BLOCK': 'Paste in license text block from emailed License Request and then click Import.',
 		'SINGLE': 'Single',
 		'MANAGER': 'License Manager',
 		'ENGINEERING': 'Engineering',
