@@ -77,11 +77,11 @@ class UserAuditBuilder {
 	private static UserAudit create(UserAuditClassification classification, 
 			String message,
 	        Project project = null, UserLogin userLogin = null) {
-		
+
 		new UserAudit(
 			userLogin: userLogin ?: loadCurrentUserLogin(),
 			project: project,
-			ipAddress: RequestContextHolder.currentRequestAttributes().request.remoteAddr,
+			ipAddress: RequestContextHolder.requestAttributes ? RequestContextHolder.currentRequestAttributes().request.remoteAddr: null,
 			severity: UserAuditSeverity.INFO,
 			securityRelevant: false,
 			classification: classification,
