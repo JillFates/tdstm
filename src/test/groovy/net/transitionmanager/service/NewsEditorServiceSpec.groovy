@@ -17,7 +17,7 @@ import spock.lang.Specification
 
 @TestFor(NewsEditorService)
 @TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
-@Mock([PartyGroup, PartyType, Project, MoveEventNews])
+@Mock([PartyGroup, PartyType, Project, MoveEventNews, Person])
 class NewsEditorServiceSpec extends Specification {
 
 	@Shared

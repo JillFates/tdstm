@@ -4,22 +4,21 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import spock.lang.Issue
 import test.AbstractUnitSpec
 
 import java.sql.Timestamp
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 import static com.tdssrc.grails.TimeUtil.ABBREVIATED
 import static com.tdssrc.grails.TimeUtil.FULL
-
 /**
  * Unit test cases for the TimeUtil class
  */
-@Mock([UserLogin, UserPreference])
+@Mock([UserLogin, UserPreference, Person])
 @TestMixin(ControllerUnitTestMixin)
 class TimeUtilTests extends AbstractUnitSpec {
 
