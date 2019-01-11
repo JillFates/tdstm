@@ -13,6 +13,7 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 
 @CompileStatic
+@Transactional
 class SettingService implements ServiceMethods {
     public static final String VERSION_KEY = 'version'
     public static final String FIELDS_KEY = 'fields'

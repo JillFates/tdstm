@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetOptionsCommand
 
 @Slf4j
+@Transactional
 class AssetOptionsService {
 
 	/**
