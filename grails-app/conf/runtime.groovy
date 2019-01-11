@@ -32,7 +32,7 @@ if(configManagerFile){
 	candidates << configManagerFile
 }
 
-if($userHome) {
+if(userHome) {
 	candidates << "$userHome/.grails/${appName}-config.groovy"
 }
 
