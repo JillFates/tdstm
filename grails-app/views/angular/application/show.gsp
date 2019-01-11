@@ -55,6 +55,7 @@
 					[action]="ButtonActions.Edit"
 					class="btn-primary"
 					tooltip="Edit Asset"
+					[permissions]="['${Permission.AssetEdit}']"
 					(click)="showAssetEditView()">
 			</tds-button>
 
@@ -76,6 +77,7 @@
 					[action]="ButtonActions.Delete"
 					tooltip="Delete Asset"
 					class="btn-danger"
+					[permissions]="['${Permission.AssetDelete}']"
 					(click)="onDeleteAsset()">
 			</tds-button>
 		</tds:hasPermission>

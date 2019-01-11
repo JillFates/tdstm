@@ -359,6 +359,7 @@
                 tooltip="Update Asset"
                 class="btn-primary pull-left component-action-update" tabindex="501"
                 [disabled]="!isDependenciesValidForm"
+                [permissions]="['${Permission.AssetEdit}']"
                 (click)="submitForm($event)">
         </tds-button>
 
@@ -367,6 +368,7 @@
                     [action]="ButtonActions.Delete"
                     tooltip="Delete Asset"
                     class="btn-danger component-action-delete" tabindex="502"
+                    [permissions]="['${Permission.AssetDelete}']"
                     (click)="onDeleteAsset()">
             </tds-button>
         </tds:hasPermission>

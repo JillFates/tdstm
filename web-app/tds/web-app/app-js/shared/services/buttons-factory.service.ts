@@ -29,6 +29,12 @@ export class ButtonsFactoryService {
 		};
 	}
 
+	/**
+	 * Create a button
+	 * @param {TDSActionsButton}  key of the button to create
+	 * @params {Array<String>} permissionsList  List of strings containing the permissions required by this button
+	 * @returns {TDSButton} created button, if key is not found returns  null
+	 */
 	create(key: TDSActionsButton, permissionsList =  []): TDSButton {
 		const button =  this.registeredButtons[key] || null;
 
@@ -37,6 +43,9 @@ export class ButtonsFactoryService {
 		return button;
 	}
 
+	/**
+	 * Returns a boolean determining if all the permissions provided by the button are fulfilled in the permissions list
+	 */
 	private hasAllPermissions(permissionsList: string[]): boolean {
 		if (permissionsList.length === 0) {
 			return true;
