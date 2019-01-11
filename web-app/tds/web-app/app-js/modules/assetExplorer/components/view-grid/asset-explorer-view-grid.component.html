@@ -82,16 +82,17 @@
 		</ng-template>
 
 		<!-- Select All column -->
-		<kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
+		<kendo-grid-column title=""
+                           [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0"
+                           [width]="SELECT_ALL_COLUMN_WIDTH"
+                           [filterable]="false">
 			<ng-template kendoGridHeaderTemplate>
-				<div class="row">
-					<div class="col-md-12 text-center">
-						<tds-checkbox name="assetsSelector"
-						              [hasThirdState]="true"
-						              (changeState)="onChangeBulkCheckbox($event)"
-						              id="assetSelector"
-						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-					</div>
+				<div class="row text-center">
+                    <tds-checkbox name="assetsSelector"
+                                  [hasThirdState]="true"
+                                  (changeState)="onChangeBulkCheckbox($event)"
+                                  id="assetSelector"
+                                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 				</div>
 			</ng-template>
 
