@@ -93,6 +93,9 @@ class ApplicationCreationSpec extends GebReportingSpec {
             waitFor{ acModalPlanStatusSelector.click()}
             acModalSelectorValues.find(text: appStatus).click()
         and: 'The User clicks the the "Save" Button'
+            interact {
+                moveToElement(createButton)
+            }
             waitFor { createButton.click() }
 
         then: ' The User is redirected to the Application Details Page'
