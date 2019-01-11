@@ -1,34 +1,58 @@
 <!-- Main content -->
-<div class="content body">
+<div class="content body tds-kendo-grid license-admin-list-component">
     <section>
-        <div>
+        <div *ngIf="noticeColumnModel">
             <div class="box-body box-with-empty-header">
-                <kendo-grid [filterable]="true" [filter]="state.filter" [data]="gridData" [sortable]="{ mode:'single' }" [sort]="state.sort"
-                    [pageSize]="state.take" [pageable]="{ pageSizes: true, info: true}" (dataStateChange)="dataStateChange($event)">
+                <kendo-grid
+                        [data]="gridData"
+                        [filter]="state.filter"
+                        [filterable]="true"
+                        (filterChange)="filterChange($event)"
+                        [sort]="state.sort"
+                        [skip]="skip"
+                        [sortable]="{mode:'single'}"
+                        [pageSize]="pageSize"
+                        [resizable]="true"
+                        (sortChange)="sortChange($event)"
+                        [pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
+                        (pageChange)="pageChange($event)"
+                        (cellClick)="cellClick($event)"
+                        [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button type="button" [disabled]="!isCreateAvailable()" class="btn btn-default kendo-grid-toolbar__add-btn" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE_MANAGER.CREATE_NOTICE' | translate }}</button>
-                        <div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <button class="btn btn-default button-create-license" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
+                        <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
-                    <kendo-grid-column title="Action" [width]="80">
-                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                            <button [disabled]="!isEditAvailable()" class="btn btn-default" (click)="onEditNotice(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                    <kendo-grid-column *ngFor="let column of noticeColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div class="sortable-column" (click)="onClickTemplate($event)">
+                                <label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
+                            </div>
                         </ng-template>
-                    </kendo-grid-column>
-                    <kendo-grid-column field="title" title="Title"></kendo-grid-column>
-                    <kendo-grid-column field="typeId" title="Type">
-                        <ng-template kendoGridFilterCellTemplate>
-                            <kendo-dropdownlist [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'" [valueField]="'typeId'" [valuePrimitive]="true"
-                                id="selectType" class="form-control" (valueChange)="applyCustomFilter($event)">
-                            </kendo-dropdownlist>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
+                                <div *ngIf="column.type === 'text'">
+                                    <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                </div>
+                            </div>
                         </ng-template>
-                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+
+                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+                            <div class="text-center">
+                                <button class="btn btn-default" (click)="openLicenseViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                                <button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'typeId'" let-dataItem>
                             {{((dataItem.typeId === 1 )? 'Prelogin' : 'Postlogin')}}
                         </ng-template>
-                    </kendo-grid-column>
-                    <kendo-grid-column field="active" title="Active" filter="boolean">
-                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'active'" let-dataItem>
                             {{dataItem.active | tdsUIBoolean}}
                         </ng-template>
+
                     </kendo-grid-column>
                 </kendo-grid>
             </div>
