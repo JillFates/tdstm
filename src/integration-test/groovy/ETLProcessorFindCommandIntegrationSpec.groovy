@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.FileSystemService
+import spock.lang.Shared
 
 @Integration
 @Rollback
@@ -28,9 +29,13 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	ETLFieldsValidator validator
 
 	FileSystemService fileSystemService
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+
+	@Shared
+	ProjectTestHelper projectTestHelper
 
 	def setup(){
+
+		projectTestHelper = new ProjectTestHelper()
 
 		assetDependencyDataSetContent = """
 			AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type

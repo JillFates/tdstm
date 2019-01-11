@@ -18,19 +18,15 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
-import com.tdsops.tm.enums.domain.SecurityRole
-import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.PartyGroup
-
 import org.apache.commons.lang3.RandomStringUtils as RSU
-import groovy.time.TimeCategory
 import org.springframework.mock.web.MockHttpServletRequest
+import spock.lang.Shared
 import spock.lang.Specification
 
 @Integration
 @Rollback
 class PersonServiceIntegrationTests extends Specification {
-
+	@Shared
 	UserLogin adminUser
 
 	MoveEventService moveEventService
@@ -38,36 +34,57 @@ class PersonServiceIntegrationTests extends Specification {
 	PersonService personService
 	ProjectService projectService
 	SecurityService securityService
-	private Person person
-	private Project project
-	private Person adminPerson
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private AssetTestHelper assetHelper = new AssetTestHelper()
+
+	@Shared
+	Person person
+
+	@Shared
+	Project project
+
+	@Shared
+	Person adminPerson
+
+	@Shared
+	PersonTestHelper personHelper
+
+	@Shared
+	ProjectTestHelper projectHelper
+
+	@Shared
+	AssetTestHelper assetHelper
+
+	@Shared
+	boolean initialized = false
+
 
 	final Map personMap = [lastName:'Bullafarht']
 
 	def setup() {
-		projectHelper = new ProjectTestHelper()
-		project = projectHelper.createProject()
+		if(!initialized) {
+			personHelper = new PersonTestHelper()
+			projectHelper = new ProjectTestHelper()
+			assetHelper = new AssetTestHelper()
+			project = projectHelper.createProject()
 
-		adminPerson = personHelper.createStaff(project.owner)
-		assert adminPerson
+			adminPerson = personHelper.createStaff(project.owner)
+			assert adminPerson
 
-		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
-		// adminUser = UserLogin.findByUsername('tdsadmin')
-		assert adminUser
-		assert adminUser.username
-		//adminUser = UserLogin.findByUsername('tdsadmin')
+			adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+			// adminUser = UserLogin.findByUsername('tdsadmin')
+			assert adminUser
+			assert adminUser.username
+			//adminUser = UserLogin.findByUsername('tdsadmin')
 
-		// logs the admin user into the system
-		securityService.assumeUserIdentity(adminUser.username, false)
-		println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
-		assert securityService.isLoggedIn()
+			// logs the admin user into the system
+			securityService.assumeUserIdentity(adminUser.username, false)
+			println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+			assert securityService.isLoggedIn()
 
-		personService.addToProjectSecured(project, adminPerson)
+			personService.addToProjectSecured(project, adminPerson)
+			initialized = true
+		}
 	}
 
 	def '01. Test the AdminPerson and AdminUser are setup correctly'() {

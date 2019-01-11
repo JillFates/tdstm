@@ -32,7 +32,7 @@ class DeviceUtilsIntegrationSpec extends Specification{
 
 	def setup() {
 		project = projectTestHelper.createProject()
-		bundleHelper.createBundle(project)
+		moveBundle = bundleHelper.createBundle(project)
 
 		Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
 		Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)

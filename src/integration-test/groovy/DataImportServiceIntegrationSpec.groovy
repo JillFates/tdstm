@@ -81,40 +81,47 @@ class DataImportServiceIntegrationSpec extends Specification {
 	Map context
 
 	@Shared
-	Person whom = personTestHelper.createPerson()
+	Person whom
+
+	@Shared
+	boolean initialized = false
 
 	void setupSpec() {
 
 	}
 	void setup() {
-		project = projectTestHelper.createProject()
-		otherProject = projectTestHelper.createProject()
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-			moveBundleTestHelper.createBundle(otherProject, null))
+		if(!initialized) {
+			whom = personTestHelper.createPerson()
+			project = projectTestHelper.createProject()
+			otherProject = projectTestHelper.createProject()
+			moveBundle = moveBundleTestHelper.createBundle(project, null)
+			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
+																		 moveBundleTestHelper.createBundle(otherProject, null))
 
-		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
-        securityService.assumeUserIdentity(adminUser.username, false)
+			def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
+			securityService.assumeUserIdentity(adminUser.username, false)
 
-		context = dataImportService.initContextForProcessBatch( project, ETLDomain.Dependency )
-		context.record = new ImportBatchRecord(sourceRowId:1)
+			context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
+			context.record = new ImportBatchRecord(sourceRowId: 1)
 
-		device.assetType = 'Server'
-		device.priority = 6
-		device.purchasePrice = 1.25
-		device.retireDate = new Date()
+			device.assetType = 'Server'
+			device.priority = 6
+			device.purchasePrice = 1.25
+			device.retireDate = new Date()
 
-		device.save()
+			device.save()
 
-		device2.assetType = 'Server'
-		device2.save()
+			device2.assetType = 'Server'
+			device2.save()
 
-		// Create a second project with a device with the same name and type as device above
-		otherProjectDevice.assetName = device.assetName
-		otherProjectDevice.assetType = device.assetType
-		otherProjectDevice.save()
+			// Create a second project with a device with the same name and type as device above
+			otherProjectDevice.assetName = device.assetName
+			otherProjectDevice.assetType = device.assetType
+			otherProjectDevice.save()
+			initialized = true
+		}
 	}
 
 	void '1. give the performQueryAndUpdateFindElement method a spin'() {
@@ -129,7 +136,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			initializeFindElement(propertyName, fieldsInfo)
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName: device.assetName], true, device.id)
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
-			[device] ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
+			device.id ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)[0].id
 
 		when: 'the query is by the assetName of an non-existing asset'
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:'A bogus asset name that does not exist for certain!'], false)
@@ -143,7 +150,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:device.assetName], true, device.id)
 			fieldsInfo.value = ''
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
-			[device] ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
+			device.id ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)[0].id
 
 		when: 'there is a second asset with the same assetType'
 			// Done in spec setup
@@ -287,7 +294,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		and: 'the method is called'
 			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
-			device == result
+			device.id == result.id
 	}
 
     void 'Test fetchEntityByFieldMetaData for #3 - single result'() {
@@ -300,7 +307,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		and: 'the method is called'
 			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
-			device == result
+			device.id == result.id
 	}
 
     void 'Test fetchEntityByFieldMetaData for #4 re-execute queries'() {
@@ -316,7 +323,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		and: 'the method is called'
 			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
-			device == result
+			device.id == result.id
 		and: 'the matchOn should be for the 2nd query'
 			1 == fieldsInfo[property].find.matchOn
 	}
@@ -331,7 +338,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		and: 'the method is called'
 			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
-			device == result
+			device.id == result.id
 	}
 
 	// Need to implement
@@ -444,14 +451,14 @@ class DataImportServiceIntegrationSpec extends Specification {
 		and: 'calling the method'
 			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'the device should be returned'
-			device == entity
+			device.id == entity.id
 
 		when: 'the ETL field.value contains the id of device'
 			fieldsInfo[property].value = device2.id
 		and: 'calling the method'
 			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'device2 from the find results should be returned'
-			device2 == entity
+			device2.id == entity.id
 
 		when: 'the ETL field.value contains an invalid id for a device'
 			fieldsInfo[property].value = 9999999999999

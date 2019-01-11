@@ -35,10 +35,10 @@ class TagEventServiceIntegrationSpec extends Specification{
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -98,6 +98,8 @@ class TagEventServiceIntegrationSpec extends Specification{
 	Date now
 
 	void setup() {
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -133,8 +135,8 @@ class TagEventServiceIntegrationSpec extends Specification{
 
 		then: 'a list of tagEvents are returned for the event'
 			tagEvents.size() == 2
-			tagEvents[0].tag == tag1
-			tagEvents[1].tag == tag2
+			tagEvents[0].tag.id == tag1.id
+			tagEvents[1].tag.id == tag2.id
 	}
 
 	void 'Test list with event from another project'() {
@@ -151,8 +153,8 @@ class TagEventServiceIntegrationSpec extends Specification{
 
 		then: 'a list of tags is returned'
 			tagEvents.size() == 2
-			tagEvents[0] == tag1
-			tagEvents[1] == tag2
+			tagEvents[0].id == tag1.id
+			tagEvents[1].id == tag2.id
 	}
 
 	void 'Test getTags with event from another project'() {
@@ -169,7 +171,7 @@ class TagEventServiceIntegrationSpec extends Specification{
 
 		then: 'a list of tagEvents is returned'
 			tagEvents.size() == 1
-			tagEvents[0].tag == tag2
+			tagEvents[0].tag.id == tag2.id
 	}
 
 	void 'Test add tag from another project'() {
@@ -192,7 +194,7 @@ class TagEventServiceIntegrationSpec extends Specification{
 			List<TagEvent> tagEvents = tagEventService.list(project, event2.id)
 		then: 'The list of tagEvents will not contain the delete tagEvent'
 			tagEvents.size() == 1
-			tagEvents[0].tag == tag1
+			tagEvents[0].tag.id == tag1.id
 	}
 
 	void 'Test remove tags from another project'() {

@@ -46,24 +46,21 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 
 	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
-
-	@Shared
 	RoomTestHelper roomTestHelper = new RoomTestHelper()
 
 	@Shared
 	RackTestHelper rackTestHelper = new RackTestHelper()
 
 	@Shared
-	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+	test.helper.ProjectTestHelper projectTestHelper
 
 	@Shared
 	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 	@Shared
-	Project otherProject = projectTestHelper.createProject()
+	Project otherProject
 	@Shared
 	MoveBundle moveBundle
 	@Shared
@@ -75,31 +72,39 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 	@Shared
 	Map context
 
+	@Shared
+	boolean initialized = false
+
 
 	void setupSpec() {
 
 	}
 
 	void setup() {
-		// project = projectTestHelper.createProject(null)
-		// otherProject = projectTestHelper.createProject()
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundleTestHelper.createBundle(otherProject, null))
-		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
-		context.record = new ImportBatchRecord(sourceRowId: 1)
+		if(!initialized) {
+			projectTestHelper = new test.helper.ProjectTestHelper()
+			project = projectTestHelper.createProject()
+			otherProject = projectTestHelper.createProject()
+			moveBundle = moveBundleTestHelper.createBundle(project, null)
+			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundleTestHelper.createBundle(otherProject, null))
+			context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
+			context.record = new ImportBatchRecord(sourceRowId: 1)
 
-		device.assetType = 'Server'
-		device.save()
+			device.assetType = 'Server'
+			device.save()
 
-		device2.assetType = 'Server'
-		device2.save()
+			device2.assetType = 'Server'
+			device2.save()
 
-		// Create a second project with a device with the same name and type as device above
-		otherProjectDevice.assetName = device.assetName
-		otherProjectDevice.assetType = device.assetType
-		otherProjectDevice.save()
+			// Create a second project with a device with the same name and type as device above
+			otherProjectDevice.assetName = device.assetName
+			otherProjectDevice.assetType = device.assetType
+			otherProjectDevice.save()
+
+			initialized = true
+		}
 	}
 
 	void '1. can find a Device by its id'() {

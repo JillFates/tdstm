@@ -37,7 +37,7 @@ class AssetCommentSpec extends Specification {
     @Shared
     ApiCatalog apiCatalog
 
-    void setupSpec() {
+    void setup() {
         apiActionHelper = new ApiActionTestHelper()
         projectHelper = new ProjectTestHelper()
         providerHelper = new ProviderTestHelper()

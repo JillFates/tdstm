@@ -6,15 +6,11 @@ import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
-import grails.gorm.transactions.Rollback
-import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import spock.lang.Specification
 
-@Integration
-@Rollback
 abstract class ETLBaseIntegrationSpec extends Specification{
 
 	/**

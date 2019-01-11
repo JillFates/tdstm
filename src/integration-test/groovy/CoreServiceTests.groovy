@@ -61,7 +61,7 @@ class CoreServiceTests extends Specification {
 		setting = coreService.getAppConfigSetting('testing.foo.configVal')
 
 		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
-		setting instanceof ConfigObject
+		setting instanceof NavigableMap
 
 		when:
 		setting = coreService.getAppConfigSetting('testing.foo.man.choo')

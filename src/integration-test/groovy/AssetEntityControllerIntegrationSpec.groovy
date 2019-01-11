@@ -43,7 +43,7 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 	/**
 	 * Used to create a test project and user that is logged in
 	 */
-	def setupSpec() {
+	def setup() {
 		project = projectHelper.createProject()
 
 		adminPerson = personHelper.createStaff(project.owner)

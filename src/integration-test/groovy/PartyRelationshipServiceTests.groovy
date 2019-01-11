@@ -10,6 +10,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import spock.lang.Shared
 import spock.lang.Specification
 
 @Integration
@@ -21,14 +22,23 @@ class PartyRelationshipServiceTests extends Specification {
 	ProjectService projectService
 	SecurityService securityService
 
-	private Person byWhom
+	@Shared
+	Person byWhom
 
-	private UserLogin userLogin
-	private Project project
-	private MoveEvent moveEvent
-	private Person person
+	@Shared
+	UserLogin userLogin
 
-	static ProjectTestHelper projectHelper = new ProjectTestHelper()
+	@Shared
+	Project project
+
+	@Shared
+	MoveEvent moveEvent
+
+	@Shared
+	Person person
+
+	@Shared
+	ProjectTestHelper projectHelper = new ProjectTestHelper()
 
 	void setup() {
 		def projectHelper = new ProjectTestHelper()

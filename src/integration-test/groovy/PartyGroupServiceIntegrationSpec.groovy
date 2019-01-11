@@ -26,27 +26,44 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 	SecurityService          securityService
 
 	// Initialized by setup()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper  personHelper  = new PersonTestHelper()
-	private Project           project
-	private Person            adminPerson
-	private UserLogin         adminUser
+	@Shared
+	ProjectTestHelper projectHelper
+
+	@Shared
+	PersonTestHelper personHelper
+
+	@Shared
+	Project project
+
+	@Shared
+	Person adminPerson
+
+	@Shared
+	UserLogin adminUser
+
+	@Shared
+	boolean initialized
 
 	void setup() {
-		company = PartyType.get('COMPANY')
-		project = projectHelper.createProject()
-		adminPerson = personHelper.createStaff(project.owner)
-		assert adminPerson
+		if(!initialized) {
+			projectHelper = new ProjectTestHelper()
+			personHelper = new PersonTestHelper()
+			company = PartyType.get('COMPANY')
+			project = projectHelper.createProject()
+			adminPerson = personHelper.createStaff(project.owner)
+			assert adminPerson
 
-		// Assign the admin to the project
-		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
+			// Assign the admin to the project
+			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
-		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
-		assert adminUser
-		assert adminUser.username
+			adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+			assert adminUser
+			assert adminUser.username
 
-		// setup the Admin User as though they're logged in
-		securityService.assumeUserIdentity(adminUser.username, false)
+			// setup the Admin User as though they're logged in
+			securityService.assumeUserIdentity(adminUser.username, false)
+			initialized = true
+		}
 
 	}
 
@@ -61,7 +78,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			testPartyGroup
 			testPartyGroup.id
 			testPartyGroup.name == 'TestCompanyZed'
-			testPartyGroup.partyType == company
+			testPartyGroup.partyType.id == company.id
 			testPartyGroup.comment == 'a comment'
 			!isPartner
 			!isAProjectPartner
@@ -78,7 +95,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			testPartyGroup
 			testPartyGroup.id
 			testPartyGroup.name == 'TestCompanyZed'
-			testPartyGroup.partyType == company
+			testPartyGroup.partyType.id == company.id
 			testPartyGroup.comment == 'a comment'
 			isPartner
 			!isAProjectPartner
@@ -97,7 +114,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			testPartyGroup
 			testPartyGroup.id
 			testPartyGroup.name == 'TestCompanyOmega'
-			testPartyGroup.partyType == company
+			testPartyGroup.partyType.id == company.id
 			testPartyGroup.comment == 'a new comment'
 			isPartner
 			!isAProjectPartner
@@ -115,7 +132,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			testPartyGroup
 			testPartyGroup.id
 			testPartyGroup.name == 'TestCompanyOmega'
-			testPartyGroup.partyType == company
+			testPartyGroup.partyType.id == company.id
 			testPartyGroup.comment == 'a new comment'
 			!isPartner
 			!isAProjectPartner

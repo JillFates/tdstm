@@ -23,7 +23,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
-	Project project = projectTestHelper.createProject()
+	Project project
 
 	@Shared
 	Tag tag1
@@ -36,6 +36,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 
 
 	void setup() {
+		project = projectTestHelper.createProject()
 		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)

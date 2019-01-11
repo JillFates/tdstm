@@ -15,9 +15,15 @@ import test.helper.ProviderTestHelper
 @Rollback
 class CredentialSpec extends  Specification{
 
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-	CredentialTestHelper credentialTestHelper = new CredentialTestHelper()
+	ProjectTestHelper projectTestHelper
+	ProviderTestHelper providerTestHelper
+	CredentialTestHelper credentialTestHelper
+
+	void setup() {
+		projectTestHelper = new ProjectTestHelper()
+		providerTestHelper = new ProviderTestHelper()
+		credentialTestHelper = new CredentialTestHelper()
+	}
 
 	void 'Test the Session/Cookie name and ValidationExpression validation of Credential'() {
 		expect:

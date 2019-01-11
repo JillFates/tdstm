@@ -4,14 +4,16 @@ import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import test.helper.AssetEntityTestHelper
-
+@Integration
+@Rollback
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
 
 	FileSystemService fileSystemService
