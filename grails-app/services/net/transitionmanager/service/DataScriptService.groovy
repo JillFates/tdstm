@@ -415,7 +415,7 @@ class DataScriptService implements ServiceMethods{
 
 		JSONConnection jsonCon = new JSONConnection(
 			config: "json",
-			path: FileSystemService.temporaryDirectory, driver: TDSJSONDriver)
+			path: fileSystemService.temporaryDirectory, driver: TDSJSONDriver)
 
 		JSONDataset dataSet = new JSONDataset(
 			connection: jsonCon,
@@ -453,7 +453,7 @@ class DataScriptService implements ServiceMethods{
 	Map parseDataFromCSV (String csvFile, Long page, Long maxRows) throws RuntimeException {
 		tempFile(csvFile)
 
-		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
+		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: fileSystemService.temporaryDirectory)
 		def csv = new CSVDataset(connection: con, fileName: csvFile, header: true)
 
 		List<Field> fields = csv.connection.driver.fields(csv)
