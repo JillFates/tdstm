@@ -14,6 +14,9 @@ import {FIELD_COLORS} from '../../model/field-settings.model';
 import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
+import {AlertType} from "../../../../shared/model/alert.model";
+import {NotifierService} from "../../../../shared/services/notifier.service";
+import { FieldSettingsService } from '../../service/field-settings.service';
 
 declare var jQuery: any;
 
@@ -40,6 +43,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input('state') gridState: any;
 	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
+	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	public colors = FIELD_COLORS;
@@ -76,12 +80,17 @@ export class FieldSettingsGridComponent implements OnInit {
 	constructor(
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private notifier: NotifierService,
+		private fieldSettingsService: FieldSettingsService) {
 	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
 		this.refresh();
+		this.fieldSettingsService.getFieldSettingsByDomain().subscribe(domains => {
+			this.domains = domains;
+		});
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
@@ -331,21 +340,50 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * The error conditions are:
 	 * 	- The label is an empty String
 	 * 	- The label String matches other label in the fields list.
+	 * 	- The label String matches a field name in the fields list.
+	 * 	- The label String matches other label or field name in the fields list of another domain.
 	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
 	 * 	  e.g. label: "Last Modified or last modified or LastModified". other label: "Last Modified". This comparisons will error.
 	 *
-	 * 	- The label String matches a fields name in the fields list.
+	 * 	- The label String matches any field names in the list of fields.
 	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
-	 * 	  e.g. label: "Asset Name or asset Name or AssetName or assetName". some field name: "assetName". This comparisons will error.
+	 * 	  e.g. label: "Asset Name or asset N ame or AssetName or assetName". some field name: "assetName". This comparisons will error.
 	 *
 	 * @See TM-13505
 	 * @param label
 	 * @returns {boolean}
 	 */
-	protected hasError(label: string) {
-		return label.trim() === '' || this.data.fields.filter(
-			item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim() ||
-					item.field.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
+	protected hasError(dataItem: FieldSettingsModel) {
+		return dataItem.label.trim() === '' ||
+			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields) ||
+			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
+	}
+
+	protected onBlur(dataItem: FieldSettingsModel) {
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields)) {
+			this.notifier.broadcast({
+				name: AlertType.DANGER,
+				message: 'There is another Label that conflicts with the Label "'
+				+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+			});
+		} else {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields)) {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: 'There is a Field Name that conflicts with the Label "'
+					+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+				});
+			} else {
+				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
+					this.notifier.broadcast({
+						name: AlertType.DANGER,
+						message: 'There is a Field Name or Label on another Domain that conflicts with the shared Label "'
+						+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+					});
+				}
+			}
+		}
 	}
 
 	/**
@@ -421,5 +459,4 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 		return false;
 	}
-
 }
