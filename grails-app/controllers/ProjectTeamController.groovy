@@ -1,5 +1,5 @@
-import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.PartyRelationship
@@ -7,7 +7,6 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectTeamController implements ControllerMethods {
 
@@ -45,7 +44,7 @@ class ProjectTeamController implements ControllerMethods {
 			delete from PartyRelationship
 			where partyRelationshipType.id = 'PROJ_TEAM'
 			  and partyIdFrom = : projectTeam
-			  and roleTypeCodeFrom.id = 'TEAM'
+			  and roleTypeCodeFrom.id = 'ROLE_TEAM'
 		''', args)
 
 		projectTeam.delete()
@@ -83,7 +82,7 @@ class ProjectTeamController implements ControllerMethods {
 				delete from PartyRelationship
 				where partyRelationshipType.id = 'PROJ_TEAM'
 				  and partyIdFrom.id = : projectTeamId
-				  and roleTypeCodeFrom.id = 'TEAM'
+				  and roleTypeCodeFrom.id = 'ROLE_TEAM'
 			''', [projectTeamId: projectTeam.id])
 
 			partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)

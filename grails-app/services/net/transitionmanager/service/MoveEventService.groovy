@@ -465,7 +465,7 @@ class MoveEventService implements ServiceMethods {
 					from PartyRelationship
 					where partyRelationshipType='PROJ_STAFF'
 					  and partyIdFrom=:project
-					  and roleTypeCodeFrom='PROJECT'
+					  and roleTypeCodeFrom='ROLE_PROJECT'
 			''', [project: currentProject])
 
 			for (int r = 8; r <= projectStaff.size() + 7; r++) {

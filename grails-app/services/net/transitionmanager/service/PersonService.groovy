@@ -13,7 +13,6 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.PersonCO
-import net.transitionmanager.domain.ExceptionDates
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.Party
@@ -1371,7 +1370,7 @@ class PersonService implements ServiceMethods {
 		def teamRef = PartyRelationship.createCriteria().get {
 			and {
 				eq('partyRelationshipType.id', 'PROJ_STAFF')
-				eq('roleTypeCodeFrom.id', 'PROJECT')
+				eq('roleTypeCodeFrom.id', 'ROLE_PROJECT')
 				eq("roleTypeCodeTo${teamCode instanceof RoleType ? '' : '.id'}", teamCode)
 				eq('partyIdFrom', project)
 				eq('partyIdTo', person)

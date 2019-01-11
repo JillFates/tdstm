@@ -243,8 +243,8 @@ class PartyGroupService implements ServiceMethods {
    				select count(p) from PartyRelationship p
    				where p.partyRelationshipType = 'PARTNERS'
    				  and p.partyIdFrom.id = :companyId
-   				  and p.roleTypeCodeFrom.id = 'COMPANY'
-   				  and p.roleTypeCodeTo.id = 'PARTNER'
+   				  and p.roleTypeCodeFrom.id = 'ROLE_COMPANY'
+   				  and p.roleTypeCodeTo.id = 'ROLE_PARTNER'
    				  and	p.partyIdTo = :partyGroup
    			''', [partyGroup: partyGroup, companyId: personCompany.id])[0] > 0
 		} else {
@@ -265,8 +265,8 @@ class PartyGroupService implements ServiceMethods {
 			PartyRelationship.executeQuery('''
    				select count(1) from PartyRelationship p
    				where p.partyRelationshipType = 'PROJ_PARTNER'
-   				  and p.roleTypeCodeFrom.id = 'PROJECT'
-   				  and p.roleTypeCodeTo.id = 'PARTNER'
+   				  and p.roleTypeCodeFrom.id = 'ROLE_PROJECT'
+   				  and p.roleTypeCodeTo.id = 'ROLE_PARTNER'
    				  and p.partyIdTo = :partyGroup
    			''', [partyGroup: partyGroup])[0] > 0
 		} else {

@@ -513,14 +513,14 @@ class PartyRelationshipService implements ServiceMethods {
 			from PartyRelationship pr
 			where pr.partyRelationshipType in ('PROJ_CLIENT','PROJ_COMPANY','PROJ_PARTNER','PROJ_VENDOR')
 			  and pr.partyIdFrom = $projectId
-			  and pr.roleTypeCodeFrom = 'PROJECT'
+			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
 		'''
 
 		def query = '''
 			from PartyRelationship p
 			where p.partyRelationshipType = 'STAFF'
 			  and (p.partyIdFrom in ($projectCompanyQuery) or p.partyIdFrom = $project.client.id)
-			  and p.roleTypeCodeFrom = 'COMPANY'
+			  and p.roleTypeCodeFrom = 'ROLE_COMPANY'
 			  and p.roleTypeCodeTo = 'STAFF'
 		'''
 

@@ -6,7 +6,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
@@ -98,7 +97,7 @@ class ProjectService implements ServiceMethods {
 			from Project p where p.id in (
 				select pr.partyIdFrom.id from PartyRelationship pr
 				where pr.partyRelationshipType.id = 'PROJ_STAFF'
-					and pr.roleTypeCodeFrom.id = 'PROJECT'
+					and pr.roleTypeCodeFrom.id = 'ROLE_PROJECT'
 					and pr.roleTypeCodeTo.id = 'STAFF'
 					and pr.partyIdTo = :person)
 		'''
@@ -268,7 +267,7 @@ class ProjectService implements ServiceMethods {
 			select distinct pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'PROJ_STAFF'
 				and pr.partyIdFrom.id = :projectId
-				and pr.roleTypeCodeFrom.id = 'PROJECT'
+				and pr.roleTypeCodeFrom.id = 'ROLE_PROJECT'
 				and pr.roleTypeCodeTo.id in (:teamList)
 		''', [projectId: byId ? project : project.id, teamList: teamList])
 
@@ -374,7 +373,7 @@ class ProjectService implements ServiceMethods {
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
-			  and pr.roleTypeCodeFrom.id = 'COMPANY'
+			  and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
 			  and pr.roleTypeCodeTo.id = 'STAFF'
 			''', [company: company])
 
@@ -1032,7 +1031,7 @@ class ProjectService implements ServiceMethods {
 		Party.executeQuery('''
 			select pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType = 'PROJ_PARTNER'
-			  and pr.roleTypeCodeFrom = 'PROJECT'
+			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
 			  and pr.roleTypeCodeTo = 'PARTNER'
 			  and pr.partyIdFrom = :project
 		''', [project: project])
@@ -1055,8 +1054,8 @@ class ProjectService implements ServiceMethods {
 	List<Long> getPartnerIds(Long projectId) {
 		PartyRelationship.where {
 			partyRelationshipType.id == 'PROJ_PARTNER'
-			roleTypeCodeFrom.id == 'PROJECT'
-			roleTypeCodeTo.id == 'PARTNER'
+			roleTypeCodeFrom.id == 'ROLE_PROJECT'
+			roleTypeCodeTo.id == 'ROLE_PARTNER'
 			partyIdFrom.id == projectId
 		}
 		.projections { property 'partyIdTo.id' }
@@ -1089,8 +1088,8 @@ class ProjectService implements ServiceMethods {
 	List<Long> getCompanyStaffIds(List<Long> partyGroupIds) {
 		PartyRelationship.where {
 			partyRelationshipType.id == 'STAFF'
-			roleTypeCodeFrom.id == 'COMPANY'
-			roleTypeCodeTo.id == 'STAFF'
+			roleTypeCodeFrom.id == 'ROLE_COMPANY'
+			roleTypeCodeTo.id == 'ROLE_STAFF'
 			partyIdFrom.id in partyGroupIds
 		}
 		.projections { property 'partyIdTo.id' }
@@ -1115,8 +1114,8 @@ class ProjectService implements ServiceMethods {
 		// Now get the list of the nonClientStaffIds that are associated with the project
 		List<Long> staffIds = PartyRelationship.where {
 			partyRelationshipType.id == 'PROJ_STAFF'
-			roleTypeCodeFrom.id == 'PROJECT'
-			roleTypeCodeTo.id == 'STAFF'
+			roleTypeCodeFrom.id == 'ROLE_PROJECT'
+			roleTypeCodeTo.id == 'ROLE_STAFF'
 			partyIdFrom.id == project.id
 			partyIdTo.id in nonClientStaffIds
 		}
@@ -1492,7 +1491,7 @@ class ProjectService implements ServiceMethods {
 			where id in (SELECT partyIdTo.id FROM PartyRelationship
 			             WHERE partyRelationshipType='PROJ_STAFF'
 			               AND partyIdFrom=:project
-			               AND roleTypeCodeFrom='PROJECT'
+			               AND roleTypeCodeFrom='ROLE_PROJECT'
 			               AND roleTypeCodeTo.id=:team)
 			ORDER BY firstName, lastName
 		''', [project:project, team:team], [sort: 'firstName'])
@@ -1657,7 +1656,7 @@ class ProjectService implements ServiceMethods {
 		PartyRelationship.executeUpdate('''
 			DELETE PartyRelationship
 			where partyRelationshipType.id='PROJ_STAFF'
-			  and roleTypeCodeFrom.id='PROJECT'
+			  and roleTypeCodeFrom.id='ROLE_PROJECT'
 			  and roleTypeCodeTo.id in (:teamCodes)
 			  and partyIdFrom=:project
 			  and partyIdTo=:person
@@ -1730,8 +1729,8 @@ class ProjectService implements ServiceMethods {
         def projects = PartyRelationship.executeQuery(
 						"select partyIdFrom from PartyRelationship pr where \
 						pr.partyRelationshipType.id = 'PROJ_COMPANY' and \
-						pr.roleTypeCodeFrom.id = 'PROJECT' and \
-                        pr.roleTypeCodeTo.id = 'COMPANY' and \
+						pr.roleTypeCodeFrom.id = 'ROLE_PROJECT' and \
+                        pr.roleTypeCodeTo.id = 'ROLE_COMPANY' and \
 						pr.partyIdTo = :owner", params)
 
                return projects
