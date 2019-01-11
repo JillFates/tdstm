@@ -2,6 +2,7 @@ package test.helper
 
 
 import com.tdssrc.grails.GormUtil
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
@@ -25,6 +26,7 @@ import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.RandomStringUtils
 
+@Transactional
 class PersonTestHelper {
 	PersonService personService
 	SecurityService securityService

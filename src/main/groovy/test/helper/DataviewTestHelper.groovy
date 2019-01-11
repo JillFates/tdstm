@@ -1,5 +1,6 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -9,6 +10,7 @@ import org.grails.web.json.JSONObject
 /**
  * Helper class to create Dataview instances during test
  */
+@Transactional
 class DataviewTestHelper {
 
     Dataview createDataview(Project project) {

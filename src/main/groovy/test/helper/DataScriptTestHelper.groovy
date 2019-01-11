@@ -1,5 +1,6 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils
 /**
  * Use this class to create datasource domain objects in your tests
  */
+@Transactional
 class DataScriptTestHelper {
 
     /**

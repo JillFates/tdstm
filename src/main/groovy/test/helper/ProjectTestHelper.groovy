@@ -1,7 +1,7 @@
 package test.helper
 
-
 import com.tdssrc.grails.StringUtil
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -12,13 +12,13 @@ import net.transitionmanager.domain.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.RandomStringUtils as RSU
-
 /**
  * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting
  * for the ITs so that they an focus on the good stuff.
  *
  * Should not rely on any pre-existing data and will generate anything that is necessary. At least that's the idea...
  */
+@Transactional
 class ProjectTestHelper {
 
 	static ProjectService projectService
@@ -110,10 +110,8 @@ class ProjectTestHelper {
 		PartyType pt = PartyType.get('COMPANY')
 		assert pt
 		PartyGroup company = new PartyGroup()
-		company.with {
-			partyType = pt
-			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
-		}
+		company.partyType = pt
+		company.name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 
 		company.save(failOnError:true, flush:true)
 	}

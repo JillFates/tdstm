@@ -1,10 +1,12 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 
+@Transactional
 class RecipeTestHelper {
 
     /**

@@ -1,11 +1,13 @@
 package test.helper
 
 import com.tdssrc.grails.ApiCatalogUtil
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.apache.commons.lang3.RandomStringUtils as RSU
 
+@Transactional
 class ApiCatalogTestHelper {
 
 	public static final String DICTIONARY = '''{

@@ -4,11 +4,13 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.RandomStringUtils
 
+@Transactional
 class AssetCommentTestHelper {
 
 	/**

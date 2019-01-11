@@ -1,9 +1,11 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.RandomStringUtils
 
+@Transactional
 class MoveEventTestHelper {
 
 	MoveEvent createMoveEvent(Project project) {

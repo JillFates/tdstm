@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdsops.tm.enums.domain.CredentialEnvironment
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.RandomStringUtils
 /**
  * Use this class to create credential domain objects in your tests
  */
+@Transactional
 class CredentialTestHelper {
 	private static final String SALT = 'abcdefd12345zxcy'
 

@@ -1,8 +1,10 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 
+@Transactional
 class RoomTestHelper {
 
 	Room createRoom(Project project, String name = 'DC1', String location = 'ACME Data Center'){

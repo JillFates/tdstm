@@ -1,10 +1,12 @@
 package test.helper
 
 import com.tdssrc.grails.JsonUtil
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import org.grails.web.json.JSONObject
 
+@Transactional
 class SettingTestHelper {
 
     /**

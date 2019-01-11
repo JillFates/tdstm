@@ -1,5 +1,6 @@
 package test.helper
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils as RSU
 /**
  * Use this class to create provider domain objects in your tests
  */
+@Transactional
 class ProviderTestHelper {
 
     /**
