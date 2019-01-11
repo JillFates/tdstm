@@ -96,7 +96,8 @@ class ApplicationCreationSpec extends GebReportingSpec {
             interact {
                 moveToElement(createButton)
             }
-            waitFor { createButton.click() }
+        driver.manage().window().maximize()
+        waitFor { createButton.click() }
 
         then: ' The User is redirected to the Application Details Page'
             at AssetDetailsPage
