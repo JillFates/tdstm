@@ -175,6 +175,8 @@ environments {
 		//used for testing email
 		grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 		grails.plugin.greenmail.ports.smtp = 2025
+		javamelody.disabled = true
+		graph.tmpDir = File.createTempDir().getCanonicalPath()
 	}
 	production {
 		greenmail.disabled = true

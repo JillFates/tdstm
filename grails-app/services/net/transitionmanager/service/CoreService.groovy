@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import grails.util.Environment
 import grails.util.Metadata
 import org.grails.core.exceptions.GrailsConfigurationException
+import org.grails.config.NavigableMap
 
 /**
  * Methods considered core to the application functionality
@@ -56,7 +57,7 @@ class CoreService implements ServiceMethods {
 			if (!config.isSet(settingList[i])) return null
 
 			def next = config[settingList[i]]
-			if (!(next instanceof ConfigObject)) return null
+			if (!(next instanceof NavigableMap)) return null
 			config = next
 		}
 
