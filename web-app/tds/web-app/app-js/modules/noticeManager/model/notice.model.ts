@@ -22,7 +22,7 @@ export class NoticeColumnModel {
 			}, {
 				label: 'Active',
 				property: 'active',
-				type: 'boolean',
+				type: 'text',
 				width: 160,
 			}
 		];
@@ -46,3 +46,8 @@ export class NoticeModel {
 	title: string;
 	typeId: number;
 }
+
+export const NoticeTypes = [
+	{typeId: '1', name: 'Prelogin'},
+	{typeId: '2', name: 'Postlogin'}
+];

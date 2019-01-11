@@ -10,7 +10,7 @@ import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
-import {NoticeColumnModel, NoticeModel} from '../../model/notice.model';
+import {NoticeColumnModel, NoticeModel, NoticeTypes} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
@@ -39,10 +39,11 @@ export class NoticeListComponent {
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
+	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	protected noticeTypes = NoticeTypes;
+	protected actionType = ActionType;
 	private gridData: GridDataResult;
-	public resultSet: any[];
+	protected resultSet: any[];
 
 	/**
 	 * @constructor
@@ -122,7 +123,7 @@ export class NoticeListComponent {
 	protected reloadData(): void {
 		this.noticeService.getNoticesList().subscribe(
 			(result: any) => {
-				this.resultSet = result.notices;
+				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));

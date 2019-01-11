@@ -17,7 +17,7 @@ export class NoticeResolveService implements Resolve<any> {
 	 */
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {
 		return this.noticeService.getNoticesList().map((result: any) => {
-			return result.notices;
+			return result;
 		}).catch((err: any) => {
 			console.error('NoticeResolveService:', 'An Error Occurred trying to fetch Notice List');
 			this.router.navigate(['/security/error']);

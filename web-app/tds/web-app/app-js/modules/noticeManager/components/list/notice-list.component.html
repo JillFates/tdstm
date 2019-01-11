@@ -31,26 +31,34 @@
 
                         <ng-template kendoGridFilterCellTemplate let-filter>
                             <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
-                                <div *ngIf="column.type === 'text'">
+                                <div *ngIf="column.type === 'text' && column.property !== 'typeId'">
                                     <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
                                     <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                </div>
+                                <div *ngIf="column.property === 'typeId'">
+                                    <kendo-dropdownlist
+                                        [data]="noticeTypes"
+                                        [textField]="'name'"
+                                        [valueField]="'typeId'"
+                                        [valuePrimitive]="true"
+                                        [(ngModel)]="column.filter"
+                                        (valueChange)="onFilter(column)"
+                                        class="form-control">
+                                    </kendo-dropdownlist>
+                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
                             </div>
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                             <div class="text-center">
-                                <button class="btn btn-default" (click)="openLicenseViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                                <button class="btn btn-default" (click)="openNoticeViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
                                 <button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
                             </div>
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'typeId'" let-dataItem>
                             {{((dataItem.typeId === 1 )? 'Prelogin' : 'Postlogin')}}
-                        </ng-template>
-
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'active'" let-dataItem>
-                            {{dataItem.active | tdsUIBoolean}}
                         </ng-template>
 
                     </kendo-grid-column>

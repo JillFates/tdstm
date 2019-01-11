@@ -29,7 +29,14 @@ export class NoticeService {
 	 */
 	getNoticesList(): Observable<NoticeModel[]> {
 		return this.http.get(this.noticeListUrl)
-			.map((res: Response) => res.json())
+			.map((res: Response) => {
+				let result = res.json();
+				result.notices.forEach( (notice: any) => {
+					notice.typeId = notice.typeId.toString();
+					notice.active = notice.active ? 'Yes' : 'No';
+				});
+				return result && result.notices;
+			})
 			.catch((error: any) => error.json());
 	}
 
