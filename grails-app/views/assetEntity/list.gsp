@@ -107,13 +107,12 @@
 					</g:else>';
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions', 'Name', 'Device Type', 'Manufacturer', 'Model', 'Location','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','Plan Status','Bundle', 'id', 'commentType'"
+					colNames="'Actions', 'Name', 'Device Type', 'Manufacturer', 'Model','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','Plan Status','Bundle', 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false,width:'90', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter},
-						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter, hidden: true},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
@@ -137,8 +136,8 @@
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
 						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
-				<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
-				<jqgrid:refreshButton id="assetListId" />
+					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
+					<jqgrid:refreshButton id="assetListId" />
 				</jqgrid:grid>
 				TDS.jqGridFilterToolbar('assetListId');
 
