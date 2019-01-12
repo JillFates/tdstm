@@ -73,7 +73,7 @@ class AssetEntityService implements ServiceMethods {
 			(AssetClass.APPLICATION): [ 'assetName'],
 			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'locationSource'
 			],
 			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
@@ -2348,7 +2348,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS sourceLocationName ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
