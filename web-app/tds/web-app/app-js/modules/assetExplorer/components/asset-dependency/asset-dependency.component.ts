@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
+import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 @Component({
 	selector: 'asset-dependency',
@@ -78,13 +79,17 @@ import { DependecyService } from '../../service/dependecy.service';
         }`]
 })
 export class AssetDependencyComponent extends UIExtraDialog {
-	dependencyA: any;
-	dependencyB: any;
+	protected dependencyA: any;
+	protected dependencyB: any;
+	protected isEditing: boolean;
+	protected ButtonActions = TDSActionsButton;
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
 		private assetService: DependecyService) {
 		super('#assetDependency');
+
+		this.isEditing = false;
 
 		this.dependencyA = assetDependency.assetA && assetDependency.assetA.dependency || null;
 		this.dependencyB = assetDependency.assetB && assetDependency.assetB.dependency || null ;
@@ -106,6 +111,15 @@ export class AssetDependencyComponent extends UIExtraDialog {
 
 	protected cancelCloseDialog(): void {
 		this.dismiss();
+	}
+
+	protected setEditMode(enabled: boolean) {
+		this.isEditing = enabled;
+	}
+
+	protected saveChanges() {
+		this.isEditing = false;
+		console.log('Editing changes');
 	}
 
 }
