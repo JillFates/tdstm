@@ -64,75 +64,32 @@
                             <i class="fa fa-fw fa-long-arrow-down"></i> <span class="depends-on">Depends On</span><br />
                             {{assetDependency.assetA.name}}
                         </div>
-
                     </div>
 
-                    <div class="dependency-row">
-                        <div class="dependency-row-legend">Frequency</div>
-                        <div class="dependency-a"><label class="dependency-label">{{dependencyA?.dataFlowFreq}}</label></div>
-                        <div class="dependency-b"><label class="dependency-label">{{dependencyB?.dataFlowFreq}}</label></div>
-                    </div>
+	                <asset-dependency-show
+                            [dependencyA]="dependencyA"
+                            [dependencyB]="dependencyB">
+                    </asset-dependency-show>
 
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Type</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.type}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.type}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Status</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.status}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.status}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Direction</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.dataFlowDirection}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.dataFlowDirection}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">C1</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.c1}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.c1}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">C2</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.c2}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.c2}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">C3</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.c3}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.c3}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">C4</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.c4}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.c4}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Comment</div>
-                            <div class="dependency-a"><label class="dependency-label dependency-comment">{{dependencyA?.comment}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label dependency-comment">{{dependencyB?.comment}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Date created</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.dateCreated}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.dateCreated}}</label></div>
-                    </div>
-
-                    <div class="dependency-row">
-                            <div class="dependency-row-legend">Last updated</div>
-                            <div class="dependency-a"><label class="dependency-label">{{dependencyA?.lastUpdated}}</label></div>
-                            <div class="dependency-b"><label class="dependency-label">{{dependencyB?.lastUpdated}}</label></div>
-                    </div>
                 </div>
+
+	            <div class="dependencies"
+                     [ngClass]="{'has-dependency-a': dependencyA, 'has-dependency-b': dependencyB}">
+
+                    <div class="dependency-row">
+                        <div class="dependency-row-legend">Date created</div>
+                        <div class="dependency-a"><label class="dependency-label">{{dependencyA?.dateCreated}}</label></div>
+                        <div class="dependency-b"><label class="dependency-label">{{dependencyB?.dateCreated}}</label></div>
+                    </div>
+
+                    <div class="dependency-row">
+                        <div class="dependency-row-legend">Last updated</div>
+                        <div class="dependency-a"><label class="dependency-label">{{dependencyA?.lastUpdated}}</label></div>
+                        <div class="dependency-b"><label class="dependency-label">{{dependencyB?.lastUpdated}}</label></div>
+                    </div>
+
+                </div>
+
             </div>
             <div class="modal-footer form-group-center">
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">

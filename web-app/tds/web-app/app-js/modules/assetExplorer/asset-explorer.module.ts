@@ -40,6 +40,7 @@ import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
 import {TaskCommentComponent} from './components/task-comment/task-comment.component';
 import {AssetDependencyComponent} from './components/asset-dependency/asset-dependency.component';
+import {AssetDependencyShowComponent} from './components/asset-dependency/show/asset-dependency-show.component';
 import {SingleCommentComponent} from './components/single-comment/single-comment.component';
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
@@ -81,6 +82,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetCreateComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
+		AssetDependencyShowComponent,
 		SingleCommentComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
@@ -114,6 +116,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetEditComponent,
 		AssetCreateComponent,
 		AssetDependencyComponent,
+		AssetDependencyShowComponent,
 		AssetExplorerIndexComponent,
 		TaskCommentComponent],
 	entryComponents: [
