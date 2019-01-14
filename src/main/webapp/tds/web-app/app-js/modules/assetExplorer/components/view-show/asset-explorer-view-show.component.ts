@@ -21,6 +21,7 @@ import { AssetQueryParams } from '../../model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { AssetExportModel } from '../../model/asset-export-model';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
@@ -45,6 +46,8 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
+	protected readonly SAVE_BUTTON_ID = 'btnSave';
+	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
@@ -54,13 +57,14 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private notifier: NotifierService) {
+		private notifier: NotifierService,
+		protected translateService: TranslatePipe) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = this.route.snapshot.data['report'];
-		this.dataSignature = JSON.stringify(this.model);
+		this.dataSignature = this.stringifyCopyOfModel(this.model);
 	}
 
 	ngOnInit(): void {
@@ -95,7 +99,7 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 					this.fields = this.lastSnapshot.data['fields'];
 					this.domains = this.lastSnapshot.data['fields'];
 					this.model = this.lastSnapshot.data['report'];
-					this.dataSignature = JSON.stringify(this.model);
+					this.dataSignature = this.stringifyCopyOfModel(this.model);
 					this.initialiseComponent();
 				}
 			}
@@ -149,34 +153,30 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	protected onSave() {
-		if (this.isSaveAvailable()) {
-			this.assetExplorerService.saveReport(this.model)
-				.subscribe(result => {
-					this.dataSignature = JSON.stringify(this.model);
-				});
-		}
+		this.assetExplorerService.saveReport(this.model)
+			.subscribe(result => {
+				this.dataSignature = this.stringifyCopyOfModel(this.model);
+			});
 	}
 
 	protected onSaveAs(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		if (this.isSaveAsAvailable()) {
-			this.dialogService.open(AssetExplorerViewSaveComponent, [
-				{ provide: ViewModel, useValue: this.model },
-				{ provide: ViewGroupModel, useValue: selectedData }
-			]).then(result => {
-				this.model = result;
-				this.dataSignature = JSON.stringify(this.model);
-				setTimeout(() => {
-					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
-				});
-			}).catch(result => {
-				console.log('error');
+		this.dialogService.open(AssetExplorerViewSaveComponent, [
+			{ provide: ViewModel, useValue: this.model },
+			{ provide: ViewGroupModel, useValue: selectedData }
+		]).then(result => {
+			this.model = result;
+			this.dataSignature = this.stringifyCopyOfModel(this.model);
+			setTimeout(() => {
+				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 			});
-		}
+		}).catch(result => {
+			console.log('error');
+		});
 	}
 
 	protected isDirty(): boolean {
-		let result = this.dataSignature !== JSON.stringify(this.model);
+		let result = this.dataSignature !== this.stringifyCopyOfModel(this.model);
 		return result;
 	}
 
@@ -246,20 +246,61 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		return assetQueryParams;
 	}
 
-	protected isSaveAvailable(): boolean {
-		return this.assetExplorerService.isSaveAvailable(this.model);
+	/**
+	 * Removes isFavorite property from view model and returns stringified json.
+	 * @param {ViewModel} model
+	 * @returns {ViewModel}
+	 */
+	private stringifyCopyOfModel(model: ViewModel): string {
+		// ignore 'favorite' property.
+		let modelCopy = {...model};
+		delete modelCopy.isFavorite;
+		return JSON.stringify(modelCopy);
 	}
 
-	protected isSaveAsAvailable(): boolean {
-		return this.model.isSystem ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
+	/**
+	 * Determines if show we can show Save/Save All buttons at all.
+	 * @returns {boolean}
+	 */
+	protected canShowSaveButton(): boolean {
+		return this.model.id && (this.canSave() || this.canSaveAs());
+		// long & old validation will leave it for the moment.
+		// return this.model.id && (this.model.isOwner || (this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))));
 	}
 
-	protected isSystemSaveAvailable(edit): boolean {
-		return edit ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
+	/**
+	 * Determines if current user can Save view.
+	 * @returns {boolean}
+	 */
+	protected canSave(): boolean {
+		// If it's all assets view then don't Save is allowed.
+		if (this.assetExplorerService.isAllAssets(this.model)) {
+			return false;
+		}
+		// If it's a system view
+		if (this.model.isSystem) {
+			return this.permissionService.hasPermission(Permission.AssetExplorerEdit) &&
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit);
+		} else {
+			// If it's not a system view.
+			return this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit);
+		}
+	}
+
+	/**
+	 * Determine if current user can Save As (new) view.
+	 * @returns {boolean}
+	 */
+	protected canSaveAs(): boolean {
+		// If it's a system view
+		if (this.model.isSystem) {
+			return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) &&
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
+		} else {
+			// If it's not a system view
+			return this.permissionService.hasPermission(Permission.AssetExplorerCreate) &&
+				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
+		}
 	}
 
 	protected isEditAvailable(): boolean {
@@ -286,18 +327,16 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 -
-	 * Based on isOwner property determines which save function call
+	 * Determines which save operation to call based on the button id.
 	 */
-	protected save() {
-		this.model.isOwner ? this.onSave() : this.onSaveAs()
+	protected save(saveButtonId: string) {
+		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
 	}
 
 	/**
-	 -
-	 * Based on isOwner property determines the id of the button save
+	 * Determines if primary button can be Save or Save all based on permissions.
 	 */
 	protected getSaveButtonId(): string {
-		return this.model.isOwner ? 'btnSave' : 'btnSaveAs'
+		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
 }

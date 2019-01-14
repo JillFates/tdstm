@@ -44,6 +44,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	protected userDateFormat: string;
 	protected userTimeZone: string;
 	protected fieldActionsMap: any = {};
+	protected entityName = '';
 
 	constructor(
 		protected bulkChangeModel: BulkChangeModel,
@@ -62,6 +63,9 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			this.editRows = {selectedValues: [] };
 			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 			this.userTimeZone = this.preferenceService.getUserTimeZone();
+			this.entityName = this.bulkChangeModel.affected === 1 ?
+				this.translatePipe.transform('ASSETS.SINGLE_NAME') :
+				this.translatePipe.transform('ASSETS.PLURAL_NAME');
 	}
 
 	ngOnInit() {
@@ -301,7 +305,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	 * @returns {Promise<boolean>}
 	 */
 	private confirmUpdate(): Promise<boolean> {
-		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.EDIT.CONFIRM_UPDATE', [this.bulkChangeModel.affected]);
+		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.EDIT.CONFIRM_UPDATE', [this.bulkChangeModel.affected, this.entityName, this.entityName]);
 		return new Promise((resolve, reject) =>  {
 			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				message,

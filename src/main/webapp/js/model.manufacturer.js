@@ -58,6 +58,11 @@ var akaUtil = (function ($) {
 	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKAs will need to be checked
 	 */
 	public.handleParentPropChange = function (forWhom) {
+		
+		// enable/disable the "Add AKA" button based on if the model has a name
+		var parentName = $('#modelNameId').val()
+		public.enableAddAkaButton(parentName != "")
+		
 		// mark all AKAs for server-side validation (the result may be different with the new parent properties)
 		$('#addAkaTableId > tr').attr('js-is-unique', 'unknown')
 
@@ -65,6 +70,18 @@ var akaUtil = (function ($) {
 		public.validateAllAka(forWhom)
 	}
 
+	/**
+	 * Called to enable or disable the "Add AKA" button
+	 * @param toEnable, whether we want to enable or disable the button
+	 */
+	public.enableAddAkaButton = function (toEnable) {
+		if (toEnable)
+			$('#addAkaId').removeClass('addAkaDisabled')
+		else
+			$('#addAkaId').addClass('addAkaDisabled')
+		
+	}
+	
 	/**
 	 * Validates all the AKAs for a model
 	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
@@ -91,18 +108,18 @@ var akaUtil = (function ($) {
 
 			// check if the AKA matches the parent's name
 			if (tdsCommon.compareStringsIgnoreCase(akaName, parentName)) {
-        		duplicateOf = 'parent'
+				duplicateOf = 'parent'
         		// check if the AKA matches another AKA on the list
       		} else if (tdsCommon.arrayContainsStringIgnoreCase(akaList, akaName)) {
-        		duplicateOf = 'local'
+      	  		duplicateOf = 'local'
         		// if this AKA is new, check it's validity against other models on the server
       		} else if (akaRow.attr('js-is-unique') === 'unknown') {
-        		duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
-          			'alias': akaName,
-          			'id': parentId,
-          			'manufacturerId': manufacturerId,
-          			'parentName': parentName
-        		});
+				duplicateOf = private.validateAkaOnServer(forWhom, akaRow, {
+					'alias': akaName,
+					'id': parentId,
+					'manufacturerId': manufacturerId,
+					'parentName': parentName
+				});
         		// check if this AKA has previously been marked as invalid
 			} else if (akaRow.attr('js-is-unique') === 'false') {
 				duplicateOf = 'other';

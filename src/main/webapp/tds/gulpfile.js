@@ -9,30 +9,32 @@ let sass = require('gulp-sass');
 let sourceMaps = require('gulp-sourcemaps');
 let shell = require('gulp-shell');
 
-/**
- * What this task do is to compile the SASS file and generate a map that can be view from modern browser
- */
-gulp.task('sass-compiler', function () {
+gulp.task('sass-main-style', function () {
 	return gulp.src('./src/main/webapp/css/tds-style.sass')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 		.pipe(gulp.dest('./src/main/webapp/css'));
 });
 
-/**
- * Execute watch task to compile css automatically on Development mode
- * from command line: gulp sass:watch
- * it will run until stop, searching for changes on any SASS file, compiles and ready to use
- */
-gulp.task('sass:watch', function () {
-	return gulp.watch('./src/main/webapp/css/**/*.sass', function () {
-		gulp.src('./src/main/webapp/css/tds-style.sass')
-			.pipe(sourceMaps.init())
-			.pipe(sass({errLogToConsole: true}))
-			.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
-			.pipe(sourceMaps.write())
-			.pipe(gulp.dest('./src/main/webapp/css'))
-	});
+gulp.task('sass-manager-compiler', function () {
+	return gulp.src('../../webapp/css/managerStyle.scss')
+		.pipe(sass({errLogToConsole: true}))
+		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
+		.pipe(gulp.dest('./src/main/webapp/css'));
+});
+
+gulp.task('sass-angular-compiler', function () {
+	return gulp.src('./web-app/css/style.sass')
+		.pipe(sass({errLogToConsole: true}))
+		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
+		.pipe(gulp.dest('./web-app/css'));
+});
+
+gulp.task('sass-angular-manager-compiler', function () {
+	return gulp.src('./src/main/webapp/css/managerStyle.scss')
+		.pipe(sass({errLogToConsole: true}))
+		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
+		.pipe(gulp.dest('./web-app/css'));
 });
 
 gulp.task('build-test', shell.task(['karma start karma.conf.js']));

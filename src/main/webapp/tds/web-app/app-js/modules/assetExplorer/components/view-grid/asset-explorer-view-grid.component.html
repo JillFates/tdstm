@@ -22,7 +22,7 @@
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
 
-					<button [disabled]="!canCreateAssets()"
+					<button type="button" [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
 					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
@@ -56,8 +56,8 @@
 				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
-					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+				<div *ngIf="hasSelectedItems() && getSelectedItemsCount(); let counter" class="bulk-change-counter">
+					<span class="badge badge-light">{{counter}}</span><label>{{ (counter === 1 ? 'ASSETS.SINGLE_NAME' : 'ASSETS.PLURAL_NAME') | translate }} selected</label>
 				</div>
 				<div class="checkbox just-planning">
 					<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"

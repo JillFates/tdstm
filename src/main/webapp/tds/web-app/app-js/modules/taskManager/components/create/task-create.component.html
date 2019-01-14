@@ -340,10 +340,11 @@
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
-                                                <button (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)"
-                                                        class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                                                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                                                </button>
+                                                <tds-button class="button-header-grid float-right"
+                                                            [tooltip]="'Add Predecessor'"
+                                                            [action]="ButtonActions.GenericAdd"
+                                                            (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
+                                                </tds-button>
                                             </ng-template>
                                             <!-- Columns -->
                                             <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
@@ -387,9 +388,11 @@
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
-                                                <button (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                                                    <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                                                </button>
+                                                <tds-button class="button-header-grid float-right"
+                                                            [tooltip]="'Add Successor'"
+                                                            [action]="ButtonActions.GenericAdd"
+                                                            (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
+                                                </tds-button>
                                             </ng-template>
                                             <!-- Columns -->
                                             <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"

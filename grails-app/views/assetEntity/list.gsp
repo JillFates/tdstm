@@ -111,7 +111,7 @@
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter},
-						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter, hidden: true},
+						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},

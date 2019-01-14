@@ -5,19 +5,18 @@
 				<button (click)="cancelCloseDialog()"  type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
-				<h4 class="modal-title">Bulk Change > Edit Assets</h4>
+				<h4 class="modal-title">Bulk Change > Edit {{entityName}}</h4>
 			</div>
 			<div class="modal-body">
 				<div class="modal-body-container full-height">
 					<form name="form" role="form" data-toggle="validator" #form='ngForm' novalidate class="form-horizontal left-alignment full-height">
-						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected] }}</label>
+						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected, entityName] }}</label>
 						<kendo-grid
 								*ngIf="gridSettings"
 								[data]="gridSettings.gridData"
 								[pageable]="false"
 								[resizable]="true"
 								(add)="addHandler($event)"
-								(cancel)="cancelHandler($event)"
 								(remove)="removeHandler($event)">
 
 							 <!-- Toolbar Template-->

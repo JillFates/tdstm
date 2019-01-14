@@ -48,7 +48,7 @@
 					<tbody id="addAkaTableId">
 					</tbody>
 				</table>
-				<span style="cursor: pointer;" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
+				<span id="addAkaId" class="addAkaDisabled" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
 			<td><g:select id="assetTypeId" name="assetType" from="${assetTypes}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
