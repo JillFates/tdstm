@@ -30,24 +30,24 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 	editor;
 
 	ngAfterViewInit() {
-		// tinymce.init({
-		// 	selector: '#' + this.elementId,
-		// 	elementpath: false,
-		// 	statusbar: false,
-		// 	menu: {},
-		// 	height: 250,
-		// 	skin_url: '../../dist/js/vendors/tinymce/lightgray',
-		// 	setup: editor => {
-		// 		this.editor = editor;
-		// 		editor.on('keyup', () => {
-		// 			this.isPristine = false;
-		// 			const content = editor.getContent();
-		// 			const rawContent = editor.getContent({format: 'raw'});
-		// 			this.valueChange.emit(content);
-		// 			this.rawValueChange.emit(rawContent);
-		// 		});
-		// 	},
-		// });
+		tinymce.init({
+			selector: '#' + this.elementId,
+			elementpath: false,
+			statusbar: false,
+			menu: {},
+			height: 250,
+			skin_url: '../../dist/js/vendors/tinymce/lightgray',
+			setup: editor => {
+				this.editor = editor;
+				editor.on('keyup', () => {
+					this.isPristine = false;
+					const content = editor.getContent();
+					const rawContent = editor.getContent({format: 'raw'});
+					this.valueChange.emit(content);
+					this.rawValueChange.emit(rawContent);
+				});
+			},
+		});
 	}
 
 	ngOnDestroy() {

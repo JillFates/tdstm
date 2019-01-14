@@ -1,48 +1,48 @@
-<!--<div class="modal-content">-->
-    <!--<div class="modal-header">-->
-        <!--<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>-->
-        <!--<h4 class="modal-title">{{ (action===0 ? 'NOTICE_MANAGER.CREATE_NOTICE':'NOTICE_MANAGER.EDIT_NOTICE') | translate }}</h4>-->
-    <!--</div>-->
-    <!--<div class="modal-body">-->
-        <!--<form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>-->
-            <!--<div class="box-body">-->
-                <!--<div class="form-group">-->
-                    <!--<label for="inputTitle" class="col-sm-3 control-label">Title: <span class="required_field">*</span></label>-->
-                    <!--<div class="col-sm-9">-->
-                        <!--<input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title" [(ngModel)]="model.title"-->
-                            <!--required>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label for="selectType" class="col-sm-3 control-label">Type: <span class="required_field">*</span></label>-->
-                    <!--<div class="col-sm-9">-->
-                        <!--<kendo-dropdownlist #typeIdField="kendoDropDownList" [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'"-->
-                            <!--[valueField]="'typeId'" [valuePrimitive]="true" id="selectType" class="form-control" [(value)]="model.typeId"-->
-                            <!--required>-->
-                        <!--</kendo-dropdownlist>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label for="checkActive" class="col-sm-3 control-label">Active:</label>-->
-                    <!--<div class="col-sm-9 checkbox">-->
-                        <!--<label>-->
-                            <!--<input id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">-->
-                        <!--</label>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<div class="col-sm-12">-->
-                        <!--&lt;!&ndash;<rich-text-editor #htmlTextField="richTextEditor" [elementId]="'htmlText'" [required]="true" [name]="'htmlText'" [(rawValue)]="model.rawText"&ndash;&gt;-->
-                            <!--&lt;!&ndash;[(value)]="model.htmlText">&ndash;&gt;-->
-                        <!--&lt;!&ndash;</rich-text-editor>&ndash;&gt;-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</form>-->
-    <!--</div>-->
-    <!--<div class="modal-footer form-group-center">-->
-        <!--<button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span>{{ 'GLOBAL.SAVE' | translate }}</button>-->
-        <!--<button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> {{ 'GLOBAL.DELETE' | translate }}</button>-->
-        <!--<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>-->
-    <!--</div>-->
-<!--</div>-->
+<div class="modal-content">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">{{ (action === 0 ? 'NOTICE.CREATE_NOTICE':'NOTICE.EDIT_NOTICE') | translate }}</h4>
+    </div>
+    <div class="modal-body">
+        <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="inputTitle" class="col-sm-2 control-label">Title: <span class="required_field">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title" [(ngModel)]="model.title"
+                            required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="selectType" class="col-sm-2 control-label">Type: <span class="required_field">*</span></label>
+                    <div class="col-sm-10">
+                        <kendo-dropdownlist #typeIdField="kendoDropDownList" [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'"
+                            [valueField]="'typeId'" [valuePrimitive]="true" id="selectType" class="form-control" [(value)]="model.typeId"
+                            required>
+                        </kendo-dropdownlist>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="checkActive" class="col-sm-2 control-label">Active:</label>
+                    <div class="col-sm-10 checkbox">
+                        <label>
+                            <input id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <rich-text-editor #htmlTextField="richTextEditor" [elementId]="'htmlText'" [required]="true" [name]="'htmlText'" [(rawValue)]="model.rawText"
+                            [(value)]="model.htmlText">
+                        </rich-text-editor>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer form-group-center">
+        <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
+        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
+        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
+    </div>
+</div>

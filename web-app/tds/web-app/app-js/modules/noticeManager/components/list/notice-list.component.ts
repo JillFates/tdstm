@@ -1,8 +1,8 @@
 // Angular
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Components
-// import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
+import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -146,15 +146,15 @@ export class NoticeListComponent {
 	 * @listens onCreateNotice
 	 */
 	public onCreateNotice(): void {
-		// this.dialogService.open(NoticeViewEditComponent, [
-		// 	{provide: NoticeModel, useValue: new NoticeModel()},
-		// 	{provide: Number, useValue: ActionType.Create}
-		// ]).then(result => {
-		// 	this.getNoticeList();
-		// }, error => {
-		// 	console.log(error);
-		// });
-		// console.log('Clicked on create notice');
+		this.dialogService.open(NoticeViewEditComponent, [
+			{provide: NoticeModel, useValue: new NoticeModel()},
+			{provide: Number, useValue: ActionType.Create}
+		]).then(result => {
+			this.reloadData();
+		}, error => {
+			console.log(error);
+		});
+		console.log('Clicked on create notice');
 	}
 
 	/**

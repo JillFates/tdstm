@@ -11,7 +11,7 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
 // Components
 import {NoticeListComponent} from './components/list/notice-list.component';
-// import {NoticeViewEditComponent} from './components/view-edit/notice-view-edit.component';
+import {NoticeViewEditComponent} from './components/view-edit/notice-view-edit.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {NoticeResolveService} from './resolve/notice-resolve.service';
@@ -32,7 +32,7 @@ import {NoticeService} from './service/notice.service';
 	],
 	declarations: [
 		NoticeListComponent,
-		// NoticeViewEditComponent
+		NoticeViewEditComponent
 	],
 	providers: [
 		// Resolve
@@ -43,10 +43,10 @@ import {NoticeService} from './service/notice.service';
 	],
 	exports: [
 		NoticeListComponent,
-		// NoticeViewEditComponent
+		NoticeViewEditComponent
 	],
 	entryComponents: [
-		// NoticeViewEditComponent
+		NoticeViewEditComponent
 	]
 })
 
