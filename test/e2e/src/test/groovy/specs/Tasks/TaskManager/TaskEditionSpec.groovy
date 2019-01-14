@@ -121,8 +121,8 @@ class TaskEditionSpec extends GebReportingSpec {
             teModalAddSuccessorBtn.click()
             waitFor {teModalSuccessorDD.click()}
             waitFor {teModalSuccessorUl}
-            def sucessor = CommonActions.getSelectRandomOption(teModalSuccessorOptions)
-            waitFor {sucessor.click()}
+            def successor = selectSuccessor(false)
+            waitFor {successor.click()}
         then: 'The User should remain in the Taks Edition Section'
             at TaskEditionPage
     }
@@ -192,4 +192,6 @@ class TaskEditionSpec extends GebReportingSpec {
         then: 'The User should be redirected to the Task Manager Section'
             at TaskManagerPage
     }
+
+
 }
