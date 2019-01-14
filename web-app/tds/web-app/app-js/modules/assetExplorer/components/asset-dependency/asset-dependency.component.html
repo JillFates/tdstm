@@ -73,7 +73,14 @@
                     </asset-dependency-show>
 
                     <ng-template #editDependenciesTemplate>
-                        <asset-dependency-edit [dependencyA]="dependencyA" [dependencyB]="dependencyB"></asset-dependency-edit>
+                        <asset-dependency-edit
+                                [dependencyA]="dependencyA"
+                                [dependencyB]="dependencyB"
+                                [frequencyList]="frequencyList"
+                                [statusList]="statusList"
+                                [typeList]="typeList"
+                                [directionList]="directionList"
+                        ></asset-dependency-edit>
                     </ng-template>
 
                 </div>

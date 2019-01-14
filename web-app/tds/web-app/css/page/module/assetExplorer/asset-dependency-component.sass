@@ -21,6 +21,11 @@
                 max-width: 200px
                 overflow: hidden
                 font-weight: normal
+    .dependency-edit
+        margin-bottom: 6px
+        .k-widget
+            visibility: hidden
+
     .dependency-label
         visibility: hidden
         max-width: 200px
@@ -37,6 +42,8 @@
         i 
             margin-left: -6px
     .has-dependency-a .dependency-a .dependency-label,
-    .has-dependency-b .dependency-b .dependency-label
-      visibility: visible
+    .has-dependency-b .dependency-b .dependency-label,
+    .has-dependency-a .dependency-edit .dependency-a .k-widget,
+    .has-dependency-b .dependency-edit .dependency-b .k-widget
+        visibility: visible
 

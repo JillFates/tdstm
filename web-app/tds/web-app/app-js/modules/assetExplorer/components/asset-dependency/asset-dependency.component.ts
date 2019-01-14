@@ -83,6 +83,10 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	protected dependencyB: any;
 	protected isEditing: boolean;
 	protected ButtonActions = TDSActionsButton;
+	protected frequencyList: string[];
+	protected typeList: string[];
+	protected statusList: string[];
+	protected directionList: string[];
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
@@ -98,6 +102,11 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		// we need to get them from assetDependency.assetX
 		this.dependencyA = this.getDependencyWithDates(this.dependencyA, assetDependency.assetA);
 		this.dependencyB = this.getDependencyWithDates(this.dependencyB, assetDependency.assetB);
+
+		this.frequencyList = this.assetDependency.dataFlowFreq;
+		this.typeList = this.assetDependency.dependencyType;
+		this.statusList = this.assetDependency.dependencyStatus;
+		this.directionList = ['Unknown', 'bi-directional', 'incoming', 'outgoing'];
 	}
 
 	private getDependencyWithDates(dependency: any, asset: any): any {
