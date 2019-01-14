@@ -11,7 +11,7 @@ buildscript {
 	}
 }
 
-version "0.1"
+version "4.7.0"
 group "tdstm"
 
 apply plugin: "eclipse"
@@ -31,10 +31,6 @@ repositories {
 
 configurations {
     all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-}
-
-war {
-   archiveName = "tdstm.war"
 }
 
 dependencies {
