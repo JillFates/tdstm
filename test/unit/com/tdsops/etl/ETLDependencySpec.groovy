@@ -833,7 +833,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 					find Application by 'assetName' eq dependentNameVar into 'id'
 					set dependentVar with DOMAIN
 					
-					domain Dependency with assetVar 'Runs On' dependentVar    
+					domain Dependency with assetVar '${dependencyType.value}' dependentVar    
 					load 'status' with 'Unknown'
 					load 'dataFlowFreq' with 'Unknown'
 				}""".stripIndent())

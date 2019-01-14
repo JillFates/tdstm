@@ -190,7 +190,6 @@ class DependencyBuilder extends DomainBuilder {
 		if (field == DEPENDENT_FIELD_NAME){
 			checkAssetEqualsDependent(currentRow)
 		}
-
 	}
 
 	/**
