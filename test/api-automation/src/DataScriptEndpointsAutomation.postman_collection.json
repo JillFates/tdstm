@@ -1,0 +1,420 @@
+{
+	"info": {
+		"_postman_id": "e0cdbcda-a9d1-46a4-93c3-c5ccbda30719",
+		"name": "DataScript Endpoints Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e7c1e1df-9ff3-43ee-ac8d-9eeebe5dc11e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"User Dashboard page\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
+							"});",
+							"",
+							"pm.test(\"TDS Login\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List all Datascripts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e560fa2-dc69-4d21-9aba-f0384411fe0c",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"var firstID = jsonObject.data[0].id; ",
+							"",
+							"//sets variable value from result.",
+							"pm.environment.set(\"datascriptID\", firstID);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"list"
+					]
+				},
+				"description": "List all available DataScripts"
+			},
+			"response": []
+		},
+		{
+			"name": "Get a DataScript",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2ac477f4-a029-4035-9906-73d5b1fe3d2b",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    ",
+							"    ",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"var provID = jsonData.data.dataScript.provider.id; ",
+							"pm.environment.set(\"firstProvider\", provID);",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/{{datascriptID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"{{datascriptID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Unique Name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f1b65d13-bf35-4297-87d1-b19159727bda",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Unique Name\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"true\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{uniqueDatascriptName}}\" ,\n\t\"providerId\": {{firstProvider}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/validateUnique/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"validateUnique",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a DataScript",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3b4f6c9e-b618-433e-9398-4ed371c6a439",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var idCreated = response.data.dataScript.id;",
+							"pm.environment.set(\"datascriptID\", idCreated);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{uniqueDatascriptName}}\",\n\t\"mode\": \"Import\",\n\t\"providerId\": {{firstProvider}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						""
+					]
+				},
+				"description": "Validate that the Provider ID matches one in your system."
+			},
+			"response": []
+		},
+		{
+			"name": "Edit a DataScript",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3427a6c-3ebd-472d-93e6-caff50330024",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var checkname = response.data.dataScript.name;",
+							"tests[\"Datascript was updated\"] = /Updating/.test(checkname);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Updating {{uniqueDatascriptName}}{{$randomInt}}\",\n\t\"description\": \"Updating description for {{uniqueDatascriptName}}{{$randomInt}}\",\n\t\"target\": \"target1\",\n\t\"mode\": \"Import\",\n\t\"etlSourceCode\": \"source1\",\n\t\"providerId\": {{firstProvider}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/{{datascriptID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"{{datascriptID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a DataScript",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db52f2ff-5827-4226-baf2-b8c7d585a21f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Provider Deleted\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"deleted\");",
+							"});",
+							"",
+							"",
+							"",
+							"//this code clears a variable that is to live within this cilection only",
+							"pm.environment.unset(\"datascriptID\");",
+							"pm.environment.unset(\"firstProvider\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/{{datascriptID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"{{datascriptID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "df8bc013-bd8e-4e8c-b397-9f4f6772ef30",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "83ebfea6-6bbe-4664-b01e-f26cb1326159",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "24abf044-ac3e-43a7-a1d1-bad880fc0e05",
+			"key": "uniqueDatascriptName",
+			"value": "UniqueName",
+			"type": "string",
+			"description": ""
+		}
+	]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "api-automation",
+  "version": "1.0.0",
+  "description": "TransitionManager API Automation Project",
+  "main": "nextman.js",
+  "scripts": {
+    "test": "ls -l nextman.js"
+  },
+  "keywords": [
+    "test",
+    "qa-team",
+    "api-automation"
+  ],
+  "author": "TransitionManager Developement Team",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.15.1",
+    "deepmerge": "^2.1.0",
+    "newman": "^4.1.0",
+    "newman-reporter-html": "^1.0.2"
+  }
+}
