@@ -45,7 +45,6 @@ abstract class AbstractUnitSpec extends Specification {
 
 		ApplicationContextHolder.instance.applicationContext = applicationContext
 
-		//userPreferenceService.metaClass.session = session
 
 		session.setAttribute('CURR_DT_FORMAT', TimeUtil.MIDDLE_ENDIAN)
 		session.setAttribute('CURR_TZ', 'GMT')
@@ -64,7 +63,7 @@ abstract class AbstractUnitSpec extends Specification {
 			}
 
 			userPreferenceService(UserPreferenceService) {
-				securityService = ref('securityService')
+				springSecurityService = ref('springSecurityService')
 			}
 		}
 
