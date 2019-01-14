@@ -144,7 +144,6 @@ class TaskEditionSpec extends GebReportingSpec {
             at TaskEditionPage
         when: 'The User clicks the "Save" Button'
             waitFor { teModalSaveBtn.click() }
-
         then: 'The User should be redirected to the Task Details Section'
             at TaskDetailsPage
     }
@@ -152,7 +151,6 @@ class TaskEditionSpec extends GebReportingSpec {
     def "7. Validating new Task Options"() {
         when: 'The User is on the Task Details Page'
             at TaskDetailsPage
-
         then: 'Proper values should be shown'
             waitFor{tdModalTaskName.text().trim() == taskNameEdit}
             tdModalTaskPerson.text().trim() == taskPerson
