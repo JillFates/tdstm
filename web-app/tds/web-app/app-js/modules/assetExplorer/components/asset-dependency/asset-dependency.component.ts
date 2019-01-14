@@ -1,4 +1,6 @@
 import { Component, Inject } from '@angular/core';
+import {forkJoin} from 'rxjs/observable/forkJoin';
+
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
 import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
@@ -129,9 +131,30 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	protected saveChanges() {
-		this.setEditMode(false)
-		this.editedDependencies = this.getInitialEditDependencies();
-		console.log('Editing changes');
+		let updates = [];
+
+		if (this.editedDependencies.aDependencyHasChanged) {
+			updates.push(this.assetService.updateDependency({dependency: {...this.dependencyA,  ...this.editedDependencies.dependencies.a}}));
+		}
+
+		if (this.editedDependencies.bDependencyHasChanged) {
+			updates.push(this.assetService.updateDependency({dependency: {...this.dependencyB, ...this.editedDependencies.dependencies.b}}));
+		}
+
+		forkJoin(updates)
+			.subscribe((result: any[]) => {
+				const [successA, successB] = result;
+				console.log('The result of the update is');
+				console.log(successA);
+				if (successA) {
+					this.dependencyA = { ...this.dependencyA, ...this.editedDependencies.dependencies.a };
+				}
+				if (successB) {
+					this.dependencyB = { ...this.dependencyB, ...this.editedDependencies.dependencies.b };
+				}
+				this.setEditMode(false);
+				this.editedDependencies = this.getInitialEditDependencies();
+		});
 	}
 
 	protected cancelEdit() {

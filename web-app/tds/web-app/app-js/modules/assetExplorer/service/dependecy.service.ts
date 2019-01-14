@@ -22,4 +22,15 @@ export class DependecyService {
 			}).catch((error: any) => error.json());
 	}
 
+	updateDependency(asset: any): Observable<any> {
+		const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
+		const options = new RequestOptions({ headers: headers });
+
+		return this.http.put(`${this.assetUrl}/dependencies`, JSON.stringify(asset), options)
+			.map((res: Response) => {
+				let result = res.json();
+				return (result && result.status === 'success');
+			}).catch((error: any) => error.json());
+	}
+
 }
