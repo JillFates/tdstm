@@ -23,33 +23,30 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 	void "1. test Entity Info Method"() {
 		setup:
-		def project = Project.read(2445)
-		def keys = ['servers', 'applications', 'dbs', 'files', 'networks', 'dependencyType', 'dependencyStatus']
+			def project = Project.read(2445)
+			def keys = ['servers', 'applications', 'dbs', 'files', 'networks', 'dependencyType', 'dependencyStatus']
 
 		when:
-		def data = assetEntityService.entityInfo(project)
-
+			def data = assetEntityService.entityInfo(project)
 		then: "keys exists in results and contains assets"
-		keys.each {
-			data.containsKey(it) && data[it].size() > 0
-		}
-
+			keys.each {
+				data.containsKey(it) && data[it].size() > 0
+			}
 		and: "dependencyType contains 'Runs On'"
-		findAssetOptionInList(data['dependencyType'], 'Runs On')
+			hasAssetOptionInList(data['dependencyType'], 'Runs On')
 
 		and: "dependencyStatus contains 'Validated'"
-		findAssetOptionInList(data['dependencyStatus'], 'Validated')
+			hasAssetOptionInList(data['dependencyStatus'], 'Validated')
 	}
 
 	void "2. test get dependency types"() {
 		when:
-		def data = assetEntityService.getDependencyTypes()
+			def data = assetEntityService.getDependencyTypes()
 
 		then:
-		data.size() > 1
-
+			data.size() > 1
 		and: "dependencyType contains 'Runs On'"
-		findAssetOptionInList(data, 'Runs On')
+			hasAssetOptionInList(data, 'Runs On')
 	}
 
 	void "3. test get dependency statuses"() {
@@ -60,62 +57,60 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		data.size() > 1
 
 		and: "dependencyStatus contains 'Validated'"
-		findAssetOptionInList(data, 'Validated')
+		hasAssetOptionInList(data, 'Validated')
 	}
 
 	void "4. test parse params for dependecy asset ids"() {
 		setup:
 		Map params = [
-				name                  : 'test',
-				'asset_support_1'     : 100,
-				'asset_support_2'     : 200,
-				'asset_support_0'     : 10,
-				'asset_support_-1'    : 20,
-				'asset_support_-3'    : 30,
-				'asset_dependent_3'   : 300,
-				'asset_dependent_0'   : 40,
-				'asset_dependent_-102': 50,
-				'asset_supportelse_1' : 999,
-				'somethingelse'       : 'blah'
+			name                  : 'test',
+			'asset_support_1'     : 100,
+			'asset_support_2'     : 200,
+			'asset_support_0'     : 10,
+			'asset_support_-1'    : 20,
+			'asset_support_-3'    : 30,
+			'asset_dependent_3'   : 300,
+			'asset_dependent_0'   : 40,
+			'asset_dependent_-102': 50,
+			'asset_supportelse_1' : 999,
+			'somethingelse'       : 'blah'
 		]
 
 		when:
-		def (existingDep, newDep) = assetEntityService.parseParamsForDependencyAssetIds('support', params)
-
+			def (existingDep, newDep) = assetEntityService.parseParamsForDependencyAssetIds('support', params)
 		then: 'Suport existing'
-		2 == existingDep.size()
+			2 == existingDep.size()
 		and: 'Support 1'
-		100 == existingDep[1L]
+			100 == existingDep[1L]
 		and: 'Support 2'
-		200 == existingDep[2L]
+			200 == existingDep[2L]
 		and: 'Support new'
-		3 == newDep.size()
+			3 == newDep.size()
 		and: 'Support 0'
-		10 == newDep[0L]
+			10 == newDep[0L]
 		and: 'Support -1'
-		20 == newDep[-1L]
+			20 == newDep[-1L]
 		and: 'Support -3'
-		30 == newDep[-3L]
+			30 == newDep[-3L]
 
 		when:
-		(existingDep, newDep) = assetEntityService.parseParamsForDependencyAssetIds('dependent', params)
+			(existingDep, newDep) = assetEntityService.parseParamsForDependencyAssetIds('dependent', params)
 		then: 'Dependent new'
-		2 == newDep.size()
+			2 == newDep.size()
 		and: 'Dependent existing'
-		1 == existingDep.size()
+			1 == existingDep.size()
 		and: 'Dependent 3'
-		300 == existingDep[3L]
+			300 == existingDep[3L]
 		and: 'Dependent new'
-		2 == newDep.size()
+			2 == newDep.size()
 		and: 'Dependent 0'
-		40 == newDep[0L]
+			40 == newDep[0L]
 		and: 'Dependent -102'
-		50 == newDep[-102L]
-
+			50 == newDep[-102L]
 		and: 'Support else existing'
-		!existingDep.values().contains(999)
+			!existingDep.values().contains(999)
 		and: 'Support else new'
-		!newDep.values().contains(999)
+			!newDep.values().contains(999)
 
 	}
 
@@ -254,23 +249,27 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			MoveBundle planningBundle1 = moveBundleHelper.createBundle(project1)
 			MoveBundle planningBundle2 = moveBundleHelper.createBundle(project2)
 			MoveBundle nonPlanningBundle1 = moveBundleHelper.createBundle(project1, null, false)
-			List bundlesAndProjects = [[project: project1, moveBundle: planningBundle1],
-			                           [project: project1, moveBundle: nonPlanningBundle1],
-			                           [project: project2, moveBundle: planningBundle2]
+			List bundlesAndProjects = [
+				[project: project1, moveBundle: planningBundle1],
+				[project: project1, moveBundle: nonPlanningBundle1],
+				[project: project2, moveBundle: planningBundle2]
 			]
-		when: 'Requesting the Asset Summary and the project has no assets'
+
+		when: 'requesting the Asset Summary and the project has no assets'
 			Map assetSummaryProject1 = assetEntityService.getAssetSummary(project1, true)
 		then: 'The summary list is empty'
 			assetSummaryProject1['assetSummaryList'].size() == 0
-		and: 'The total number of assets is zero'
-			assetSummaryProject1['totalAsset'] == 0
-		when: 'Requesting the Asset Summary for a project with no bundles'
+		and: 'the total number of assets is zero'
+			assetSummaryProject1['totalServer'] == 0
+
+		when: 'requesting the Asset Summary for a project with no bundles'
 			Map assetSummaryProject2 = assetEntityService.getAssetSummary(project2, true)
-		then: 'The summary list is empty'
+		then: 'the summary list is empty'
 			assetSummaryProject2['assetSummaryList'].size() == 0
-		and: 'The total number of assets is zero'
-			assetSummaryProject2['totalAsset'] == 0
-		when: 'Requesting the Asset Summary for a project with planning and non-planning assets (justPlanning set to true)'
+		and: 'the total number of assets is zero'
+			assetSummaryProject2['totalServer'] == 0
+
+		when: 'requesting the Asset Summary for a project with planning and non-planning assets (justPlanning set to true)'
 			Map planningDeviceParams = ['moveBundle': planningBundle1]
 			Map nonPlanningDeviceParams = ['moveBundle': nonPlanningBundle1]
 			bundlesAndProjects.each { Map bundleInfo ->
@@ -283,18 +282,19 @@ class AssetEntityServiceTests extends IntegrationSpec {
 				assetHelper.createDevice(project, moveBundle, AssetType.VM)
 			}
 			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, true)
-		then: 'There should be one element and totals should be 1, except for servers, which should be 2'
+		then: 'there should be one element and totals should be 1, except for servers, which should be 2'
 			assetSummaryProject1['assetSummaryList'].size() == 1
-			assetSummaryProject1['totalAsset'] == 2
+			assetSummaryProject1['totalServer'] == 2
 			assetSummaryProject1['totalApplication'] == 1
 			assetSummaryProject1['totalDatabase'] == 1
 			assetSummaryProject1['totalPhysical'] == 1
 			assetSummaryProject1['totalFiles'] == 1
-		when: 'Retrieving the Asset Summary Table for planning and non-planning bundles'
+
+		when: 'retrieving the Asset Summary Table for planning and non-planning bundles'
 			assetSummaryProject1 = assetEntityService.getAssetSummary(project1, false)
-		then: 'There should be 3 bundles and the totals should be 2, except for servers, which should be 4'
+		then: 'there should be 3 bundles and the totals should be 2, except for servers, which should be 4'
 			assetSummaryProject1['assetSummaryList'].size() == 2
-			assetSummaryProject1['totalAsset'] == 4
+			assetSummaryProject1['totalServer'] == 4
 			assetSummaryProject1['totalApplication'] == 2
 			assetSummaryProject1['totalDatabase'] == 2
 			assetSummaryProject1['totalPhysical'] == 2
@@ -303,7 +303,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 	}
 
 	// Helper functions ////////////////////
-	protected boolean findAssetOptionInList(List list, String key) {
+	protected boolean hasAssetOptionInList(List list, String key) {
 		list.contains(key)
 	}
 

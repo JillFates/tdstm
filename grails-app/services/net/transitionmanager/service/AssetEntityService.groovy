@@ -3094,7 +3094,7 @@ class AssetEntityService implements ServiceMethods {
 	 *
 	 * @param project - user's current project
 	 * @param justPlanning - user preference value
-	 * @return a Map with the information broken down accordingly.
+	 * @return a Map with the information broken down accordingly
 	 */
 	Map getAssetSummary(Project project, boolean justPlanning) {
 
@@ -3102,7 +3102,7 @@ class AssetEntityService implements ServiceMethods {
 			throw new RuntimeException("Unable to retrieve the asset summary without a project.")
 		}
 
-		Integer totalAsset = 0
+		Integer totalServer = 0
 		Integer totalPhysical = 0
 		Integer totalApplication = 0
 		Integer totalDatabase = 0
@@ -3124,21 +3124,33 @@ class AssetEntityService implements ServiceMethods {
 			Integer databaseCount = summaryMap['databases']
 			Integer filesCount = summaryMap['files']
 
-			totalAsset += serverCount
+			totalServer += serverCount
 			totalPhysical += physicalCount
 			totalApplication += applicationCount
 			totalDatabase += databaseCount
 			totalFiles += filesCount
 
 			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
-				assetSummaryList << [name: moveBundle, assetCount: serverCount, applicationCount: applicationCount, physicalCount: physicalCount,
-				                     databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+				assetSummaryList << [
+					id: moveBundle.id,
+					name: moveBundle,
+					applicationCount: applicationCount,
+					serverCount: serverCount,
+					physicalCount: physicalCount,
+				    databaseCount: databaseCount,
+					filesCount: filesCount
+				]
 			}
-
 		}
 
-		return [assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
-		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
+		return [
+			assetSummaryList: assetSummaryList,
+			totalServer: totalServer,
+			totalApplication: totalApplication,
+			totalDatabase: totalDatabase,
+			totalPhysical: totalPhysical,
+			totalFiles: totalFiles
+		]
 	}
 
 }
