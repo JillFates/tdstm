@@ -1,0 +1,297 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import groovy.xml.MarkupBuilder
+import groovy.json.JsonOutput
+import groovy.io.FileType
+
+import static groovyx.net.http.HttpBuilder.configure
+//import static groovyx.net.http.ContentTypes.JSON
+import groovyx.net.http.HttpBuilder
+//import static groovy.json.JsonOutput.prettyPrint
+
+def xrayTestExecutionsJson
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'io.github.http-builder-ng', name: 'http-builder-ng-core', version: '0.18.0'
+    }
+}
+
+ext {
+    // The drivers we want to use
+    drivers = ["firefox", "chrome"]
+
+    ext {
+        // Check http://www.seleniumhq.org/download/ for the
+        // latest version of Selenium, Chrome, and Gecko Driver.
+        // Make sure to update the grid to the latest Selenium version as well.
+        groovyVersion = '2.4.12'
+        gebVersion = '1.1.1'
+        //seleniumVersion = '3.4.0'
+        seleniumVersion = '3.5.3'
+        chromeDriverVersion = '2.37'
+        geckoDriverVersion = '0.18.0'
+    }
+}
+
+apply plugin: "groovy"
+apply from: "gradle/idea.gradle"
+apply from: "gradle/osSpecificDownloads.gradle"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // If using Spock, need to depend on geb-spock
+    testCompile "org.gebish:geb-spock:$gebVersion"
+    testCompile("org.spockframework:spock-core:1.1-groovy-2.4") {
+        exclude group: "org.codehaus.groovy"
+    }
+    testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
+
+    // If using JUnit, need to depend on geb-junit (3 or 4)
+//    testCompile "org.gebish:geb-junit4:$gebVersion"
+
+    // Drivers
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion"
+    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
+
+    // Additional Selenium Support added within Geb
+    testCompile "org.seleniumhq.selenium:selenium-support:$seleniumVersion"
+
+    // Apache commons v3.1
+    compile 'org.apache.commons:commons-lang3:3.1'
+}
+
+drivers.each { driver ->
+    task "${driver}Test"(type: Test) {
+        reports {
+            //html.destination = reporting.file("$name/tests") // dont remove in case is needed in the future
+            //junitXml.destination = file("$buildDir/test-results/$name") // dont remove in case is needed in the future
+            junitXml.destination = file("${buildDir}/tmp/test-reports/$name")
+        }
+
+        outputs.upToDateWhen { false }  // Always run tests
+
+        systemProperty "geb.build.reportsDir", reporting.file("$name/geb")
+        systemProperty "geb.env", driver
+
+    }
+}
+
+task aggregateReports{
+    drivers.each { driver ->
+        doLast {
+            ant.move file: "${buildDir}/tmp/test-reports/${driver}Test/",
+                    todir: "${buildDir}/test-results/e2e/"
+        }
+    }
+}
+
+firefoxTest {
+    dependsOn unzipGeckoDriver
+    def geckodriverFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "geckodriver.exe" : "geckodriver"
+    def geckodriverFile = new File(unzipGeckoDriver.outputs.files.singleFile, geckodriverFilename)
+    systemProperty "webdriver.gecko.driver", geckodriverFile.absolutePath
+}
+
+drivers.findAll{it =~ /^chrome.*/}.each { chromeTask ->
+    "${chromeTask}Test" {
+        dependsOn unzipChromeDriver
+
+        def chromedriverFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "chromedriver.exe" : "chromedriver"
+        systemProperty "webdriver.chrome.driver", new File(unzipChromeDriver.outputs.files.singleFile, chromedriverFilename).absolutePath
+    }
+}
+
+test {
+    dependsOn drivers.collect { tasks["${it}Test"] }
+    enabled = false
+}
+
+// Initialize and accumulate the test case execution results per test key
+tasks.withType(Test) {
+    // Setup variables to use for getting Xray to import test results
+    def testKeyMatcher
+    def testKey
+    def testStatus
+    def xrayTestExecution =  [
+        testKey: '',
+        //start: '',
+        //finish: '',
+        comment: '',
+        status: ''
+    ]
+    def xrayTestExecutions = [
+        info: [
+            summary: 'TE: Execution of automated tests for release v4.3.0',
+            description: 'This execution is automaticallly created when importing execution results from an external source',
+            version: '4.3.0',
+            user: 'Ralph Navarro',
+            revision: 'alpha',
+            //startDate: '',
+            //finishDate: '',
+            testPlanKey: 'TM-7178',
+            testEnvironments: ['TMQA']
+        ],
+        tests: [
+        ]
+    ]
+
+    // Pass system properties to the Geb JVM from the Gradle JVM
+    systemProperties['browser.location'] = System.properties['browser.location']
+    systemProperties['geb.build.baseUrl'] = System.properties['geb.build.baseUrl']
+    systemProperties['tm.creds.username'] = System.properties['tm.creds.username']
+    systemProperties['tm.creds.password'] = System.properties['tm.creds.password']
+
+    onOutput { desc, event ->
+        testKeyMatcher = event.message =~ /TM-\d{4}/
+        if (testKeyMatcher) {
+            testKey = testKeyMatcher.group()
+            //logger.quiet "Test Event Message: ${testKeyMatcher.group()}: ${event.message}"
+        }
+    }
+
+    // Collect the test key, name, and status after each test run
+    afterTest { desc, result ->
+        logger.quiet "Executed test ${testKey}: ${desc.name} [${desc.className}] with result: ${result.resultType}"
+        xrayTestExecution.testKey = testKey
+        xrayTestExecution.comment = "${desc.name} [${desc.className}]"
+        // Translate test results into Xray test statuses
+        switch (result.resultType) {
+            case 'SUCCESS':
+                xrayTestExecution.status = 'PASS'
+                break
+            case 'FAILURE':
+                xrayTestExecution.status = 'FAIL'
+                //xrayTestExecution.comment += "\nEvent Message: Start ${event.message}"
+                break
+            default:
+                xrayTestExecution.status = 'TODO'
+                break
+        }
+        xrayTestExecutions.tests << xrayTestExecution
+        xrayTestExecution =  [
+                testKey: '',
+                //start: '',
+                //finish: '',
+                comment: '',
+                status: ''
+        ]
+        if (result.resultType == 'FAILURE') {
+            logger.quiet "Event Message: Start ${event.message}"
+        }
+        xrayTestExecutionsJson = JsonOutput.toJson(xrayTestExecutions)
+    }
+}
+
+// Call xray to import the test execution results
+task xrayImport {
+    description 'Call xray to import the test execution results.  Requires jira.auth property.'
+    doLast {
+        println JsonOutput.prettyPrint(xrayTestExecutionsJson)
+
+        def xrayResult = HttpBuilder.configure {
+            request.uri = 'https://support.transitionmanager.com'
+            request.uri.path = '/rest/raven/1.0/import/execution'
+            request.headers['Authorization'] = 'Basic ' + System.properties['jira.auth']
+            request.contentType = 'application/json'
+            request.body = xrayTestExecutionsJson
+        }.post()
+        //println "Result = " + xrayResult
+    }
+}
+
+xrayImport.mustRunAfter firefoxTest
+xrayImport.mustRunAfter chromeTest
+
+// Generate a report per test of both the screen snapshots and the raw page html.
+task reportSnaps {
+    description 'Generate a report per test of both the screen snapshots and the raw page html.'
+    doLast{
+        def list = []
+        def dir = new File("build/reports")
+//        println "  List of all files found at ${dir.path}"
+        dir.eachFileRecurse (FileType.FILES) { file ->
+//            println "    ${file.path}"
+           if (file.path.contains( "geb" )) {
+                list << file
+            }
+        }
+//        println "  File path list of screenshots found:"
+//        list.each {
+//            println "    " + it.path
+//        }
+        generateScreenshotsReportsPage(list)
+    }
+}
+
+reportSnaps.mustRunAfter firefoxTest
+reportSnaps.mustRunAfter chromeTest
+
+/**
+ * Generate an html page that contains links to the Report Screnshots
+ * and other report artifact files.
+ *
+ * @param list - A list of report artifact File objects.
+ */
+void generateScreenshotsReportsPage(list) {
+
+    def reportArtifactsHtmlFile = new File('build/reports/reportArtifacts.html')
+    def writer = new StringWriter()
+    def html = new MarkupBuilder(writer)
+    def now = new Date()
+    html.html {
+        head {
+            title "Report Screen Shots"
+        }
+        body(id: "main") {
+            h2 id: "report-files",  "Report Artifact Files"
+            ul {
+                list.each { reportArtifactFile ->
+                    li {
+                        // Build link and extract the filename from the path
+                        a( href: removeFirstTwoDirectoriesFromPath(reportArtifactFile.path),
+                                removeFirstTwoDirectoriesFromPath(reportArtifactFile.path) )    // display relative path
+                        //reportArtifactFile.path.split(File.separator)[-1] )           // display just filename
+                    }
+                }
+            }
+            h3 "Report Generated Time"
+            p now
+        }
+    }
+    reportArtifactsHtmlFile.write writer.toString()
+}
+
+/**
+ * Removes the first two directories from the path
+ *
+ * @parm reportFile -The reportFile
+ */
+String removeFirstTwoDirectoriesFromPath(String reportArtifactFilePath) {
+    // Must normalize Windows File.separator to be like UNIX.
+    String reportArtifactFilePathAsUnix = reportArtifactFilePath.replace("\\","/")
+    String reportFileNewPath = ""
+    reportArtifactFilePathAsUnix.split('/')[2..-1].each {
+        // Rebuild the path
+        reportFileNewPath += ( it + '/' )
+    }
+    // Return path with last character from path removed
+    reportFileNewPath[0..-2]
+}
+
+// Prints all of the system properties and their values in ascending order by key.
+task printSystemProperties {
+    description 'Prints all of the system properties and their values in ascending order by key.'
+    doLast {
+        println "*** All System Properties settings seen by build.gradle ***"
+        def tm = System.properties as TreeMap
+        tm.each { println it }
+    }
+}
+
+apply from: "gradle/ci.gradle"

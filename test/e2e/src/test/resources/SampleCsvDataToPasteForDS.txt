@@ -1,0 +1,6 @@
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type,DataFlowFreq,DataFlowDirection,status,comment,c1,c2,c3,c4
+114052,113857,PE-1950-02,Server,205750,AGPM,Application,Unknown,Unknown,Unknown,Confirmed,text,,,,
+114007,113866,PE-R610-03,Server,114063,DNS,Application,Unknown,Unknown,Unknown,Questioned,,,,,
+113916,113868,PE-R610-05,Server,138067,App no sme,Application,Unknown,Unknown,Unknown,Unknown,,113868Server138067Application,,,
+48727,113954,PL-DL580-01,Server,114129,ACMEVMPROD07,VM,Unknown,Unknown,Unknown,Unknown,Adding Coments 1-1,113954Server114129VM,,,
+114006,113956,Mailserver04,Server,114072,Exchange 2013 Test x 2,Application,Hosts,hourly,Unknown,Archived,,,,,
