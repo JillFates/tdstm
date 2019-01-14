@@ -3,18 +3,18 @@ import {TranslatePipe} from '../../../../pipes/translate.pipe';
 import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
 import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bulk-change.model';
-import {TDSActionsButton} from '../../../button/model/action-button.model';
 
 @Component({
 	selector: 'tds-bulk-change-button',
 	template: `
-		<tds-button
-			[action]="ButtonActions.BulkEdit"
+		<tds-button-custom
+			icon="ellipsis-v"
+			title="Bulk Change"
 			[id]="'bntBulkChange'"
             (click)="onClick()"
             class="btnBulkChange pull-left"
 			[disabled]="!enabled">
-		</tds-button>
+		</tds-button-custom>
 	`,
 	providers: [TranslatePipe]
 })
@@ -28,7 +28,6 @@ export class BulkChangeButtonComponent {
 
 	private selectedItems: number[];
 	private selectedAssets: Array<any>;
-	ButtonActions = TDSActionsButton;
 
 	constructor(private dialogService: UIDialogService) {
 		this.enabled = false;
