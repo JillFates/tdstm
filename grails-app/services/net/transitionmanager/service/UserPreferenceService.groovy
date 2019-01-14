@@ -36,7 +36,6 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 
 @Slf4j
 @GrailsCompileStatic(TypeCheckingMode.SKIP)
-// @GrailsCompileStatic
 class UserPreferenceService {
 	SpringSecurityService springSecurityService
 
