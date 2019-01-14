@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
 import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
+import {DependencyChange, DependencyType} from './model/asset-dependency.model';
 
 @Component({
 	selector: 'asset-dependency',
@@ -87,7 +88,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	protected typeList: string[];
 	protected statusList: string[];
 	protected directionList: string[];
-	protected changedDependencies = null;
+	protected editedDependencies = this.getInitialEditDependencies();
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
@@ -129,16 +130,31 @@ export class AssetDependencyComponent extends UIExtraDialog {
 
 	protected saveChanges() {
 		this.setEditMode(false)
-		this.changedDependencies = null;
+		this.editedDependencies = this.getInitialEditDependencies();
 		console.log('Editing changes');
 	}
 
 	protected cancelEdit() {
 		this.setEditMode(false);
-		this.changedDependencies = null;
+		this.editedDependencies = this.getInitialEditDependencies();
 	}
 
-	protected onChangeDependencies(dependencies: any) {
-		this.changedDependencies = dependencies;
+	protected onChangeDependencies(change: DependencyChange) {
+		if (change.dependencies) {
+			if (change.type === DependencyType.dependencyA) {
+				this.editedDependencies.aDependencyHasChanged = true;
+			} else {
+				this.editedDependencies.bDependencyHasChanged = true;
+			}
+			this.editedDependencies.dependencies = change.dependencies;
+		}
+	}
+
+	private getInitialEditDependencies(): any {
+		return {
+			dependencies: null,
+			aDependencyHasChanged: false,
+			bDependencyHasChanged: false,
+		}
 	}
 }

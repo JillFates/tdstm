@@ -124,7 +124,7 @@
 	            <ng-template #buttonsEditModeTemplate>
                     <tds-button
                             [action]="ButtonActions.AssetUpdate"
-                            [disabled]="!changedDependencies"
+                            [disabled]="!editedDependencies.dependencies"
                             class="btn-primary pull-left"
                             tooltip="Save changes"
                             (click)="saveChanges()">
