@@ -8,6 +8,7 @@ import {ViewHtmlComponent} from '../view-html/view-html.component';
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
@@ -23,6 +24,7 @@ export class NoticeViewEditComponent {
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 	@ViewChild('noticeForm') noticeForm: FormControl;
 
+	private dataSignature: string;
 	protected model: NoticeModel;
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
@@ -38,14 +40,29 @@ export class NoticeViewEditComponent {
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
+		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
 		this.model.typeId = parseInt(this.model.typeId, 10);
+		this.dataSignature = JSON.stringify(this.model);
 	}
 
 	protected cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		if (this.isDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.activeDialog.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.activeDialog.dismiss();
+		}
 	}
 
 	protected deleteNotice(): void {
@@ -99,5 +116,13 @@ export class NoticeViewEditComponent {
 
 	protected isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeDelete);
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.model);
 	}
 }

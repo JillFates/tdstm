@@ -15,8 +15,6 @@ import 'rxjs/add/operator/finally';
 export class ViewHtmlComponent extends UIExtraDialog {
 
 	protected modalOptions: DecoratorOptions;
-	protected licenseKey = '';
-	private dataSignature = {};
 
 	constructor(
 		private noticeModel: NoticeModel) {
