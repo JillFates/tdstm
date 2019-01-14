@@ -177,7 +177,7 @@
 								value="${rack.roomY}" size="3"
 								onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
 							<td><g:select id="frontId_${rack.id}" name="front_${rack.id}"
-									from="${Rack.constraints.front.inList}" value="${rack.front}"
+									from="${Rack.constrainedProperties.front.inList}" value="${rack.front}"
 									onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())"
 									style="width:40px;"/></td>
 							<td><input type="text" class="focusShadow" id="powerA_${rack.id}" name="powerA_${rack.id}" value="${tds.rackPower(power: rack.powerA)}" size="3" /></td>
@@ -185,7 +185,7 @@
 							<td><input type="text" class="focusShadow" id="powerC_${rack.id}" name="powerC_${rack.id}" value="${tds.rackPower(power: rack.powerC)}" size="3" /></td>
 							<td><g:select id="rackTypeId_${rack.id}"
 									name="rackType_${rack.id}"
-									from="${Rack.constraints.rackType.inList}"
+									from="${Rack.constrainedProperties.rackType.inList}"
 									value="${rack.rackType}"
 									onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"
 									style="width:100px;"/></td>
@@ -218,14 +218,14 @@
 								id="roomYId_${rack}" name="roomY_${rack}" value="" size="3"
 								onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
 							<td><g:select id="frontId_${rack}" name="front_${rack}"
-									from="${Rack.constraints.front.inList}"
+									from="${Rack.constrainedProperties.front.inList}"
 									onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())"
 									style="width:40px;"/></td>
 							<td><input type="text" class="focusShadow" id="newPowerA_${rack}" name="powerA_${rack}" value="${tds.rackPower(powerProperty: 'powerA')}" size="3" /></td>
 							<td><input type="text" class="focusShadow" id="newPowerB_${rack}" name="powerB_${rack}" value="${tds.rackPower(powerProperty: 'powerB')}" size="3" /></td>
 							<td><input type="text" class="focusShadow" id="newPowerC_${rack}" name="powerC_${rack}" value="${tds.rackPower(powerProperty: 'powerC')}" size="3" /></td>
 							<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}"
-									from="${Rack.constraints.rackType.inList}" value="Rack"
+									from="${Rack.constrainedProperties.rackType.inList}" value="Rack"
 									onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"
 									style="width:100px;"/></td>
 							<td><span id="modelSpan_${rack}"><g:select

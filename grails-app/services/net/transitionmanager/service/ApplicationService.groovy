@@ -93,7 +93,7 @@ class ApplicationService implements ServiceMethods {
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
-				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: Person.constraints.staffType.inList,
+				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: Person.constrainedProperties.staffType.inList,
 		        personList: personList, currentUserId: securityService.currentPersonId] +
 				commonModel
 
@@ -120,7 +120,7 @@ class ApplicationService implements ServiceMethods {
 			moveEventList: moveEventList,
 			availableRoles: availableRoles,
 			partyGroupList: partyGroupList,
-			staffTypes: Person.constraints.staffType.inList,
+			staffTypes: Person.constrainedProperties.staffType.inList,
 			personList: personList
 		] + commonModel
 	}

@@ -64,7 +64,7 @@
                                     <label for="role"><b>Role:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'role','errors')}">
-                                    <g:select id="role" name="role" from="${projectTeamInstance.constraints.role.inList}" valueMessagePrefix="ProjectTeam.role" value="${projectTeamInstance.role}" ></g:select>
+                                    <g:select id="role" name="role" from="${projectTeamInstance.constrainedProperties.role.inList}" valueMessagePrefix="ProjectTeam.role" value="${projectTeamInstance.role}" ></g:select>
                                     <g:hasErrors bean="${projectTeamInstance}" field="role">
 						            <div class="errors">
 						                <g:renderErrors bean="${projectTeamInstance}" as="list"  field="role" />
@@ -86,7 +86,7 @@
                                     <label for="isDisbanded">Is Disbanded:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:projectTeamInstance,field:'isDisbanded','errors')}">
-                                    <g:select id="isDisbanded" name="isDisbanded" from="${projectTeamInstance.constraints.isDisbanded.inList}" value="${projectTeamInstance.isDisbanded}"></g:select>
+                                    <g:select id="isDisbanded" name="isDisbanded" from="${projectTeamInstance.constrainedProperties.isDisbanded.inList}" value="${projectTeamInstance.isDisbanded}"></g:select>
                                 </td>
                             </tr>
                             <tr class="prop">

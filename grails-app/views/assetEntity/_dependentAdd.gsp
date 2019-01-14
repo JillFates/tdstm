@@ -9,7 +9,7 @@
 	<table id="assetDependencyRow">
 		<tr>
 			<%-- Frequency SELECT --%>
-			<td><g:select name="dataFlowFreq_FIELD_SUFFIX" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+			<td><g:select name="dataFlowFreq_FIELD_SUFFIX" from="${com.tds.asset.AssetDependency.constrainedProperties.dataFlowFreq.inList}"></g:select></td>
 
 			<%-- Asset Class Options SELECT --%>
 			<td class="class-wrap-depend">

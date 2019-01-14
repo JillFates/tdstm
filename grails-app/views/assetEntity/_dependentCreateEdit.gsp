@@ -23,7 +23,7 @@
 			<g:each in="${supportAssets}" var="support" status="i">
 				<g:set var="type" value="${ AssetClass.getClassOptionForAsset(support?.asset) }"></g:set>
 				<tr id='row_s_${i}_${support.id}'>
-					<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
+					<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constrainedProperties.dataFlowFreq.inList}" /></td>
 
 					<%-- Class --%>
 					<td class="class-wrap-depend">
@@ -120,7 +120,7 @@
 					<%-- Dataflow --%>
 					<td>
 						<g:select name="dataFlowFreq_dependent_${dependent.id}" 
-							value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}"
+							value="${dependent.dataFlowFreq}" from="${dependent.constrainedProperties.dataFlowFreq.inList}"
 						></g:select>
 					</td>
 

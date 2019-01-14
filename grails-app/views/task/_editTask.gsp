@@ -74,7 +74,7 @@
 							<label for="category">Category:</label>
 						</td>
 						<td>
-							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" noSelection="['':'please select']" />
+							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" noSelection="['':'please select']" />
 						</td>
 					</tr>
 					<tr class="prop" id="workFlowTransitionEditTrId" ng-show="ds.workflows.length > 0">

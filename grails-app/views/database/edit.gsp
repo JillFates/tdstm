@@ -75,7 +75,7 @@
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${databaseInstance.size}"/>
 								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale"
+									<g:select from="${databaseInstance.constrainedProperties.scale.inList}" id="scale" name="scale"
 											  value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
 								</tds:tooltipSpan>
 							</td>
@@ -126,7 +126,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
-									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation"
+									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${databaseInstance.constrainedProperties.validation.inList}" id="validation" name="validation"
 										   value="${databaseInstance.validation}" tabindex="35"/>
 								</tds:tooltipSpan>
 							</td>

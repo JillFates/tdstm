@@ -13,7 +13,7 @@
 			<tr>
 				<td>Usize:</td>
 				<td><g:select id="usizeId" name="usize"
-						from="${modelInstance.constraints.usize.inList}"
+						from="${modelInstance.constrainedProperties.usize.inList}"
 						value="${modelInstance.usize}"></g:select></td>
 			</tr>
 			<tr>

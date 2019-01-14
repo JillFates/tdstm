@@ -52,9 +52,6 @@ import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
-import org.apache.poi.ss.usermodel.Cell
-import org.hibernate.Criteria
-import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -1418,7 +1415,7 @@ class AssetEntityService implements ServiceMethods {
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),
-			dataFlowFreq:		AssetDependency.constraints.dataFlowFreq.inList,
+			dataFlowFreq:		AssetDependency.constrainedProperties.dataFlowFreq.inList,
 
 			// The page to return to after submitting changes (2018-11 JPM - believe this to be legacy and not needed)
 			redirectTo: params.redirectTo,
@@ -2044,14 +2041,14 @@ class AssetEntityService implements ServiceMethods {
 						assetCable.toPower = ''
 					}
 
-					if (AssetCableMap.constraints.cableColor.inList.contains(cableColor)) {
+					if (AssetCableMap.constrainedProperties.cableColor.inList.contains(cableColor)) {
 						assetCable.cableColor = cableColor
 					}
 
 					assetCable.cableComment = cableComment
 					assetCable.cableStatus = cableStatus
 
-					if (AssetCableMap.constraints.assetLoc.inList.contains(roomType))
+					if (AssetCableMap.constrainedProperties.assetLoc.inList.contains(roomType))
 						assetCable.assetLoc= roomType
 
 					if (assetCable.dirtyPropertyNames.size()) {

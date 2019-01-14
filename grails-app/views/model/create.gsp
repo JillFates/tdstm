@@ -55,7 +55,7 @@
 		<tr>
 			<td valign="top" class="name">Usize:</td>
 			<td>
-				<g:select id="usizeId" name="usize" from="${modelInstance.constraints.usize.inList}" value="${modelInstance.usize}"></g:select>
+				<g:select id="usizeId" name="usize" from="${modelInstance.constrainedProperties.usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Dimensions(inches):</td>
 			<td>
@@ -153,7 +153,7 @@
 		<tr id="bladeHeightId" style="display: ${modelInstance.assetType == 'Blade' ? 'block' : 'none'}">
 			<td>Blade Height:</td>
 			<td>
-				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constraints.bladeHeight.inList}" ></g:select>
+				<g:select id="bladeHeightId" name="bladeHeight" from="${modelInstance.constrainedProperties.bladeHeight.inList}" ></g:select>
 			</td>
 		</tr>
 		<tr>
@@ -234,7 +234,7 @@
 			<tbody id="connectorModelBody">
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 			<tr id="connectorTr${modelConnector.connector}">
-					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
+					<td><g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constrainedProperties.type.inList}" value="${modelConnector.type}"></g:select></td>
 					<td><input title="Label" id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
 					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width: 25px;" type="number" min="0" value="${modelConnector.connectorPosX}"></td>
@@ -247,7 +247,7 @@
 			</g:each>
 			<g:each in="${otherConnectors}" var="count">
 			<tr id="connectorTr${count}" style="display: none;">
-					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constraints.type.inList}"></g:select></td>
+					<td><g:select id="typeId${count}" name="type" from="${ModelConnector.constrainedProperties.type.inList}"></g:select></td>
 					<td><input id="labelId${count}" type="text" onchange="changeLabel(${count}, this.value)"></td>
 					<td><g:select id="labelPositionId${count}" name="labelPosition" from="${['Right','Left','Top','Bottom']}" onchange="changeLabelPosition(${count}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${count}" maxlength="3" style="width: 35px;" type="number" min="0" value="0"></td>

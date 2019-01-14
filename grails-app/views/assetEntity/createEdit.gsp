@@ -340,7 +340,7 @@
 								<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.size}">
 									<input type="number" min="0"  id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
 									<g:select id="scale" name="scale"
-											  from="${assetEntityInstance.constraints.scale.inList}"
+											  from="${assetEntityInstance.constrainedProperties.scale.inList}"
 											  optionValue="value" noSelection="${['':'Please select...']}"
 											  value="${assetEntityInstance.scale}"
 											  class="${standardFieldSpecs.scale.imp?:''}"
@@ -409,7 +409,7 @@
 								<td  colspan="2">
 									<tds:tooltipSpan field="${standardFieldSpecs.validation}">
 										<g:select id="validation" name="validation"
-											  from="${assetEntityInstance.constraints.validation.inList}"
+											  from="${assetEntityInstance.constrainedProperties.validation.inList}"
 											  value="${assetEntityInstance.validation}"
 											  class="${standardFieldSpecs.validation.imp?:''}"
 											  tabindex="370"

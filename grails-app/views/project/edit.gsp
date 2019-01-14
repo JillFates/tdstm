@@ -55,7 +55,7 @@
 								<label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
-								<g:select id="projectType" name="projectType" indextab="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"/>
+								<g:select id="projectType" name="projectType" indextab="130" from="${projectInstance.constrainedProperties.projectType.inList}" value="${projectInstance.projectType}"/>
 								<g:hasErrors bean="${projectInstance}" field="projectType">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
 								</g:hasErrors>

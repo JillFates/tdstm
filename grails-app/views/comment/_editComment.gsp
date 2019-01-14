@@ -26,7 +26,7 @@
 							<label for="category">Category:</label>&nbsp;<span class="error-msg" ng-show="form.category.$error.required"><b>*</b></span>
 						</td>
 						<td colspan="4">
-							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}"
+							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}"
 							noSelection="['':'please select']" ng-change="updateWorkflowTransitions(ac.assetEntity, this.value, 'workFlowTransitionId', 'predecessorId','')"></tds:select>
 						</td>
 					</tr>

@@ -155,7 +155,7 @@
 	</tr>
 	<tr class="prop">
 		<td class="label">Validation</td>
-		<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
+		<td><g:select from="${assetEntityInstance.constrainedProperties.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}"
 					 value="${assetEntityInstance.validation}"/>	
 		</td>
 	</tr>
@@ -182,7 +182,7 @@
 			<tr>
 				<td>Usize:</td>
 				<td><g:select id="modelAuditPanel_usize" name="usize"
-						from="${assetEntityInstance.model?.constraints?.usize?.inList ?: (1..42)}"
+						from="${assetEntityInstance.model?.constrainedProperties?.usize?.inList ?: (1..42)}"
 						value=""></g:select></td>
 			</tr>
 			<tr>

@@ -105,7 +105,7 @@
 							<label for="nickName">Active:</label>
 						</td>
 						<td valign="top" class="value" colspan="2">
-							<g:select from="${Person.constraints.active.inList}" id="activeId" name="active" value="${person.active}" />
+							<g:select from="${Person.constrainedProperties.active.inList}" id="activeId" name="active" value="${person.active}" />
 						</td>
 					</tr>
 
@@ -141,7 +141,7 @@
 							<label for="staffType">Staff Type:</label>
 						</td>
 						<td valign="top" class="value" colspan="2">
-							<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
+							<g:select id="staffTypeId" name="staffType" from="${Person.constrainedProperties.staffType.inList}" value="Salary" />
 						</td>
 					</tr>
 

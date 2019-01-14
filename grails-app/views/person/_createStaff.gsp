@@ -87,7 +87,7 @@
                 <tr class="prop">
 					<td valign="top" class="name"><label for="staffType ">StaffType:</label></td>
 					<td valign="top" class="value" colspan="2">
-					<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
+					<g:select id="staffTypeId" name="staffType" from="${Person.constrainedProperties.staffType.inList}" value="Salary" />
 					</td>
 				</tr>
 				<tr class="prop">
@@ -104,7 +104,7 @@
                   </td>
                   <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
                     <select name="active" id="active" >
-                      <g:each in="${Person.constraints.active.inList}" status="i" var="active">
+                      <g:each in="${Person.constrainedProperties.active.inList}" status="i" var="active">
                         <option value="${active}">${active}</option>
                       </g:each>
                     </select>

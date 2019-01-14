@@ -25,7 +25,7 @@
                   <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
                   <td>
                     <g:select id="type" name="type" 
-                      from="${roleTypeInstance.constraints.type.inList}" value="${roleTypeInstance.type}"  
+                      from="${roleTypeInstance.constrainedProperties.type.inList}" value="${roleTypeInstance.type}"
                       noSelection="${['':'Please select']}" onchange="typeChanged()">
                     </g:select>
                   </td>

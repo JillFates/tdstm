@@ -122,7 +122,7 @@
                                     <label for="runbookStatus">Runbook Status:</label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
-                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
+                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constrainedProperties.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -154,7 +154,7 @@
 				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
 				                </td>
 				                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'newsBarMode','errors')}">
-				                  <g:select id="newsBarMode" name="newsBarMode" from="${moveEventInstance.constraints.newsBarMode.inList}" value="${moveEventInstance.newsBarMode}" valueMessagePrefix="event.newsBarMode"></g:select>
+				                  <g:select id="newsBarMode" name="newsBarMode" from="${moveEventInstance.constrainedProperties.newsBarMode.inList}" value="${moveEventInstance.newsBarMode}" valueMessagePrefix="event.newsBarMode"></g:select>
 				                  <g:hasErrors bean="${moveEventInstance}" field="newsBarMode">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="newsBarMode"/>

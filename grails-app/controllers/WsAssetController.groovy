@@ -1,4 +1,3 @@
-import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
@@ -211,7 +210,7 @@ class WsAssetController implements ControllerMethods {
 					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
 					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
 			],
-			"dataFlowFreq"    : AssetDependency.constraints.dataFlowFreq.inList,
+			"dataFlowFreq"    : AssetDependency.constrainedProperties.dataFlowFreq.inList,
 			"dependencyType"  : assetEntityService.entityInfo(currentProject).dependencyType,
 			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
 			"editPermission"  : securityService.hasPermission(Permission.AssetEdit)

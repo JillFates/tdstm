@@ -320,7 +320,7 @@
                                                 [tabIndex]="40"
                                                 class="tm-input-control"
                                                 name="modelAssetValidation"
-                                                [data]="${asset.constraints.validation.inList as JSON}"
+                                                [data]="${asset.constrainedProperties.validation.inList as JSON}"
                                                 [(ngModel)]="model.asset.validation">
                                         </kendo-dropdownlist>
                                     </td>

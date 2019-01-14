@@ -204,7 +204,7 @@
 				</td>
 
 				<td nowrap="nowrap">
-					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tds.asset.AssetComment.constraints.category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}"  noSelection="['':'Please select']" ></g:select>
+					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}"  noSelection="['':'Please select']" ></g:select>
 				</td>
 
 				<td nowrap="nowrap">
@@ -273,7 +273,7 @@
 		</div>
     </g:form>
     <div style="display: none;" >
-		<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" optionValue="${{ e -> e.capitalize() }}" noSelection="['':'Please select']" ></g:select>
+		<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" optionValue="${{ e -> e.capitalize() }}" noSelection="['':'Please select']" ></g:select>
     </div>
     <div style="display: none;" >
     		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description}}"

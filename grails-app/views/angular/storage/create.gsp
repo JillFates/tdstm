@@ -94,13 +94,13 @@
                                             <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${assetInstance.rateOfChange}" tabindex="17" ngmodel="model.asset.rateOfChange"/>
                                         </td>
                                         <td colspan="2"></td>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constraints.validation.inList as JSON}[0]"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constrainedProperties.validation.inList as JSON}[0]"/>
                                         <td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                             <kendo-dropdownlist
                                                     [tabIndex]="22"
                                                     class="tm-input-control"
                                                     name="modelAssetValidation"
-                                                    [data]="${assetInstance.constraints.validation.inList as JSON}"
+                                                    [data]="${assetInstance.constrainedProperties.validation.inList as JSON}"
                                                     [(ngModel)]="model.asset.validation">
                                             </kendo-dropdownlist>
                                         </td>
