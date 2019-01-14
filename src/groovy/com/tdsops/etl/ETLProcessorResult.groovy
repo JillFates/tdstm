@@ -525,7 +525,7 @@ class RowResult {
 	void addLoadElement(Element element){
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
-		this.errorCount = fieldData.errors.size()
+		this.errorCount = fieldData.errors.size() + this.errors.size()
 	}
 
 	/**
@@ -643,6 +643,16 @@ class RowResult {
 	void addComments(CommentElement commentElement) {
 		this.comments.add(commentElement.commentText)
 	}
+	/**
+	 * Add a error message in {@code RowResult#errors} list.
+	 *
+	 * @param errorMessage a String with error message content
+	 */
+	void addError(String errorMessage){
+		errors.add(errorMessage)
+		errorCount = errors.size()
+	}
+
 }
 
 /**
