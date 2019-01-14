@@ -175,7 +175,7 @@ class AssetUtils {
 					project == project
 				}
 				assetClass == AssetClass.DEVICE
-				assetType in AssetType.physicalServerTypes
+				assetType == null || !(assetType in AssetType.virtualServerTypes)
 
 			}.count().toInteger()
 		}
