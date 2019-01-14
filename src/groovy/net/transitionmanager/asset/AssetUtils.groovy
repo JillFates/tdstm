@@ -165,20 +165,20 @@ class AssetUtils {
 	 * @return the number of physical devices found.
 	 */
 	private static Integer getPhysicalCount(Project project, MoveBundle bundle, boolean justPlanning) {
-		return AssetEntity.where {
-			if (bundle) {
-				moveBundle == bundle
-			} else {
-				project == project
-			}
+		if (justPlanning && ! bundle?.useForPlanning) {
+			return 0
+		} else {
+			return AssetEntity.where {
+				if (bundle) {
+					moveBundle == bundle
+				} else {
+					project == project
+				}
+				assetClass == AssetClass.DEVICE
+				assetType in AssetType.physicalServerTypes
 
-			assetClass == AssetClass.DEVICE
-			assetType == null || !(assetType in AssetType.virtualServerTypes)
-
-			if (justPlanning) {
-				moveBundle.useForPlanning == justPlanning
-			}
-		}.count().toInteger()
+			}.count().toInteger()
+		}
 	}
 
 	/**
@@ -189,20 +189,21 @@ class AssetUtils {
 	 * @return the number of servers found.
 	 */
 	private static Integer getServerCount(Project project, MoveBundle bundle, boolean justPlanning) {
-		return AssetEntity.where {
-			if (bundle) {
-				moveBundle == bundle
-			} else {
-				project == project
-			}
+		if (justPlanning && ! bundle?.useForPlanning) {
+			return 0
+		} else {
+			return AssetEntity.where {
+				if (bundle) {
+					moveBundle == bundle
+				} else {
+					project == project
+				}
 
-			assetType in AssetType.serverTypes
-			assetClass == AssetClass.DEVICE
+				assetClass == AssetClass.DEVICE
+				assetType in AssetType.serverTypes
 
-			if (justPlanning) {
-				moveBundle.useForPlanning == justPlanning
-			}
-		}.count().toInteger()
+			}.count().toInteger()
+		}
 	}
 
 
@@ -217,20 +218,21 @@ class AssetUtils {
 	 * @return an integer with the number of assets for the bundle.
 	 */
 	private static Integer getAssetCount(Project project, MoveBundle bundle, AssetClass assetClass, boolean justPlanning) {
-		return AssetEntity.where {
-			// Check if a bundle was passed. If so, use it. If not, use the project.
-			if (bundle) {
-				moveBundle == bundle
-			} else {
-				project == project
-			}
+		if (justPlanning && ! bundle?.useForPlanning) {
+			return 0
+		} else {
+			return AssetEntity.where {
+				// Check if a bundle was passed. If so, use it. If not, use the project.
+				if (bundle) {
+					moveBundle == bundle
+				} else {
+					project == project
+				}
 
-			assetClass == assetClass
+				assetClass == assetClass
 
-			if (justPlanning) {
-				moveBundle.useForPlanning == justPlanning
-			}
-		}.count().toInteger()
+			}.count().toInteger()
+		}
 	}
 
 }
