@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {clone, equals} from 'ramda';
 
 @Component({
 	selector: 'asset-dependency-edit',
@@ -8,18 +9,20 @@ import { Component, Input, OnInit } from '@angular/core';
 				<div class="dependency-row-legend">Frequency</div>
 				<div class="dependency-a">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="frequencyListA"
 						[valuePrimitive]="true"
 						[data]="frequencyList"
-						[(ngModel)]="dependencies.a.frequency">
+						[(ngModel)]="dependencies.a.dataFlowFreq">
 					</kendo-dropdownlist>
 				</div>
 				<div class="dependency-b">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="frequencyListB"
 						[valuePrimitive]="true"
 						[data]="frequencyList"
-						[(ngModel)]="dependencies.a.frequency">
+						[(ngModel)]="dependencies.b.dataFlowFreq">
 					</kendo-dropdownlist>
 				</div>
 			</div>
@@ -28,6 +31,7 @@ import { Component, Input, OnInit } from '@angular/core';
 				<div class="dependency-a">
 					<kendo-dropdownlist
 						name="typeListA"
+						(valueChange)="notifyChanges()"
 						[valuePrimitive]="true"
 						[data]="typeList"
 						[(ngModel)]="dependencies.a.type">
@@ -36,9 +40,10 @@ import { Component, Input, OnInit } from '@angular/core';
 				<div class="dependency-b">
 					<kendo-dropdownlist
 						name="typeListB"
+						(valueChange)="notifyChanges()"
 						[valuePrimitive]="true"
 						[data]="typeList"
-						[(ngModel)]="dependencies.a.type">
+						[(ngModel)]="dependencies.b.type">
 					</kendo-dropdownlist>
 				</div>
 			</div>
@@ -46,6 +51,7 @@ import { Component, Input, OnInit } from '@angular/core';
 				<div class="dependency-row-legend">Status</div>
 				<div class="dependency-a">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="statusListA"
 						[valuePrimitive]="true"
 						[data]="statusList"
@@ -54,10 +60,11 @@ import { Component, Input, OnInit } from '@angular/core';
 				</div>
 				<div class="dependency-b">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="statusListB"
 						[valuePrimitive]="true"
 						[data]="statusList"
-						[(ngModel)]="dependencies.a.status">
+						[(ngModel)]="dependencies.b.status">
 					</kendo-dropdownlist>
 				</div>
 			</div>
@@ -65,70 +72,73 @@ import { Component, Input, OnInit } from '@angular/core';
 				<div class="dependency-row-legend">Direction</div>
 				<div class="dependency-a">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="directionListA"
 						[valuePrimitive]="true"
 						[data]="directionList"
-						[(ngModel)]="dependencies.a.direction">
+						[(ngModel)]="dependencies.a.dataFlowDirection">
 					</kendo-dropdownlist>
 				</div>
 				<div class="dependency-b">
 					<kendo-dropdownlist
+						(valueChange)="notifyChanges()"
 						name="directionListB"
 						[valuePrimitive]="true"
 						[data]="directionList"
-						[(ngModel)]="dependencies.b.direction">
+						[(ngModel)]="dependencies.b.dataFlowDirection">
 					</kendo-dropdownlist>
 				</div>
 			</div>
 			<div class="dependency-row  dependency-edit">
 				<div class="dependency-row-legend">c1</div>
 				<div class="dependency-a">
-					<input type="text" name="c1A" [(ngModel)]="dependencies.a.c1">
+					<input type="text" name="c1A" [(ngModel)]="dependencies.a.c1" (change)="notifyChanges()">
 				</div>
 				<div class="dependency-b">
-					<input type="text" name="c1B" [(ngModel)]="dependencies.b.c1">
+					<input type="text" name="c1B" [(ngModel)]="dependencies.b.c1" (change)="notifyChanges()">
 				</div>
 			</div>
 			<div class="dependency-row  dependency-edit">
 				<div class="dependency-row-legend">c2</div>
 				<div class="dependency-a">
-					<input type="text" name="c2A" [(ngModel)]="dependencies.a.c2">
+					<input type="text" name="c2A" [(ngModel)]="dependencies.a.c2" (change)="notifyChanges()">
 				</div>
 				<div class="dependency-b">
-					<input type="text" name="c2B" [(ngModel)]="dependencies.b.c2">
+					<input type="text" name="c2B" [(ngModel)]="dependencies.b.c2" (change)="notifyChanges()">
 				</div>
 			</div>
 			<div class="dependency-row  dependency-edit">
 				<div class="dependency-row-legend">c3</div>
 				<div class="dependency-a">
-					<input type="text" name="c3A" [(ngModel)]="dependencies.a.c3">
+					<input type="text" name="c3A" [(ngModel)]="dependencies.a.c3" (change)="notifyChanges()">
 				</div>
 				<div class="dependency-b">
-					<input type="text" name="c3B" [(ngModel)]="dependencies.b.c3">
+					<input type="text" name="c3B" [(ngModel)]="dependencies.b.c3" (change)="notifyChanges()">
 				</div>
 			</div>
 			<div class="dependency-row  dependency-edit">
 				<div class="dependency-row-legend">c4</div>
 				<div class="dependency-a">
-					<input type="text" name="c4A" [(ngModel)]="dependencies.a.c4">
+					<input type="text" name="c4A" [(ngModel)]="dependencies.a.c4" (change)="notifyChanges()">
 				</div>
 				<div class="dependency-b">
-					<input type="text" name="c4B" [(ngModel)]="dependencies.b.c4">
+					<input type="text" name="c4B" [(ngModel)]="dependencies.b.c4" (change)="notifyChanges()">
 				</div>
 			</div>
 			<div class="dependency-row  dependency-edit">
 				<div class="dependency-row-legend">comment</div>
 				<div class="dependency-a">
-					<textarea name="commentA" [(ngModel)]="dependencies.a.comment"></textarea>
+					<textarea name="commentA" [(ngModel)]="dependencies.a.comment" (change)="notifyChanges()"></textarea>
 				</div>
 				<div class="dependency-b">
-					<textarea name="commentB" [(ngModel)]="dependencies.b.comment"></textarea>
+					<textarea name="commentB" [(ngModel)]="dependencies.b.comment" (change)="notifyChanges()"></textarea>
 				</div>
 			</div>
 		</div>
 	`
 })
 export class AssetDependencyEditComponent implements OnInit {
+	@Output() change: EventEmitter<any> = new EventEmitter<any>();
 	@Input() dependencyA: any;
 	@Input() dependencyB: any;
 	@Input() frequencyList: string[] = [];
@@ -141,15 +151,18 @@ export class AssetDependencyEditComponent implements OnInit {
 		b: {}
 	};
 
+	protected initialModel = null;
+
 	ngOnInit() {
 		this.dependencies.a = this.getDependencyElements(this.dependencyA);
 		this.dependencies.b = this.getDependencyElements(this.dependencyB);
+		this.initialModel = clone(this.dependencies);
 	}
 
 	private getDependencyElements(dependency: any): any {
 		return {
-			frequency: dependency && dependency.dataFlowFreq || '',
-			direction: dependency && dependency.dataFlowDirection || '',
+			dataFlowFreq: dependency && dependency.dataFlowFreq || '',
+			dataFlowDirection: dependency && dependency.dataFlowDirection || '',
 			status: dependency && dependency.status || '',
 			type: dependency && dependency.type || '',
 			c1: dependency && dependency.c1 || '',
@@ -159,4 +172,11 @@ export class AssetDependencyEditComponent implements OnInit {
 			comment: dependency && dependency.comment || ''
 		}
 	}
+
+	protected notifyChanges(): void {
+		console.log('has changes');
+		console.log(JSON.stringify(this.dependencies, null, 2));
+		this.change.emit(this.dependencies);
+	}
+
 }

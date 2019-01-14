@@ -87,6 +87,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	protected typeList: string[];
 	protected statusList: string[];
 	protected directionList: string[];
+	protected changedDependencies = null;
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
@@ -127,8 +128,17 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	protected saveChanges() {
-		this.isEditing = false;
+		this.setEditMode(false)
+		this.changedDependencies = null;
 		console.log('Editing changes');
 	}
 
+	protected cancelEdit() {
+		this.setEditMode(false);
+		this.changedDependencies = null;
+	}
+
+	protected onChangeDependencies(dependencies: any) {
+		this.changedDependencies = dependencies;
+	}
 }

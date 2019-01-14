@@ -80,6 +80,7 @@
                                 [statusList]="statusList"
                                 [typeList]="typeList"
                                 [directionList]="directionList"
+                                (change)="onChangeDependencies($event)"
                         ></asset-dependency-edit>
                     </ng-template>
 
@@ -123,6 +124,7 @@
 	            <ng-template #buttonsEditModeTemplate>
                     <tds-button
                             [action]="ButtonActions.AssetUpdate"
+                            [disabled]="!changedDependencies"
                             class="btn-primary pull-left"
                             tooltip="Save changes"
                             (click)="saveChanges()">
@@ -132,7 +134,7 @@
                             [action]="ButtonActions.AssetCancel"
                             tooltip="Cancel editing"
                             class="pull-right"
-                            (click)="setEditMode(false)">
+                            (click)="cancelEdit(false)">
                     </tds-button>
 
                 </ng-template>
