@@ -15,6 +15,7 @@ declare var tinymce: any;
 	exportAs: 'richTextEditor'
 })
 export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
+
 	private isPristine = true;
 
 	@Input() elementId: String;
@@ -39,15 +40,21 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			skin_url: '../../dist/js/vendors/tinymce/lightgray',
 			setup: editor => {
 				this.editor = editor;
-				editor.on('keyup', () => {
-					this.isPristine = false;
-					const content = editor.getContent();
-					const rawContent = editor.getContent({format: 'raw'});
-					this.valueChange.emit(content);
-					this.rawValueChange.emit(rawContent);
-				});
+				editor.on('keyup', () => this.saveContent());
+				editor.on('blur', () => this.saveContent());
 			},
 		});
+	}
+
+	/**
+	 * Updates the model on any change
+	 */
+	private saveContent(): void {
+		this.isPristine = false;
+		const content = this.editor.getContent();
+		const rawContent = this.editor.getContent({format: 'raw'});
+		this.valueChange.emit(content);
+		this.rawValueChange.emit(rawContent);
 	}
 
 	ngOnDestroy() {

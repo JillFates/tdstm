@@ -32,7 +32,12 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
-                        <rich-text-editor #htmlTextField="richTextEditor" [elementId]="'htmlText'" [required]="true" [name]="'htmlText'" [(rawValue)]="model.rawText"
+                        <rich-text-editor
+                            #htmlTextField="richTextEditor"
+                            [elementId]="'htmlText'"
+                            [required]="true"
+                            [name]="'htmlText'"
+                            [(rawValue)]="model.rawText"
                             [(value)]="model.htmlText">
                         </rich-text-editor>
                     </div>
@@ -42,7 +47,7 @@
     </div>
     <div class="modal-footer form-group-center">
         <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
-        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
+        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="submit" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
     </div>
 </div>

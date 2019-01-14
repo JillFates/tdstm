@@ -22,11 +22,11 @@ export class NoticeViewEditComponent {
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 	@ViewChild('noticeForm') noticeForm: FormControl;
 
-	model: NoticeModel;
-	defaultItem: any = {
+	protected model: NoticeModel;
+	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-	typeDataSource: Array<any> = [
+	protected typeDataSource: Array<any> = [
 		{typeId: 1, name: 'Prelogin'},
 		{typeId: 2, name: 'Postlogin'}
 	];
@@ -39,20 +39,24 @@ export class NoticeViewEditComponent {
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
+		this.model.typeId = parseInt(this.model.typeId, 10);
 	}
 
-	cancelCloseDialog(): void {
+	protected cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 
-	deleteNotice(): void {
+	protected deleteNotice(): void {
 		this.noticeService.deleteNotice(this.model)
 			.subscribe(
 				res => this.activeDialog.close(),
 				error => this.activeDialog.dismiss(error));
 	}
 
-	saveNotice(): void {
+	/**
+	 *
+	 */
+	protected saveNotice(): void {
 		if (this.model.id) {
 			this.noticeService.editNotice(this.model)
 				.subscribe(
@@ -68,7 +72,7 @@ export class NoticeViewEditComponent {
 
 	}
 
-	formValid(): boolean {
+	protected formValid(): boolean {
 		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
 	}
 

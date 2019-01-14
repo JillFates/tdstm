@@ -44,7 +44,7 @@ export class NoticeModel {
 	lastModified: string;
 	rawText: string;
 	title: string;
-	typeId: number;
+	typeId: any;
 }
 
 export const NoticeTypes = [

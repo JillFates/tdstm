@@ -52,8 +52,8 @@ export class NoticeService {
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
-	deleteNotice(notice: NoticeModel): Observable<NoticeModel[]> {
-		return this.http.delete(`${this.noticeListUrl}/${notice.id}`)
+	deleteNotice(noticeId: NoticeModel): Observable<NoticeModel[]> {
+		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
