@@ -23,8 +23,14 @@
                 font-weight: normal
     .dependency-edit
         margin-bottom: 6px
-        .k-widget
+        .k-widget,
+        textarea,
+        input
             visibility: hidden
+            width: 80%
+
+    textarea
+        resize: none
 
     .dependency-label
         visibility: hidden
@@ -44,6 +50,10 @@
     .has-dependency-a .dependency-a .dependency-label,
     .has-dependency-b .dependency-b .dependency-label,
     .has-dependency-a .dependency-edit .dependency-a .k-widget,
-    .has-dependency-b .dependency-edit .dependency-b .k-widget
+    .has-dependency-b .dependency-edit .dependency-b .k-widget,
+    .has-dependency-a .dependency-edit .dependency-a input,
+    .has-dependency-b .dependency-edit .dependency-b input,
+    .has-dependency-a .dependency-edit .dependency-a textarea,
+    .has-dependency-b .dependency-edit .dependency-b textarea
         visibility: visible
 

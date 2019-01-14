@@ -80,6 +80,51 @@ import { Component, Input, OnInit } from '@angular/core';
 					</kendo-dropdownlist>
 				</div>
 			</div>
+			<div class="dependency-row  dependency-edit">
+				<div class="dependency-row-legend">c1</div>
+				<div class="dependency-a">
+					<input type="text" name="c1A" [(ngModel)]="dependencies.a.c1">
+				</div>
+				<div class="dependency-b">
+					<input type="text" name="c1B" [(ngModel)]="dependencies.b.c1">
+				</div>
+			</div>
+			<div class="dependency-row  dependency-edit">
+				<div class="dependency-row-legend">c2</div>
+				<div class="dependency-a">
+					<input type="text" name="c2A" [(ngModel)]="dependencies.a.c2">
+				</div>
+				<div class="dependency-b">
+					<input type="text" name="c2B" [(ngModel)]="dependencies.b.c2">
+				</div>
+			</div>
+			<div class="dependency-row  dependency-edit">
+				<div class="dependency-row-legend">c3</div>
+				<div class="dependency-a">
+					<input type="text" name="c3A" [(ngModel)]="dependencies.a.c3">
+				</div>
+				<div class="dependency-b">
+					<input type="text" name="c3B" [(ngModel)]="dependencies.b.c3">
+				</div>
+			</div>
+			<div class="dependency-row  dependency-edit">
+				<div class="dependency-row-legend">c4</div>
+				<div class="dependency-a">
+					<input type="text" name="c4A" [(ngModel)]="dependencies.a.c4">
+				</div>
+				<div class="dependency-b">
+					<input type="text" name="c4B" [(ngModel)]="dependencies.b.c4">
+				</div>
+			</div>
+			<div class="dependency-row  dependency-edit">
+				<div class="dependency-row-legend">comment</div>
+				<div class="dependency-a">
+					<textarea name="commentA" [(ngModel)]="dependencies.a.comment"></textarea>
+				</div>
+				<div class="dependency-b">
+					<textarea name="commentB" [(ngModel)]="dependencies.b.comment"></textarea>
+				</div>
+			</div>
 		</div>
 	`
 })
@@ -95,15 +140,6 @@ export class AssetDependencyEditComponent implements OnInit {
 		a: {},
 		b: {}
 	};
-
-	constructor() {
-		console.log('Dependency');
-		console.log('------');
-		// dataFlowFreq
-		// dataFlowDirection
-		// status
-		// type
-	}
 
 	ngOnInit() {
 		this.dependencies.a = this.getDependencyElements(this.dependencyA);
