@@ -3,9 +3,10 @@ import {Component, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
+import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
@@ -35,6 +36,7 @@ export class NoticeViewEditComponent {
 		model: NoticeModel,
 		public action: Number,
 		public activeDialog: UIActiveDialogService,
+		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private permissionService: PermissionService) {
 
@@ -54,7 +56,7 @@ export class NoticeViewEditComponent {
 	}
 
 	/**
-	 *
+	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
 		if (this.model.id) {
@@ -70,6 +72,19 @@ export class NoticeViewEditComponent {
 
 		}
 
+	}
+
+	/**
+	 * Opens the view to pre-render the HTML
+	 */
+	protected viewHTML(): void {
+		this.dialogService.extra(ViewHtmlComponent,
+			[{provide: NoticeModel, useValue: this.model}],
+			false, false)
+			.then((result) => {
+				//
+			})
+			.catch(error => console.log('View HTML Closed'));
 	}
 
 	protected formValid(): boolean {

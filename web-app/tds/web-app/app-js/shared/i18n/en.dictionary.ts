@@ -266,6 +266,7 @@ export const en_DICTIONARY: Object = {
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'VIEW_HTML': 'View HTML',
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',
