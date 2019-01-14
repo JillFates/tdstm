@@ -2,6 +2,7 @@ package pages.Tasks.TaskManager
 
 import geb.Page
 import modules.TasksModule
+import utils.CommonActions
 import pages.Tasks.*
 
 class TaskEditionPage extends Page{
@@ -30,6 +31,7 @@ class TaskEditionPage extends Page{
         teModalStatusSelector(wait:true) { teModalWindow.find("select#status")}
         teModalAddPredecessorBtn(wait:true) { teModalWindow.find("a","ng-click":"\$broadcast('addDependency','predecessor')")}
         teModalPredecessorDD (wait:true, required:false){ teModalWindow.find("task-dependencies","ng-model":"dependencies.predecessors").find("span",class:"k-icon k-i-arrow-s")}
+        teModalPredecessorValue {$(".k-input.ng-scope")}
         teModalAddSuccessorBtn(wait:true) { teModalWindow.find("a","ng-click":"\$broadcast('addDependency','successor')")}
         teModalSuccessorDD  (wait:true, required:false) { teModalWindow.find("task-dependencies","ng-model":"dependencies.successors").find("span",class:"k-icon k-i-arrow-s")}
         teModalNote { teModalWindow.find("textarea#noteEditId")}
@@ -41,5 +43,25 @@ class TaskEditionPage extends Page{
         teModalPredecessorOptions {teModalPredecessorUl.find("li")}
         teModalSuccessorOptions {teModalSuccessorUl.find("li")}
         tasksModule { module TasksModule}
+    }
+    /**
+     * This method select a successor. The boolean parameter will define
+     * whether this successor is different
+     * from the predecessor or if it is  the same
+     * @author ingrid
+     */
+    def selectSuccessor(boolean same){
+        def opt = teModalPredecessorValue[0].text()
+        for (int i = 0; i < teModalSuccessorOptions.size(); i++) {
+            if (teModalSuccessorOptions[i].text().equals(opt)) {
+                if(same) {
+                    return teModalSuccessorOptions[i]
+                }else{
+                    teModalSuccessorOptions.remove(i)//removes the predecessor from the available options
+                }
+                break
+            }
+        }
+        CommonActions.getSelectRandomOption(teModalSuccessorOptions)
     }
 }
