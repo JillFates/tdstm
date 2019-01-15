@@ -24,7 +24,7 @@
                                 </li>
                             </g:if>
                             <li class="menu-child-item menu-admin-license-manager">
-                                <a href="/tdstm/app/notice/list">Notices</a>
+                                <a href="/tdstm/module/notice/list">Notices</a>
                             </li>
                             <li class="menu-child-item menu-admin-role">
                                 <tds:hasPermission permission="${Permission.RolePermissionView}">
