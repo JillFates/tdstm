@@ -4,7 +4,13 @@ import grails.util.Environment
 // vars are: appName, appVersion, basedir, baseFile, baseName, grailsHome,
 //           grailsSettings, grailsVersion, groovyVersion, springVersion, userHome
 getBinding().variables.each { name, value -> setProperty name, value }
-String appName = this.appName ?: 'tdstm'
+
+String appName = this.appName
+
+if ( ! appName ) {
+	File userDir = new File( System.getProperty("user.dir") )
+	appName = userDir.name ?: 'tdstm'
+}
 
 grails.config.locations = []
 
