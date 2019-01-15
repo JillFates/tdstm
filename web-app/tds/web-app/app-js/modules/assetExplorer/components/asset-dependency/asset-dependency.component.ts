@@ -5,6 +5,9 @@ import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
 import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {DependencyChange, DependencyType} from './model/asset-dependency.model';
+import {BulkActions} from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: 'asset-dependency',
@@ -95,7 +98,9 @@ export class AssetDependencyComponent extends UIExtraDialog {
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
-		private assetService: DependecyService) {
+		private assetService: DependecyService,
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe) {
 		super('#assetDependency');
 
 		this.isEditing = false;
@@ -180,19 +185,45 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	protected onDeleteDependency(dependencyType: DependencyType) {
-		const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
+		this.confirmDelete()
+			.then((result) => {
+				if (result) {
+					console.log(result);
+					const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
 
-		const dependencyChange = {
-			assetId: dependency.asset.id,
-			dependencyId: dependency.id
-		};
+					const dependencyChange = {
+						assetId: dependency.asset.id,
+						dependencyId: dependency.id
+					};
 
-		console.log('Deleting...');
-		console.log(dependencyChange);
-		this.assetService.deleteDependency(dependencyChange)
-			.subscribe((result) => {
-				console.log('The result of delete is');
-				console.log(result);
-			}, (error) => console.log('Error:', error));
+					console.log('Deleting...');
+					console.log(dependencyChange);
+					this.assetService.deleteDependency(dependencyChange)
+						.subscribe((result) => {
+							if (result) {
+								if (dependencyType === DependencyType.dependencyA ) {
+									this.cancelCloseDialog();
+								} else {
+									this.dependencyB = null;
+								}
+							}
+							console.log('The result of delete is');
+							console.log(result);
+						}, (error) => console.log('Error:', error));
+				}
+			});
+	}
+
+	/**
+	 * confirmation popup. Launched when user wants to delete a dependency
+	 * @returns {Promise<boolean>}
+	 */
+	private confirmDelete(): Promise<boolean> {
+		const message = this.translatePipe
+			.transform('DEPENDENCIES.CONFIRM_DELETE_DEPENDENCY');
+
+		return this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+					message, this.translatePipe.transform('GLOBAL.CONFIRM'),
+					this.translatePipe.transform('GLOBAL.CANCEL'));
 	}
 }
