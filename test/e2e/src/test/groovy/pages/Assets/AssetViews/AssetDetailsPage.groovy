@@ -19,9 +19,9 @@ class AssetDetailsPage extends Page{
     static content = {
         assetDetailModal { $("div.tds-angular-component-content")}
         modalTitle { assetDetailModal.find(".modal-title")}
-        editButton { assetDetailModal.find(".modal-footer button span.glyphicon-pencil")}
+        editButton { assetDetailModal.find(".modal-footer button i.fa-pencil")}
         closeButton { assetDetailModal.find(".modal-header .close")}
-        cloneButton { assetDetailModal.find(".modal-footer button span.glyphicon-duplicate")}
+        cloneButton { assetDetailModal.find(".modal-footer button i.fa-clone")}
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
