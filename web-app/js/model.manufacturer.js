@@ -11,6 +11,10 @@ var akaUtil = (function ($) {
 	 * @param forWhom, 'model' or 'manufacturer' to specify which type of AKA this is
 	 */
 	public.addAka = function (forWhom) {
+		// do nothing while disabled
+		if ($('span#addAkaId').hasClass('addAkaDisabled'))
+			return
+			
 		// TODO : rmacfarlane 2/9/2017 : this is pretty messy and should probable be done in a more elegant way
 		var akaId = private.lastAkaId--
 		var spanId = "errSpan_" + akaId
