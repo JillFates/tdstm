@@ -67,17 +67,21 @@
 			</div>
 			<div class="col-sm-6 filters-section">
 				<div>
-					<tds-button [action]="ButtonActions.FilterClear"
+					<tds-button-custom
 							class="component-action-clear-filters"
 					        id="btnClean"
+					        icon="times"
+					        title="Clear filters"
 					        [disabled]="!hasFilterApplied()"
 					        (click)="onClearFilters()">
-					</tds-button>
+					</tds-button-custom>
 				</div>
-				<tds-button [action]="ButtonActions.GenericRefresh"
+				<tds-button-custom
+				            icon="refresh"
+				            title="Refresh"
 				            isIconButton="true"
 				            class="component-action-reload pull-righ"
-				            (click)="onReload()"></tds-button>
+				            (click)="onReload()"></tds-button-custom>
 			</div>
 		</ng-template>
 
@@ -116,12 +120,12 @@
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="tds-action-button-set">
-					<tds-button [action]="ButtonActions.AssetEdit" (click)="showAssetEditView(dataItem, rowIndex)"></tds-button>
-					<tds-button [action]="ButtonActions.TaskCreate" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button>
-					<tds-button [action]="ButtonActions.TaskList" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button>
-					<tds-button [action]="ButtonActions.CommentCreate" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button>
-					<tds-button [action]="ButtonActions.CommentList" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button>
-					<tds-button [action]="ButtonActions.AssetClone" (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button>
+					<tds-button-edit  (click)="showAssetEditView(dataItem, rowIndex)" tooltip="Edit Asset"></tds-button-edit>
+					<tds-button-custom tooltip="Create Task" icon="file-text-o" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="List Tasks" icon="list-alt" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="Create Comment" icon="comment-o" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="Show Comments" icon="comments-o" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-clone  (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button-clone>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>
