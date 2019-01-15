@@ -46,6 +46,7 @@ import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.hibernate.ObjectNotFoundException
+import grails.transaction.NotTransactional
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -403,6 +404,7 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.DashboardMenuView)
+	@NotTransactional()
 	def planningStats() {
 		Project project = securityService.userCurrentProject
 
@@ -890,6 +892,7 @@ class MoveBundleController implements ControllerMethods {
 	 * @param  Console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
+	@NotTransactional()
 	def dependencyConsole() {
 		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
 		validateCommandObject(console)
