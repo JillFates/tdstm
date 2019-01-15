@@ -161,4 +161,20 @@ enum AssetClass {
 		return assetClassByDomainClassMap[clazz]
 	}
 
+	/**
+	 * Retrieve the class option value for the given asset.
+	 * @param asset
+	 * @return the corresponding class option value for the given asset.
+	 */
+	static String getClassOptionValueForAsset(AssetEntity asset) {
+		String result = null
+		if (asset) {
+			String classOptionKey = getClassOptionForAsset(asset)
+			if (classOptionKey) {
+				result = classOptions[classOptionKey]
+			}
+		}
+		return result
+	}
+
 }
