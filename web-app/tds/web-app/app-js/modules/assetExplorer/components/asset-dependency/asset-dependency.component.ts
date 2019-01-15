@@ -143,13 +143,10 @@ export class AssetDependencyComponent extends UIExtraDialog {
 
 		forkJoin(updates)
 			.subscribe((result: any[]) => {
-				const [successA, successB] = result;
-				console.log('The result of the update is');
-				console.log(successA);
-				if (successA) {
+				if (this.editedDependencies.aDependencyHasChanged) {
 					this.dependencyA = { ...this.dependencyA, ...this.editedDependencies.dependencies.a };
 				}
-				if (successB) {
+				if (this.editedDependencies.bDependencyHasChanged) {
 					this.dependencyB = { ...this.dependencyB, ...this.editedDependencies.dependencies.b };
 				}
 				this.setEditMode(false);
