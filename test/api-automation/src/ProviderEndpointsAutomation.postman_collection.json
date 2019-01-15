@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "87bc4a02-caaf-4435-aded-974b76a3c701",
+		"_postman_id": "7eebb1af-a6b8-408b-97b8-5aaf740eee4a",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -174,11 +174,11 @@
 							"",
 							"var response = JSON.parse(responseBody);",
 							"var checkname = response.data.provider.name;",
-							"tests[\"Name was updated\"] = /QAUpdate/.test(checkname);",
+							"tests[\"Name was updated\"] = /updatedName/.test(checkname);",
 							"",
 							"",
 							"var provName = response.data.provider.name; ",
-							"provName = provName + _.random(1, 1000) ;",
+							"provName = \"NewProvider\" + _.random(1, 1000) + _.random(1, 1000) ;",
 							"",
 							"pm.environment.set(\"createProvider\", provName);",
 							""
