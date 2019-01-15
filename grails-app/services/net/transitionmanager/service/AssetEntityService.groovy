@@ -3087,4 +3087,65 @@ class AssetEntityService implements ServiceMethods {
 		return commonModel
 	}
 
+
+	/**
+	 * Create and return a map with all the information regarding the dependencies
+	 * between two assets.
+	 *
+	 * @param project - user's current asset.
+	 * @param assetAId - one of the asset's id.
+	 * @param assetBId - id of the other asset.
+	 * @return a map with all the fields with the information for the dependencies between two assets.
+	 */
+	Map getAssetDependenciesBetweenAssets(Project project, Long assetAId, Long assetBId) {
+		AssetEntity assetA = GormUtil.findInProject(project, AssetEntity, assetAId, true)
+		AssetEntity assetB = GormUtil.findInProject(project, AssetEntity, assetBId, true)
+
+		AssetDependency dependencyA = AssetDependency.where {
+			asset == assetA
+			dependent == assetB
+		}.find()
+
+		AssetDependency dependencyB = AssetDependency.where {
+			asset == assetB
+			dependent == assetA
+		}.find()
+
+		String assetAClassLabel = AssetClass.getClassOptionValueForAsset(assetA)
+		String assetBClassLabel = AssetClass.getClassOptionValueForAsset(assetB)
+
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
+		return  [
+			assetA:[
+				name: assetA.assetName,
+				assetClass: assetAClassLabel,
+				environment: assetA.environment,
+				bundle: assetA.moveBundleName,
+				planStatus: assetA.planStatus,
+				dependency: dependencyA?.toMap(),
+				dependencyClass: dependencyA?.dependent?.assetClass,
+				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
+			],
+			assetB: [
+				name: assetB.assetName,
+				assetClass: assetBClassLabel,
+				environment: assetB.environment,
+				bundle: assetB.moveBundleName,
+				planStatus: assetB.planStatus,
+				dependency: dependencyB?.toMap(),
+				dependencyClass: dependencyB?.dependent?.assetClass,
+				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
+			],
+			dataFlowFreq: AssetDependency.constraints.dataFlowFreq.inList,
+			dependencyType: entityInfo(project).dependencyType,
+			dependencyStatus: entityInfo(project).dependencyStatus,
+			directionList: AssetDependency.constraints.dataFlowDirection.inList,
+			editPermission: securityService.hasPermission(Permission.AssetEdit)
+		]
+	}
+
 }

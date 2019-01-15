@@ -155,68 +155,8 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getAssetDependencies(Long assetAId, Long assetBId){
-		AssetEntity assetA = AssetEntity.get(assetAId)
-		AssetEntity assetB = AssetEntity.get(assetBId)
-		// check that the assets are part of the project
-		if(!securityService.isCurrentProjectId(assetA.projectId) || !securityService.isCurrentProjectId(assetB.projectId)){
-			log.error(
-					"Security Violation, user {} attempted to access an asset not associated to the project",
-					securityService.getCurrentUsername()
-			)
-			errors << "Asset not found in current project"
-		}
-
-		List<AssetDependency> requiredDependenciesA = assetA.requiredDependencies()
-		AssetDependency dependencyA =  requiredDependenciesA.find {
-			it.dependent.id == assetBId
-		}
-
-		List<AssetDependency> requiredDependenciesB = assetB.requiredDependencies()
-		AssetDependency dependencyB =  requiredDependenciesB.find {
-			it.dependent.id == assetAId
-		}
-
-		def assetAClassLabel = AssetClass.classOptions.find {
-			it.key == AssetClass.getClassOptionForAsset(assetA)
-		}
-
-		def assetBClassLabel = AssetClass.classOptions.find {
-			it.key == AssetClass.getClassOptionForAsset(assetB)
-		}
-
-		def Project currentProject = securityService.getUserCurrentProject()
-		String userTzId = userPreferenceService.timeZone
-		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
-
-		def dependencyMap = [
-			"assetA"          : [
-					"name"           : assetA.assetName,
-					"assetClass"     : assetAClassLabel.value,
-					"environment"    : assetA.environment,
-					"bundle"         : assetA.moveBundleName,
-					"planStatus"     : assetA.planStatus,
-					"dependency"     : dependencyA,
-					"dependencyClass": dependencyA?.dependent?.assetClass,
-					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
-					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
-			],
-			"assetB"          : [
-					"name"           : assetB.assetName,
-					"assetClass"     : assetBClassLabel.value,
-					"environment"    : assetB.environment,
-					"bundle"         : assetB.moveBundleName,
-					"planStatus"     : assetB.planStatus,
-					"dependency"     : dependencyB,
-					"dependencyClass": dependencyB?.dependent?.assetClass,
-					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
-					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
-			],
-			"dataFlowFreq"    : AssetDependency.constraints.dataFlowFreq.inList,
-			"dependencyType"  : assetEntityService.entityInfo(currentProject).dependencyType,
-			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
-			"editPermission"  : securityService.hasPermission(Permission.AssetEdit)
-		]
-		renderSuccessJson(dependencyMap)
+		Project project = getProjectForWs()
+		renderSuccessJson(assetEntityService.getAssetDependenciesBetweenAssets(project, assetAId, assetBId))
 	}
 
 	/**
