@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "Login",
+			"name": "Login - Provider",
 			"event": [
 				{
 					"listen": "test",
