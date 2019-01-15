@@ -30,11 +30,6 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.material.min.css')}">
 <link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.material.mobile.min.css')}">
 
-<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-<script src="${resource(dir: 'dist/js/vendors/html5shiv/dist', file: 'html5shiv.min.js')}"></script>
-<script src="${resource(dir: 'dist/js/vendors/respond/dest', file: 'respond.min.js')}"></script>
-<![endif]-->
 
 <!-- jQuery -->
 <script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>
@@ -113,8 +108,6 @@ def moveEvent = tds.currentMoveEvent() ?: null
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
 <!-- SlimScroll -->
 <script src="${resource(dir: 'dist/js/vendors/jquery-slimscroll', file: 'jquery.slimscroll.min.js')}"></script>
-<!-- FastClick -->
-<script src="${resource(dir: 'dist/js/vendors/fastclick/lib', file: 'fastclick.js')}"></script>
 <!-- ProgressBar.js -->
 <script src="${resource(dir: 'dist/js/vendors/progressbar.js/dist', file: 'progressbar.js')}"></script>
 
