@@ -643,16 +643,6 @@ class RowResult {
 	void addComments(CommentElement commentElement) {
 		this.comments.add(commentElement.commentText)
 	}
-	/**
-	 * Add a error message in {@code RowResult#errors} list.
-	 *
-	 * @param errorMessage a String with error message content
-	 */
-	void addError(String errorMessage){
-		errors.add(errorMessage)
-		errorCount = errors.size()
-	}
-
 }
 
 /**

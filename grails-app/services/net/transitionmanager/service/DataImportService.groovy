@@ -4,7 +4,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
-import com.tdsops.etl.DependencyBuilder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
@@ -441,7 +440,7 @@ class DataImportService implements ServiceMethods {
 				property('queuedBy')
 			}
 			.sort('queuedAt')
-			.list(max: 1)
+				.list(max: 1)
 
 			if (batchIds) {
 				return [batchId: batchIds.get(0)[0], queuedBy: batchIds.get(0)[1]]
@@ -620,7 +619,7 @@ class DataImportService implements ServiceMethods {
 				}
 			}
 			.projections { property('id') }
-			.list(sortBy: 'id')
+				.list(sortBy: 'id')
 
 			log.info 'processBatch({}) found {} PENDING rows', batchId, recordIds.size()
 
@@ -711,8 +710,8 @@ class DataImportService implements ServiceMethods {
 
 			default:
 				break
-				//log.error "Batch Import process called for unsupported domain ${batch.domainClassName} in batch ${batch.id} in project ${batch.project}"
-				//error = "Batch process not supported for domain ${domainName}"
+		//log.error "Batch Import process called for unsupported domain ${batch.domainClassName} in batch ${batch.id} in project ${batch.project}"
+		//error = "Batch process not supported for domain ${domainName}"
 		}
 
 		return error
@@ -795,8 +794,6 @@ class DataImportService implements ServiceMethods {
 					log.warn 'processEntityRecord() binding values failed'
 				} else if (recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
 					log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
-				} else if (recordIsDependencyAndContainsInvalidReferences(entity, context.record, fieldsInfo)) {
-					log.warn "processEntityRecord() record AssetDependency contains errors ${GormUtil.allErrorsString(entity)}"
 				} else {
 					abandonEntity = false
 				}
@@ -1335,28 +1332,6 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * This is used to perform the validate on a domain object is {@ AssetDependency}
-	 * and {@ AssetDependency#asset} is the same domain in {@ AssetDependency#dependent}
-	 *
-	 * @param domain - the domain that is being created or updated
-	 * @param record - the import record being processed (errors can be logged to this object)
-	 * @param fieldsInfo - the Map of the fields that came from the ETL process
-	 * @return true if an error was recognized otherwise false
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Boolean recordIsDependencyAndContainsInvalidReferences(Object domain, ImportBatchRecord record, Map fieldsInfo) {
- 		boolean errorsFound = false
-		if (domain.class in [AssetDependency]) {
-			AssetDependency dependency = (AssetDependency)domain
-			if (dependency?.asset?.id == dependency?.dependent?.id) {
-				record.addError(DependencyBuilder.SELF_REFERENCE_ERROR_MESSAGE)
-				errorsFound = true
-			}
-		}
-
-		return errorsFound
-	}
-	/**
 	 * This is used to perform the validate on a domain object and will save the errors back into the
 	 * fieldsInfo map appropriately or into the ImportBatchRecord if the constraint failure was on a property
 	 * that is not in the fieldsInfo.
@@ -1726,7 +1701,7 @@ class DataImportService implements ServiceMethods {
 		quartzScheduler.scheduleJob(trigger)
 
 		log.info('scheduleJob() {} kicked of an ETL transform data process for script and filename ({},{})',
-				securityService.currentUsername, dataScriptId, filename)
+			securityService.currentUsername, dataScriptId, filename)
 
 		// return progress key
 		return ['progressKey': key]
