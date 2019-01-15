@@ -101,8 +101,6 @@
 
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
-<!-- SlimScroll -->
-<script src="${resource(dir: 'dist/js/vendors/jquery-slimscroll', file: 'jquery.slimscroll.min.js')}"></script>
 <!-- TDSTMLayout App -->
 <script src="${resource(dir: 'dist/js', file: 'TDSTMLayout.min.js')}"></script>
 </body>

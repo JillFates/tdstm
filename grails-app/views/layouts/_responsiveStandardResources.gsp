@@ -106,8 +106,6 @@ def moveEvent = tds.currentMoveEvent() ?: null
 <script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
-<!-- SlimScroll -->
-<script src="${resource(dir: 'dist/js/vendors/jquery-slimscroll', file: 'jquery.slimscroll.min.js')}"></script>
 <!-- ProgressBar.js -->
 <script src="${resource(dir: 'dist/js/vendors/progressbar.js/dist', file: 'progressbar.js')}"></script>
 
