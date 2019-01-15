@@ -26,7 +26,6 @@ class AssetDependency {
 	Date dateCreated
 	Date lastUpdated
 
-
 	String c1
 	String c2
 	String c3
@@ -37,7 +36,11 @@ class AssetDependency {
 
 	static constraints = {
 		asset unique: ['dependent', 'type']
-		dependent nullable: false
+		dependent nullable: false, validator: { val, obj ->
+			if (val && obj && obj.asset?.id == obj.dependent?.id) {
+				return ['invalid.dependent']
+			}
+		}
 		c1 nullable: true, blank: true, size:0..255
 		c2 nullable: true, blank: true, size:0..255
 		c3 nullable: true, blank: true, size:0..255
