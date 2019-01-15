@@ -14,6 +14,9 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 <!-- General Template Style -->
 <link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'style.css')}">
+<g:if test="${isLicenseManagerEnabled}">
+    <link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'managerStyle.css')}">
+</g:if>
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
@@ -49,6 +52,9 @@
 <g:javascript src="timezone/jquery.timezone-picker.min.js" />
 <g:javascript src="person.js"/>
 <script src="${resource(dir: 'dist/js/vendors/jquery.browser/dist', file: 'jquery.browser.min.js')}"></script>
+
+<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'tinymce.min.js')}"></script>
+<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'theme.min.js')}"></script>
 
 <script type="text/javascript">
     var contextPath = "${request.contextPath}";

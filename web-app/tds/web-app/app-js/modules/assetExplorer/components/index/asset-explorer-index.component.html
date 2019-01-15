@@ -27,11 +27,11 @@
 					<div class="box-header with-border">
 						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
                         <div class="box-tools-actions" *ngIf="isCreateAvailable()" style="vertical-align: super;">
-	                        <tds-button
-			                        [action]="ButtonActions.ViewCreate"
+	                        <tds-button-create
+			                        tooltip="Create View"
 			                        class="btn-primary"
 			                        (click)="onCreateReport()">
-	                        </tds-button>
+	                        </tds-button-create>
                         </div>
 						<div class="pull-right">
 							<div class="form-group has-feedback search-filter-text">
@@ -60,24 +60,26 @@
 									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
 										<td class="asset-explorer-td-actions">
 											<div class="tds-action-button-set">
-												<tds-button [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
-												    [action]="ButtonActions.ViewEdit"
+												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
+												    tooltip="Edit View"
 											        (click)="onEditReport(report)">
-												</tds-button>
+												</tds-button-edit>
 
-												<tds-button [style.visibility]="isDeleteAvailable(report) && !report.isSystem ? 'visible' : 'hidden'"
-													[action]="ButtonActions.ViewDelete"
+												<tds-button-delete [style.visibility]="isDeleteAvailable(report) && !report.isSystem ? 'visible' : 'hidden'"
+												    tooltip="Delete View"
 													(click)="onDeleteReport(report)">
-												</tds-button>
+												</tds-button-delete>
 											</div>
 										</td>
 
-										<td class="asset-explorer-td-favorite text-center tds-action-button-set">
-											<tds-button [action]="report.isFavorite ? ButtonActions.GenericIsFavorite : ButtonActions.GenericIsNotFavorite"
+										<td class="text-center tds-action-button-set">
+											<tds-button-custom
+											            [icon]="report.isFavorite ? 'star' : 'star-o' "
+											            [title]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
 											            class="text-yellow"
 											            isIconButton="true"
 											            (click)="toggleFavorite(report)">
-											</tds-button>
+											</tds-button-custom>
 										</td>
 										<td>
 											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>

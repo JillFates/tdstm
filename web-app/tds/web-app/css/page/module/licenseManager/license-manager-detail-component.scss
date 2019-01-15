@@ -1,0 +1,18 @@
+.inner-activity_table {
+  td {
+    padding: 0px;
+    border-right: 0px !important;
+  }
+  .glyphicon {
+    font-size: 10px;
+  }
+  .col-action_td,
+  .col-value_td {
+    text-align: center;
+  }
+  tr:last-child {
+    td {
+      border-bottom: 0px !important;
+    }
+  }
+}
