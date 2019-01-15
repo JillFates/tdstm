@@ -107,7 +107,6 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 	private currentUser: any;
 	protected fieldPipeMap: {pipe: any, metadata: any};
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
-	ButtonActions = TDSActionsButton;
 	protected SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
 
 	constructor(
