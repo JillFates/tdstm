@@ -3,7 +3,6 @@ import {forkJoin} from 'rxjs/observable/forkJoin';
 
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {DependencyChange, DependencyType} from './model/asset-dependency.model';
 import {BulkActions} from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -88,7 +87,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	protected dependencyA: any;
 	protected dependencyB: any;
 	protected isEditing: boolean;
-	protected ButtonActions = TDSActionsButton;
 	protected frequencyList: string[];
 	protected typeList: string[];
 	protected statusList: string[];

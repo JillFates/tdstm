@@ -108,46 +108,38 @@
             <div class="modal-footer form-group-center">
                 <div *ngIf="!isEditing; else buttonsEditModeTemplate">
                     <div class="pull-left">
-                        <tds-button
-                                [action]="ButtonActions.AssetEdit"
+                        <tds-button-edit
                                 class="btn-primary"
                                 tooltip="Edit dependencies"
                                 (click)="setEditMode(true)">
-                        </tds-button>
+                        </tds-button-edit>
                     </div>
 
 	                <div class="pull-right">
-                        <tds-button  *ngIf="dependencyA && !dependencyB"
-                                     [action]="ButtonActions.AssetDelete"
+                        <tds-button-delete  *ngIf="dependencyA && !dependencyB"
                                      class="btn-danger"
                                      (click)="onDeleteDependency(DependencyType.dependencyA)"
                                      tooltip="Delete dependency">
-                        </tds-button>
-                        <tds-button
-                                [action]="ButtonActions.AssetClose"
-                                tooltip="Close"
-
-                                (click)="cancelCloseDialog()">
-                        </tds-button>
+                        </tds-button-delete>
+                        <tds-button-close tooltip="Close" (click)="cancelCloseDialog()">
+                        </tds-button-close>
                     </div>
 
                 </div>
 
 	            <ng-template #buttonsEditModeTemplate>
-                    <tds-button
-                            [action]="ButtonActions.AssetUpdate"
+                    <tds-button-save
                             [disabled]="!editedDependencies.dependencies"
                             class="btn-primary pull-left"
                             tooltip="Save changes"
                             (click)="saveChanges()">
-                    </tds-button>
+                    </tds-button-save>
 
-                    <tds-button
-                            [action]="ButtonActions.AssetCancel"
+                    <tds-button-cancel
                             tooltip="Cancel editing"
                             class="pull-right"
                             (click)="cancelEdit(false)">
-                    </tds-button>
+                    </tds-button-cancel>
 
                 </ng-template>
             </div>
