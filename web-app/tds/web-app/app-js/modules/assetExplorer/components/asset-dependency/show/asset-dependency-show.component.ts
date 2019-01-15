@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {TDSActionsButton} from '../../../../../shared/components/button/model/action-button.model';
+import {DependencyChange, DependencyType} from '../model/asset-dependency.model';
 
 @Component({
 	selector: 'asset-dependency-show',
@@ -56,10 +57,11 @@ import {TDSActionsButton} from '../../../../../shared/components/button/model/ac
 			<div class="dependency-row-legend">Comment</div>
 			<div class="dependency-a">
 				<label class="dependency-label dependency-comment">{{dependencyA?.comment}}</label>
-				<div *ngIf="dependencyA">
+				<div *ngIf="dependencyA && dependencyB">
 					<tds-button
 						[action]="ButtonActions.AssetDelete"
 						class="btn-danger"
+						(click)="onDeleteDependency(DependencyType.dependencyA)"
 						tooltip="Delete dependency">
 					</tds-button>
 				</div>
@@ -69,6 +71,7 @@ import {TDSActionsButton} from '../../../../../shared/components/button/model/ac
 				<div *ngIf="dependencyB">
 					<tds-button
 						[action]="ButtonActions.AssetDelete"
+						(click)="onDeleteDependency(DependencyType.dependencyB)"
 						class="btn-danger"
 						tooltip="Delete dependency">
 					</tds-button>
@@ -78,8 +81,15 @@ import {TDSActionsButton} from '../../../../../shared/components/button/model/ac
 			`
 })
 export class AssetDependencyShowComponent {
+	@Output() deleteDependency: EventEmitter<DependencyType> = new EventEmitter<DependencyType>();
 	@Input() dependencyA: any;
 	@Input() dependencyB: any;
+	protected DependencyType = DependencyType;
 
 	protected ButtonActions = TDSActionsButton;
+
+	protected onDeleteDependency(dependencyType: DependencyType): void {
+		this.deleteDependency.emit(dependencyType);
+
+	}
 }

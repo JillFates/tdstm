@@ -33,4 +33,14 @@ export class DependecyService {
 			}).catch((error: any) => error.json());
 	}
 
+	deleteDependency(asset: any): Observable<any> {
+		const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
+		const options = new RequestOptions({ headers: headers, body: JSON.stringify(asset) });
+
+		return this.http.delete(`${this.assetUrl}/dependencies`, options)
+			.map((res: Response) => {
+				let result = res.json();
+				return (result && result.status === 'success');
+			}).catch((error: any) => error.json());
+	}
 }

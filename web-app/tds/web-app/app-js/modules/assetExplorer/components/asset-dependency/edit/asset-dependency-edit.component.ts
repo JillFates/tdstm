@@ -164,12 +164,9 @@ export class AssetDependencyEditComponent implements OnInit {
 		b: {}
 	};
 
-	protected initialModel = null;
-
 	ngOnInit() {
 		this.dependencies.a = this.getDependencyElements(this.dependencyA);
 		this.dependencies.b = this.getDependencyElements(this.dependencyB);
-		this.initialModel = clone(this.dependencies);
 	}
 
 	private getDependencyElements(dependency: any): any {
@@ -187,9 +184,7 @@ export class AssetDependencyEditComponent implements OnInit {
 	}
 
 	protected notifyChanges(type: DependencyType): void {
-		console.log('has changes');
 		console.log(JSON.stringify(this.dependencies, null, 2));
 		this.change.emit({type, dependencies: this.dependencies});
 	}
-
 }

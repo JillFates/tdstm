@@ -68,6 +68,7 @@
 
 	                <asset-dependency-show
 			                *ngIf="!isEditing; else editDependenciesTemplate"
+                            (deleteDependency)="onDeleteDependency($event)"
                             [dependencyA]="dependencyA"
                             [dependencyB]="dependencyB">
                     </asset-dependency-show>
@@ -106,19 +107,30 @@
             </div>
             <div class="modal-footer form-group-center">
                 <div *ngIf="!isEditing; else buttonsEditModeTemplate">
-                    <tds-button
-                            [action]="ButtonActions.AssetEdit"
-                            class="btn-primary pull-left"
-                            tooltip="Edit dependencies"
-                            (click)="setEditMode(true)">
-                    </tds-button>
+                    <div class="pull-left">
+                        <tds-button
+                                [action]="ButtonActions.AssetEdit"
+                                class="btn-primary"
+                                tooltip="Edit dependencies"
+                                (click)="setEditMode(true)">
+                        </tds-button>
+                    </div>
 
-                    <tds-button
-                            [action]="ButtonActions.AssetClose"
-                            tooltip="Close"
-                            class="pull-right"
-                            (click)="cancelCloseDialog()">
-                    </tds-button>
+	                <div class="pull-right">
+                        <tds-button  *ngIf="dependencyA && !dependencyB"
+                                     [action]="ButtonActions.AssetDelete"
+                                     class="btn-danger"
+                                     (click)="onDeleteDependency(DependencyType.dependencyA)"
+                                     tooltip="Delete dependency">
+                        </tds-button>
+                        <tds-button
+                                [action]="ButtonActions.AssetClose"
+                                tooltip="Close"
+
+                                (click)="cancelCloseDialog()">
+                        </tds-button>
+                    </div>
+
                 </div>
 
 	            <ng-template #buttonsEditModeTemplate>

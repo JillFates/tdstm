@@ -177,4 +177,21 @@ export class AssetDependencyComponent extends UIExtraDialog {
 			bDependencyHasChanged: false,
 		}
 	}
+
+	protected onDeleteDependency(dependencyType: DependencyType) {
+		const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
+
+		const dependencyChange = {
+			assetId: dependency.asset.id,
+			dependencyId: dependency.id
+		};
+
+		console.log('Deleting...');
+		console.log(dependencyChange);
+		this.assetService.deleteDependency(dependencyChange)
+			.subscribe((result) => {
+				console.log('The result of delete is');
+				console.log(result);
+			}, (error) => console.log('Error:', error));
+	}
 }
