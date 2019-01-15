@@ -440,7 +440,7 @@ class DataImportService implements ServiceMethods {
 				property('queuedBy')
 			}
 			.sort('queuedAt')
-				.list(max: 1)
+			.list(max: 1)
 
 			if (batchIds) {
 				return [batchId: batchIds.get(0)[0], queuedBy: batchIds.get(0)[1]]
@@ -619,7 +619,7 @@ class DataImportService implements ServiceMethods {
 				}
 			}
 			.projections { property('id') }
-				.list(sortBy: 'id')
+			.list(sortBy: 'id')
 
 			log.info 'processBatch({}) found {} PENDING rows', batchId, recordIds.size()
 
@@ -710,8 +710,8 @@ class DataImportService implements ServiceMethods {
 
 			default:
 				break
-		//log.error "Batch Import process called for unsupported domain ${batch.domainClassName} in batch ${batch.id} in project ${batch.project}"
-		//error = "Batch process not supported for domain ${domainName}"
+				//log.error "Batch Import process called for unsupported domain ${batch.domainClassName} in batch ${batch.id} in project ${batch.project}"
+				//error = "Batch process not supported for domain ${domainName}"
 		}
 
 		return error
@@ -1701,7 +1701,7 @@ class DataImportService implements ServiceMethods {
 		quartzScheduler.scheduleJob(trigger)
 
 		log.info('scheduleJob() {} kicked of an ETL transform data process for script and filename ({},{})',
-			securityService.currentUsername, dataScriptId, filename)
+				securityService.currentUsername, dataScriptId, filename)
 
 		// return progress key
 		return ['progressKey': key]
