@@ -86,8 +86,7 @@ class DatabaseController implements ControllerMethods {
 			assetName: params.assetName,
 			depNumber: params.depNumber,
 			depResolve: params.depResolve,
-			depConflicts: params.depConflicts,
-			event: params.event
+			depConflicts: params.depConflicts
 		]
 		def dbPref = assetEntityService.getExistingPref(PREF.Database_Columns)
 
