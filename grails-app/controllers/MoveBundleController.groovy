@@ -402,7 +402,6 @@ class MoveBundleController implements ControllerMethods {
 		render moveBundlesList as JSON
 	}
 
-//	@HasPermission(Permission.MoveDashboardView)
 	@HasPermission(Permission.DashboardMenuView)
 	def planningStats() {
 		Project project = securityService.userCurrentProject
@@ -678,15 +677,6 @@ class MoveBundleController implements ControllerMethods {
 			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
 		}
 
-		/*
-		// TODO - this is unnecessary and could just load the map
-
-		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
-		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
-		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
-		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
-		*/
-
 		// ------------------------------------
 		// Calculate the Plan Status values
 		// ------------------------------------
@@ -723,20 +713,12 @@ class MoveBundleController implements ControllerMethods {
 		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery + planStatusMovedQuery,
 			countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.allServerTypes])[0] : 0
 		percentageOtherCount = percOfCount(percentageOtherCount, otherAssetCount)
-/*
-		def likelyLatencyCount=0
-		def unlikelyLatencyCount=0
-		def unknownLatencyCount=0
-*/
+
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ?
 			AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
 
 		def pendingServerDependenciesCount = serversOfPlanningBundle ?
 		AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
-
-
-		def assetDependencyList = jdbcTemplate.queryForList("select dependency_bundle as dependencyBundle from  asset_dependency_bundle \
-			where project_id = $project.id  group by dependency_bundle order by dependency_bundle  limit 48")
 
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
@@ -751,29 +733,6 @@ class MoveBundleController implements ControllerMethods {
 		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
 			and a.category in (:category) AND a.isPublished = true",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category: AssetComment.planningCategories])
 		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category: AssetComment.planningCategories, dueDate:today]).size()
-
-		def dependencyConsoleList = []
-		assetDependencyList.each { dependencyBundle ->
-			def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle, project)
-			def appCount = 0
-			def serverCount = 0
-			def vmCount = 0
-			try {
-				appCount = assetDependentlist.findAll { it.asset.assetType == app }.size()
-				// TODO : JPM 9/2014 - serverCount should be using the AssetType method since it is not looking at all of the correct assetTypes
-				serverCount = assetDependentlist.findAll{ it.asset.assetType in [server, blade] }.size()
-				vmCount = assetDependentlist.findAll{ it.asset.assetType == vm }.size()
-			} catch (ObjectNotFoundException e) {
-				logger.error 'Database inconsistency: {}', e.message, e
-			}
-
-			dependencyConsoleList << [dependencyBundle: dependencyBundle.dependencyBundle, appCount: appCount,
-			                          serverCount: serverCount, vmCount: vmCount]
-		}
-
-		int dependencyBundleCount = jdbcTemplate.queryForObject('''
-			select count(distinct dependency_bundle) from asset_dependency_bundle
-			where project_id=?''', Integer, project.id)
 
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')
@@ -888,11 +847,6 @@ class MoveBundleController implements ControllerMethods {
 			virtServerList                : virtServerList,
 
 			unassignedAssetCount          : unassignedAssetCount,
-/*
-			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount,
-			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount,
-			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount,
-*/
 			appDependenciesCount          : appDependenciesCount,
 			pendingAppDependenciesCount   : pendingAppDependenciesCount,
 			serverDependenciesCount       : serverDependenciesCount,
@@ -901,8 +855,6 @@ class MoveBundleController implements ControllerMethods {
 			project                       : project,
 			moveEventList                 : moveEventList,
 			moveBundleList                : moveBundleList,
-			dependencyConsoleList         : dependencyConsoleList,
-			dependencyBundleCount         : dependencyBundleCount,
 			planningDashboard             : 'planningDashboard',
 			eventStartDate                : eventStartDate,
 			date                          : time,
@@ -931,7 +883,7 @@ class MoveBundleController implements ControllerMethods {
 
 			groupPlanMethodologyCount     : groupPlanMethodologyCount
 		]
-	}
+	} // end-of-planningStats
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
