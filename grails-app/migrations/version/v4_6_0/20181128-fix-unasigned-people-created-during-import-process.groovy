@@ -25,8 +25,8 @@ databaseChangeLog = {
 					LEFT JOIN (
 					  SELECT * FROM party_relationship 
 					  WHERE party_relationship_type_id = 'PROJ_STAFF'
-					  AND role_type_code_from_id = 'PROJECT'
-					  AND role_type_code_to_id = 'STAFF') pr ON pr.party_id_from_id=tmp.project_id AND pr.party_id_to_id=tmp.person_id
+					  AND role_type_code_from_id = 'ROLE_PROJECT'
+					  AND role_type_code_to_id = 'ROLE_STAFF') pr ON pr.party_id_from_id=tmp.project_id AND pr.party_id_to_id=tmp.person_id
 					WHERE 
 					  tmp.person_id > 0 
 					  AND pr.party_id_from_id IS NULL 
@@ -38,7 +38,7 @@ databaseChangeLog = {
 					missingPartiesAssignments.each { missingParty ->
 						sql.execute("""
 							INSERT INTO party_relationship (party_relationship_type_id, party_id_from_id, party_id_to_id, role_type_code_from_id, role_type_code_to_id, status_code)
-							VALUES ('PROJ_STAFF', ${missingParty[0]}, ${missingParty[1]}, 'PROJECT', 'STAFF', 'ENABLED')
+							VALUES ('PROJ_STAFF', ${missingParty[0]}, ${missingParty[1]}, 'ROLE_PROJECT', 'ROLE_STAFF', 'ENABLED')
 						""")
 					}
 				}

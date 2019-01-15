@@ -484,11 +484,11 @@ class ProjectController implements ControllerMethods {
 		}
 
 		// Use the passed role or default all staff
-		String staffRole = request.JSON.role ?: 'STAFF'
+		String staffRole = request.JSON.role ?: 'ROLE_STAFF'
 		List<Map> staffList = []
 		String staffQuery = "FROM PartyRelationship p \
 			WHERE p.partyRelationshipType = 'STAFF' AND p.partyIdFrom = :company \
-			AND p.roleTypeCodeFrom.id = 'COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
+			AND p.roleTypeCodeFrom.id = 'ROLE_COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
 
 		// Closure to do query and load the staff into the staffList variable for the given company
 		def getCompanyStaffClosure = { def company ->

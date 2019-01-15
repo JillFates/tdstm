@@ -308,16 +308,16 @@ class PersonServiceIntegrationTests extends Specification {
 		when:
 			Person person = personHelper.createPerson(adminPerson, project.client, null,
 				[lastName:'Buster', firstName:'Brock'],
-				['SYS_ADMIN', 'DB_ADMIN'], ['editor'])
+				['SYS_ADMIN', 'DB_ADMIN'], ['ROLE_editor'])
 
 			personService.addToTeam(person, 'ROLE_SYS_ADMIN')
 			personService.addToTeam(person, 'ROLE_DB_ADMIN')
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
-			teams.contains('SYS_ADMIN')
-			teams.contains('DB_ADMIN')
-			teams[0] == 'DB_ADMIN'   // Should be sorted alphabetical
+			teams.contains('ROLE_SYS_ADMIN')
+			teams.contains('ROLE_DB_ADMIN')
+			teams[0] == 'ROLE_DB_ADMIN'   // Should be sorted alphabetical
 			// Check individually
 			personService.isAssignedToTeam(person, 'ROLE_SYS_ADMIN')
 			personService.isAssignedToTeam(person, 'ROLE_DB_ADMIN')
@@ -506,7 +506,7 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
-			String extraTeam = 'DB_ADMIN'
+			String extraTeam = 'ROLE_DB_ADMIN'
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
 			personService.addToProjectTeam(project.id.toString(), fromPerson.id.toString(), extraTeam, results)

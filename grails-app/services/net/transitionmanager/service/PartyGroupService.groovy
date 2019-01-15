@@ -44,11 +44,11 @@ class PartyGroupService implements ServiceMethods {
 					SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
 					FROM party_group pg
 					INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
-					LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'COMPANY' and pr.role_type_code_to_id = 'PARTNER' and pr.party_id_to_id = pg.party_group_id
+					LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'ROLE_COMPANY' and pr.role_type_code_to_id = 'ROLE_PARTNER' and pr.party_id_to_id = pg.party_group_id
 					WHERE party_group_id in (
 						SELECT party_id_to_id FROM party_relationship
-						WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
-						AND role_type_code_to_id='CLIENT' AND party_id_from_id=:whomCompanyId
+						WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='ROLE_COMPANY'
+						AND role_type_code_to_id='ROLE_CLIENT' AND party_id_from_id=:whomCompanyId
 						) OR party_group_id =:whomCompanyId
 					GROUP BY party_group_id ORDER BY
 				""")

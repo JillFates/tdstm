@@ -108,8 +108,8 @@ class PersonService implements ServiceMethods {
 		StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		query.append(' WHERE pr.party_id_from_id=:company')
-		query.append(' AND pr.role_type_code_from_id="COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="STAFF"')
+		query.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
+		query.append(' AND pr.role_type_code_to_id="ROLE_STAFF"')
 		// query.append(' ')
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
@@ -161,8 +161,8 @@ class PersonService implements ServiceMethods {
 		StringBuilder select = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		select.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		select.append(' WHERE pr.party_id_from_id=:companyId')
-		select.append(' AND pr.role_type_code_from_id="COMPANY"')
-		select.append(' AND pr.role_type_code_to_id="STAFF" ')
+		select.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
+		select.append(' AND pr.role_type_code_to_id="ROLE_STAFF" ')
 
 		StringBuilder query = new StringBuilder(select)
 		if (nameMap.first) {
@@ -214,8 +214,8 @@ class PersonService implements ServiceMethods {
 			Map args = [company: company.id, email: email]
 			StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
 			query.append(' WHERE pr.party_id_from_id=:company')
-			query.append(' AND pr.role_type_code_from_id="COMPANY"')
-			query.append(' AND pr.role_type_code_to_id="STAFF"')
+			query.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
+			query.append(' AND pr.role_type_code_to_id="ROLE_STAFF"')
 			query.append(' AND p.email=:email')
 
 			log.debug 'findByCompanyAndEmail: query {}, map {}', query, args
@@ -293,7 +293,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-			  "and PR.roleTypeCodeFrom.id='COMPANY' and PR.roleTypeCodeTo.id='STAFF' and PR.partyIdFrom IN (:companies)"
+			  "and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 

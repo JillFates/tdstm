@@ -16,7 +16,7 @@ class ProjectTeam extends PartyGroup {
 		teamCode blank: false, unique: 'moveBundle'
 		latestAsset nullable: true
 		isDisbanded nullable: true, inList: ['Y', 'N']
-		role nullable: true, inList: ['MOVE_TECH', 'CLEANER', 'SYS_ADMIN', 'DB_ADMIN']
+		role nullable: true, inList: ['ROLE_MOVE_TECH', 'ROLE_CLEANER', 'ROLE_SYS_ADMIN', 'ROLE_DB_ADMIN']
 	}
 
 	static mapping = {

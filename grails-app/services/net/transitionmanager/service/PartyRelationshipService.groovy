@@ -1156,7 +1156,7 @@ class PartyRelationshipService implements ServiceMethods {
 				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
-				WHERE pr.role_type_code_to_id in ('STAFF')
+				WHERE pr.role_type_code_to_id in ('ROLE_STAFF')
 					AND pr.role_type_code_from_id in ('ROLE_COMPANY')
 					AND pr.party_relationship_type_id in ('ROLE_STAFF')
 					AND pr.party_id_from_id IN ($project.client.id)
