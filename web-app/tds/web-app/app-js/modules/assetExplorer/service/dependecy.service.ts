@@ -34,7 +34,7 @@ export class DependecyService {
 	}
 
 	deleteDependency(asset: any): Observable<any> {
-		const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
+		const headers = new Headers({ 'Content-Type': 'application/json' });
 		const options = new RequestOptions({ headers: headers, body: JSON.stringify(asset) });
 
 		return this.http.delete(`${this.assetUrl}/dependencies`, options)

@@ -91,6 +91,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	protected statusList: string[];
 	protected directionList: string[];
 	protected editedDependencies = this.getInitialEditDependencies();
+	protected DependencyType = DependencyType;
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
