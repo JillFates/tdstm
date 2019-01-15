@@ -28,7 +28,6 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 @CompileStatic
 class DependencyBuilder extends DomainBuilder {
 
-
 	private RowResultFacade asset
 	private RowResultFacade dependent
 	private boolean withProcessed
@@ -37,6 +36,7 @@ class DependencyBuilder extends DomainBuilder {
 	static final String ASSET_FIELD_NAME = 'asset'
 	static final String DEPENDENT_FIELD_NAME = 'dependent'
 	static final String TYPE_FIELD_NAME = 'type'
+	static final String SELF_REFERENCE_ERROR_MESSAGE = 'An asset dependency reference to itself is prohibited'
 
 	DependencyBuilder(ETLDomain domain, ETLProcessor processor) {
 		super(domain, processor)
@@ -115,7 +115,20 @@ class DependencyBuilder extends DomainBuilder {
 
 		this.dependent = validate((RowResultFacade) argsList[0])
 		process(DEPENDENT_FIELD_NAME, this.dependent, methodName)
+
 		return this
+	}
+
+	/**
+	 * ETL Import should add an error when an Asset is dependent on itself while processing Dependencies
+	 */
+	@CompileStatic(TypeCheckingMode.SKIP)
+	void checkAssetEqualsDependent(RowResult currentRow){
+		FieldResult assetId = this.asset.getRowResult().fields[ID_FIELD_NAME]
+		FieldResult dependentId = this.dependent.getRowResult().fields[ID_FIELD_NAME]
+		if (assetId.find.results == dependentId.find.results){
+			currentRow.addError(SELF_REFERENCE_ERROR_MESSAGE)
+		}
 	}
 
 	/**
@@ -141,9 +154,6 @@ class DependencyBuilder extends DomainBuilder {
 		 */
 		processor.load(field).with(null)
 
-		/**
-		 *
-		 */
 		RowResult currentRow = processor.result.findOrCreateCurrentRow()
 		FieldResult fieldResult = currentRow.findOrCreateFieldData(createFieldDefinition(field))
 
@@ -175,6 +185,10 @@ class DependencyBuilder extends DomainBuilder {
 			if (ID_FIELD_NAME != fieldName) {
 				fieldResult.create[fieldName] = (results.init != null) ? results.init : results.value
 			}
+		}
+
+		if (field == DEPENDENT_FIELD_NAME){
+			checkAssetEqualsDependent(currentRow)
 		}
 	}
 
