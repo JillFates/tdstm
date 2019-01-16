@@ -868,7 +868,8 @@ class DataImportService implements ServiceMethods {
 			).save()
 		}
 	}
-/**
+  
+	/**
 	 * This method should be used after any SearchQueryHelper.findEntityByMetaData calls to record errors
 	 * into the field or import batch record errors appropriately.
 	 * @param fieldName - the field that was being queried
