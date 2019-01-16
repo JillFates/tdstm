@@ -364,22 +364,22 @@ export class FieldSettingsGridComponent implements OnInit {
 		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields)) {
 			this.notifier.broadcast({
 				name: AlertType.DANGER,
-				message: 'There is another Label that conflicts with the Label "'
-				+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+				message: 'Another label conflicts with the label "'
+				+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
 			});
 		} else {
 			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
-					message: 'There is a Field Name that conflicts with the Label "'
-					+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+					message: 'A field name conflicts with the label "'
+					+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
 				});
 			} else {
 				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
 					this.notifier.broadcast({
 						name: AlertType.DANGER,
-						message: 'There is a Field Name or Label on another Domain that conflicts with the shared Label "'
-						+ dataItem.label + '" of field '+ dataItem.field + '. Please rename the Label.'
+						message: 'A field name or label on another domain conflicts with the shared label "'
+						+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
 					});
 				}
 			}
