@@ -23,8 +23,6 @@ import spock.lang.See
 /**
  * Test about ETLProcessorResults and JSON transformation:
  */
-@TestMixin(ControllerUnitTestMixin)
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
 class ETLResultsSpec extends ETLBaseSpec {
 
