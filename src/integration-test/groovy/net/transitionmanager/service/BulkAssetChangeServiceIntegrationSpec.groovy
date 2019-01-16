@@ -313,7 +313,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].replace(Application.class, [tag1.id, tag2.id], 'tagAssets',  [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange replace, all assets in filter'() {
@@ -345,7 +345,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 		then: 'the bulkRemove function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping[(ControlType.ASSET_TAG_SELECTOR.value())].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
 	void 'Test bulkChange remove, all assets in filter'() {
