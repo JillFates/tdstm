@@ -28,7 +28,7 @@ class AssetDetailsPage extends Page{
         commonsModule { module CommonsModule}
         commentsContent { assetDetailModal.find('.comment-content')}
         viewAllComments { commentsContent.find('#showAllComments')}
-        addCommentsButton(wait: true) { commentsContent.find('button.btn-add')}
+        addCommentsButton(wait: true) { commentsContent.find(title: 'Add Comment')}
         commentsSectionTitle(wait: true) { commentsContent.find('label.task')}
         commentRows(wait: true) { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
         adModalAppName { assetDetailModal.find("td.assetName").next()}
