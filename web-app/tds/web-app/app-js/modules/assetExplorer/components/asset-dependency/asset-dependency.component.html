@@ -115,12 +115,13 @@
                         </tds-button-edit>
                     </div>
 
+                    <tds-button-delete  *ngIf="dependencyA && !dependencyB"
+                                        class="btn-danger"
+                                        (click)="onDeleteDependency(DependencyType.dependencyA)"
+                                        tooltip="Delete dependency">
+                    </tds-button-delete>
+
 	                <div class="pull-right">
-                        <tds-button-delete  *ngIf="dependencyA && !dependencyB"
-                                     class="btn-danger"
-                                     (click)="onDeleteDependency(DependencyType.dependencyA)"
-                                     tooltip="Delete dependency">
-                        </tds-button-delete>
                         <tds-button-close tooltip="Close" (click)="cancelCloseDialog()">
                         </tds-button-close>
                     </div>
