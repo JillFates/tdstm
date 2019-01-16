@@ -24,7 +24,7 @@ import spock.lang.See
  *     <li><b>whenNotFound</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
+
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model, AssetOptions])
 class ETLWhenFoundSpec extends ETLBaseSpec {
 

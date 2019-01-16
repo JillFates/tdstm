@@ -25,7 +25,7 @@ import net.transitionmanager.service.FileSystemService
  *     <li><b>read labels on 2</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
+
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLSpreadSheetSpec extends ETLBaseSpec {
 

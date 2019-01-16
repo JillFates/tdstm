@@ -16,6 +16,7 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.testing.spring.AutowiredTest
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
@@ -31,7 +32,7 @@ import spock.lang.Shared
  *     <li><b>transform</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
+
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
 class ETLTransformSpec extends ETLBaseSpec {
 
@@ -148,8 +149,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		applicationFieldsValidator = new ETLFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application,
-			buildFieldSpecsFor(AssetClass.APPLICATION))
+		applicationFieldsValidator.addAssetClassFieldsSpecFor(
+			ETLDomain.Application,
+			buildFieldSpecsFor(AssetClass.APPLICATION)
+		)
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)

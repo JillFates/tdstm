@@ -30,7 +30,6 @@ import spock.lang.Shared
 /**
  * Test about ETL Current Element (CE):
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLCurrentElementSpec extends ETLBaseSpec {
 

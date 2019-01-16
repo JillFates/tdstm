@@ -35,7 +35,6 @@ import spock.lang.Shared
  *     <li><b>skip</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLIterateSpec extends ETLBaseSpec {
 

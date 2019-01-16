@@ -12,6 +12,7 @@ import getl.utils.FileUtils
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.FileSystemService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -19,13 +20,22 @@ import spock.lang.Specification
 
 abstract class ETLBaseSpec extends Specification {
 
+	FileSystemService fileSystemService
+
+	FileSystemService getFileSystemService() {
+		if (!fileSystemService) {
+			fileSystemService = applicationContext.getBean('fileSystemService')
+		}
+		return fileSystemService
+	}
+
 	/**
 	 * Builds a list of Mock Room using this fields order
 	 * ['id', 'project', 'roomName', 'location', 'roomDepth', 'roomWidth', 'address', 'city', 'stateProv', 'postalCode']
 	 * @param valuesList
 	 * @return a list of Mock(Room)
 	 */
-	List<Room> buildRooms(List<List<?>> valuesList) {
+	protected List<Room> buildRooms(List<List<?>> valuesList) {
 		return valuesList.collect { List<?> values ->
 			Room room = Mock()
 			room.getId() >> values[0]
@@ -48,7 +58,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param valuesList
 	 * @return a list of Mock(Rack)
 	 */
-	List<Rack> buildRacks(List<List<?>> valuesList) {
+	protected List<Rack> buildRacks(List<List<?>> valuesList) {
 		return valuesList.collect { List<?> values ->
 			Rack rack = Mock()
 			rack.getId() >> values[0]
@@ -77,7 +87,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param required
 	 * @return a map with the correct fieldSpec format
 	 */
-	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
+	protected Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
 		return [
 			constraints: [
 				required: required
@@ -104,7 +114,7 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	protected List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
 
-		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
+		def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xlsx')
 		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
 
@@ -113,7 +123,7 @@ abstract class ETLBaseSpec extends Specification {
 		WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
 		ExcelConnection con = new ExcelConnection(
-			path: service.temporaryDirectory,
+			path: getFileSystemService().temporaryDirectory,
 			fileName: fileName,
 			driver: TDSExcelDriver)
 		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -144,7 +154,7 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	protected List buildSpreadSheetDataSetWithMultipleSheets(Map<String, String> sheetsContent) {
 
-		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
+		def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xlsx')
 		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
 		// Getting the Sheet at index zero
@@ -161,7 +171,7 @@ abstract class ETLBaseSpec extends Specification {
 		WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
 		ExcelConnection con = new ExcelConnection(
-			path: service.temporaryDirectory,
+			path: getFileSystemService().temporaryDirectory,
 			fileName: fileName,
 			driver: TDSExcelDriver)
 		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -191,13 +201,13 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param csvContent
 	 * @return
 	 */
-	private List buildCSVDataSet(String csvContent) {
+	protected List buildCSVDataSet(String csvContent) {
 
-		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
+		def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'csv')
 		dataSetOS << csvContent
 		dataSetOS.close()
 
-		String fullName = service.getTemporaryFullFilename(fileName)
+		String fullName = getFileSystemService().getTemporaryFullFilename(fileName)
 
 		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
 		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
@@ -213,11 +223,11 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	protected List buildJSONDataSet(String jsonContent) {
 
-		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'json')
+		def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'json')
 		dataSetOS << jsonContent
 		dataSetOS.close()
 
-		String fullName = service.getTemporaryFullFilename(fileName)
+		String fullName = getFileSystemService().getTemporaryFullFilename(fileName)
 
 		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver:TDSJSONDriver)
 		JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
@@ -230,7 +240,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param asset
 	 * @return
 	 */
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
+	protected List<Map<String, ?>> buildFieldSpecsFor(def asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
 		switch(asset){

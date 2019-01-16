@@ -13,8 +13,6 @@ import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 
-@TestFor(AssetEntity)
-@TestMixin([DomainClassUnitTestMixin])
 class ETLFetchSpec extends ETLBaseSpec {
 
 	ETLProcessor processor

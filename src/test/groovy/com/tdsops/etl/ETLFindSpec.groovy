@@ -28,7 +28,6 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>warn</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model, AssetOptions])
 class ETLFindSpec extends ETLBaseSpec {
 

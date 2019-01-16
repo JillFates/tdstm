@@ -23,7 +23,6 @@ import spock.util.mop.ConfineMetaClassChanges
 /**
  * Test about ETL Current Element (CE):
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
 class ETLDependencySpec extends ETLBaseSpec {
 

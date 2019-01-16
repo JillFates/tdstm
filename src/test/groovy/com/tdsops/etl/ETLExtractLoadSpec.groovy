@@ -8,6 +8,7 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -32,7 +33,6 @@ import net.transitionmanager.service.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
-import spock.lang.Unroll
 
 /**
  * Test about ETLProcessor commands:
@@ -44,8 +44,6 @@ import spock.lang.Unroll
  *     <li><b>ignore record</b></li>
  * </ul>
  */
-@TestMixin(ControllerUnitTestMixin)
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
 class ETLExtractLoadSpec extends ETLBaseSpec {
 
@@ -188,7 +186,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -219,7 +217,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -261,7 +259,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 3
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -298,7 +296,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and: 'A new result was added in the result'
 
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -364,6 +362,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	 * 	saved into the target domain object.
 	 */
 	void 'test can extract a field value over all rows based on column ordinal position'() {
+
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
@@ -502,7 +501,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -571,12 +570,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'environment'] as Set
-					with(fieldLabelMap) {
+					with(fieldLabelMap){
 						assetName == 'Name'
 						environment == 'Environment'
 					}
@@ -629,12 +628,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-					with(fieldLabelMap) {
+					with(fieldLabelMap){
 						assetName == 'Name'
 						environment == 'Environment'
 						appVendor == 'Vendor'
@@ -703,12 +702,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-					with(fieldLabelMap) {
+					with(fieldLabelMap){
 						assetName == 'Name'
 						environment == 'Environment'
 						appVendor == 'Vendor'
@@ -777,7 +776,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -830,11 +829,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					with(fieldLabelMap) {
+					with(fieldLabelMap){
 						description == 'Description'
 					}
 					data.size() == 2
@@ -954,7 +953,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1012,7 +1011,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1075,7 +1074,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -1106,12 +1105,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(fieldLabelMap) {
+					with(fieldLabelMap){
 						appVendor == 'Vendor'
 					}
 					with(data[0], RowResult) {
@@ -1251,7 +1250,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Room domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 			}
 
@@ -1306,7 +1305,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -1335,7 +1334,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1376,6 +1375,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 				}
+
 			}
 	}
 
@@ -1412,7 +1412,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			e.message == 'A \'domain Class\' must be specified before any load or find commands'
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -1473,7 +1473,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1562,7 +1562,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1639,7 +1639,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1720,7 +1720,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1754,7 +1754,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1791,7 +1791,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Third row was removed from the domain results'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1839,7 +1839,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1866,7 +1866,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -1899,7 +1899,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1926,7 +1926,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -1960,7 +1960,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1995,7 +1995,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2034,7 +2034,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2085,7 +2085,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2123,12 +2123,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate(scriptContent)
 
 		then:
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
-						with(fields, Map) {
+						with(fields, Map){
 
 							with(assetName, FieldResult) {
 								value == 'fubar'
@@ -2137,7 +2137,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 							with(custom1, FieldResult) {
 								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-								assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+								//assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
 							}
 						}
 					}
@@ -2145,7 +2145,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2179,7 +2179,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2206,7 +2206,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2243,7 +2243,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			e.message == ETLProcessorException.missingPropertyException('myLocalVariable').message
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2281,7 +2281,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			e.message == ETLProcessorException.invalidSetParameter().message
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2314,7 +2314,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
@@ -2345,7 +2345,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2376,14 +2376,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult) {
+					with(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
@@ -2396,7 +2396,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2427,14 +2427,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult) {
+					with(data[0], RowResult){
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
 							value == null
@@ -2446,7 +2446,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2478,14 +2478,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult) {
+					with(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
@@ -2503,7 +2503,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2529,7 +2529,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -2577,7 +2577,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -2617,14 +2617,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				new DebugConsole(buffer: new StringBuilder()),
-				validator)
+					GroovyMock(Project),
+					dataSet,
+					new DebugConsole(buffer: new StringBuilder()),
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-				.evaluate("""
+					.evaluate("""
 						read labels
 						iterate {
 							domain Device
@@ -2641,7 +2641,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2687,7 +2687,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2697,14 +2697,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuilder()),
-				validator)
+					GroovyMock(Project),
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuilder()),
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-				.evaluate("""
+					.evaluate("""
 						read labels
 						iterate {
 							domain Application
@@ -2742,22 +2742,22 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domain Application
 				iterate {
 					extract 'firstname' set firstNameVar
-					assert firstNameVar == 'Tony'
-
+					//assert firstNameVar == 'Tony'
+					
 					extract 'lastname' set lastNameVar
-					assert lastNameVar == 'Baker'
-
+					//assert lastNameVar == 'Baker'
+					
 					set fullNameVar with firstNameVar + ' ' + lastNameVar
-					assert firstNameVar == 'Tony'
-					assert lastNameVar == 'Baker'
-					assert fullNameVar == 'Tony Baker'
-
+					//assert firstNameVar == 'Tony'
+					//assert lastNameVar == 'Baker'
+					//assert fullNameVar == 'Tony Baker'
+					
 					load 'description' with fullNameVar
 				}
 				""".stripIndent())
 
 		then: 'Results should contain correctly set full name'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -2775,7 +2775,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2813,7 +2813,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain correctly set full name'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2822,7 +2822,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields) {
+						with(fields){
 							with(it.assetName, FieldResult) {
 								originalValue == 'xraysrv01'
 								value == 'xraysrv01'
@@ -2845,7 +2845,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields) {
+						with(fields){
 							with(it.assetName, FieldResult) {
 								originalValue == 'zuludb01'
 								value == 'zuludb01'
@@ -2864,7 +2864,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2898,7 +2898,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain correctly set full name'
-			with(etlProcessor.finalResult()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2907,7 +2907,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields) {
+						with(fields){
 							with(it.assetName, FieldResult) {
 								originalValue == 'xraysrv01'
 								value == 'xraysrv01'
@@ -2922,7 +2922,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields) {
+						with(fields){
 							with(it.assetName, FieldResult) {
 								originalValue == 'zuludb01'
 								value == 'zuludb01'
@@ -2934,7 +2934,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
 	}
@@ -2968,7 +2968,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because command is incorrect was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			with (ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.incorrectWhenCommandStructure().message} at line 5"
 				startLine == 5
 				endLine == 5
@@ -2978,292 +2978,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) {
+			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
-	}
-
-	void 'test can trim whitespaces after backslash character'() {
-
-		given:
-			ETLFieldsValidator validator = new ETLFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuilder()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-
-			String script = "read labels\n" +
-				"domain Application\n" +
-				"iterate {\n" +
-				"\textract 'vendor name'  \\ \t\t  \n" +
-				"\tload 'Vendor'\n" +
-				"\textract 'technology'  \\  \t  \r" +
-				"\tload 'appTech'\n \r\n" +
-				"}\n"
-
-			etlProcessor.evaluate(script)
-
-		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0], DomainResult) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['appVendor', 'appTech'] as Set
-					with(fieldLabelMap) {
-						appVendor == 'Vendor'
-						appTech == 'Technology'
-					}
-
-					data.size() == 2
-					with(data[0], RowResult) {
-						op == ImportOperationEnum.INSERT.toString()
-						rowNum == 1
-						fields.keySet().size() == 2
-						with(fields.appVendor, FieldResult) {
-							value == 'Microsoft'
-							originalValue == 'Microsoft'
-							init == null
-						}
-						with(fields.appTech, FieldResult) {
-							value == '(xlsx updated)'
-							originalValue == '(xlsx updated)'
-							init == null
-						}
-					}
-
-					with(data[1], RowResult) {
-						op == ImportOperationEnum.INSERT.toString()
-						rowNum == 2
-						fields.keySet().size() == 2
-						with(fields.appVendor, FieldResult) {
-							value == 'Mozilla'
-							originalValue == 'Mozilla'
-						}
-						with(fields.appTech, FieldResult) {
-							value == 'NGM'
-							originalValue == 'NGM'
-							init == null
-						}
-					}
-				}
-			}
-	}
-
-	@See('TM-13627')
-	void 'test can throw an exception if undefined variables are referenced in ETL extract load with statements'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name
-				abc
-			""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Device
-				iterate {
-					extract 'name' load 'Description' with aBogusVariableNameVar
-				}
-			""".stripIndent())
-
-		then: 'It throws an Exception because comments command is incorrect'
-			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
-				startLine == 5
-				endLine == 5
-				startColumn == null
-				endColumn == null
-				fatal == true
-			}
-
-		cleanup:
-			service.deleteTemporaryFile(fileName)
-	}
-
-	@See('TM-13627')
-	void 'test can throw an exception if undefined variables are referenced in ETL load with statements'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name
-				abc
-			""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'the ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Device
-				iterate {
-					load 'Description' with aBogusVariableNameVar
-				}
-			""".stripIndent())
-
-		then: 'it throws an Exception because comments command is incorrect'
-			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.missingPropertyException('aBogusVariableNameVar').message} at line 5".toString()
-				startLine == 5
-				endLine == 5
-				startColumn == null
-				endColumn == null
-				fatal == true
-			}
-
-		cleanup:
-			service.deleteTemporaryFile(fileName)
-	}
-
-	@See('TM-13627')
-	void 'test can throw an exception if invalid variable is referenced in ETL load with statements'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name
-				abc
-			""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'the ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Device
-				iterate {
-					load 'Name' with aBogusVariableName
-				}
-			""".stripIndent())
-
-		then: 'it throws an Exception because comments command is incorrect'
-			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.missingPropertyException('aBogusVariableName').message} at line 5".toString()
-				startLine == 5
-				endLine == 5
-				startColumn == null
-				endColumn == null
-				fatal == true
-			}
-
-		cleanup:
-			service.deleteTemporaryFile(fileName)
-	}
-
-	@See('TM-13627')
-	@Unroll
-	void 'test can throw an exception if undefined variables are referenced in the ETL statement -> #findStatement'() {
-
-		setup:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				simpleDataSet,
-				debugConsole,
-				validator)
-
-		when: 'the ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Device
-				iterate {
-					 $findStatement
-				}
-			""".stripIndent())
-
-		then: 'it throws an Exception because comments command is incorrect'
-			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.missingPropertyException(variableName).message} at line 5".toString()
-				startLine == 5
-				endLine == 5
-				startColumn == null
-				endColumn == null
-				fatal == true
-			}
-
-		where:
-			findStatement                                                       || variableName
-			"find Device by 'Name' eq aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' eq invalidVariableName into 'id'"            || 'invalidVariableName'
-			"find Device by 'Name' ne aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' ne invalidVariableName into 'id'"            || 'invalidVariableName'
-			"find Device by 'Name' nseq aBogusVariableNameVar into 'id'"        || 'aBogusVariableNameVar'
-			"find Device by 'Name' lt aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' le aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' gt aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' ge aBogusVariableNameVar into 'id'"          || 'aBogusVariableNameVar'
-			"find Device by 'Name' like aBogusVariableNameVar into 'id'"        || 'aBogusVariableNameVar'
-			"find Device by 'Name' notLike aBogusVariableNameVar into 'id'"     || 'aBogusVariableNameVar'
-			"find Device by 'Name' contains aBogusVariableNameVar into 'id'"    || 'aBogusVariableNameVar'
-			"find Device by 'Name' notContains aBogusVariableNameVar into 'id'" || 'aBogusVariableNameVar'
-			"find Device by 'Name' inList aBogusVariableNameVar into 'id'"      || 'aBogusVariableNameVar'
-			"find Device by 'Name' notInList aBogusVariableNameVar into 'id'"   || 'aBogusVariableNameVar'
-			"find Device by 'Name' between aBogusVariableNameVar into 'id'"     || 'aBogusVariableNameVar'
-			"find Device by 'Name' notBetween aBogusVariableNameVar into 'id'"  || 'aBogusVariableNameVar'
-	}
-
-	@See('TM-13627')
-	@Unroll
-	void 'test can throw an exception if undefined variables are referenced in the ETL statement -> #statement'() {
-
-		setup:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				simpleDataSet,
-				debugConsole,
-				validator)
-
-		when: 'the ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Device
-				iterate {
-					extract 1 load 'Name' set nameVar
-					find Device by 'Name' eq nameVar into 'id'
-					$statement
-				}
-			""".stripIndent())
-
-		then: 'it throws an Exception because comments command is incorrect'
-			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.missingPropertyException(variableName).message} at line 9".toString()
-				startLine == 9
-				endLine == 9
-				startColumn == null
-				endColumn == null
-				fatal == true
-			}
-
-		where:
-			statement                                                                             || variableName
-			"whenNotFound 'id' create {\nassetName nameVar\ndescription aBogusVariableNameVar\n}" || 'aBogusVariableNameVar'
-			"whenFound 'id' update {\nassetName nameVar\ndescription aBogusVariableNameVar\n}"    || 'aBogusVariableNameVar'
 	}
 
 }
