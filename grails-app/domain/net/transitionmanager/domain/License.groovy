@@ -38,6 +38,7 @@ class License {
 	Date lastUpdated
 
 	static mapping = {
+		autowire true
 		id 			generator: 'assigned'
 		requestNote type:'text'
 		hash 		type:'text'

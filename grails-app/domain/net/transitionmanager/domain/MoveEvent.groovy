@@ -69,6 +69,7 @@ class MoveEvent {
 	}
 
 	static mapping = {
+		autowire true
 		id column: 'move_event_id'
 		sort 'name'
 		columns {
