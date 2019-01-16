@@ -14,7 +14,7 @@
                                 <g:link controller="admin" action="home">Admin Portal</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.LicenseAdministration}">
-                                <li class="menu-child-item menu-admin-license-manager">
+                                <li class="menu-child-item menu-admin-license-admin">
                                     <a href="/tdstm/module/license/admin/list">License Admin</a>
                                 </li>
                             </tds:hasPermission>
@@ -23,7 +23,7 @@
                                     <a href="/tdstm/app/license/manager/list">License Manager</a>
                                 </li>
                             </g:if>
-                            <li class="menu-child-item menu-admin-license-manager">
+                            <li class="menu-child-item menu-admin-notice-manager">
                                 <a href="/tdstm/module/notice/list">Notices</a>
                             </li>
                             <li class="menu-child-item menu-admin-role">

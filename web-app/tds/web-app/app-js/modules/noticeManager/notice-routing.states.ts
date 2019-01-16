@@ -16,6 +16,8 @@ export class NoticeManagerStates {
 	};
 }
 
+const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
+
 export const NoticeManagerRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: NoticeManagerStates.NOTICE_LIST.url},
 	{
@@ -24,7 +26,8 @@ export const NoticeManagerRoute: Routes = [
 			page: {
 				title: 'NOTICE.NOTICE_ADMINISTRATION',
 				instruction: '',
-				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'GLOBAL.LIST']
+				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'GLOBAL.LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-notice-manager', subMenu: true }
 			},
 			requiresAuth: true,
 		},
