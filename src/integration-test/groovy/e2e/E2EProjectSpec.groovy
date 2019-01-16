@@ -4,6 +4,8 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.JsonUtil
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.License
@@ -36,6 +38,8 @@ import test.helper.SettingTestHelper
 import test.helper.TagTestHelper
 import org.apache.commons.lang3.RandomStringUtils
 
+@Integration
+@Rollback
 class E2EProjectSpec extends Specification {
 	// Set transactional false to persist at database when spec finishes
 	static transactional = false
@@ -49,18 +53,18 @@ class E2EProjectSpec extends Specification {
 	LicenseManagerService licenseManagerService
 	LicensedClient licensedClient
 	private static List<String> browsersInParallel = ["chrome", "firefox"]
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private MoveEventTestHelper eventHelper = new MoveEventTestHelper()
-	private MoveBundleTestHelper bundleHelper = new MoveBundleTestHelper()
-	private ProviderTestHelper providerHelper = new ProviderTestHelper()
-	private DataScriptTestHelper etlScriptHelper = new DataScriptTestHelper()
-	private DataviewTestHelper dataviewHelper = new DataviewTestHelper()
-	private TagTestHelper tagHelper = new TagTestHelper()
-	private ApplicationTestHelper appHelper = new ApplicationTestHelper()
-	private RecipeTestHelper recipeHelper = new RecipeTestHelper()
-	private AssetCommentTestHelper assetCommentsHelper = new AssetCommentTestHelper()
-	private SettingTestHelper settingHelper = new SettingTestHelper()
+	private ProjectTestHelper projectHelper
+	private PersonTestHelper personHelper
+	private MoveEventTestHelper eventHelper
+	private MoveBundleTestHelper bundleHelper
+	private ProviderTestHelper providerHelper
+	private DataScriptTestHelper etlScriptHelper
+	private DataviewTestHelper dataviewHelper
+	private TagTestHelper tagHelper
+	private ApplicationTestHelper appHelper
+	private RecipeTestHelper recipeHelper
+	private AssetCommentTestHelper assetCommentsHelper
+	private SettingTestHelper settingHelper
 	private Project project
 	private List<Project> projectsToBeDeleted = []
 	private UserLogin userLogin1
@@ -101,6 +105,19 @@ class E2EProjectSpec extends Specification {
 	private Date now = new Date()
 
 	void setup(){
+		projectHelper = new ProjectTestHelper()
+		personHelper = new PersonTestHelper()
+		eventHelper = new MoveEventTestHelper()
+		bundleHelper = new MoveBundleTestHelper()
+		providerHelper = new ProviderTestHelper()
+		etlScriptHelper = new DataScriptTestHelper()
+		dataviewHelper = new DataviewTestHelper()
+		tagHelper = new TagTestHelper()
+		appHelper = new ApplicationTestHelper()
+		recipeHelper = new RecipeTestHelper()
+		assetCommentsHelper = new AssetCommentTestHelper()
+		settingHelper = new SettingTestHelper()
+
 		originalData = getJsonObjectFromFile()
 		project = projectHelper.createProject(originalData.e2eProjectData)
 		licenseProject(project)
@@ -277,7 +294,7 @@ class E2EProjectSpec extends Specification {
 	 * @return: JSON object
 	 */
 	private JSONObject getJsonObjectFromFile(){
-		String jsonText = this.getClass().getResource("E2EProjectData.json").text
+		String jsonText = this.getClass().getResource("/E2EProjectData.json").text
 		return new JSONObject(jsonText)
 	}
 
