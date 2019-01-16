@@ -17,7 +17,7 @@ import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.dataview.FieldSpec
-import net.transitionmanager.dataview.FieldSpecCache
+import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
@@ -312,8 +312,8 @@ class DataviewService implements ServiceMethods {
 	 */
 	// TODO : Annotate READONLY
 	Map query(Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand) {
-		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
-		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview, fieldSpecCache)
+		FieldSpecProject fieldSpecProject = customDomainService.createFieldSpecProject(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview, fieldSpecProject)
 		previewQuery(project, dataviewSpec)
 	}
 
@@ -329,8 +329,8 @@ class DataviewService implements ServiceMethods {
 	Map getAssetIdsHql(Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
 		Dataview dataview = get(Dataview, dataViewId, project)
 
-		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
-		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview, fieldSpecCache)
+		FieldSpecProject fieldSpecProject = customDomainService.createFieldSpecProject(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview, fieldSpecProject)
 
 		Map whereInfo = hqlWhere(dataviewSpec, project)
 		String conditions = whereInfo.conditions
@@ -348,8 +348,8 @@ class DataviewService implements ServiceMethods {
 	}
 
 	Map previewQuery(Project project, Dataview dataview, DataviewUserParamsCommand dataviewUserParamsCommand) {
-		FieldSpecCache fieldSpecCache = customDomainService.createFieldSpecCache(project)
-		DataviewSpec dataviewSpec = new DataviewSpec(dataviewUserParamsCommand, dataview, fieldSpecCache)
+		FieldSpecProject fieldSpecProject = customDomainService.createFieldSpecProject(project)
+		DataviewSpec dataviewSpec = new DataviewSpec(dataviewUserParamsCommand, dataview, fieldSpecProject)
 		previewQuery(project, dataviewSpec)
 	}
 

@@ -1,10 +1,10 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -62,7 +62,7 @@ class DataviewSpec {
     private Map<String, String> order
     private Boolean justPlanning
 
-	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview, FieldSpecCache fieldSpecCache = null) {
+	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview, FieldSpecProject fieldSpecProject = null) {
 
 		spec = [
 			domains: [],
@@ -96,12 +96,12 @@ class DataviewSpec {
 
 		this.spec.columns = this.spec.columns.collect {
 			Map map = it as Map
-			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))
+			map.put('fieldSpec', fieldSpecProject?.getFieldSpec(map.domain, map.property))
 			map
 		}
 	}
 
-	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null, FieldSpecCache fieldSpecCache = null) {
+	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null, FieldSpecProject fieldSpecProject = null) {
 		spec = command.filters
 		justPlanning = command.justPlanning
 		args = [offset: command.offset]
@@ -117,7 +117,7 @@ class DataviewSpec {
 				dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
 				Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
 				if(!specColumn){
-					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter, fieldSpecCache)
+					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter, fieldSpecProject)
 				}
 			}
 		}
@@ -126,12 +126,12 @@ class DataviewSpec {
 			domain: command.sortDomain,
 			property: command.sortProperty,
 			sort: command.sortOrder == ASCENDING ? 'asc' : 'desc',
-			fieldSpec: fieldSpecCache?.getFieldSpec(command.sortDomain, command.sortProperty)
+			fieldSpec: fieldSpecProject?.getFieldSpec(command.sortDomain, command.sortProperty)
 		]
 
 		this.spec.columns = this.spec.columns.collect {
 			Map map = it as Map
-			map.put('fieldSpec', fieldSpecCache?.getFieldSpec(map.domain, map.property))
+			map.put('fieldSpec', fieldSpecProject?.getFieldSpec(map.domain, map.property))
 			map
 		}
 	}

@@ -6,7 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.dataview.FieldSpecCache
+import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
@@ -518,14 +518,14 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * It creates an instance of {@code FieldSpecCache} with all the field Spec
+     * It creates an instance of {@code FieldSpecProject} with all the field Spec
      * associated to a particular {@code Project} instance
      * @param project an instance of {@code Project}
-     * @return and instance {@code FieldSpecCache}
-     * @see FieldSpecCache#addFieldSpecs(java.lang.String, java.util.Map)
+     * @return and instance {@code FieldSpecProject}
+     * @see net.transitionmanager.dataview.FieldSpecProject#addFieldSpecs(java.lang.String, java.util.Map)
      * @see CustomDomainService#fieldSpecsWithCommon(net.transitionmanager.domain.Project)
      */
-    FieldSpecCache createFieldSpecCache(Project project){
-        return  new FieldSpecCache(this.fieldSpecsWithCommon(project))
+    FieldSpecProject createFieldSpecProject(Project project){
+        return  new FieldSpecProject(this.fieldSpecsWithCommon(project))
     }
 }
