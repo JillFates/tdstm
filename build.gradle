@@ -11,6 +11,10 @@ buildscript {
 	}
 }
 
+plugins {
+  id "com.gorylenko.gradle-git-properties" version "2.0.0"
+}
+
 version "4.7.0"
 group "tdstm"
 
@@ -189,4 +193,11 @@ sourceSets {
             srcDir 'grails-app/migrations'
         }
     }
+}
+
+// Customize Git properties plugin.
+gitProperties {
+    // Change date format in git.properties file.
+    dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+    dateFormatTimeZone = 'EST'
 }
