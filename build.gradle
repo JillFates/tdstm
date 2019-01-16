@@ -163,6 +163,7 @@ bootRun {
 	systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
 
+// Default configuration for Integration tests (Should be passed as an argument?)
 integrationTest.jvmArgs('-Dcom.tdsops.tm.skp=B3c00l')
 
 tasks.withType(Test) {
@@ -177,10 +178,10 @@ assets {
 	minifyCss = true
 }
 
-[bootRun].each { runTask ->
-    configure(runTask) {
-        systemProperties System.properties
-    }
+[bootRun, integrationTest, runScript].each { runTask ->
+	configure(runTask) {
+		systemProperties System.properties
+	}
 }
 
 sourceSets {
