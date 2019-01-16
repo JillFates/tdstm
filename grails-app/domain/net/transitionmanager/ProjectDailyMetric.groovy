@@ -35,6 +35,7 @@ class ProjectDailyMetric {
 
 	static mapping = {
 		version false
+		autowire true
 	}
 
 	static constraints = {

@@ -107,6 +107,7 @@ class Model {
 	                     'noOfConnectors', 'securityService', 'modelService', 'source', 'valid']
 
 	static mapping = {
+		autowire true
 		autoTimestamp false
 		columns {
 			id column: 'model_id'

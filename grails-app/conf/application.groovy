@@ -423,11 +423,6 @@ xssSanitizer.enabled = true
 // grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
 grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
 
-//TODO GRAILS UPGRADE port any service that does you autowiring to use GORM events and eliminate this.
-grails.gorm.default.mapping = {
-        autowire true
-}
-
 grails.resources.pattern = '/**'
 
 /*

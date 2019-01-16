@@ -30,6 +30,7 @@ class LicenseActivityTrack {
 
 	static transients=['securityService', 'changesJSON']
 	static mapping = {
+		autowire true
 		version false
 	}
 

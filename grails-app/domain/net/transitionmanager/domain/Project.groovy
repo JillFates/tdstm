@@ -66,6 +66,7 @@ class Project extends PartyGroup {
 	}
 
 	static mapping = {
+		autowire true
 		autoTimestamp false
 		id column: 'project_id'
 		columns {

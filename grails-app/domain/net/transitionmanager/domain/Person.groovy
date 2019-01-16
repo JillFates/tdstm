@@ -71,6 +71,7 @@ class Person extends Party {
 	}
 
 	static mapping = {
+		autowire true
 		version false
 		autoTimestamp false
 		tablePerHierarchy false
