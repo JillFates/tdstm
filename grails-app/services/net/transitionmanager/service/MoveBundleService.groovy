@@ -21,7 +21,6 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.domain.MoveBundle
@@ -32,7 +31,6 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.StepSnapshot
-import net.transitionmanager.domain.Tag
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -917,7 +915,7 @@ class MoveBundleService implements ServiceMethods {
 	 */
 	MoveBundle update(Long id, MoveBundleCommand command) {
 		MoveBundle moveBundle = findById(id, true)
-		command.populateDomain(moveBundle, false)
+		command.populateDomain(moveBundle, false, ['constraintsMap'])
 
 		if (!moveBundle.hasErrors() && moveBundle.save()) {
 			return moveBundle
@@ -935,7 +933,7 @@ class MoveBundleService implements ServiceMethods {
 	 */
 	MoveBundle save(MoveBundleCommand command) {
 		MoveBundle moveBundle = new MoveBundle()
-		command.populateDomain(moveBundle, false)
+		command.populateDomain(moveBundle, false, ['constraintsMap'])
 		moveBundle.project = securityService.getUserCurrentProject()
 
 		if (!moveBundle.hasErrors() && moveBundle.save()) {

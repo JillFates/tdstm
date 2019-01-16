@@ -565,7 +565,7 @@ class PersonService implements ServiceMethods {
 		List personMerged = []
 
 		// toPerson.properties = cmdObj
-		cmdObj.populateDomain(toPerson, true)
+		cmdObj.populateDomain(toPerson, true, ['constraintsMap'])
 		if (!toPerson.save(flush:true)) {
 			throw new DomainUpdateException('Unable to update person ' + GormUtil.allErrorsString(toPerson))
 			toPerson.errors.allErrors.each{ println it }

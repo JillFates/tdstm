@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
@@ -11,12 +10,12 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.connector.GenericHttpConnector
-import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
@@ -388,7 +387,7 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		// Populate the apiAction with the properties from the command object
-		apiActionCommand.populateDomain(apiAction, false)
+		apiActionCommand.populateDomain(apiAction, false, ['constraintsMap'])
 
 		apiAction.save(failOnError: true)
 
