@@ -7,8 +7,8 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.service.TaskService
-import grails.core.GrailsDomainClassProperty
 import org.grails.core.exceptions.InvalidPropertyException
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.beans.factory.annotation.Autowired
 
 class TaskFacade {
@@ -29,8 +29,9 @@ class TaskFacade {
 	 */
 	Object getProperty(String name) {
 		try {
-			GrailsDomainClassProperty taskProperty = GormUtil.getDomainProperty(task, name)
+			PersistentProperty taskProperty = GormUtil.getDomainProperty(task, name)
 			Object value = task.getProperty(taskProperty.name)
+
 			if (GormUtil.isReferenceProperty(task, taskProperty.name)) {
 				value.toString()
 			} else {
