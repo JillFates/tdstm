@@ -83,6 +83,11 @@ export class AssetDependencyShowComponent {
 	@Input() dependencyB: any;
 	protected DependencyType = DependencyType;
 
+	/**
+	 * Notify to the host component a delete action
+	 * @param {DependencyType} dependencyType Type of dependency to be deleted
+	 * @return {void)
+	 */
 	protected onDeleteDependency(dependencyType: DependencyType): void {
 		this.deleteDependency.emit(dependencyType);
 

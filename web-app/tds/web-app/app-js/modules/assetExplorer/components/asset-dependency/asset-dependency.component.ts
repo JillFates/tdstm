@@ -114,9 +114,15 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		this.frequencyList = this.assetDependency.dataFlowFreq;
 		this.typeList = this.assetDependency.dependencyType;
 		this.statusList = this.assetDependency.dependencyStatus;
-		this.directionList = ['Unknown', 'bi-directional', 'incoming', 'outgoing'];
+		this.directionList = this.assetDependency.directionList;
 	}
 
+	/**
+	 * Add to the dependency provided as argument the dateCreated and lastUpdated field of the asset parameter
+	 * @param {any} dependency Object containing the dependency to change
+	 * @param {any} asset Asset containing the dateCreated and lastUpdated fields
+	 * @return {any) Original dependency modified adding the extra date field
+	 */
 	private getDependencyWithDates(dependency: any, asset: any): any {
 		if (!asset || !dependency) {
 			return dependency;
@@ -126,15 +132,28 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		return Object.assign({}, dependency, { dateCreated, lastUpdated });
 	}
 
+	/**
+	 * Close the window
+	 * @return {void)
+	 */
 	protected cancelCloseDialog(): void {
 		this.dismiss();
 	}
 
-	protected setEditMode(enabled: boolean) {
+	/**
+	 * Set the flag to indicate if the view is in edit model
+	 * @param {boolean} enabled Flag indicating the edit mode
+	 * @return {void)
+	 */
+	protected setEditMode(enabled: boolean): void {
 		this.isEditing = enabled;
 	}
 
-	protected saveChanges() {
+	/**
+	 * Save the dependencies changes, based on the flags that indicate if the dependency has changes
+	 * @return {void)
+	 */
+	protected saveChanges(): void {
 		let updates = [];
 
 		if (this.editedDependencies.aDependencyHasChanged) {
@@ -158,12 +177,21 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		});
 	}
 
-	protected cancelEdit() {
+	/**
+	 * Cancel the edit changes
+	 * @return {void)
+	 */
+	protected cancelEdit(): void {
 		this.setEditMode(false);
 		this.editedDependencies = this.getInitialEditDependencies();
 	}
 
-	protected onChangeDependencies(change: DependencyChange) {
+	/**
+	 * On change a dependency, grab the dependency value and set the flag indicating which dependency has changed
+	 * @param {DependencyChange} change Object containing the dependency change
+	 * @return {void)
+	 */
+	protected onChangeDependencies(change: DependencyChange): void {
 		if (change.dependencies) {
 			if (change.type === DependencyType.dependencyA) {
 				this.editedDependencies.aDependencyHasChanged = true;
@@ -174,6 +202,10 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		}
 	}
 
+	/**
+	 * Set the initial dependencies values
+	 * @return {void)
+	 */
 	private getInitialEditDependencies(): any {
 		return {
 			dependencies: null,
@@ -182,7 +214,12 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		}
 	}
 
-	protected onDeleteDependency(dependencyType: DependencyType) {
+	/**
+	 * Delete a dependency previous confirmation
+	 * @param {DependencyType} dependencyType Type of dependency to be deleted
+	 * @return {void)
+	 */
+	protected onDeleteDependency(dependencyType: DependencyType): void {
 		this.confirmDelete()
 			.then((result) => {
 				if (result) {
@@ -194,8 +231,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						dependencyId: dependency.id
 					};
 
-					console.log('Deleting...');
-					console.log(dependencyChange);
 					this.assetService.deleteDependency(dependencyChange)
 						.subscribe((result) => {
 							if (result) {
@@ -205,8 +240,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 									this.dependencyB = null;
 								}
 							}
-							console.log('The result of delete is');
-							console.log(result);
 						}, (error) => console.log('Error:', error));
 				}
 			});
