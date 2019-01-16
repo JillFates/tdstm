@@ -24,11 +24,14 @@ class CredentialServiceIntegrationSpec extends Specification{
     GrailsApplication grailsApplication
     SessionFactory    sessionFactory
 
-    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-    ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-    CredentialTestHelper credentialTestHelper = new CredentialTestHelper()
+    ProjectTestHelper projectTestHelper
+    ProviderTestHelper providerTestHelper
+    CredentialTestHelper credentialTestHelper
 
     def setup() {
+        projectTestHelper = new ProjectTestHelper()
+        providerTestHelper = new ProviderTestHelper()
+        credentialTestHelper = new CredentialTestHelper()
         sessionFactory = grailsApplication.getMainContext().getBean('sessionFactory')
     }
 

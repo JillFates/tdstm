@@ -38,21 +38,29 @@ class PartyRelationshipServiceTests extends Specification {
 	Person person
 
 	@Shared
-	ProjectTestHelper projectHelper = new ProjectTestHelper()
+	ProjectTestHelper projectHelper
+
+	@Shared
+	boolean initialized = false
 
 	void setup() {
-		def projectHelper = new ProjectTestHelper()
-		project = projectHelper.getProject()
-		moveEvent = projectHelper.getFirstMoveEvent(project)
+		if(!initialized) {
+			projectHelper = new ProjectTestHelper()
+			def projectHelper = new ProjectTestHelper()
+			project = projectHelper.getProject()
+			moveEvent = projectHelper.getFirstMoveEvent(project)
 
-		def personHelper = new PersonTestHelper()
-		byWhom = personHelper.getAdminPerson()
-		securityService.assumeUserIdentity(byWhom.userLogin.username, false)
+			def personHelper = new PersonTestHelper()
+			byWhom = personHelper.getAdminPerson()
+			securityService.assumeUserIdentity(byWhom.userLogin.username, false)
 
-		userLogin = byWhom.userLogin
-		assert userLogin
+			userLogin = byWhom.userLogin
+			assert userLogin
 
-		person = personHelper.createPerson(byWhom, project.client)
+			person = personHelper.createPerson(byWhom, project.client)
+
+			initialized =true
+		}
 	}
 
 	void "Test the getTeamRoleTypes"() {

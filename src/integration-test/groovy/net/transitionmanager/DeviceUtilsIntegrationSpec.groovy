@@ -21,40 +21,49 @@ import test.helper.MoveBundleTestHelper
 class DeviceUtilsIntegrationSpec extends Specification{
 
 	@Shared
-	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+	test.helper.ProjectTestHelper projectTestHelper
 	@Shared
-	MoveBundleTestHelper bundleHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper bundleHelper
 
 	@Shared
 	Project project
 	@Shared
 	MoveBundle moveBundle
 
+	@Shared
+	boolean initialized = false
+
 	def setup() {
-		project = projectTestHelper.createProject()
-		moveBundle = bundleHelper.createBundle(project)
+		if(!initialized) {
+			projectTestHelper = new test.helper.ProjectTestHelper()
+			bundleHelper = new MoveBundleTestHelper()
+			project = projectTestHelper.createProject()
+			moveBundle = bundleHelper.createBundle(project)
 
-		Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
-		Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
+			Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
+			Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
 
-		Manufacturer manufacturer1 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
-		Manufacturer manufacturer2 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
+			Manufacturer manufacturer1 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
+			Manufacturer manufacturer2 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
 
-		Model model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true, failOnError: true)
-		Model model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true, failOnError: true)
-		Model model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true, failOnError: true)
-		Model model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true, failOnError: true)
+			Model model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true, failOnError: true)
+			Model model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true, failOnError: true)
+			Model model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true, failOnError: true)
+			Model model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true, failOnError: true)
 
-		Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true, failOnError: true)
-		Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true, failOnError: true)
+			Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true, failOnError: true)
+			Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true, failOnError: true)
 
-		AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true, failOnError: true)
-		AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true, failOnError: true)
+			AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true, failOnError: true)
+			AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true, failOnError: true)
 
-		room1.addToRacks(rack1).save(flush: true, failOnError: true)
-		room2.addToRacks(rack2).save(flush: true, failOnError: true)
-		room1.addToSourceAssets(assetEntity1).save(flush: true, failOnError: true)
-		room2.addToTargetAssets(assetEntity2).save(flush: true, failOnError: true)
+			room1.addToRacks(rack1).save(flush: true, failOnError: true)
+			room2.addToRacks(rack2).save(flush: true, failOnError: true)
+			room1.addToSourceAssets(assetEntity1).save(flush: true, failOnError: true)
+			room2.addToTargetAssets(assetEntity2).save(flush: true, failOnError: true)
+
+			initialized = true
+		}
 	}
 
 	@See('TM-13021')
@@ -152,95 +161,78 @@ class DeviceUtilsIntegrationSpec extends Specification{
 		when: 'retrieving source device select options'
 			Map sourceSelectOptions = DeviceUtils.deviceModelOptions(project, assetEntities[0])
 		then: 'source select device options are returned as expected'
-			with(sourceSelectOptions) {
-				get('railTypeOption') != null
-				get('sourceRoomSelect') != null
-				get('sourceRackSelect') != null
-				get('sourceChassisSelect') != null
 
-				with(get('railTypeOption')) {
-					size() == 6
-					it == AssetEntity.RAIL_TYPES
-				}
+				sourceSelectOptions.get('railTypeOption') != null
+				sourceSelectOptions.get('sourceRoomSelect') != null
+				sourceSelectOptions.get('sourceRackSelect') != null
+				sourceSelectOptions.get('sourceChassisSelect') != null
 
-				with(get('sourceRoomSelect')) {
-					size() == 2
-					with(get(0)) {
-						id == -1
-						value == 'Add Room...'
-					}
-					with(get(1)) {
-						id
-						value == 'Location 1 / Room 1'
-					}
-				}
 
-				with(get('sourceRackSelect')) {
-					size() == 2
-					with(get(0)) {
-						id == -1
-						value == 'Add Rack...'
-					}
-					with(get(1)) {
-						id
-						value == 'Rack 1'
-					}
-				}
+					sourceSelectOptions.get('railTypeOption').size() == 6
+					sourceSelectOptions.get('railTypeOption') == AssetEntity.RAIL_TYPES
 
-				with(get('sourceChassisSelect')) {
-					size() == 1
-					with(get(0)) {
-						id
-						value == 'Asset 1/AT1'
-					}
-				}
 
-			}
+
+				sourceSelectOptions.get('sourceRoomSelect').size() == 2
+
+				sourceSelectOptions.get('sourceRoomSelect').get(0).id == -1
+				sourceSelectOptions.get('sourceRoomSelect').get(0).value == 'Add Room...'
+
+
+				sourceSelectOptions.get('sourceRoomSelect').get(1).id
+				sourceSelectOptions.get('sourceRoomSelect').get(1).value == 'Location 1 / Room 1'
+
+
+				sourceSelectOptions.get('sourceRackSelect').size() == 2
+
+				sourceSelectOptions.get('sourceRackSelect').get(0).id == -1
+				sourceSelectOptions.get('sourceRackSelect').get(0).value == 'Add Rack...'
+
+
+				sourceSelectOptions.get('sourceRackSelect').get(1).id
+				sourceSelectOptions.get('sourceRackSelect').get(1).value == 'Rack 1'
+
+				sourceSelectOptions.get('sourceChassisSelect').size() == 1
+
+				sourceSelectOptions.get('sourceChassisSelect').get(0).id
+				sourceSelectOptions.get('sourceChassisSelect').get(0).value == 'Asset 1/AT1'
+
 		when: 'retrieving target device select options'
 			Map targetSelectOptions = DeviceUtils.deviceModelOptions(project, assetEntities[1])
 		then: 'target select device options are returned as expected'
-			with(targetSelectOptions) {
-				get('railTypeOption') != null
-				get('targetRoomSelect') != null
-				get('targetRackSelect') != null
-				get('targetChassisSelect') != null
 
-				with(get('railTypeOption')) {
-					size() == 6
-					it == AssetEntity.RAIL_TYPES
-				}
+				targetSelectOptions.get('railTypeOption') != null
+				targetSelectOptions.get('targetRoomSelect') != null
+				targetSelectOptions.get('targetRackSelect') != null
+				targetSelectOptions.get('targetChassisSelect') != null
 
-				with(get('targetRoomSelect')) {
-					size() == 2
-					with(get(0)) {
-						id == -1
-						value == 'Add Room...'
-					}
-					with(get(1)) {
-						id
-						value == 'Location 2 / Room 2'
-					}
-				}
 
-				with(get('targetRackSelect')) {
-					size() == 2
-					with(get(0)) {
-						id == -1
-						value == 'Add Rack...'
-					}
-					with(get(1)) {
-						id
-						value == 'Rack 2'
-					}
-				}
+			targetSelectOptions.get('railTypeOption').size() == 6
+			targetSelectOptions.get('railTypeOption') == AssetEntity.RAIL_TYPES
 
-				with(get('targetChassisSelect')) {
-					size() == 1
-					with(get(0)) {
-						id
-						value == 'Asset 2/AT2'
-					}
-				}
-			}
+
+			targetSelectOptions.get('targetRoomSelect').size() == 2
+
+			targetSelectOptions.get('targetRoomSelect').get(0).id == -1
+			targetSelectOptions.get('targetRoomSelect').get(0).value == 'Add Room...'
+
+			targetSelectOptions.get('targetRoomSelect').get(1).id
+			targetSelectOptions.get('targetRoomSelect').get(1).value == 'Location 2 / Room 2'
+
+
+			targetSelectOptions.get('targetRackSelect').size() == 2
+
+			targetSelectOptions.get('targetRackSelect').get(0).id == -1
+			targetSelectOptions.get('targetRackSelect').get(0).value == 'Add Rack...'
+
+
+			targetSelectOptions.get('targetRackSelect').get(1).id
+			targetSelectOptions.get('targetRackSelect').get(1).value == 'Rack 2'
+
+
+			targetSelectOptions.get('targetChassisSelect').size() == 1
+
+			targetSelectOptions.get('targetChassisSelect').get(0).id
+			targetSelectOptions.get('targetChassisSelect').get(0).value == 'Asset 2/AT2'
 	}
 }

@@ -27,13 +27,13 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 	CustomDomainService customDomainService
 
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+	ProjectTestHelper projectTestHelper
 
 	@Shared
 	Project project
@@ -58,6 +58,9 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 	 */
 	@Shared
 	AssetEntity device
+
+	@Shared
+	boolean initialized = false
 
 	// Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
 	// After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
@@ -84,21 +87,30 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 
 	void setup() {
-		project = projectTestHelper.createProject()
-		otherProject = projectTestHelper.createProject()
+		if(!initialized) {
+			assetEntityTestHelper = new AssetEntityTestHelper()
+			moveBundleTestHelper = new MoveBundleTestHelper()
+			projectTestHelper = new ProjectTestHelper()
 
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+			project = projectTestHelper.createProject()
+			otherProject = projectTestHelper.createProject()
 
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			moveBundle = moveBundleTestHelper.createBundle(project, null)
+			moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+
+			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+			Project project = projectTestHelper.createProjectWithDefaultBundle()
+			JSONObject fieldSpec = loadFieldSpecJson()
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+
+			initialized =true
+		}
 	}
 
 
 	void 'Test clear'() {
 		given:
-			Project project = projectTestHelper.createProjectWithDefaultBundle()
-			JSONObject fieldSpec = loadFieldSpecJson()
-			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 		when: 'clear is called with a list of assets'
 			BulkChangeNumber.clear(AssetEntity.class, null, 'custom8', [device.id], null)
 
@@ -112,9 +124,6 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 	void 'Test replace'() {
 		given:
-			Project project = projectTestHelper.createProjectWithDefaultBundle()
-			JSONObject fieldSpec = loadFieldSpecJson()
-			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 			Number testNumber
 
 		when: 'replace is called with a random integer, and a list of assets'

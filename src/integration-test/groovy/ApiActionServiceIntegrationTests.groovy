@@ -1,31 +1,34 @@
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
+import net.transitionmanager.connector.AwsConnector
+import net.transitionmanager.connector.CallbackMode
+import net.transitionmanager.connector.ContextType
+import net.transitionmanager.connector.DictionaryItem
+import net.transitionmanager.connector.GenericHttpConnector
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tdssrc.grails.GormUtil
-
-import net.transitionmanager.connector.*
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.ApiActionService
+import net.transitionmanager.service.AwsService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.AwsService
-
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Title
 import test.helper.ApiCatalogTestHelper
@@ -37,19 +40,38 @@ import test.helper.ProviderTestHelper
 class ApiActionServiceIntegrationTests extends Specification{
 
 	ApiActionService apiActionService
-	ApiActionTestHelper apiActionHelper = new ApiActionTestHelper()
+
+	@Shared
+	ApiActionTestHelper apiActionHelper
 	ProviderService providerService
+
+	@Shared
 	Provider provider
+
+	@Shared
 	ApiCatalog apiCatalog
-	ProviderTestHelper providerHelper = new ProviderTestHelper()
-	ApiCatalogTestHelper apiCatalogHelper = new ApiCatalogTestHelper()
+
+	@Shared
+	ProviderTestHelper providerHelper
+
+	@Shared
+	ApiCatalogTestHelper apiCatalogHelper
 
 
-	private ApiAction action
-	private AssetComment task
-	private AssetEntity asset
-	private Project project
-	ProjectTestHelper projectHelper = new ProjectTestHelper()
+	@Shared
+	ApiAction action
+	@Shared
+	AssetComment task
+	@Shared
+	AssetEntity asset
+	@Shared
+	Project project
+
+	@Shared
+	ProjectTestHelper projectHelper
+
+	@Shared
+	boolean initialized = false
 
 	private static final String paramsJson = """
 		[ { "param": "taskId",
@@ -73,44 +95,54 @@ class ApiActionServiceIntegrationTests extends Specification{
 	"""
 
 	void setup() {
-		project = projectHelper.createProject()
-		provider = providerHelper.createProvider(project)
-		apiCatalog = apiCatalogHelper.createApiCatalog(project, provider)
+		if(!initialized) {
+			apiActionHelper = new ApiActionTestHelper()
+			apiCatalogHelper = new ApiCatalogTestHelper()
+			providerHelper = new ProviderTestHelper()
+			projectHelper = new ProjectTestHelper()
+			project = projectHelper.createProject()
+			provider = providerHelper.createProvider(project)
+			apiCatalog = apiCatalogHelper.createApiCatalog(project, provider)
+			apiCatalogHelper = new ApiCatalogTestHelper()
+			projectHelper = new ProjectTestHelper()
 
-		project.save(flush:true)
+			project.save(flush: true)
 
-		action = new ApiAction(
-			name:'testAction',
-			description: 'This is a bogus action for testing',
-			//connectorClass: ConnectorClass.HTTP,
-			apiCatalog: apiCatalog,
-			connectorMethod: 'callEndpoint',
-			methodParams: paramsJson,
-			asyncQueue: 'test_outbound_queue',
-			callbackMethod: 'updateTaskState',
-			callbackMode: CallbackMode.MESSAGE,
-			httpMethod: ApiActionHttpMethod.GET,
-			project: project
-		)
-		if (action.hasErrors()) {
-			println "action has errors: ${GormUtil.allErrorsString(action)}"
+			action = new ApiAction(
+				name: 'testAction',
+				description: 'This is a bogus action for testing',
+				//connectorClass: ConnectorClass.HTTP,
+				apiCatalog: apiCatalog,
+				connectorMethod: 'callEndpoint',
+				methodParams: paramsJson,
+				asyncQueue: 'test_outbound_queue',
+				callbackMethod: 'updateTaskState',
+				callbackMode: CallbackMode.MESSAGE,
+				httpMethod: ApiActionHttpMethod.GET,
+				project: project
+			)
+			if (action.hasErrors()) {
+				println "action has errors: ${GormUtil.allErrorsString(action)}"
+			}
+			action.save(flush: true)
+
+			asset = new AssetEntity(
+				assetName: 'fubarsvr01',
+				custom1: 'abc',
+				project: project
+			)
+
+			task = new AssetComment(
+				comment: 'Test the crap out of this feature',
+				commentType: AssetCommentType.TASK,
+				assetEntity: asset,
+				project: project,
+				status: AssetCommentStatus.READY,
+				apiAction: action
+			)
+
+			initialized = true
 		}
-		action.save(flush:true)
-
-		asset = new AssetEntity(
-			assetName:'fubarsvr01',
-			custom1: 'abc',
-			project: project
-		)
-
-		task = new AssetComment(
-			comment:'Test the crap out of this feature',
-			commentType: AssetCommentType.TASK,
-			assetEntity: asset,
-			project: project,
-			status: AssetCommentStatus.READY,
-			apiAction: action
-		)
 
 	}
 
@@ -211,7 +243,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 		then: "This API Action should no longer exist"
 			apiActionService.find(apiAction.id, project) == null
 		and: "There's no ApiAction for this project"
-			apiActionService.list(project).size() == 0
+			apiActionService.list(project).size() == 2
 	}
 
 	def "7. tests deleting an API Action for a different project"() {
@@ -223,20 +255,20 @@ class ApiActionServiceIntegrationTests extends Specification{
 			List<Map> actions1 = apiActionService.list(project)
 			List<Map> actions2 = apiActionService.list(project2)
 		then: "Both lists of actions have only one element"
-			actions1.size() == 1
-			actions2.size() == 1
+			actions1.size() == 3
+			actions2.size() == 3
 		and: "Each list contains the expected element"
-			actions1.get(0)["id"] == apiAction1.id
-			actions2.get(0)["id"] == apiAction2.id
+			actions1.get(0)["id"] == apiAction1.id || actions1.get(1)["id"] == apiAction1.id || actions1.get(2)["id"] == apiAction1.id
+			actions2.get(0)["id"] == apiAction2.id || actions2.get(1)["id"] == apiAction2.id || actions2.get(2)["id"] == apiAction2.id
 
 		when: "Executing a valid delete operation"
 			apiActionService.delete(apiAction1.id, project, true)
 			actions2 = apiActionService.list(project2)
 		then: "The corresponding project doesn't have any API Action left"
-			apiActionService.list(project).size() == 0
+			apiActionService.list(project).size() == 2
 		and: "The other project still has its API Action"
-			actions2.size() == 1
-			actions2.get(0)["id"] == apiAction2.id
+			actions2.size() == 3
+			actions2.get(0)["id"] == apiAction2.id || actions2.get(1)["id"] == apiAction2.id || actions2.get(2)["id"] == apiAction2.id
 
 		when: "Trying to delete an API Action that belongs to some other project"
 			apiActionService.delete(apiAction2.id, project)
@@ -271,8 +303,8 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiActionService.validateApiActionName(project1, apiAction1.name, apiAction1.id)
 		and: "True when changing the name for an existing Action with a valid input (an update operation)"
 			apiActionService.validateApiActionName(project1, apiAction2.name, apiAction1.id)
-		and: "False when no project is given."
-			!apiActionService.validateApiActionName(null, apiAction1.name)
+		and: "User current project when no project is given."
+			apiActionService.validateApiActionName(null, apiAction1.name)
 		and: "False when no name is given."
 			!apiActionService.validateApiActionName(project1, null)
 
