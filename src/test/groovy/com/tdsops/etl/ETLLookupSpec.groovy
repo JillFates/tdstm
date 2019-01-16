@@ -26,7 +26,6 @@ import spock.lang.Issue
  *     <li><b>lookup</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
 class ETLLookupSpec extends ETLBaseSpec {
 

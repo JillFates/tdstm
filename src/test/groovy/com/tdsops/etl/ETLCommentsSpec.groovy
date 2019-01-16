@@ -24,7 +24,6 @@ import spock.lang.See
 
 
 @TestMixin(ControllerUnitTestMixin)
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
 class ETLCommentsSpec extends ETLBaseSpec {
 

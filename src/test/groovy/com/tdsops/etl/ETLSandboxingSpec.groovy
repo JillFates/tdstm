@@ -20,7 +20,6 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
 import spock.lang.See
 
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
 class ETLSandboxingSpec extends ETLBaseSpec {
 

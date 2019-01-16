@@ -34,8 +34,6 @@ import spock.lang.Specification
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
-@TestFor (ScriptProcessorService)
-@TestMixin (ControllerUnitTestMixin)
 @Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
 class ScriptProcessorServiceSpec extends Specification {
 

@@ -31,7 +31,6 @@ import spock.lang.Shared
  *     <li><b>initialize</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLInitializeSpec extends ETLBaseSpec {
 

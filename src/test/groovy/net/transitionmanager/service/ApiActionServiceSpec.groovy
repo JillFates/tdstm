@@ -20,7 +20,6 @@ import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 
-@TestFor(ApiActionService)
 @TestMixin(GrailsUnitTestMixin)
 class ApiActionServiceSpec extends Specification {
 
