@@ -805,18 +805,17 @@ class DataImportService implements ServiceMethods {
 
 					if (shouldBeSaved) {
 
-						// TODO: add comments
-						if (record.hasComments()) {
-							List<String> comments = record.commentsAsList()
-							log.info "processEntityRecord() record ${record.id} contains comments ${}"
-							saveCommentsForEntity(comments, entity, context)
-							entity.lastUpdated = new Date()
-						}
-
 						if (entity.save(failOnError:false)) {
+
+							if (record.hasComments()) {
+								List<String> comments = record.commentsAsList()
+								log.info "processEntityRecord() record ${record.id} contains comments ${}"
+								saveCommentsForEntity(comments, entity, context)
+								entity.lastUpdated = new Date()
+							}
 							// If we still have a dependency record then the process must have finished
 							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-							//    Note that I was running to some strange issues of casting that prevented from doing this originally
+							// Note that I was running to some strange issues of casting that prevented from doing this originally
 							// record.status = ImportBatchRecordStatusEnum.COMPLETED
 							record.status = ImportBatchStatusEnum.COMPLETED
 						} else {
@@ -865,7 +864,7 @@ class DataImportService implements ServiceMethods {
 				comment: comment,
 				commentType: AssetCommentType.COMMENT,
 				assetEntity: entity
-			).save()
+			).save(failOnError: true)
 		}
 	}
   
