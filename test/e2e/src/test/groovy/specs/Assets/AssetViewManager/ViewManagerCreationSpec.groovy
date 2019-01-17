@@ -116,13 +116,11 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             at AssetViewsPage
             allViewsModule.filterViewByName(randStr)
         then: "The newly created view is filtered and displayed"
-            vwGrid.find("tr")[1].find("a")[1].displayed
+            vwGrid.find("tr")[1].find("a").displayed
     }
     def "11. User can go the the newly crated view page"() {
-        given: "I have filtered the view"
-            println "validate the filtered view is displayed"
-        when: "I click on it"
-            waitFor{vwGrid.find("tr")[1].find("a")[1].click()}
+        when: "I click on the view"
+            vwGrid.find("tr")[1].find("a").click()
         then: "I am taken to the view's page"
             at ViewPage
     }
