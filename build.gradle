@@ -163,8 +163,6 @@ bootRun {
 	systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
 
-integrationTest.jvmArgs('-Dcom.tdsops.tm.skp=B3c00l')
-
 tasks.withType(Test) {
 	systemProperty "geb.env", System.getProperty('geb.env')
 	systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
@@ -177,10 +175,10 @@ assets {
 	minifyCss = true
 }
 
-[bootRun].each { runTask ->
-    configure(runTask) {
-        systemProperties System.properties
-    }
+[bootRun, integrationTest, runScript].each { runTask ->
+	configure(runTask) {
+		systemProperties System.properties
+	}
 }
 
 sourceSets {
