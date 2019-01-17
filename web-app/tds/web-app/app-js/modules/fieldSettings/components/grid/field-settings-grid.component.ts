@@ -200,7 +200,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			model['count'] = this.data.fields.length;
 			model.control = CUSTOM_FIELD_CONTROL_TYPE.String;
 			model.show = true;
-			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
+			let availableOrder = this.data.fields.map(f => f.order).sort((a,b) => a - b).filter(item => !isNaN(item));
 			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.data.fields.push(model);
 			this.onFilter();
