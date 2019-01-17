@@ -13,7 +13,7 @@ databaseChangeLog = {
         // 1 - Change the FKC DataScript > ImportBatch - to set NULL on DELETE
         dropForeignKeyConstraint(baseTableName:'import_batch', constraintName:'import_batch_data_script')
         addForeignKeyConstraint(
-                constraintName: 'import_batch_data_script',
+                constraintName: 'fk_import_batch_data_script',
                 baseTableName: 'import_batch',
                 baseColumnNames: 'data_script_id',
                 referencedTableName: 'data_script',
@@ -31,6 +31,7 @@ databaseChangeLog = {
                 onDelete: 'SET NULL'
         )
         // 3 - Add FK constraint Provider > Action - to DELETE the Action (the old name for the fk constraint and index was wrong, just changing names)
+        dropNotNullConstraint(tableName:'api_action', columnDataType: 'bigint(20)', columnName: 'provider_id')
         dropForeignKeyConstraint(baseTableName:'api_action', constraintName:'fk_datascript_provider')
         dropIndex(tableName:'api_action', indexName:'fk_datascript_provider')
         createIndex(indexName: 'fk_api_action_provider', tableName: 'api_action') {
@@ -42,12 +43,12 @@ databaseChangeLog = {
                 baseColumnNames: 'provider_id',
                 referencedTableName: 'provider',
                 referencedColumnNames: 'provider_id',
-                onDelete: 'CASCADE'
+                onDelete: 'SET NULL' 
         )
         // 4 - Add FK constraint Action > Task (AssetComment) - to set AssetComment.action NULL on DELETE
         dropForeignKeyConstraint(baseTableName:'asset_comment', constraintName:'FK_ASSET_COMMENT_TO_API_ACTION')
         addForeignKeyConstraint(
-                constraintName: 'FK_ASSET_COMMENT_TO_API_ACTION',
+                constraintName: 'fk_asset_comment_api_action',
                 baseTableName: 'asset_comment',
                 baseColumnNames: 'api_action_id',
                 referencedTableName: 'api_action',
