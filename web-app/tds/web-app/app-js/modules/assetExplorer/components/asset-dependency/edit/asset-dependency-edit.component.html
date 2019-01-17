@@ -1,0 +1,141 @@
+<div>
+	<div class="dependency-row dependency-edit">
+		<div class="dependency-row-legend">Frequency</div>
+		<div class="dependency-a">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyA)"
+					name="frequencyListA"
+					[valuePrimitive]="true"
+					[data]="frequencyList"
+					[(ngModel)]="dependencies.a.dataFlowFreq">
+			</kendo-dropdownlist>
+		</div>
+		<div class="dependency-b">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyB)"
+					name="frequencyListB"
+					[valuePrimitive]="true"
+					[data]="frequencyList"
+					[(ngModel)]="dependencies.b.dataFlowFreq">
+			</kendo-dropdownlist>
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit ">
+		<div class="dependency-row-legend">Type</div>
+		<div class="dependency-a">
+			<kendo-dropdownlist
+					name="typeListA"
+					(valueChange)="notifyChanges(DependencyType.dependencyA)"
+					[valuePrimitive]="true"
+					[data]="typeList"
+					[(ngModel)]="dependencies.a.type">
+			</kendo-dropdownlist>
+		</div>
+		<div class="dependency-b">
+			<kendo-dropdownlist
+					name="typeListB"
+					(valueChange)="notifyChanges(DependencyType.dependencyB)"
+					[valuePrimitive]="true"
+					[data]="typeList"
+					[(ngModel)]="dependencies.b.type">
+			</kendo-dropdownlist>
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">Status</div>
+		<div class="dependency-a">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyA)"
+					name="statusListA"
+					[valuePrimitive]="true"
+					[data]="statusList"
+					[(ngModel)]="dependencies.a.status">
+			</kendo-dropdownlist>
+		</div>
+		<div class="dependency-b">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyB)"
+					name="statusListB"
+					[valuePrimitive]="true"
+					[data]="statusList"
+					[(ngModel)]="dependencies.b.status">
+			</kendo-dropdownlist>
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">Direction</div>
+		<div class="dependency-a">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyA)"
+					name="directionListA"
+					[valuePrimitive]="true"
+					[data]="directionList"
+					[(ngModel)]="dependencies.a.dataFlowDirection">
+			</kendo-dropdownlist>
+		</div>
+		<div class="dependency-b">
+			<kendo-dropdownlist
+					(valueChange)="notifyChanges(DependencyType.dependencyB)"
+					name="directionListB"
+					[valuePrimitive]="true"
+					[data]="directionList"
+					[(ngModel)]="dependencies.b.dataFlowDirection">
+			</kendo-dropdownlist>
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">c1</div>
+		<div class="dependency-a">
+			<input type="text" name="c1A" [(ngModel)]="dependencies.a.c1"
+			       (keyup)="notifyChanges(DependencyType.dependencyA)">
+		</div>
+		<div class="dependency-b">
+			<input type="text" name="c1B" [(ngModel)]="dependencies.b.c1"
+			       (keyup)="notifyChanges(DependencyType.dependencyB)">
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">c2</div>
+		<div class="dependency-a">
+			<input type="text" name="c2A" [(ngModel)]="dependencies.a.c2"
+			       (keyup)="notifyChanges(DependencyType.dependencyA)">
+		</div>
+		<div class="dependency-b">
+			<input type="text" name="c2B" [(ngModel)]="dependencies.b.c2"
+			       (keyup)="notifyChanges(DependencyType.dependencyB)">
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">c3</div>
+		<div class="dependency-a">
+			<input type="text" name="c3A" [(ngModel)]="dependencies.a.c3"
+			       (keyup)="notifyChanges(DependencyType.dependencyA)">
+		</div>
+		<div class="dependency-b">
+			<input type="text" name="c3B" [(ngModel)]="dependencies.b.c3"
+			       (keyup)="notifyChanges(DependencyType.dependencyB)">
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">c4</div>
+		<div class="dependency-a">
+			<input type="text" name="c4A" [(ngModel)]="dependencies.a.c4"
+			       (keyup)="notifyChanges(DependencyType.dependencyA)">
+		</div>
+		<div class="dependency-b">
+			<input type="text" name="c4B" [(ngModel)]="dependencies.b.c4"
+			       (keyup)="notifyChanges(DependencyType.dependencyB)">
+		</div>
+	</div>
+	<div class="dependency-row  dependency-edit">
+		<div class="dependency-row-legend">comment</div>
+		<div class="dependency-a">
+					<textarea name="commentA" [(ngModel)]="dependencies.a.comment"
+					          (keyup)="notifyChanges(DependencyType.dependencyA)"></textarea>
+		</div>
+		<div class="dependency-b">
+					<textarea name="commentB" [(ngModel)]="dependencies.b.comment"
+					          (keyup)="notifyChanges(DependencyType.dependencyB)"></textarea>
+		</div>
+	</div>
+</div>

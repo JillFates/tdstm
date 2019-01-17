@@ -191,7 +191,8 @@ export const en_DICTIONARY: Object = {
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
-		'PLURAL_NAME': 'Dependencies'
+		'PLURAL_NAME': 'Dependencies',
+		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
