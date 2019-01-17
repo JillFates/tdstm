@@ -134,8 +134,15 @@ export class LicenseListComponent implements OnInit {
 	 */
 	protected onImportLicenseRequest(): void {
 		this.dialogService.open(RequestImportComponent, []).then((license: any) => {
-			this.reloadData();
-			this.openLicenseViewEdit(license);
+
+			setTimeout(() => {
+				this.openLicenseViewEdit(license);
+			}, 1000);
+
+			if (license) {
+				this.reloadData();
+			}
+
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
