@@ -1763,19 +1763,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Retrieve the bundles associated with the selected event (if any).
 		List<Long> bundleIds = getBundleIds(contextObj)
 
-		return TagAsset.where {
+		return AssetEntity.where {
 			if (tagIds) {
-				tag.id in tagIds
+				tagAssets.tag.id in tagIds
 			}
 			if (bundleIds) {
-				asset.moveBundle.id in bundleIds
+				moveBundle.id in bundleIds
 			}
 
 			// Assets must belong to a planning bundle.
-			asset.moveBundle.useForPlanning == true
+			moveBundle.useForPlanning == true
 
-		}.projections {
-			property('asset')
 		}.list()
 	}
 
@@ -4242,10 +4240,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				// When using tags, bundles are going to be ignored
 				map.remove('bIds')
-			} else if (map.bIds) {
+			}
+
+			if (map.bIds) {
 				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
-			} else {
-				throw new IllegalArgumentException('The selected event has no assigned bundles')
 			}
 
 			// Assemble the SQL and attempt to execute it
