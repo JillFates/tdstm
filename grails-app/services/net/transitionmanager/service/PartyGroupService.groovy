@@ -162,7 +162,7 @@ class PartyGroupService implements ServiceMethods {
 
 			if (!partyGroup.hasErrors() && partyGroup.save()) {
 
-				def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
+				def company = securityService.loadCurrentPerson().company
 
 				if (company) {
 					if (params.partner && params.partner == "Y" && !isAPartner(partyGroup)) {
@@ -204,7 +204,7 @@ class PartyGroupService implements ServiceMethods {
 				partyRelationshipService.savePartyRelationship("CLIENTS", companyParty, "ROLE_COMPANY", partyGroup, "ROLE_CLIENT")
 
 				if (partner && partner == "Y") {
-					def company = partyRelationshipService.getCompanyOfStaff(securityService.loadCurrentPerson())
+					def company = securityService.loadCurrentPerson().company
 					if (company) {
 						partyRelationshipService.savePartyRelationship("PARTNERS", company, "ROLE_COMPANY", partyGroup, "ROLE_PARTNER")
 					}

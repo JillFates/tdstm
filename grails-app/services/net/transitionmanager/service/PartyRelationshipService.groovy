@@ -164,25 +164,6 @@ class PartyRelationshipService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to retrieve the Company for which a person is associated as a "STAFF" member
-	 * @param staff  the staff member instance or id
-	 * @return Party - the company Staff is associated with or NULL if no associations
-	 */
-	PartyGroup getCompanyOfStaff(def staff) {
-		def staffRef = StringUtil.toLongIfString(staff)
-		boolean byId = (staffRef instanceof Long)
-		String query = """select pr.partyIdFrom from
-			PartyRelationship pr where
-			pr.partyRelationshipType.id = 'STAFF'
-			and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-			and pr.roleTypeCodeTo.id = 'ROLE_STAFF'
-			and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
-		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff:staffRef])
-
-		return (company ? company[0] : null)
-	}
-
-	/**
 	 * Persons that are staff of the company
 	 * @param company  the company to look up (id or object)
 	 * @param includeDisabled - flag to control if disabled staff are included in list (default false)

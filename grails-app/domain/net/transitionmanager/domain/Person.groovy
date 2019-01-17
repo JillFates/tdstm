@@ -5,13 +5,9 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.NoticeAcknowledgment
-import net.transitionmanager.service.PartyRelationshipService
-
 // Domain classes that Person is associated with that are impacted by merging which are not in
 // this package.
 
@@ -41,8 +37,6 @@ class Person extends Party {
 	String staffType = 'Salary'
 	Integer travelOK = 0
 
-	transient PartyRelationshipService partyRelationshipService
-
 	static hasMany = [blackOutDates: ExceptionDates]
 	static hasOne = [userLogin: UserLogin]
 
@@ -71,7 +65,6 @@ class Person extends Party {
 	}
 
 	static mapping = {
-		autowire true
 		version false
 		autoTimestamp false
 		tablePerHierarchy false
@@ -97,7 +90,6 @@ class Person extends Party {
 		'lastNameFirst',
 		'lastNameFirstAndTitle',
 		'name',
-		'partyRelationshipService',
 		'suitableTeams',
 		'systemUser'
 		//'userLogin'
@@ -145,7 +137,17 @@ class Person extends Party {
 	 * The company for this person.
 	 */
 	Party getCompany() {
-		partyRelationshipService.getCompanyOfStaff(this)
+		def staffRef = StringUtil.toLongIfString(this)
+		boolean byId = (staffRef instanceof Long)
+		String query = """select pr.partyIdFrom from
+					PartyRelationship pr where
+					pr.partyRelationshipType.id = 'STAFF'
+					and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
+					and pr.roleTypeCodeTo.id = 'ROLE_STAFF'
+					and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
+		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff: staffRef])
+
+		return (company ? company[0] : null)
 	}
 
 	/**

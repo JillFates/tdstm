@@ -100,7 +100,6 @@ class PersonTestHelper extends test.helper.PersonTestHelper {
         UserLogin user = UserLogin.findWhere([username: personData.email])
         if (!user){
             Person person = createPerson(personData)
-            person.partyRelationshipService = partyRelationshipService
             partyRelationshipService.addCompanyStaff(projectService.getOwner(project), person)
             user = createUserLoginWithRoles(person, personData.roles, project, personData.password, false)
         }

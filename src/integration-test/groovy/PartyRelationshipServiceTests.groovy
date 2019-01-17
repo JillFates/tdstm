@@ -164,19 +164,7 @@ class PartyRelationshipServiceTests extends Specification {
 	void "Test getCompanyOfStaff"() {
 		// Get company by Person object
 		when:
-			def company = partyRelationshipService.getCompanyOfStaff(byWhom)
-		then:
-			company
-
-		// Get company by id number
-		when:
-			company = partyRelationshipService.getCompanyOfStaff(byWhom.id)
-		then:
-			company
-
-		// Get company by string of number
-		when:
-			company = partyRelationshipService.getCompanyOfStaff("${byWhom.id}")
+			def company = byWhom.company
 		then:
 			company
 	}

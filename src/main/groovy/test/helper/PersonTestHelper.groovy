@@ -75,7 +75,6 @@ class PersonTestHelper {
 
 		Party companyParty = Party.get(company.id)
 		Person person = new Person(personMap)
-		person.partyRelationshipService = partyRelationshipService
 		person.save(failOnError: true, flush:true)
 
 		if(project) {
@@ -130,7 +129,6 @@ class PersonTestHelper {
 	 */
 	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
 		Person staff = createPerson(firstName, middleName, lastName, email)
-		staff.partyRelationshipService = partyRelationshipService
 		partyRelationshipService.addCompanyStaff(company, staff)
 		return staff
 	}
