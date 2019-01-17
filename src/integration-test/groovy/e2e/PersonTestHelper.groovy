@@ -4,7 +4,9 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Fetches, creates and does other helpful data preparation in the e2e project integration test *
@@ -12,6 +14,10 @@ import org.apache.commons.lang3.RandomStringUtils
  */
 
 class PersonTestHelper extends test.helper.PersonTestHelper {
+
+    @Autowired
+    ProjectService projectService
+
     /**
      * Create a person for E2EProjectSpec by given map
      * @param personData = [firstName: string, middleName: string, lastName: string, email: string, username: string]
@@ -95,7 +101,7 @@ class PersonTestHelper extends test.helper.PersonTestHelper {
         if (!user){
             Person person = createPerson(personData)
             person.partyRelationshipService = partyRelationshipService
-            partyRelationshipService.addCompanyStaff(project.owner, person)
+            partyRelationshipService.addCompanyStaff(projectService.getOwner(project), person)
             user = createUserLoginWithRoles(person, personData.roles, project, personData.password, false)
         }
         user.passwordNeverExpires = true

@@ -16,11 +16,17 @@ import spock.lang.Specification
 class AssetEntityServiceTests extends Specification{
 
 	AssetEntityService assetEntityService
-	TagAssetService tagAssetService
+	TagAssetService tagAssetServic
 
-	private AssetTestHelper assetHelper = new AssetTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
+	private AssetTestHelper assetHelper
+	private ProjectTestHelper projectHelper
+	private PersonTestHelper personHelper
+
+	void setup(){
+		assetHelper = new AssetTestHelper()
+		projectHelper = new ProjectTestHelper()
+		personHelper = new PersonTestHelper()
+	}
 
 	void "1. test Entity Info Method"() {
 		setup:

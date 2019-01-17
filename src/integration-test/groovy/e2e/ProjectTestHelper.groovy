@@ -40,7 +40,7 @@ class ProjectTestHelper extends test.helper.ProjectTestHelper {
 
             //project.projectService = projectService
             // Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
-            project.owner = company
+            projectService.setOwner(project,company)
             project.save(flush: true)
 
             projectService.cloneDefaultSettings(project)

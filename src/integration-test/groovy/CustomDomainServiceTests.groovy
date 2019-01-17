@@ -9,8 +9,8 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.BooleanUtils
-import org.grails.web.json.JSONObject
 import org.apache.commons.lang3.RandomStringUtils as RSU
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -28,9 +28,15 @@ class CustomDomainServiceTests extends Specification {
     private static final String fieldSpecDefinitionJson = 'CustomDomainServiceTests_FieldSpec.json'
     private static JSONObject fieldSpecJson
 
-    private AssetTestHelper assetHelper = new AssetTestHelper()
-    private CustomDomainTestHelper customDomainTestHelper = new CustomDomainTestHelper()
-    private ProjectTestHelper projectHelper = new ProjectTestHelper()
+    private AssetTestHelper assetHelper
+    private CustomDomainTestHelper customDomainTestHelper
+    private ProjectTestHelper projectHelper
+
+    void setup(){
+        assetHelper = new AssetTestHelper()
+        customDomainTestHelper = new CustomDomainTestHelper()
+        projectHelper = new ProjectTestHelper()
+    }
 
     private static final String CUSTOM1_LABEL = 'Description'
 

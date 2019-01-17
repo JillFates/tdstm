@@ -154,7 +154,7 @@ class ProjectController implements ControllerMethods {
 		if (!project) return
 
 		def projectPartners = partyRelationshipService.getProjectPartners(project)
-		PartyGroup company = project.owner
+		PartyGroup company = projectService.getOwner(project)
 
 		def projectDetails
 		def moveBundles
@@ -214,7 +214,7 @@ class ProjectController implements ControllerMethods {
 			Project project = controllerService.getProjectForPage(this)
 			if (!project) return
 
-			PartyGroup company = project.owner
+			PartyGroup company = projectService.getOwner(project)
 
 			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
 			def startDate = params.startDate
@@ -395,7 +395,7 @@ class ProjectController implements ControllerMethods {
 				return
 			}
 
-			project.setOwner(company)
+			projectService.setOwner(project,company)
 
 			// Save the partners to be related to the project
 			projectService.updateProjectPartners(project, partnersIds)
@@ -419,7 +419,7 @@ class ProjectController implements ControllerMethods {
 
 			/* Create and assign the default Bundle for this project. Although the bundle
 			* is assigned in ProjectService::getDefaultBundle, it's done here too for visibility. */
-			project.defaultBundle = project.getProjectDefaultBundle(params.defaultBundleName)
+			project.defaultBundle = projectService.getDefaultBundle(project, (String)params.defaultBundleName)
 			project.save()
 
 			flash.message = "Project $project was created"

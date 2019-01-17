@@ -1,8 +1,5 @@
 package net.transitionmanager.domain
 
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
-
 class Project extends PartyGroup {
 
 	//COMPANION
@@ -14,8 +11,9 @@ class Project extends PartyGroup {
 	// a constant and non-persistent marker instance used to indicate that all projects should be used
 	static final Project ALL = new Project()
 
-	transient ProjectService projectService
-	transient PartyRelationshipService partyRelationshipService
+	//TODO GRAILS UPGRADE I don't know why but if I remove this property a lot of integration test fail, even thought it doesn't look like
+	//TODO it is being used
+	transient MoveBundle projectDefaultBundle
 
 	// A code that is use to reference projects with export filename, etc
 	String projectCode
@@ -66,7 +64,6 @@ class Project extends PartyGroup {
 	}
 
 	static mapping = {
-		autowire true
 		autoTimestamp false
 		id column: 'project_id'
 		columns {
@@ -76,8 +73,7 @@ class Project extends PartyGroup {
 		}
 	}
 
-	static transients = ['active', 'defaultProject', 'owner', 'partners', 'partyRelationshipService',
-	                     'projectDefaultBundle', 'projectService', 'status']
+	static transients = ['active', 'defaultProject', 'status']
 
 	String toString() {
 		projectCode
@@ -125,37 +121,6 @@ class Project extends PartyGroup {
 	boolean isActive() {
 		//TODO: check time GMT
 		completionDate.compareTo(new Date()) > 0
-	}
-
-	/**
-	 * The partners associated with a project
-	 */
-	List<PartyGroup> getPartners() {
-		partyRelationshipService.getProjectPartners(this)
-	}
-
-	/**
-	 * The default move bundle for the current project.
-	 * @param defaultBundleName  in case a new one is to be created).
-	 * @return the MoveBundle
-	 */
-	MoveBundle getProjectDefaultBundle(String defaultBundleName = null) {
-		projectService.getDefaultBundle(this, defaultBundleName)
-	}
-
-	/**
-	 * The owner of the project
-	 */
-	PartyGroup getOwner() {
-		projectService.getOwner(this)
-	}
-
-	/**
-	 * Set the owner of the project
-	 * @param owner  the project owner
-	 */
-	void setOwner(PartyGroup owner) {
-		projectService.setOwner(this, owner)
 	}
 
 	/**

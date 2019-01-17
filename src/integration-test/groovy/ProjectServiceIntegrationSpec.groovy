@@ -43,7 +43,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 		projectHelper = new ProjectTestHelper()
 		personHelper = new PersonTestHelper()
 		project = projectHelper.createProject()
-		adminPerson = personHelper.createStaff(project.owner)
+		adminPerson = personHelper.createStaff(projectService.getOwner(project))
 		assert adminPerson
 
 		// Assign the admin to the project
@@ -156,7 +156,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 
 	void '5. Testing the getUserProjects for project owner staff to determine user access to projects'() {
 		when: 'creating a new person'
-			Person person = personHelper.createPerson(adminPerson, project.owner, project)
+			Person person = personHelper.createPerson(adminPerson, projectService.getOwner(project), project)
 
 		then: 'a person should be created'
 			person
@@ -177,7 +177,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 
 	void '6. Testing the getUserProjects for project partner staff to determine user access to projects'() {
 		when: 'creating a partner company and staff for the partner'
-			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 			Person person = personHelper.createPerson(adminPerson, partner, project)
 		then: 'a partner company and  person should be created'
 			partner
@@ -240,11 +240,11 @@ class ProjectServiceIntegrationSpec extends Specification {
 		when:
 			Project p = projectHelper.createProject()
 			PartyGroup partner = projectHelper.createCompany()
-			partyRelationshipService.assignPartnerToCompany(partner, p.owner)
+			partyRelationshipService.assignPartnerToCompany(partner, projectService.getOwner(p))
 			projectService.updateProjectPartners(p, partner.id)
 			PartyGroup unrelatedCompany = projectHelper.createCompany()
 		then:
-			projectService.companyIsAssociated(p, p.owner.id)
+			projectService.companyIsAssociated(p, projectService.getOwner(p).id)
 			projectService.companyIsAssociated(p, p.client)
 			projectService.companyIsAssociated(p, partner)
 			! projectService.companyIsAssociated(p, unrelatedCompany)
@@ -310,7 +310,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
         when: 'creating a new person'
-			Person userPerson = personHelper.createStaff(project.owner)
+			Person userPerson = personHelper.createStaff(projectService.getOwner(project))
 			projectService.addTeamMember(project, userPerson, ['ROLE_PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
@@ -330,7 +330,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 
 	void '13. Test deleting a project will delete Dataviews belonging to the project'() {
 		setup: 'Given a project is created'
-			Person userPerson = personHelper.createStaff(project.owner)
+			Person userPerson = personHelper.createStaff(projectService.getOwner(project))
 			projectService.addTeamMember(project, userPerson, ['ROLE_PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
@@ -355,7 +355,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			[] == projectService.getPartners(project)
 
 		when: 'a partner is added to the project'
-			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 		then: 'the partner id should be returned'
 			[ partner.id ] == projectService.getPartnerIds(project)
 		and: 'the partner object should be returned'
@@ -364,7 +364,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 
 	def '15. Test getAssociatedStaffIds method'() {
 		setup: 'Get the list of owner staff'
-			List ownerStaffIds = projectService.getCompanyStaffIds(project.owner)
+			List ownerStaffIds = projectService.getCompanyStaffIds(projectService.getOwner(project))
 		expect: 'Project owner staff should have one person'
 			1 == ownerStaffIds.size()
 		and: 'Project Associated Staff should be the owner staff person'
@@ -375,7 +375,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			[] == projectService.getCompanyStaffIds(project.client)
 
 		when: 'a partner is added to the project'
-			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 		and: 'partner staff is added to the project'
 			def partnerPerson = personHelper.createStaff(partner)
 			projectService.addTeamMember(project, partnerPerson, ['ROLE_PROJ_MGR'])
@@ -398,7 +398,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			3 == projectService.getAssociatedStaffIds(project).size()
 
 		when: 'a owner staff is created'
-			Person ownerPerson = personHelper.createStaff(project.owner)
+			Person ownerPerson = personHelper.createStaff(projectService.getOwner(project))
 		then: 'the list of associated staff should remain the same size'
 			3 == projectService.getAssociatedStaffIds(project).size()
 

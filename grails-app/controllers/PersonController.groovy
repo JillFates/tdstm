@@ -567,7 +567,7 @@ class PersonController implements ControllerMethods {
 		StringBuilder companies = new StringBuilder(project.clientId.toString())
 		if (onlyClientStaff == '0') {
 			// Add the owner company and any partner companies associated with the project
-			companies.append(', ').append(project.owner.id)
+			companies.append(', ').append(projectService.getOwner(project).id)
 			def projectPartners = projectService.getPartners(project)
 
 			// log.debug "loadFilteredStaff() phase 5b took ${TimeUtil.elapsed(start)} Get Partners"

@@ -22,10 +22,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.RandomStringUtils
-import org.hibernate.SessionFactory
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -36,9 +33,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 
 	MoveBundleService moveBundleService
 	MoveEventService  moveEventService
-	SettingService    settingService
-	SecurityService   securityService
-	SessionFactory    sessionFactory
 
 	@Shared
 	ProjectTestHelper    projectHelper

@@ -7,6 +7,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import spock.lang.Shared
@@ -29,6 +30,9 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 	UserPreferenceService userPreferenceService
 
 	@Shared
+	ProjectService projectService
+
+	@Shared
 	AssetEntityController controller = new AssetEntityController()
 
 	static Person person
@@ -36,17 +40,20 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 	static UserLogin adminUser
 	static Person adminPerson
 
-	static PersonTestHelper personHelper = new PersonTestHelper()
-	static ProjectTestHelper projectHelper = new ProjectTestHelper()
-	static AssetTestHelper assetHelper = new AssetTestHelper()
+	static PersonTestHelper personHelper
+	static ProjectTestHelper projectHelper
+	static AssetTestHelper assetHelper
 
 	/**
 	 * Used to create a test project and user that is logged in
 	 */
 	def setup() {
+		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
+		assetHelper = new AssetTestHelper()
 		project = projectHelper.createProject()
 
-		adminPerson = personHelper.createStaff(project.owner)
+		adminPerson = personHelper.createStaff(projectService.getOwner(project))
 		assert adminPerson
 
 		// projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])

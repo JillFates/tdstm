@@ -50,7 +50,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			personHelper = new PersonTestHelper()
 			company = PartyType.get('COMPANY')
 			project = projectHelper.createProject()
-			adminPerson = personHelper.createStaff(project.owner)
+			adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			assert adminPerson
 
 			// Assign the admin to the project

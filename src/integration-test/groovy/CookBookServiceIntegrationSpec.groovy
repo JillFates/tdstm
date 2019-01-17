@@ -9,6 +9,7 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,6 +19,9 @@ import spock.lang.Specification
 class CookBookServiceIntegrationSpec extends Specification{
 	@Shared
 	CookbookService cookbookService
+
+	@Shared
+	ProjectService projectService
 
 	@Shared
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
@@ -136,7 +140,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test get recipe context'() {
 		given:
 			PersonTestHelper personHelper = new PersonTestHelper()
-			Person adminPerson = personHelper.createStaff(project.owner)
+			Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			//Person adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"tagMatch":"ANY","tag":[]}', project: project, projectId: project.id)
 			existingRecipe.save(failOnError: true, flush: true)

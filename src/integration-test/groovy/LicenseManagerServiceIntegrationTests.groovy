@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseManagerService
+import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.StringUtils
 import org.joda.time.DateTime
 import spock.lang.Narrative
@@ -36,6 +37,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 	GrailsApplication     grailsApplication
 	LicenseAdminService   licenseAdminService
 	LicenseManagerService licenseManagerService
+	ProjectService        projectService
 
 	private String testEmail = 'sample@sampleEmail.com'
 	private String testRequestNote = 'Test request note'
@@ -57,7 +59,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 		]
 
 		project = projectTestHelper.createProject()
-		adminPerson = personTestHelper.createStaff(project.owner)
+		adminPerson = personTestHelper.createStaff(projectService.getOwner(project))
 		adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 
 	}
@@ -65,7 +67,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 
 	def '01. Test license loading' () {
 		setup: 'first we generate a new license request'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 
 		when: "we load the encoded request it into the manager"
@@ -84,7 +86,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 
 	def '02. Activate License' () {
 		setup: 'first we generate a new license request and load it'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 
@@ -115,7 +117,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 
 	def '03. Revoke license' () {
 		setup: 'first we generate a new license request and load it'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 
@@ -148,7 +150,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 
 	def '04. Modify License' () {
 		setup: 'first we generate a new license request with an original ammount of 100 servers'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 			log.info("ID: ${licenseRequest.id}")
 			String encodedMessage  = licenseRequest.toEncodedMessage()
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)

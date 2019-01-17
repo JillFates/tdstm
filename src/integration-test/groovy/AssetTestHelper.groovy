@@ -9,30 +9,31 @@
 
 
 
+
+
+
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import grails.util.Holders
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
-import org.springframework.beans.factory.annotation.Autowired
 
 class AssetTestHelper {
-	@Autowired
-	DeviceService deviceService
-
-	@Autowired
-	PersonService personService
-
-	@Autowired
 	SecurityService securityService
+	ProjectService projectService
 
 	Long adminPersonId = 100
+
+	AssetTestHelper(){
+		projectService = Holders.applicationContext.getBean('projectService')
+		securityService = Holders.applicationContext.getBean('securityService')
+	}
 
 	/**
 	 * Used to create an application and reference the person in all possible properties
@@ -52,7 +53,7 @@ class AssetTestHelper {
 			shutdownBy: pRef,
 			startupBy: pRef,
 			testingBy: pRef,
-			moveBundle: project.projectDefaultBundle
+			moveBundle: projectService.getDefaultBundle(project)
 		)
 
 		app.moveBundle = project.getDefaultBundle()
@@ -88,8 +89,8 @@ class AssetTestHelper {
 		Map defaultValues = [
 			assetName          : RandomStringUtils.randomAlphabetic(15),
 			currentAssetType   : assetType,
-			moveBundle         : project.projectDefaultBundle,
-			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
+			moveBundle         : projectService.getDefaultBundle(project),
+			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : projectService.getDefaultBundle(project).id.toString(),
 			roomSourceId       : "-1",
 			locationSource     : "TBD",
 			roomSource         : "",

@@ -139,14 +139,14 @@ class E2EProjectSpec extends Specification {
 			// create company and associate to current project
 			PartyGroup company = projectHelper.createCompany( "${formatToRandomValue(dataFile.companyToBeEdited.name, browser, false)}")
 			companiesToBeDeleted.add(company)
-			partyRelationshipService.assignClientToCompany(company, project.owner)
+			partyRelationshipService.assignClientToCompany(company, projectService.getOwner(project))
 			// create company and associate to current project
 			company = projectHelper.createCompany("${formatToRandomValue(dataFile.companyToBeDeleted.name, browser, false)}")
 			companiesToBeEdited.add(company)
-			partyRelationshipService.assignClientToCompany(company, project.owner)
+			partyRelationshipService.assignClientToCompany(company, projectService.getOwner(project))
 
 			Map sanitizedStaff = sanitizeStaffUserData(browser, dataFile.staffFiltering)
-			staffsFiltering.add(personHelper.createStaff(project.owner, sanitizedStaff))
+			staffsFiltering.add(personHelper.createStaff(projectService.getOwner(project), sanitizedStaff))
 			usersFiltering.add(personHelper.createPersonWithLoginAndRoles(sanitizeStaffUserData(browser, dataFile.userFiltering), project))
 			createApplications(dataFile.applications, project, buildoutBundle)
 			applicationsToBeEdited.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeEdited, browser), project, buildoutBundle))
@@ -188,7 +188,7 @@ class E2EProjectSpec extends Specification {
 	void "Setup E2E Project data"() {
 		expect:
 			Project.findWhere([projectCode: originalData.e2eProjectData.projectCode]) != null
-			License.findWhere([owner: project.owner, status: License.Status.ACTIVE]) != null
+			License.findWhere([owner: projectService.getOwner(project), status: License.Status.ACTIVE]) != null
 			UserLogin.findWhere([username: originalData.userData1.email]) != null
 			UserLogin.findWhere([username: originalData.userData2.email]) != null
 			UserLogin.findWhere([username: originalData.userData3.email]) != null
@@ -255,11 +255,11 @@ class E2EProjectSpec extends Specification {
 	 * @param: project
 	 */
 	private void licenseProject(Project project) {
-		def currentLicense = License.findWhere([owner: project.owner])
+		def currentLicense = License.findWhere([owner: projectService.getOwner(project)])
 		if (!currentLicense){
 			String testEmail = 'sample@sampleEmail.com'
 			String testRequestNote = 'Test request note'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
 
 			String targetHostName = System.getenv(TARGET_HOSTNAME)
 			if (targetHostName){

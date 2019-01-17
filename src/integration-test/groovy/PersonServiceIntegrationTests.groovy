@@ -66,7 +66,7 @@ class PersonServiceIntegrationTests extends Specification {
 			assetHelper = new AssetTestHelper()
 			project = projectHelper.createProject()
 
-			adminPerson = personHelper.createStaff(project.owner)
+			adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			assert adminPerson
 
 			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
@@ -100,16 +100,16 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.addToProjectSecured(project, adminPerson)
 
 		when: 'creating a person and user as staff for the project owner with USER role'
-			Person newPerson = personHelper.createPerson(adminPerson, project.owner)
+			Person newPerson = personHelper.createPerson(adminPerson, projectService.getOwner(project))
 			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the person and the accompaning userlogin are created and associated to the project owner'
 			newPerson
 			newPerson.id
 			newPerson.userLogin
 			newPerson.userLogin.id
-			newPerson.company == project.owner
+			newPerson.company == projectService.getOwner(project)
 		and: 'the person is staff of the client'
-			newPerson.company.id == project.owner.id
+			newPerson.company.id == projectService.getOwner(project).id
 		and: 'the person does not have access to the project'
 			!personService.hasAccessToProject(newPerson, project)
 		and: 'the person is not assigned to the project'
@@ -124,7 +124,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'a new project for the newPerson.company as the owner is created'
 			Project newProject = projectHelper.createProject()
-			newProject.owner = newPerson.company
+			projectService.setOwner(newProject, newPerson.company)
 		then: 'the newPerson should not have access to the project'
 			!personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson is not assigned to the project'
@@ -139,7 +139,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'an unrelatedProject is created with the default project.client as the owner'
 			Project unrelatedProject = projectHelper.createProject()
-			unrelatedProject.owner = project.client
+			projectService.setOwner(unrelatedProject, project.client)
 		then: 'the newPerson should not have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 		and: 'the newPerson is not assigned to the unrelatedProject'
@@ -172,7 +172,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'a new project for the newPerson.company as the owner is created'
 			Project newProject = projectHelper.createProject()
-			newProject.owner = newPerson.company
+			projectService.setOwner(newProject, newPerson.company)
 		then: 'the newPerson should not have access to the project'
 			!personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson is not assigned to the project'
@@ -187,7 +187,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'an unrelatedProject is created with the default project.owner as the owner'
 			Project unrelatedProject = projectHelper.createProject()
-			unrelatedProject.owner = project.owner
+			projectService.setOwner(unrelatedProject, projectService.getOwner(project))
 		then: 'the newPerson should not have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 		and: 'the newPerson is not assigned to the unrelatedProject'
@@ -197,7 +197,7 @@ class PersonServiceIntegrationTests extends Specification {
 	def '04. Test partner staff access to a project'() {
 
 		when: 'a partner and partnerStaff with USER role are created '
-			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 			Person newPerson = personHelper.createPerson(adminPerson, partner)
 			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the partnerStaff should NOT have access to any projects'
@@ -215,12 +215,12 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 
 		when: 'an unrelatedProject is created where the owner is the same as the default project.owner'
-			Project unrelatedProject = projectHelper.createProject(project.owner)
+			Project unrelatedProject = projectHelper.createProject(projectService.getOwner(project))
 		then: 'the partnerStaff should NOT have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 
 		when: 'a partnerProject is created where the owner is the the default project.owner and the partner company is a partner'
-			Project partnerProject = projectHelper.createProject(project.owner)
+			Project partnerProject = projectHelper.createProject(projectService.getOwner(project))
 			partyRelationshipService.assignPartnerToProject(partner, partnerProject)
 		then: 'the partnerStaff should NOT have access to the partnerProject'
 			!personService.hasAccessToProject(newPerson, partnerProject)

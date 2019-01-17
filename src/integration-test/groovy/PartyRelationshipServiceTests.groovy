@@ -212,7 +212,7 @@ class PartyRelationshipServiceTests extends Specification {
 		and: "There are no duplicated companies"
 			companies.unique { it.id }.size() == 3
 		and: "It contains the owner"
-			companies.find { it.id == project.owner.id }
+			companies.find { it.id == projectService.getOwner(project).id }
 		and: "It contains the client"
 			companies.find {it.id == project.client.id}
 
@@ -235,7 +235,7 @@ class PartyRelationshipServiceTests extends Specification {
 		and: "There are no duplicated companies"
 			companies.unique {it.id}.size() == 2
 		and: "It contains the owner"
-			companies.find {it.id == project.owner.id}
+			companies.find {it.id == projectService.getOwner(project).id}
 		and: "It contains the client"
 			companies.find {it.id == project.client.id}
 	}

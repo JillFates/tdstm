@@ -1,6 +1,5 @@
 package com.tdssrc.grails
 
-
 import com.tdsops.common.grails.ApplicationContextHolder
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClassProperty
@@ -20,6 +19,7 @@ import net.transitionmanager.service.InvalidRequestException
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.mapping.config.Property
+import org.grails.datastore.mapping.model.AbstractMappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -27,7 +27,6 @@ import org.grails.datastore.mapping.model.types.OneToOne
 import org.grails.orm.hibernate.cfg.CompositeIdentity
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
-import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.hibernate.FlushMode
@@ -494,7 +493,7 @@ class GormUtil{
 	}
 
 	@Memoized
-	private static HibernateMappingContext mappingContext() {
+	private static AbstractMappingContext mappingContext() {
 		return Holders.applicationContext.getBean('grailsDomainClassMappingContext')
 	}
 

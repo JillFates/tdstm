@@ -49,6 +49,7 @@ class GormUtilIntegrationSpec extends Specification {
 		projectHelper = new ProjectTestHelper()
 		sharedProject = projectHelper.createProject()
 		sharedPerson = personHelper.createPerson()
+
 		for (int i = 0; i < 3; i++) {
 			assetHelper.createApplication(sharedPerson, sharedProject)
 		}

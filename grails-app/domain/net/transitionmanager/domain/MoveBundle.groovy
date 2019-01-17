@@ -54,14 +54,6 @@ class MoveBundle extends Party {
 		project column: 'project_id'
 	}
 
-	def beforeDelete() {
-		/* Discarding current move bundle object from delete if
-		   trying to delete project's default move bundle */
-		if (id == project.projectDefaultBundle.id) {
-			discard()
-		}
-	}
-
 	String toString() { name }
 
 	int getAssetQty() {

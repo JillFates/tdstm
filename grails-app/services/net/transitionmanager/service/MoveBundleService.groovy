@@ -51,6 +51,7 @@ class MoveBundleService implements ServiceMethods {
 	TagService tagService
 	AssetOptionsService assetOptionsService
 	SecurityService securityService
+	ProjectService projectService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
@@ -214,7 +215,7 @@ class MoveBundleService implements ServiceMethods {
 			// Theoretically this isn't necessary but as a safety precaution
 			AssetEntity.where {
 				moveBundle == moveBundle
-			}.updateAll(moveBundle: project.getProjectDefaultBundle())
+			}.updateAll(moveBundle: projectService.getDefaultBundle(project))
 
 			//remove bundle and associated data
 			deleteBundle(moveBundle, project)

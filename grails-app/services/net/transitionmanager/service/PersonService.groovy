@@ -1515,7 +1515,7 @@ class PersonService implements ServiceMethods {
 			UserLogin user = person.userLogin
 			if (user) {
 				boolean hasShowAllProj = securityService.hasPermission(user, Permission.ProjectShowAll)
-				if (hasShowAllProj && (person.company.id == project.owner.id || person.company.id == project.client.id)) {
+				if (hasShowAllProj && (person.company.id == projectService.getOwner(project).id || person.company.id == project.client.id)) {
 					hasAccess = true
 				} else if (hasShowAllProj) {
 					// Check if person is staff for a partner on the project

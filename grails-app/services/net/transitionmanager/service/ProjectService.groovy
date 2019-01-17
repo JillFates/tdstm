@@ -83,6 +83,7 @@ class ProjectService implements ServiceMethods {
 	ProviderService providerService
 	CredentialService credentialService
 	DataScriptService dataScriptService
+	ProjectService projectService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -449,8 +450,8 @@ class ProjectService implements ServiceMethods {
 	List<PartyGroup> getCompanies(Project project) {
 		List companies = []
 		companies << project.client
-		companies << project.owner
-		companies.addAll(project.partners)
+		companies << getOwner(project)
+		companies.addAll(partyRelationshipService.getProjectPartners(project))
 		return companies
 	}
 
@@ -757,7 +758,7 @@ class ProjectService implements ServiceMethods {
 	void updateProjectPartners(Project projectInstance, def partnersIds) {
 
 		// Get a list of the partners associated to the owner of the project plus the partners assigned to the project
-		Party projectOwner = projectInstance.getOwner()
+		Party projectOwner = getOwner(projectInstance)
 		List ownerPartners = partyRelationshipService.getCompanyPartners(projectOwner)
 		List ownerPartnerIds = ownerPartners*.partyIdTo.id
 
@@ -919,7 +920,7 @@ class ProjectService implements ServiceMethods {
 			userPreferenceService.setCurrentProjectId(projectInstance.id)
 
 			//Will create a bundle name TBD and set it as default bundle for project
-			projectInstance.getProjectDefaultBundle()
+			projectService.getDefaultBundle(projectInstance)
 
 			return [message: "Project $projectInstance created", success: true, imageId: image.id]
 		} else {
@@ -1106,7 +1107,7 @@ class ProjectService implements ServiceMethods {
 	List<Long> getAssociatedStaffIds(Project project) {
 
 		// Get the list of staff ids of the project owner and partners of the project
-		PartyGroup owner = project.owner
+		PartyGroup owner = getOwner(project)
 		List<Long> companyIds = getPartnerIds(project)
 		companyIds << owner.id
 		List<Long> nonClientStaffIds = getCompanyStaffIds(companyIds)
@@ -1516,7 +1517,7 @@ class ProjectService implements ServiceMethods {
 
 		// Get the list of all Staff for the owner, partners and client
 		PartyGroup employer = forWhom.company
-		PartyGroup owner = project.owner
+		PartyGroup owner = getOwner(project)
 		PartyGroup client = project.client
 
 		// Get the existing list of assigned staff

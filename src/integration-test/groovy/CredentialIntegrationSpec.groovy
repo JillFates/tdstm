@@ -29,7 +29,7 @@ class CredentialIntegrationSpec extends Specification{
 	void "1. Validate that deleting Project deletes the new Credential"() {
 		setup:
 			Project project = projectHelper.createProjectWithDefaultBundle()
-			Person adminPerson = personHelper.createStaff(project.owner)
+			Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
 
 			UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
