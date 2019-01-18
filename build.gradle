@@ -199,3 +199,7 @@ gitProperties {
     dateFormat = "yyyy-MM-dd HH:mm:ssZ"
     dateFormatTimeZone = 'EST'
 }
+
+grails {
+   pathingJar = true
+}
