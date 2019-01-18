@@ -4237,9 +4237,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
 				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
-
-				// When using tags, bundles are going to be ignored
-				map.remove('bIds')
+				
 			}
 
 			if (map.bIds) {
