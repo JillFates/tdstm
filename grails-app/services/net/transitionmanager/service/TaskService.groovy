@@ -4258,14 +4258,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
 
-			map.bIds = getBundleIds(contextObject, project, filter)
+
+			List bundleIds = getBundleIds(contextObject, project, filter)
+
+			if(bundleIds) {
+				map.bIds = bundleIds
+			}
+
 			String join = ''
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
 				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
-				
 			}
 
 			if (map.bIds) {
