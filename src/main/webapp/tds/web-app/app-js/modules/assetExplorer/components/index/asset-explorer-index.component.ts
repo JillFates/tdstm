@@ -16,22 +16,18 @@ import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 @Component({
 	selector: 'asset-explorer-index',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html',
 })
 export class AssetExplorerIndexComponent implements OnInit {
-
 	private reportGroupModels = Array<ViewGroupModel>();
 	private searchText: String;
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 	private gridColumns: GridColumnModel[];
 	private report;
-	ButtonActions = TDSActionsButton;
-
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,

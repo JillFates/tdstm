@@ -20,12 +20,6 @@
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
-<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-<script src="${resource(dir: 'dist/js/vendors/html5shiv/dist', file: 'html5shiv.min.js')}"></script>
-<script src="${resource(dir: 'dist/js/vendors/respond/dest', file: 'respond.min.js')}"></script>
-<![endif]-->
-
 <!-- jQuery -->
 <!-- LEGACY AND SUPPORT LEGACY CODE START -->
 
@@ -44,6 +38,9 @@
 </g:if>
 
 <script src="${resource(dir: 'dist/js/vendors/jquery.browser/dist', file: 'jquery.browser.min.js')}"></script>
+
+<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'tinymce.min.js')}"></script>
+<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'theme.min.js')}"></script>
 
 <script type="text/javascript">
     var contextPath = "${request.contextPath}";

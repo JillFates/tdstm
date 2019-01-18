@@ -35,8 +35,8 @@ class AdminModule extends Module{
         adminMenu { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
         adminSections { adminMenu.find("li", class: "menu-parent-item") }
         adminPortalItem { adminMenu.find("li.menu-admin-portal") }
-        adminLMItem { adminMenu.find("li.menu-admin-license-manager").find("a", "href": "/tdstm/module/license/admin/list") }
-        adminNoticesItem { adminMenu.find("li.menu-admin-license-manager").find("a", "href": "/tdstm/app/notice/list") }
+        adminLMItem { adminMenu.find("li.menu-admin-license-admin").find("a", "href": "/tdstm/module/license/admin/list") }
+        adminNoticesItem { adminMenu.find("li.menu-admin-notice-manager").find("a", "href": "/tdstm/module/notice/list") }
         adminRolesItem { adminMenu.find("li.menu-admin-role") }
         adminAssetOptItem { adminMenu.find("li.menu-admin-asset-options") }
         adminCompaniesItem { adminMenu.find("li.menu-list-companies") }

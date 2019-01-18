@@ -21,6 +21,24 @@
                 max-width: 200px
                 overflow: hidden
                 font-weight: normal
+    .dependency-edit
+        textarea,
+        input
+            padding-left: 6px
+        .k-dropdown
+            span
+                background-color: white
+        margin-bottom: 6px
+        .k-widget,
+        textarea,
+        input
+            visibility: hidden
+            width: 80%
+            border-color: rgba(0, 0, 0, 0.08)
+
+    textarea
+        resize: none
+
     .dependency-label
         visibility: hidden
         max-width: 200px
@@ -37,6 +55,11 @@
         i 
             margin-left: -6px
     .has-dependency-a .dependency-a .dependency-label,
-    .has-dependency-b .dependency-b .dependency-label
-      visibility: visible
-
+    .has-dependency-b .dependency-b .dependency-label,
+    .has-dependency-a .dependency-edit .dependency-a .k-widget,
+    .has-dependency-b .dependency-edit .dependency-b .k-widget,
+    .has-dependency-a .dependency-edit .dependency-a input,
+    .has-dependency-b .dependency-edit .dependency-b input,
+    .has-dependency-a .dependency-edit .dependency-a textarea,
+    .has-dependency-b .dependency-edit .dependency-b textarea
+        visibility: visible

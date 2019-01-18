@@ -1,25 +1,25 @@
-import { NgModule, ModuleWithProviders } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { PopupModule } from '@progress/kendo-angular-popup';
-import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
-import { InputsModule } from '@progress/kendo-angular-inputs';
-import { GridModule } from '@progress/kendo-angular-grid';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import {NgModule, ModuleWithProviders} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {PopupModule} from '@progress/kendo-angular-popup';
+import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
+import {InputsModule} from '@progress/kendo-angular-inputs';
+import {GridModule} from '@progress/kendo-angular-grid';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
-import { IntlModule } from '@progress/kendo-angular-intl';
+import {IntlModule} from '@progress/kendo-angular-intl';
 
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
-import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
+import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
 // Shared Services
-import { PreferenceService } from '../shared/services/preference.service';
-import { NotifierService } from '../shared/services/notifier.service';
-import { ComponentCreatorService } from '../shared/services/component-creator.service';
-import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
-import { UILoaderService } from '../shared/services/ui-loader.service';
-import { PersonService } from './services/person.service';
-import { PermissionService } from './services/permission.service';
-import { WindowService } from './services/window.service';
+import {PreferenceService} from '../shared/services/preference.service';
+import {NotifierService} from '../shared/services/notifier.service';
+import {ComponentCreatorService} from '../shared/services/component-creator.service';
+import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
+import {UILoaderService} from '../shared/services/ui-loader.service';
+import {PersonService} from './services/person.service';
+import {PermissionService} from './services/permission.service';
+import {WindowService} from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
@@ -39,7 +39,6 @@ import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-
 import {UIAutoCenterDirective} from './directives/autocenter-directive';
 import {InputPasteDirective} from './directives/input-paste.directive';
 import {CopyClipboardDirective} from './directives/copy-clipboard.directive';
-
 // Shared Pipes
 import {DateTimePipe} from './pipes/datetime.pipe';
 import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
@@ -49,7 +48,6 @@ import {UtilsPipe} from './pipes/utils.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
-
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -77,10 +75,11 @@ import {BulkChangeActionsComponent} from './components/bulk-change/components/bu
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
 import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
+import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
 
 // Dictionary
-import { DictionaryService } from './services/dictionary.service';
-import { en_DICTIONARY } from './i18n/en.dictionary';
+import {DictionaryService} from './services/dictionary.service';
+import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 
 @NgModule({
@@ -141,7 +140,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
 		TDSActionButton,
-		TDSCustomValidationErrorsComponent
+		TDSCustomValidationErrorsComponent,
+		RichTextEditorComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -189,7 +189,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
 		TDSActionButton,
-		TDSCustomValidationErrorsComponent
+		TDSCustomValidationErrorsComponent,
+		RichTextEditorComponent
 	],
 	entryComponents: [
 		DynamicComponent,

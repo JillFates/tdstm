@@ -191,7 +191,8 @@ export const en_DICTIONARY: Object = {
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
-		'PLURAL_NAME': 'Dependencies'
+		'PLURAL_NAME': 'Dependencies',
+		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
@@ -260,12 +261,13 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
-	'NOTICE_MANAGER': {
+	'NOTICE': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'VIEW_HTML': 'View HTML',
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

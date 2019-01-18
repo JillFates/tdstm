@@ -17,7 +17,7 @@ class SaveViewPage extends Page{
         saveViewModal { $(".asset-explorer-view-save-component")}
         headerTitle { saveViewModal.find("h4.modal-title")}
         nameField {saveViewModal.find("input#name")}
-        saveBtn {saveViewModal.find("button[type=submit]")}
+        saveBtn {saveViewModal.find("button", title:"Save")}
         menuModule { module MenuModule }
         commonsModule { module CommonsModule }
         createViewModule { module CreateViewModule }
