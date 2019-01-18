@@ -19,7 +19,7 @@ class ViewsModule extends Module {
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
         viewsListed       (required: false) {vwGridRows.find("td:nth-child(3)")}
-        deleteButtons     {viewList.find("title": "Click to delete this view")}
+        deleteButtons     {viewList.find("title": "Delete View")}
         editButtons       {viewList.find("title": "Click to edit this view")}
         createViewButton  {viewModuleContainer.find(".box-tools-actions button", text:containsWord("Create"))}
         closeDeleteModal  {$("button.close")}
@@ -122,7 +122,7 @@ class ViewsModule extends Module {
      * @return
      */
     def clickFirstViewOfTheList(){
-        vwGrid.find("tr")[1].find("a")[1].click()
+        vwGrid.find("tr")[1].find("a").click()
     }
 
     def filterViewByName(String name){
