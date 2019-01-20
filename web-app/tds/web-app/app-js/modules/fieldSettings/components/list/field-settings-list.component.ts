@@ -212,7 +212,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 			// Validates "Field Labels" should be unique by domain
 			&& values.filter((l, i) => values.indexOf(l) !== i).length === 0
 			&& invalidOrderFields.length === 0
-			&& invalidFieldLabels == false;
+			&& invalidFieldLabels === false;
 	}
 
 	protected onAdd(callback): void {

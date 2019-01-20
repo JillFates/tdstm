@@ -79,9 +79,9 @@ export class FieldSettingsService {
 	 *
 	 * @param The label string to be compared with the list of existing labels.
 	 */
-	 conflictsWithAnotherLabel(label: string, fields: any): boolean {
+	conflictsWithAnotherLabel(label: string, fields: any): boolean {
 		return fields.filter(
-				item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
+		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
 	}
 	// conflictsWithAnotherLabel(label: string, fields: any): boolean {
 	// 	let filterFields = fields.filter((item) => {
@@ -115,33 +115,34 @@ export class FieldSettingsService {
 	// 	return (filterFields.length > 0);
 	// }
 
-    /**
-     * Check if the label from the field parameter has conflicts with any label or fieldName from another domains.
-     *
-     * @param field  The field from where we are taking the label string we are using to compare
-     * (It will be used only if the field is shared, otherwise it won't do anything).
-     * @param domains  The domains with the list of fields we will compare to (the list of fields corresponding to the
-     * domain where "field" comes from won't be used, just the list of fields of the other domains).
+	/**
+	 * Check if the label from the field parameter has conflicts with any label or fieldName from another domains.
+	 *
+	 * @param field  The field from where we are taking the label string we are using to compare
+	 * (It will be used only if the field is shared, otherwise it won't do anything).
+	 * @param domains  The domains with the list of fields we will compare to (the list of fields corresponding to the
+	 * domain where "field" comes from won't be used, just the list of fields of the other domains).
 	 * @param originDomain  The domain to which "fields" belongs to.
-     * @returns {boolean} True if any conflict is found, false otherwise.
-     */
-	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any):boolean {
-        let conflicts = [];
+	 * @returns {boolean} True if any conflict is found, false otherwise.
+	 */
+	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any): boolean {
+		let conflicts = [];
 		// We are going to find conflicts in other domains, so first remove the origin domain from the list of domains
 		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain)
-        for (let domain of filteredDomains) {
-            let fields = domain.fields;
+		for (let domain of filteredDomains) {
+			let fields = domain.fields;
 			let x = 0;
-            if (field.shared == 1) {
-                conflicts = fields.filter(
-                	item => item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim().length > 0 ||
-					this.conflictsWithAnotherFieldName(field.label, fields));
+			if (field.shared === 1) {
+				conflicts = fields.filter(
+					item => item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim().length > 0 ||
+						this.conflictsWithAnotherFieldName(field.label, fields));
 				if (conflicts.length > 0) {
 					return true;
 				}
-            }
-        };
-        return false;
+			}
+		}
+		;
+		return false;
 	}
 
 	/**
@@ -157,28 +158,28 @@ export class FieldSettingsService {
 	 */
 	checkLabelsAndNamesConflicts(fields: any, domains: any, originDomain: any): boolean {
 		// Check if there are conflicts among labels
-		let labelConflicts = fields.filter((item)=> this.conflictsWithAnotherLabel(item.label, fields));
-        // Now clone the field list to do the next check (this is needed because the cloned array will be potentially modified)
-        let clonedFields  = Object.assign([], fields);
-        // We will need to remove the element corresponding to the item from the clonedFields array
-        // before doing the comparision so it doesn't compare to itself.
+		let labelConflicts = fields.filter((item) => this.conflictsWithAnotherLabel(item.label, fields));
+		// Now clone the field list to do the next check (this is needed because the cloned array will be potentially modified)
+		let clonedFields = Object.assign([], fields);
+		// We will need to remove the element corresponding to the item from the clonedFields array
+		// before doing the comparision so it doesn't compare to itself.
 		// (otherwise if for example the fieldName is "custom1" and the label is "custom1" in the same field it will error)
-        // Here in actualElement we hold the removed element so we can restore it to the array later
-		let actualElement= null;
-        // Check if there are conflicts between labels and field names
+		// Here in actualElement we hold the removed element so we can restore it to the array later
+		let actualElement = null;
+		// Check if there are conflicts between labels and field names
 		let nameConflicts = fields.filter((item, index) => {
 			// If we have remove an element from the cloned list to
-            // do the comparison, restore that element to the list
-			if(actualElement!=null){
-				clonedFields.splice(index -1, 0, actualElement[0]);
-			};
+			// do the comparison, restore that element to the list
+			if (actualElement != null) {
+				clonedFields.splice(index - 1, 0, actualElement[0]);
+			}
 			// We need to temporarily remove the element corresponding to the item
-            // we are using to compare, so item doesn't compare to itself
+			// we are using to compare, so item doesn't compare to itself
 			actualElement = clonedFields.splice(index, 1);
 			return this.conflictsWithAnotherFieldName(item.label, clonedFields)
 		});
-        // Finally, check if there are conflicts among labels and between labels and field names but against other domains
-        let domainConflicts = fields.filter(item => this.conflictsWithAnotherDomain(item, domains, originDomain))
+		// Finally, check if there are conflicts among labels and between labels and field names but against other domains
+		let domainConflicts = fields.filter(item => this.conflictsWithAnotherDomain(item, domains, originDomain))
 
 		return (labelConflicts.length > 0 || nameConflicts.length > 0 || domainConflicts.length > 0)
 	}
