@@ -65,6 +65,9 @@
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
             <input (blur)="onBlur(dataItem)" type="text" [ngClass]="{'has-error': hasError(dataItem), 'to-be-deleted': toBeDeleted(dataItem)}" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label"
                 id="{{dataItem.field}}" name="{{dataItem.field}}" [disabled]="toBeDeleted(dataItem)">
+            <div *ngIf="dataItem.errorMessage" class="error-message">
+                {{dataItem.errorMessage}}
+            </div>
             <span *ngIf="!dataItem.udf">{{dataItem.label}}</span>
         </ng-template>
     </kendo-grid-column>

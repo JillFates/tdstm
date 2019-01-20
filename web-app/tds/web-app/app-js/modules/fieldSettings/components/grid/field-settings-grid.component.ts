@@ -14,8 +14,7 @@ import {FIELD_COLORS} from '../../model/field-settings.model';
 import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
-import {AlertType} from "../../../../shared/model/alert.model";
-import {NotifierService} from "../../../../shared/services/notifier.service";
+import {AlertType} from '../../../../shared/model/alert.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
 
 declare var jQuery: any;
@@ -81,7 +80,6 @@ export class FieldSettingsGridComponent implements OnInit {
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
 		private dialogService: UIDialogService,
-		private notifier: NotifierService,
 		private fieldSettingsService: FieldSettingsService) {
 	}
 
@@ -361,26 +359,19 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onBlur(dataItem: FieldSettingsModel) {
+		dataItem.errorMessage = '';
+
 		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields)) {
-			this.notifier.broadcast({
-				name: AlertType.DANGER,
-				message: 'Another label conflicts with the label "'
-				+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
-			});
+			dataItem.errorMessage = 'Another label conflicts with the label "'
+					+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.'
 		} else {
 			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields)) {
-				this.notifier.broadcast({
-					name: AlertType.DANGER,
-					message: 'A field name conflicts with the label "'
-					+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
-				});
+				dataItem.errorMessage =  'A field name conflicts with the label "'
+						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
 			} else {
 				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
-					this.notifier.broadcast({
-						name: AlertType.DANGER,
-						message: 'A field name or label on another domain conflicts with the shared label "'
-						+ dataItem.label + '" in field '+ dataItem.field + '. Please rename the label.'
-					});
+					dataItem.errorMessage = 'A field name or label on another domain conflicts with the shared label "'
+						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
 				}
 			}
 		}
