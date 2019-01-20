@@ -354,7 +354,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected hasError(dataItem: FieldSettingsModel) {
 		return dataItem.label.trim() === '' ||
 			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields) ||
-			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, this.data.fields) ||
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
 	}
 
@@ -365,7 +365,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			dataItem.errorMessage = 'Another label conflicts with the label "'
 					+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.'
 		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, this.data.fields)) {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, this.data.fields)) {
 				dataItem.errorMessage =  'A field name conflicts with the label "'
 						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
 			} else {

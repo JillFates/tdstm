@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DomainModel } from '../model/domain.model';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
+import {equals} from 'ramda';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -101,9 +102,12 @@ export class FieldSettingsService {
 	 * 	  e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
 	 * @param  The label string to be compared with the list of existing field names.
 	 */
-	conflictsWithAnotherFieldName(label: string, fields: any) {
-		return fields.filter(
-				item => item.field.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 0;
+	conflictsWithAnotherFieldName(field: any, fields: any): boolean {
+		const label = field && field.label || '';
+		return fields.some(
+				item => !equals(field, item) && item.field.replace(/\s/g, '')
+					.toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
+		);
 	}
 	// conflictsWithAnotherFieldName(label: string, fields: any): boolean {
 	// 	let filterFields = fields.filter((item) => {
