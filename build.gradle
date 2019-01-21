@@ -179,7 +179,7 @@ assets {
 	minifyCss = true
 }
 
-[bootRun, integrationTest, runScript].each { runTask ->
+[bootRun, integrationTest, runScript, dbmUpdate].each { runTask ->
 	configure(runTask) {
 		systemProperties System.properties
 	}

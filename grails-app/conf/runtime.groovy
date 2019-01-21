@@ -38,6 +38,7 @@ if(configManagerFile){
 	candidates << configManagerFile
 }
 
+
 if(userHome) {
 	candidates << "$userHome/.grails/${appName}-config.groovy"
 }
@@ -59,7 +60,7 @@ for (appConfigLocation in candidates) {
 		new ConfigSlurper(Environment.current.name).parse(f.toURI().toURL())
 	}
 	catch (e) {
-		throw new IllegalArgumentException("ERROR There appears to be an error in the $appConfigLocation application configuration file: $e.message")
+		continue //If no config is found a error will be thrown, but don't fail if one is missing.
 	}
 
 	grails.config.locations << 'file:' + appConfigLocation
