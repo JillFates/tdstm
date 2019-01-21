@@ -1,43 +1,44 @@
-import { NgModule, ModuleWithProviders } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { PopupModule } from '@progress/kendo-angular-popup';
-import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
-import { InputsModule } from '@progress/kendo-angular-inputs';
-import { GridModule } from '@progress/kendo-angular-grid';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import {NgModule, ModuleWithProviders} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {PopupModule} from '@progress/kendo-angular-popup';
+import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
+import {InputsModule} from '@progress/kendo-angular-inputs';
+import {GridModule} from '@progress/kendo-angular-grid';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
-import { IntlModule } from '@progress/kendo-angular-intl';
+import {IntlModule} from '@progress/kendo-angular-intl';
 
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
-import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
+import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
 // Shared Services
-import { PreferenceService } from '../shared/services/preference.service';
-import { NotifierService } from '../shared/services/notifier.service';
-import { ComponentCreatorService } from '../shared/services/component-creator.service';
-import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
-import { UILoaderService } from '../shared/services/ui-loader.service';
-import { PersonService } from './services/person.service';
-import { PermissionService } from './services/permission.service';
-import { WindowService } from './services/window.service';
+import {PreferenceService} from '../shared/services/preference.service';
+import {NotifierService} from '../shared/services/notifier.service';
+import {ComponentCreatorService} from '../shared/services/component-creator.service';
+import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
+import {UILoaderService} from '../shared/services/ui-loader.service';
+import {PersonService} from './services/person.service';
+import {PermissionService} from './services/permission.service';
+import {WindowService} from './services/window.service';
 import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
+import {ButtonsFactoryService} from './services/buttons-factory.service';
 import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
 import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
 // Shared Directives
-import { UIAutofocusDirective } from './directives/autofocus-directive';
-import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
-import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
-import { UIToastDirective } from '../shared/directives/ui-toast.directive';
-import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
-import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
-import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
-import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
-import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
-import { UIAutoCenterDirective } from './directives/autocenter-directive';
-import { InputPasteDirective } from './directives/input-paste.directive';
-
+import {UIAutofocusDirective} from './directives/autofocus-directive';
+import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
+import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
+import {UIToastDirective} from '../shared/directives/ui-toast.directive';
+import {UIDialogDirective} from '../shared/directives/ui-dialog.directive';
+import {UIPromptDirective, UIPromptService} from '../shared/directives/ui-prompt.directive';
+import {UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
+import {UISVGIconDirectiveDirective} from './directives/ui-svg-icon.directive';
+import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
+import {UIAutoCenterDirective} from './directives/autocenter-directive';
+import {InputPasteDirective} from './directives/input-paste.directive';
+import {CopyClipboardDirective} from './directives/copy-clipboard.directive';
 // Shared Pipes
 import {DateTimePipe} from './pipes/datetime.pipe';
 import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
@@ -46,7 +47,7 @@ import {FilterPipe} from './pipes/filter.pipe';
 import {UtilsPipe} from './pipes/utils.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
-
+import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -69,15 +70,16 @@ import { TDSDateControlComponent } from './components/custom-control/date-time/d
 import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
 import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
-import { TDSButton } from './components/button/button.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
+import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
+import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
 
 // Dictionary
-import { DictionaryService } from './services/dictionary.service';
-import { en_DICTIONARY } from './i18n/en.dictionary';
+import {DictionaryService} from './services/dictionary.service';
+import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 
 @NgModule({
@@ -104,6 +106,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UtilsPipe,
 		DatePipe,
 		NumericPipe,
+		EscapeUrlEncodingPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -124,6 +127,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		InputPasteDirective,
+		CopyClipboardDirective,
 		AkaComponent,
 		ConnectorComponent,
 		FieldReferencePopupComponent,
@@ -131,12 +135,13 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSCustomValidationErrorsComponent
+		TDSActionButton,
+		TDSCustomValidationErrorsComponent,
+		RichTextEditorComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -149,11 +154,13 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
 		InputPasteDirective,
+		CopyClipboardDirective,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
 		DatePipe,
 		NumericPipe,
+		EscapeUrlEncodingPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		DynamicComponent,
@@ -177,12 +184,13 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSButton,
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
-		TDSCustomValidationErrorsComponent
+		TDSActionButton,
+		TDSCustomValidationErrorsComponent,
+		RichTextEditorComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -222,6 +230,8 @@ export class SharedModule {
 				BulkChangeService,
 				BulkCheckboxService,
 				UserService,
+				TranslatePipe,
+				ButtonsFactoryService,
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY

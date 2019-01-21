@@ -23,7 +23,6 @@ import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
-
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit {
@@ -52,7 +51,6 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected isEventLocked: boolean;
 	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
-
 	constructor(
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,

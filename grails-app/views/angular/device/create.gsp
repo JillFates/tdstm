@@ -264,10 +264,11 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}" />
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <tds-date-control
+                                            [(ngModel)]="model.asset.retireDate"
                                             class="tm-input-control"
                                             name="modelAssetRetireDate"
 										    [tabindex]="26"
-                                            [(value)]="model.asset.retireDate">
+                                            [value]="model.asset.retireDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
@@ -307,10 +308,11 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
                                         <tds-date-control
+                                            [(ngModel)]="model.asset.maintExpDate"
                                             class="tm-input-control"
                                             name="modelAssetMaintExpDate"
                                             [tabindex]="27"
-                                            [(value)]="model.asset.maintExpDate">
+                                            [value]="model.asset.maintExpDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constraints.validation.inList as JSON}[0]" />

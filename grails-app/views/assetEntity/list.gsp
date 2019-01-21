@@ -112,8 +112,8 @@
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
-						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter},
-						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter, hidden: true},
+						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter}, 
+						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
@@ -137,8 +137,8 @@
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
 						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
-				<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
-				<jqgrid:refreshButton id="assetListId" />
+					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
+					<jqgrid:refreshButton id="assetListId" />
 				</jqgrid:grid>
 				TDS.jqGridFilterToolbar('assetListId');
 

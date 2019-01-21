@@ -27,6 +27,11 @@ class TaskCreationSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
+        at MenuPage
+        // set up starts making sure no event is in context
+        tasksModule.goToTasksManager()
+        at TaskManagerPage
+        selectEvent("All")
     }
 
     def setup() {
@@ -38,27 +43,17 @@ class TaskCreationSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "1. Displaying the Task Manager Section"() {
-        given: 'The User is at the Menu Page'
-            at MenuPage
-        when: 'User Goes to the Tasks > Task Manager Section'
-            tasksModule.goToTasksManager()
 
-        then: 'Task Manager Section should be Displayed'
-            at TaskManagerPage
-    }
-
-    def "2. Opening the Create Task Pop-Up"() {
+    def "1. Opening the Create Task Pop-Up"() {
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User clicks the "Create" Button'
-            tmCreateTaskBtn.click()
-
+            clickCreateTask()
         then: 'Task Creation Pop-Up should be displayed'
             at TaskCreationPage
     }
 
-    def "3. Creating a brand new Task"() {
+    def "2. Creating a brand new Task"() {
         given: 'The User is on the Task Creation Pop-Up'
             at TaskCreationPage
         when: 'The User completes all related information such as Name, Event, Status, Person, Team'
@@ -75,7 +70,7 @@ class TaskCreationSpec extends GebReportingSpec {
             at TaskManagerPage
     }
 
-    def "5. Filtering out by the brand New Task on the List"() {
+    def "3. Filtering out by the brand New Task on the List"() {
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User filters by the brand new Task'
@@ -90,7 +85,7 @@ class TaskCreationSpec extends GebReportingSpec {
             at TaskDetailsPage
     }
 
-    def "6. Validate Task Details"() {
+    def "4. Validate Task Details"() {
         when: 'The User is on the Task Details Section'
             at TaskDetailsPage
 

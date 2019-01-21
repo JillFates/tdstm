@@ -53,13 +53,25 @@ class FindStatementBuilder {
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>check for field matching a value</p>
 	 * <pre>
-	 *   find Device by 'custom1' ne 'xyz'
+	 *   find Device by 'custom1' eq'xyz'
 	 * </pre>
 	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
 	 * @return
 	 */
 	FindStatementBuilder eq(Object value){
 		return completeCurrentCondition(FindOperator.eq, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' eq aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder eq(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -76,6 +88,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' ne aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder ne(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for field matching a value null safe (<=>)</p>
 	 * <pre>
@@ -86,6 +110,18 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder nseq(Object value){
 		return completeCurrentCondition(FindOperator.nseq, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' nseq aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder nseq(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -102,6 +138,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' lt aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder lt(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for field less than or equals a value</p>
 	 * <pre>
@@ -112,6 +160,18 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder le(Object value){
 		return completeCurrentCondition(FindOperator.le, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' le aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder le(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -128,6 +188,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' gt aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder gt(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for field greater than or equals a value</p>
 	 * <pre>
@@ -138,6 +210,18 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder ge(Object value){
 		return completeCurrentCondition(FindOperator.ge, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' ge aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder ge(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -154,6 +238,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' like aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder like(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks a non-match of a partial string field for, must include % appropriately</p>
 	 * <pre>
@@ -164,6 +260,18 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder notLike(Object value){
 		return completeCurrentCondition(FindOperator.notLike, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' notLike aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder notLike(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -180,6 +288,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' contains aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder contains(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a non-match of a string field that contains a value</p>
 	 * <pre>
@@ -193,6 +313,18 @@ class FindStatementBuilder {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' notContains aBogusVariableNameVar into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder notContains(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a field being in a list</p>
 	 * <pre>
@@ -203,6 +335,18 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder inList(Object value){
 		return completeCurrentCondition(FindOperator.inList, value)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	find Device by 'Name' inList [aBogusVariableNameVar] into 'id'
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @return
+	 */
+	FindStatementBuilder inList(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	FindStatementBuilder inList(List<Object> values){
@@ -222,6 +366,10 @@ class FindStatementBuilder {
 		return completeCurrentCondition(FindOperator.notInList, value)
 	}
 
+	FindStatementBuilder notInList(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
 	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a value being in a numeric range</p>
@@ -235,6 +383,10 @@ class FindStatementBuilder {
 		return completeCurrentCondition(FindOperator.between, value)
 	}
 
+	FindStatementBuilder between(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
 	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks for a value not being in a numeric range</p>
@@ -246,6 +398,10 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder notBetween(Object value){
 		return completeCurrentCondition(FindOperator.notBetween, value)
+	}
+
+	FindStatementBuilder notBetween(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**

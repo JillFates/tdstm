@@ -14,7 +14,7 @@ import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.BooleanUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
-import org.apache.commons.lang.RandomStringUtils as RSU
+import org.apache.commons.lang3.RandomStringUtils as RSU
 
 import spock.lang.Specification
 import spock.lang.Stepwise

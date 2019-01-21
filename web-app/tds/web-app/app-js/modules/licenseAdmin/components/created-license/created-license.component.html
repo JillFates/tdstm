@@ -1,0 +1,23 @@
+<div class="modal-content data-script-view-edit-component"  #createdLicenseContainer>
+	<div class="modal-header">
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<h4 class="modal-title">{{ 'LICENSE.LICENSE_REQUEST_COMPLETED' | translate }}</h4>
+	</div>
+	<div class="modal-body">
+		<form role="form" data-toggle="validator" class="form-horizontal left-alignment">
+			<div class="box-body">
+				<blockquote>
+					<p>Congratulations!  Your License request has been submitted successfully.</p>
+					<p>The request has been sent to TDS for processing, and a license will be issued soon.  The license key will be emailed to the email contact ({{requestLicenseModel?.email}}) specified in the request.  The email with the license key will contain the instructions for applying the license and unlocking all of the features of TransitionManager.</p>
+					<p>The license process typically takes one (1) business day to complete.</p>
+				</blockquote>
+			</div><!-- /.box-body -->
+		</form>
+	</div>
+	<div class="modal-footer form-group-center">
+		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+			<span class="glyphicon glyphicon-ban-circle"></span>
+			<span>{{'GLOBAL.CLOSE' | translate }}</span>
+		</button>
+	</div>
+</div>

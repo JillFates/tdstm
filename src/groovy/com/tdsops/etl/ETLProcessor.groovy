@@ -694,7 +694,26 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 		set environmentVar with SOURCE.'application id'
 	 * 		set environmentVar with DOMAIN.id
 	 * 		.....
-	 *}* </pre>
+	 *} </pre>
+	 * @param field
+	 * @return
+	 */
+	Map<String, ?> set(LocalVariableDefinition localVariable) {
+		doSet(localVariable.name)
+	}
+
+	/**
+	 * Create a local variable using variableName parameter.
+	 * It adds a new dynamic variable in he current script row execution.
+	 * <pre>
+	 * 	iterate {
+	 * 		domain Application
+	 * 	    ...
+	 * 	    def varName = 'myVarName'
+	 * 		set varName with 'Production'
+	 * 		.....
+	 * }
+	 * </pre>
 	 * @param field
 	 * @return
 	 */
@@ -704,11 +723,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			!binding.isValidETLVariableName(variableName)
 		) {
 			throw ETLProcessorException.invalidSetParameter()
-
 		}
+		doSet((String) variableName)
+	}
 
+	/**
+	 * Completes ETL set command creating a local variable using {@code variableName} parameter
+	 * and adding it in Binding context.
+	 * @param variableName a String used to define variable name
+	 * @return an instance of Map to continue with the chain methods
+	 * @see ETLProcessor#set(LocalVariableDefinition)
+	 * @see ETLProcessor#set(java.lang.Object)
+	 */
+	private Map<String, ?> doSet(String variableName){
 		validateStack()
-
 		return [
 			with: { value ->
 

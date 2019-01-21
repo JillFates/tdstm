@@ -13,8 +13,8 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.security.Permission
-import org.apache.commons.lang.StringUtils
-import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.dao.DataIntegrityViolationException
 
 @Transactional

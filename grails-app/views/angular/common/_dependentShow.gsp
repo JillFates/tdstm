@@ -26,7 +26,7 @@
 								<td style="background-color: lightpink;position:relative;" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 									<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 									<div class="text-center" style="position:absolute;right:5px;top:20%;">
-										<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover"
+										<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="19" height="19" alt="..." data-toggle="popover"
 										 data-trigger="hover" data-content="The linked assets have conflicting bundles." />
 									</div>
 								</td>
@@ -36,7 +36,7 @@
 									<b>
 										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;">
-											<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover"
+											<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="19" height="19" alt="..." data-toggle="popover"
 											 data-trigger="hover" data-content="The linked assets have conflicting bundles." />
 										</div>
 									</b>
@@ -86,7 +86,7 @@
 								<td style="background-color: lightpink;position:relative;" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 									<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 									<div class="text-center" style="position:absolute;right:5px;top:20%;">
-										<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover"
+										<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="19" height="19" alt="..." data-toggle="popover"
 										 data-trigger="hover" data-content="The linked assets have conflicting bundles." />
 									</div>
 								</td>
@@ -96,7 +96,7 @@
 									<b>
 										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;">
-											<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover"
+											<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="19" height="19" alt="..." data-toggle="popover"
 											 data-trigger="hover" data-content="The linked assets have conflicting bundles." />
 										</div>
 									</b>

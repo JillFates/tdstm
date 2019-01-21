@@ -1,34 +1,24 @@
 {
 	"info": {
-		"_postman_id": "4dd5a0ec-ff0a-412a-af9b-66bd63c4c354",
+		"_postman_id": "7eebb1af-a6b8-408b-97b8-5aaf740eee4a",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login",
+			"name": "Login - Provider",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "c8a8d9f4-783e-432b-adc4-a02a51276167",
-						"type": "text/javascript",
+						"id": "42907336-d108-461e-8c0f-aea4e41c9309",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
-							"});",
-							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");",
-							"});",
-							"",
-							""
-						]
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -79,8 +69,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9cbff9f6-d218-4e1e-9ea3-eebfcec68b6a",
-						"type": "text/javascript",
+						"id": "aa8e308f-24ca-46fb-9260-b7562e1a0b9c",
 						"exec": [
 							"var jsonObject = JSON.parse(responseBody);",
 							"var firstID = jsonObject.data[0].id; ",
@@ -95,7 +84,8 @@
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -130,7 +120,6 @@
 					"listen": "test",
 					"script": {
 						"id": "b3d55562-0af3-43fc-92c8-a095fe32f56f",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -139,7 +128,8 @@
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -172,8 +162,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4a2b464a-36bc-49aa-b46a-150b13ab8097",
-						"type": "text/javascript",
+						"id": "a57f1233-6bf9-4614-ac5c-0a4af6c341a5",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -185,8 +174,16 @@
 							"",
 							"var response = JSON.parse(responseBody);",
 							"var checkname = response.data.provider.name;",
-							"tests[\"Name was updated\"] = /QAUpdate/.test(checkname);"
-						]
+							"tests[\"Name was updated\"] = /updatedName/.test(checkname);",
+							"",
+							"",
+							"var provName = response.data.provider.name; ",
+							"provName = \"NewProvider\" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"",
+							"pm.environment.set(\"createProvider\", provName);",
+							""
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -200,7 +197,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"{{updatedName}}{{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
+					"raw": "{\n\t\"name\": \"updatedName {{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
@@ -225,7 +222,6 @@
 					"listen": "test",
 					"script": {
 						"id": "f2d158c2-6420-49ad-8fc4-4a50e7911709",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -239,7 +235,8 @@
 							"    pm.expect(pm.response.text()).to.include(\"true\");",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -274,7 +271,6 @@
 					"listen": "test",
 					"script": {
 						"id": "8b1b7a1b-a5e0-4d0e-acb3-d895e67b6e6f",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -287,7 +283,8 @@
 							"var response = JSON.parse(responseBody);",
 							"var idCreated = response.data.provider.id;",
 							"pm.environment.set(\"providerID\", idCreated);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -325,8 +322,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a21f5e53-52ef-4e6c-b983-9bcd5efbfe01",
-						"type": "text/javascript",
+						"id": "f746d9ce-7c01-4da2-b4c5-c5445e74a4ce",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -342,8 +338,10 @@
 							"",
 							"//clean-up code: variables that shpuld live only during the execution",
 							"//of this collection are unset here",
-							"pm.environment.unset(\"providerID\");"
-						]
+							"pm.environment.unset(\"providerID\");",
+							"pm.environment.unset(\"createProvider\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -395,18 +393,10 @@
 	],
 	"variable": [
 		{
-			"id": "0ba2e077-56bc-46c1-898e-d6f3f13ae6ee",
-			"key": "createProvider",
-			"value": "PostmanName",
-			"type": "string",
-			"description": ""
-		},
-		{
-			"id": "f42aafbb-0076-4fc6-a85f-7d79871c88fd",
+			"id": "6476e085-a2a3-4afc-9009-7822df108599",
 			"key": "updatedName",
 			"value": "QAUpdate",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		}
 	]
 }

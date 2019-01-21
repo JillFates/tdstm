@@ -22,14 +22,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html',
 })
 export class AssetExplorerIndexComponent implements OnInit {
-
 	private reportGroupModels = Array<ViewGroupModel>();
 	private searchText: String;
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 	private gridColumns: GridColumnModel[];
 	private report;
-
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,

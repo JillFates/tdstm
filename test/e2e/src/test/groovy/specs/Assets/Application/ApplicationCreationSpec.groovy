@@ -68,19 +68,19 @@ class ApplicationCreationSpec extends GebReportingSpec {
             acModalAppName = appName
             acModalDescription = appDesc
         and: 'The User Searches by SME1'
-            acModalSME1Selector.click()
+            waitFor { acModalSME1Selector.click()}
             waitFor { acModalSelectorValues.size() > 2 }
             def selector = acModalSelectorValues[2]
             appSME1 = selector.text()
             waitFor { selector.click() }
         and: 'The User Searches by SME2'
-            acModalSME2Selector.click()
+            waitFor { acModalSME2Selector.click()}
             waitFor { acModalSelectorValues.size() > 2 }
             selector = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-1,2)]
             appSME2 = selector.text()
             waitFor { selector.click() }
         and: 'The User Searches by App Owner'
-            acModalAppOwnerSelector.click()
+            waitFor{ acModalAppOwnerSelector.click()}
             selector = acModalSelectorValues[acModalSelectorValues.size()-1]
             appOwner = selector.text()
             waitFor { acModalSelectorValues.size() > 2 }
@@ -88,13 +88,12 @@ class ApplicationCreationSpec extends GebReportingSpec {
         and: 'The User chooses a Bundle'
             waitFor{ acModalBundleSelector.click()}
             acModalSelectorValues.find(text: appBundle).click()
-            acModalBundleSelector.click() // close dropdown
+            waitFor{ acModalBundleSelector.click()} // close dropdown
         and: 'The User chooses a proper Status'
             waitFor{ acModalPlanStatusSelector.click()}
             acModalSelectorValues.find(text: appStatus).click()
         and: 'The User clicks the the "Save" Button'
             waitFor { createButton.click() }
-
         then: ' The User is redirected to the Application Details Page'
             at AssetDetailsPage
         and: 'The User closes the Application Details Page'
@@ -120,10 +119,10 @@ class ApplicationCreationSpec extends GebReportingSpec {
             at AssetDetailsPage
 
         then: 'The User Searches by the AppName, SME1, SME2, AppOwner'
-        // TODO some items cannot located due to missing ID's
+        // TODO some items cannot be located due to missing ID's
         waitFor{adModalAppName.text().trim() == appName}
-        adModalSME1.text().trim().contains(appSME1) // contains(because user can part of a different company)
-        adModalSME2.text().trim().contains(appSME2) // contains(because user can part of a different company)
-        adModalAppOwner.text().trim().contains(appOwner) // contains(because user can part of a different company)
+        adModalSME1.text().trim().contains(appSME1) // contains(because user can be part of a different company)
+        adModalSME2.text().trim().contains(appSME2) // contains(because user can be part of a different company)
+        adModalAppOwner.text().trim().contains(appOwner) // contains(because user can be part of a different company)
     }
 }

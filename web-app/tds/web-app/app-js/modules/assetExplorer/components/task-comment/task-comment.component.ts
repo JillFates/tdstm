@@ -48,7 +48,6 @@ export class TaskCommentComponent implements OnInit {
 	private showAllComments: boolean;
 	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
-
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
 		this.getPreferences();
 	}

@@ -36,8 +36,8 @@
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
-	          <g:if test="${assetSummary.assetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[filter:"server", moveBundleId:"${assetSummary.id}"]' >${assetSummary.assetCount}</g:link></td>
+	          <g:if test="${assetSummary.serverCount>0}">
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[filter:"server", moveBundleId:"${assetSummary.id}"]' >${assetSummary.serverCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
@@ -65,7 +65,7 @@
         <tr class='odd'>
 	          <td  style="text-align:right;"><b>Total</b></td>
 	          <td  style="text-align:right;"><b><g:link controller="application" action="list">${totalApplication}</g:link></b></td>
-	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[filter:'server']">${totalAsset}</g:link></b></td>
+	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[filter:'server']">${totalServer}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[filter:'physical']">${totalPhysical}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="database" action="list">${totalDatabase}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="files" action="list">${totalFiles}</g:link></b></td>

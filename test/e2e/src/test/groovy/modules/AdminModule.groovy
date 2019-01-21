@@ -31,13 +31,13 @@ class AdminModule extends Module{
         menuContainer { $("div", class: "container menu-top-container menu-top-container-full-menu") }
         menuBar { menuContainer.find("div#navbar-collapse") }
 
-        adminItem       { menuBar.find("li.menu-parent-admin") }
-        adminMenu       { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
-        adminSections   { adminMenu.find("li", class: "menu-parent-item") }
+        adminItem { menuBar.find("li.menu-parent-admin") }
+        adminMenu { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
+        adminSections { adminMenu.find("li", class: "menu-parent-item") }
         adminPortalItem { adminMenu.find("li.menu-admin-portal") }
-        adminLMItem     { adminMenu.find("li.menu-admin-license-manager").find("a", "href": "/tdstm/app/license/admin/list") }
-        adminNoticesItem { adminMenu.find("li.menu-admin-license-manager").find("a", "href": "/tdstm/app/notice/list") }
-        adminRolesItem  { adminMenu.find("li.menu-admin-role") }
+        adminLMItem { adminMenu.find("li.menu-admin-license-admin").find("a", "href": "/tdstm/module/license/admin/list") }
+        adminNoticesItem { adminMenu.find("li.menu-admin-notice-manager").find("a", "href": "/tdstm/module/notice/list") }
+        adminRolesItem { adminMenu.find("li.menu-admin-role") }
         adminAssetOptItem { adminMenu.find("li.menu-admin-asset-options") }
         adminCompaniesItem { adminMenu.find("li.menu-list-companies") }
         adminStaffItem { adminMenu.find("li.menu-list-staff") }

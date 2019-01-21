@@ -338,6 +338,7 @@ class PersonController implements ControllerMethods {
 			if (!personService.isAssociatedTo(person, newCompany)) {
 				throw new DomainUpdateException("The person $person is not associated with the company $newCompany")
 			}*/
+			params.teams = params.list("function")
 			Person person = personService.updatePerson(params, true)
 			if (params.tab) {
 				forward(action: 'loadGeneral', params :[tab: params.tab, personId:person.id])

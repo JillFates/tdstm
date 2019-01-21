@@ -7,14 +7,14 @@ import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bul
 @Component({
 	selector: 'tds-bulk-change-button',
 	template: `
-        <button tds-button
-            icon="ellipsis-v"
+		<tds-button-custom
+			icon="ellipsis-v"
+			title="Bulk Change"
+			[id]="'bntBulkChange'"
             (click)="onClick()"
-            class="btn btn-default btnBulkChange pull-left"
-            id="btnBulkChange"
-            [disabled]="!enabled">
-            {{'ASSET_EXPLORER.BULK_CHANGE.TITLE' | translate}}
-        </button>
+            class="btnBulkChange pull-left"
+			[disabled]="!enabled">
+		</tds-button-custom>
 	`,
 	providers: [TranslatePipe]
 })

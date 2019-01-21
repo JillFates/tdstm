@@ -22,16 +22,14 @@
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="displayCreateButton()">
 
-					<button tds-button
-					        icon=""
-					        [disabled]="!canCreateAssets()"
+					<button type="button" [disabled]="!canCreateAssets()"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
-					        class="btn btn-default dropdown-toggle"
+					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
 						{{ 'GLOBAL.CREATE' | translate }}
 					</button>
 
-					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!canCreateAssets()"
 					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
@@ -58,45 +56,47 @@
 				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="hasSelectedItems()" class="bulk-change-counter">
-					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+				<div *ngIf="hasSelectedItems() && getSelectedItemsCount(); let counter" class="bulk-change-counter">
+					<span class="badge badge-light">{{counter}}</span><label>{{ (counter === 1 ? 'ASSETS.SINGLE_NAME' : 'ASSETS.PLURAL_NAME') | translate }} selected</label>
 				</div>
 				<div class="checkbox just-planning">
 					<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
 					       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
-					<label>Just Planning</label>
+					<label style="margin-left: 4px;">Just Planning</label>
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section">
 				<div>
-					<button tds-button
+					<tds-button-custom
+							class="component-action-clear-filters"
+					        id="btnClean"
 					        icon="times"
-					        class="btn btn-default component-action-clear-filters"
-					        id="btnClear"
+					        title="Clear filters"
 					        [disabled]="!hasFilterApplied()"
 					        (click)="onClearFilters()">
-						{{'GLOBAL.CLEAR_FILTERS' | translate}}
-					</button>
+					</tds-button-custom>
 				</div>
-				<button tds-button
-				        icon="refresh"
-				        class="tds-button-icon component-action-reload pull-right"
-				        (click)="onReload()">
-				</button>
+				<tds-button-custom
+				            icon="refresh"
+				            title="Refresh"
+				            isIconButton="true"
+				            class="component-action-reload pull-righ"
+				            (click)="onReload()"></tds-button-custom>
 			</div>
 		</ng-template>
 
 		<!-- Select All column -->
-		<kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
+		<kendo-grid-column title=""
+                           [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0"
+                           [width]="SELECT_ALL_COLUMN_WIDTH"
+                           [filterable]="false">
 			<ng-template kendoGridHeaderTemplate>
-				<div class="row">
-					<div class="col-md-12 text-center">
-						<tds-checkbox name="assetsSelector"
-						              [hasThirdState]="true"
-						              (changeState)="onChangeBulkCheckbox($event)"
-						              id="assetSelector"
-						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-					</div>
+				<div class="row text-center">
+                    <tds-checkbox name="assetsSelector"
+                                  [hasThirdState]="true"
+                                  (changeState)="onChangeBulkCheckbox($event)"
+                                  id="assetSelector"
+                                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 				</div>
 			</ng-template>
 
@@ -119,31 +119,13 @@
 			             let-rowIndex="rowIndex"
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
-				<div class="tds-button-set">
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="showAssetEditView(dataItem, rowIndex)"
-					        icon="edit"
-					        title="Edit Asset">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="isIssue ? showTask(dataItem, rowIndex) : createTask(dataItem, rowIndex)"
-					        [icon]="isIssue ? 'list-alt' : 'file-text-o'"
-					        [title]="isIssue ? 'List existing Tasks' : 'Create a Task'">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="isComment ? showComment(dataItem, rowIndex) : createComment(dataItem, rowIndex)"
-					        [icon]="isComment ? 'comments' : 'comment'"
-					        [title]="isComment ? 'List existing Comments' : 'Create a Comment'">
-					</button>
-					<button tds-button
-					        class="tds-button-in-row btn-action"
-					        (click)="showAssetCloneView(dataItem, rowIndex)"
-					        icon="clone"
-					        title="Clone Asset">
-					</button>
+				<div class="tds-action-button-set">
+					<tds-button-edit  (click)="showAssetEditView(dataItem, rowIndex)" tooltip="Edit Asset"></tds-button-edit>
+					<tds-button-custom tooltip="Create Task" icon="file-text-o" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="List Tasks" icon="list-alt" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="Create Comment" icon="comment-o" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-custom tooltip="Show Comments" icon="comments-o" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button-custom>
+					<tds-button-clone  (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button-clone>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>
@@ -153,14 +135,14 @@
 				*ngFor="let column of model.columns; let i = index"
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
-				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH"
+				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
 				[width]="column.width"
 				[class]="column.domain"
 		>
 			<ng-template kendoGridHeaderTemplate>
 				<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 					<div [ngClass]="{'field-not-found': column?.notFound }">
-						<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+						<label> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 					</div>
 				</div>
 			</ng-template>
