@@ -254,7 +254,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
         when: 'The User clicks the "Save" Button'
-            clickOnsaveButton()
+            clickOnSaveButton()
 
         then: 'The User should be redirected to the Application Details Pop-Up'
             at AssetDetailsPage
