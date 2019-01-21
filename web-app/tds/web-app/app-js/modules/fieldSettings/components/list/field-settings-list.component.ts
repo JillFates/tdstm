@@ -157,10 +157,12 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.refresh();
+					} else {
+						callback.failure();
 					}
 				});
 		} else {
-			callback();
+			callback.success();
 		}
 	}
 

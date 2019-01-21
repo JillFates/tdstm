@@ -65,6 +65,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
+	protected resettingChanges = false;
+	protected lastEditedControl = null;
 
 	private readonly availableControls = [
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.List, value: CUSTOM_FIELD_CONTROL_TYPE.List},
@@ -144,11 +146,23 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	}
 
-	protected onCancel(): void {
-		this.cancelEmitter.emit(() => {
-			this.reset();
-			this.refresh();
-		});
+	protected onCancel(event: any): void {
+		this.resettingChanges = true;
+		event = event || this.lastEditedControl || null;
+
+		this.cancelEmitter.emit({
+			success: () => {
+				this.reset();
+				this.refresh();
+			},
+			failure: () => {
+				if (event) {
+					this.resettingChanges = false;
+					if (!this.gridState.valid) {
+						event.target.focus();
+					}
+				}
+			}});
 	}
 
 	/**
@@ -257,6 +271,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	public refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
+		this.resettingChanges = false;
+		this.lastEditedControl = null;
 	}
 
 	/**
@@ -360,7 +376,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
 	}
 
-	protected onBlur(dataItem: FieldSettingsModel) {
+	protected onBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
 
@@ -376,6 +392,12 @@ export class FieldSettingsGridComponent implements OnInit {
 					dataItem.errorMessage = 'A field name or label on another domain conflicts with the shared label "'
 						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
 				}
+			}
+		}
+		if (dataItem.errorMessage)  {
+			this.lastEditedControl = event;
+			if (!this.resettingChanges) {
+				event.target.focus();
 			}
 		}
 	}
@@ -461,5 +483,14 @@ export class FieldSettingsGridComponent implements OnInit {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * On esc key pressed open confirmation dialog
+	 */
+	protected onKeyPressed(event: KeyboardEvent): void {
+		if (event.code === 'Escape') {
+			this.onCancel(event);
+		}
 	}
 }
