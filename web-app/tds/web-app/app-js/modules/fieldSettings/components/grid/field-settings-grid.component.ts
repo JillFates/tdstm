@@ -352,20 +352,23 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected hasError(dataItem: FieldSettingsModel) {
+		const fields = this.getFieldsExcludingDeleted();
+
 		return dataItem.label.trim() === '' ||
-			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields) ||
-			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, this.data.fields) ||
+			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
 	}
 
 	protected onBlur(dataItem: FieldSettingsModel) {
 		dataItem.errorMessage = '';
+		const fields = this.getFieldsExcludingDeleted();
 
-		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, this.data.fields)) {
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
 			dataItem.errorMessage = 'Another label conflicts with the label "'
 					+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.'
 		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, this.data.fields)) {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields)) {
 				dataItem.errorMessage =  'A field name conflicts with the label "'
 						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
 			} else {
@@ -375,6 +378,15 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the list of fields excluding fields to be deleted
+	 * @returns {any[]}
+	 */
+	protected getFieldsExcludingDeleted(): any {
+		return this.data.fields
+			.filter((item) => !((this.fieldsToDelete || []).includes(item.field)));
 	}
 
 	/**
