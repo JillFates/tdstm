@@ -162,9 +162,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			failure: () => {
 				if (event) {
 					this.resettingChanges = false;
-					if (!this.gridState.valid) {
-						event.target.focus();
-					}
+					event.target.focus();
 				}
 			}});
 	}
@@ -174,6 +172,11 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
+		const targetField = this.data.fields.find((item) => item.field === dataItem.field);
+		if (targetField) {
+			targetField.errorMessage = '';
+		}
+
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
 			domain: this.data.domain,
@@ -385,8 +388,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
+	 * Returns a boolean indicating if the fields contain atleast one field with error
+	 */
+	protected atLeastOneInvalidField(): boolean {
+		const fields = this.getFieldsExcludingDeleted() || [];
+
+		return fields.some((field) => field.errorMessage);
+	}
+
+	/**
 	 * On blur input field controls, it applies the validation rules to the label and name of the field control
 	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
+	 * @param {any} event Context event from the input that launched the change
 	 */
 	protected onBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
@@ -407,9 +420,15 @@ export class FieldSettingsGridComponent implements OnInit {
 			}
 		}
 		if (dataItem.errorMessage)  {
-			this.lastEditedControl = event;
 			if (!this.resettingChanges) {
-				event.target.focus();
+				this.lastEditedControl = this.lastEditedControl || event;
+				setTimeout(() => this.lastEditedControl.target.focus(), 0.1);
+			}
+		} else {
+			if (this.lastEditedControl) {
+				if (this.lastEditedControl.target.id === event.target.id)  {
+					this.lastEditedControl = null;
+				}
 			}
 		}
 	}
