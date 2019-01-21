@@ -34,7 +34,7 @@ class ViewsModule extends Module {
     def openRandomView(){
         def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
         def editedViewName = viewsListed[willSelect].text()
-        waitFor{viewsListed[willSelect].click()}
+        waitFor{viewsListed[willSelect].find("a").click()}
         editedViewName
     }
 
@@ -152,7 +152,7 @@ class ViewsModule extends Module {
         // otherwise we can click in other view than is required
         def links = viewsListed.findAll { it.text() == name }
         links.size() == 1
-        waitFor{ links[0].click() }
+        waitFor{links[0].find("a").click() }
     }
 
     def numberViewNamesEqualsNumberRows(){
