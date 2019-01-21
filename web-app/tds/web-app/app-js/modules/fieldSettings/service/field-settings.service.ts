@@ -84,15 +84,6 @@ export class FieldSettingsService {
 		return fields.filter(
 		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
 	}
-	// conflictsWithAnotherLabel(label: string, fields: any): boolean {
-	// 	let filterFields = fields.filter((item) => {
-	// 		console.log(item);
-	// 		let fromList = item.label.replace(/\s/g, '').toLowerCase().trim();
-	// 		let labelToCompare = label.replace(/\s/g, '').toLowerCase().trim();
-	// 		return  fromList === labelToCompare
-	// 	});
-	// 	return (filterFields.length > 1);
-	// }
 
 	/**
 	 * NOTE This function is added here in the service as it needs to be shared with different components.
@@ -109,15 +100,6 @@ export class FieldSettingsService {
 					.toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
 		);
 	}
-	// conflictsWithAnotherFieldName(label: string, fields: any): boolean {
-	// 	let filterFields = fields.filter((item) => {
-	// 		console.log(item);
-	// 		let fromList = item.field.replace(/\s/g, '').toLowerCase().trim();
-	// 		let labelToCompare = label.replace(/\s/g, '').toLowerCase().trim();
-	// 		return  fromList === labelToCompare
-	// 	});
-	// 	return (filterFields.length > 0);
-	// }
 
 	/**
 	 * Check if the label from the field parameter has conflicts with any label or fieldName from another domains.

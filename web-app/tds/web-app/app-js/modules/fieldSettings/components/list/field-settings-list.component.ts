@@ -149,6 +149,9 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * Shows the confirmation cancel changes dialog, on success refresh the grid otherwise reset the flag variables
+	 */
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(

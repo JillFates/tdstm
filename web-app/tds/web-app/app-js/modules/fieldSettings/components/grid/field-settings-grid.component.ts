@@ -146,6 +146,10 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	}
 
+	/**
+	 * On click Cancel button send the message to the host container to cancel the changes
+	 * @param {any} event containing the current event control which has the latest error
+	 */
 	protected onCancel(event: any): void {
 		this.resettingChanges = true;
 		event = event || this.lastEditedControl || null;
@@ -269,6 +273,10 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.applyFilter();
 	}
 
+	/**
+	 * Refresh the changes in the data grid, in addition reset the values of the resettingChanges
+	 * and lastEditeControls variables
+	 */
 	public refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
 		this.resettingChanges = false;
@@ -376,6 +384,10 @@ export class FieldSettingsGridComponent implements OnInit {
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
 	}
 
+	/**
+	 * On blur input field controls, it applies the validation rules to the label and name of the field control
+	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
+	 */
 	protected onBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
