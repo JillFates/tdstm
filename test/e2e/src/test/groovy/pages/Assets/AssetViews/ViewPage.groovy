@@ -14,7 +14,7 @@ class ViewPage extends Page{
         exportViewButton.displayed
     }
     static content = {
-        view (wait:true) { $("section","class":"page-asset-explorer-config")}
+        view (wait:true) { $("section.page-asset-explorer-config")}
         sectionHeaderTitle { $("section.content-header h1")}
         clearBtn {$("button", id:"btnClear")}
         createButton {$("button[type=button]", text: "Create")}
