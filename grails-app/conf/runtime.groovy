@@ -32,6 +32,17 @@ if (configFileFromJavaOpts){
 	}
 }
 
+configFileFromJavaOpts = System.getProperty("tdstm.config.location")
+if (configFileFromJavaOpts){
+	candidates << configFileFromJavaOpts
+	try{ //get the possible Manager config File
+		File f = new File(configFileFromJavaOpts)
+		configManagerFile = "${f.getParent()}/licman-config.groovy"
+	}catch(e){
+		//configuration not found fails silently??
+	}
+}
+
 //check if the manager config file was injected on the JavaOPTS
 configManagerFile = System.getProperty("licManConf") ?: configManagerFile
 if(configManagerFile){
