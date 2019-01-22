@@ -38,6 +38,7 @@ class UserService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	AuditService auditService
 	MetricReportingService metricReportingService
+	MoveEventService moveEventService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -454,7 +455,7 @@ class UserService implements ServiceMethods {
 	 * @return
 	 */
 	def getEvents(projects, dateNow){
-		def moveEventList = MoveEvent.findAllByProjectInList(projects).sort{it.eventTimes.start}
+		def moveEventList = MoveEvent.findAllByProjectInList(projects).sort{moveEventService.getEventTimes(it.id).start}
 		def thirtyDaysInMS = 2592000000
 
 		def events = [:]

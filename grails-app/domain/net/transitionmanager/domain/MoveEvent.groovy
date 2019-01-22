@@ -1,8 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.WebUtil
-import org.springframework.jdbc.core.JdbcTemplate
-
 /**
  * Represents the concept of an event where one or move bundles that will occur at one logical period of time.
  */
@@ -10,8 +8,6 @@ class MoveEvent {
 
 	public static final String METHOD_LINEAR = 'L'
 	public static final String METHOD_MANUAL = 'M'
-
-	JdbcTemplate jdbcTemplate
 
 	Project project
 	String name
@@ -69,7 +65,6 @@ class MoveEvent {
 	}
 
 	static mapping = {
-		autowire true
 		id column: 'move_event_id'
 		sort 'name'
 		columns {
@@ -81,31 +76,6 @@ class MoveEvent {
 		apiActionBypass column: 'api_action_bypass'
 	}
 
-	static transients = ['jdbcTemplate']
-
-	/**
-	 * Retrieves the PLAN MIN/MAX Start and Completion times of the MoveBundleSteps associate with the MoveBundle.MoveEvent
-	 * TODO : JPM 3/2014 - getPlanTimes () doesn't look like it can actually work as the columns don't exist in MoveBundle
-	 * @return Map[planStart , planCompletion] times for the MoveEvent
-	 */
-	Map<String, Object> getPlanTimes() {
-		jdbcTemplate.queryForMap('''
-			SELECT MIN(mbs.plan_start_time) AS start, MAX(mbs.plan_completion_time) AS completion
-			FROM move_bundle mb
-			LEFT JOIN move_bundle_step mbs ON mb.move_bundle_id = mbs.move_bundle_id
-			WHERE move_event_id = ?''', id)
-	}
-
-	/**
-	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundles associate with the MoveEvent
-	 * @return Map[start , completion] times for the MoveEvent
-	 */
-	Map<String, Date> getEventTimes() {
-		jdbcTemplate.queryForMap('''
-			SELECT MIN(start_time) AS start, MAX(completion_time) AS completion
-			FROM move_bundle
-			WHERE move_event_id = ?''', id)
-	}
 
 	/**
 	 *  Render moveBundles list as comma separated value string

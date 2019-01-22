@@ -11,7 +11,6 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
@@ -32,8 +31,8 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.NotTransactional
 import grails.gorm.transactions.Transactional
+import grails.transaction.NotTransactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -92,6 +91,7 @@ class TaskService implements ServiceMethods {
 	Scheduler quartzScheduler
 	def sequenceService
 	CustomDomainService customDomainService
+	MoveEventService moveEventService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -1832,7 +1832,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Determine the start/completion times for the event
 		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
-		def eventTimes = event ? event.getEventTimes() : [start:null, completion:null]
+		def eventTimes = event ? moveEventService.getEventTimes(event.id) : [start:null, completion:null]
 
 		// TODO : Need to change out the categories to support all ???
 		def categories = GormUtil.asQuoteCommaDelimitedString(ACC.moveDayCategories)

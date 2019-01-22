@@ -22,6 +22,7 @@ import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.EmailDispatchService
 import net.transitionmanager.service.EnvironmentService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.NoticeService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
@@ -39,6 +40,7 @@ class AuthController implements ControllerMethods {
 	SpringSecurityService springSecurityService
 	UserPreferenceService userPreferenceService
 	UserService userService
+	MoveEventService moveEventService
 
 	def index() {
 		if (springSecurityService.loggedIn) {
@@ -150,7 +152,7 @@ class AuthController implements ControllerMethods {
 		def moveEventsData = []
 
 		for (MoveEvent moveEvent in MoveEvent.list()) {
-			Map<String, Date> eventTimes = moveEvent.eventTimes
+			Map<String, Date> eventTimes = moveEventService.getEventTimes(moveEvent.id)
 			Date eventStart = eventTimes.start
 			Date eventCompletion = eventTimes.completion
 			Long completion = eventCompletion?.time

@@ -20,6 +20,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.NotTransactional
 import net.transitionmanager.command.DependencyConsoleCommand
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
@@ -39,13 +40,12 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.hibernate.ObjectNotFoundException
-import grails.transaction.NotTransactional
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -68,6 +68,7 @@ class MoveBundleController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
     CustomDomainService customDomainService
+	MoveEventService moveEventService
 
 	@HasPermission(Permission.BundleView)
 	def list() {}
@@ -429,7 +430,7 @@ class MoveBundleController implements ControllerMethods {
 		def getEventStartDate = {
 			Date start = it.estStartTime
 			if(!start){
-				start = it.getEventTimes().start
+				start = moveEventService.getEventTimes(it.id).start
 			}
 			return start
 		}
@@ -481,7 +482,7 @@ class MoveBundleController implements ControllerMethods {
 
 			Date startDate = moveEvent.estStartTime
 			if(!startDate){
-				def eventDates = moveEvent.getEventTimes()
+				def eventDates = moveEventService.getEventTimes(moveEvent.id)
 				startDate = eventDates.start
 			}
 			eventStartDate[moveEvent.id] = TimeUtil.formatDateTime(startDate, TimeUtil.FORMAT_DATE_TIME_7)

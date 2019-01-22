@@ -24,6 +24,7 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
@@ -48,6 +49,7 @@ class PersonController implements ControllerMethods {
 	UserPreferenceService    userPreferenceService
 	UserService              userService
 	LinkGenerator            grailsLinkGenerator
+	MoveEventService         moveEventService
 
 	/**
 	 * Generates a list view of persons related to company
@@ -708,7 +710,7 @@ class PersonController implements ControllerMethods {
 			for (MoveEvent moveEvent in moveEvents) {
 				Collection<MoveBundle> moveBundles = moveEvent?.moveBundles ?: []
 				List<Date> startDates = moveBundles*.startTime.sort()
-				def eventTimes = moveEvent.eventTimes
+				def eventTimes = moveEventService.getEventTimes(moveEvent.id)
 				startDates?.removeAll([null])
 				if (startDates) {
 					if (startDates[0]) {

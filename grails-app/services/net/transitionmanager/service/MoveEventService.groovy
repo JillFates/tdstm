@@ -455,7 +455,7 @@ class MoveEventService implements ServiceMethods {
 			moveBundleService.issueExport(postMoveIssue,    postMoveCols,   postMoveSheet,                    tzId, userDTFormat, 7, viewUnpublished)
 
 			// Update the Schedule/Tasks Sheet with the correct start/end times
-			Map<String, Date> times = moveEvent.getEventTimes()
+			Map<String, Date> times =getEventTimes(moveEvent.id)
 			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(times.start))
 			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(times.completion))
 
@@ -481,5 +481,16 @@ class MoveEventService implements ServiceMethods {
 			log.info 'Exception occurred while exporting data: {}', e.message, e
 			throw new ServiceException('Exception occurred while exporting data: ' + e.message)
 		}
+	}
+
+	/**
+	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundles associate with the MoveEvent
+	 * @return Map[start , completion] times for the MoveEvent
+	 */
+	Map<String, Date> getEventTimes(Long id) {
+		jdbcTemplate.queryForMap('''
+			SELECT MIN(start_time) AS start, MAX(completion_time) AS completion
+			FROM move_bundle
+			WHERE move_event_id = ?''', id)
 	}
 }

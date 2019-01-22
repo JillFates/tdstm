@@ -17,6 +17,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DashboardService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
@@ -34,6 +35,7 @@ class DashboardController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
+	MoveEventService moveEventService
 
 	@HasPermission(Permission.DashboardMenuView)
 	def index() {
@@ -133,7 +135,7 @@ class DashboardController implements ControllerMethods {
 	def retrieveEventsList() {
 		def result = userService.getEventDetails(getProjectOrAll()).values().collect { value -> [
 				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
-				name: value.moveEvent.name, startDate: value.moveEvent.eventTimes.start,
+				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
 				days: value.daysToGo + ' days', teams: value.teams]
 		}
 		render result as JSON

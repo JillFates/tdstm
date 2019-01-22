@@ -7,6 +7,7 @@ import com.tdsops.common.security.DESCodec
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Model
@@ -25,10 +26,10 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserService
-
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.lang.management.ManagementFactory
@@ -37,7 +38,6 @@ import java.lang.management.MemoryUsage
 import java.lang.management.OperatingSystemMXBean
 import java.lang.management.RuntimeMXBean
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class AdminController implements ControllerMethods {
 
@@ -50,6 +50,7 @@ class AdminController implements ControllerMethods {
 	ProjectService projectService
 	UserService userService
 	AssetOptionsService assetOptionsService
+	MoveEventService moveEventService
 
 	static final String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
@@ -1482,7 +1483,7 @@ class AdminController implements ControllerMethods {
 		def moveEventsList = []
 
 		MoveEvent.list().each { MoveEvent moveEvent ->
-			Long completion = moveEvent.getEventTimes()?.completion?.time
+			Long completion = moveEventService.getEventTimes(moveEvent.id)?.completion?.time
 			if (moveEvent.newsBarMode == 'on' || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
 				MoveEventSnapshot snapshot = MoveEventSnapshot.findByMoveEvent(moveEvent, [sort: 'dateCreated', order: 'DESC'])
 				String status = ''
@@ -1502,8 +1503,8 @@ class AdminController implements ControllerMethods {
 						status = color + '(' + indicator + ')'
 					}
 				}
-				moveEventsList << [moveEvent: moveEvent, status: status, startTime: moveEvent.eventTimes.start,
-				                   completionTime: moveEvent.eventTimes.completion]
+				moveEventsList << [moveEvent: moveEvent, status: status, startTime: moveEventService.getEventTimes(moveEvent.id).start,
+				                   completionTime: moveEventService.getEventTimes(moveEvent.id).completion]
 			}
 		}
 		// retrieve the list of 10 upcoming bundles
