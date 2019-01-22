@@ -12,6 +12,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.asset.AssetFacade

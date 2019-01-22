@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecCache
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
@@ -526,6 +527,23 @@ class CustomDomainService implements ServiceMethods {
      * @see CustomDomainService#fieldSpecsWithCommon(net.transitionmanager.domain.Project)
      */
     FieldSpecCache createFieldSpecCache(Project project){
-        return  new FieldSpecCache(this.fieldSpecsWithCommon(project))
+        return new FieldSpecCache(this.fieldSpecsWithCommon(project))
+    }
+
+    /**
+     * Based on Field Spec definitions it assigns all the default values
+     * for every custom field in an entity object.
+     * @param fieldSpecs an instance of {@code FieldSpecCache}
+     * @param domainClass a Class in AssetEntity hierarchy
+     * @param entity an instance of an AssetEntity hierarchy
+     * @return entity instance with default values assigned
+     */
+    Object setFieldsDefaultValue(FieldSpecCache fieldSpecs, Class domainClass, Object entity) {
+        Map<String, FieldSpec> fieldSpecMap = fieldSpecs.getAllCustomFields(domainClass.getSimpleName())
+        fieldSpecMap.each { String fieldName, FieldSpec fieldSpec ->
+            entity[fieldName] = fieldSpec.defaultValue
+        }
+
+        return entity
     }
 }

@@ -1,13 +1,10 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
-import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
-import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
@@ -15,27 +12,19 @@ import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileStatic
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
@@ -66,6 +55,8 @@ class DataImportService implements ServiceMethods {
 	ProgressService progressService
 	Scheduler quartzScheduler
 	ScriptProcessorService scriptProcessorService
+	AssetService assetService
+	CustomDomainService customDomainService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -564,7 +555,10 @@ class DataImportService implements ServiceMethods {
 			whom: securityService.getUserLoginPerson(),
 
 			//
-			staffList: getStaffReferencesForProject(project)
+			staffList: getStaffReferencesForProject(project),
+
+			// Prepares field Specs cache from database
+			fieldSpecCache: customDomainService.createFieldSpecCache(project)
 		]
 	}
 
@@ -928,6 +922,11 @@ class DataImportService implements ServiceMethods {
 		// project
 		if ( 'project' in propsInDomain ) {
 			entity.project = context.project
+		}
+
+		// Add default values for an assetEntity
+		if (AssetEntity.isAssignableFrom(domainClass)) {
+			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecCache, domainClass, entity)
 		}
 
 		// moveBundle

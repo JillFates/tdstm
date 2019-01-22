@@ -76,4 +76,15 @@ class FieldSpecCache {
 		}
 		return fieldSpec
 	}
+
+	/**
+	 * Retrieve a {@code Map} with all customFields for an asset class definition.
+	 * @param assetClassName a Class name in AssetEntity hierarchy
+	 * @return a {@code Map} with all custom fields
+	 * @see FieldSpec#isCustom()
+	 */
+	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
+		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(assetClassName.toUpperCase())
+		return allFieldSpecs.findAll { it.value.isCustom() }
+	}
 }
