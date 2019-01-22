@@ -25,7 +25,7 @@ import groovy.transform.TypeCheckingMode
  * </pre>
  */
 @CompileStatic
-class FieldSpecCache {
+class FieldSpecProject {
 
 	/*
 	 * Contains each domains' individual set of fieldSpec objects where the Map key is the domain name.
@@ -38,7 +38,7 @@ class FieldSpecCache {
 	 * {@code CustomDomainService # fieldSpecsWithCommon} results.
 	 * It defines common fields and manages field specs type during a {@code DataviewService # query}
 	 */
-	FieldSpecCache(Map<String, Map> fieldsSpec) {
+	FieldSpecProject(Map<String, Map> fieldsSpec) {
 		Set keys = fieldsSpec.keySet()
 		for (String key in keys) {
 			fieldsSpecMap[key] = [:]
