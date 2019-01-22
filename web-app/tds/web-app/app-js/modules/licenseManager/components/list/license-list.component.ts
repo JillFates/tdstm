@@ -23,6 +23,7 @@ import {
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-license-manager-list',
@@ -185,5 +186,6 @@ export class LicenseListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
