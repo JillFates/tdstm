@@ -20,8 +20,8 @@
     (dataStateChange)="dataStateChange($event)" class="field-settings-grid">
     <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
         <div class="col-xs-4 col-md-3 col-lg-2">
-            <button type="button" class="btn" [ngClass]="{'btn-default':!gridState.dirty, 'btn-success':gridState.valid && gridState.dirty, 'btn-danger':!gridState.valid && gridState.dirty}"
-                id="btnSaveAll" [disabled]="!gridState.editable || !gridState.dirty || !gridState.valid" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
+            <button type="button" class="btn" [ngClass]="{'btn-default':!gridState.dirty && !atLeastOneInvalidField(), 'btn-success':gridState.valid && gridState.dirty, 'btn-danger':(!gridState.valid && gridState.dirty) || atLeastOneInvalidField()}"
+                id="btnSaveAll" [disabled]="!gridState.editable || !gridState.dirty || !gridState.valid || atLeastOneInvalidField()" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
             <button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()"><i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}</button>
         </div>
         <div *ngIf="isFilterDisabled; else filterControl"></div>
@@ -63,8 +63,11 @@
     </kendo-grid-column>
     <kendo-grid-column field="label" title="Label" [width]="150">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" [ngClass]="{'has-error': hasError(dataItem.label), 'to-be-deleted': toBeDeleted(dataItem)}" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label"
+            <input (blur)="onBlur(dataItem, $event)" (keyup)="onKeyPressed($event)" type="text" [ngClass]="{'has-error': hasError(dataItem), 'to-be-deleted': toBeDeleted(dataItem)}" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label"
                 id="{{dataItem.field}}" name="{{dataItem.field}}" [disabled]="toBeDeleted(dataItem)">
+            <div *ngIf="dataItem.errorMessage" class="error-message">
+                {{dataItem.errorMessage}}
+            </div>
             <span *ngIf="!dataItem.udf">{{dataItem.label}}</span>
         </ng-template>
     </kendo-grid-column>
