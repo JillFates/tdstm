@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.dataview.FieldSpecCache
+import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
@@ -21,7 +21,7 @@ class CustomDomainServiceSpec extends Specification {
 	@Shared
 	Project defaultProject
 	@Shared
-	FieldSpecCache fieldSpecCache
+	FieldSpecProject fieldSpecProject
 
 	void setup() {
 		defaultProject = new Project()
@@ -53,7 +53,7 @@ class CustomDomainServiceSpec extends Specification {
 			setting.save(failOnError: true)
 		}
 
-		fieldSpecCache = service.createFieldSpecCache(defaultProject)
+		fieldSpecProject = service.createFieldSpecProject(defaultProject)
 	}
 
 	void 'test can set default custom field values for an instance of Application Asset'() {
@@ -64,7 +64,7 @@ class CustomDomainServiceSpec extends Specification {
 			entity.project = defaultProject
 
 		when: 'service set default field values'
-			entity = service.setFieldsDefaultValue(fieldSpecCache, domainClass, entity)
+			entity = service.setFieldsDefaultValue(fieldSpecProject, domainClass, entity)
 
 		then: 'entity contains correct default value defined in field spec'
 			entity.custom6 == 'Yes'

@@ -1153,9 +1153,7 @@ class UrlMappings {
 			]
 		}
 
-		// Angular 1.5
-		"/app/**/*" ( controller: 'app', action: 'index' )
-		// Angular 6 and future latest version
+		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )

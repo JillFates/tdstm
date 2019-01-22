@@ -558,7 +558,7 @@ class DataImportService implements ServiceMethods {
 			staffList: getStaffReferencesForProject(project),
 
 			// Prepares field Specs cache from database
-			fieldSpecCache: customDomainService.createFieldSpecCache(project)
+			fieldSpecProject: customDomainService.createFieldSpecProject(project)
 		]
 	}
 
@@ -926,7 +926,7 @@ class DataImportService implements ServiceMethods {
 
 		// Add default values for an assetEntity
 		if (AssetEntity.isAssignableFrom(domainClass)) {
-			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecCache, domainClass, entity)
+			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
 		}
 
 		// moveBundle

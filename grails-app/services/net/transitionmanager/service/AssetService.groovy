@@ -3,22 +3,18 @@ package net.transitionmanager.service
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
-import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import grails.transaction.Transactional
+import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
-import net.transitionmanager.dataview.FieldSpec
-import net.transitionmanager.dataview.FieldSpecCache
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.asset.AssetFacade
-import grails.transaction.Transactional
-
+import net.transitionmanager.domain.Project
 
 class AssetService {
 
