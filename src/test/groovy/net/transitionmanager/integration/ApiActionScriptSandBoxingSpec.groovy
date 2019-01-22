@@ -121,7 +121,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				// disallow method definitions
 				methodDefinitionAllowed = false
 				// Empty withe list means forbid imports
-				importsWhitelist = []
+				importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
 				starImportsWhitelist = []
 				// Language tokens allowed
 				tokensWhitelist = [
@@ -277,7 +277,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				// disallow method definitions
 				methodDefinitionAllowed = false
 				// Empty withe list means forbid imports
-				importsWhitelist = []
+				importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
 				starImportsWhitelist = []
 				// Language tokens allowed
 				tokensWhitelist = [
@@ -386,7 +386,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				// disallow method definitions
 				methodDefinitionAllowed = true
 				// Empty withe list means forbid imports
-				importsWhitelist = []
+				importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
 				starImportsWhitelist = []
 				// Language tokens allowed
 				tokensWhitelist = [

@@ -6,7 +6,6 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -17,7 +16,6 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.See
 
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
@@ -184,7 +182,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
 			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-			secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+			secureASTCustomizer.importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']  // Empty withe list means forbid imports
 			secureASTCustomizer.starImportsWhitelist = []
 
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -229,7 +227,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
 			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-			secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+			secureASTCustomizer.importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']  // Empty withe list means forbid imports
 			secureASTCustomizer.starImportsWhitelist = []
 
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -330,7 +328,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
 			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-			secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+			secureASTCustomizer.importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']  // Empty withe list means forbid imports
 
 			ImportCustomizer customizer = new ImportCustomizer()
 			customizer.addStaticStars(Math.name)

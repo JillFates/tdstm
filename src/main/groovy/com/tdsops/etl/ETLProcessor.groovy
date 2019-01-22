@@ -1576,8 +1576,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			// disallow method definitions
 			methodDefinitionAllowed = false
 			// Empty withe list means forbid imports
-			importsWhitelist = []
-			starImportsWhitelist = ['org.springframework.beans.factory.annotation']
+			importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
+			starImportsWhitelist = []
 			// Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
 			tokensWhitelist = [
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
