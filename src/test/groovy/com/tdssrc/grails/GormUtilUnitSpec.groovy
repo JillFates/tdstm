@@ -5,7 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
-import grails.core.GrailsDomainClassProperty
+import grails.test.mixin.Mock
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Memoized
@@ -18,13 +18,14 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
+import org.grails.datastore.mapping.model.PersistentProperty
 import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll
-
 /**
  * Unit test cases for the GormUtil class
  */
+@Mock([AssetEntity, AssetDependency,Database,Application,Manufacturer,Model,PartyRelationship,Person,Rack,Room])
 class GormUtilUnitSpec extends Specification {
 
 	void '1 Test isDomainProperty'() {
@@ -40,9 +41,9 @@ class GormUtilUnitSpec extends Specification {
 			GormUtil.isDomainProperty(AssetDependency, 'asset')
 
 		when: 'called with a non-domain class'
-			GormUtil.isDomainProperty(Specification, 'NotADomainClass')
-		then: 'an exception is thrown'
-			thrown RuntimeException
+			boolean isDomain = GormUtil.isDomainProperty(Specification, 'NotADomainClass')
+		then: 'The check returns false'
+			!isDomain
 	}
 
 	void '2 Test getDomainPropertyType'() {
@@ -139,21 +140,21 @@ class GormUtilUnitSpec extends Specification {
 			Class clazz = ApiActionResponse.class
 
 		when: 'trying to evaluate a property for a non-domain Class'
-			GormUtil.isDomainProperty(clazz, 'assetType')
-		then: 'an exception should be thrown'
-			thrown RuntimeException
+			boolean isProperty = GormUtil.isDomainProperty(clazz, 'assetType')
+		then: 'false is returned.'
+			!isProperty
 
 		when: 'trying to evaluate a property for non-domain class instance'
-			GormUtil.isDomainProperty(new ApiActionResponse(), 'assetType')
-		then: 'an exception should be thrown'
-			thrown RuntimeException
+			isProperty = GormUtil.isDomainProperty(new ApiActionResponse(), 'assetType')
+		then: 'false is returned.'
+			!isProperty
 
 	}
 
 	@Unroll
 	void '9 test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
 		expect:
-			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
+			PersistentProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
 			grailsDomainClassProperty.name == name
 			grailsDomainClassProperty.type == type
 
@@ -228,15 +229,15 @@ class GormUtilUnitSpec extends Specification {
 		when: 'getDomainClass is called for a domain class'
 			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
-			'org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass' == dc.getClass().getName()
+			'org.grails.datastore.mapping.keyvalue.mapping.config.KeyValuePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
-			'AssetEntity' == dc.name
+			'com.tds.asset.AssetEntity' == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)
 		then: 'an exception should occur'
 			RuntimeException e = thrown RuntimeException
-			e.message == 'Identity property not found, but required in domain class [spock.lang.Specification]'
+			e.message == 'Invalid domain name (spock.lang.Specification) specified for getDomainClass()'
 
 		when: 'getDomainClass is called with a null value'
 			GormUtil.getDomainClass(null)
