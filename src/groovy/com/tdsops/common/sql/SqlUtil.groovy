@@ -399,11 +399,13 @@ class SqlUtil {
 	private static void handleEnumerationField(FieldSearchData fieldSearchData) {
 
 		String operator = 'IN'
+		fieldSearchData.useWildcards = true
 
 		switch (fieldSearchData.filter) {
 			/* Scenario 1: Starts with '=' */
 			case ~/^(=).*/:
 				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				fieldSearchData.useWildcards = false
 				operator = 'IN'
 				break
 
@@ -541,9 +543,13 @@ class SqlUtil {
 	 */
 	private static List parseEnumParameter(FieldSearchData fsd) {
 		Class type = fsd.getType()
-		String regex = convertFilterToRegex(fsd.getFilter().toLowerCase())
+		String regex = convertFilterToRegex(fsd)
 		List coincidences = type.values().findAll { enumeration ->
-			enumeration.value.toLowerCase() =~ /$regex/
+			String enumValue = enumeration.value
+			if (fsd.useWildcards) {
+				enumValue = enumValue.toLowerCase()
+			}
+			enumValue =~ /$regex/
 		}
 		return coincidences?:null
 	}
@@ -559,13 +565,17 @@ class SqlUtil {
 	 * @param filter
 	 * @return
 	 */
-	static String convertFilterToRegex(String filter) {
+	static String convertFilterToRegex(FieldSearchData fsd) {
 
+		String filter = fsd.getFilter()
+		if (fsd.useWildcards) {
+			filter = filter.toLowerCase()
+		}
 		// 1) Check if filter contains only characters.
 		// If this is the case, we can filter using the most generic expression
 		// e.g.: Mega --> .*Mega.*
 		if (filter.matches(/^[A-Za-z0-9]+/)) {
-			return '.*' + filter + '.*'
+			return (fsd.useWildcards?'.*':'^') + filter + (fsd.useWildcards?'.*':'$')
 		}
 		// 2) Check if user type an 'Or' expression using '|' character
 		if (filter.contains('|')) {

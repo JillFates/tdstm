@@ -251,7 +251,8 @@ class SqlUtilTests extends Specification {
 			filter           || sqlSearchExpression      || sqlSearchParameters
 			'Mega'           || 'AE.scale IN :scale'     || [SizeScale.MB]
 			'%Mega%'         || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'=Mega'          || 'AE.scale IN :scale'     || [SizeScale.MB]
+			'=Mega'          || ' 1 = 0'                 || null
+			'=Megabyte'      || 'AE.scale IN :scale'     || [SizeScale.MB]
 			'!Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
 			'-Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
 			'Mega|Peta|Giga' || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.GB, SizeScale.PB]
@@ -271,30 +272,36 @@ class SqlUtilTests extends Specification {
 	@Unroll
 	void 'test can convert filter {#filter} to regex content {#regexPattern}'() {
 
+		setup:
+			FieldSearchData fieldSearchData = new FieldSearchData([filter: filter])
+			fieldSearchData.useWildcards = useWildcards
+
 		expect:
-			SqlUtil.convertFilterToRegex(filter) == regexPattern
+			SqlUtil.convertFilterToRegex(fieldSearchData) == regexPattern
 
 		where:
-			filter           || regexPattern
-			'Mega'           || '.*Mega.*'
-			'P%'             || '^P.*'
-			'P$'             || '^P\\$'
-			'(Mega)'         || '\\(Mega\\)'
-			'[Mega]'         || '\\[Mega\\]'
-			'{Mega}'         || '\\{Mega\\}'
-			'P?'             || '^P\\?'
-			'%obyte'         || '.*obyte$'
-			'%obyte%'        || '.*obyte.*'
-			'%obyte*'        || '.*obyte.*'
-			'%ob%te%'        || '.*ob.*te.*'
-			'%ob*te*'        || '.*ob.*te.*'
-			'Mega|Peta'      || '.*(Mega|Peta).*'
-			'Mega|Peta|Giga' || '.*(Mega|Peta|Giga).*'
-			'Mega:Peta'      || '.*(Mega|Peta).*'
-			'Mega:Peta:Giga' || '.*(Mega|Peta|Giga).*'
-			'Mega&Peta'      || '(?=.*Mega)(?=.*Peta).*'
-			'Peta&by'        || '(?=.*Peta)(?=.*by).*'
-			'by&Peta'        || '(?=.*by)(?=.*Peta).*'
+			filter           | useWildcards || regexPattern
+			'Mega'           | true         || '.*mega.*'
+			'Mega'           | false        || '^Mega$'
+			'Megabyte'       | false        || '^Megabyte$'
+			'P%'             | true         || '^p.*'
+			'P$'             | true         || '^p\\$'
+			'(Mega)'         | true         || '\\(mega\\)'
+			'[Mega]'         | true         || '\\[mega\\]'
+			'{Mega}'         | true         || '\\{mega\\}'
+			'P?'             | true         || '^p\\?'
+			'%obyte'         | true         || '.*obyte$'
+			'%obyte%'        | true         || '.*obyte.*'
+			'%obyte*'        | true         || '.*obyte.*'
+			'%ob%te%'        | true         || '.*ob.*te.*'
+			'%ob*te*'        | true         || '.*ob.*te.*'
+			'Mega|Peta'      | true         || '.*(mega|peta).*'
+			'Mega|Peta|Giga' | true         || '.*(mega|peta|giga).*'
+			'Mega:Peta'      | true         || '.*(mega|peta).*'
+			'Mega:Peta:Giga' | true         || '.*(mega|peta|giga).*'
+			'Mega&Peta'      | true         || '(?=.*mega)(?=.*peta).*'
+			'Peta&by'        | true         || '(?=.*peta)(?=.*by).*'
+			'by&Peta'        | true         || '(?=.*by)(?=.*peta).*'
 	}
 
 }
