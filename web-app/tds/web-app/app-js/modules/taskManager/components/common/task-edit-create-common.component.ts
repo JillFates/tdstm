@@ -1,5 +1,5 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Component, HostListener, OnInit, AfterViewInit, OnDestroy, ViewChild, ViewChildren, QueryList} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
 import {NgForm} from '@angular/forms';
 import {clone} from 'ramda';
 import {ModalType} from '../../../../shared/model/constants';
@@ -23,10 +23,14 @@ import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {takeUntil} from 'rxjs/operators';
 declare var jQuery: any;
 
-export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit {
+export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
+	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -51,6 +55,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected isEventLocked: boolean;
 	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
+	private destroySubject: Subject<any> = new Subject<any>();
 	constructor(
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
@@ -141,6 +146,25 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+	}
+
+	ngAfterViewInit() {
+		// set the handlers on open / on close to set the flags that indicate the state of the
+		// dropdown list items (opened/closed)
+		this.dropdowns.toArray()
+			.forEach((dropdown) => {
+				dropdown.open
+					.pipe(takeUntil(this.destroySubject))
+					.subscribe(() => this.onOpenListItems(dropdown));
+
+				dropdown.close
+					.pipe(takeUntil(this.destroySubject))
+					.subscribe(() => this.onCloseListItems(dropdown));
+			});
+	}
+
+	ngOnDestroy() {
+		this.destroySubject.next();
 	}
 
 	/**
@@ -472,5 +496,25 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			}
 		}
 		return dataItem.text;
+	}
+
+	/**
+	 * Whenever the list of items of the dropdown controls, set a flag to indicate that the dropwdow
+	 * is closing its list
+	 * @event list Dropdown list
+	 */
+	protected onCloseListItems(list: any): void {
+		console.log('On close');
+		setTimeout(() => EscapeHandler.setIsDropdownListOpen(list.wrapper.nativeElement, false), 200);
+	}
+
+	/**
+	 * Set a flag to indicate that the dropwdow list is open
+	 * is closing its list
+	 * @event list Dropdown list
+	 */
+	protected onOpenListItems(list: any): void {
+		console.log('On open');
+		EscapeHandler.setIsDropdownListOpen(list.wrapper.nativeElement, true);
 	}
 }
