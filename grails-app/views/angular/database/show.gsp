@@ -10,7 +10,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <table>
+            <table class="tds-asset-view-content-table">
                 <tr>
                     <td colspan="2" class="dialog-container">
                         <div class="dialog">
