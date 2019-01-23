@@ -42,11 +42,11 @@ class ViewPage extends Page{
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
         nameFilter {$('td#k-grid0-r1c2').find("div").find("input", type:"text")}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
-        assetClassFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
+        assetClassFilter {$('#k-grid0-r1c3 input.form-control')}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
-        descriptionFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
+        descriptionFilter { $("#k-grid0-r1c4 input")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
-        environmentFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
+        environmentFilter { $("#k-grid0-r1c5 input")}
         environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
         allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
         nameColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Name")).parent("a.k-link")}
@@ -57,7 +57,7 @@ class ViewPage extends Page{
         noRecords {$("div.grid-message label")}
         assetsDisplayedInPager {$("kendo-pager-info")}
         paginationSizes {$("kendo-pager-page-sizes select")}
-        selectedAssets {$('.selected-assets')}
+        selectedAssets {$("div.bulk-change-counter")}
         gridHeader {$(".k-grid-header")}
         editAssetButtons { $("button", title: "Edit Asset")}
         cloneAssetButtons { $("button", title: "Clone Asset")}
@@ -218,6 +218,7 @@ class ViewPage extends Page{
     }
 
     def checkAllItems(){
+        waitFor{firstElementName.displayed}
         def isChecked = getCheckedInputStatus(selectAllChecks)
         def isIndeterminate = getSelectIndeterminateState()
         if(!isChecked && !isIndeterminate){
@@ -229,6 +230,7 @@ class ViewPage extends Page{
     }
 
     def unCheckAllItems(){
+        waitFor{firstElementName.displayed}
         def isChecked = getCheckedInputStatus(selectAllChecks)
         def isIndeterminate = getSelectIndeterminateState()
         if(isChecked && !isIndeterminate){
@@ -520,7 +522,7 @@ class ViewPage extends Page{
 
     def verifySelectedAssetsText(selectedCount){
         goToBulkChangeButton()
-        getSelectedAssetsText() == selectedCount + " Asset(s) selected"
+        getSelectedAssetsText().contains( selectedCount + " Asset")
     }
 
     def verifySelectedAssetsTextDisplayed(){
