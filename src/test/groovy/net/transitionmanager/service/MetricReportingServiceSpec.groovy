@@ -26,7 +26,7 @@ import spock.util.mop.ConfineMetaClassChanges
 
 @TestFor(MetricReportingService)
 @TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
-@Mock([PartyGroup, PartyType, Project, Setting, MetricResult])
+@Mock([PartyGroup, PartyType, Project, Setting, MetricResult, Project])
 class MetricReportingServiceSpec extends Specification {
 
 
@@ -495,13 +495,13 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'The definition returned is the sql definition, as JSON.'
 			definitions.definitions == """[{
    "mode": "sql",
-   "function": null,
    "query": null,
+   "function": null,
    "description": "A description.",
-   "enabled": 1,
    "metricCode": "The code...",
+   "enabled": 1,
    "sql": "Select * from Table"
-}]"""
+}]""".stripIndent()
 	}
 
 	void 'test saveDefinitions function definition'() {
@@ -530,13 +530,13 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'The definition returned is the function definition, as JSON.'
 			definitions.definitions == """[{
    "mode": "function",
-   "function": "TestFunction",
    "query": null,
+   "function": "TestFunction",
    "description": "A description.",
-   "enabled": 1,
    "metricCode": "The code...",
+   "enabled": 1,
    "sql": null
-}]"""
+}]""".stripIndent()
 	}
 
 	void 'test saveDefinitions query definition'() {
@@ -578,7 +578,6 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'The definition returned is the query definition, as JSON.'
 			definitions.definitions == """[{
    "mode": "query",
-   "function": null,
    "query": {
       "domain": "Device",
       "aggregation": "count(*)",
@@ -591,11 +590,12 @@ class MetricReportingServiceSpec extends Specification {
          "assetType"
       ]
    },
+   "function": null,
    "description": "A description.",
-   "enabled": 1,
    "metricCode": "The code...",
+   "enabled": 1,
    "sql": null
-}]"""
+}]""".stripIndent()
 	}
 
 
@@ -626,13 +626,13 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'The function definition is returned, as JSON'
 			definitions.definitions == """[{
    "mode": "function",
-   "function": "TestFunction",
    "query": null,
+   "function": "TestFunction",
    "description": "A description.",
-   "enabled": 1,
    "metricCode": "The code...",
+   "enabled": 1,
    "sql": null
-}]"""
+}]""".stripIndent()
 	}
 
 
@@ -640,9 +640,11 @@ class MetricReportingServiceSpec extends Specification {
 	void 'test generateDailyMetrics'() {
 
 		setup: 'Given a function definition is saved to the database.'
+			int writeData = 0
 			service.metaClass.projectIdsForMetrics = { -> [1, 2, 3] }
 			service.settingService = new SettingService()
 			service.settingService.transactionManager = getTransactionManager()
+			service.metaClass.writeMetricData = { Map<String, ?> data ->  writeData++}
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -665,7 +667,7 @@ class MetricReportingServiceSpec extends Specification {
 
 		then: 'The results are 3 metrics run, and 3 results in the db.'
 			metrics == [metrics: 3, errors: 0]
-			results.size() == 3
+			writeData == 3
 	}
 
 	@ConfineMetaClassChanges([MetricReportingService])
@@ -675,6 +677,7 @@ class MetricReportingServiceSpec extends Specification {
 			service.metaClass.projectIdsForMetrics = { -> [1] }
 			service.settingService = new SettingService()
 			service.settingService.transactionManager = getTransactionManager()
+		service
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 

@@ -5,7 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Memoized
@@ -25,10 +25,17 @@ import spock.lang.Unroll
 /**
  * Unit test cases for the GormUtil class
  */
-@Mock([AssetEntity, AssetDependency,Database,Application,Manufacturer,Model,PartyRelationship,Person,Rack,Room])
-class GormUtilUnitSpec extends Specification {
+class GormUtilUnitSpec extends Specification implements DataTest{
+
+
+	void setupSpec() {
+		mockDomains AssetEntity, AssetDependency, Database, Application, Manufacturer, Model, PartyRelationship, Person, Rack, Room
+	}
 
 	void '1 Test isDomainProperty'() {
+		setup:
+			mockDomain AssetEntity
+					mockDomain AssetDependency
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:

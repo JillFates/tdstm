@@ -14,7 +14,6 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -26,7 +25,6 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.junit.Ignore
 import spock.lang.Shared
-
 /**
  * Test about ETLProcessor commands:
  * <ul>

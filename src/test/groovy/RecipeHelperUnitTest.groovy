@@ -1,10 +1,15 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.tm.domain.RecipeHelper
+import grails.testing.gorm.DataTest
 import spock.lang.Shared
 import spock.lang.Specification
 
-class RecipeHelperUnitTest extends Specification {
+class RecipeHelperUnitTest extends Specification implements DataTest {
+
+    void setupSpec(){
+        mockDomain AssetEntity
+    }
 
     @Shared
     AssetEntity asset = new AssetEntity("custom1": "http://www.domain.com", "custom2": "some value",

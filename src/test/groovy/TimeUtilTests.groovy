@@ -234,7 +234,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDate('GMT', timestamp, formatter) == '02/01/1970'
+		TimeUtil.formatDate('GMT', timestamp, formatter) == '01/01/1970'
 	}
 
 	void 'Test formatDateTime(dateValue, DateFormat formatter)'() {
@@ -254,7 +254,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDateTime('GMT', timestamp, formatter) == '02/01/1970'
+		TimeUtil.formatDateTime('GMT', timestamp, formatter) == '01/01/1970'
 	}
 
 	@Issue('https://support.transitionmanager.com/browse/TM-4823')
@@ -267,7 +267,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
-		TimeUtil.formatDateTime('GMT', timeAsLong, formatter) == '02/01/1970'
+		TimeUtil.formatDateTime('GMT', timeAsLong, formatter) == '01/01/1970'
 	}
 
 	void 'Test formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter)'() {

@@ -38,7 +38,7 @@ class TaskServiceTests extends Specification {
 		when:
 		Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
 
-		TestAssetComment task = new TestAssetComment(previousStatus: AssetCommentStatus.PENDING)
+		AssetComment task = new AssetComment().save(flush:true, failOnError:true)
 		task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
 
 		then:
@@ -50,7 +50,6 @@ class TaskServiceTests extends Specification {
 
 		when:
 		// Test bumping status to COMPLETED after STARTED
-		task.previousStatus = task.status
 		service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
 
 		then:
@@ -64,7 +63,6 @@ class TaskServiceTests extends Specification {
 		when:
 		// Test reverting status TO STARTED from COMPLETED
 		def prevStarted = task.actStart
-		task.previousStatus = task.status
 		service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
 
 		then:
@@ -501,15 +499,5 @@ class TaskServiceTests extends Specification {
 	private void resetTaskDuration(task) {
 		task.duration = null
 		task.durationScale = null
-	}
-}
-
-class TestAssetComment extends AssetComment {
-	String previousStatus
-
-	def getPersistentValue(String fieldName) {
-		if ('status' == fieldName) {
-			return previousStatus
-		}
 	}
 }

@@ -2,9 +2,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.test.hibernate.HibernateSpec
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
@@ -18,27 +17,24 @@ import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
-import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
-class ApiActionServiceSpec extends Specification {
-
-	static doWithSpring = {
-		messageSourceService(MessageSourceService) { bean ->
-			messageSource = ref('messageSource')
-		}
-
-		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
-			bean.scope = 'prototype'
-			messageSourceService = ref('messageSourceService')
-		}
-
-		taskFacade(TaskFacade) { bean ->
-			bean.scope = 'prototype'
-		}
-	}
+class ApiActionServiceSpec  extends HibernateSpec implements ServiceUnitTest<ApiActionService> {
 
 	def setup() {
+		defineBeans {
+			messageSourceService(MessageSourceService) { bean ->
+				messageSource = ref('messageSource')
+			}
+
+			apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
+				bean.scope = 'prototype'
+				messageSourceService = ref('messageSourceService')
+			}
+
+			taskFacade(TaskFacade) { bean ->
+				bean.scope = 'prototype'
+			}
+		}
 		service.grailsApplication = grailsApplication
 	}
 
@@ -163,15 +159,16 @@ class ApiActionServiceSpec extends Specification {
 			AssetFacade asset = new AssetFacade(new AssetEntity([assetType: 'Database']), [:], true)
 			AssetComment assetComment = new AssetComment([status: 'Ready'])
 			//TaskFacade task = new TaskFacade(new AssetComment())
-			def taskServiceMock = mockFor(TaskService)
-			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
-			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
-				assetComment.status = 'Completed'
-				assetComment
-			}
+			def taskServiceMock = [
+				getAutomaticPerson: { -> new Person() },
+				setTaskStatus: { AssetComment task, String status, Person whom ->
+					assetComment.status = 'Completed'
+					assetComment
+				}
+			] as TaskService
 
 			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
-			task.taskService = taskServiceMock.createMock()
+			task.taskService = taskServiceMock
 
 
 			ApiActionJob job = new ApiActionJob()
