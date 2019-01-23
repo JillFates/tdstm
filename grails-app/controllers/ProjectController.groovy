@@ -685,7 +685,7 @@ class ProjectController implements ControllerMethods {
 		if (!project) return
 
 		[project: project.name, client: project.client.name,
-		 defaultEmail: StringEscapeUtils.escapeHtml4(grailsApplication.config.grails.mail.default.from),
+		 defaultEmail: StringEscapeUtils.escapeHtml(grailsApplication.config.grails.mail.default.from),
 		 accounts: projectService.getAccountActivationUsers(project), adminEmail: securityService.userLoginPerson.email]
 	}
 
@@ -707,7 +707,7 @@ class ProjectController implements ControllerMethods {
 				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
 					def fromEmail = grailsApplication.config.grails.mail.default.from
-					fromEmail = StringEscapeUtils.escapeHtml4(fromEmail)
+					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
 					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params.customMessage, fromEmail, request.getRemoteAddr())
 					message = "The Account Activation Notification has been sent out to the users."
 				}else{

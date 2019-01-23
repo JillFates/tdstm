@@ -88,7 +88,7 @@ class ControlAngularTagLib {
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
-		sb.append(StringEscapeUtils.escapeHtml4(fieldSpec.label))
+		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -693,9 +693,9 @@ class ControlAngularTagLib {
 
 		boolean isBlank = StringUtil.isBlank(value)
 		if (! isBlank) {
-			attrib += StringEscapeUtils.escapeHtml4(value)
+			attrib += StringEscapeUtils.escapeHtml(value)
 		} else if (defValue != null) {
-			attrib += StringEscapeUtils.escapeHtml4(defValue)
+			attrib += StringEscapeUtils.escapeHtml(defValue)
 		}
 		attrib += '"'
 
@@ -714,7 +714,7 @@ class ControlAngularTagLib {
 		if (label==null) label = ''
 
 		boolean labelBlank = StringUtil.isBlank(label)
-		String escapedvalue = StringEscapeUtils.escapeHtml4(option)
+		String escapedvalue = StringEscapeUtils.escapeHtml(option)
 		String text = (labelBlank ? option : label)
 		return ["value": "$escapedvalue", "text": "$text"]
 	}

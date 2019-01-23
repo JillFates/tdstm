@@ -2090,7 +2090,7 @@ class AssetEntityService implements ServiceMethods {
 	def getEscapedName(assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
 		if (assetEntity.assetName) {
-			name = SEU.escapeHtml4(SEU.escapeEcmaScript(assetEntity.assetName))
+			name = SEU.escapeHtml(SEU.escapeEcmaScript(assetEntity.assetName))
 		}
 		return name
 	}
