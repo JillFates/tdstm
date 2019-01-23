@@ -19,18 +19,18 @@ class RunbookServiceTests extends Specification {
 
 	// This represents the [ edge id, downstreamTaskCount, pathDuration ] for the map defined below
 	private static final List<List> dataMatrix = [
-		['100', 7, 71],
-		['101', 6, 73],
-		['102', 5, 63],
-		['103', 2, 21],
-		['104', 5, 63],
-		['105', 4, 60],
-		['106', 1, 1],
-		['107', 7, 71],
-		['108', 6, 73],
-		['109', 1, 45],
-		['110', 1, 2],
-		['111', 1, 1]
+		[i: '100', c: 7, d: 71],
+		[i: '101', c: 6, d: 73],
+		[i: '102', c: 5, d: 63],
+		[i: '103', c: 2, d: 21],
+		[i: '104', c: 5, d: 63],
+		[i: '105', c: 4, d: 60],
+		[i: '106', c: 1, d: 1],
+		[i: '107', c: 7, d: 71],
+		[i: '108', c: 6, d: 73],
+		[i: '109', c: 1, d: 45],
+		[i: '110', c: 1, d: 2],
+		[i: '111', c: 1, d: 1]
 	]
 
 	private List tasks = []
@@ -142,22 +142,23 @@ class RunbookServiceTests extends Specification {
 	// Test that the processDurations is returning the proper results
 	void testProcessDurations() {
 		when:
-		def tmp = service.createTempObject(tasks, deps)
-		def dfsMap = service.processDFS(tasks, deps, tmp)
-		def durMap = service.processDurations(tasks, deps, dfsMap.sinks, tmp)
+			def tmp = service.createTempObject(tasks, deps)
+			def dfsMap = service.processDFS(tasks, deps, tmp)
+			def durMap = service.processDurations(tasks, deps, dfsMap.sinks, tmp)
 
 		then:
-		dataMatrix.each { i, c, d ->
-			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
-		}
 
-		tmp['tasks'][durMap.tasks[9].id].tmpMapDepth == 1 //Finish tmpMapDepth
-		tmp['tasks'][durMap.tasks[5].id].tmpMapDepth == 2 //Task 1005 tmpMapDepth
-		tmp['tasks'][durMap.tasks[3].id].tmpMapDepth == 3 //Task 1003 tmpMapDepth
-		tmp['tasks'][durMap.tasks[2].id].tmpMapDepth == 4 //Task 1002 tmpMapDepth
-		tmp['tasks'][durMap.tasks[1].id].tmpMapDepth == 4 //Task 1001 tmpMapDepth
-		tmp['tasks'][durMap.tasks[0].id].tmpMapDepth == 5 //Task 1000 tmpMapDepth
+			for (Map data : dataMatrix) {
+				data.c == tmp['dependencies'][durMap.edges[data.i].id].tmpDownstreamTaskCount
+				data.d == tmp['dependencies'][durMap.edges[data.i].id].tmpPathDuration
+			}
+
+			tmp['tasks'][durMap.tasks[9].id].tmpMapDepth == 1 //Finish tmpMapDepth
+			tmp['tasks'][durMap.tasks[5].id].tmpMapDepth == 2 //Task 1005 tmpMapDepth
+			tmp['tasks'][durMap.tasks[3].id].tmpMapDepth == 3 //Task 1003 tmpMapDepth
+			tmp['tasks'][durMap.tasks[2].id].tmpMapDepth == 4 //Task 1002 tmpMapDepth
+			tmp['tasks'][durMap.tasks[1].id].tmpMapDepth == 4 //Task 1001 tmpMapDepth
+			tmp['tasks'][durMap.tasks[0].id].tmpMapDepth == 5 //Task 1000 tmpMapDepth
 	}
 
 	// Test that the processDFS and processDurations properly handle an cicular references within the map
@@ -180,14 +181,14 @@ class RunbookServiceTests extends Specification {
 		// println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
 		def m = [
-			['103', 2, 21],   // We added the earlier reference
-			['109', 1, 45]   // Shouldn't of changed
+			[i: '103', c: 2, d:21],   // We added the earlier reference
+			[i: '109', c: 1, d:45]   // Shouldn't of changed
 		]
 
 		then:
-		m.each { i, c, d ->
-			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
+		for (Map data: m) {
+			data.c == tmp['dependencies'][durMap.edges[data.i].id].tmpDownstreamTaskCount
+			data.d == tmp['dependencies'][durMap.edges[data.i].id].tmpPathDuration
 		}
 	}
 
@@ -303,16 +304,16 @@ class RunbookServiceTests extends Specification {
 		then:
 		edge != null //Edge should not be null
 		108 == edge.id //Critical edge should be
-		assertTrue 'Monitor - Edge should not be null', edge != null
-		assertEquals "Critical edge should be", 108, edge.id
+		edge != null
+		108 == edge.id
 
 		when:
 		edges = service.findCriticalPath(tasks[5], edgesByPred, tmp)
 		edge = edges[0]
 
 		then:
-		assertTrue 'Unrack - Edge should not be null', edge != null
-		assertEquals "Critical edge should be", 109, edge.id
+		edge != null
+		109 == edge.id
 
 		when:
 		edges = service.findCriticalPath(tasks[8], edgesByPred, tmp)
@@ -344,28 +345,26 @@ class RunbookServiceTests extends Specification {
 		// Task id, estStart, earliest, latest, is Critical Path
 		// Estimated Start (6) expected:<0> but was:<44>
 		def startTimes = [
-			[0, 0, 0, 48, false],
-			[1, 0, 9, 53, false],
-			[2, 9, 9, 9, true],
-			[3, 19, 19, 19, true],
-			[4, 0, 17, 61, false],
-			[5, 22, 22, 22, true],
-			[6, 0, 0, 0, true],   // Start vertice of the true Critical Path
-			[7, 37, 37, 37, true],
-			[8, 0, 37, 80, false],
-			[9, 0, 37, 81, false],
+			[id:0, estStart: 0, earliest: 0,latest: 48, criticalPath: false],
+			[id:1, estStart: 0, earliest: 9,latest: 53, criticalPath: false],
+			[id:2, estStart: 9, earliest: 9,latest: 9, criticalPath: true],
+			[id:3, estStart: 19, earliest: 19,latest: 19, criticalPath: true],
+			[id:4, estStart: 0, earliest: 17,latest: 61, criticalPath: false],
+			[id:5, estStart: 22, earliest: 22,latest: 22, criticalPath: true],
+			[id:6, estStart: 0, earliest: 0,latest: 0, criticalPath: true],   // Start vertice of the true Critical Path
+			[id:7, estStart: 37, earliest: 37,latest: 37, criticalPath: true],
+			[id:8, estStart: 0, earliest: 37,latest: 80, criticalPath: false],
+			[id:9, estStart: 0, earliest: 37,latest: 81, criticalPath: false],
 		]
 
 		then:
 		82 == estFinish //estFinish should be zero
 
-		// Check the times and critical path of all tasks
-		startTimes.each { id, estStart, earliest, latest, criticalPath ->
-			def task = tasks[id]
-			assertEquals "Estimated Start ($id)", estStart, tmp['tasks'][tasks[id].id].tmpEstimatedStart
-			assertEquals "Earliest Start ($id)", earliest, tmp['tasks'][tasks[id].id].tmpEarliestStart
-			assertEquals "Estimated Start ($id)", latest, tmp['tasks'][tasks[id].id].tmpLatestStart
-			assertEquals "Critical Path ($id)", criticalPath, tmp['tasks'][tasks[id].id].tmpCriticalPath
+		for(Map st: startTimes){
+			st.estStart == tmp['tasks'][tasks[st.id].id].tmpEstimatedStart
+			st.earliest == tmp['tasks'][tasks[st.id].id].tmpEarliestStart
+			st.latest == tmp['tasks'][tasks[st.id].id].tmpLatestStart
+			st.criticalPath == tmp['tasks'][tasks[st.id].id].tmpCriticalPath
 		}
 	}
 }

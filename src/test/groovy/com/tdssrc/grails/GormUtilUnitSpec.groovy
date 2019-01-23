@@ -35,7 +35,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 	void '1 Test isDomainProperty'() {
 		setup:
 			mockDomain AssetEntity
-					mockDomain AssetDependency
+			mockDomain AssetDependency
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:
