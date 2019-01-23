@@ -28,7 +28,7 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 declare var jQuery: any;
 
-export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit {
+export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 
@@ -148,18 +148,18 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 	}
 
+	// set the handlers on open / on close to set the flags that indicate the state of the
+	// dropdown list items (opened/closed)
 	ngAfterViewInit() {
-		// set the handlers on open / on close to set the flags that indicate the state of the
-		// dropdown list items (opened/closed)
 		this.dropdowns.toArray()
 			.forEach((dropdown) => {
 				dropdown.open
 					.pipe(takeUntil(this.destroySubject))
-					.subscribe(() => this.onOpenListItems(dropdown));
+					.subscribe(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, true));
 
 				dropdown.close
 					.pipe(takeUntil(this.destroySubject))
-					.subscribe(() => this.onCloseListItems(dropdown));
+					.subscribe(() => setTimeout(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, false), 200));
 			});
 	}
 
@@ -496,25 +496,5 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			}
 		}
 		return dataItem.text;
-	}
-
-	/**
-	 * Whenever the list of items of the dropdown controls, set a flag to indicate that the dropwdow
-	 * is closing its list
-	 * @event list Dropdown list
-	 */
-	protected onCloseListItems(list: any): void {
-		console.log('On close');
-		setTimeout(() => EscapeHandler.setIsDropdownListOpen(list.wrapper.nativeElement, false), 200);
-	}
-
-	/**
-	 * Set a flag to indicate that the dropwdow list is open
-	 * is closing its list
-	 * @event list Dropdown list
-	 */
-	protected onOpenListItems(list: any): void {
-		console.log('On open');
-		EscapeHandler.setIsDropdownListOpen(list.wrapper.nativeElement, true);
 	}
 }
