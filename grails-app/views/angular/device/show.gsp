@@ -12,7 +12,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
+            <table style="border:0;" class="assetEntity tds-asset-view-content-table" data-id="${assetEntity?.id}">
 
                 <tr>
                     <td colspan="2" class="dialog-container">

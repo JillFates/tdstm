@@ -16,7 +16,7 @@
 						<g:if test="${errors}">
 							<div id="messageDivId" class="message">${errors}</div>
 						</g:if>
-						<table>
+						<table class="tds-asset-view-content-table">
 							<tbody>
 							<tr class="prop">
 								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
