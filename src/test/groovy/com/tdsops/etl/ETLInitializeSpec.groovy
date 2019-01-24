@@ -113,23 +113,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -159,23 +159,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -205,23 +205,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -251,23 +251,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -296,23 +296,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == null
 							originalValue == null
 							init == 'Microsoft'
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							value == null
 							originalValue == null
 							init == 'Mozilla'
@@ -341,9 +341,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -373,9 +373,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -405,9 +405,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -438,9 +438,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -471,9 +471,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]

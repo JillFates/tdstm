@@ -83,7 +83,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
@@ -111,7 +111,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels by default in first row by default for a JSON DataSet'(){
@@ -153,7 +153,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can define a quoted string for the JSON DataSet'(){
@@ -193,7 +193,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 		and:
 			etlProcessor.currentRowIndex == 1
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if rootNode is incorrect key in the JSON DataSet'(){
@@ -218,7 +218,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == 'Unrecognized command rootNode with args [10]'
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception rootNode is incorrect (not found) for a JSON DataSet'(){
@@ -243,7 +243,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == "Data was not found in JSON at rootNode 'Active Applications'"
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if rootNode name case is incorrect for a JSON DataSet'(){
@@ -268,7 +268,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == "Data was not found in JSON at rootNode 'applications'"
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows for a JSON DataSet'(){
@@ -312,7 +312,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for a JSON DataSet'(){
@@ -341,22 +341,22 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				with(data[0].fields.appVendor) {
+				customWith(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
 
-				with(data[1].fields.appVendor) {
+				customWith(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read JSONObject fields iterating rows for a JSON DataSet'(){
@@ -405,22 +405,22 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				with(data[0].fields.appVendor) {
+				customWith(data[0].fields.appVendor) {
 					originalValue.value == 'Microsoft'
 					value.value == 'Microsoft'
 				}
 
-				with(data[1].fields.appVendor) {
+				customWith(data[1].fields.appVendor) {
 					originalValue.value == 'Mozilla'
 					value.value == 'Mozilla'
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read JSONObject fields for complex JSON DataSet'(){
@@ -478,30 +478,30 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
-				with(data[0].fields.custom1) {
+				customWith(data[0].fields.custom1) {
 					originalValue == 4096
 					value == 4096
 				}
 
-				with(data[0].fields.custom2) {
+				customWith(data[0].fields.custom2) {
 					originalValue == 2
 					value == 2
 				}
 
-				with(data[0].fields.custom3) {
+				customWith(data[0].fields.custom3) {
 					originalValue == 2
 					value == 2
 				}
 
-				with(data[0].fields.custom4) {
+				customWith(data[0].fields.custom4) {
 					originalValue == ["IDE", "SSD"]
 					value == ["IDE", "SSD"]
 				}
 
-				with(data[0].fields.custom5) {
+				customWith(data[0].fields.custom5) {
 					originalValue == null
 					value == null
 				}
@@ -509,7 +509,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -540,18 +540,18 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 
-				with(data[0].fields.appVendor) {
+				customWith(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for more than one rootNode in a JSON DataSet'(){
@@ -589,36 +589,36 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 2
 
 		and: 'Results contains values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				with(data[0].fields.appVendor) {
+				customWith(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
 
-				with(data[1].fields.appVendor) {
+				customWith(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
 			}
 
-			with(etlProcessor.finalResult().domains[1]) {
+			customWith(etlProcessor.finalResult().domains[1]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 2
-				with(data[0].fields.assetName) {
+				customWith(data[0].fields.assetName) {
 					originalValue == 'xraysrv01'
 					value == 'xraysrv01'
 				}
 
-				with(data[1].fields.assetName) {
+				customWith(data[1].fields.assetName) {
 					originalValue == 'zuludb01'
 					value == 'zuludb01'
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows before for a JSON DataSet'(){
@@ -656,7 +656,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.column('vendor name') != null
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read rows ignoring rows in the middle of an iteration for a JSON DataSet'(){
@@ -690,17 +690,17 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.finalResult().domains[0]) {
+			customWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
-				with(data[0].fields.appVendor) {
+				customWith(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11181')
@@ -746,29 +746,29 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			with(etlProcessor.finalResult().domains[0], DomainResult) {
+			customWith(etlProcessor.finalResult().domains[0], DomainResult) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				with(data[0], RowResult) {
+				customWith(data[0], RowResult) {
 					rowNum == 1
 
-					with(fields.id, FieldResult) {
+					customWith(fields.id, FieldResult) {
 						originalValue == 123
 						value == 123
 					}
 
-					with(fields.custom1, FieldResult) {
+					customWith(fields.custom1, FieldResult) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					with(data[0].fields.custom2) {
+					customWith(data[0].fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					with(data[0].fields.custom3) {
+					customWith(data[0].fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -777,7 +777,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -826,29 +826,29 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			with(etlProcessor.finalResult().domains[0], DomainResult) {
+			customWith(etlProcessor.finalResult().domains[0], DomainResult) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				with(data[0], RowResult) {
+				customWith(data[0], RowResult) {
 					rowNum == 1
 
-					with(fields.id, FieldResult) {
+					customWith(fields.id, FieldResult) {
 						originalValue == 123
 						value == 123
 					}
 
-					with(fields.custom1, FieldResult) {
+					customWith(fields.custom1, FieldResult) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					with(data[0].fields.custom2) {
+					customWith(data[0].fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					with(data[0].fields.custom3) {
+					customWith(data[0].fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -857,7 +857,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 

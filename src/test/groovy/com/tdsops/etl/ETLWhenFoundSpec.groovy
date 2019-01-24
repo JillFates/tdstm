@@ -5,14 +5,13 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
-import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
@@ -25,7 +24,7 @@ import spock.lang.See
  * </ul>
  */
 
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model, AssetOptions])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model, AssetOptions, Room])
 class ETLWhenFoundSpec extends ETLBaseSpec {
 
 	String assetDependencyDataSetContent
@@ -147,7 +146,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							find Device by 'id' with DOMAIN.asset into 'asset'
    							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found customWith( wrong asset class'
 
     						whenNotFound 'asset' create {
     							assetName primaryNameVar
@@ -158,9 +157,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -171,7 +170,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
-					with(data[0].fields.asset) {
+					customWith(data[0].fields.asset) {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [
@@ -198,7 +197,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -278,7 +277,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -343,7 +342,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							find Application by 'id' with DOMAIN.asset into 'asset'
    							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, 'primaryType' into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found customWith( wrong asset class'
 
     						whenFound 'asset' create {
     							"TN Last Seen" NOW
@@ -357,7 +356,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -423,7 +422,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							find Device by 'id' with DOMAIN.asset into 'asset'
    							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found customWith( wrong asset class'
 
     						whenFound 'asset' update {
     							"Modified Date" NOW
@@ -432,9 +431,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -445,7 +444,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
-					with(data[0].fields.asset) {
+					customWith(data[0].fields.asset) {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [
@@ -470,7 +469,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -544,7 +543,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -587,7 +586,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 	    cleanup:
 		    if (fileName) {
-			    service.deleteTemporaryFile(fileName)
+			    fileSystemService.deleteTemporaryFile(fileName)
 		    }
     }
 

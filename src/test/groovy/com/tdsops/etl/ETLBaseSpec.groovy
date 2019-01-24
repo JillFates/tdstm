@@ -16,6 +16,7 @@ import net.transitionmanager.service.FileSystemService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
+import org.spockframework.runtime.SpockAssertionError
 import spock.lang.Specification
 
 abstract class ETLBaseSpec extends Specification {
@@ -92,16 +93,16 @@ abstract class ETLBaseSpec extends Specification {
 			constraints: [
 				required: required
 			],
-			control: type,
-			default: '',
-			field: field,
-			imp: 'U',
-			label: label,
-			order: 0,
-			shared: 0,
-			show: 0,
-			tip: "",
-			udf: 0
+			control    : type,
+			default    : '',
+			field      : field,
+			imp        : 'U',
+			label      : label,
+			order      : 0,
+			shared     : 0,
+			show       : 0,
+			tip        : "",
+			udf        : 0
 		]
 	}
 
@@ -160,9 +161,9 @@ abstract class ETLBaseSpec extends Specification {
 		// Getting the Sheet at index zero
 		sheetsContent.each { String sheetName, String sheetContent ->
 			Sheet sheet = workbook.createSheet(sheetName)
-			sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
+			sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 				XSSFRow currentRow = sheet.createRow(rowNumber)
-				line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+				line.split(",").eachWithIndex { String cellContent, int columnNumber ->
 					currentRow.createCell(columnNumber).setCellValue(cellContent)
 				}
 			}
@@ -183,7 +184,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * Creates an instance of DomainClassFieldsValidator with all the fields spec correctly set.
 	 * @return an intance of DomainClassFieldsValidator
 	 */
-	protected ETLFieldsValidator createDomainClassFieldsValidator(){
+	protected ETLFieldsValidator createDomainClassFieldsValidator() {
 		ETLFieldsValidator validator = new ETLFieldsValidator()
 		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
 
@@ -229,7 +230,7 @@ abstract class ETLBaseSpec extends Specification {
 
 		String fullName = getFileSystemService().getTemporaryFullFilename(fileName)
 
-		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver:TDSJSONDriver)
+		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver: TDSJSONDriver)
 		JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
 
 		return [fileName, new DataSetFacade(dataSet)]
@@ -243,7 +244,7 @@ abstract class ETLBaseSpec extends Specification {
 	protected List<Map<String, ?>> buildFieldSpecsFor(def asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch(asset){
+		switch (asset) {
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
 					buildFieldSpec('appFunction', 'Function', 'String'),
@@ -465,10 +466,27 @@ abstract class ETLBaseSpec extends Specification {
 		FindOperator operator,
 		Object value,
 		Boolean isComplete = true
-	){
+	) {
 		assert propertyName == condition.propertyName
 		assert operator == condition.operator
 		assert value == condition.value
 		assert condition.isComplete() == isComplete
+	}
+
+	def customWith(Object target, Closure<?> closure) {
+		if (target == null) {
+			throw new SpockAssertionError("Target of 'with' block must not be null");
+		}
+		closure.setDelegate(target)
+		closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+		return closure.call(target)
+	}
+
+	def customWith(Object target, Class<?> type, Closure closure) {
+		if (target != null && !type.isInstance(target)) {
+			throw new SpockAssertionError(String.format("Expected target of 'with' block to have type '%s', but got '%s'",
+				type, target.getClass().getName()))
+		}
+		return customWith(target, closure)
 	}
 }

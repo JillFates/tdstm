@@ -7,9 +7,6 @@ import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.converters.JSON
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -202,7 +199,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 }

@@ -115,7 +115,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by aPropertyName eq srcNameVar
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete() == isComplete
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], aPropertyName, FindOperator.eq, aConditionValue, isComplete)
@@ -140,7 +140,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'assetName' eq 'zulu01' and aPropertyName eq srcIPVar
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete() == isComplete
 				conditions.size() == 2
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.eq, 'zulu01')
@@ -165,7 +165,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			customWith(ETLProcessor.getErrorMessage(e)) {
 				message == 'Incorrect structure for find command'
 				startLine == null
 				endLine == null
@@ -199,7 +199,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
  				    into 'id'
 
 		then:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 2
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.eq, 'zulu01')
@@ -229,7 +229,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'assetName' ne 'zulu01' into 'id'
 
 		then:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.ne, 'zulu01')
@@ -258,7 +258,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'assetName' nseq 'zulu01' into 'id'
 
 		then:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.nseq, 'zulu01')
@@ -287,7 +287,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'priority' lt 3 into 'id'
 
 		then:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.lt, 3)
@@ -316,7 +316,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'priority' le 3 into 'id'
 
 		then:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.le, 3)
@@ -345,7 +345,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'priority' gt 4 into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.gt, 4)
@@ -374,7 +374,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'priority' ge 4 into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.ge, 4)
@@ -403,7 +403,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'Name' like 'zulu%' into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.like, 'zulu%')
@@ -432,7 +432,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'Name' notLike 'zulu%' into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.notLike, 'zulu%')
@@ -461,7 +461,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'Name' contains 'zulu' into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.contains, 'zulu')
@@ -490,7 +490,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by 'Name' notContains 'zulu' into 'id'
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.notContains, 'zulu')
@@ -519,7 +519,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by('Environment').inList(['QA', 'Development']).into('id')
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'environment', FindOperator.inList, ['QA', 'Development'])
@@ -548,7 +548,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by('Environment').notInList(['QA', 'Development']).into('id')
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'environment', FindOperator.notInList, ['QA', 'Development'])
@@ -577,7 +577,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by('priority').between(4..6).into('id')
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.between, 4..6)
@@ -606,7 +606,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			find.by('priority').notBetween(4..6).into('id')
 
 		expect:
-			with(find.currentFind.statement, FindStatementBuilder) {
+			customWith(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
 				assertFindConditionComplete(conditions[0], 'priority', FindOperator.notBetween, 4..6)

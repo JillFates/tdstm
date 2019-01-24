@@ -151,17 +151,17 @@ class ETLFindSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
+			customWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						with(fields['id'].find, FindResult){
+						customWith(fields['id'].find, FindResult){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -173,11 +173,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					customWith(data[1], RowResult){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						with(fields['id'].find, FindResult){
+						customWith(fields['id'].find, FindResult){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -191,7 +191,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -199,7 +199,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -250,17 +250,17 @@ class ETLFindSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
+			customWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						with(fields['id'].find, FindResult){
+						customWith(fields['id'].find, FindResult){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -272,11 +272,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					customWith(data[1], RowResult){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						with(fields['id'].find, FindResult){
+						customWith(fields['id'].find, FindResult){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -290,14 +290,14 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
 				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -358,9 +358,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
+			customWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 14
@@ -369,7 +369,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
 
 
-					with(data[0].fields.id) {
+					customWith(data[0].fields.id) {
 						find.query.size() == 1
 						assertQueryResult(
 							find.query[0],
@@ -382,7 +382,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						find.matchOn == 0
 					}
 
-					with(data[1].fields.id) {
+					customWith(data[1].fields.id) {
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
 						assertQueryResult(
@@ -396,7 +396,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						find.matchOn == 0
 					}
 
-					with(data[2].fields.id) {
+					customWith(data[2].fields.id) {
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
 						assertQueryResult(
@@ -412,7 +412,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 14.29
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -422,7 +422,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [with] keyword is not found"() {
@@ -514,7 +514,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found"() {
@@ -606,7 +606,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found in find with multiple fields"() {
@@ -646,7 +646,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [find operation] keywords are not found"(){
@@ -739,7 +739,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables'() {
@@ -838,9 +838,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
+			customWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -853,7 +853,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					// Validates command: find Application of asset by id with DOMAIN.asset
 					(1..14).eachWithIndex { int value, int index ->
-						with(data[index].fields.id.find) {
+						customWith(data[index].fields.id.find) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -866,11 +866,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 
 						fields.size() == 2
 
-						with(fields['asset'].find, FindResult){
+						customWith(fields['asset'].find, FindResult){
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -907,7 +907,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 7.14
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -917,7 +917,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  service.deleteTemporaryFile(fileName)
+			if(fileName)  fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
@@ -1014,9 +1014,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
+			customWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -1029,7 +1029,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					// Validates command: find Application of asset by id with DOMAIN.asset
 					(1..14).eachWithIndex { int value, int index ->
-						with(data[index].fields.id.find) {
+						customWith(data[index].fields.id.find) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -1042,11 +1042,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 
 						fields.size() == 2
 
-						with(fields['asset'].find, FindResult){
+						customWith(fields['asset'].find, FindResult){
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -1083,7 +1083,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 7.14
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -1093,7 +1093,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  service.deleteTemporaryFile(fileName)
+			if(fileName)  fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can grab the reference to the FINDINGS to be used later'() {
@@ -1185,9 +1185,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'comment'] as Set
 					data.size() == 14
@@ -1198,7 +1198,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value for a findId'() {
@@ -1246,24 +1246,24 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 
-					with(data[0].fields.asset) {
+					customWith(data[0].fields.asset) {
 						originalValue == '152254'
 						value == '152254'
 					}
 
-					with(data[1].fields.asset) {
+					customWith(data[1].fields.asset) {
 						originalValue == '152255'
 						value == '152255'
 					}
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -1271,7 +1271,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
@@ -1310,7 +1310,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if find command uses an invalid Find Operator'() {
@@ -1349,7 +1349,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
@@ -1405,30 +1405,30 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 
-					with(data[0]) {
+					customWith(data[0]) {
 						!warn
 
-						with(fields) {
+						customWith(fields) {
 
-							with(environment) {
+							customWith(environment) {
 								originalValue == 'Production'
 								value == 'Production'
 							}
-							with(appVendor) {
+							customWith(appVendor) {
 								originalValue == 'Microsoft'
 								value == 'Microsoft'
 							}
-							with(id) {
+							customWith(id) {
 								originalValue == '152254'
 								value == '152254'
 
 								// Validating queries
-								with(find) {
+								customWith(find) {
 
 									assertQueryResult(
 										query[0],
@@ -1452,24 +1452,24 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						warn
 						errors == ['found without asset id field']
-						with(fields) {
+						customWith(fields) {
 
-							with(environment) {
+							customWith(environment) {
 								originalValue == 'Production'
 								value == 'Production'
 							}
-							with(appVendor) {
+							customWith(appVendor) {
 								originalValue == 'Mozilla'
 								value == 'Mozilla'
 							}
-							with(id) {
+							customWith(id) {
 								originalValue == '152255'
 								value == '152255'
 								// Validating queries
-								with(find) {
+								customWith(find) {
 
 									assertQueryResult(
 										query[0],
@@ -1506,7 +1506,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can collect error messages in find command'() {
@@ -1542,20 +1542,20 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
-					with(data[0]) {
+					customWith(data[0]) {
 
 						errorCount == 2
-						with(fields) {
+						customWith(fields) {
 
-							with(id) {
+							customWith(id) {
 								originalValue == '152254'
 								value == '152254'
-								with(find) {
+								customWith(find) {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
@@ -1570,20 +1570,20 @@ class ETLFindSpec extends ETLBaseSpec {
 								}
 								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-							with(appVendor) {
+							customWith(appVendor) {
 								originalValue == 'Microsoft'
 								value == 'Microsoft'
 							}
 						}
 					}
-					with(data[1]) {
+					customWith(data[1]) {
 						errorCount == 2
-						with(fields) {
+						customWith(fields) {
 
-							with(id) {
+							customWith(id) {
 								originalValue == '152255'
 								value == '152255'
-								with(find) {
+								customWith(find) {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
@@ -1598,7 +1598,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								}
 								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-							with(appVendor) {
+							customWith(appVendor) {
 								originalValue == 'Mozilla'
 								value == 'Mozilla'
 							}
@@ -1608,7 +1608,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
@@ -1717,7 +1717,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Rack domain instances and find Rooms associated'() {
@@ -1771,64 +1771,64 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Rack.name()
 					fieldNames == ['id', 'location', 'room'] as Set
 
 					data.size() == 5
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '4'
 							value == '4'
 						}
 					}
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '13145'
 							value == '13145'
 						}
 					}
-					with(data[2]) {
+					customWith(data[2]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 3
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '5'
 							value == '5'
 						}
 					}
-					with(data[3]) {
+					customWith(data[3]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 4
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '6'
 							value == '6'
 						}
 					}
-					with(data[4]) {
+					customWith(data[4]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 5
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '13358'
 							value == '13358'
 						}
@@ -1838,7 +1838,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Devices with locationSource, Rooms and Racks'() {
@@ -1915,16 +1915,16 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
 				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if the find/elseFind command is incorrectly formatted'() {
@@ -1990,7 +1990,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using integer transformation'() {
@@ -2040,16 +2040,16 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
+					customWith(data[0].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[0].fields.id) {
+					customWith(data[0].fields.id) {
 						originalValue == '152254'
 						value == 152254
 
@@ -2059,12 +2059,12 @@ class ETLFindSpec extends ETLBaseSpec {
 						)
 					}
 
-					with(data[1].fields.environment) {
+					customWith(data[1].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[1].fields.id) {
+					customWith(data[1].fields.id) {
 						originalValue == '152255'
 						value == 152255
 
@@ -2074,7 +2074,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -2082,7 +2082,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using number transformation'() {
@@ -2132,16 +2132,16 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
+					customWith(data[0].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[0].fields.id) {
+					customWith(data[0].fields.id) {
 						originalValue == '152254'
 						value == 152254l
 
@@ -2149,12 +2149,12 @@ class ETLFindSpec extends ETLBaseSpec {
 						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 					}
 
-					with(data[1].fields.environment) {
+					customWith(data[1].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[1].fields.id) {
+					customWith(data[1].fields.id) {
 						originalValue == '152255'
 						value == 152255l
 
@@ -2164,7 +2164,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -2172,7 +2172,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 0 results'() {
@@ -2204,24 +2204,24 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					data.size() == 2
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152254'
 							value == '152254'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
@@ -2229,19 +2229,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152255'
 							value == '152255'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -2251,7 +2251,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2259,7 +2259,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 1 result'() {
@@ -2305,24 +2305,24 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
@@ -2330,19 +2330,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152255l]
 								matchOn == 0
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -2352,7 +2352,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2360,7 +2360,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with more than 1 results'() {
@@ -2406,24 +2406,24 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
@@ -2431,19 +2431,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.TBD.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == ['The find/elseFind command(s) found multiple records']
 							warn == false
-							with(find) {
+							customWith(find) {
 								matchOn == 0
 								results == [152255, 152255]
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -2453,7 +2453,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2461,7 +2461,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-10678')
@@ -2585,55 +2585,55 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 3
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 2
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'ERP']])
 							}
-							with(create){
+							customWith(create){
 								assetName == 'ERP'
 
 							}
 						}
 
 					}
-					with(data[1]){
+					customWith(data[1]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'Oracle7-Cluster']])
 							}
-							with(create){
+							customWith(create){
 								assetName == 'Oracle7-Cluster'
 
 							}
@@ -2641,52 +2641,52 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 				}
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id'] as Set
 					data.size() == 2
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							//errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'xraysrv001']])
 							}
-							with(create){
+							customWith(create){
 								assetName == 'xraysrv001'
 
 							}
 						}
 
 					}
-					with(data[1]){
+					customWith(data[1]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							//errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zuludb01']])
 							}
-							with(create){
+							customWith(create){
 								assetName == 'zuludb01'
 
 							}
@@ -2694,7 +2694,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 				}
-				with(domains[2]) {
+				customWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq'] as Set
 					data.size() == 3
@@ -2702,7 +2702,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2761,14 +2761,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 1
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2776,39 +2776,39 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 2
 						fields.keySet().size() == 3
 
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							originalValue == 'Mozilla'
 							value == 'Mozilla'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields.appTech) {
+						customWith(fields.appTech) {
 							originalValue == 'NGM'
 							value == 'NGM'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
@@ -2818,7 +2818,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('appVendor','Microsoft')]) == [152253l]
@@ -2826,7 +2826,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2883,14 +2883,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 1
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2898,39 +2898,39 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 2
 						fields.keySet().size() == 3
 
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							originalValue == 'Mozilla'
 							value == 'Mozilla'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields.appTech) {
+						customWith(fields.appTech) {
 							originalValue == 'NGM'
 							value == 'NGM'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
@@ -2940,7 +2940,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
@@ -2948,7 +2948,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3005,14 +3005,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 1
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3020,39 +3020,39 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 2
 						fields.keySet().size() == 3
 
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
-						with(fields.appVendor) {
+						customWith(fields.appVendor) {
 							originalValue == null
 							value == null
 							init == 'Mozilla'
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields.appTech) {
+						customWith(fields.appTech) {
 							originalValue == null
 							value == null
 							init == 'NGM'
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
@@ -3063,7 +3063,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3124,14 +3124,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 1
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3139,19 +3139,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 2
 						fields.keySet().size() == 1
 
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
-							with(create){
+							customWith(create){
 								assetClass == ETLDomain.Application.name()
 								appVendor == 'Mozilla'
 								appTech == 'NGM'
@@ -3163,7 +3163,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3224,14 +3224,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 1
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
@@ -3239,19 +3239,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 1
 						fields.keySet().size() == 1
 
-						with(fields.id) {
+						customWith(fields.id) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152253l]
 								matchOn == 0
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 							}
-							with(update){
+							customWith(update){
 								assetClass == ETLDomain.Application.name()
 								appVendor == 'Microsoft'
 								appTech == '(xlsx updated)'
@@ -3263,7 +3263,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3320,20 +3320,20 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			customWith(etlProcessor.finalResult()){
 				domains.size() == 2
 
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 0
 				}
 
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['description'] as Set
 					data.size() == 1
-					with(data[0]){
+					customWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3341,13 +3341,13 @@ class ETLFindSpec extends ETLBaseSpec {
 						rowNum == 2
 						fields.keySet().size() == 1
 
-						with(fields.description) {
+						customWith(fields.description) {
 							originalValue == 'Mozilla'
 							value == 'Mozilla'
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								query.size() == 0
@@ -3357,7 +3357,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
@@ -3365,7 +3365,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3403,15 +3403,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					fieldLabelMap == ['id': 'Id']
 					data.size() == 2
 
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 1
@@ -3419,7 +3419,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == '152254'
 							value == '152254'
 							init == null
@@ -3428,7 +3428,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3437,7 +3437,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					customWith(data[1], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 1
@@ -3445,7 +3445,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == '152255'
 							value == '152255'
 							init == null
@@ -3454,7 +3454,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3465,13 +3465,13 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			customWith(etlProcessor.findCache){
 				size() == 0
 				hitCountRate() == 0
 			}
 
 		cleanup:
-			if (fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3508,19 +3508,19 @@ class ETLFindSpec extends ETLBaseSpec {
 				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 				}
 
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 				}
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3557,19 +3557,19 @@ class ETLFindSpec extends ETLBaseSpec {
 				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 				}
 
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 				}
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3615,12 +3615,12 @@ class ETLFindSpec extends ETLBaseSpec {
 				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3628,27 +3628,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						customWith(fields['assetName'], FieldResult){
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3658,10 +3658,10 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3669,27 +3669,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						customWith(fields['assetName'], FieldResult){
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3701,7 +3701,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3747,12 +3747,12 @@ class ETLFindSpec extends ETLBaseSpec {
 				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3760,27 +3760,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						customWith(fields['assetName'], FieldResult){
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3790,10 +3790,10 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1]) {
+				customWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					customWith(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3801,27 +3801,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						customWith(fields['assetName'], FieldResult){
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						customWith(fields['id'], FieldResult){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							customWith(find, FindResult){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3833,7 +3833,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -3884,25 +3884,25 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					data.size() == 3
 
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
@@ -3910,19 +3910,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152255l]
 								matchOn == 0
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -3930,19 +3930,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[2]) {
+					customWith(data[2]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 3
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152255l]
 								matchOn == 0
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255]])
@@ -3953,7 +3953,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -4005,25 +4005,25 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			customWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					data.size() == 3
 
-					with(data[0]) {
+					customWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == []
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
@@ -4031,19 +4031,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					customWith(data[1]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152255l]
 								matchOn == 0
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -4051,19 +4051,19 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[2]) {
+					customWith(data[2]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 3
-						with(fields.asset) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
 							errors == []
 							warn == false
-							with(find) {
+							customWith(find) {
 								results == [152255l]
 								matchOn == 0
 								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
@@ -4076,7 +4076,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.findCache == null
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 }
 
