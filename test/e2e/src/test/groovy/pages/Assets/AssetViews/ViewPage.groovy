@@ -60,7 +60,7 @@ class ViewPage extends Page{
         selectedAssets {$("div.bulk-change-counter")}
         gridHeader {$(".k-grid-header")}
         editAssetButtons { $("button", title: "Edit Asset")}
-        cloneAssetButtons { $("button", title: "Clone Asset")}
+        cloneAssetButtons { $("button", title: "Clone")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
