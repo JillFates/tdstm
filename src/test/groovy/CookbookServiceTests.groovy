@@ -1,7 +1,5 @@
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -9,17 +7,19 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.SecurityService
-import test.AbstractUnitSpec
+import spock.lang.Specification
 import test.helper.mock.ProjectMock
 
-@Mock([UserLogin, UserPreference, SecurityService, Person, ApiAction])
-@TestMixin(ControllerUnitTestMixin)
-@TestFor(CookbookService)
-class CookbookServiceTests extends AbstractUnitSpec { //Specification {
+class CookbookServiceTests extends Specification implements ServiceUnitTest<CookbookService>, DataTest {
+
+	void setupSpec(){
+		mockDomains UserLogin, UserPreference, Person, ApiAction
+	}
 
 	void setup() {
-		login()
 		Project project = ProjectMock.create()
+		SecurityService securityService = GroovyMock(SecurityService)
+		service.securityService = securityService
 
 		//Mocking up the Users Current Project
 		service.securityService.metaClass.getUserCurrentProject = {

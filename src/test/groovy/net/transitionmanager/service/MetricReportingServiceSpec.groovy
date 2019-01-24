@@ -6,11 +6,9 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ValidationType
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
+import grails.testing.web.GrailsWebUnitTest
 import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.command.metricdefinition.QueryCommand
@@ -24,13 +22,11 @@ import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 
-@TestFor(MetricReportingService)
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
-@Mock([PartyGroup, PartyType, Project, Setting, MetricResult, Project])
-class MetricReportingServiceSpec extends Specification {
+class MetricReportingServiceSpec extends Specification implements ServiceUnitTest<MetricReportingService>, DataTest, GrailsWebUnitTest{
 
-
-	void setup() {}
+	void setupSpec() {
+		mockDomains PartyGroup, PartyType, Project, Setting, MetricResult, Project
+	}
 
 	void 'Test gatherMetric for invalid mode'() {
 		setup: 'Given a function JSON structure'

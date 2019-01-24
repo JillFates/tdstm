@@ -12,7 +12,7 @@ class AssetEntityHelperUnitTests extends Specification implements  DataTest {
 	@Shared Database db = new Database()
 	@Shared AssetEntity asset = new AssetEntity()
 
-	void setupSpec(){
+	void setupSpec() {
 		mockDomains AssetEntity, Application, Database
 	}
 
