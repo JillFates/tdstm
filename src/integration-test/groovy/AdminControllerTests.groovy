@@ -1,11 +1,14 @@
 import com.tdsops.tm.enums.domain.SecurityRole
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import grails.util.GrailsWebMockUtil
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.SecurityService
-import spock.lang.Ignore
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.context.WebApplicationContext
+import org.springframework.web.context.request.RequestContextHolder
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -15,35 +18,35 @@ import test.helper.PersonTestHelper
  * Note that in order to test with the HttpSession that this test spec is using the AdminController not for any thing in particular
  * but it allows the tests to access the session and manipulate it appropriately.
  */
-@Ignore  //TODO GRAILS Upgrade figure out why there is leakage between this test and DomainClassQueryHelperIntegrationSpec
 @Integration
 @Rollback
-class AdminControllerTests extends Specification{
+class AdminControllerTests extends Specification {
 
-    def             controller = new AdminController()
+    @Autowired
+    AdminController controller
+    @Autowired
+    WebApplicationContext ctx
+    @Autowired
     SecurityService securityService
-    CoreService     coreService
+    @Autowired
+    CoreService coreService
 
     @Shared
     def personHelper
-
     @Shared
     def projectHelper
     @Shared
     Project project
-
     @Shared
     def privPerson, adminPerson
-
     @Shared
     def unPrivPerson, unPrivUser
-
     @Shared
     boolean initialized = false
 
-
     def setup() {
-        if(!initialized) {
+        GrailsWebMockUtil.bindMockWebRequest(ctx)
+        if (!initialized) {
             personHelper = new PersonTestHelper()
             projectHelper = new ProjectTestHelper()
             adminPerson = personHelper.getAdminPerson()
@@ -53,6 +56,10 @@ class AdminControllerTests extends Specification{
             assert securityService.isLoggedIn()
             initialized = true
         }
+    }
+
+    def cleanup() {
+         RequestContextHolder.resetRequestAttributes()
     }
 
     def 'Test the AccountImportExport controller methods for permissions'() {
