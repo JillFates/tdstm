@@ -33,7 +33,7 @@ declare var jQuery: any;
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
                 <tds-button-add
                         class="float-right button-header-grid"
-						[tooltip]="'Add Support Asset'"
+						[tooltip]="'Add link to Support Asset'"
                         id="add-support"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                 </tds-button-add>
@@ -150,7 +150,7 @@ declare var jQuery: any;
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
                 <tds-button-add
                         class="float-right button-header-grid"
-                        [tooltip]="'Add Dependent Asset'"
+                        [tooltip]="'Add link to Dependent Asset'"
                         id="dependent-support"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                 </tds-button-add>
