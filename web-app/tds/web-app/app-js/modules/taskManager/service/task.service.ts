@@ -375,4 +375,22 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Show the asset using the link asset
+	 * @param {string asstClass Full asset name
+	 * @return {string} Corresponding category
+	 */
+	getAssetCategory(assetClass: string): string {
+		const assetTypes = {
+			'APPLICATION': 'APPLICATION',
+			'DATABASE': 'DATABASE',
+			'SERVER-DEVICE': 'DEVICE',
+			'NETWORK-DEVICE': 'DEVICE',
+			'STORAGE-DEVICE': 'DEVICE',
+			'STORAGE-LOGICAL': 'STORAGE',
+			'OTHER-DEVICE': 'DEVICE'
+		};
+
+		return assetTypes[assetClass];
+	}
 }
