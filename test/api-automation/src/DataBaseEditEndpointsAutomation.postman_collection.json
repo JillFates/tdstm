@@ -238,7 +238,8 @@
 							"",
 							"",
 							"//This code cleans up the global variables created through code that should live only in this collection ",
-							"pm.globals.unset(\"dataBaseID\");"
+							"pm.globals.unset(\"dataBaseID\");",
+							"pm.globals.unset(\"bundleId\");"
 						],
 						"type": "text/javascript"
 					}
