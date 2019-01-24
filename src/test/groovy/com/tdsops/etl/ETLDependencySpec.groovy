@@ -1,13 +1,14 @@
 package com.tdsops.etl
 
 import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tds.asset.TaskDependency
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -23,7 +24,7 @@ import spock.util.mop.ConfineMetaClassChanges
 /**
  * Test about ETL Current Element (CE):
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions, TaskDependency, AssetComment])
 class ETLDependencySpec extends ETLBaseSpec {
 
 	DebugConsole debugConsole

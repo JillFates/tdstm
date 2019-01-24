@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Issue
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -543,6 +544,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
+	@ConfineMetaClassChanges([Application])
 	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
@@ -556,7 +558,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		and:
-			GroovySpy(Application, global: true)
 			Application.executeQuery(_, _) >> { String query, Map args ->
 				return []
 			}

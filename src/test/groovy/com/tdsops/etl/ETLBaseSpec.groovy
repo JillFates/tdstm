@@ -424,7 +424,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param errors
 	 * @param warn
 	 */
-	static void assertFieldResult(FieldResult fieldResult,
+	def assertFieldResult(FieldResult fieldResult,
 								  Object originalValue = null,
 								  Object value = null,
 								  Object initValue = null,
@@ -435,6 +435,7 @@ abstract class ETLBaseSpec extends Specification {
 		assert fieldResult.init == initValue
 		assert fieldResult.errors == errors
 		assert fieldResult.warn == warn
+		return true
 	}
 
 	/**
@@ -444,12 +445,13 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param domain
 	 * @param values
 	 */
-	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+	def assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
 		queryResult.criteria.eachWithIndex { Map map, int i ->
 			assert map['propertyName'] == values[i][0]
 			assert map['operator'] == values[i][1]
 			assert map['value'] == values[i][2]
+			return true
 		}
 	}
 
@@ -460,7 +462,7 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param operator
 	 * @param value
 	 */
-	static void assertFindConditionComplete(
+	def assertFindConditionComplete(
 		FindCondition condition,
 		String propertyName,
 		FindOperator operator,
@@ -471,6 +473,7 @@ abstract class ETLBaseSpec extends Specification {
 		assert operator == condition.operator
 		assert value == condition.value
 		assert condition.isComplete() == isComplete
+		return true
 	}
 
 	def customWith(Object target, Closure<?> closure) {
