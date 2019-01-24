@@ -376,7 +376,7 @@ export class TaskService {
 	}
 
 	/**
-	 * Show the asset using the link asset
+	 * Based on the asset name, get the corresponding category
 	 * @param {string asstClass Full asset name
 	 * @return {string} Corresponding category
 	 */
