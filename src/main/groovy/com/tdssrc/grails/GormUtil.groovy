@@ -5,6 +5,7 @@ import grails.core.GrailsApplication
 import grails.core.GrailsDomainClassProperty
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
+import grails.util.Environment
 import grails.util.GrailsClassUtils
 import grails.util.Holders
 import grails.web.databinding.DataBindingUtils
@@ -492,9 +493,22 @@ class GormUtil{
 		ApplicationContextHolder.grailsApplication
 	}
 
-	@Memoized
+
 	private static AbstractMappingContext mappingContext() {
+		if (Environment.current == Environment.TEST) {
+			return testMappingContext()
+		}
+
+		return runningMappingContext()
+	}
+
+	private static AbstractMappingContext testMappingContext() {
 		return Holders.applicationContext.getBean('grailsDomainClassMappingContext')
+	}
+
+	@Memoized
+	private static AbstractMappingContext runningMappingContext() {
+			return Holders.applicationContext.getBean('grailsDomainClassMappingContext')
 	}
 
 	/**
