@@ -16,7 +16,7 @@ class ViewPage extends Page{
     static content = {
         view (wait:true) { $("section.page-asset-explorer-config")}
         sectionHeaderTitle { $("section.content-header h1")}
-        clearBtn {$("button", id:"btnClear")}
+        clearBtn {$("button#btnClean")}
         createButton {$("button[type=button]", text: "Create")}
         bulkChangeButton {$('#btnBulkChange')}
         exportViewButton {$("button#btnExport")}
@@ -39,25 +39,25 @@ class ViewPage extends Page{
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
-        firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
+        firstElementAssetClass(required:false) {$('td#k-grid0-r2c3').find("span")}
         nameFilter {$('td#k-grid0-r1c2').find("div").find("input", type:"text")}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
-        assetClassFilter {$("td[kendogridfiltercell] input", "ng-reflect-name": "common.assetClass")}
+        assetClassFilter {$('#k-grid0-r1c3 input.form-control')}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
         descriptionFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
         environmentFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
         environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
         allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
-        nameColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Name")).parent("a.k-link")}
-        descColumn(required:false) { gridHeader.find("thead tr th label.text-delimited", text: contains("Description")).parent("a.k-link")}
-        refreshBtn {$("div", class:"component-action-reload").find("span", class:"glyphicon-refresh")}
+        nameColumn(required:false) { gridHeader.find("div.sortable-column", text: contains("Name")).parent("a.k-link")}
+        descColumn(required:false) { gridHeader.find("div.sortable-column", text: contains("Description")).parent("a.k-link")}
+        refreshBtn {$("button.tds-action-button--just-icon",title:"Refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
         noRecords {$("div.grid-message label")}
         assetsDisplayedInPager {$("kendo-pager-info")}
         paginationSizes {$("kendo-pager-page-sizes select")}
-        selectedAssets {$('.selected-assets')}
+        selectedAssets {$("div.bulk-change-counter")}
         gridHeader {$(".k-grid-header")}
         editAssetButtons { $("button", title: "Edit Asset")}
         cloneAssetButtons { $("button", title: "Clone Asset")}
@@ -218,6 +218,7 @@ class ViewPage extends Page{
     }
 
     def checkAllItems(){
+        waitFor{firstElementName.displayed}
         def isChecked = getCheckedInputStatus(selectAllChecks)
         def isIndeterminate = getSelectIndeterminateState()
         if(!isChecked && !isIndeterminate){
@@ -229,6 +230,7 @@ class ViewPage extends Page{
     }
 
     def unCheckAllItems(){
+        waitFor{firstElementName.displayed}
         def isChecked = getCheckedInputStatus(selectAllChecks)
         def isIndeterminate = getSelectIndeterminateState()
         if(isChecked && !isIndeterminate){
@@ -520,7 +522,7 @@ class ViewPage extends Page{
 
     def verifySelectedAssetsText(selectedCount){
         goToBulkChangeButton()
-        getSelectedAssetsText() == selectedCount + " Asset(s) selected"
+        getSelectedAssetsText().contains( selectedCount + " Asset")
     }
 
     def verifySelectedAssetsTextDisplayed(){
