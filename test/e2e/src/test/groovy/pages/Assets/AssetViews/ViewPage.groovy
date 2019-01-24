@@ -44,9 +44,9 @@ class ViewPage extends Page{
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
         assetClassFilter {$('#k-grid0-r1c3 input.form-control')}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
-        descriptionFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.description")}
+        descriptionFilter { $("#k-grid0-r1c4 input")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
-        environmentFilter { $("td[kendogridfiltercell] input", "ng-reflect-name": "common.environment")}
+        environmentFilter { $("#k-grid0-r1c5 input")}
         environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
         allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
         nameColumn(required:false) { gridHeader.find("div.sortable-column", text: contains("Name")).parent("a.k-link")}
