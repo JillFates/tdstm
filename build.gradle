@@ -203,3 +203,10 @@ gitProperties {
 grails {
    pathingJar = true
 }
+
+test {
+    if (project.hasProperty('maxParallelForks'))
+        maxParallelForks = project.maxParallelForks as int
+    if (project.hasProperty('forkEvery'))
+        forkEvery = project.forkEvery as int
+}
