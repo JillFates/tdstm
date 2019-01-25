@@ -2,7 +2,7 @@
 import {Injectable} from '@angular/core';
 import {Router, Resolve, ActivatedRouteSnapshot} from '@angular/router';
 // Services
-import {AssetExplorerService} from '../service/asset-explorer.service';
+import {AssetExplorerService} from '../../assetManager/service/asset-explorer.service';
 // Others
 import {Observable} from 'rxjs';
 

@@ -16,11 +16,11 @@ import {AssetExplorerRouteModule} from './asset-explorer-routing.states';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
-import {ReportsResolveService} from './resolve/reports-resolve.service';
+import {ReportsResolveService} from '../assetManager/resolve/reports-resolve.service';
 import {ReportResolveService} from './resolve/report-resolve.service';
 import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
-import { AssetExplorerService } from './service/asset-explorer.service';
+import { AssetExplorerService } from '../assetManager/service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
@@ -34,7 +34,6 @@ import {AssetExplorerViewSaveComponent} from './components/view-save/asset-explo
 import {AssetExplorerViewExportComponent} from './components/view-export/asset-explorer-view-export.component';
 import {AssetExplorerViewGridComponent} from './components/view-grid/asset-explorer-view-grid.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
-import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
 import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
@@ -72,7 +71,6 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 	],
 	declarations: [
 		AssetExplorerViewSelectorComponent,
-		AssetExplorerIndexComponent,
 		AssetExplorerViewConfigComponent,
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
@@ -120,7 +118,6 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
-		AssetExplorerIndexComponent,
 		TaskCommentComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,

@@ -10,7 +10,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';

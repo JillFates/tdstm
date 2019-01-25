@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
 import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';

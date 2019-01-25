@@ -7,7 +7,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';

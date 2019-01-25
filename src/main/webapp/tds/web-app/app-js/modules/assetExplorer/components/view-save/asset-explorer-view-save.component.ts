@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { ViewModel, ViewGroupModel } from '../../model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';

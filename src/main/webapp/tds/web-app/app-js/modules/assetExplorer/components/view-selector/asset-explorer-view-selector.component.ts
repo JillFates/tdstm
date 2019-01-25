@@ -17,7 +17,7 @@ import {ViewType} from '../../model/view.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {Router} from '@angular/router';
 
 @Component({

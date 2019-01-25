@@ -1,7 +1,6 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
@@ -10,9 +9,6 @@ import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service'
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
-import {ReportsResolveService} from '../assetExplorer/resolve/reports-resolve.service';
-import {FieldsResolveService} from '../assetExplorer/resolve/fields-resolve.service';
-import {ReportResolveService} from '../assetExplorer/resolve/report-resolve.service';
 
 /**
  * Top menu parent section class for all Dependencies module.

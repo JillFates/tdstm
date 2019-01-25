@@ -43,7 +43,7 @@ import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 
 const {

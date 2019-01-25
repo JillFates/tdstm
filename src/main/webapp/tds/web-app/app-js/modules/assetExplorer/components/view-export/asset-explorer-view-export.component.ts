@@ -4,7 +4,7 @@ import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
 import {AssetExportModel} from '../../model/asset-export-model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({

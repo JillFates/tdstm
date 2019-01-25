@@ -5,7 +5,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
-import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset-explorer.service';
+import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
 import {DEPENDENCY_TYPE} from './model/support-depends.model';
 import * as R from 'ramda';

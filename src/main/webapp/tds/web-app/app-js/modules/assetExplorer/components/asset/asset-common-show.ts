@@ -1,6 +1,6 @@
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
 import {HostListener, OnInit} from '@angular/core';

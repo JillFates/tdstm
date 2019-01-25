@@ -5,13 +5,12 @@ import {RouterModule, Routes} from '@angular/router';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 import {ReportResolveService} from './resolve/report-resolve.service';
-import {ReportsResolveService} from './resolve/reports-resolve.service';
+import {ReportsResolveService} from '../assetManager/resolve/reports-resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
-import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
 import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
 
@@ -42,25 +41,6 @@ export class AssetExplorerStates {
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
 export const AssetExplorerRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: AssetExplorerStates.REPORT_SELECTOR.url},
-	{
-		path: AssetExplorerStates.REPORT_SELECTOR.url,
-		data: {
-			page: {
-				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-				instruction: '',
-				menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
-				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-manager', subMenu: true }
-			},
-			requiresAuth: true,
-		},
-		component: AssetExplorerIndexComponent,
-		resolve: {
-			reports: ReportsResolveService
-		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-		runGuardsAndResolvers: 'always'
-	},
 	{
 		path: AssetExplorerStates.REPORT_CREATE.url,
 		data: {

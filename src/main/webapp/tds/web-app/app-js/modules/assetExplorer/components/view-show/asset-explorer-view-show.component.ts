@@ -6,7 +6,7 @@ import {State} from '@progress/kendo-data-query';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import {ViewGroupModel, ViewModel} from '../../model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';

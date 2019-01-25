@@ -7,7 +7,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({

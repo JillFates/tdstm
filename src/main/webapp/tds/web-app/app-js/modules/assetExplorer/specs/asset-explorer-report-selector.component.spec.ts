@@ -10,7 +10,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 
 import { AssetExplorerViewSelectorComponent } from '../components/view-selector/asset-explorer-view-selector.component';
-import {AssetExplorerService} from '../service/asset-explorer.service';
+import {AssetExplorerService} from '../../assetManager/service/asset-explorer.service';
 
 describe('AssetExplorerViewSelectorComponent:', () => {
 	let fixture: ComponentFixture<AssetExplorerViewSelectorComponent>;
