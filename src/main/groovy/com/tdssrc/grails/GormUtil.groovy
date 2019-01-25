@@ -595,7 +595,6 @@ class GormUtil{
 		List<PersistentProperty> domainProperties = []
 		boolean allProperties = false
 		PersistentEntity dfdc = getDomainClass(domainClass)
-		Property identity = GrailsDomainBinder.getMapping(domainClass).identity
 
 		if (properties) {
 			for (String property in properties) {
