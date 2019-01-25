@@ -30,6 +30,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.CloneAssetCommand
@@ -73,7 +74,7 @@ class AssetEntityService implements ServiceMethods {
 			(AssetClass.APPLICATION): [ 'assetName'],
 			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'locationSource'
 			],
 			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
@@ -2348,7 +2349,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS sourceLocationName ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
@@ -3085,6 +3086,132 @@ class AssetEntityService implements ServiceMethods {
 		commonModel.standardFieldSpecs.environment.constraints.put('values', getAssetEnvironmentOptions())
 
 		return commonModel
+	}
+
+
+	/**
+	 * Create and return a map with all the information regarding the dependencies
+	 * between two assets.
+	 *
+	 * @param project - user's current asset.
+	 * @param assetAId - one of the asset's id.
+	 * @param assetBId - id of the other asset.
+	 * @return a map with all the fields with the information for the dependencies between two assets.
+	 */
+	Map getAssetDependenciesBetweenAssets(Project project, Long assetAId, Long assetBId) {
+		AssetEntity assetA = GormUtil.findInProject(project, AssetEntity, assetAId, true)
+		AssetEntity assetB = GormUtil.findInProject(project, AssetEntity, assetBId, true)
+
+		AssetDependency dependencyA = AssetDependency.where {
+			asset == assetA
+			dependent == assetB
+		}.find()
+
+		AssetDependency dependencyB = AssetDependency.where {
+			asset == assetB
+			dependent == assetA
+		}.find()
+
+		String assetAClassLabel = AssetClass.getClassOptionValueForAsset(assetA)
+		String assetBClassLabel = AssetClass.getClassOptionValueForAsset(assetB)
+
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
+		return  [
+			assetA:[
+				name: assetA.assetName,
+				assetClass: assetAClassLabel,
+				environment: assetA.environment,
+				bundle: assetA.moveBundleName,
+				planStatus: assetA.planStatus,
+				dependency: dependencyA?.toMap(),
+				dependencyClass: dependencyA?.dependent?.assetClass,
+				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
+			],
+			assetB: [
+				name: assetB.assetName,
+				assetClass: assetBClassLabel,
+				environment: assetB.environment,
+				bundle: assetB.moveBundleName,
+				planStatus: assetB.planStatus,
+				dependency: dependencyB?.toMap(),
+				dependencyClass: dependencyB?.dependent?.assetClass,
+				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
+			],
+			dataFlowFreq: AssetDependency.constraints.dataFlowFreq.inList,
+			dependencyType: entityInfo(project).dependencyType,
+			dependencyStatus: entityInfo(project).dependencyStatus,
+			directionList: AssetDependency.constraints.dataFlowDirection.inList,
+			editPermission: securityService.hasPermission(Permission.AssetEdit)
+		]
+	}
+
+	/**
+	 * This method fetches the content for the Asset Summary Table, which contains
+	 * the total number of assets and also totals by MoveBundle.
+	 *
+	 * @param project - user's current project
+	 * @param justPlanning - user preference value
+	 * @return a Map with the information broken down accordingly
+	 */
+	Map getAssetSummary(Project project, boolean justPlanning) {
+
+		if (!project) {
+			throw new RuntimeException("Unable to retrieve the asset summary without a project.")
+		}
+
+		Integer totalServer = 0
+		Integer totalPhysical = 0
+		Integer totalApplication = 0
+		Integer totalDatabase = 0
+		Integer totalFiles = 0
+
+		def moveBundles = MoveBundle.withCriteria {
+			eq('project', project)
+			order('name', 'asc')
+		}
+		List assetSummaryList = []
+
+		for (MoveBundle moveBundle in moveBundles) {
+
+			Map<String, Integer> summaryMap = AssetUtils.getAssetSummary(project, moveBundle, justPlanning)
+
+			Integer physicalCount = summaryMap['physical']
+			Integer serverCount = summaryMap['servers']
+			Integer applicationCount = summaryMap['applications']
+			Integer databaseCount = summaryMap['databases']
+			Integer filesCount = summaryMap['files']
+
+			totalServer += serverCount
+			totalPhysical += physicalCount
+			totalApplication += applicationCount
+			totalDatabase += databaseCount
+			totalFiles += filesCount
+
+			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
+				assetSummaryList << [
+					id: moveBundle.id,
+					name: moveBundle,
+					applicationCount: applicationCount,
+					serverCount: serverCount,
+					physicalCount: physicalCount,
+				    databaseCount: databaseCount,
+					filesCount: filesCount
+				]
+			}
+		}
+
+		return [
+			assetSummaryList: assetSummaryList,
+			totalServer: totalServer,
+			totalApplication: totalApplication,
+			totalDatabase: totalDatabase,
+			totalPhysical: totalPhysical,
+			totalFiles: totalFiles
+		]
 	}
 
 }

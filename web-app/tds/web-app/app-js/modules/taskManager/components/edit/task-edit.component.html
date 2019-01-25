@@ -353,10 +353,11 @@
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
-                                                        <button (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)"
-                                                                class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                                                            <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                                                        </button>
+                                                        <tds-button-add class="button-header-grid float-right"
+                                                                    [tooltip]="'Add Predecessor'"
+                                                                    [id]="'btnAddPredecessor'"
+                                                                    (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
+                                                        </tds-button-add>
                                                     </ng-template>
                                                     <!-- Columns -->
                                                     <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
@@ -400,9 +401,11 @@
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
-                                                    <button (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
-                                                        <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
-                                                    </button>
+                                                    <tds-button-add class="button-header-grid float-right"
+                                                                [tooltip]="'Add Successor'"
+                                                                [id]="'btnAddSuccessor'"
+                                                                (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
+                                                    </tds-button-add>
                                                 </ng-template>
                                                 <!-- Columns -->
                                                 <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
@@ -493,19 +496,23 @@
                 </form>
             </div>
             <div class="modal-footer form-group-center">
-	            <button class="btn btn-primary pull-left"
-                        [disabled]="isFormInvalid() || !hasEditTaskPermission" (click)="onSave()" type="button">
-		            <i  class="fa fa-fw fa-floppy-o"></i>
-		            <span>Update</span>
-	            </button>
-                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
-                    <span>Cancel</span>
-                </button>
-                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                    <i  class="glyphicon glyphicon-trash action-button"></i>
-                    <span>Delete</span>
-                </button>
+                <tds-button-save
+                        class="btn-primary pull-left"
+                        title="Update"
+                        [disabled]="isFormInvalid() || !hasEditTaskPermission"
+                        (click)="onSave()">
+                </tds-button-save>
+
+                <tds-button-delete
+                        class="btn-danger component-action-delete"
+                        [disabled]="!hasDeleteTaskPermission"
+                        (click)="deleteTask()">
+                </tds-button-delete>
+
+                <tds-button-cancel
+                        class="component-action-cancel pull-right"
+                        (click)="cancelCloseDialog()">
+                </tds-button-cancel>
             </div>
         </div>
     </div>

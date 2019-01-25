@@ -4,14 +4,14 @@
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Application Detail</h4>
 	</div>
 	<div class="modal-body">
 		<div>
-			<table style="border: 0">
+			<table style="border: 0;" class="tds-asset-view-content-table">
 				<tr>
 
 					<td colspan="2" class="dialog-container"><div class="dialog">
@@ -50,12 +50,38 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
+		<div class="asset-commands pull-left">
+			<tds-button-edit
+					class="btn-primary"
+					tooltip="Edit Asset"
+					[permissions]="['${Permission.AssetEdit}']"
+					(click)="showAssetEditView()">
+			</tds-button-edit>
+
+			<tds-button-clone
+					(click)="onCloneAsset()">
+			</tds-button-clone>
+
+			<tds-button-custom
+					icon="sitemap"
+					title="Arch Graph"
+					(click)="openGraphUrl()">
+			</tds-button-custom>
+		</div>
+
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<tds-button-delete
+					tooltip="Delete Asset"
+					class="btn-danger"
+					[permissions]="['${Permission.AssetDelete}']"
+					(click)="onDeleteAsset()">
+			</tds-button-delete>
 		</tds:hasPermission>
-		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
-		<a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph</a>
+
+		<tds-button-close
+				class="pull-right"
+				(click)="cancelCloseDialog()">
+		</tds-button-close>
+
 	</div>
 </div>

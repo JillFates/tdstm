@@ -6,13 +6,11 @@ import modules.AdminModule
 class LicensePage extends Page{
 
     static at = {
-        title == "Administer Licenses"
-        pageHeaderName.text() == "Administer Licenses"
+        title == "License Admin"
     }
 
     static content = {
         adminModule { module AdminModule}
-        pageHeaderName { $("section", class:"content-header ng-scope").find("h1")}
     }
 
 }

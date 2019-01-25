@@ -132,9 +132,10 @@
 											<td data-for="retireDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
                                                 <tds-date-control
 													class="tm-input-control"
+													[(ngModel)]="model.asset.retireDate"
 													name="modelAssetRetireDate"
 													[tabindex]="24"
-                                                    [(value)]="model.asset.retireDate">
+                                                    [value]="model.asset.retireDate">
                                                 </tds-date-control>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
@@ -157,9 +158,10 @@
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}  ${standardFieldSpecs.maintExpDate.imp?:''} ">
                                                 <tds-date-control
 													class="tm-input-control"
+													[(ngModel)]="model.asset.maintExpDate"
 													name="modelAssetMaintExpDate"
 													[tabindex]="25"
-                                                    [(value)]="model.asset.maintExpDate">
+                                                    [value]="model.asset.maintExpDate">
                                                 </tds-date-control>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}" tabindex="34"  ngmodel="model.asset.latency" blankOptionListText="?" />
@@ -252,10 +254,28 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" tabindex="501" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<tds-button-save
+				class="btn-primary pull-left component-action-update" tabindex="501"
+				tooltip="Update Asset"
+				[disabled]="!isDependenciesValidForm"
+				[permissions]="['${Permission.AssetEdit}']"
+				(click)="submitForm($event)">
+		</tds-button-save>
+
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" tabindex="502" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<tds-button-delete
+					tooltip="Delete Asset"
+					class="btn-danger component-action-delete" tabindex="502"
+					[permissions]="['${Permission.AssetDelete}']"
+					(click)="onDeleteAsset()">
+			</tds-button-delete>
 		</tds:hasPermission>
-		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" tabindex="503" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+
+		<tds-button-cancel
+				tooltip="Cancel Edit"
+				class="pull-right component-action-cancel"
+				tabindex="503"
+				(click)="onCancelEdit()">
+		</tds-button-cancel>
 	</div>
 </div>

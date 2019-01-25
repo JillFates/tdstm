@@ -331,6 +331,7 @@
 	margin-left: 5px;
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
+	padding: 15px;
 }
 .dashboardContainer {
 	display: flex;

@@ -20,7 +20,7 @@ class AssetEditPage extends Page {
     static content = {
         assetEditModal { $("div.tds-angular-component-content") }
         modalTitle { assetEditModal.find(".modal-title") }
-        updateButton { assetEditModal.find("button", text: contains("Update")) }
+        saveButton { assetEditModal.find("button", text: contains("Save")) }
         cancelButton { assetEditModal.find("button", text: contains("Cancel")) }
         closeButton { assetEditModal.find("button", class:"component-action-close")}
         deleteButton { assetEditModal.find("button", text: contains("Delete")) }
@@ -29,7 +29,7 @@ class AssetEditPage extends Page {
         tagsOptionList { $("div.k-list-container").find("li.k-item") }
         tagNamesSelector { tagsOptionList.find("div.asset-tag-selector-single-item") }
         deleteTagIcon { assetTagSelector.find("li span.k-i-close") }
-        tagsInput { assetTagSelector.find("input#asset-tag-selector-component") }
+        tagsInput { assetTagSelector.find("div.asset-tag-selector-component") }
         tagsSelected { assetTagSelector.find("kendo-taglist li") }
         commonsModule { module CommonsModule }
 
@@ -58,7 +58,7 @@ class AssetEditPage extends Page {
         aeModalSupportsTable            { assetEditModal.find("kendo-grid", 0)}
         aeModalDependencyTable          { assetEditModal.find("kendo-grid", 1)}
 
-        aeModalAddSuppBtn { aeModalSupportsTable.find("button.btn-add-new-dependency")}
+        aeModalAddSuppBtn {$("button", id:'add-support')}
         aeModalSuppColTitles (wait:true, required:false) { aeModalSupportsTable.find(".k-grid-header table thead th a label")}
         aeModalSuppList  { aeModalSupportsTable.find("kendo-grid-list tr")}
 
@@ -86,7 +86,7 @@ class AssetEditPage extends Page {
         aeModalSuppStatusArrow  { aeModalSuppStatusSelector.find("span.k-select")}
         aeModalSuppStatusValue  { aeModalSuppStatusSelector.find("span.k-input")}
 
-        aeModalAddIsDepBtn { aeModalDependencyTable.find("button.btn-add-new-dependency")}
+        aeModalAddIsDepBtn {$("button", id:'dependent-support')}
         aeModalIsDepColTitles (wait:true, required:false) { aeModalSupportsTable.find(".k-grid-header table thead th a label")}
         aeModalIsDepList  { aeModalDependencyTable.find("kendo-grid-list tr")}
 
@@ -115,8 +115,8 @@ class AssetEditPage extends Page {
         aeModalIsDepStatusValue  { aeModalIsDepStatusSelector.find("span.k-input")}
     }
 
-    def clickOnUpdateButton() {
-        waitFor { updateButton.click() }
+    def clickOnSaveButton() {
+        waitFor { saveButton.click() }
     }
 
     def clickOnCloseButton() {

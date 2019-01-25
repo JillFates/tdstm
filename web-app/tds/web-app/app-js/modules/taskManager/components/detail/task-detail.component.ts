@@ -19,6 +19,11 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {DeviceModel} from '../../../assetExplorer/components/device/model-device/model/device-model.model';
+import {ModelDeviceShowComponent} from '../../../assetExplorer/components/device/model-device/components/model-device-show/model-device-show.component';
+import {AlertType} from '../../../../shared/model/alert.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 @Component({
 	selector: `task-detail`,
@@ -55,7 +60,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
-		private windowService: WindowService) {
+		private windowService: WindowService,
+		private notifierService: NotifierService) {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -283,4 +289,26 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			});
 	}
 
+	/**
+	 * Show the asset using the link asset
+	 */
+	protected onOpenLinkAsset() {
+		const id = this.model.asset.id;
+		const assetClass = this.taskManagerService.getAssetCategory(this.model.assetClass.id);
+
+		if (assetClass) {
+			this.dialogService.replace(AssetShowComponent,
+				[UIDialogService,
+					{ provide: 'ID', useValue: id },
+					{ provide: 'ASSET', useValue: assetClass }
+				], DIALOG_SIZE.LG);
+
+			this.close();
+		} else {
+			this.notifierService.broadcast({
+				name: AlertType.DANGER,
+				message: 'Invalid asset type'
+			});
+		}
+	}
 }

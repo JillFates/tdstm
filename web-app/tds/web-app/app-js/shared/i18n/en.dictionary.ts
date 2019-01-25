@@ -8,25 +8,33 @@ export const en_DICTIONARY: Object = {
 		'ADD': 'Add',
 		'ADMIN': 'Admin',
 		'ACTION': 'Action',
+		'ARCHITECTURE_GRAPH': 'Arch Graph',
 		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
+		'CONFIGURE': 'Configure',
 		'CREATE': 'Create',
 		'CLOSE': 'Close',
+		'CLONE': 'Clone',
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
+		'EXPORT': 'Export',
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
 		'LOAD': 'Load',
 		'NAME': 'Name',
 		'MERGE': 'Merge',
+		'REFRESH': 'Refresh',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
 		'DEFAULT': 'Default',
+		'SHOW': 'Show',
 		'SORT': 'Sort',
+		'UPDATE': 'Update',
 		'ADD_FAVORITES': 'Add to Favorites',
+		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
 		'FREEZE': 'Freeze',
@@ -44,6 +52,17 @@ export const en_DICTIONARY: Object = {
 			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
+		},
+		'ARTIFACTS': {
+			'ARCHITECTURE_GRAPH': 'Arch Graph',
+			'ASSET' : 'Asset',
+			'ASSETS' : 'Assets',
+			'COMMENT' : 'Comment',
+			'COMMENTS' : 'Comments',
+			'TASK' : 'Task',
+			'TASKS' : 'Tasks',
+			'VIEW' : 'View',
+			'VIEWS' : 'Views'
 		}
 	},
 	'ASSETS': {
@@ -52,7 +71,9 @@ export const en_DICTIONARY: Object = {
 		'DEVICE': 'Device',
 		'STORAGE': 'Storage',
 		'ASSETS': 'Assets',
-		'COMMON': 'Common'
+		'COMMON': 'Common',
+		'SINGLE_NAME': 'Asset',
+		'PLURAL_NAME': 'Assets'
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
@@ -92,13 +113,12 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'EFFECTED_ASSETS': 'This action will affect {param1} Asset(s)',
-				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel',
-				'EFFECTED_DEPENDENCIES': 'This action will affect {param1} {params2}',
-				'CONFIRM_UPDATE_DEPENDENCIES': 'You are about to update {param1} Dependency(s). There is no undo for this action. Click confirm to update the dependencies, otherwise click Cancel'
+				'EFFECTED_ASSETS': 'This action will affect {param1} {param2}',
+				'CONFIRM_UPDATE': 'You are about to update {param1} {param2}. There is no undo for this action. Click confirm to update the {param3}, otherwise click Cancel',
+				'EFFECTED_DEPENDENCIES': 'This action will affect {param1} {params2}'
 			},
 			'DELETE': {
-				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} Asset(s). There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel',
+				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
 			},
 			'ACTIONS': {
@@ -171,12 +191,13 @@ export const en_DICTIONARY: Object = {
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
-		'PLURAL_NAME': 'Dependencies'
+		'PLURAL_NAME': 'Dependencies',
+		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
-		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
+		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
 		'PROJECT_LIST': 'Project List',
 		'CREATE_CUSTOM': 'Add Custom Field',
 		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
@@ -192,6 +213,8 @@ export const en_DICTIONARY: Object = {
 		'DEMO': 'Demo',
 		'CREATE_LICENSE': 'Create License',
 		'GLOBAL': 'Global',
+		'IMPORT_LICENSE_REQUEST': 'Import License Request',
+		'PASTE_LICENSE_BLOCK': 'Paste in license text block from emailed License Request and then click Import.',
 		'SINGLE': 'Single',
 		'MANAGER': 'License Manager',
 		'ENGINEERING': 'Engineering',
@@ -238,12 +261,13 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
-	'NOTICE_MANAGER': {
+	'NOTICE': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'VIEW_HTML': 'View HTML',
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

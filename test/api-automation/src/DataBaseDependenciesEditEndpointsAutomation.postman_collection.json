@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "63dda9d3-8abc-4768-b83a-7e3b33385b29",
+		"_postman_id": "6d82038e-ad87-4c84-9f6f-f8de0a297afe",
 		"name": "DataBaseDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -85,9 +85,9 @@
 						"exec": [
 							"pm.test(\"Save DB Info\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
-							"    var dbID = jsonObject.rows[0].id; ",
-							"    var dbName = jsonObject.rows[0].escapedName; ",
-							"    var dbPlanStatus = jsonObject.rows[0].cell[5];",
+							"    var dbID = jsonObject.data.assets[0].common_id; ",
+							"    var dbName = jsonObject.data.assets[0].common_assetName; ",
+							"    var dbPlanStatus = jsonObject.data.assets[0].common_planStatus;",
 							"    pm.environment.set(\"dbPlanStatus\", dbPlanStatus);",
 							"    pm.environment.set(\"dataBaseID\", dbID);",
 							"    pm.environment.set(\"dataBaseName\", dbName);",
@@ -98,21 +98,30 @@
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": ""
+					"raw": "{\"offset\":0,\"limit\":25,\"sortDomain\":\"common\",\"sortProperty\":\"assetName\",\"sortOrder\":\"a\",\"filters\":{\"domains\":[\"common\",\"database\"],\"columns\":[{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Name\",\"locked\":true,\"property\":\"assetName\",\"width\":220},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Description\",\"locked\":false,\"property\":\"description\",\"width\":220},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Environment\",\"locked\":false,\"property\":\"environment\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Bundle\",\"locked\":false,\"property\":\"moveBundle\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Tags\",\"locked\":false,\"property\":\"tagAssets\",\"width\":220},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Validation\",\"locked\":false,\"property\":\"validation\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Plan Status\",\"locked\":false,\"property\":\"planStatus\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"External Ref Id\",\"locked\":false,\"property\":\"externalRefId\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Modified Date\",\"locked\":false,\"property\":\"lastUpdated\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Format\",\"locked\":false,\"property\":\"dbFormat\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Size\",\"locked\":false,\"property\":\"size\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Scale\",\"locked\":false,\"property\":\"scale\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Rate Of Change\",\"locked\":false,\"property\":\"rateOfChange\",\"width\":140},{\"domain\":\"common\",\"edit\":false,\"filter\":\"\",\"label\":\"Support\",\"locked\":false,\"property\":\"supportType\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Retire Date\",\"locked\":false,\"property\":\"retireDate\",\"width\":140},{\"domain\":\"database\",\"edit\":false,\"filter\":\"\",\"label\":\"Maint Expiration\",\"locked\":false,\"property\":\"maintExpDate\",\"width\":140}]}}"
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/database/listJson",
+					"raw": "{{host}}/tdstm/ws/assetExplorer/query/2",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"database",
-						"listJson"
+						"ws",
+						"assetExplorer",
+						"query",
+						"2"
 					]
 				}
 			},

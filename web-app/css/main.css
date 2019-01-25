@@ -1153,3 +1153,11 @@ div.dialog input#description {
 .k-grid-content tr td {
 	padding: 2px 6px;
 }
+
+span#addAkaId.addAkaDisabled {
+	color: grey !important;
+	cursor: not-allowed;
+}
+span#addAkaId:not(.addAkaDisabled) {
+	cursor: pointer;
+}
