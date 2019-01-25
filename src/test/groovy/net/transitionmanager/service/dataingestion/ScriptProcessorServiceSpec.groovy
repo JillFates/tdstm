@@ -1,7 +1,6 @@
-import com.tds.asset.Application
+package net.transitionmanager.service.dataingestion
+
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
@@ -14,18 +13,14 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.WorkbookUtil
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
-import net.transitionmanager.domain.DataScript
+import grails.test.hibernate.HibernateSpec
+import grails.testing.services.ServiceUnitTest
+import grails.testing.spring.AutowiredTest
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SettingService
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -34,31 +29,35 @@ import spock.lang.Specification
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
-@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
-class ScriptProcessorServiceSpec extends Specification {
+//@Mock([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
+class ScriptProcessorServiceSpec extends HibernateSpec implements ServiceUnitTest<ScriptProcessorService>, AutowiredTest {
 
 	String sixRowsDataSetFileName
 	String applicationDataSetFileName
 	FileSystemService fileSystemService
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			settingService(SettingService)
 		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-		settingService(SettingService)
 	}
 
-	static doWithConfig(c) {
-		c.graph.tmpDir = '/tmp/'
+	Closure doWithConfig() {
+		{ config ->
+			config.graph.tmpDir = '/tmp/'
+		}
 	}
 
-	def setup() {
+	void setup() {
+		assert fileSystemService != null
 
-		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
+		// fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
 
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetFileName = fileName
@@ -86,7 +85,7 @@ class ScriptProcessorServiceSpec extends Specification {
 		ETLProcessorResult.registerObjectMarshaller()
 	}
 
-	def cleanup() {
+	void cleanup() {
 		fileSystemService.deleteTemporaryFile(sixRowsDataSetFileName)
 		fileSystemService.deleteTemporaryFile(applicationDataSetFileName)
 	}
@@ -266,7 +265,6 @@ application id,vendor name,technology,location
 			TMDEMO.getId() >> 125612l
 
 		and:
-			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				[]
 			}
@@ -340,7 +338,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
@@ -485,10 +482,10 @@ application id,vendor name,technology,location
 				!isValid
 				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
 				!data.domains
-				with(error){
+				with(error) {
 					message == 'No such property: Unknown at line 5'
 					startLine == 5
-					endLine  == 5
+					endLine == 5
 					startColumn == null
 					endColumn == null
 					fatal == true
