@@ -27,7 +27,8 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.springframework.beans.factory.InitializingBean
+import org.springframework.context.ApplicationListener
+import org.springframework.context.event.ContextRefreshedEvent
 
 import javax.management.RuntimeErrorException
 
@@ -35,7 +36,7 @@ import javax.management.RuntimeErrorException
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
 @Transactional(readOnly = true)
-class FileSystemService implements ServiceMethods, InitializingBean {
+class FileSystemService implements ApplicationListener<ContextRefreshedEvent> {
 	public static final String ETL_SAMPLE_DATA_PREFIX = 'EtlSampleData_'
 	public static final String ETL_SOURCE_DATA_PREFIX = 'EtlSourceData_'
 
@@ -44,7 +45,7 @@ class FileSystemService implements ServiceMethods, InitializingBean {
      */
 	public static final List<String> ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ['csv', 'json', 'xls', 'xlsx', 'xml']
 
-    // The maximum number of tries to get a unique filename so that the getUniqueFilename doesn't get into infinite loop
+    // The maximum number of tries to get a unique filename so that the getUniqueFilename doens't get into infinite loop
     static final int maxUniqueTries=100
 
     // The directory that temporary files will be created
@@ -53,15 +54,16 @@ class FileSystemService implements ServiceMethods, InitializingBean {
     CoreService coreService
     SecurityService securityService
 
-	void afterPropertiesSet() {
-		// Load the temporary directory name and make sure that it has the
+	@Override
+    void onApplicationEvent(ContextRefreshedEvent event) {
+        // Load the temporary directory name and make sure that it has the
 		temporaryDirectory = coreService.getAppTempDirectory()
 
 
-		if (! temporaryDirectory.endsWith(File.separator)) {
+        if (! temporaryDirectory.endsWith(File.separator)) {
 			temporaryDirectory = temporaryDirectory + File.separator
-		}
-	}
+        }
+    }
 
 	/**
 	 * Initialize a CSV file
@@ -214,7 +216,6 @@ class FileSystemService implements ServiceMethods, InitializingBean {
      *      OutputStream output stream
      */
     List createTemporaryFile(String prefix='', String extension='tmp') {
-		println '>>>>>> createTemporaryFile ' + temporaryDirectory + ' -----  ' + prefix + ' ----- ' + extension
         String filename = getUniqueFilename(temporaryDirectory, prefix, extension)
         OutputStream os = new File(temporaryDirectory + filename).newOutputStream()
         log.info 'Created temporary file {}{}', temporaryDirectory, filename
@@ -272,7 +273,6 @@ class FileSystemService implements ServiceMethods, InitializingBean {
      * @return true if the file exists otherwise false
      */
     static boolean temporaryFileExists(String filename) {
-		println '--------- temporaryDirectory ---- ' + temporaryDirectory
         return new File(temporaryDirectory, filename).exists()
     }
 
