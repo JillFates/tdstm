@@ -399,7 +399,7 @@ export class TaskEditCreateModelHelper {
 	 * @returns {boolean}
 	 */
 	hasDuplicatedPredecessors(): boolean {
-		return this.hasDuplicates(this.model.predecessorList);
+		return this.hasDuplicates(this.model.predecessorList, true);
 	}
 
 	/**
@@ -407,16 +407,19 @@ export class TaskEditCreateModelHelper {
 	 * @returns {boolean}
 	 */
 	hasDuplicatedSuccessors(): boolean {
-		return this.hasDuplicates(this.model.successorList);
+		return this.hasDuplicates(this.model.successorList, true);
 	}
 
 	/**
 	 * Determine if the array of objects passed as argument has duplicated id properties
-	 * @param {any[]} array
+	 * @param {any[]} array with values
+	 * @param {boolean} ignoreBlanks  Flag to ignore blank values
 	 * @returns {boolean}
 	 */
-	private hasDuplicates(array: any[]): boolean {
-		return this.extractDistinctIds(array).length < array.length;
+	private hasDuplicates(array: any[], ignoreBlanks = false): boolean {
+		const items = ignoreBlanks ? array.filter((item) => item.id) : array;
+
+		return this.extractDistinctIds(items).length < items.length;
 	}
 
 	/**
