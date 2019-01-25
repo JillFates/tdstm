@@ -3,10 +3,12 @@ package specs.Admin.Company
 import geb.spock.GebReportingSpec
 import pages.Admin.Company.CompanyDetailsPage
 import pages.Admin.Company.CompanyEditionPage
+import pages.Admin.Company.CompanyCreationPage
 import pages.Admin.Company.ListCompaniesPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import utils.CommonActions
 
 /**
  * @author ingrid
@@ -16,14 +18,30 @@ import spock.lang.Stepwise
 class CompanyEditionSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static baseName = "QAE2E"
-    static companyName =""
-    static companyComment=""
+    static randStr = CommonActions.getRandomString()
+    static nowDate = new Date().format("MM/dd/yyyy")
+    static baseName = "QAE2E Edit Co spec"
+    static companyName = baseName +" "+ randStr
+    static companyComment="Comment for company "+ companyName +" created by QA E2E Scripts"
     static initPartnerValue=false;
+    static companyInfo = [
+            name: companyName,
+            comment: companyComment ,
+            isPartner: false,
+            dateCreated: nowDate,
+            lastUpdated: nowDate
+    ]
     def setupSpec() {
         testCount = 0
         to LoginPage
         login()
+        at MenuPage
+        adminModule.goToListCompanies()
+        //a company is created so it can be edited later (TM-13962)
+        at ListCompaniesPage
+        clickOnCreateButton()
+        at CompanyCreationPage
+        createCompany companyInfo
         at MenuPage
         adminModule.goToListCompanies()
     }
