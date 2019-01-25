@@ -14,10 +14,9 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.WorkbookUtil
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
+import grails.testing.web.GrailsWebUnitTest
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
@@ -34,31 +33,36 @@ import spock.lang.Specification
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
-@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
-class ScriptProcessorServiceSpec extends Specification {
+class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTest<ScriptProcessorService>, DataTest, GrailsWebUnitTest {
 
 	String sixRowsDataSetFileName
 	String applicationDataSetFileName
 	FileSystemService fileSystemService
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-		settingService(SettingService)
-	}
-
 	static doWithConfig(c) {
 		c.graph.tmpDir = '/tmp/'
 	}
 
+	void setupSpec(){
+		mockDomains DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions
+	}
+
 	def setup() {
+		defineBeans {
+
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+				transactionManager = ref('transactionManager')
+			}
+			settingService(SettingService)
+		}
 
 		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
+
+		fileSystemService.onApplicationEvent(null)
 
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetFileName = fileName
@@ -185,69 +189,63 @@ class ScriptProcessorServiceSpec extends Specification {
 			Map<String, ?> result = service.testScript(GMDEMO, script, fileSystemService.getTemporaryFullFilename(applicationDataSetFileName))
 
 		then: 'Service result has validSyntax equals false and a list of errors'
-			with(result) {
-				isValid
-				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
-				data.domains.size() == 1
-				with(data.domains[0]) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
-					with(data[0].fields.id) {
-						value == 152254l
-						originalValue == '152254'
-						find.results == [152254l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152254l]
-							]
-						)
-					}
+			result.isValid
+			result.consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
+			result.data.domains.size() == 1
 
-					with(data[1].fields.id) {
-						value == 152255l
-						originalValue == '152255'
-						find.results == [152255l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152255l]
-							]
-						)
-					}
+			result.data.domains[0].domain == ETLDomain.Application.name()
+			result.data.domains[0].fieldNames == ['id', 'appVendor', 'environment'] as Set
 
-					with(data[0].fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						!find.query
-					}
 
-					with(data[1].fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						!find.query
-					}
+			result.data.domains[0].data[0].fields.id.value == 152254l
+			result.data.domains[0].data[0].fields.id.originalValue == '152254'
+			result.data.domains[0].data[0].fields.id.find.results == [152254l]
+			result.data.domains[0].data[0].fields.id.find.matchOn == 0
+			result.data.domains[0].data[0].fields.id.find.query.size() == 1
 
-					with(data[0].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
+			assertQueryResult(
+				result.data.domains[0].data[0].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152254l]
+				]
+			)
 
-					with(data[1].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
-				}
-			}
+
+			result.data.domains[0].data[1].fields.id.value == 152255l
+			result.data.domains[0].data[1].fields.id.originalValue == '152255'
+			result.data.domains[0].data[1].fields.id.find.results == [152255l]
+			result.data.domains[0].data[1].fields.id.find.matchOn == 0
+			result.data.domains[0].data[1].fields.id.find.query.size() == 1
+
+			assertQueryResult(
+				result.data.domains[0].data[1].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152255l]
+				]
+			)
+
+
+			result.data.domains[0].data[0].fields.appVendor.value == 'Microsoft'
+			result.data.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
+			!result.data.domains[0].data[0].fields.appVendor.find.query
+
+
+			result.data.domains[0].data[1].fields.appVendor.value == 'Mozilla'
+			result.data.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
+			!result.data.domains[0].data[1].fields.appVendor.find.query
+
+
+			result.data.domains[0].data[0].fields.environment.value == 'Production'
+			result.data.domains[0].data[0].fields.environment.originalValue == 'Production'
+			!result.data.domains[0].data[0].fields.environment.find.query
+
+
+			result.data.domains[0].data[1].fields.environment.value == 'Production'
+			result.data.domains[0].data[1].fields.environment.originalValue == 'Production'
+			!result.data.domains[0].data[1].fields.environment.find.query
 	}
 
 	void 'test can test a script content can have blank lines at the top without failing the line number in error messages'() {
@@ -367,69 +365,62 @@ application id,vendor name,technology,location
 				fileSystemService.getTemporaryFullFilename(fileName))
 
 		then: 'Service result has validSyntax equals false and a list of errors'
-			with(result) {
-				isValid
-				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
-				data.domains.size() == 1
-				with(data.domains[0]) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
-					with(data[0].fields.id) {
-						value == 152254l
-						originalValue == '152254'
-						find.results == [152254l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152254l]
-							]
-						)
-					}
+			result.isValid
+			result.consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
+			result.data.domains.size() == 1
 
-					with(data[1].fields.id) {
-						value == 152255l
-						originalValue == '152255'
-						find.results == [152255l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152255l]
-							]
-						)
-					}
+			result.data.domains[0].domain == ETLDomain.Application.name()
+			result.data.domains[0].fieldNames == ['id', 'appVendor', 'environment'] as Set
 
-					with(data[0].fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						!find.query
-					}
 
-					with(data[1].fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						!find.query
-					}
+			result.data.domains[0].data[0].fields.id.value == 152254l
+			result.data.domains[0].data[0].fields.id.originalValue == '152254'
+			result.data.domains[0].data[0].fields.id.find.results == [152254l]
+			result.data.domains[0].data[0].fields.id.find.matchOn == 0
+			result.data.domains[0].data[0].fields.id.find.query.size() == 1
 
-					with(data[0].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
+			assertQueryResult(
+				result.data.domains[0].data[0].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152254l]
+				]
+			)
 
-					with(data[1].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
-				}
-			}
+
+			result.data.domains[0].data[1].fields.id.value == 152255l
+			result.data.domains[0].data[1].fields.id.originalValue == '152255'
+			result.data.domains[0].data[1].fields.id.find.results == [152255l]
+			result.data.domains[0].data[1].fields.id.find.matchOn == 0
+			result.data.domains[0].data[1].fields.id.find.query.size() == 1
+
+			assertQueryResult(
+				result.data.domains[0].data[1].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152255l]
+				]
+			)
+
+			result.data.domains[0].data[0].fields.appVendor.value == 'Microsoft'
+			result.data.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
+			!result.data.domains[0].data[0].fields.appVendor.find.query
+
+
+			result.data.domains[0].data[1].fields.appVendor.value == 'Mozilla'
+			result.data.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
+			!result.data.domains[0].data[1].fields.appVendor.find.query
+
+
+			result.data.domains[0].data[0].fields.environment.value == 'Production'
+			result.data.domains[0].data[0].fields.environment.originalValue == 'Production'
+			!result.data.domains[0].data[0].fields.environment.find.query
+
+
+			result.data.domains[0].data[1].fields.environment.value == 'Production'
+			result.data.domains[0].data[1].fields.environment.originalValue == 'Production'
+			!result.data.domains[0].data[1].fields.environment.find.query
 
 		cleanup:
 			if (fileName) {
@@ -553,68 +544,60 @@ application id,vendor name,technology,location
 			outputFilename != null
 
 		and: 'Service result returns the instance of ETLProcessor and its results'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['id', 'appVendor', 'environment'] as Set
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					data.size() == 2
-					with(data[0].fields.id) {
-						value == 152254l
-						originalValue == '152254'
-						find.results == [152254l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152254l]
-							]
-						)
-					}
+			results.domains[0].domain == ETLDomain.Application.name()
+			results.domains[0].fieldNames == ['id', 'appVendor', 'environment'] as Set
 
-					with(data[1].fields.id) {
-						value == 152255l
-						originalValue == '152255'
-						find.results == [152255l]
-						find.matchOn == 0
-						find.query.size() == 1
-						assertQueryResult(
-							find.query[0],
-							ETLDomain.Application,
-							[
-								['id', FindOperator.eq.name(), 152255l]
-							]
-						)
-					}
+			results.domains[0].data.size() == 2
 
-					with(data[0].fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						!find.query
-					}
+			results.domains[0].data[0].fields.id.value == 152254l
+			results.domains[0].data[0].fields.id.originalValue == '152254'
+			results.domains[0].data[0].fields.id.find.results == [152254l]
+			results.domains[0].data[0].fields.id.find.matchOn == 0
+			results.domains[0].data[0].fields.id.find.query.size() == 1
+			assertQueryResult(
+				results.domains[0].data[0].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152254l]
+				]
+			)
 
-					with(data[1].fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						!find.query
-					}
 
-					with(data[0].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
+			results.domains[0].data[1].fields.id.value == 152255l
+			results.domains[0].data[1].fields.id.originalValue == '152255'
+			results.domains[0].data[1].fields.id.find.results == [152255l]
+			results.domains[0].data[1].fields.id.find.matchOn == 0
+			results.domains[0].data[1].fields.id.find.query.size() == 1
+			assertQueryResult(
+				results.domains[0].data[1].fields.id.find.query[0],
+				ETLDomain.Application,
+				[
+					['id', FindOperator.eq.name(), 152255l]
+				]
+			)
 
-					with(data[1].fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-						!find.query
-					}
-				}
-			}
+
+			results.domains[0].data[0].fields.appVendor.value == 'Microsoft'
+			results.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
+			!results.domains[0].data[0].fields.appVendor.find.query
+
+
+			results.domains[0].data[1].fields.appVendor.value == 'Mozilla'
+			results.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
+			!results.domains[0].data[1].fields.appVendor.find.query
+
+
+			results.domains[0].data[0].fields.environment.value == 'Production'
+			results.domains[0].data[0].fields.environment.originalValue == 'Production'
+			!results.domains[0].data[0].fields.environment.find.query
+
+
+			results.domains[0].data[1].fields.environment.value == 'Production'
+			results.domains[0].data[1].fields.environment.originalValue == 'Production'
+			!results.domains[0].data[1].fields.environment.find.query
 
 		and: 'ProgressCallback registered all report messages'
 			with(callback) {
@@ -754,14 +737,16 @@ application id,vendor name,technology,location
 	 * @param domain
 	 * @param values
 	 */
-	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+	static boolean assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
+
 		queryResult.criteria.eachWithIndex { Map map, int i ->
 			assert map['propertyName'] == values[i][0]
 			assert map['operator'] == values[i][1]
 			assert map['value'] == values[i][2]
 		}
 
+		return true
 	}
 
 }
