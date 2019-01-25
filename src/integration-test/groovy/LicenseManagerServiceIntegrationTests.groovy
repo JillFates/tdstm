@@ -2,6 +2,7 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.domain.Person
@@ -31,6 +32,7 @@ This unit test class is intended to test the License MAnager Process in the foll
 ''')
 
 @See('https://support.transitionmanager.com/browse/TM-5966')
+@Slf4j
 @Integration
 @Rollback
 class LicenseManagerServiceIntegrationTests extends Specification {

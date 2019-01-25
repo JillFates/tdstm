@@ -609,13 +609,13 @@ class ProjectService implements ServiceMethods {
 		//remove the AssetEntity
 		def assetsQuery = "select a.id from AssetEntity a where a.project = $projectInstance.id"
 
-		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
-		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
+		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)".toString())
+		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)".toString())
 		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = $projectInstance.id")
-		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
+		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)".toString())
 		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='$AssetCableStatus.UNKNOWN',assetTo=null,
-										assetToPort=null where assetTo in ($assetsQuery)""")
-		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
+										assetToPort=null where assetTo in ($assetsQuery)""".toString())
+		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)".toString())
 
 		AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = $projectInstance.id")
 		AssetComment.executeUpdate("delete from AssetComment ac where ac.project = $projectInstance.id")

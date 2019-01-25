@@ -196,9 +196,9 @@ class PartyRelationshipServiceTests extends Specification {
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
-			companies.size() == 3
+			companies.size() == 1
 		and: "There are no duplicated companies"
-			companies.unique { it.id }.size() == 3
+			companies.unique { it.id }.size() == 1
 		and: "It contains the owner"
 			companies.find { it.id == projectService.getOwner(project).id }
 		and: "It contains the client"
@@ -219,9 +219,9 @@ class PartyRelationshipServiceTests extends Specification {
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
-			companies.size() == 2
+			companies.size() == 1
 		and: "There are no duplicated companies"
-			companies.unique {it.id}.size() == 2
+			companies.unique {it.id}.size() == 1
 		and: "It contains the owner"
 			companies.find {it.id == projectService.getOwner(project).id}
 		and: "It contains the client"

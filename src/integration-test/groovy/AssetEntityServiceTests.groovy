@@ -18,7 +18,7 @@ import spock.lang.Specification
 class AssetEntityServiceTests extends Specification{
 
 	AssetEntityService assetEntityService
-	TagAssetService tagAssetServic
+	TagAssetService tagAssetService
 
 	private AssetTestHelper assetHelper
 	private ProjectTestHelper projectHelper
