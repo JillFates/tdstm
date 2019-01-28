@@ -1,22 +1,21 @@
 import {Component, ViewChild} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
-import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
-import {AssetExportModel} from '../../model/asset-export-model';
-import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'asset-explorer-view-export',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-export/asset-explorer-view-export.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-export/asset-view-export.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
 	`]
 })
-export class AssetExplorerViewExportComponent {
+export class AssetViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
 	protected exportFileName = '';

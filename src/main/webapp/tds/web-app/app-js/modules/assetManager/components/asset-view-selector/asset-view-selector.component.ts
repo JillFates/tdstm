@@ -12,18 +12,18 @@ import {
 import {Observable} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 
-import {ViewGroupModel} from '../../model/view.model';
-import {ViewType} from '../../model/view.model';
+import {ViewGroupModel} from '../../../assetExplorer/model/view.model';
+import {ViewType} from '../../../assetExplorer/model/view.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 
-import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {Router} from '@angular/router';
 
 @Component({
-	selector: 'asset-explorer-view-selector',
-	exportAs: 'assetExplorerViewSelector',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
+	selector: 'tds-asset-view-selector',
+	exportAs: 'tdsAssetViewSelector',
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-selector/asset-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
 			`ul.k-list .k-item.k-state-selected, ul.k-list .k-item.k-state-selected:hover {
@@ -32,7 +32,7 @@ import {Router} from '@angular/router';
         }`
 	]
 })
-export class AssetExplorerViewSelectorComponent implements AfterViewInit {
+export class AssetViewSelectorComponent implements AfterViewInit {
 	@Input() open ? = false;
 	@Input() nameAsUrl ? = true;
 	@Input() showCreate ? = true;

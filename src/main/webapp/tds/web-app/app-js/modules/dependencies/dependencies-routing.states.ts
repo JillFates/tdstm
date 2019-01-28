@@ -4,7 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
-import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service';
+import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components

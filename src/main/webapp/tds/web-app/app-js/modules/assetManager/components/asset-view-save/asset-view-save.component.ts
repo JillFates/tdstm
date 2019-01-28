@@ -1,16 +1,16 @@
-import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel, ViewGroupModel } from '../../model/view.model';
-import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
+import { ViewModel, ViewGroupModel } from '../../../assetExplorer/model/view.model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'asset-explorer-view-save',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-save/asset-explorer-view-save.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-save/asset-view-save.component.html'
 })
-export class AssetExplorerViewSaveComponent implements AfterViewInit {
+export class AssetViewSaveComponent implements AfterViewInit {
 	model: ViewModel;
 	private isUnique = true;
 	constructor(

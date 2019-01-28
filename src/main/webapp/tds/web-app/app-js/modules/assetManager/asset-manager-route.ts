@@ -4,16 +4,16 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
-// import {ReportResolveService} from './resolve/report-resolve.service';
+import {ReportResolveService} from './resolve/report-resolve.service';
 import {ReportsResolveService} from './resolve/reports-resolve.service';
-// import {FieldsResolveService} from './resolve/fields-resolve.service';
-// import {TagsResolveService} from './resolve/tags-resolve.service';
+import {FieldsResolveService} from './resolve/fields-resolve.service';
+import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
-// import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
-// import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
+import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';
+import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 
 /**
  * Asset Manager Route States
@@ -61,71 +61,71 @@ export const AssetManagerRoute: Routes = [
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
 		runGuardsAndResolvers: 'always'
 	},
-	// {
-	// 	path: AssetExplorerStates.REPORT_CREATE.url,
-	// 	data: {
-	// 		page: {
-	// 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-	// 			instruction: '',
-	// 			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.CREATE']
-	// 		},
-	// 		requiresAuth: true,
-	// 		requiresPermission: 'AssetExplorerCreate',
-	// 		hasPendingChanges: false
-	// 	},
-	// 	component: AssetExplorerViewConfigComponent,
-	// 	resolve: {
-	// 		tagList: TagsResolveService,
-	// 		report: ReportResolveService,
-	// 		reports: ReportsResolveService,
-	// 		fields: FieldsResolveService
-	// 	},
-	// 	canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-	// 	runGuardsAndResolvers: 'always'
-	// },
-	// {
-	// 	path: AssetExplorerStates.REPORT_EDIT.url,
-	// 	data: {
-	// 		page: {
-	// 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-	// 			instruction: '',
-	// 			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.EDIT']
-	// 		},
-	// 		requiresAuth: true,
-	// 		requiresPermission: 'AssetExplorerEdit',
-	// 		hasPendingChanges: false
-	// 	},
-	// 	component: AssetExplorerViewConfigComponent,
-	// 	resolve: {
-	// 		tagList: TagsResolveService,
-	// 		report: ReportResolveService,
-	// 		reports: ReportsResolveService,
-	// 		fields: FieldsResolveService
-	// 	},
-	// 	canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-	// 	runGuardsAndResolvers: 'always'
-	// },
-	// {
-	// 	path: AssetExplorerStates.REPORT_SHOW.url,
-	// 	data: {
-	// 		page: {
-	// 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-	// 			instruction: '',
-	// 			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.SHOW'],
-	// 			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
-	// 		},
-	// 		requiresAuth: true
-	// 	},
-	// 	component: AssetExplorerViewShowComponent,
-	// 	resolve: {
-	// 		tagList: TagsResolveService,
-	// 		report: ReportResolveService,
-	// 		reports: ReportsResolveService,
-	// 		fields: FieldsResolveService
-	// 	},
-	// 	canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-	// 	runGuardsAndResolvers: 'always'
-	// }
+	{
+		path: AssetExplorerStates.REPORT_CREATE.url,
+		data: {
+			page: {
+				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.CREATE']
+			},
+			requiresAuth: true,
+			requiresPermission: 'AssetExplorerCreate',
+			hasPendingChanges: false
+		},
+		component: AssetViewConfigComponent,
+		resolve: {
+			tagList: TagsResolveService,
+			report: ReportResolveService,
+			reports: ReportsResolveService,
+			fields: FieldsResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: AssetExplorerStates.REPORT_EDIT.url,
+		data: {
+			page: {
+				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.EDIT']
+			},
+			requiresAuth: true,
+			requiresPermission: 'AssetExplorerEdit',
+			hasPendingChanges: false
+		},
+		component: AssetViewConfigComponent,
+		resolve: {
+			tagList: TagsResolveService,
+			report: ReportResolveService,
+			reports: ReportsResolveService,
+			fields: FieldsResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: AssetExplorerStates.REPORT_SHOW.url,
+		data: {
+			page: {
+				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.SHOW'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
+			},
+			requiresAuth: true
+		},
+		component: AssetViewShowComponent,
+		resolve: {
+			tagList: TagsResolveService,
+			report: ReportResolveService,
+			reports: ReportsResolveService,
+			fields: FieldsResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always'
+	}
 ];
 
 @NgModule({
