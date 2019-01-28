@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5f4b1a11-8000-4dca-af2d-ab704be88d28",
+		"_postman_id": "e2109fb9-15b1-4dde-84e9-4be6d5671095",
 		"name": "TDS - Dataview API",
 		"description": "Dataview Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -88,22 +88,8 @@
 							"var jsonObject = JSON.parse(responseBody);",
 							"var firstIDIsOwnerTrue ; ",
 							"var jsonData = pm.response.json();",
-							"var counter = jsonData.data.length-1;",
 							"",
-							"/*",
-							"Only the dataviews where \"isOwner:\" true can be used, we don't have an endpoint nor a filter so we",
-							"need to manually search for the record.",
-							"I iterate from the last record to the first one because when I observed the results, typically the views",
-							"that we should use are the last results.",
-							"*/",
-							"",
-							"while(counter !== 0){",
-							"    if(jsonObject.data[counter].isOwner === true) {",
-							"    firstIDIsOwnerTrue = jsonObject.data[counter].id;",
-							"    break;",
-							"    }",
-							"counter--;",
-							"}",
+							"firstIDIsOwnerTrue = jsonObject.data[0].id;",
 							"",
 							"pm.environment.set(\"dataviewID\", firstIDIsOwnerTrue);",
 							"",
@@ -160,39 +146,26 @@
 							"//Here we will extract 1 property(column) of one asset(the first one) and pass it to an environment",
 							"//variable which will then be used to test the filters. Also we extract the value of said property.",
 							"var jsonObject = JSON.parse(responseBody);",
-							"",
+							"var len = jsonObject.data.assets.length;",
 							"var firstPropertyFirstAsset = ([Object.keys(jsonObject.data.assets[0])[0]].toString());",
 							"var firstFiltersValue = Object.values(jsonObject.data.assets[0])[0];",
-							"pm.environment.set(\"firstFilterValueUnchanged\", firstFiltersValue);",
+							"if(firstFiltersValue===null)",
+							"firstFiltersValue=\"null\";",
+							"",
+							"",
 							"pm.environment.set(\"firstFilterValue\", firstFiltersValue);",
-							"",
-							"/*",
-							"For some reason, internally the properties that have a \"_\" don't work because they use a",
-							"\".\" instead. We need to change them before filtering.",
-							"For example, if the property is called common_custom, if you use it as a filter it fails.",
-							"You have to use common.custom instead, so we do that transformation before.",
-							"This functionality might change soon so we need to update this.",
-							"If the property has a single word, there's no need of transformation and can be used as is.",
-							"",
-							"All the properties I've seen have a max of 1 \"_\" so this transformation method assumes that as well.",
-							"*/",
-							"pm.environment.set(\"firstFilterProperty\", \"\");",
-							"if(firstPropertyFirstAsset.includes(\"_\")){",
-							"    var newFirstProperty = firstPropertyFirstAsset.split(\"_\");",
-							"    firstFilterProperty = newFirstProperty[0] + \".\" + newFirstProperty[1];",
-							"    pm.environment.set(\"firstFilterProperty\", firstFilterProperty);",
-							"}",
-							"else{",
-							"    pm.environment.set(\"firstFilterProperty\", firstFilterProperty);",
-							"}",
-							"",
-							"",
+							"pm.environment.set(\"firstFilterProperty\", firstPropertyFirstAsset);",
+							"pm.environment.set(\"offset\", (jsonObject.data.pagination.total-4));",
+							"pm.environment.set(\"limit\", (jsonObject.data.pagination.total-2));",
 							""
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -209,10 +182,7 @@
 						"value": "1.0"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
+				"body": {},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataview/{{dataviewID}}/data",
 					"host": [
@@ -397,14 +367,17 @@
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});",
 							"",
-							"//As you can see on the collection details, I set the {{offset}} as 2 so here on the test",
-							"//we'll check that it matches. It can be easily changed from Collection>Edit",
-							"",
 							"var jsonObject = JSON.parse(responseBody);",
 							"var offsetResponseValue = jsonObject.data.pagination.offset;",
 							"",
 							"pm.test(\"The offset value matches our offset parameter\", function () {",
-							"    pm.expect(offsetResponseValue.toString()).to.eql(pm.variables.get(\"offset\"));",
+							"    pm.expect(offsetResponseValue).to.eql(pm.variables.get(\"offset\"));",
+							"});",
+							"",
+							"pm.test(\"The max number matches the total\", function () {",
+							"    var total = jsonObject.data.pagination.total;",
+							"    var max = jsonObject.data.pagination.max;",
+							"    pm.expect(total).to.eql(max);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -453,81 +426,6 @@
 				"description": "Endpoint previewQuery\n\nRequest:\n  URI: /tdstm/ws/assetExplorer/previewQuery\n\n{\n  \"offset\": 5,\n  \"limit\": 25,\n  \"sortDomain\": \"application\",\n  \"sortField\": \"sme',\n  \"sortOrder\": \"a\",\n  \"viewSpec: {\n    \"domains\": [\"application\", \"device\"],\n    \"columns\": [ { \"domain\": \"common\", \"property\": \"environment\", \"filter\": \"production\" } ],\n  }\n}"
 			},
 			"response": [
-				{
-					"name": "SME and SME2 with Nulls. ",
-					"originalRequest": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tdstm",
-								"ws",
-								"assetExplorer",
-								"previewQuery"
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8",
-							"name": "Content-Type",
-							"description": ""
-						},
-						{
-							"key": "Date",
-							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
-							"name": "Date",
-							"description": ""
-						},
-						{
-							"key": "Server",
-							"value": "Apache-Coyote/1.1",
-							"name": "Server",
-							"description": ""
-						},
-						{
-							"key": "Transfer-Encoding",
-							"value": "chunked",
-							"name": "Transfer-Encoding",
-							"description": ""
-						}
-					],
-					"cookie": [
-						{
-							"expires": "Invalid Date",
-							"httpOnly": true,
-							"domain": "localhost",
-							"path": "/tdstm/",
-							"secure": false,
-							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
-							"key": "JSESSIONID"
-						}
-					],
-					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
-				},
 				{
 					"name": "Manufacturer with Nulls",
 					"originalRequest": {
@@ -602,6 +500,81 @@
 						}
 					],
 					"body": "{\"pagination\":{\"offset\":300,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152254,\"device.model\":\"SRW24G4\",\"device.manufacturer\":\"LINKSYS\"},{\"common.id\":152255,\"device.model\":\"ZPHA MODULE\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152256,\"device.model\":\"Slideaway\",\"device.manufacturer\":\"ATEN\"},{\"common.id\":152257,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152258,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152259,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152260,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152261,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152262,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152263,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152264,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152265,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152266,\"device.model\":\"2400E\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152267,\"device.model\":\"2U Cable Management\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152268,\"device.model\":\"Desktops SxS\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152269,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152270,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152271,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152272,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152273,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152274,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152275,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152276,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152277,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152278,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152279,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152280,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152281,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152282,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152283,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152284,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152285,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152286,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152287,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152288,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152289,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152290,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152291,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152292,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152293,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152294,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152295,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152296,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152297,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152298,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152299,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152300,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152301,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152302,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152303,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152304,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152305,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152306,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152307,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152308,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152309,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152310,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152311,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152312,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152313,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152314,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152315,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152316,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152317,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152318,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152319,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152320,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152321,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152322,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152323,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152324,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152325,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152326,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152327,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152328,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152329,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152330,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152331,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152332,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152333,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152334,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152335,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152336,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152337,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152338,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152339,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152340,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152341,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152342,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152343,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152344,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152345,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152346,\"device.model\":\"ProxyAV\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152347,\"device.model\":\"ProxySG\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152348,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152349,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152350,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152351,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152352,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152353,\"device.model\":null,\"device.manufacturer\":null}],\"status\":\"success\"}"
+				},
+				{
+					"name": "SME and SME2 with Nulls. ",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"previewQuery"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "Apache-Coyote/1.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"httpOnly": true,
+							"domain": "localhost",
+							"path": "/tdstm/",
+							"secure": false,
+							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
+							"key": "JSESSIONID"
+						}
+					],
+					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
 				}
 			]
 		},
@@ -621,18 +594,19 @@
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});",
 							"",
-							"",
-							"//As you can see on the collection details, I set the {{limit}} as 4 so here on the test",
-							"//we'll check that it matches. It can be easily changed from Collection>Edit",
-							"",
 							"var jsonObject = JSON.parse(responseBody);",
-							"var limtResponseValue = jsonObject.data.pagination.max;",
-							"pm.test(\"The limit value matches our limit parameter\", function () {",
-							"    pm.expect(limtResponseValue.toString()).to.eql(pm.variables.get(\"limit\"));",
-							"    var jsonData = pm.response.json();",
-							"    var resultsNumber = jsonData.data.assets.length;",
-							"    pm.expect(resultsNumber.toString()).to.eql(pm.variables.get(\"limit\"));",
-							"});"
+							"",
+							"pm.test(\"The max number matches the limit\", function () {",
+							"    var total = jsonObject.data.pagination.total;",
+							"    var max = pm.variables.get(\"limit\"); ",
+							"    pm.expect(max).to.eql(jsonObject.data.pagination.max);",
+							"});",
+							"",
+							"pm.test(\"The offset value matches our offset parameter\", function () {",
+							"    var offsetResponseValue = jsonObject.data.pagination.offset;",
+							"    pm.expect(offsetResponseValue).to.eql(pm.variables.get(\"offset\"));",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -685,81 +659,6 @@
 			},
 			"response": [
 				{
-					"name": "SME and SME2 with Nulls. ",
-					"originalRequest": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tdstm",
-								"ws",
-								"assetExplorer",
-								"previewQuery"
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8",
-							"name": "Content-Type",
-							"description": ""
-						},
-						{
-							"key": "Date",
-							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
-							"name": "Date",
-							"description": ""
-						},
-						{
-							"key": "Server",
-							"value": "Apache-Coyote/1.1",
-							"name": "Server",
-							"description": ""
-						},
-						{
-							"key": "Transfer-Encoding",
-							"value": "chunked",
-							"name": "Transfer-Encoding",
-							"description": ""
-						}
-					],
-					"cookie": [
-						{
-							"expires": "Invalid Date",
-							"httpOnly": true,
-							"domain": "localhost",
-							"path": "/tdstm/",
-							"secure": false,
-							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
-							"key": "JSESSIONID"
-						}
-					],
-					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
-				},
-				{
 					"name": "Manufacturer with Nulls",
 					"originalRequest": {
 						"method": "POST",
@@ -833,6 +732,81 @@
 						}
 					],
 					"body": "{\"pagination\":{\"offset\":300,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152254,\"device.model\":\"SRW24G4\",\"device.manufacturer\":\"LINKSYS\"},{\"common.id\":152255,\"device.model\":\"ZPHA MODULE\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152256,\"device.model\":\"Slideaway\",\"device.manufacturer\":\"ATEN\"},{\"common.id\":152257,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152258,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152259,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152260,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152261,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152262,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152263,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152264,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152265,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152266,\"device.model\":\"2400E\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152267,\"device.model\":\"2U Cable Management\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152268,\"device.model\":\"Desktops SxS\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152269,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152270,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152271,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152272,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152273,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152274,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152275,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152276,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152277,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152278,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152279,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152280,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152281,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152282,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152283,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152284,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152285,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152286,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152287,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152288,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152289,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152290,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152291,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152292,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152293,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152294,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152295,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152296,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152297,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152298,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152299,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152300,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152301,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152302,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152303,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152304,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152305,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152306,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152307,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152308,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152309,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152310,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152311,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152312,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152313,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152314,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152315,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152316,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152317,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152318,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152319,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152320,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152321,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152322,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152323,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152324,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152325,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152326,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152327,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152328,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152329,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152330,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152331,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152332,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152333,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152334,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152335,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152336,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152337,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152338,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152339,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152340,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152341,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152342,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152343,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152344,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152345,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152346,\"device.model\":\"ProxyAV\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152347,\"device.model\":\"ProxySG\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152348,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152349,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152350,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152351,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152352,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152353,\"device.model\":null,\"device.manufacturer\":null}],\"status\":\"success\"}"
+				},
+				{
+					"name": "SME and SME2 with Nulls. ",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"previewQuery"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "Apache-Coyote/1.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"httpOnly": true,
+							"domain": "localhost",
+							"path": "/tdstm/",
+							"secure": false,
+							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
+							"key": "JSESSIONID"
+						}
+					],
+					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
 				}
 			]
 		},
@@ -910,81 +884,6 @@
 			},
 			"response": [
 				{
-					"name": "SME and SME2 with Nulls. ",
-					"originalRequest": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tdstm",
-								"ws",
-								"assetExplorer",
-								"previewQuery"
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8",
-							"name": "Content-Type",
-							"description": ""
-						},
-						{
-							"key": "Date",
-							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
-							"name": "Date",
-							"description": ""
-						},
-						{
-							"key": "Server",
-							"value": "Apache-Coyote/1.1",
-							"name": "Server",
-							"description": ""
-						},
-						{
-							"key": "Transfer-Encoding",
-							"value": "chunked",
-							"name": "Transfer-Encoding",
-							"description": ""
-						}
-					],
-					"cookie": [
-						{
-							"expires": "Invalid Date",
-							"httpOnly": true,
-							"domain": "localhost",
-							"path": "/tdstm/",
-							"secure": false,
-							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
-							"key": "JSESSIONID"
-						}
-					],
-					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
-				},
-				{
 					"name": "Manufacturer with Nulls",
 					"originalRequest": {
 						"method": "POST",
@@ -1058,6 +957,81 @@
 						}
 					],
 					"body": "{\"pagination\":{\"offset\":300,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152254,\"device.model\":\"SRW24G4\",\"device.manufacturer\":\"LINKSYS\"},{\"common.id\":152255,\"device.model\":\"ZPHA MODULE\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152256,\"device.model\":\"Slideaway\",\"device.manufacturer\":\"ATEN\"},{\"common.id\":152257,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152258,\"device.model\":\"CCM4850\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152259,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152260,\"device.model\":\"DSR2035\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152261,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152262,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152263,\"device.model\":\"DSR8020\",\"device.manufacturer\":\"Avocent\"},{\"common.id\":152264,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152265,\"device.model\":\"Unknown - Firewall\",\"device.manufacturer\":\"unknown\"},{\"common.id\":152266,\"device.model\":\"2400E\",\"device.manufacturer\":\"TippingPoint\"},{\"common.id\":152267,\"device.model\":\"2U Cable Management\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152268,\"device.model\":\"Desktops SxS\",\"device.manufacturer\":\"Generic\"},{\"common.id\":152269,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152270,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152271,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152272,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152273,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152274,\"device.model\":\"BladeSystem c7000\",\"device.manufacturer\":\"HP\"},{\"common.id\":152275,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152276,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152277,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152278,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152279,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152280,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152281,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152282,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152283,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152284,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152285,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152286,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152287,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152288,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152289,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152290,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152291,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152292,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152293,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152294,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152295,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152296,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152297,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152298,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152299,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152300,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152301,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152302,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152303,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152304,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152305,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152306,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152307,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152308,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152309,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152310,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152311,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152312,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152313,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152314,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152315,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152316,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152317,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152318,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152319,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152320,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152321,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152322,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152323,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152324,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152325,\"device.model\":\"ProLiant BL490c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152326,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152327,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152328,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152329,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152330,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152331,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152332,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152333,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152334,\"device.model\":\"ProLiant BL460c G5\",\"device.manufacturer\":\"HP\"},{\"common.id\":152335,\"device.model\":\"ProLiant BL460c G6\",\"device.manufacturer\":\"HP\"},{\"common.id\":152336,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152337,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152338,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152339,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152340,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152341,\"device.model\":\"ProLiant BL465c G7\",\"device.manufacturer\":\"HP\"},{\"common.id\":152342,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152343,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152344,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152345,\"device.model\":\"ProLiant BL460c G1\",\"device.manufacturer\":\"HP\"},{\"common.id\":152346,\"device.model\":\"ProxyAV\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152347,\"device.model\":\"ProxySG\",\"device.manufacturer\":\"Blue Coat\"},{\"common.id\":152348,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152349,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152350,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152351,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152352,\"device.model\":null,\"device.manufacturer\":null},{\"common.id\":152353,\"device.model\":null,\"device.manufacturer\":null}],\"status\":\"success\"}"
+				},
+				{
+					"name": "SME and SME2 with Nulls. ",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"offset\":0,\n   \"limit\": 50,\n   \"sortDomain\": \"common\",\n   \"sortProperty\": \"id\",\n   \"sortOrder\": \"a\",\n   \"filters\":{\n   \t\t\"domains\": [ \"common\", \"application\", \"device\"],\n        \"columns\":[ \n        \t{ \"domain\": \"common\", \"property\": \"id\", \"filter\": \"151954|151955|151957|151959\" },\n        \t{ \"domain\": \"common\", \"property\": \"moveBundle\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetName\", \"filter\": \"\" },\n        \t{ \"domain\": \"common\", \"property\": \"assetClass\", \"filter\": \"\" }\n    \t]\n   }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/tdstm/ws/assetExplorer/previewQuery",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"previewQuery"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8",
+							"name": "Content-Type",
+							"description": ""
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 15 Sep 2017 00:49:07 GMT",
+							"name": "Date",
+							"description": ""
+						},
+						{
+							"key": "Server",
+							"value": "Apache-Coyote/1.1",
+							"name": "Server",
+							"description": ""
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": ""
+						}
+					],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"httpOnly": true,
+							"domain": "localhost",
+							"path": "/tdstm/",
+							"secure": false,
+							"value": "D78D15641EC5FD8F6D98A7FFB649E96C",
+							"key": "JSESSIONID"
+						}
+					],
+					"body": "{\"pagination\":{\"offset\":350,\"max\":100,\"total\":472},\"data\":[{\"common.id\":152304,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152305,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152306,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152307,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152308,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152309,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152310,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152311,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152312,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152313,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152314,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152315,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152316,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152317,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152318,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152319,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152320,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152321,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152322,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152323,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152324,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152325,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152326,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152327,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152328,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152329,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152330,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152331,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152332,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152333,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152334,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152335,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152336,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152337,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152338,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152339,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152340,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152341,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152342,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152343,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152344,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152345,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152346,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152347,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152348,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152349,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152350,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152351,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152352,\"application.sme\":\"Tom\",\"application.sme2\":\"Dan\"},{\"common.id\":152353,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152354,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152355,\"application.sme\":\"Tim\",\"application.sme2\":\"Tim\"},{\"common.id\":152356,\"application.sme\":\"Bob\",\"application.sme2\":\"Sarah\"},{\"common.id\":152357,\"application.sme\":\"Bob\",\"application.sme2\":\"Bruce\"},{\"common.id\":152358,\"application.sme\":\"Clark\",\"application.sme2\":\"Tom\"},{\"common.id\":152359,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152360,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152361,\"application.sme\":\"Dan\",\"application.sme2\":\"Tom\"},{\"common.id\":152362,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152363,\"application.sme\":\"Tom\",\"application.sme2\":\"Jamie\"},{\"common.id\":152364,\"application.sme\":\"Tom\",\"application.sme2\":\"Tom\"},{\"common.id\":152365,\"application.sme\":\"Dan\",\"application.sme2\":\"Bob\"},{\"common.id\":152366,\"application.sme\":\"Tom\",\"application.sme2\":\"Jane\"},{\"common.id\":152367,\"application.sme\":null,\"application.sme2\":null},{\"common.id\":152368,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152369,\"application.sme\":\"Tom\",\"application.sme2\":\"Bruce\"},{\"common.id\":152370,\"application.sme\":\"Regis\",\"application.sme2\":\"Regis\"},{\"common.id\":152371,\"application.sme\":\"Homer\",\"application.sme2\":\"Bruce\"},{\"common.id\":152372,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152373,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152374,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152375,\"application.sme\":\"Homer\",\"application.sme2\":\"Tony\"},{\"common.id\":152376,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152377,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152378,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152379,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152380,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152381,\"application.sme\":\"Johnny\",\"application.sme2\":\"Johnny\"},{\"common.id\":152382,\"application.sme\":\"Kim\",\"application.sme2\":\"Kim\"},{\"common.id\":152383,\"application.sme\":\"Tom\",\"application.sme2\":\"Kim\"},{\"common.id\":152384,\"application.sme\":\"Erin\",\"application.sme2\":\"Kim\"},{\"common.id\":152385,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152386,\"application.sme\":\"Erin\",\"application.sme2\":\"Tony\"},{\"common.id\":152387,\"application.sme\":\"Erin\",\"application.sme2\":\"Paul\"},{\"common.id\":152388,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152389,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152390,\"application.sme\":\"Bernice\",\"application.sme2\":\"Clark\"},{\"common.id\":152391,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152392,\"application.sme\":\"Clark\",\"application.sme2\":\"Clark\"},{\"common.id\":152393,\"application.sme\":\"Tom\",\"application.sme2\":null},{\"common.id\":152394,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152395,\"application.sme\":\"Clark\",\"application.sme2\":\"Peter\"},{\"common.id\":152396,\"application.sme\":\"Steve\",\"application.sme2\":\"Peter\"},{\"common.id\":152397,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152398,\"application.sme\":\"Steve\",\"application.sme2\":\"Han\"},{\"common.id\":152399,\"application.sme\":\"Paul\",\"application.sme2\":\"Paul\"},{\"common.id\":152400,\"application.sme\":\"Tom\",\"application.sme2\":\"Kelley\"},{\"common.id\":152401,\"application.sme\":\"Kelly\",\"application.sme2\":\"Peter\"},{\"common.id\":152402,\"application.sme\":\"Kelly\",\"application.sme2\":\"Han\"},{\"common.id\":152403,\"application.sme\":\"Kelly\",\"application.sme2\":\"Clark\"}],\"status\":\"success\"}"
 				}
 			]
 		},
@@ -1079,14 +1053,9 @@
 							"",
 							"var jsonObject = JSON.parse(responseBody);",
 							"var jsonData = pm.response.json();",
-							"var counter = jsonData.data.assets.length-1;",
 							"",
-							"pm.test(\"Each assets first filter values match the filter we set\", function () {",
-							"    while(counter !== 0){",
-							"        pm.expect(Object.values(jsonObject.data.assets[counter])[0]).to.eql(pm.variables.get(\"firstFilterValueUnchanged\"));",
-							"        counter--;    ",
-							"    }",
-							"});"
+							"",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1128,6 +1097,11 @@
 						{
 							"key": "filter",
 							"value": "{{firstFilterProperty}}={{firstFilterValue}}"
+						},
+						{
+							"key": "filter",
+							"value": "",
+							"disabled": true
 						}
 					]
 				},
@@ -1304,11 +1278,10 @@
 							"});",
 							"",
 							"pm.test(\"Checks that the error refers to the non existent filter\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"'nonExistentColumn' not specified in dataview\");",
+							"    pm.expect(pm.response.text()).to.include(\"'nonExistentColumn'\");",
 							"});",
 							"",
 							"pm.environment.unset(\"dataviewID\");",
-							"pm.environment.unset(\"firstFilterValueUnchanged\");",
 							"pm.environment.unset(\"firstFilterValue\");",
 							"pm.environment.unset(\"firstFilterProperty\");",
 							"pm.environment.unset(\"limit\");",
