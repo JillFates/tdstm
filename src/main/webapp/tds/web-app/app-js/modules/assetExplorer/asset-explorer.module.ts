@@ -19,7 +19,6 @@ import {ManufacturerService} from './service/manufacturer.service';
 import {ModelService} from './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 // Components
-import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
 import {TaskCommentComponent} from './components/task-comment/task-comment.component';
@@ -37,6 +36,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
+import {AssetCreateComponent} from './components/asset/asset-create.component';
 
 @NgModule({
 	imports: [
@@ -53,18 +53,18 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 	],
 	declarations: [
 		AssetShowComponent,
-		// AssetEditComponent,
-		// AssetCreateComponent,
+		AssetCreateComponent,
+		AssetEditComponent,
 		TaskCommentComponent,
-		// AssetDependencyComponent,
-		// AssetDependencyShowComponent,
-		// AssetDependencyEditComponent,
-		// SingleCommentComponent,
-		// ModelDeviceShowComponent,
-		// ManufacturerShowComponent,
-		// ManufacturerEditComponent,
-		// AssetCloneComponent,
-		// PopupAssetMessageComponent,
+		AssetDependencyComponent,
+		AssetDependencyShowComponent,
+		AssetDependencyEditComponent,
+		SingleCommentComponent,
+		ModelDeviceShowComponent,
+		ManufacturerShowComponent,
+		ManufacturerEditComponent,
+		AssetCloneComponent,
+		PopupAssetMessageComponent,
 		TaskCommentDialogComponent,
 		TaskCreateComponent,
 		TaskEditComponent,
@@ -83,23 +83,23 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 	],
 	exports: [
 		AssetShowComponent,
-		// AssetEditComponent,
-		// AssetCreateComponent,
-		// AssetDependencyComponent,
-		// AssetDependencyShowComponent,
-		// AssetDependencyEditComponent,
+		AssetCreateComponent,
+		AssetEditComponent,
+		AssetDependencyComponent,
+		AssetDependencyShowComponent,
+		AssetDependencyEditComponent,
 		TaskCommentComponent
 	],
 	entryComponents: [
 		AssetShowComponent,
-		// AssetEditComponent,
-		// AssetCreateComponent,
-		// AssetDependencyComponent,
-		// SingleCommentComponent,
-		// ManufacturerShowComponent,
-		// ManufacturerEditComponent,
-		// ModelDeviceShowComponent,
-		// AssetCloneComponent,
+		AssetCreateComponent,
+		AssetEditComponent,
+		AssetDependencyComponent,
+		SingleCommentComponent,
+		ManufacturerShowComponent,
+		ManufacturerEditComponent,
+		ModelDeviceShowComponent,
+		AssetCloneComponent,
 		TaskCommentDialogComponent,
 		TaskCreateComponent,
 		TaskEditComponent,
