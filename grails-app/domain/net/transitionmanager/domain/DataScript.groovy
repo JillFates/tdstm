@@ -72,7 +72,6 @@ class DataScript {
     }
 
     static mapping = {
-		autowire true
         id column: 'data_script_id'
         name 			sqlType: 'VARCHAR(255)'
         description 	sqlType: 'VARCHAR(255)'
