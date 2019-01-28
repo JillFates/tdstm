@@ -36,9 +36,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
-
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-
 		}
 
 		ngOnInit() {

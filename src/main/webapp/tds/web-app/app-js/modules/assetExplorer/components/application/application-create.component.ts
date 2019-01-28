@@ -7,12 +7,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
@@ -50,8 +48,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
-			private prompt: UIPromptService,
+			promptService: UIPromptService
 			) {
 				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}

@@ -35,7 +35,6 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
-
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
