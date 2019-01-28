@@ -26,6 +26,10 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
+import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
+import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
+import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
+import {SingleNoteComponent} from '../../../assetExplorer/components/single-note/single-note.component';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
@@ -496,5 +500,28 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			}
 		}
 		return dataItem.text;
+	}
+
+	protected onCreateNote(dataItem: any): void {
+
+		let singleNoteModel: SingleNoteModel = {
+			modal: {
+				title: 'Create Note',
+				type: ModalType.CREATE
+			},
+			asset: {
+				id: 'dataItem.common_id',
+				text: 'dataItem.common_assetName'
+			},
+			note: ''
+		};
+
+		this.dialogService.extra(SingleNoteComponent, [
+			{provide: SingleNoteModel, useValue: singleNoteModel}
+		], false, false).then(result => {
+			console.log('RESULT SINGLE COMMENT', result);
+		}).catch(result => {
+			console.log(result);
+		});
 	}
 }
