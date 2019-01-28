@@ -680,14 +680,17 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
 	}
 
-	@IgnoreRest
 	void '36. can find Dependency by asset using asset.id'() {
 
 		given:
 			AssetEntity asset = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			AssetEntity dependent = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 
-			AssetDependency dependency = new AssetDependency(asset: asset, dependent: dependent, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+			AssetDependency dependency = new AssetDependency(
+				asset: asset,
+				dependent: dependent,
+				status: AssetDependencyStatus.VALIDATED
+			).save(flush: true, failOnError: true)
 
 
 		when:
