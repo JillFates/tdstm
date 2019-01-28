@@ -112,44 +112,38 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
 
-					with(data[0].fields.id) {
-						originalValue == '152254'
-						value == '152254'
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-						find.query.size() == 1
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152254]])
-					}
+			results.domains[0].domain == ETLDomain.Application.name()
+			results.domains[0].data[0].fields.environment.originalValue == 'Production'
+			results.domains[0].data[0].fields.environment.value == 'Production'
 
-					with(data[1].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
 
-					with(data[1].fields.id) {
-						originalValue == '152255'
-						value == '152255'
+			results.domains[0].data[0].fields.id.originalValue == '152254'
+			results.domains[0].data[0].fields.id.value == '152254'
 
-						find.query.size() == 1
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152255]])
-					}
-				}
-			}
+			results.domains[0].data[0].fields.id.find.query.size() == 1
+			assertQueryResult(results.domains[0].data[0].fields.id.find.query[0], ETLDomain.Application, [['id', 'eq', 152254]])
 
-			with(etlProcessor.findCache) {
-				size() == 2
-				hitCountRate() == 0
-				get(ETLDomain.Application.name(), [new FindCondition('id', 152254l)]) == [152254l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', 152255l)]) == [152255l]
-			}
+
+			results.domains[0].data[1].fields.environment.originalValue == 'Production'
+			results.domains[0].data[1].fields.environment.value == 'Production'
+
+
+			results.domains[0].data[1].fields.id.originalValue == '152255'
+			results.domains[0].data[1].fields.id.value == '152255'
+
+			results.domains[0].data[1].fields.id.find.query.size() == 1
+			assertQueryResult(results.domains[0].data[1].fields.id.find.query[0], ETLDomain.Application, [['id', 'eq', 152255]])
+
+
+			etlProcessor.findCache.size() == 2
+			etlProcessor.findCache.hitCountRate() == 0
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', 152254l)]) == [152254l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', 152255l)]) == [152255l]
+
 
 		cleanup:
 			if(fileName){
@@ -253,39 +247,37 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'asset'] as Set
-					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-					data.collect { it.fields.asset.value } == [
-							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-					]
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					// Validates command: find Application by 'id' with DOMAIN.asset
-					(1..14).eachWithIndex { int value, int index ->
-						with(data[index].fields.id.find) {
-							query.size() == 1
-							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value]])
-						}
-					}
+			results.domains[0].domain == ETLDomain.Dependency.name()
+			results.domains[0].fieldNames == ['id', 'asset'] as Set
+			results.domains[0].data.size() == 14
+			results.domains[0].data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-					// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
-					with(data[0].fields.asset.find) {
-						query.size() == 3
-						assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 151954]])
-						assertQueryResult(query[1], ETLDomain.Application, [
-							['assetName', 'eq', 'ACMEVMPROD01'],
-							['assetClass', 'eq', 'VM']
-						])
-						assertQueryResult(query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
-					}
-				}
+			results.domains[0].data.collect { it.fields.asset.value } == [
+				'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+				'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+			]
+
+			// Validates command: find Application by 'id' with DOMAIN.asset
+			(1..14).eachWithIndex { int value, int index ->
+
+				results.domains[0].data[index].fields.id.find.query.size() == 1
+				assertQueryResult(results.domains[0].data[index].fields.id.find.query[0], ETLDomain.Dependency, [['id', 'eq', value]])
+
 			}
+
+			// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
+
+			results.domains[0].data[0].fields.asset.find.query.size() == 3
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[1], ETLDomain.Application, [
+				['assetName', 'eq', 'ACMEVMPROD01'],
+				['assetClass', 'eq', 'VM']
+			])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 
 		cleanup:
 			if(fileName){
@@ -356,33 +348,29 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'comment'] as Set
-					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					// Validates command: find Application by 'id' with DOMAIN.asset
-					(1..13).eachWithIndex { int value, int index ->
-						with(data[index].fields.id.find) {
-							query.size() == 1
-							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value]])
-						}
-					}
-					// Validates command: set comment with 'Asset results found'
-					data[0..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
-				}
+			results.domains[0].domain == ETLDomain.Dependency.name()
+			results.domains[0].fieldNames == ['id', 'comment'] as Set
+			results.domains[0].data.size() == 14
+			results.domains[0].data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+
+			// Validates command: find Application by 'id' with DOMAIN.asset
+			(1..13).eachWithIndex { int value, int index ->
+
+				results.domains[0].data[index].fields.id.find.query.size() == 1
+				assertQueryResult(results.domains[0].data[index].fields.id.find.query[0] , ETLDomain.Dependency , [['id', 'eq', value]] )
+
 			}
+			// Validates command: set comment with 'Asset results found'
+			results.domains[0].data[0..results.domains[0].data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 
-			with(etlProcessor.findCache) {
-				size() == 14
-				hitCountRate() == 0
+			etlProcessor.findCachesize() == 14
+				etlProcessor.findCachehitCountRate() == 0
 				[1..14].each {
-					get(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
+					etlProcessor.findCacheget(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
 				}
-			}
 
 		cleanup:
 			if(fileName){
@@ -435,29 +423,23 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					with(data[0].fields.asset) {
-						originalValue == '152254'
-						value == '152254'
-					}
+			results.domains[0].domain == ETLDomain.Dependency.name()
 
-					with(data[1].fields.asset) {
-						originalValue == '152255'
-						value == '152255'
-					}
-				}
-			}
 
-			with(etlProcessor.findCache) {
-				size() == 2
-				hitCountRate() == 0
-				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == [152255l]
-			}
+			results.domains[0].data[0].fields.asset.originalValue == '152254'
+			results.domains[0].data[0].fields.asset.value == '152254'
+
+
+			results.domains[0].data[1].fields.asset.originalValue == '152255'
+			results.domains[0].data[1].fields.asset.value == '152255'
+
+			etlProcessor.findCache.size() == 2
+			etlProcessor.findCache.hitCountRate() == 0
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == [152255l]
 
 		cleanup:
 			if(fileName){
@@ -577,56 +559,46 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Application.name()
+				def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					with(data[0]) {
-						fields.environment.originalValue == 'Production'
-						fields.environment.value == 'Production'
+			results.domains[0].domain == ETLDomain.Application.name()
 
-						fields.appVendor.originalValue == 'Microsoft'
-						fields.appVendor.value == 'Microsoft'
 
-						fields.id.originalValue == '152254'
-						fields.id.value == '152254'
+			results.domains[0].data[0].fields.environment.originalValue == 'Production'
+			results.domains[0].data[0].fields.environment.value == 'Production'
 
-						// Validating queries
-						with(fields.id.find) {
-							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254]])
-							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
-						}
-					}
+			results.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
+			results.domains[0].data[0].fields.appVendor.value == 'Microsoft'
 
-					with(data[1]) {
-						fields.environment.originalValue == 'Production'
-						fields.environment.value == 'Production'
+			results.domains[0].data[0].fields.id.originalValue == '152254'
+			results.domains[0].data[0].fields.id.value == '152254'
 
-						fields.appVendor.originalValue == 'Mozilla'
-						fields.appVendor.value == 'Mozilla'
+			// Validating queries
+			assertQueryResult(results.domains[0].data[0].fields.id.find.query[0], ETLDomain.Application, [['id', 'eq', 152254]])
+			assertQueryResult(results.domains[0].data[0].fields.id.find.query[1], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 
-						fields.id.originalValue == '152255'
-						fields.id.value == '152255'
 
-						// Validating queries
-						with(fields.id.find) {
-							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255]])
-							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
-						}
+			results.domains[0].data[1].fields.environment.originalValue == 'Production'
+			results.domains[0].data[1].fields.environment.value == 'Production'
 
-						fields.id.warn
-					}
-				}
-			}
+			results.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
+			results.domains[0].data[1].fields.appVendor.value == 'Mozilla'
 
-			with(etlProcessor.findCache) {
-				size() == 3
-				hitCountRate() == 0
-				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == []
-				get(ETLDomain.Application.name(), [new FindCondition('appVendor', 'Mozilla')]) == [152253l]
-			}
+			results.domains[0].data[1].fields.id.originalValue == '152255'
+			results.domains[0].data[1].fields.id.value == '152255'
+
+			// Validating queries
+			assertQueryResult(results.domains[0].data[1].fields.id.find.query[0], ETLDomain.Application, [['id', 'eq', 152255]])
+			assertQueryResult(results.domains[0].data[1].fields.id.find.query[1], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
+
+			results.domains[0].data[1].fields.id.warn
+
+			etlProcessor.findCache.size() == 3
+			etlProcessor.findCache.hitCountRate() == 0
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == []
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('appVendor', 'Mozilla')]) == [152253l]
 
 		cleanup:
 			if(fileName){
@@ -810,45 +782,38 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'asset'] as Set
-					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					data.collect { it.fields.asset.value } == [
-							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-					]
+			results.domains[0].domain == ETLDomain.Dependency.name()
+			results.domains[0].fieldNames == ['id', 'asset'] as Set
+			results.domains[0].data.size() == 14
+			results.domains[0].data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-					with(data[0].fields.asset) {
+			results.domains[0].data.collect { it.fields.asset.value } == [
+				'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+				'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+			]
 
-						find.query.size() == 3
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
-						assertQueryResult(find.query[1], ETLDomain.Application, [
-							['assetName', 'eq', 'ACMEVMPROD01'],
-							['assetClass', 'eq', 'VM']
-						])
-						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
+			results.domains[0].data[0].fields.asset.find.query.size() == 3
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[1], ETLDomain.Application, [
+				['assetName', 'eq', 'ACMEVMPROD01'],
+				['assetClass', 'eq', 'VM']
+			])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 
-						// whenNotFound create command assertions
-						create.assetName == 'ACMEVMPROD01'
-						create.assetClass == 'VM'
-						!!create.lastUpdated
-					}
-				}
-			}
+			// whenNotFound create command assertions
+			results.domains[0].data[0].fields.asset.create.assetName == 'ACMEVMPROD01'
+			results.domains[0].data[0].fields.asset.create.assetClass == 'VM'
+			!!results.domains[0].data[0].fields.asset.create.lastUpdated
 
-			with(etlProcessor.findCache) {
-				size() == 12
-				hitCountRate() == 14.29
-				get(ETLDomain.Application.name(), [new FindCondition('id', '151954')]) == [151954l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', '151971')]) == [151971l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', '151974')]) == [151974l]
-				get(ETLDomain.Application.name(), [new FindCondition('id', '151975')]) == [151975l]
-			}
+			etlProcessor.findCache.size() == 12
+			etlProcessor.findCache.hitCountRate() == 14.29
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '151954')]) == [151954l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '151971')]) == [151971l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '151974')]) == [151974l]
+			etlProcessor.findCache.get(ETLDomain.Application.name(), [new FindCondition('id', '151975')]) == [151975l]
 
 		cleanup:
 			if(fileName){
@@ -1167,35 +1132,29 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'asset'] as Set
-					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			def results = etlProcessor.finalResult()
 
-					data.collect { it.fields.asset.value } == [
-							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-					]
+			results.domains.size() == 1
+			results.domains[0].domain == ETLDomain.Dependency.name()
+			results.domains[0].fieldNames == ['id', 'asset'] as Set
+			results.domains[0].data.size() == 14
+			results.domains[0].data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-					with(data[0].fields.asset) {
-						find.query.size() == 3
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
-						assertQueryResult(find.query[1], ETLDomain.Application, [
-							['assetName', 'eq', 'ACMEVMPROD01'],
-							['assetClass', 'eq', 'VM']
-						])
-						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
-					}
-				}
-			}
+			results.domains[0].data.collect { it.fields.asset.value } == [
+				'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+				'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+			]
 
-			with(etlProcessor.findCache) {
-				size() == 12
-				hitCountRate() == 14.29
-			}
+			results.domains[0].data[0].fields.asset.find.query.size() == 3
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[1], ETLDomain.Application, [
+				['assetName', 'eq', 'ACMEVMPROD01'],
+				['assetClass', 'eq', 'VM']
+			])
+			assertQueryResult(results.domains[0].data[0].fields.asset.find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
+
+			etlProcessor.findCache.size() == 12
+			etlProcessor.findCache.hitCountRate() == 14.29
 
 		cleanup:
 			if(fileName){
@@ -1250,34 +1209,31 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Rack.name()
-					fieldNames == ['id', 'location', 'room'] as Set
+			def results = etlProcessor.finalResult()
+			results.domains.size() == 1
 
-					data.collect { it.fields.id.value } == [
-							racks[0].id.toString(), '13145',
-							racks[1].id.toString(),
-							racks[2].id.toString(), '13358'
-					]
+			results.domains[0].domain == ETLDomain.Rack.name()
+			results.domains[0].fieldNames == ['id', 'location', 'room'] as Set
 
-					data.collect { it.fields.location.value } == [
-							'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
-							'ACME Data Center', 'New Colo Provider'
-					]
+			results.domains[0].data.collect { it.fields.id.value } == [
+				racks[0].id.toString(), '13145',
+				racks[1].id.toString(),
+				racks[2].id.toString(), '13358'
+			]
 
-					data.collect { it.fields.room.value } == [
-							'ACME Data Center / DC1', 'ACME Data Center / DC1',
-							'ACME Data Center / DC1', 'ACME Data Center / DC1',
-							'New Colo Provider / ACME Room 1'
-					]
+			results.domains[0].data.collect { it.fields.location.value } == [
+				'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
+				'ACME Data Center', 'New Colo Provider'
+			]
 
-					with(data[4].fields.room) {
-						find.query.size() == 0
-					}
-				}
-			}
+			results.domains[0].data.collect { it.fields.room.value } == [
+				'ACME Data Center / DC1', 'ACME Data Center / DC1',
+				'ACME Data Center / DC1', 'ACME Data Center / DC1',
+				'New Colo Provider / ACME Room 1'
+			]
+
+
+			results.domains[0].data[4].fields.room.find.query.size() == 0
 
 		cleanup:
 			if(fileName){

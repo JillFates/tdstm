@@ -586,8 +586,8 @@ class ProjectService implements ServiceMethods {
 		}
 
 		// remove preferences
-		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = $projectInstance.id"
-		String eventQuery = "select me.id from MoveEvent me where me.project = $projectInstance.id"
+		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = :project"
+		String eventQuery = "select me.id from MoveEvent me where me.project = :project"
 		String roomQuery = " select ro.id from Room ro where ro.project = $projectInstance.id"
 		List projectCodes = [UserPreferenceEnum.CURR_PROJ.name()]
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
@@ -607,74 +607,74 @@ class ProjectService implements ServiceMethods {
 		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
 
 		//remove the AssetEntity
-		def assetsQuery = "select a.id from AssetEntity a where a.project = $projectInstance.id"
+		String assetsQuery = "select a.id from AssetEntity a where a.project = :project"
 
-		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)".toString())
-		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)".toString())
-		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = $projectInstance.id")
-		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)".toString())
+		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)".toString(), [project: projectInstance])
+		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)".toString(), [project: projectInstance])
+		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = $projectInstance")
+		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)".toString(), [project: projectInstance])
 		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='$AssetCableStatus.UNKNOWN',assetTo=null,
-										assetToPort=null where assetTo in ($assetsQuery)""".toString())
-		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)".toString())
+										assetToPort=null where assetTo in ($assetsQuery)""".toString(), [project: projectInstance])
+		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)".toString(), [project: projectInstance])
 
-		AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = $projectInstance.id")
-		AssetComment.executeUpdate("delete from AssetComment ac where ac.project = $projectInstance.id")
-		TaskBatch.executeUpdate("delete from TaskBatch tb where tb.project = $projectInstance.id")
+		AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = $projectInstance")
+		AssetComment.executeUpdate("delete from AssetComment ac where ac.project = $projectInstance")
+		TaskBatch.executeUpdate("delete from TaskBatch tb where tb.project = $projectInstance")
 
 		// remove DataTransferBatch
-		def batchQuery = "select dtb.id from DataTransferBatch dtb where dtb.project = $projectInstance.id"
+		String batchQuery = "select dtb.id from DataTransferBatch dtb where dtb.project.id = :projectId"
 
-		DataTransferComment.executeUpdate("delete from DataTransferComment dtc where dtc.dataTransferBatch in ($batchQuery)")
-		DataTransferValue.executeUpdate("delete from DataTransferValue dtv where dtv.dataTransferBatch in ($batchQuery)")
+		DataTransferComment.executeUpdate("delete from DataTransferComment dtc where dtc.dataTransferBatch in ($batchQuery)".toString(), [projectId: projectInstance.id ])
+		DataTransferValue.executeUpdate("delete from DataTransferValue dtv where dtv.dataTransferBatch in ($batchQuery)".toString(), [projectId: projectInstance.id ])
 
-		DataTransferBatch.executeUpdate("delete from DataTransferBatch dtb where dtb.project = $projectInstance.id")
+		DataTransferBatch.executeUpdate("delete from DataTransferBatch dtb where dtb.project = $projectInstance")
 
 		// remove Move Bundle
 
-		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)")
-		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))")
-		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)")
+		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
+		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))".toString(), [project: projectInstance ])
+		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
-		def teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
-		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)")
-		PartyGroup.executeUpdate("delete from Party p where p.id in ($teamQuery)")
-		Party.executeUpdate("delete from Party p where p.id in ($teamQuery)")
-		ProjectTeam.executeUpdate("delete from ProjectTeam pt where pt.moveBundle in ($bundleQuery)")
+		String teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
+		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)".toString(), [project: projectInstance ])
+		PartyGroup.executeUpdate("delete from Party p where p.id in ($teamQuery)".toString(), [project: projectInstance ])
+		Party.executeUpdate("delete from Party p where p.id in ($teamQuery)".toString(), [project: projectInstance ])
+		ProjectTeam.executeUpdate("delete from ProjectTeam pt where pt.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
-		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($bundleQuery) or pr.partyIdTo in ($bundleQuery)")
-		Party.executeUpdate("delete from Party p where p.id in ($bundleQuery)")
-		MoveBundle.executeUpdate("delete from MoveBundle mb where mb.project = $projectInstance.id")
+		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($bundleQuery) or pr.partyIdTo in ($bundleQuery)".toString(), [project: projectInstance ])
+		Party.executeUpdate("delete from Party p where p.id in ($bundleQuery)".toString(), [project: projectInstance ])
+		MoveBundle.executeUpdate("delete from MoveBundle mb where mb.project = $projectInstance")
 
 		// remove Move Event
-		MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)")
-		MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)")
-		MoveEventSnapshot.executeUpdate("delete from MoveEventSnapshot mes where mes.moveEvent in ($eventQuery)")
+		MoveBundle.executeUpdate("Update MoveBundle mb SET mb.moveEvent = null where mb.moveEvent in ($eventQuery)".toString(), [project: projectInstance ])
+		MoveEventNews.executeUpdate("delete from MoveEventNews men where men.moveEvent in ($eventQuery)".toString(), [project: projectInstance])
+		MoveEventSnapshot.executeUpdate("delete from MoveEventSnapshot mes where mes.moveEvent in ($eventQuery)".toString(), [project: projectInstance ])
 
-		MoveEvent.executeUpdate("delete from MoveEvent me where me.project = $projectInstance.id")
+		MoveEvent.executeUpdate("delete from MoveEvent me where me.project = $projectInstance")
 
 		// remove Project Logo
-		ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = $projectInstance.id")
+		ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = $projectInstance")
 		// remove party relationship
-		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = $projectInstance.id or pr.partyIdTo = $projectInstance.id")
+		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = $projectInstance or pr.partyIdTo = $projectInstance")
 
 		// remove associated references e.g. Room, Rack FI, AssetDepBundles, KeyValue .
-		Room.executeUpdate("delete from Room r where r.project  = $projectInstance.id")
-		Rack.executeUpdate("delete from Rack ra where ra.project  = $projectInstance.id")
-		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = $projectInstance.id")
-		KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = $projectInstance.id")
+		Room.executeUpdate("delete from Room r where r.project  = $projectInstance")
+		Rack.executeUpdate("delete from Rack ra where ra.project  = $projectInstance")
+		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = $projectInstance")
+		KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = $projectInstance")
 
-		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance.id")
-		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = $projectInstance.id")
+		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance")
+		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = $projectInstance")
 
-		def recipesQuery = "select r.id from Recipe r where r.project.id = $projectInstance.id"
+		def recipesQuery = "select r.id from Recipe r where r.project.id = :projectId"
 		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project.id = $projectInstance.id")
-		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
+		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
 		if (recipeVersions) {
 			recipeVersions.each {
 				RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom.id = $it.id")
 			}
 		}
-		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
 		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")

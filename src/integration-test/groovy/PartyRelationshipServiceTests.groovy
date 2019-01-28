@@ -52,7 +52,7 @@ class PartyRelationshipServiceTests extends Specification {
 
 			def personHelper = new PersonTestHelper()
 			byWhom = personHelper.getAdminPerson()
-			securityService.assumeUserIdentity(byWhom.userLogin.username, false)
+
 
 			userLogin = byWhom.userLogin
 			assert userLogin
@@ -61,6 +61,7 @@ class PartyRelationshipServiceTests extends Specification {
 
 			initialized =true
 		}
+		securityService.assumeUserIdentity(byWhom.userLogin.username, false)
 	}
 
 	void "Test the getTeamRoleTypes"() {

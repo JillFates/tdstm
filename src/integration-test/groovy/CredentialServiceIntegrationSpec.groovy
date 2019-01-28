@@ -13,6 +13,7 @@ import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
 import org.hibernate.SessionFactory
+import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.ProviderTestHelper
@@ -24,8 +25,13 @@ class CredentialServiceIntegrationSpec extends Specification{
     GrailsApplication grailsApplication
     SessionFactory    sessionFactory
 
+    @Shared
     ProjectTestHelper projectTestHelper
+
+    @Shared
     ProviderTestHelper providerTestHelper
+
+    @Shared
     CredentialTestHelper credentialTestHelper
 
     def setup() {
