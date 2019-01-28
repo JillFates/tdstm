@@ -36,7 +36,8 @@ class AssetDependency {
 
 	static constraints = {
 		asset unique: ['dependent', 'type']
-		dependent nullable: false, validator: { val, obj ->
+		dependent validator: { val, obj ->
+			// Validate that the asset and dependent are not the same
 			if (val && obj && obj.asset?.id == obj.dependent?.id) {
 				return ['invalid.dependent']
 			}
