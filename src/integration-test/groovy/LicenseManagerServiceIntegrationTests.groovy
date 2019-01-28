@@ -70,7 +70,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 	def '01. Test license loading' () {
 		setup: 'first we generate a new license request'
 			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 
 		when: "we load the encoded request it into the manager"
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
@@ -89,7 +89,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 	def '02. Activate License' () {
 		setup: 'first we generate a new license request and load it'
 			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 
 		when: 'we configure the license'
@@ -120,7 +120,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 	def '03. Revoke license' () {
 		setup: 'first we generate a new license request and load it'
 			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 
 		when: 'we configure the license'
@@ -154,7 +154,7 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 		setup: 'first we generate a new license request with an original ammount of 100 servers'
 			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 			log.info("ID: ${licenseRequest.id}")
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 			LicensedClient licensedClient = licenseManagerService.loadRequest(encodedMessage)
 			licensedClient.email = testEmail
 			licensedClient.websitename = License.WILDCARD

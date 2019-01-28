@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.JsonUtil
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.DataScript
@@ -41,6 +42,8 @@ import org.apache.commons.lang3.RandomStringUtils
 @Integration
 @Rollback
 class E2EProjectSpec extends Specification {
+	GrailsApplication grailsApplication
+
 	// Set transactional false to persist at database when spec finishes
 	static transactional = false
 	static final String TARGET_HOSTNAME = 'TDS_TARGET_HOSTNAME'
@@ -271,7 +274,7 @@ class E2EProjectSpec extends Specification {
 				licenseRequest.websitename = targetWebsiteName
 			}
 
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 			licensedClient = licenseManagerService.loadRequest(encodedMessage)
 			licensedClient.type = License.Type.MULTI_PROJECT
 			licensedClient.max  = 100
