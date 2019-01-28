@@ -860,6 +860,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/assetComment/list" {
+			controller = "wsTask"
+			action = [
+					GET: "listComments"
+			]
+		}
+
 		"/ws/dataingestion/datascript/list" {
 			controller = "wsDataScript"
 			action = [

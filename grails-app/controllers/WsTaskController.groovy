@@ -1,6 +1,8 @@
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.AssetCommentType
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
@@ -159,6 +161,32 @@ class WsTaskController implements ControllerMethods {
 			log.error "resetAction: $errorMsg"
 			renderErrorJson([errorMsg])
 		}
+	}
+
+	@HasPermission([Permission.CommentView, Permission.TaskView])
+	def listComments() {
+		def assetComments = []
+
+		if(securityService.hasPermission(Permission.CommentView)) {
+			assetComments = AssetComment.findAllByCommentType(AssetCommentType.COMMENT)
+		}
+		def assetCommentsList = []
+		def today = new Date()
+		boolean viewUnpublished = securityService.viewUnpublished()
+		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
+		boolean canEditTasks = securityService.hasPermission(Permission.TaskEdit)
+
+		assetComments.each {
+			if ((viewUnpublished || it.isPublished) && it.assetEntity)
+				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
+									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
+									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
+									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
+									 canEditComments: canEditComments,
+									 canEditTasks: canEditTasks]
+		}
+
+		renderAsJson assetCommentsList
 	}
 
 	/**

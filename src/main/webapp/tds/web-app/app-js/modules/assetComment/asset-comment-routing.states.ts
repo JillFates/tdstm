@@ -8,6 +8,7 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {AssetCommentListComponent} from './components/list/asset-comment-list.component';
+import {AssetCommentResolveService} from './resolve/asset-comment-resolve.service';
 
 /**
  * Asset Explorer Route States
@@ -33,6 +34,9 @@ export const AssetCommentRoute: Routes = [
 			requiresAuth: true
 		},
 		component: AssetCommentListComponent,
+		resolve: {
+			assetComments: AssetCommentResolveService
+		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
 		runGuardsAndResolvers: 'always'
 	}
