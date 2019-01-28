@@ -1,10 +1,8 @@
 package net.transitionmanager.domain
 
-import com.tdsops.common.grails.ApplicationContextHolder
+
 import grails.converters.JSON
 import groovy.json.JsonSlurper
-import net.transitionmanager.service.SecurityService
-
 /**
  * Created by octavio on 2/20/17.
  */
@@ -28,9 +26,8 @@ class LicenseActivityTrack {
  	*/
 	String changes
 
-	static transients=['securityService', 'changesJSON']
+	static transients=['changesJSON']
 	static mapping = {
-		autowire true
 		version false
 	}
 
@@ -66,48 +63,5 @@ class LicenseActivityTrack {
 		this.changes = (changes as JSON).toString()
 
 		this.userLogin = userLogin
-	}
-
-	/**
-	 * Factory/Creator object that creates an instance of an LicenseActivityTrack if there are changes to report
-	 * @param licensedClient
-	 * @return
-	 */
-	static LicenseActivityTrack trackChanges(LicensedClient licensedClient){
-		//Convert non standar Json Values (String, Number, Boolean) to the toString representation
-		Closure toBasicType = { input ->
-			switch(input){
-				case String:
-				case Number:
-				case Boolean: break
-				default:
-					input = String.valueOf(input)
-			}
-			input
-		}
-
-		/*
-		  WARNING: Beware of the IDEs!! somehow IntelliJ doesn't get the 'dirtyPropertyNames'
-		  but this is the correct way of doing it!!
-		 */
-		Collection<String> dirtyProperties = licensedClient.dirtyPropertyNames
-		List<Map> changes = []
-		dirtyProperties.each { field ->
-			Object currentValue = toBasicType(licensedClient[field])
-			Object originalValue = toBasicType(licensedClient.getPersistentValue(field))
-
-			if (currentValue != originalValue) {
-				changes << [field:field, oldValue:originalValue, newValue:currentValue]
-			}
-		}
-
-		LicenseActivityTrack licenseActivityTrack
-		if(changes) {
-			SecurityService securityService = ApplicationContextHolder.getService("securityService")
-			UserLogin userLogin = securityService.userLogin
-			licenseActivityTrack = new LicenseActivityTrack(userLogin, licensedClient, changes)
-			licenseActivityTrack.save()
-		}
-		licenseActivityTrack
 	}
 }
