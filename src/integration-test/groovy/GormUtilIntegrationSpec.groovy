@@ -309,7 +309,7 @@ class GormUtilIntegrationSpec extends Specification {
 			Person newPerson3 = personHelper.createPerson(adminPerson, project.client, project, [title:title])
 		then:
 			GormUtil.findAllByProperties(Person, personMap).size() == 2
-			GormUtil.findAllByProperties(Person, personMap, GormUtil.Operator.OR).size() == 5
+			GormUtil.findAllByProperties(Person, personMap, GormUtil.Operator.OR).size() == 3
 	}
 
 	/**
@@ -351,7 +351,7 @@ class GormUtilIntegrationSpec extends Specification {
 
 			// println "***** fromPerson=$fromPerson (${fromPerson.id}), toPerson=$toPerson (${toPerson.id})"
 		then: 'we should expect the following'
-			GormUtil.findAllByProperties(Person, personMap).size() == 4
+			GormUtil.findAllByProperties(Person, personMap).size() == 2
 
 			// The from person should have a number of PartyRelationships
 			GormUtil.findAllByProperties(PartyRelationship, [partyIdFrom:fromPerson, partyIdTo:fromPerson], GormUtil.Operator.OR).size() > 0
@@ -370,8 +370,8 @@ class GormUtilIntegrationSpec extends Specification {
 			wf.refresh()
 		then:
 			// We should now only have one person that matches the To person
-			persons.size() == 3
-			persons[2].id == toPerson.id
+			persons.size() == 1
+			persons[0].id == toPerson.id
 
 			// Validate that direct references switch over (case 1)
 			wf.updatedBy.id == toPerson.id

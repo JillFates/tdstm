@@ -180,10 +180,10 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             // TODO check hash returned. Here we can check how the hash is formed
             // Generates a license hash with some parameters. Then, we have to retrieve those parameters,
             // desencrypt them and check that are the same used to generate the license.
-            def encodedLicense = licenseRequest.toEncodedMessage()
+            def encodedLicense = licenseRequest.toEncodedMessage(grailsApplication)
 
             //Encoding strategy
-            def manualEncodeBody = new String(Base64.encodeBase64(Smaz.compress(licenseRequest.toJsonString())))
+            def manualEncodeBody = new String(Base64.encodeBase64(Smaz.compress(licenseRequest.toJsonString(grailsApplication))))
             def manualEncode = "${License.BEGIN_REQ_TAG}\n${manualEncodeBody}\n${License.END_REQ_TAG}"
 
         then: 'an encoded message is generated'

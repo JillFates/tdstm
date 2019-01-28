@@ -5,14 +5,14 @@ import com.tdsops.tm.domain.AssetEntityHelper
 import grails.testing.gorm.DataTest
 import spock.lang.Shared
 import spock.lang.Specification
-// @TestFor(AssetEntityHelper)
+
 class AssetEntityHelperUnitTests extends Specification implements  DataTest {
 
 	@Shared Application app = new Application()
 	@Shared Database db = new Database()
 	@Shared AssetEntity asset = new AssetEntity()
 
-	void setupSpec(){
+	void setupSpec() {
 		mockDomains AssetEntity, Application, Database
 	}
 

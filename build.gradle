@@ -17,6 +17,7 @@ plugins {
 
 version "4.7.0"
 group "tdstm"
+buildDir = 'target'
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -202,4 +203,11 @@ gitProperties {
 
 grails {
    pathingJar = true
+}
+
+test {
+    if (project.hasProperty('maxParallelForks'))
+        maxParallelForks = project.maxParallelForks as int
+    if (project.hasProperty('forkEvery'))
+        forkEvery = project.forkEvery as int
 }

@@ -306,12 +306,15 @@ abstract class ETLBaseIntegrationSpec extends Specification{
 	 * @param domain
 	 * @param values
 	 */
-	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+	static boolean assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
+
 		queryResult.criteria.eachWithIndex { Map map, int i ->
 			assert map['propertyName'] == values[i][0]
 			assert map['operator'] == values[i][1]
 			assert map['value'] == values[i][2]
 		}
+
+		return true
 	}
 }

@@ -19,6 +19,9 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils as RSU
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.OneToOne
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -608,18 +611,17 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 
 		when: 'getting the Person userLogin property'
-			def domainProp = GormUtil.getDomainProperty(Person, 'userLogin')
+			PersistentProperty domainProp = GormUtil.getDomainProperty(Person, 'userLogin')
 		then: 'it should have an association and the owner of relationship'
-			domainProp.isAssociation()
-			domainProp.isOwningSide()
-			domainProp.isOneToOne()
-			domainProp.isHasOne()
+			domainProp instanceof Association
+			domainProp?.owningSide
+			domainProp instanceof OneToOne
 
 		when: 'getting the UserLogin person property'
 			domainProp = GormUtil.getDomainProperty(UserLogin, 'person')
 		then: 'it should have an Association relationship'
-			domainProp.isAssociation()
-			! domainProp.isOwningSide()
+			domainProp instanceof Association
+			!domainProp?.owningSide
 
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]

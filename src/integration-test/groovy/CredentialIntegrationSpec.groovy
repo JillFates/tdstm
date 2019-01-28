@@ -8,6 +8,7 @@ import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.PersonTestHelper
@@ -16,15 +17,35 @@ import test.helper.ProviderTestHelper
 
 @Integration
 @Rollback
-class CredentialIntegrationSpec extends Specification{
+class CredentialIntegrationSpec extends Specification {
 
-	ProjectService projectService
+	ProjectService  projectService
 	SecurityService securityService
 
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-	private CredentialTestHelper credentialTestHelper = new CredentialTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
+	@Shared
+	ProjectTestHelper projectHelper
+
+	@Shared
+	ProviderTestHelper providerTestHelper
+
+	@Shared
+	CredentialTestHelper credentialTestHelper
+
+	@Shared
+	PersonTestHelper personHelper
+
+	@Shared
+	boolean initialized = false
+
+	void setup() {
+		if(!initialized) {
+			projectHelper = new ProjectTestHelper()
+			providerTestHelper = new ProviderTestHelper()
+			credentialTestHelper = new CredentialTestHelper()
+			personHelper = new PersonTestHelper()
+			initialized = true
+		}
+	}
 
 	void "1. Validate that deleting Project deletes the new Credential"() {
 		setup:

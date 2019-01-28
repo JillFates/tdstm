@@ -1,4 +1,4 @@
-package net.transitionmanager.service.license.prefs
+package net.transitionmanager.service.domain.listeners
 
 import grails.events.annotation.gorm.Listener
 import grails.events.bus.EventBusAware
@@ -11,7 +11,7 @@ class ModelListenerService implements EventBusAware {
 	SecurityService securityService
 
 	@Listener(Model)
-	void onSprocketPreInsert(PreInsertEvent event) {
+	void onModelPreInsert(PreInsertEvent event) {
 
 		if (!event.entityAccess.getProperty('createdBy')) {
 			Person person = securityService.userLoginPerson
