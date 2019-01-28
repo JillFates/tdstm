@@ -31,6 +31,7 @@ class CompanyEditionSpec extends GebReportingSpec {
             dateCreated: nowDate,
             lastUpdated: nowDate
     ]
+    static newValues
     def setupSpec() {
         testCount = 0
         to LoginPage
@@ -67,15 +68,15 @@ class CompanyEditionSpec extends GebReportingSpec {
         when:"The user edits the company"
             clickEdit()
             at CompanyEditionPage
-            editCompany()
+            newValues = editCompany()
         then: "The user is led to Company Details page"
             at CompanyDetailsPage
         and: "A message stating the company was updated is displayed"
-            validateMessage "PartyGroup "+companyName+" Edited updated"
+            validateMessage "PartyGroup "+newValues[0]+" updated"
         and:'The changes in Company Name are saved'
-            validateCompanyName companyName + " Edited"
+            validateCompanyName newValues[0]
         and:'The changes in Comments are saved'
-            validateComment companyComment + " Edited"
+            validateComment newValues[1]
         and: "Partner Value has changed"
             validatePartnerValue(!initPartnerValue)
     }
@@ -86,9 +87,9 @@ class CompanyEditionSpec extends GebReportingSpec {
             adminModule.goToListCompanies()
             at ListCompaniesPage
         when: "The user filters by the edited company"
-            filterByName companyName + " Edited"
+            filterByName newValues[0]
         then: "The company is listed with the 'Edited' word added"
-            validateCompanyIsListed(companyName + " Edited")
+            validateCompanyIsListed(newValues[0])
         and: "The partner field displays the opposite value it initially had"
             validatePartnerField(initPartnerValue)
     }
