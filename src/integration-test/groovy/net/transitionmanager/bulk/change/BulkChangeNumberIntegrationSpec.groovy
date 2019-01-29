@@ -87,30 +87,25 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 
 	void setup() {
-		if(!initialized) {
-			assetEntityTestHelper = new AssetEntityTestHelper()
-			moveBundleTestHelper = new MoveBundleTestHelper()
-			projectTestHelper = new ProjectTestHelper()
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
+		projectTestHelper = new ProjectTestHelper()
 
-			project = projectTestHelper.createProject()
-			otherProject = projectTestHelper.createProject()
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
 
-			moveBundle = moveBundleTestHelper.createBundle(project, null)
-			moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
-			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 
-			Project project = projectTestHelper.createProjectWithDefaultBundle()
-			JSONObject fieldSpec = loadFieldSpecJson()
-			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
-
-			initialized =true
-		}
+		Project project = projectTestHelper.createProjectWithDefaultBundle()
+		JSONObject fieldSpec = loadFieldSpecJson()
+		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 	}
 
 
 	void 'Test clear'() {
-		given:
 		when: 'clear is called with a list of assets'
 			BulkChangeNumber.clear(AssetEntity.class, null, 'custom8', [device.id], null)
 

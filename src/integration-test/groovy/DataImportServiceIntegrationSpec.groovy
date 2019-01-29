@@ -89,39 +89,37 @@ class DataImportServiceIntegrationSpec extends Specification {
 	void setupSpec() {
 
 	}
+
 	void setup() {
-		if(!initialized) {
-			whom = personTestHelper.createPerson()
-			project = projectTestHelper.createProject()
-			otherProject = projectTestHelper.createProject()
-			moveBundle = moveBundleTestHelper.createBundle(project, null)
-			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-																		 moveBundleTestHelper.createBundle(otherProject, null))
+		whom = personTestHelper.createPerson()
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
+																	 moveBundleTestHelper.createBundle(otherProject, null))
 
-			def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
-			securityService.assumeUserIdentity(adminUser.username, false)
+		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
+		securityService.assumeUserIdentity(adminUser.username, false)
 
-			context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
-			context.record = new ImportBatchRecord(sourceRowId: 1)
+		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
+		context.record = new ImportBatchRecord(sourceRowId: 1)
 
-			device.assetType = 'Server'
-			device.priority = 6
-			device.purchasePrice = 1.25
-			device.retireDate = new Date()
+		device.assetType = 'Server'
+		device.priority = 6
+		device.purchasePrice = 1.25
+		device.retireDate = new Date()
 
-			device.save()
+		device.save()
 
-			device2.assetType = 'Server'
-			device2.save()
+		device2.assetType = 'Server'
+		device2.save()
 
-			// Create a second project with a device with the same name and type as device above
-			otherProjectDevice.assetName = device.assetName
-			otherProjectDevice.assetType = device.assetType
-			otherProjectDevice.save()
-			initialized = true
-		}
+		// Create a second project with a device with the same name and type as device above
+		otherProjectDevice.assetName = device.assetName
+		otherProjectDevice.assetType = device.assetType
+		otherProjectDevice.save()
 	}
 
 	void '1. give the performQueryAndUpdateFindElement method a spin'() {
