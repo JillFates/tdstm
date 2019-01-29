@@ -67,7 +67,7 @@ export const AssetManagerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.CREATE']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.CREATE']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerCreate',
@@ -89,7 +89,7 @@ export const AssetManagerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.EDIT']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.EDIT']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerEdit',
@@ -111,7 +111,7 @@ export const AssetManagerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.SHOW'],
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.SHOW'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
 			},
 			requiresAuth: true

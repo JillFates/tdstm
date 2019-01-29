@@ -1,4 +1,5 @@
 import {NgModule, ModuleWithProviders} from '@angular/core';
+import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {PopupModule} from '@progress/kendo-angular-popup';
@@ -8,7 +9,6 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
-
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
 import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -76,7 +76,6 @@ import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-
 import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
-
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -92,7 +91,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UploadModule,
 		DateInputsModule,
 		IntlModule,
-		InputsModule
+		InputsModule,
+		RouterModule
 	],
 	declarations: [
 		UIAutofocusDirective,
