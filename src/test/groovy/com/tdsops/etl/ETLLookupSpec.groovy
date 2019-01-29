@@ -130,44 +130,44 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model', 'custom1'] as Set
 					data.size() == 3
-					customWith(data[0]) {
-						customWith(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						customWith(fields.custom1) {
+						assertWith(fields.custom1) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
 					}
 
-					customWith(data[1]) {
-						customWith(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[2]) {
-						customWith(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -218,16 +218,16 @@ class ETLLookupSpec extends ETLBaseSpec {
 		then: 'Results should contain Application domain results associated'
 			with (etlProcessor.finalResult()){
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['model', 'custom1'] as Set
 					data.size() == 1
-					customWith(data[0]){
-						customWith(fields.model) {
+					assertWith(data[0]){
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						customWith(fields.custom1){
+						assertWith(fields.custom1){
 							value == 'xray01, deltasrv03, alpha'
 							originalValue == 'xray01, deltasrv03, alpha'
 						}
@@ -271,40 +271,40 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model'] as Set
 					data.size() == 3
-					customWith(data[0]) {
-						customWith(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[1]) {
-						customWith(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[2]) {
-						customWith(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -349,44 +349,44 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model', 'custom1'] as Set
 					data.size() == 3
-					customWith(data[0]) {
-						customWith(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						customWith(fields.custom1) {
+						assertWith(fields.custom1) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
 					}
 
-					customWith(data[1]) {
-						customWith(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[2]) {
-						customWith(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -435,9 +435,9 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Device domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os', 'custom1'] as Set
 					data.size() == 5
@@ -497,40 +497,40 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model'] as Set
 					data.size() == 3
-					customWith(data[0]) {
-						customWith(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[1]) {
-						customWith(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					customWith(data[2]) {
-						customWith(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						customWith(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -632,21 +632,21 @@ class ETLLookupSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 3
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
 					data.size() == 5
 				}
 
-				customWith(domains[1]) {
+				assertWith(domains[1]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'id'] as Set
 					data.size() == 2
 				}
 
-				customWith(domains[2]) {
+				assertWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
 					data.size() == 5

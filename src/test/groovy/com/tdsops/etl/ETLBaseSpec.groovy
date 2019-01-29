@@ -476,7 +476,7 @@ abstract class ETLBaseSpec extends Specification {
 		return true
 	}
 
-	def customWith(Object target, Closure<?> closure) {
+	def assertWith(Object target, Closure<?> closure) {
 		if (target == null) {
 			throw new SpockAssertionError("Target of 'with' block must not be null");
 		}
@@ -485,11 +485,11 @@ abstract class ETLBaseSpec extends Specification {
 		return closure.call(target)
 	}
 
-	def customWith(Object target, Class<?> type, Closure closure) {
+	def assertWith(Object target, Class<?> type, Closure closure) {
 		if (target != null && !type.isInstance(target)) {
 			throw new SpockAssertionError(String.format("Expected target of 'with' block to have type '%s', but got '%s'",
 				type, target.getClass().getName()))
 		}
-		return customWith(target, closure)
+		return assertWith(target, closure)
 	}
 }

@@ -5,9 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
-import getl.exception.ExceptionGETL
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -341,15 +339,15 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				customWith(data[0].fields.appVendor) {
+				assertWith(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
 
-				customWith(data[1].fields.appVendor) {
+				assertWith(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
@@ -405,15 +403,15 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				customWith(data[0].fields.appVendor) {
+				assertWith(data[0].fields.appVendor) {
 					originalValue.value == 'Microsoft'
 					value.value == 'Microsoft'
 				}
 
-				customWith(data[1].fields.appVendor) {
+				assertWith(data[1].fields.appVendor) {
 					originalValue.value == 'Mozilla'
 					value.value == 'Mozilla'
 				}
@@ -478,30 +476,30 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
-				customWith(data[0].fields.custom1) {
+				assertWith(data[0].fields.custom1) {
 					originalValue == 4096
 					value == 4096
 				}
 
-				customWith(data[0].fields.custom2) {
+				assertWith(data[0].fields.custom2) {
 					originalValue == 2
 					value == 2
 				}
 
-				customWith(data[0].fields.custom3) {
+				assertWith(data[0].fields.custom3) {
 					originalValue == 2
 					value == 2
 				}
 
-				customWith(data[0].fields.custom4) {
+				assertWith(data[0].fields.custom4) {
 					originalValue == ["IDE", "SSD"]
 					value == ["IDE", "SSD"]
 				}
 
-				customWith(data[0].fields.custom5) {
+				assertWith(data[0].fields.custom5) {
 					originalValue == null
 					value == null
 				}
@@ -540,11 +538,11 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 
-				customWith(data[0].fields.appVendor) {
+				assertWith(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
@@ -589,29 +587,29 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 2
 
 		and: 'Results contains values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
-				customWith(data[0].fields.appVendor) {
+				assertWith(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
 
-				customWith(data[1].fields.appVendor) {
+				assertWith(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
 			}
 
-			customWith(etlProcessor.finalResult().domains[1]) {
+			assertWith(etlProcessor.finalResult().domains[1]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 2
-				customWith(data[0].fields.assetName) {
+				assertWith(data[0].fields.assetName) {
 					originalValue == 'xraysrv01'
 					value == 'xraysrv01'
 				}
 
-				customWith(data[1].fields.assetName) {
+				assertWith(data[1].fields.assetName) {
 					originalValue == 'zuludb01'
 					value == 'zuludb01'
 				}
@@ -690,10 +688,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			customWith(etlProcessor.finalResult().domains[0]) {
+			assertWith(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
-				customWith(data[0].fields.appVendor) {
+				assertWith(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
@@ -746,29 +744,29 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			customWith(etlProcessor.finalResult().domains[0], DomainResult) {
+			assertWith(etlProcessor.finalResult().domains[0], DomainResult) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				customWith(data[0], RowResult) {
+				assertWith(data[0], RowResult) {
 					rowNum == 1
 
-					customWith(fields.id, FieldResult) {
+					assertWith(fields.id, FieldResult) {
 						originalValue == 123
 						value == 123
 					}
 
-					customWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1, FieldResult) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					customWith(data[0].fields.custom2) {
+					assertWith(data[0].fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					customWith(data[0].fields.custom3) {
+					assertWith(data[0].fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -826,29 +824,29 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'the results contain expected values'
-			customWith(etlProcessor.finalResult().domains[0], DomainResult) {
+			assertWith(etlProcessor.finalResult().domains[0], DomainResult) {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				customWith(data[0], RowResult) {
+				assertWith(data[0], RowResult) {
 					rowNum == 1
 
-					customWith(fields.id, FieldResult) {
+					assertWith(fields.id, FieldResult) {
 						originalValue == 123
 						value == 123
 					}
 
-					customWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1, FieldResult) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					customWith(data[0].fields.custom2) {
+					assertWith(data[0].fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					customWith(data[0].fields.custom3) {
+					assertWith(data[0].fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}

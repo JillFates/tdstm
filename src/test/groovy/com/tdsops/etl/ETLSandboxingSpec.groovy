@@ -107,9 +107,9 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 0
 				}
@@ -132,10 +132,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Result has validSyntax equals false and a list of errors'
-			customWith(result) {
+			assertWith(result) {
 				validSyntax == false
 				errors.size() == 1
-				customWith(errors[0]) {
+				assertWith(errors[0]) {
 					startLine == 5
 					endLine == 5
 					startColumn == 1
@@ -201,10 +201,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 				configuration)
 
 		then: 'Result has validSyntax equals false and a list of errors'
-			customWith(result) {
+			assertWith(result) {
 				validSyntax == false
 				errors.size() == 1
-				customWith(errors[0]) {
+				assertWith(errors[0]) {
 					startLine == null
 					endLine == null
 					startColumn == null
@@ -423,32 +423,32 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			'''.stripIndent())
 
 		then: 'Results should contain Device Name assigment'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					customWith(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						customWith(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'x'
 							value == 'x'
 						}
 					}
-					customWith(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						customWith(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'y'
 							value == 'y'
 						}
 					}
-					customWith(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 3
-						customWith(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'z'
 							value == 'z'
 						}

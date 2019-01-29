@@ -224,7 +224,7 @@ class ETLFetchSpec extends ETLBaseSpec {
 			Map myVar = fetch.fields 'assetName', 'priority' set 'myVar'
 
 		then:
-			customWith(myVar, Map) {
+			assertWith(myVar, Map) {
 				assetName == 'ACMEVMPROD01'
 				priority == 2
 			}

@@ -157,9 +157,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -170,7 +170,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
-					customWith(data[0].fields.asset) {
+					assertWith(data[0].fields.asset) {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [
@@ -431,9 +431,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['id', 'asset'] as Set
 					data.size() == 14
@@ -444,7 +444,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
-					customWith(data[0].fields.asset) {
+					assertWith(data[0].fields.asset) {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [

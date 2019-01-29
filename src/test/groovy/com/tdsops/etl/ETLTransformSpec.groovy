@@ -963,31 +963,31 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'Evaluating a DataScript with having substitute with default value'
 			etlProcessor.evaluate(dataScript)
 		then: 'The evaluate process completed successfully replacing using the default value for custom2 where applicable.'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
-					customWith(data[0]) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						customWith(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'xraysrv01'
 							value == 'xraysrv01'
 							init == null
 							errors == []
 							warn == false
 						}
-						customWith(fields.custom1) {
+						assertWith(fields.custom1) {
 							originalValue == 'ProLiant BL460c Gen8'
 							value == 'Blade'
 							init == null
 							errors == []
 							warn == false
 						}
-						customWith(fields.custom2) {
+						assertWith(fields.custom2) {
 							originalValue == 'ProLiant BL460c Gen8'
 							value == 'Blade'
 							init == null
@@ -996,26 +996,26 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 					}
 
-					customWith(data[1]) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						customWith(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'zulu'
 							init == null
 							errors == []
 							warn == false
 						}
-						customWith(fields.custom1) {
+						assertWith(fields.custom1) {
 							originalValue == 'A Unknown Model'
 							value == 'A Unknown Model'
 							init == null
 							errors == []
 							warn == false
 						}
-						customWith(fields.custom2) {
+						assertWith(fields.custom2) {
 							originalValue == 'A Unknown Model'
 							value == 'VM'
 							init == null
@@ -1047,16 +1047,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					customWith(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Centermicrosoft - ACME Data Center'
 					}
 
-					customWith(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Centermozilla - ACME Data Center'
 					}
@@ -1083,16 +1083,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					customWith(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center-microsoft-ACME Data Center'
 					}
 
-					customWith(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center-mozilla-ACME Data Center'
 					}
@@ -1121,16 +1121,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					customWith(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - microsoft - '
 					}
 
-					customWith(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - mozilla - '
 					}
@@ -1158,16 +1158,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					customWith(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - microsoft'
 					}
 
-					customWith(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - mozilla'
 					}
@@ -1197,16 +1197,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				customWith(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					customWith(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'acme data center**'
 					}
 
-					customWith(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'acme data center**'
 					}
@@ -1464,105 +1464,105 @@ class ETLTransformSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				customWith(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 7
-					customWith(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						rowNum == 1
 						errorCount == 0
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					customWith(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						rowNum == 2
 						errorCount == 0
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					customWith(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						rowNum == 3
 						errorCount == 1
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == '06/25/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					customWith(data[3], RowResult) {
+					assertWith(data[3], RowResult) {
 						rowNum == 4
 						errorCount == 1
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					customWith(data[4], RowResult) {
+					assertWith(data[4], RowResult) {
 						rowNum == 5
 						errorCount == 1    // Should be 2
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					customWith(data[5], RowResult) {
+					assertWith(data[5], RowResult) {
 						rowNum == 6
 						errorCount == 1 // Should be 2
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					customWith(data[6], RowResult) {
+					assertWith(data[6], RowResult) {
 						rowNum == 7
 						errorCount == 1 // Should be 2
-						customWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						customWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
@@ -1627,34 +1627,34 @@ class ETLTransformSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				customWith(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					customWith(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						errorCount == 1
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Integer']
 						}
 					}
-					customWith(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						errorCount == 0
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					customWith(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						errorCount == 0
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
@@ -1697,65 +1697,65 @@ class ETLTransformSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			customWith(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				customWith(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					customWith(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						errorCount == 1
-						customWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM01'
 							init == null
 							errors == []
 						}
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Long']
 						}
 					}
-					customWith(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						rowNum == 2
 						errorCount == 0
-						customWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM03'
 							init == null
 							errors == []
 						}
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					customWith(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						rowNum == 3
 						errorCount == 0
-						customWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
 							errors == []
 						}
 					}
-					customWith(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						errorCount == 0
-						customWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						customWith(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
