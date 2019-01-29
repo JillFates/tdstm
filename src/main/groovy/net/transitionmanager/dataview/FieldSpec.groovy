@@ -306,7 +306,7 @@ class FieldSpec {
 	 * </pre>
 	 * * @see FieldSpec#getClassType()
 	 */
-	static Map<String, Closure<Object>> mapClassType = [
+	static Map<String, Closure> mapClassType = [
 		'Number'  : { FieldSpec fieldSpec -> fieldSpec.precision > 0 ? BigDecimal : Long },
 		'Date'    : { FieldSpec fieldSpec -> Date },
 		'DateTime': { FieldSpec fieldSpec -> Timestamp },

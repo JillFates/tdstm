@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <span aria-hidden="true">×</span>
@@ -12,7 +12,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
+            <table style="border:0;" class="assetEntity tds-asset-view-content-table" data-id="${assetEntity?.id}">
 
                 <tr>
                     <td colspan="2" class="dialog-container">

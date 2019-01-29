@@ -147,8 +147,8 @@ class ApplicationController implements ControllerMethods {
 			if(customField){
 				query.append(" AND ")
 
-				// Unescaping the paramater since it can include HTML encoded characters (like \' == &#39; )
-				def planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
+				// Unescaping the parameter since it can include HTML encoded characters (like \' == &#39; )
+				def planMethodology = StringEscapeUtils.unescapeHtml4(params.planMethodology)
 
 				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")

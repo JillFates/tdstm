@@ -10,7 +10,7 @@ import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bul
 		<tds-button-custom
 			icon="ellipsis-v"
 			title="Bulk Change"
-			[id]="'bntBulkChange'"
+			[id]="'btnBulkChange'"
             (click)="onClick()"
             class="btnBulkChange pull-left"
 			[disabled]="!enabled">

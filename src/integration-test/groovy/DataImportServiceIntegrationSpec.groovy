@@ -677,7 +677,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			Map assetFieldsInfo = [:]
 
 		when: 'calling the createEntity for a device'
-			Object entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+			Object entity = dataImportService.createEntity(Application, assetFieldsInfo, context)
 		then: 'we should get an AssetEntity'
 			(entity instanceof AssetEntity)
 		and: 'the moveBundle is set to the TBD'
@@ -694,7 +694,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		when: 'the fieldsInfo has a bundle defined'
 			initializeFieldElement('moveBundle', assetFieldsInfo, moveBundle.name)
 		and: 'calling createEntity'
-			entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+			entity = dataImportService.createEntity(Application, assetFieldsInfo, context)
 		then: 'the default bundle should not be assigned'
 			null == entity.moveBundle
 	}

@@ -4,18 +4,24 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {OnInit, ViewChild} from '@angular/core';
+import {OnInit, AfterViewInit, OnDestroy, ViewChildren, ViewChild, QueryList} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 import {AssetCommonHelper} from './asset-common-helper';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 
 declare var jQuery: any;
 
-export class AssetCommonEdit implements OnInit {
+export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('form') protected form: NgForm;
+	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
+	private destroySubject: Subject<any> = new Subject<any>();
 
 	private assetTagsDirty = false;
 	protected assetTagsModel: any = {tags: []};
@@ -51,6 +57,25 @@ export class AssetCommonEdit implements OnInit {
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
+	}
+
+	// set the handlers on open / on close to set the flags that indicate the state of the
+	// dropdown list items (opened/closed)
+	ngAfterViewInit() {
+		this.dropdowns.toArray()
+			.forEach((dropdown) => {
+				dropdown.open
+					.pipe(takeUntil(this.destroySubject))
+					.subscribe(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, true));
+
+				dropdown.close
+					.pipe(takeUntil(this.destroySubject))
+					.subscribe(() => setTimeout(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, false), 200));
+			});
+	}
+
+	ngOnDestroy() {
+		this.destroySubject.next();
 	}
 
 	/**

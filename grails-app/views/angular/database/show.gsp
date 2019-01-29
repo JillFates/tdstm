@@ -3,14 +3,14 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">Database Detail</h4>
     </div>
     <div class="modal-body">
         <div>
-            <table>
+            <table class="tds-asset-view-content-table">
                 <tr>
                     <td colspan="2" class="dialog-container">
                         <div class="dialog">

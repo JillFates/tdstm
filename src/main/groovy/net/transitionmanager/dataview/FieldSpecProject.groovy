@@ -1,11 +1,9 @@
 package net.transitionmanager.dataview
 
-import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.InvalidParamException
+
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-
+import net.transitionmanager.service.InvalidParamException
 /**
  * This class converts {@code customDomainService.fieldSpecsWithCommon ( project )}
  * in a fieldsSpecMap like this:
@@ -25,7 +23,7 @@ import groovy.transform.TypeCheckingMode
  * </pre>
  */
 @CompileStatic
-class FieldSpecCache {
+class FieldSpecProject {
 
 	/*
 	 * Contains each domains' individual set of fieldSpec objects where the Map key is the domain name.
@@ -38,7 +36,7 @@ class FieldSpecCache {
 	 * {@code CustomDomainService # fieldSpecsWithCommon} results.
 	 * It defines common fields and manages field specs type during a {@code DataviewService # query}
 	 */
-	FieldSpecCache(Map<String, Map> fieldsSpec) {
+	FieldSpecProject(Map<String, Map> fieldsSpec) {
 		Set keys = fieldsSpec.keySet()
 		for (String key in keys) {
 			fieldsSpecMap[key] = [:]
@@ -75,5 +73,16 @@ class FieldSpecCache {
 			fieldSpec = fieldsSpecMap[key][fieldName]
 		}
 		return fieldSpec
+	}
+
+	/**
+	 * Retrieve a {@code Map} with all customFields for an asset class definition.
+	 * @param assetClassName a Class name in AssetEntity hierarchy
+	 * @return a {@code Map} with all custom fields
+	 * @see FieldSpec#isCustom()
+	 */
+	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
+		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(assetClassName.toUpperCase())
+		return allFieldSpecs.findAll { it.value.isCustom() }
 	}
 }

@@ -54,7 +54,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "1. To Open the Clone Application Modal Window"() {
+    def "1. Open the Clone Application Modal Window"() {
         given: 'The User is on the Application Details Page'
             at AssetDetailsPage
         when: 'The user clicks on Clone Button'
@@ -163,9 +163,9 @@ class ApplicationCloneSpec extends GebReportingSpec {
         then: 'The User should be redirected to the Application Edition Section'
             at AssetEditPage
             waitFor {aeModalAppName.value() == appName}
-            waitFor {!updateButton.@disabled}
+            waitFor {!saveButton.@disabled}
         when: 'The User clicks the "Update" Button'
-            waitFor {updateButton.click()}
+            waitFor {saveButton.click()}
 
         then: 'The User should be redirected to the Application Details Page'
             at AssetDetailsPage

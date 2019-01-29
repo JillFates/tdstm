@@ -29,7 +29,7 @@ class AssetEditPage extends Page {
         tagsOptionList { $("div.k-list-container").find("li.k-item") }
         tagNamesSelector { tagsOptionList.find("div.asset-tag-selector-single-item") }
         deleteTagIcon { assetTagSelector.find("li span.k-i-close") }
-        tagsInput { assetTagSelector.find("input#asset-tag-selector-component") }
+        tagsInput { assetTagSelector.find("div.asset-tag-selector-component") }
         tagsSelected { assetTagSelector.find("kendo-taglist li") }
         commonsModule { module CommonsModule }
 
@@ -115,7 +115,7 @@ class AssetEditPage extends Page {
         aeModalIsDepStatusValue  { aeModalIsDepStatusSelector.find("span.k-input")}
     }
 
-    def clickOnsaveButton() {
+    def clickOnSaveButton() {
         waitFor { saveButton.click() }
     }
 

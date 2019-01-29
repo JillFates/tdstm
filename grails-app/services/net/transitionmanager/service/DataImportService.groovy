@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-
+import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
@@ -55,6 +55,8 @@ class DataImportService implements ServiceMethods {
 	Scheduler quartzScheduler
 	ScriptProcessorService scriptProcessorService
 	ProjectService projectService
+	AssetService assetService
+	CustomDomainService customDomainService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -553,7 +555,10 @@ class DataImportService implements ServiceMethods {
 			whom: securityService.getUserLoginPerson(),
 
 			//
-			staffList: getStaffReferencesForProject(project)
+			staffList: getStaffReferencesForProject(project),
+
+			// Prepares field Specs cache from database
+			fieldSpecProject: customDomainService.createFieldSpecProject(project)
 		]
 	}
 
@@ -917,6 +922,11 @@ class DataImportService implements ServiceMethods {
 		// project
 		if ( 'project' in propsInDomain ) {
 			entity.project = context.project
+		}
+
+		// Add default values for an assetEntity
+		if (AssetEntity.isAssignableFrom(domainClass)) {
+			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
 		}
 
 		// moveBundle

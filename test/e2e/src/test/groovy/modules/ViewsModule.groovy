@@ -19,7 +19,7 @@ class ViewsModule extends Module {
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
         viewsListed       (required: false) {vwGridRows.find("td:nth-child(3)")}
-        deleteButtons     {viewList.find("title": "Click to delete this view")}
+        deleteButtons     {viewList.find("title": "Delete View")}
         editButtons       {viewList.find("title": "Click to edit this view")}
         createViewButton  {viewModuleContainer.find(".box-tools-actions button", text:containsWord("Create"))}
         closeDeleteModal  {$("button.close")}
@@ -34,7 +34,7 @@ class ViewsModule extends Module {
     def openRandomView(){
         def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
         def editedViewName = viewsListed[willSelect].text()
-        waitFor{viewsListed[willSelect].click()}
+        waitFor{viewsListed[willSelect].find("a").click()}
         editedViewName
     }
 
@@ -122,7 +122,7 @@ class ViewsModule extends Module {
      * @return
      */
     def clickFirstViewOfTheList(){
-        vwGrid.find("tr")[1].find("a")[1].click()
+        vwGrid.find("tr")[1].find("a").click()
     }
 
     def filterViewByName(String name){
@@ -152,7 +152,7 @@ class ViewsModule extends Module {
         // otherwise we can click in other view than is required
         def links = viewsListed.findAll { it.text() == name }
         links.size() == 1
-        waitFor{ links[0].click() }
+        waitFor{links[0].find("a").click() }
     }
 
     def numberViewNamesEqualsNumberRows(){
@@ -211,7 +211,7 @@ class ViewsModule extends Module {
     def clickOnNonSharedView(){
         def nonSharedView=vwGridRows.find(":nth-child(7)").hasNot(".glyphicon-ok")[0]
         //nonSharedView.siblings().find("[uisref]").click()
-        nonSharedView.siblings().find("a")[1].click()
+        nonSharedView.siblings().find("a").click()
     }
 
 }
