@@ -14,11 +14,10 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group single-component">
-										<textarea rows="8" id="singeNote" name="singleNote" class="form-control"
-										          [(ngModel)]="singleNoteModel.comment"
+										<textarea rows="8" id="singleNote" name="singleNote" class="form-control"
+										          [(ngModel)]="note"
 										          *ngIf="singleNoteModel.modal.type !== modalType.VIEW" tds-autofocus>
 										</textarea>
-										<div *ngIf="singleNoteModel.modal.type === modalType.VIEW">{{singleNoteModel.comment}}</div>
 									</div>
 								</div>
 							</div>
@@ -27,18 +26,18 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
+
 				<button type="button" (click)="onSave()" class="btn btn-primary pull-left"
 				        *ngIf="singleNoteModel.modal.type !== modalType.VIEW"
-				        [disabled]="singleNoteModel.asset?.id === '' || singleNoteModel.comment === ''">
+				        [disabled]="note.trim() === ''">
 					<span class="fa fa-fw fa-floppy-o"></span> Save
 				</button>
-				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left" *ngIf="singleNoteModel.modal.type === modalType.VIEW">
-					<span class="glyphicon glyphicon-pencil"></span> Edit
-				</button>
+
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>Cancel</span>
 				</button>
+
 			</div>
 		</div>
 	</div>

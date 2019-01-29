@@ -503,23 +503,23 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	protected onCreateNote(dataItem: any): void {
-
 		let singleNoteModel: SingleNoteModel = {
 			modal: {
 				title: 'Create Note',
 				type: ModalType.CREATE
-			},
-			asset: {
-				id: 'dataItem.common_id',
-				text: 'dataItem.common_assetName'
 			},
 			note: ''
 		};
 
 		this.dialogService.extra(SingleNoteComponent, [
 			{provide: SingleNoteModel, useValue: singleNoteModel}
-		], false, false).then(result => {
-			console.log('RESULT SINGLE COMMENT', result);
+		], false, false)
+		.then(addedNote => {
+			this.hasModelChanges = true;
+			const newNote = ['Pending to save', this.model.personCreateObj, addedNote];
+			this.model.notesList.unshift(newNote);
+			const [dateCreated, createdBy, note] = newNote;
+			this.dataGridTaskNotesHelper.addDataItem({dateCreated, createdBy, note});
 		}).catch(result => {
 			console.log(result);
 		});

@@ -1,10 +1,7 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SingleNoteModel} from './model/single-note.model';
 import {ModalType} from '../../../../shared/model/constants';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {TaskService} from '../../../taskManager/service/task.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
@@ -13,17 +10,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 	styles: []
 })
 export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
-
 	public modalType = ModalType;
-	public assetClassOptions: any[];
-	private dataSignature: string;
+	private note: string;
 
-	constructor(public singleNoteModel: SingleNoteModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
+	constructor(public singleNoteModel: SingleNoteModel, public promptService: UIPromptService) {
 		super('#single-note-component');
 	}
 
 	ngOnInit(): void {
-		/* on init */
+		this.note = '';
 	}
 
 	/**
@@ -31,7 +26,7 @@ export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.getModelFields());
+		return this.note.trim() !== '';
 	}
 
 	/**
@@ -43,20 +38,7 @@ export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
 	}
 
 	protected onSave(): void {
-		/*
-		this.taskManagerService.saveComment(this.singleNoteModel).subscribe((res) => {
-			this.close();
-		});
-		*/
-	}
-
-	/**
-	 * Get only the fields relevants to the model
-	 */
-	getModelFields(): any {
-		const {id, note, asset} = this.singleNoteModel;
-
-		return {id, note, asset};
+		this.close(this.note);
 	}
 
 	/**
