@@ -174,7 +174,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [
-							['id', FindOperator.eq.name(), 151954l]
+							['id', FindOperator.eq.name(), "151954"]
 						])
 						assertQueryResult(find.query[1], ETLDomain.Device, [
 							['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],

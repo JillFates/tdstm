@@ -9,7 +9,6 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.NumberUtil
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -821,8 +820,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 
-							extract 'AssetDependencyId' load 'id'
-							find Dependency by 'id' with DOMAIN.id into 'id'
+							extract 'AssetDependencyId' load 'asset'
+							find Dependency by 'asset' with DOMAIN.asset into 'asset'
 
     						extract 'AssetId' load 'asset'
 
@@ -842,9 +841,9 @@ class ETLFindSpec extends ETLBaseSpec {
 				domains.size() == 1
 				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'asset'] as Set
+					fieldNames == ['asset', 'asset'] as Set
 					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+					data.collect { it.fields.asset.value } == (1..14).collect { it.toString() }
 
 					data.collect { it.fields.asset.value } == [
 						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
@@ -853,13 +852,13 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					// Validates command: find Application of asset by id with DOMAIN.asset
 					(1..14).eachWithIndex { int value, int index ->
-						customWith(data[index].fields.id.find) {
+						customWith(data[index].fields.asset.find) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toLong()]
+									['asset', FindOperator.eq.name(), value.toLong()]
 								]
 							)
 						}
@@ -998,8 +997,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							extract 'AssetDependencyId' load 'id'
-							find Dependency by 'id' eq DOMAIN.id into 'id'
+							extract 'AssetDependencyId' load 'asset'
+							find Dependency by 'asset' eq DOMAIN.asset into 'asset'
 
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
@@ -1018,9 +1017,9 @@ class ETLFindSpec extends ETLBaseSpec {
 				domains.size() == 1
 				customWith(domains[0], DomainResult) {
 					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'asset'] as Set
+					fieldNames == ['asset', 'asset'] as Set
 					data.size() == 14
-					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+					data.collect { it.fields.asset.value } == (1..14).collect { it.toString() }
 
 					data.collect { it.fields.asset.value } == [
 						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
@@ -1029,13 +1028,13 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					// Validates command: find Application of asset by id with DOMAIN.asset
 					(1..14).eachWithIndex { int value, int index ->
-						customWith(data[index].fields.id.find) {
+						customWith(data[index].fields.asset.find) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toLong()]
+									['asset', FindOperator.eq.name(), value]
 								]
 							)
 						}
@@ -1052,7 +1051,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), 151954l]
+									['asset', FindOperator.eq.name(), 151954l]
 								]
 							)
 							assertQueryResult(
@@ -1170,8 +1169,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 
-							extract 'AssetId' load 'id'
-							find Application by 'id' with DOMAIN.id into 'id'
+							extract 'AssetId' load 'asset'
+							find Application by 'id' with DOMAIN.asset into 'asset'
 
 							// Grab the reference to the FINDINGS to be used later.
 							def primaryFindings = FINDINGS
@@ -1189,10 +1188,10 @@ class ETLFindSpec extends ETLBaseSpec {
 				domains.size() == 1
 				customWith(domains[0]) {
 					domain == ETLDomain.Dependency.name()
-					fieldNames == ['id', 'comment'] as Set
+					fieldNames == ['asset', 'comment'] as Set
 					data.size() == 14
 					data.collect {
-						it.fields.id.value.toLong()
+						it.fields.asset.value.toLong()
 					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
 				}
 			}
@@ -2198,8 +2197,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						extract 'application id' load 'id'
-						find Application by 'id' with SOURCE.'application id' into 'id'
+						extract 'application id' load 'asset'
+						find Application by 'id' with SOURCE.'application id' into 'asset'
 					}
 					""".stripIndent())
 
@@ -2215,7 +2214,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 1
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152254'
 							value == '152254'
 							init == null
@@ -2235,7 +2234,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 2
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == '152255'
 							init == null
@@ -2299,8 +2298,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						extract 'application id' transform with toLong() load 'id' set appIdVar
-						find Application by 'id' with appIdVar into 'id'
+						extract 'application id' transform with toLong() load 'asset' set appIdVar
+						find Application by 'id' with appIdVar into 'asset'
 					}
 					""".stripIndent())
 
@@ -2316,7 +2315,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 1
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
@@ -2336,7 +2335,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 2
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null
@@ -2400,8 +2399,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						extract 'application id' transform with toLong() load 'id' set appIdVar
-						find Application by 'id' with appIdVar into 'id'
+						extract 'application id' transform with toLong() load 'asset' set appIdVar
+						find Application by 'id' with appIdVar into 'asset'
 					}
 					""".stripIndent())
 
@@ -2417,7 +2416,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 1
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152254'
 							value == 152254l
 							init == null
@@ -2437,7 +2436,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						rowNum == 2
-						customWith(fields.id) {
+						customWith(fields.asset) {
 							originalValue == '152255'
 							value == 152255l
 							init == null

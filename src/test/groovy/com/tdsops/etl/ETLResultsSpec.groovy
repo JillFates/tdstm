@@ -148,27 +148,27 @@ class ETLResultsSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-			JSONObject jsonResult = JSON.parse(new JSON(etlProcessor.finalResult()).toString())
+			JSONObject jsonResult = new JSONObject(etlProcessor.finalResult().properties)
 
 		then: 'Results should contain Application domain results associated'
-			with(jsonResult) {
+			customWith(jsonResult) {
 				domains.size() == 1
-				with(domains[0]) {
+				customWith(domains[0]) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
+					customWith(data[0].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[0].fields.id) {
+					customWith(data[0].fields.id) {
 						originalValue == '152254'
 						value == '152254'
 
 						 
 						find.query.size() == 1
-						with(find.query[0]) {
+						customWith(find.query[0]) {
 							domain == 'Application'
-							with(criteria[0]){
+							customWith(criteria[0]){
 								propertyName == 'id'
 								operator == 'eq'
 								value == 152254l
@@ -176,19 +176,19 @@ class ETLResultsSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1].fields.environment) {
+					customWith(data[1].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[1].fields.id) {
+					customWith(data[1].fields.id) {
 						originalValue == '152255'
 						value == '152255'
 
 						find.query.size() == 1
-						with(find.query[0]) {
+						customWith(find.query[0]) {
 							domain == 'Application'
-							with(criteria[0]){
+							customWith(criteria[0]){
 								propertyName == 'id'
 								operator == 'eq'
 								value == 152255l

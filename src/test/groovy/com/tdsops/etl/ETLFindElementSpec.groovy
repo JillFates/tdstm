@@ -161,7 +161,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 		when: 'it appends an eq statement'
 			find.by 'assetName' \
  				    and 'IP Address' eq '192.168.1.100'   \
- 				    into 'id'
+ 				    into 'asset'
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -196,7 +196,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 		when: 'it appends an eq statement'
 			find.by 'assetName' eq 'zulu01'   \
  				    and 'IP Address' eq '192.168.1.100'   \
- 				    into 'id'
+ 				    into 'asset'
 
 		then:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -226,7 +226,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an eq statement'
-			find.by 'assetName' ne 'zulu01' into 'id'
+			find.by 'assetName' ne 'zulu01' into 'asset'
 
 		then:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -255,7 +255,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an nseq statement'
-			find.by 'assetName' nseq 'zulu01' into 'id'
+			find.by 'assetName' nseq 'zulu01' into 'asset'
 
 		then:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -284,7 +284,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an lt statement'
-			find.by 'priority' lt 3 into 'id'
+			find.by 'priority' lt 3 into 'asset'
 
 		then:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -313,7 +313,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an le statement'
-			find.by 'priority' le 3 into 'id'
+			find.by 'priority' le 3 into 'asset'
 
 		then:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -342,7 +342,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an gt statement'
-			find.by 'priority' gt 4 into 'id'
+			find.by 'priority' gt 4 into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -371,7 +371,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an ge statement'
-			find.by 'priority' ge 4 into 'id'
+			find.by 'priority' ge 4 into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -400,7 +400,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an like statement'
-			find.by 'Name' like 'zulu%' into 'id'
+			find.by 'Name' like 'zulu%' into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -429,7 +429,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an notLike statement'
-			find.by 'Name' notLike 'zulu%' into 'id'
+			find.by 'Name' notLike 'zulu%' into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -458,7 +458,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an contains statement'
-			find.by 'Name' contains 'zulu' into 'id'
+			find.by 'Name' contains 'zulu' into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -487,7 +487,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an notContains statement'
-			find.by 'Name' notContains 'zulu' into 'id'
+			find.by 'Name' notContains 'zulu' into 'asset'
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -516,7 +516,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an inList statement'
-			find.by('Environment').inList(['QA', 'Development']).into('id')
+			find.by('Environment').inList(['QA', 'Development']).into('asset')
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -545,7 +545,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an notInList statement'
-			find.by('Environment').notInList(['QA', 'Development']).into('id')
+			find.by('Environment').notInList(['QA', 'Development']).into('asset')
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -574,7 +574,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an between statement'
-			find.by('priority').between(4..6).into('id')
+			find.by('priority').between(4..6).into('asset')
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
@@ -603,7 +603,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'it appends an notBetween statement'
-			find.by('priority').notBetween(4..6).into('id')
+			find.by('priority').notBetween(4..6).into('asset')
 
 		expect:
 			customWith(find.currentFind.statement, FindStatementBuilder) {
