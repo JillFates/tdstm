@@ -17,7 +17,7 @@ gulp.task('sass-main-style', function () {
 });
 
 gulp.task('sass-manager-compiler', function () {
-	return gulp.src('../../web-app/css/managerStyle.scss')
+	return gulp.src('../../web-app/css/managerStyle.sass')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 		.pipe(gulp.dest('../../web-app/css'));
