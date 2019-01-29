@@ -5,37 +5,20 @@ import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
-import { GridModule } from '@progress/kendo-angular-grid';
-import { ExcelExportModule } from '@progress/kendo-angular-excel-export';
-import { SortableModule } from '@progress/kendo-angular-sortable';
-import { IntlModule } from '@progress/kendo-angular-intl';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
-// Route Module
-import {AssetExplorerRouteModule} from './asset-explorer-routing.states';
-// Resolves
-import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {FieldsResolveService} from './resolve/fields-resolve.service';
-import {ReportsResolveService} from './resolve/reports-resolve.service';
-import {ReportResolveService} from './resolve/report-resolve.service';
-import {TagsResolveService} from './resolve/tags-resolve.service';
+import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
+import {GridModule} from '@progress/kendo-angular-grid';
+import {SortableModule} from '@progress/kendo-angular-sortable';
+import {IntlModule} from '@progress/kendo-angular-intl';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Services
-import { AssetExplorerService } from './service/asset-explorer.service';
-import { TaskCommentService } from './service/task-comment.service';
-import { DependecyService } from './service/dependecy.service';
-import { TagService } from '../assetTags/service/tag.service';
-import { ManufacturerService } from './service/manufacturer.service';
-import { ModelService } from  './service/model.service';
+import {AssetExplorerService} from '../assetManager/service/asset-explorer.service';
+import {TaskCommentService} from './service/task-comment.service';
+import {DependecyService} from './service/dependecy.service';
+import {TagService} from '../assetTags/service/tag.service';
+import {ManufacturerService} from './service/manufacturer.service';
+import {ModelService} from './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 // Components
-import {AssetExplorerViewSelectorComponent} from './components/view-selector/asset-explorer-view-selector.component';
-import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
-import {AssetExplorerViewSaveComponent} from './components/view-save/asset-explorer-view-save.component';
-import {AssetExplorerViewExportComponent} from './components/view-export/asset-explorer-view-export.component';
-import {AssetExplorerViewGridComponent} from './components/view-grid/asset-explorer-view-grid.component';
-import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
-import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
-import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
 import {TaskCommentComponent} from './components/task-comment/task-comment.component';
@@ -53,6 +36,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
+import {AssetCreateComponent} from './components/asset/asset-create.component';
 
 @NgModule({
 	imports: [
@@ -63,24 +47,14 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		// Kendo
 		DropDownListModule,
 		GridModule,
-		ExcelExportModule,
 		SortableModule,
 		IntlModule,
 		DateInputsModule,
-		// Route
-		AssetExplorerRouteModule
 	],
 	declarations: [
-		AssetExplorerViewSelectorComponent,
-		AssetExplorerIndexComponent,
-		AssetExplorerViewConfigComponent,
-		AssetExplorerViewSaveComponent,
-		AssetExplorerViewExportComponent,
-		AssetExplorerViewGridComponent,
-		AssetExplorerViewShowComponent,
 		AssetShowComponent,
-		AssetEditComponent,
 		AssetCreateComponent,
+		AssetEditComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
@@ -98,12 +72,6 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		TaskActionsComponent
 	],
 	providers: [
-		// Resolve
-		ModuleResolveService,
-		FieldsResolveService,
-		ReportResolveService,
-		ReportsResolveService,
-		TagsResolveService,
 		// Services
 		CustomDomainService,
 		AssetExplorerService,
@@ -115,19 +83,17 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 	],
 	exports: [
 		AssetShowComponent,
-		AssetEditComponent,
 		AssetCreateComponent,
+		AssetEditComponent,
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
-		AssetExplorerIndexComponent,
-		TaskCommentComponent],
+		TaskCommentComponent
+	],
 	entryComponents: [
-		AssetExplorerViewSaveComponent,
-		AssetExplorerViewExportComponent,
 		AssetShowComponent,
-		AssetEditComponent,
 		AssetCreateComponent,
+		AssetEditComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		ManufacturerShowComponent,

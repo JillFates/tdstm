@@ -3,7 +3,7 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';

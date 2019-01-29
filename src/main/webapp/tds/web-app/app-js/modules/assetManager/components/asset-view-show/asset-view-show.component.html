@@ -38,9 +38,9 @@
 
             <tds-button-export (click)="onExport()" [id]="'btnExport'"></tds-button-export>
 
-            <asset-explorer-view-selector
-                    #select="assetExplorerViewSelector">
-            </asset-explorer-view-selector>
+            <tds-asset-view-selector
+                    #select="tdsAssetViewSelector">
+            </tds-asset-view-selector>
             <tds-button-custom *ngIf="isEditAvailable()"
                         isIconButton="true"
                         icon="cog"

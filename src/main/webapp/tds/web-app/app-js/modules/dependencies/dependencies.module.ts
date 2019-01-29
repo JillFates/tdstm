@@ -21,7 +21,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {DependenciesViewGridComponent} from './components/view-grid/dependencies-view-grid.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {TagsResolveService} from '../assetExplorer/resolve/tags-resolve.service';
+import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {DependenciesService} from './service/dependencies.service';
 import {OpenAssetDependenciesService} from './service/open-asset-dependencies.service';

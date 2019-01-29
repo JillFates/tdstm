@@ -9,15 +9,15 @@ import {
 	Inject
 } from '@angular/core';
 
-import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.provider';
-import { DynamicComponent } from '../../../../shared/components/dynamic.component';
+import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
+import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
-import { DatabaseShowComponent } from '../database/database-show.component';
-import { ApplicationShowComponent } from '../application/application-show.component';
-import { DeviceShowComponent } from '../device/device-show.component';
-import { StorageShowComponent } from '../storage/storage-show.component';
+import {DatabaseShowComponent} from '../database/database-show.component';
+import {ApplicationShowComponent} from '../application/application-show.component';
+import {DeviceShowComponent} from '../device/device-show.component';
+import {StorageShowComponent} from '../storage/storage-show.component';
 
-import { AssetExplorerModule } from '../../asset-explorer.module';
+import {AssetExplorerModule} from '../../asset-explorer.module';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 

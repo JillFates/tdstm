@@ -10,7 +10,7 @@ import { ManufacturerShowComponent } from './manufacturer/components/manufacture
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';

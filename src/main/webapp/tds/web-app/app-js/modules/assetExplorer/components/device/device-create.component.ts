@@ -9,7 +9,7 @@ import * as R from 'ramda';
 import {Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -36,9 +36,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
-
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-
 		}
 
 		ngOnInit() {
