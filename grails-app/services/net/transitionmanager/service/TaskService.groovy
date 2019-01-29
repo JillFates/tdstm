@@ -1252,7 +1252,7 @@ class TaskService implements ServiceMethods {
 	 */
 	def genTableHtmlForDependencies(depTasks, task, String dependency){
 		def html = new StringBuilder("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-		def optionList = AssetComment.constrainedProperties.category.inList.toList()
+		def optionList = GormUtil.getConstrainedProperties(AssetComment).category.inList.toList()
 		def i=1
 		depTasks.each { depTask ->
 			def succecessor = dependency == 'predecessor' ? depTask.predecessor : depTask.assetComment

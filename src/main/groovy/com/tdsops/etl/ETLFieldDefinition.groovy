@@ -39,8 +39,8 @@ class ETLFieldDefinition {
 	}
 
 	/**
-	 * Creates an instance of ETLFieldDefinition using GrailsDomainClassProperty definition.
-	 * @param domainProperty an instance of GrailsDomainClassProperty
+	 * Creates an instance of ETLFieldDefinition using PersistentProperty definition.
+	 * @param domainProperty an instance of PersistentProperty
 	 * @see ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldDefinition(PersistentProperty domainProperty) {

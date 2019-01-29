@@ -2,7 +2,6 @@ package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import grails.core.GrailsApplication
-import grails.core.GrailsDomainClassProperty
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
 import grails.util.Environment
@@ -25,6 +24,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.OneToOne
+import org.grails.datastore.mapping.validation.ValidatorRegistry
 import org.grails.orm.hibernate.cfg.CompositeIdentity
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
@@ -37,6 +37,7 @@ import org.hibernate.transform.Transformers
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 import org.springframework.validation.BindingResult
+import org.springframework.validation.Validator
 
 @Slf4j(value='logger')
 class GormUtil{
@@ -176,13 +177,11 @@ class GormUtil{
 			throw new RuntimeException("A non-domain class parameter was provided")
 		}
 
-		String domainName = domainClass.getName()
-		def domainObj = ApplicationContextHolder.getArtefact('Domain', domainName)
-		if (! domainObj) {
-			throw RuntimeException('Unable to find artefact for domain ' + domainName)
-		}
+		PersistentEntity persistentEntity = mappingContext().getPersistentEntity(domainClass.name)
+		ValidatorRegistry registry = ((ValidatorRegistry)Holders.getApplicationContext().getBean('gormValidatorRegistry'))
+		Validator validator = registry.getValidator(persistentEntity)
 
-		return domainObj.getConstrainedProperties()
+		return validator.constrainedProperties
 	}
 
 	/**
@@ -403,14 +402,14 @@ class GormUtil{
 	}
 
 	/**
-	 * Returns a Collection of GrailsDomainClassProperty properties for a domain class that are
+	 * Returns a Collection of PersistentProperty properties for a domain class that are
 	 * persistable and updatable.
 	 * @param clazz - the Class object of the domain being inspected
 	 * @param notToUpdateNames - a list of property names that should be excluded from the result
-	 * @return a list of GrailsDomainClassProperty that are updatable
+	 * @return a list of PersistentProperty that are updatable
 	 */
 	@Memoized
-	static Collection<GrailsDomainClassProperty> updatablePersistentProperties(Class clazz, Collection<String> notToUpdateNames) {
+	static Collection<PersistentProperty> updatablePersistentProperties(Class clazz, Collection<String> notToUpdateNames) {
 		getDomainClass(clazz).persistentProperties.findAll { !notToUpdateNames.contains(it.name) }
 	}
 
@@ -426,7 +425,7 @@ class GormUtil{
 	static void copyUnsetValues(to, from, Collection<String> notToUpdateNames = []) {
 		Assert.isTrue(from.getClass() == to.getClass() || (from instanceof Map),
 				'Can only copy between instances of the same type unless from is a Map')
-		for (GrailsDomainClassProperty property in updatablePersistentProperties(to.getClass(), notToUpdateNames)) {
+		for (PersistentProperty property in updatablePersistentProperties(to.getClass(), notToUpdateNames)) {
 			String name = property.name
 			if (from[name] && !to[name]) {
 				to[name] = from[name]
@@ -529,11 +528,11 @@ class GormUtil{
 	 * @param propertyName
 	 * @return
 	 */
-	@Memoized
+	//@Memoized
 	static boolean isDomainProperty(Class domainClass, String propertyName) {
 		PersistentEntity persistentEntity = mappingContext().getPersistentEntity(domainClass.name)
 
-		return persistentEntity && (persistentEntity.persistentPropertyNames.contains(propertyName) || persistentEntity.identity.name == propertyName)
+		return persistentEntity && (persistentEntity.persistentProperties*.name.contains(propertyName) || persistentEntity.identity.name == propertyName)
 	}
 
 	/**
@@ -646,7 +645,7 @@ class GormUtil{
 	 * Used to get the list of persistent properties for a given domain class
 	 * @param domainInst - the Domain instance to get the properties for
 	 * @param propertyName - the name of a property to retrieve
-	 * @return The GrailsDomainClassProperty object
+	 * @return The PersistentProperty object
 	 */
 	static PersistentProperty getDomainProperty(Object domainInst, String propertyName) {
 		return getDomainProperty(domainInst.getClass(), propertyName)
@@ -656,7 +655,7 @@ class GormUtil{
 	 * Used to get the list of persistent properties for a given domain class
 	 * @param domainClass - the Domain class to get the properties for
 	 * @param propertyName - the name of a property to retrieve
-	 * @return The GrailsDomainClassProperty object
+	 * @return The PersistentProperty object
 	 */
 	@Memoized
 	static PersistentProperty getDomainProperty(Class domainClass, String propertyName) {

@@ -1416,7 +1416,7 @@ class AssetEntityService implements ServiceMethods {
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),
-			dataFlowFreq:		AssetDependency.constrainedProperties.dataFlowFreq.inList,
+			dataFlowFreq:		GormUtil.getConstrainedProperties(AssetDependency).dataFlowFreq.inList,
 
 			// The page to return to after submitting changes (2018-11 JPM - believe this to be legacy and not needed)
 			redirectTo: params.redirectTo,
@@ -2042,14 +2042,14 @@ class AssetEntityService implements ServiceMethods {
 						assetCable.toPower = ''
 					}
 
-					if (AssetCableMap.constrainedProperties.cableColor.inList.contains(cableColor)) {
+					if (GormUtil.getConstrainedProperties(AssetCableMap).cableColor.inList.contains(cableColor)) {
 						assetCable.cableColor = cableColor
 					}
 
 					assetCable.cableComment = cableComment
 					assetCable.cableStatus = cableStatus
 
-					if (AssetCableMap.constrainedProperties.assetLoc.inList.contains(roomType))
+					if (GormUtil.getConstrainedProperties(AssetCableMap).assetLoc.inList.contains(roomType))
 						assetCable.assetLoc= roomType
 
 					if (assetCable.dirtyPropertyNames.size()) {

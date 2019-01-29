@@ -94,7 +94,7 @@ class AssetService {
             environmentOptions : getAssetEnvironmentOptions(),
             planStatusOptions : getAssetPlanStatusOptions(),
             validationOptions : ValidationType.list,
-            dataFlowFreq : AssetDependency.constrainedProperties.dataFlowFreq.inList,
+            dataFlowFreq : GormUtil.getConstrainedProperties(AssetDependency).dataFlowFreq.inList,
             moveBundleList : getMoveBundleOptions(project),
             dependencyMap : dependencyCreateMap(project)
         ]

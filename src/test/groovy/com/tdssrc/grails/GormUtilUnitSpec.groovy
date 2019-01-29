@@ -156,7 +156,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 	}
 
 	@Unroll
-	void '9 test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
+	void '9 test can return a PersistentProperty for #propertyName and #clazz DomainClass'() {
 		expect:
 			PersistentProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
 			grailsDomainClassProperty.name == name
