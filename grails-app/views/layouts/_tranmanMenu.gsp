@@ -244,7 +244,7 @@
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-comments-list" onclick="hideMegaMenu('assetMegaMenu')">
-                                <g:link class="mmlink" controller="assetEntity" action="listComment">
+                                <g:link class="mmlink" controller="module" action="assetcomment" id="list">
 	                                <asset:image src="icons/comments.png" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>
                             </li>

@@ -39,7 +39,6 @@ export class AssetCommentListComponent implements OnInit {
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: AssetCommentModel[];
-	public selectedRows = [];
 	public dateFormat = '';
 
 	constructor(
@@ -91,17 +90,16 @@ export class AssetCommentListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openAssetCommentDialogViewEdit(dataItem);
+		this.openAssetCommentDialogViewEdit(dataItem, ModalType.EDIT);
 	}
 
 	/**
-	 * Catch the Selected Row
+	 * Check the field clicked and if appropriate open the comment view
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem']);
-			this.openAssetCommentDialogViewEdit(event['dataItem']);
+		if (event.columnIndex === 1) {
+			this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
 		}
 	}
 
@@ -130,12 +128,12 @@ export class AssetCommentListComponent implements OnInit {
 	 * @param {ProviderModel} providerModel
 	 * @param {number} actionType
 	 */
-	private openAssetCommentDialogViewEdit(comment: any): void {
+	private openAssetCommentDialogViewEdit(comment: any, type: ModalType): void {
 		let singleCommentModel: SingleCommentModel = {
 			id: comment.commentInstance.id,
 			modal: {
 				title: 'Comment Detail',
-				type: ModalType.VIEW
+				type: type
 			},
 			archive: comment.commentInstance.dateResolved !== null,
 			comment: comment.commentInstance.comment,
@@ -151,18 +149,13 @@ export class AssetCommentListComponent implements OnInit {
 			dateCreated: comment.commentInstance.dateCreated
 		};
 
-		this.dialogService.open(SingleCommentComponent, [
+		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		]).then(result => {
 			this.reloadData();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
-	}
-
-	private selectRow(dataItem: any): void {
-		this.selectedRows = [];
-		this.selectedRows.push(dataItem);
 	}
 
 	/**

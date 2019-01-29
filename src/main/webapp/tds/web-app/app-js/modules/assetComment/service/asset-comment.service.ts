@@ -21,8 +21,15 @@ export class AssetCommentService {
 
 	getAssetComments(): Observable<AssetCommentModel[]> {
 		return this.http.get(`${this.listCommentUrl}`)
-			.map((res: Response) => res.json())
+			.map((res: Response) => {
+				let commentModels = res.json();
+				commentModels.forEach((r) => {
+					r.commentInstance.lastUpdated = ((r.commentInstance.lastUpdated) ? new Date(r.commentInstance.lastUpdated) : '');
+				});
+				return commentModels;
+			})
 			.catch((error: any) => error.json());
+
 	}
 
 	/**
