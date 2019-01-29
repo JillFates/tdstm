@@ -58,7 +58,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	}
 
 	def cleanup() {
-		if (simpleDataSetFileName) service.deleteTemporaryFile(simpleDataSetFileName)
+		if (simpleDataSetFileName) fileSystemService.deleteTemporaryFile(simpleDataSetFileName)
 	}
 
 	void 'test can check syntax in an ETL script with groovy comments'() {
@@ -107,9 +107,9 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 0
 				}
@@ -120,7 +120,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor.checkSyntax("""
@@ -132,10 +132,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Result has validSyntax equals false and a list of errors'
-			with(result) {
+			assertWith(result) {
 				validSyntax == false
 				errors.size() == 1
-				with(errors[0]) {
+				assertWith(errors[0]) {
 					startLine == 5
 					endLine == 5
 					startColumn == 1
@@ -150,14 +150,14 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-					.evaluate("""
+				.evaluate("""
 					domain Device
 					read labels
 					iterate
@@ -173,10 +173,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -192,19 +192,19 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor
-					.checkSyntax("""
+				.checkSyntax("""
 					domain Device
 					read labels
 					def greeting = { String name -> "Hello, \$name!" }
 					assert greeting('Diego') == 'Hello, Diego!'
 				""".stripIndent(),
-					configuration)
+				configuration)
 
 		then: 'Result has validSyntax equals false and a list of errors'
-			with(result) {
+			assertWith(result) {
 				validSyntax == false
 				errors.size() == 1
-				with(errors[0]) {
+				assertWith(errors[0]) {
 					startLine == null
 					endLine == null
 					startColumn == null
@@ -218,10 +218,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	void 'test can evaluate an ETL script disallowing closure creation and using a custom compiler configuration'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -237,13 +237,13 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-					.evaluate("""
+				.evaluate("""
 					domain Device
 					read labels
 					def greeting = { String name -> "Hello, \$name!" }
 					assert greeting('Diego') == 'Hello, Diego!'
 				""".stripIndent(),
-					configuration)
+				configuration)
 
 		then: 'An MissingMethodException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -254,7 +254,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -275,10 +275,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -298,11 +298,11 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.
-					evaluate("""
+				evaluate("""
 					import java.lang.Math.*
 
 					domain Device
@@ -319,10 +319,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -340,7 +340,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 				read labels
 				max 10, 100
 			""".stripIndent(),
-					configuration)
+				configuration)
 
 		then: 'An MultipleCompilationErrorsException exception is not thrown'
 			notThrown MultipleCompilationErrorsException
@@ -350,10 +350,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					new DebugConsole(buffer: new StringBuilder()),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -364,8 +364,8 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 		then: 'A console content could be recovered after processing an ETL Script'
 			etlProcessor.debugConsole.buffer.toString().startsWith(
 				new StringBuilder("INFO - Selected Domain: Device")
-				.append(System.lineSeparator())
-				.toString()
+					.append(System.lineSeparator())
+					.toString()
 			)
 	}
 
@@ -407,10 +407,10 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			'''.stripIndent())
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					dataSet,
-					GroovyMock(DebugConsole),
-					validator)
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate('''
@@ -423,32 +423,32 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			'''.stripIndent())
 
 		then: 'Results should contain Device Name assigment'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'x'
 							value == 'x'
 						}
 					}
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'y'
 							value == 'y'
 						}
 					}
-					with(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 3
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'z'
 							value == 'z'
 						}
@@ -458,7 +458,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 

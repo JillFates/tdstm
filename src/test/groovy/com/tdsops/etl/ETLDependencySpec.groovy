@@ -1,13 +1,14 @@
 package com.tdsops.etl
 
 import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tds.asset.TaskDependency
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -23,7 +24,7 @@ import spock.util.mop.ConfineMetaClassChanges
 /**
  * Test about ETL Current Element (CE):
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions, TaskDependency, AssetComment])
 class ETLDependencySpec extends ETLBaseSpec {
 
 	DebugConsole debugConsole
@@ -89,21 +90,21 @@ class ETLDependencySpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement) {
+			assertWith(etlProcessor.currentElement) {
 				originalValue == 'PE2950'
 				value == 'PE2950'
 				init == null
-				with(fieldDefinition, ETLFieldDefinition) {
+				assertWith(fieldDefinition, ETLFieldDefinition) {
 					name == 'model'
 					label == 'Model'
 				}
 			}
 
 		and: 'Results contains the following values'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'manufacturer', 'model'] as Set
 					data.size() == 1
@@ -112,7 +113,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -144,7 +145,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is being incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidDomainForDomainDependencyWithCommand().message} at line 8"
 				startLine == 8
 				endLine == 8
@@ -155,7 +156,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -185,7 +186,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.incorrectDomainVariableForDomainWithCommand().message} at line 6"
 				startLine == 6
 				endLine == 6
@@ -196,7 +197,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -227,7 +228,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.incorrectDomainVariableForDomainWithCommand().message} at line 7"
 				startLine == 7
 				endLine == 7
@@ -238,7 +239,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -271,7 +272,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidAssetEntityClassForDomainDependencyWithCommand().message} at line 9"
 				startLine == 9
 				endLine == 9
@@ -282,7 +283,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -315,7 +316,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message.startsWith(ETLProcessorException.unrecognizedDomainCommandArguments('Runs On').message)
 				startLine == 9
 				endLine == 9
@@ -326,7 +327,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -363,7 +364,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidDependencyTypeInDomainDependencyWithCommand('Runs On').message} at line 13"
 				startLine == 13
 				endLine == 13
@@ -374,7 +375,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -416,7 +417,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidAssetEntityClassForDomainDependencyWithCommand().message} at line 13"
 				startLine == 13
 				endLine == 13
@@ -427,7 +428,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -494,22 +495,22 @@ class ETLDependencySpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results contains the following values'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 3
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'manufacturer', 'model', 'id'] as Set
 					data.size() == 1
 
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 4
 						assertFieldResult(fields['assetName'], 'xraysrv01', 'xraysrv01')
 						assertFieldResult(fields['manufacturer'], 'Dell', 'Dell')
 						assertFieldResult(fields['model'], 'PE2950', 'PE2950')
 						assertFieldResult(fields['id'], null, null)
-						with(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -524,19 +525,19 @@ class ETLDependencySpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1], DomainResult) {
+				assertWith(domains[1], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'appTech', 'url', 'id'] as Set
 					data.size() == 1
 
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 4
 						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
 						assertFieldResult(fields['appTech'], '(xlsx updated)', '(xlsx updated)')
 						assertFieldResult(fields['url'], 'www.microsoft.com', 'www.microsoft.com')
 						assertFieldResult(fields['id'], null, null)
 
-						with(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -551,15 +552,15 @@ class ETLDependencySpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[2], DomainResult) {
+				assertWith(domains[2], DomainResult) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type'] as Set
 					data.size() == 1
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 3
 
 						assertFieldResult(fields['asset'])
-						with(fields['asset'].find, FindResult) {
+						assertWith(fields['asset'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -571,7 +572,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 								]
 							)
 
-							with(fields['asset'].create) {
+							assertWith(fields['asset'].create) {
 								!it.containsKey('id')
 								it.'assetName' == 'xraysrv01'
 								it.'manufacturer' == 'Dell'
@@ -580,7 +581,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 						}
 
 						assertFieldResult(fields['dependent'])
-						with(fields['dependent'].find, FindResult) {
+						assertWith(fields['dependent'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -592,7 +593,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 								]
 							)
 
-							with(fields['dependent'].create) {
+							assertWith(fields['dependent'].create) {
 								!it.containsKey('id')
 								it.'appVendor' == 'Microsoft'
 								it.'appTech' == '(xlsx updated)'
@@ -608,7 +609,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -677,21 +678,21 @@ class ETLDependencySpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results contains the following values'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 3
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'appVendor', 'id'] as Set
 					data.size() == 1
 
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 3
 						assertFieldResult(fields['assetName'], 'Exchange', 'Exchange')
 						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
 						assertFieldResult(fields['id'], null, null)
-						with(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find, FindResult) {
 							query.size() == 2
 							assertQueryResult(
 								query[0],
@@ -705,12 +706,12 @@ class ETLDependencySpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1], DomainResult) {
+				assertWith(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'manufacturer', 'model', 'externalRefId','id'] as Set
 					data.size() == 1
 
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 5
 						assertFieldResult(fields['assetName'], 'exchangedb01', 'exchangedb01')
 						assertFieldResult(fields['manufacturer'], 'VMWare', 'VMWare')
@@ -718,7 +719,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 						assertFieldResult(fields['externalRefId'], '123-abc-456-def', '123-abc-456-def')
 						assertFieldResult(fields['id'], null, null)
 
-						with(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find, FindResult) {
 							query.size() == 5
 							assertQueryResult(
 								query[0],
@@ -731,15 +732,15 @@ class ETLDependencySpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[2], DomainResult) {
+				assertWith(domains[2], DomainResult) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'comment'] as Set
 					data.size() == 1
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						fields.size() == 4
 
 						assertFieldResult(fields['asset'])
-						with(fields['asset'].find, FindResult) {
+						assertWith(fields['asset'].find, FindResult) {
 							query.size() == 2
 							assertQueryResult(
 								query[0],
@@ -750,7 +751,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 								]
 							)
 
-							with(fields['asset'].create) {
+							assertWith(fields['asset'].create) {
 								!it.containsKey('id')
 								it.'assetName' == 'Exchange'
 								it.'appVendor' == 'Microsoft'
@@ -758,7 +759,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 						}
 
 						assertFieldResult(fields['dependent'])
-						with(fields['dependent'].find, FindResult) {
+						assertWith(fields['dependent'].find, FindResult) {
 							query.size() == 5
 							assertQueryResult(
 								query[0],
@@ -768,7 +769,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 								]
 							)
 
-							with(fields['dependent'].create) {
+							assertWith(fields['dependent'].create) {
 								!it.containsKey('id')
 								it.'assetName' == 'exchangedb01'
 								it.'manufacturer' == 'VMWare'
@@ -785,7 +786,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 

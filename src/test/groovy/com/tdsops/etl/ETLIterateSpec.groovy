@@ -326,48 +326,48 @@ class ETLIterateSpec extends ETLBaseSpec {
 					}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '152255'
 						originalValue == '152255'
 					}
 
-					with(data[0].fields.appVendor) {
+					assertWith(data[0].fields.appVendor) {
 						value == 'Microsoft'
 						originalValue == 'Microsoft'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '152256'
 						originalValue == '152256'
 					}
 
-					with(data[1].fields.appVendor) {
+					assertWith(data[1].fields.appVendor) {
 						value == 'Mozilla'
 						originalValue == 'Mozilla'
 					}
 				}
-				with(domains[1]) {
+				assertWith(domains[1]) {
 					domain == 'Device'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '1522'
 						originalValue == '1522'
 					}
 
-					with(data[0].fields.assetName) {
+					assertWith(data[0].fields.assetName) {
 						value == 'SRW24G1'
 						originalValue == 'SRW24G1'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '1523'
 						originalValue == '1523'
 					}
 
-					with(data[1].fields.assetName) {
+					assertWith(data[1].fields.assetName) {
 						value == 'ZPHA MODULE'
 						originalValue == 'ZPHA MODULE'
 					}
@@ -376,7 +376,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -413,48 +413,48 @@ class ETLIterateSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '152255'
 						originalValue == '152255'
 					}
 
-					with(data[0].fields.appVendor) {
+					assertWith(data[0].fields.appVendor) {
 						value == 'Microsoft'
 						originalValue == 'Microsoft'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '152256'
 						originalValue == '152256'
 					}
 
-					with(data[1].fields.appVendor) {
+					assertWith(data[1].fields.appVendor) {
 						value == 'Mozilla'
 						originalValue == 'Mozilla'
 					}
 				}
-				with(domains[1]) {
+				assertWith(domains[1]) {
 					domain == 'Device'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '1522'
 						originalValue == '1522'
 					}
 
-					with(data[0].fields.assetName) {
+					assertWith(data[0].fields.assetName) {
 						value == 'SRW24G1'
 						originalValue == 'SRW24G1'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '1523'
 						originalValue == '1523'
 					}
 
-					with(data[1].fields.assetName) {
+					assertWith(data[1].fields.assetName) {
 						value == 'ZPHA MODULE'
 						originalValue == 'ZPHA MODULE'
 					}
@@ -463,7 +463,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -498,38 +498,38 @@ class ETLIterateSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.result){
+			assertWith(etlProcessor.result){
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 4
 
-					with(data[0], RowResult){
-						with(fields['assetName'], FieldResult){
+					assertWith(data[0], RowResult){
+						assertWith(fields['assetName'], FieldResult){
 							init == null
 							value == 'alphadb01'
 							originalValue == 'alphadb01'
 						}
 					}
 
-					with(data[1]){
-						with(fields['assetName']){
+					assertWith(data[1]){
+						assertWith(fields['assetName']){
 							init == null
 							value == 'bravodb01'
 							originalValue == 'bravodb01'
 						}
 					}
 
-					with(data[2]){
-						with(fields['assetName']) {
+					assertWith(data[2]){
+						assertWith(fields['assetName']) {
 							init == null
 							value == 'alphadb01'
 							originalValue == 'alphadb01'
 						}
 					}
 
-					with(data[3]){
-						with(fields['assetName']) {
+					assertWith(data[3]){
+						assertWith(fields['assetName']) {
 							init == null
 							value == 'bravodb01'
 							originalValue == 'bravodb01'
@@ -540,7 +540,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -577,48 +577,48 @@ class ETLIterateSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 2
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '152255'
 						originalValue == '152255'
 					}
 
-					with(data[0].fields.appVendor) {
+					assertWith(data[0].fields.appVendor) {
 						value == 'Microsoft'
 						originalValue == 'Microsoft'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '152256'
 						originalValue == '152256'
 					}
 
-					with(data[1].fields.appVendor) {
+					assertWith(data[1].fields.appVendor) {
 						value == 'Mozilla'
 						originalValue == 'Mozilla'
 					}
 				}
-				with(domains[1]) {
+				assertWith(domains[1]) {
 					domain == 'Device'
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						value == '1522'
 						originalValue == '1522'
 					}
 
-					with(data[0].fields.assetName) {
+					assertWith(data[0].fields.assetName) {
 						value == 'SRW24G1'
 						originalValue == 'SRW24G1'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						value == '1523'
 						originalValue == '1523'
 					}
 
-					with(data[1].fields.assetName) {
+					assertWith(data[1].fields.assetName) {
 						value == 'ZPHA MODULE'
 						originalValue == 'ZPHA MODULE'
 					}
@@ -627,7 +627,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 

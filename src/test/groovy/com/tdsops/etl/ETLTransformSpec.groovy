@@ -15,8 +15,6 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.testing.spring.AutowiredTest
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
@@ -26,6 +24,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
 import spock.lang.See
 import spock.lang.Shared
+
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -46,9 +45,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 	JSONConnection jsonConnection
 
 	@Shared
-	Date          now = new DateMidnight(1974,06,26).toDate()
+	Date now = new DateMidnight(1974, 06, 26).toDate()
 	@Shared
-	Date          otherD = new DateMidnight(2018, 7,4).toDate()
+	Date otherD = new DateMidnight(2018, 7, 4).toDate()
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
@@ -173,9 +172,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'issue date', alias: 'ISSUE DATE', type: "DATE", isNull: false)
 
 		new Flow().writeTo(dest: mixedTypeDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': 152255, 'user count': 12345,
-			         'expiration date': DateUtils.parseDate("1974-06-26", 'yyyy-MM-dd'),
-			         'issue date': DateUtils.parseDate("1977-02-18", 'yyyy-MM-dd')
+			updater(['device id'      : 152255, 'user count': 12345,
+					 'expiration date': DateUtils.parseDate("1974-06-26", 'yyyy-MM-dd'),
+					 'issue date'     : DateUtils.parseDate("1977-02-18", 'yyyy-MM-dd')
 			])
 		}
 
@@ -209,52 +208,52 @@ class ETLTransformSpec extends ETLBaseSpec {
 			result == ETLProcessor.coalesce(value1, value2, value3)
 
 		where:
-			result || value1 | value2 | value3
-			null   || null   | ''     | null
-			5      || ''     | null   | 5
-			'tadah'|| null   | ''     | 'tadah'
-			false  || null   | null   | false
-			true   || ''     | true   | 3
-			0      || ''     | 0      | 1
-			now    || ''     | null   | now
-			new Element(value: 5) || null | null | new Element(value: 5)
+			result                || value1 | value2 | value3
+			null                  || null   | ''     | null
+			5                     || ''     | null   | 5
+			'tadah'               || null   | ''     | 'tadah'
+			false                 || null   | null   | false
+			true                  || ''     | true   | 3
+			0                     || ''     | 0      | 1
+			now                   || ''     | null   | now
+			new Element(value: 5) || null   | null   | new Element(value: 5)
 	}
 
 	void 'test can apply defaultValue transformation'() {
 
 		expect:
-			result == new Element(value:value).defaultValue(dafaultVal).value
+			result == new Element(value: value).defaultValue(dafaultVal).value
 
 		where:
 
-			result  || value     | dafaultVal
-			'abc'   || null      | 'abc'
-			'abc'   || ''        | 'abc'
-			'xyz'   || 'xyz'     | 'abc'
-			now     || null      | now
-			otherD  || otherD    | now
-			5       || null      | 5
-			42      || 42        | 5
-			5       || ''        | new Element(value:5)
+			result || value  | dafaultVal
+			'abc'  || null   | 'abc'
+			'abc'  || ''     | 'abc'
+			'xyz'  || 'xyz'  | 'abc'
+			now    || null   | now
+			otherD || otherD | now
+			5      || null   | 5
+			42     || 42     | 5
+			5      || ''     | new Element(value: 5)
 
 	}
 
 	void 'test can apply ellipsis transformation'() {
 
 		expect:
-			result == new Element(value:value).ellipsis(len).value
+			result == new Element(value: value).ellipsis(len).value
 
 		where:
 
-			result         || value                    | len
-			'this is...'   || 'this is a long string'  | 10
-			'Ye'           || 'Ye'                     | 10
-			null           || null                     | 8
-			'1974-06...'   || now                      | 10
-			'1234...'      || 123456                   | 7
-			'123...'       || 1234.56                  | 6
-			'1.23'         || 1.23456                  | 6
-			'Ye'           || 'Ye'                     | 2
+			result       || value                   | len
+			'this is...' || 'this is a long string' | 10
+			'Ye'         || 'Ye'                    | 10
+			null         || null                    | 8
+			'1974-06...' || now                     | 10
+			'1234...'    || 123456                  | 7
+			'123...'     || 1234.56                 | 6
+			'1.23'       || 1.23456                 | 6
+			'Ye'         || 'Ye'                    | 2
 
 
 	}
@@ -262,39 +261,39 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can apply truncate transformation'() {
 
 		expect:
-			result == new Element(value:value).truncate(len).value
+			result == new Element(value: value).truncate(len).value
 
 		where:
 
-			result         || value                    | len
-			'this is a '   || 'this is a long string'  | 10
-			'Ye'           || 'Ye'                     | 10
-			null           || null                     | 8
-			'1974-06-26'   || now                      | 10
-			'123456'       || 123456                   | 6
-			'1234.5'       || 1234.56                  | 6
-			'1.23'         || 1.23456                  | 6
-			'Ye'           || 'Ye'                     | 2
+			result       || value                   | len
+			'this is a ' || 'this is a long string' | 10
+			'Ye'         || 'Ye'                    | 10
+			null         || null                    | 8
+			'1974-06-26' || now                     | 10
+			'123456'     || 123456                  | 6
+			'1234.5'     || 1234.56                 | 6
+			'1.23'       || 1.23456                 | 6
+			'Ye'         || 'Ye'                    | 2
 
 	}
 
 	void 'test can apply prepend transformation'() {
 
 		expect:
-			result == new Element(value:value).prepend(param).value
+			result == new Element(value: value).prepend(param).value
 
 		where:
 
-			result         || value     | param
-			'Prefix null'  || null      | 'Prefix '
-			'Prefix data'  || 'data'    | 'Prefix '
-			'Prefix data'  || 'data'    | new Element(value:'Prefix ')
-			'Prefix ' + now.format(Element.DATETIME_FORMAT) || now | 'Prefix '
-			'Prefix 12.34' || 12.34     | 'Prefix '
-			'Prefix 12.00' || 12.00     | 'Prefix '
-			'Prefix 0.00'  || 0.0       | 'Prefix '
-			'Prefix 0.00'  || 0         | 'Prefix '
-			'Prefix 12.00' || 12        | 'Prefix '
+			result                                          || value  | param
+			'Prefix null'                                   || null   | 'Prefix '
+			'Prefix data'                                   || 'data' | 'Prefix '
+			'Prefix data'                                   || 'data' | new Element(value: 'Prefix ')
+			'Prefix ' + now.format(Element.DATETIME_FORMAT) || now    | 'Prefix '
+			'Prefix 12.34'                                  || 12.34  | 'Prefix '
+			'Prefix 12.00'                                  || 12.00  | 'Prefix '
+			'Prefix 0.00'                                   || 0.0    | 'Prefix '
+			'Prefix 0.00'                                   || 0      | 'Prefix '
+			'Prefix 12.00'                                  || 12     | 'Prefix '
 
 	}
 
@@ -453,7 +452,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -474,7 +473,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -495,7 +494,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -515,7 +514,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -535,7 +534,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -555,7 +554,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -575,7 +574,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -595,7 +594,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -615,7 +614,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -794,22 +793,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 				""".stripIndent())
 
-		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.finalResult()){
-				domains.size() == 1
-				with(domains[0]) {
-					domain == ETLDomain.Application.name()
-					with(data[0].fields.appVendor) {
-						originalValue.contains('Microsoft\b\nInc')
-						value == 'Microsoft~+Incorporated'
-					}
+			ETLProcessorResult result = etlProcessor.finalResult()
 
-					with(data[1].fields.appVendor) {
-						originalValue.contains('Mozilla\t\t\0Inc')
-						value == 'Mozilla++~Incorporated'
-					}
-				}
-			}
+		then: 'Every field property is assigned to the correct element'
+			result.domains.size() == 1
+			result.domains[0].domain == ETLDomain.Application.name()
+			result.domains[0].data[0].fields.appVendor.originalValue.contains('Microsoft\b\nInc')
+			result.domains[0].data[0].fields.appVendor.value == 'Microsoft~+Incorporated'
+
+			result.domains[0].data[1].fields.appVendor.originalValue.contains('Mozilla\t\t\0Inc')
+			result.domains[0].data[1].fields.appVendor.value == 'Mozilla++~Incorporated'
 	}
 
 	void 'test can transform a field value using replace command with a Regular expression value'() {
@@ -827,21 +820,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 				""".stripIndent())
 
-		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.finalResult()) {
-				with(domains[0]) {
-					domain == ETLDomain.Application.name()
-					with(data[0].fields.appVendor) {
-						originalValue.contains('Microsoft\b\nInc')
-						value == "Mirosoft~+In"
-					}
+			ETLProcessorResult result = etlProcessor.finalResult()
 
-					with(data[1].fields.appVendor) {
-						originalValue.contains('Mozilla\t\t\0Inc')
-						value == "Mozill++~In"
-					}
-				}
-			}
+		then: 'Every field property is assigned to the correct element'
+
+			result.domains[0].domain == ETLDomain.Application.name()
+			result.domains[0].data[0].fields.appVendor.originalValue.contains('Microsoft\b\nInc')
+			result.domains[0].data[0].fields.appVendor.value == "Mirosoft~+In"
+
+			result.domains[0].data[1].fields.appVendor.originalValue.contains('Mozilla\t\t\0Inc')
+			result.domains[0].data[1].fields.appVendor.value == "Mozill++~In"
 	}
 
 	void 'test can apply transformations on a field value many times'() {
@@ -884,22 +872,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 				""".stripIndent())
 
-		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					domain == 'Application'
-					with(data[0].fields.description) {
-						value == 'ACME Data Center - microsoft'
-						originalValue == 'ACME Data Center'
-					}
+			ETLProcessorResult result = etlProcessor.finalResult()
 
-					with(data[1].fields.description) {
-						value == 'ACME Data Center - mozilla'
-						originalValue == 'ACME Data Center'
-					}
-				}
-			}
+		then: 'Results should contain domain results associated'
+
+			result.domains[0].domain == ETLDomain.Application.name()
+			result.domains[0].data[0].fields.description.value == 'ACME Data Center - microsoft'
+			result.domains[0].data[0].fields.description.originalValue == 'ACME Data Center'
+
+			result.domains[0].data[1].fields.description.value == 'ACME Data Center - mozilla'
+			result.domains[0].data[1].fields.description.originalValue == 'ACME Data Center'
 	}
 
 	void 'test can throw an ETLProcessorException for an invalid console status'() {
@@ -981,31 +963,31 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'Evaluating a DataScript with having substitute with default value'
 			etlProcessor.evaluate(dataScript)
 		then: 'The evaluate process completed successfully replacing using the default value for custom2 where applicable.'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
-					with(data[0]) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'xraysrv01'
 							value == 'xraysrv01'
 							init == null
 							errors == []
 							warn == false
 						}
-						with(fields.custom1) {
+						assertWith(fields.custom1) {
 							originalValue == 'ProLiant BL460c Gen8'
 							value == 'Blade'
 							init == null
 							errors == []
 							warn == false
 						}
-						with(fields.custom2) {
+						assertWith(fields.custom2) {
 							originalValue == 'ProLiant BL460c Gen8'
 							value == 'Blade'
 							init == null
@@ -1014,26 +996,26 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 2
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'zulu'
 							init == null
 							errors == []
 							warn == false
 						}
-						with(fields.custom1) {
+						assertWith(fields.custom1) {
 							originalValue == 'A Unknown Model'
 							value == 'A Unknown Model'
 							init == null
 							errors == []
 							warn == false
 						}
-						with(fields.custom2) {
+						assertWith(fields.custom2) {
 							originalValue == 'A Unknown Model'
 							value == 'VM'
 							init == null
@@ -1065,16 +1047,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Centermicrosoft - ACME Data Center'
 					}
 
-					with(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Centermozilla - ACME Data Center'
 					}
@@ -1101,16 +1083,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center-microsoft-ACME Data Center'
 					}
 
-					with(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center-mozilla-ACME Data Center'
 					}
@@ -1139,16 +1121,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - microsoft - '
 					}
 
-					with(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - mozilla - '
 					}
@@ -1176,16 +1158,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - microsoft'
 					}
 
-					with(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'ACME Data Center - mozilla'
 					}
@@ -1215,16 +1197,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == 'Application'
-					with(data[0].fields.description) {
+					assertWith(data[0].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'acme data center**'
 					}
 
-					with(data[1].fields.description) {
+					assertWith(data[1].fields.description) {
 						originalValue == 'ACME Data Center'
 						value == 'acme data center**'
 					}
@@ -1441,14 +1423,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLTransformation.concat(separator, values) == result
 
 		where:
-			separator	|	values									|	result
-			''			|	['one', 'two', 'three'] 				|	'onetwothree'
-			','			|	['one', 'two', 'three']					|	'one,two,three'
-			','			|	['one', '', 'three']					|	'one,three'
-			','			|	['one', '', 'three', true]				|	'one,,three'
-			','			|	['one', null, 'three', true]			|	'one,,three'
-			','			|	['one', 'two', ['three', 'four']]		|	'one,two,three,four'
-			','			|	['one', 'two', ['three', 'four', null]]	|	'one,two,three,four'
+			separator | values                                  | result
+			''        | ['one', 'two', 'three']                 | 'onetwothree'
+			','       | ['one', 'two', 'three']                 | 'one,two,three'
+			','       | ['one', '', 'three']                    | 'one,three'
+			','       | ['one', '', 'three', true]              | 'one,,three'
+			','       | ['one', null, 'three', true]            | 'one,,three'
+			','       | ['one', 'two', ['three', 'four']]       | 'one,two,three,four'
+			','       | ['one', 'two', ['three', 'four', null]] | 'one,two,three,four'
 
 	}
 
@@ -1469,7 +1451,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			Date goodDate = new Date(2018 - 1900, 6 - 1, 25)
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
-					validator)
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1482,106 +1464,105 @@ class ETLTransformSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			with(etlProcessor.finalResult()){
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 7
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						rowNum == 1
 						errorCount == 0
-						with(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						rowNum == 2
 						errorCount == 0
-						with(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					with(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						rowNum == 3
 						errorCount == 1
-						with(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == '06/25/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					with(data[3], RowResult) {
+					assertWith(data[3], RowResult) {
 						rowNum == 4
 						errorCount == 1
-						with(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					with(data[4], RowResult) {
+					assertWith(data[4], RowResult) {
 						rowNum == 5
-						errorCount == 1	// Should be 2
-						with(fields.retireDate, FieldResult) {
+						errorCount == 1    // Should be 2
+						assertWith(fields.retireDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					with(data[5], RowResult) {
+					assertWith(data[5], RowResult) {
 						rowNum == 6
 						errorCount == 1 // Should be 2
-						with(fields.retireDate  , FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						with(fields.maintExpDate  , FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					with(data[6], RowResult) {
+					assertWith(data[6], RowResult) {
 						rowNum == 7
 						errorCount == 1 // Should be 2
-						with(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate, FieldResult) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						with(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate, FieldResult) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
@@ -1591,8 +1572,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName){
-				service.deleteTemporaryFile(fileName)
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 
 	}
@@ -1601,7 +1582,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), mixedTypeDataSet, GroovyMock(DebugConsole),
-					  GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1646,34 +1627,34 @@ class ETLTransformSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			with(etlProcessor.finalResult()){
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						errorCount == 1
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Integer']
 						}
 					}
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						errorCount == 0
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					with(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						errorCount == 0
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
@@ -1684,8 +1665,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName){
-				service.deleteTemporaryFile(fileName)
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 
 	}
@@ -1716,65 +1697,65 @@ class ETLTransformSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			with(etlProcessor.finalResult()){
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						errorCount == 1
-						with(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM01'
 							init == null
 							errors == []
 						}
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Long']
 						}
 					}
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						rowNum == 2
 						errorCount == 0
-						with(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM03'
 							init == null
 							errors == []
 						}
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					with(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						rowNum == 3
 						errorCount == 0
-						with(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
 							errors == []
 						}
 					}
-					with(data[2], RowResult) {
+					assertWith(data[2], RowResult) {
 						errorCount == 0
-						with(fields.assetName, FieldResult) {
+						assertWith(fields.assetName, FieldResult) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						with(fields.size, FieldResult) {
+						assertWith(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
 							init == null
@@ -1785,8 +1766,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName){
-				service.deleteTemporaryFile(fileName)
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 
 	}
