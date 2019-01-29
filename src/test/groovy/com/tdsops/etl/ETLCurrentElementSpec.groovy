@@ -15,7 +15,6 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -186,7 +185,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'xraysrv01'
 				value == 'xraysrv01'
 				init == null
@@ -197,7 +196,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			with (etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == [] as Set
 					data.isEmpty()
@@ -206,7 +205,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -237,11 +236,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'xraysrv01'
 				value == 'xraysrv01'
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
 				}
@@ -251,22 +250,22 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
-					with(data[0]) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == 'xraysrv01'
 							value == 'xraysrv01'
 							errors == []
 							warn == false
-							with(find) {
+							assertWith(find) {
 								query == []
 							}
 						}
@@ -276,7 +275,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -307,11 +306,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == null
 				value == null
 				init == 'Initial Name'
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
 				}
@@ -321,23 +320,23 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
-					with(data[0]) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false
 						errors == []
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							originalValue == null
 							value == null
 							init == 'Initial Name'
 							errors == []
 							warn == false
-							with(find) {
+							assertWith(find) {
 								query == []
 							}
 						}
@@ -347,7 +346,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -384,20 +383,20 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == null
 				value == null
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'id'
 					label == 'Id'
 				}
 			}
 
 		and: 'Results contains the following values'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 0
@@ -406,7 +405,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -437,11 +436,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'xraysrv01'
 				value == 'xraysrv01'
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
 				}
@@ -449,7 +448,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -482,11 +481,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'Dell'
 				value == 'Dell'
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'manufacturer'
 					label == 'Manufacturer'
 				}
@@ -494,7 +493,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -530,16 +529,16 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 1
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields) {
-							with(assetName) {
+						assertWith(fields) {
+							assertWith(assetName) {
 								value == 'xraysrv01'
 								originalValue == 'xraysrv01'
 							}
@@ -551,7 +550,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -583,11 +582,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'xraysrv02'
 				value == 'xraysrv02'
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
 				}
@@ -595,7 +594,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -630,11 +629,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == 'xraysrv01'
 				value == 'xraysrv01'
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
 				}
@@ -642,7 +641,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -685,11 +684,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Current element should contains values'
-			with(etlProcessor.currentElement){
+			assertWith(etlProcessor.currentElement){
 				originalValue == null
 				value == null
 				init == null
-				with(fieldDefinition){
+				assertWith(fieldDefinition){
 					name == 'id'
 					label == 'Id'
 				}
@@ -697,7 +696,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 }

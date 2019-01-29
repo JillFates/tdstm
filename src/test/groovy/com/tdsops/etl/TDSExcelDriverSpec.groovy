@@ -1,18 +1,13 @@
 package com.tdsops.etl
 
-import com.tdsops.etl.DataSetFacade
-import com.tdsops.etl.ETLBaseSpec
-import com.tdsops.etl.TDSExcelDriver
+import com.tds.asset.AssetEntity
 import getl.data.Field
-import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Specification
 
-@TestFor(FileSystemService)
+@Mock([AssetEntity])
 class TDSExcelDriverSpec extends ETLBaseSpec {
-
-	FileSystemService fileSystemService
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -34,7 +29,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 				'Applications',
 				ApplicationDataSet
 			)
-			TDSExcelDriver tdsExcelDriver = (TDSExcelDriver)dataSetFacade.dataSet.connection.driver
+			TDSExcelDriver tdsExcelDriver = (TDSExcelDriver) dataSetFacade.dataSet.connection.driver
 		when:
 			List<Field> fields = dataSetFacade.fields()
 
@@ -56,7 +51,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 			tdsExcelDriver.fieldsMap[0][3].name == 'location'
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
@@ -67,7 +62,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 				'Applications',
 				ApplicationDataSet
 			)
-			TDSExcelDriver tdsExcelDriver = (TDSExcelDriver)dataSetFacade.dataSet.connection.driver
+			TDSExcelDriver tdsExcelDriver = (TDSExcelDriver) dataSetFacade.dataSet.connection.driver
 		when:
 			dataSetFacade.setSheetName('Applications')
 			List<Field> fields = dataSetFacade.fields()
@@ -90,10 +85,9 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 			tdsExcelDriver.fieldsMap['Applications'][3].name == 'location'
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
-
 
 
 	static final String ApplicationDataSet = """

@@ -6,9 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tds.asset.Files
-import com.tdssrc.grails.StringUtil
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -19,6 +17,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Issue
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -96,7 +95,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'unknown').message
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP found to check results'() {
@@ -131,44 +130,44 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model', 'custom1'] as Set
 					data.size() == 3
-					with(data[0]) {
-						with(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						with(fields.custom1) {
+						assertWith(fields.custom1) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
 					}
 
-					with(data[1]) {
-						with(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[2]) {
-						with(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -178,7 +177,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	@Issue("https://support.transitionmanager.com/browse/TM-10625")
@@ -219,16 +218,16 @@ class ETLLookupSpec extends ETLBaseSpec {
 		then: 'Results should contain Application domain results associated'
 			with (etlProcessor.finalResult()){
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['model', 'custom1'] as Set
 					data.size() == 1
-					with(data[0]){
-						with(fields.model) {
+					assertWith(data[0]){
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						with(fields.custom1){
+						assertWith(fields.custom1){
 							value == 'xray01, deltasrv03, alpha'
 							originalValue == 'xray01, deltasrv03, alpha'
 						}
@@ -237,7 +236,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP notFound to check results'() {
@@ -272,40 +271,40 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model'] as Set
 					data.size() == 3
-					with(data[0]) {
-						with(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[1]) {
-						with(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[2]) {
-						with(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -315,7 +314,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test that when the lookup finds previous results that the current result is the earlier one'() {
@@ -350,44 +349,44 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model', 'custom1'] as Set
 					data.size() == 3
-					with(data[0]) {
-						with(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
-						with(fields.custom1) {
+						assertWith(fields.custom1) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
 					}
 
-					with(data[1]) {
-						with(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[2]) {
-						with(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -397,7 +396,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test lookup with multiple criteria'() {
@@ -436,9 +435,9 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Device domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os', 'custom1'] as Set
 					data.size() == 5
@@ -465,7 +464,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used !LOOKUP to check results'() {
@@ -498,40 +497,40 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'model'] as Set
 					data.size() == 3
-					with(data[0]) {
-						with(fields.assetName) {
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
 							value == 'xray01'
 							originalValue == 'xray01'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[1]) {
-						with(fields.assetName) {
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
 							value == 'deltasrv03'
 							originalValue == 'deltasrv03'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
 					}
 
-					with(data[2]) {
-						with(fields.assetName) {
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
 							value == 'alpha'
 							originalValue == 'alpha'
 						}
-						with(fields.model) {
+						assertWith(fields.model) {
 							value == 'VM'
 							originalValue == 'VM'
 						}
@@ -542,9 +541,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
+	@ConfineMetaClassChanges([Application])
 	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
@@ -558,7 +558,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		and:
-			GroovySpy(Application, global: true)
 			Application.executeQuery(_, _) >> { String query, Map args ->
 				return []
 			}
@@ -633,21 +632,21 @@ class ETLLookupSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 3
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
 					data.size() == 5
 				}
 
-				with(domains[1]) {
+				assertWith(domains[1]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'id'] as Set
 					data.size() == 2
 				}
 
-				with(domains[2]) {
+				assertWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
 					data.size() == 5
@@ -655,7 +654,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test the ETLProcessorResult lookupInReference method'() {

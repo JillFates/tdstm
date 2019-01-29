@@ -5,11 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.converters.JSON
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -102,7 +98,6 @@ class ETLResultsSpec extends ETLBaseSpec {
 	}
 
 	def teardown(){
-
 	}
 
 	@See ('TM-10695')
@@ -151,27 +146,27 @@ class ETLResultsSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-			JSONObject jsonResult = JSON.parse(new JSON(etlProcessor.finalResult()).toString())
+			JSONObject jsonResult = new JSONObject(etlProcessor.finalResult().properties)
 
 		then: 'Results should contain Application domain results associated'
-			with(jsonResult) {
+			assertWith(jsonResult) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
+					assertWith(data[0].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[0].fields.id) {
+					assertWith(data[0].fields.id) {
 						originalValue == '152254'
 						value == '152254'
 
 						 
 						find.query.size() == 1
-						with(find.query[0]) {
+						assertWith(find.query[0]) {
 							domain == 'Application'
-							with(criteria[0]){
+							assertWith(criteria[0]){
 								propertyName == 'id'
 								operator == 'eq'
 								value == 152254l
@@ -179,19 +174,19 @@ class ETLResultsSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1].fields.environment) {
+					assertWith(data[1].fields.environment) {
 						originalValue == 'Production'
 						value == 'Production'
 					}
 
-					with(data[1].fields.id) {
+					assertWith(data[1].fields.id) {
 						originalValue == '152255'
 						value == '152255'
 
 						find.query.size() == 1
-						with(find.query[0]) {
+						assertWith(find.query[0]) {
 							domain == 'Application'
-							with(criteria[0]){
+							assertWith(criteria[0]){
 								propertyName == 'id'
 								operator == 'eq'
 								value == 152255l
@@ -202,7 +197,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 }

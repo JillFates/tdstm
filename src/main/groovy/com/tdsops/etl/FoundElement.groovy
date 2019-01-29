@@ -103,7 +103,7 @@ abstract class FoundElement implements ETLCommand {
 	 * @param closure
 	 * @return
 	 */
-	private FoundElement action(FoundElementType action, Closure closure) {
+	FoundElement action(FoundElementType action, Closure closure) {
 		this.action = action
 		closure.resolveStrategy = Closure.DELEGATE_FIRST
 		closure.delegate = this

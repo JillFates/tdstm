@@ -8,7 +8,6 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
@@ -73,17 +72,17 @@ class ETLCommentsSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'xraysrv01'
 							originalValue == 'xraysrv01'
 							init == null
@@ -91,10 +90,10 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'zuludb01'
 							originalValue == 'zuludb01'
 							init == null
@@ -106,7 +105,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -133,17 +132,17 @@ class ETLCommentsSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'xraysrv01'
 							originalValue == 'xraysrv01'
 							init == null
@@ -151,10 +150,10 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'zuludb01'
 							originalValue == 'zuludb01'
 							init == null
@@ -167,7 +166,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -195,17 +194,17 @@ class ETLCommentsSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0], DomainResult) {
+				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					with(data[0], RowResult) {
+					assertWith(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'xraysrv01'
 							originalValue == 'xraysrv01'
 							init == null
@@ -213,10 +212,10 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					with(data[1], RowResult) {
+					assertWith(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
-						with(fields.assetName) {
+						assertWith(fields.assetName) {
 							value == 'zuludb01'
 							originalValue == 'zuludb01'
 							init == null
@@ -229,7 +228,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -256,7 +255,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because comments command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with(ETLProcessor.getErrorMessage(e)) {
+			assertWith(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidDomainForComments(ETLDomain.Model).message} at line 5".toString()
 				startLine == 5
 				endLine == 5
@@ -268,7 +267,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
 }
