@@ -3,8 +3,8 @@ package net.transitionmanager.service
 import com.tds.asset.Application
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
@@ -14,17 +14,21 @@ import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(CustomDomainService)
-@Mock([Application, Project, Setting, SettingService])
-class CustomDomainServiceSpec extends Specification {
+class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<CustomDomainService>, DataTest {
 
 	@Shared
 	Project defaultProject
 	@Shared
 	FieldSpecProject fieldSpecProject
 
+	void setupSpec(){
+		mockDomains Application, Project, Setting
+	}
+
 	void setup() {
+		service.settingService = [getAsMap: {Project project, SettingType type, String key -> applicationJsonFieldMap} ] as SettingService
 		defaultProject = new Project()
+
 		defaultProject.with {
 			client = new PartyGroup(name: RandomStringUtils.randomAlphabetic(10))
 			projectCode = RandomStringUtils.randomAlphabetic(10)
@@ -37,6 +41,7 @@ class CustomDomainServiceSpec extends Specification {
 			timezone = Timezone.findByCode('GMT')
 			guid = StringUtil.generateGuid()
 		}
+
 		defaultProject.save(failOnError: true)
 
 		[
@@ -98,4 +103,33 @@ class CustomDomainServiceSpec extends Specification {
 		   ],
 		   "domain":"APPLICATION"
 		}"""
+
+
+	private static final Map applicationJsonFieldMap = [
+		"planMethodology": "",
+		"fields"         : [
+			[
+				"bulkChangeActions": [
+					"replace"
+				],
+				"constraints"      : [
+					"required": 1,
+					"values"  : [
+						"Yes",
+						"No"
+					]
+				],
+				"control"          : "YesNo",
+				"default"          : "Yes",
+				"field"            : "custom6",
+				"imp"              : "B",
+				"label"            : "Free",
+				"order"            : 23,
+				"shared"           : 0,
+				"show"             : 1,
+				"udf"              : 1
+			]
+		],
+		"domain"         : "APPLICATION"
+	]
 }
