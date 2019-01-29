@@ -396,23 +396,27 @@ export class TaskEditCreateModelHelper {
 
 	/**
 	 * Determine if array predecessor contains duplicated tasks
+	 * It ignores blanks
 	 * @returns {boolean}
 	 */
 	hasDuplicatedPredecessors(): boolean {
-		return this.hasDuplicates(this.model.predecessorList);
+		const predecessorList = this.model.predecessorList.filter((item) => item.id);
+		return this.hasDuplicates(predecessorList);
 	}
 
 	/**
 	 * Determine if array successors contains duplicated tasks
+	 * It ignores blanks
 	 * @returns {boolean}
 	 */
 	hasDuplicatedSuccessors(): boolean {
-		return this.hasDuplicates(this.model.successorList);
+		const successorList = this.model.successorList.filter((item) => item.id);
+		return this.hasDuplicates(successorList);
 	}
 
 	/**
 	 * Determine if the array of objects passed as argument has duplicated id properties
-	 * @param {any[]} array
+	 * @param {any[]} array with values
 	 * @returns {boolean}
 	 */
 	private hasDuplicates(array: any[]): boolean {
