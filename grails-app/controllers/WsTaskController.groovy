@@ -1,4 +1,5 @@
 import com.tds.asset.AssetComment
+import com.tds.asset.CommentNote
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import grails.plugin.springsecurity.annotation.Secured
@@ -157,6 +158,37 @@ class WsTaskController implements ControllerMethods {
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "resetAction: $errorMsg"
+			renderErrorJson([errorMsg])
+		}
+	}
+
+	/**
+	 * @See TM-13937
+	 * Adds a note to a task and returns the list of notes associated to that Task.
+	 * @param id  The task id
+	 * @param note  The note text
+	 * @return  The list of notes associated to the Task.
+	 */
+	@HasPermission(Permission.CommentEdit)
+	def addNote() {
+		AssetComment assetComment = fetchDomain(AssetComment, params)
+		if (assetComment) {
+			Map requestParams = request.JSON
+			Person whom = securityService.loadCurrentPerson()
+			Boolean status = taskService.addNote(assetComment, whom, requestParams.note, 0)
+			if (!status) {
+				def errorMsg = " There was a problem when creating Note for Task whithz id - $params.id "
+				log.error "addNote: $errorMsg"
+				renderErrorJson([errorMsg])
+			}
+			List<CommentNote> notes = CommentNote.where {
+				assetComment == assetComment
+			}.list()
+
+			renderSuccessJson(notes)
+		} else {
+			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
+			log.error "addNote: $errorMsg"
 			renderErrorJson([errorMsg])
 		}
 	}
