@@ -1,7 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { HttpInterceptor } from '../providers/http-interceptor.provider';
+/**
+ * Permission Service keeps the reference of the requested permissions at the beginning of the App
+ * it Also ensure the Permission are available
+ * If a component request the permissions it will return the information on it or fetch if the list is empty
+ */
+
+// Angular
+import {Injectable} from '@angular/core';
+// Other
+import {Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {HttpInterceptor} from '../providers/http-interceptor.provider';
 
 @Injectable()
 export class PermissionService {
@@ -13,20 +21,20 @@ export class PermissionService {
 	/**
 	 * @param http
 	 */
-	constructor(private http: HttpInterceptor) {}
+	constructor(private http: HttpInterceptor) {
+	}
 
 	/**
 	 * Get the Permissions
 	 * Validate if the Permissions are already set
 	 */
 	public getPermissions(): Observable<any> {
-		if (this.permissionsList.getValue().length === 0 ) {
-			return this.http.get(this.permissionUrl)
-				.map((res) => {
-					let result = res.json();
-					return this.permissionsList.next(result.data);
-				})
-				.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+		if (this.permissionsList.getValue().length === 0) {
+			return this.http.get(this.permissionUrl).map((res) => {
+				let result = res.json();
+				this.permissionsList.next(result.data);
+				return result.data;
+			}).catch((error: any) => Observable.throw(error.json() || 'Server error'));
 		}
 		return Observable.from(this.permissions);
 	}

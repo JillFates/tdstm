@@ -1,13 +1,15 @@
 /**
  * TDS App
  */
+// Angular
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
+import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, APP_INITIALIZER} from '@angular/core';
 import {HttpModule} from '@angular/http';
 import {TDSAppComponent} from './tds-app.component';
 // Service
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
+import {AppSettingsService} from '../modules/security/services/app-settings.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
@@ -31,7 +33,14 @@ import {UserModule} from '../modules/user/user.module';
 	],
 	providers: [
 		AuthGuardService,
-		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
+		AppSettingsService,
+		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
+		{
+			provide: APP_INITIALIZER,
+			useFactory: (provider: AppSettingsService) => () => provider.initializeAppSettings(),
+			deps: [AppSettingsService],
+			multi: true
+		}
 	],
 	bootstrap: [
 		TDSAppComponent

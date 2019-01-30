@@ -675,6 +675,14 @@ class UrlMappings {
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
 
 		//load a request HASH from a client, returns JSON object
+		"/ws/manager/license/enabled" {
+			controller = "wsLicenseManager"
+			action = [
+					GET: "getLicenseManagerEnabled"
+			]
+		}
+
+		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license/request" {
 			controller = "wsLicenseManager"
 			action = [

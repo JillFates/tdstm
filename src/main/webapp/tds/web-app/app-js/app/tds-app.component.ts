@@ -10,11 +10,19 @@ import {NotifierService} from '../shared/services/notifier.service';
 @Component({
 	selector: 'tds-app',
 	template: `
-        <tds-ui-loader></tds-ui-loader>
-        <tds-ui-toast></tds-ui-toast>
+		<tds-header></tds-header>
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container">
 
-        <tds-header></tds-header>
-        <router-outlet></router-outlet>
+                <tds-ui-loader></tds-ui-loader>
+                <tds-ui-toast></tds-ui-toast>
+
+                <tds-breadcrumb-navigation></tds-breadcrumb-navigation>
+                <router-outlet></router-outlet>
+            </div>
+            <!-- /.container -->
+        </div>
 	`,
 })
 
