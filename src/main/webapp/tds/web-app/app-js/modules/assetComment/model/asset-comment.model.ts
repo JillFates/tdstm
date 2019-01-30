@@ -47,8 +47,13 @@ export class AssetCommentColumnModel {
 
 export class AssetCommentModel {
 	id?: number;
-	name: string;
+	modal?: any;
 	description?: string;
+	archive?: Date;
 	comment?: string;
+	category?: string;
+	assetClass?: any;
+	asset?: any;
+	lastUpdated?: Date;
 	dateCreated?: Date;
 }
