@@ -54,5 +54,15 @@ databaseChangeLog = {
                 referencedColumnNames: 'id',
                 onDelete: 'SET NULL'
         )
+        // 6 - Change the FKC Provider > ImportBatch - to set NULL on DELETE
+        dropForeignKeyConstraint(baseTableName:'import_batch', constraintName:'import_batch_provider')
+        addForeignKeyConstraint(
+                constraintName: 'fk_import_batch_provider',
+                baseTableName: 'import_batch',
+                baseColumnNames: 'provider_id',
+                referencedTableName: 'provider',
+                referencedColumnNames: 'provider_id',
+                onDelete: 'SET NULL'
+        )
     }
 }
