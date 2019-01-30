@@ -1,3 +1,4 @@
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -5,6 +6,7 @@ import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
@@ -1247,6 +1249,30 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results[0].model.modelName == modelName
 			results[0].manufacturer.id == manufacturer.id
 			results[0].manufacturer.name == manufacturerName
+	}
+
+	void '46. can find Dependency by asset using asset.id'() {
+		given:
+			AssetEntity asset = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			AssetEntity dependent = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+			AssetDependency dependency = new AssetDependency(
+				asset: asset,
+				dependent: dependent,
+				status: AssetDependencyStatus.VALIDATED
+			).save(flush: true, failOnError: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Dependency,
+				project,
+				[
+					new FindCondition('asset', asset.id, FindOperator.eq)
+				]
+			)
+
+		then:
+			results.size() > 0
+			results.contains(dependency.id)
 	}
 
 	/**

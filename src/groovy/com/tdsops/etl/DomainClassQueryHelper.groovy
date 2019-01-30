@@ -432,7 +432,7 @@ class DomainClassQueryHelper {
 
 				// Why is Project being queried ONLY if query is by reference ID?
 				if (GormUtil.isDomainProperty(propertyClazz, 'project')) {
-					where += " and ${property}.project =:${namedParameter}_project \n"
+					where += " and ${DOMAIN_ALIAS}.${condition.propertyName}.project =:${namedParameter}_project \n"
 					hqlParams[namedParameter + '_project'] = project
 				}
 				return where
