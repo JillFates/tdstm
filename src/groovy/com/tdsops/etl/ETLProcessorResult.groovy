@@ -525,7 +525,7 @@ class RowResult {
 	void addLoadElement(Element element){
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
-		this.errorCount = fieldData.errors.size()
+		this.errorCount = fieldData.errors.size() + this.errors.size()
 	}
 
 	/**

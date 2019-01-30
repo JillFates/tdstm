@@ -28,7 +28,6 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 @CompileStatic
 class DependencyBuilder extends DomainBuilder {
 
-
 	private RowResultFacade asset
 	private RowResultFacade dependent
 	private boolean withProcessed
@@ -141,9 +140,6 @@ class DependencyBuilder extends DomainBuilder {
 		 */
 		processor.load(field).with(null)
 
-		/**
-		 *
-		 */
 		RowResult currentRow = processor.result.findOrCreateCurrentRow()
 		FieldResult fieldResult = currentRow.findOrCreateFieldData(createFieldDefinition(field))
 
