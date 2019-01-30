@@ -1100,7 +1100,7 @@ class PartyRelationshipService implements ServiceMethods {
 			}
 		}
 		if (projects && sortOn ) {
-			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
+			projects = projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
 		}
 
 		return projects as List

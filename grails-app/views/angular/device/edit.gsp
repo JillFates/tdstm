@@ -263,10 +263,11 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <tds-date-control
+                                            [(ngModel)]="model.asset.retireDate"
                                             class="tm-input-control"
                                             name="modelAssetRetireDate"
                                             [tabindex]="26"
-                                            [(value)]="model.asset.retireDate">
+                                            [value]="model.asset.retireDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
@@ -306,10 +307,11 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
                                         <tds-date-control
+                                            [(ngModel)]="model.asset.maintExpDate"
                                             class="tm-input-control"
                                             name="modelAssetMaintExpDate"
                                             [tabindex]="27"
-                                            [(value)]="model.asset.maintExpDate">
+                                            [value]="model.asset.maintExpDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
@@ -352,10 +354,28 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" tabindex="501" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <tds-button-save
+                tooltip="Update Asset"
+                class="btn-primary pull-left component-action-update" tabindex="501"
+                [disabled]="!isDependenciesValidForm"
+                [permissions]="['${Permission.AssetEdit}']"
+                (click)="submitForm($event)">
+        </tds-button-save>
+
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger component-action-delete" tabindex="502" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <tds-button-delete
+                    tooltip="Delete Asset"
+                    class="btn-danger component-action-delete" tabindex="502"
+                    [permissions]="['${Permission.AssetDelete}']"
+                    (click)="onDeleteAsset()">
+            </tds-button-delete>
         </tds:hasPermission>
-        <button class="btn btn-default pull-right component-action-delete" tabindex="503" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+
+        <tds-button-cancel
+                tooltip="Cancel Edit"
+                class="pull-right component-action-cancel"
+                tabindex="503"
+                (click)="onCancelEdit()">
+        </tds-button-cancel>
     </div>
 </div>

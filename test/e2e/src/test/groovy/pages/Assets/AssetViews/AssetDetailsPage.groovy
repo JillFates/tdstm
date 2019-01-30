@@ -19,16 +19,16 @@ class AssetDetailsPage extends Page{
     static content = {
         assetDetailModal { $("div.tds-angular-component-content")}
         modalTitle { assetDetailModal.find(".modal-title")}
-        editButton { assetDetailModal.find(".modal-footer button span.glyphicon-pencil")}
+        editButton { assetDetailModal.find(".modal-footer button i.fa-pencil")}
         closeButton { assetDetailModal.find(".modal-header .close")}
-        cloneButton { assetDetailModal.find(".modal-footer button span.glyphicon-duplicate")}
+        cloneButton { assetDetailModal.find(".modal-footer button i.fa-clone")}
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
         commonsModule { module CommonsModule}
         commentsContent { assetDetailModal.find('.comment-content')}
         viewAllComments { commentsContent.find('#showAllComments')}
-        addCommentsButton(wait: true) { commentsContent.find('button.btn-add')}
+        addCommentsButton(wait: true) { commentsContent.find(title: 'Add Comment')}
         commentsSectionTitle(wait: true) { commentsContent.find('label.task')}
         commentRows(wait: true) { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
         adModalAppName { assetDetailModal.find("td.assetName").next()}

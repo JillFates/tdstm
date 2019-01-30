@@ -93,6 +93,31 @@ class AssetDependency {
 		)
 	}
 
+	/**
+	 * Create and return a map representation of this AssetDependency.
+	 * @return a map with the most relevant fields for this dependency.
+	 */
+	Map toMap() {
+		return [
+			id: id,
+			asset: [
+				id: asset.id
+			],
+			c1: c1,
+			c2: c2,
+			c3: c3,
+			c4: c4,
+			comment: comment,
+			dataFlowDirection: dataFlowDirection,
+			dataFlowFreq: dataFlowFreq,
+			dependent: [
+			    id: dependent.id
+			],
+			status: status,
+			type: type
+		]
+	}
+
 	String toString() {
 		"(${asset?.id}) ${asset?.assetName} > depends on > (${dependent?.id}) ${dependent?.assetName}"
 	}

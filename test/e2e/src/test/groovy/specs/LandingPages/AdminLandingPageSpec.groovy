@@ -35,7 +35,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "1. The Admin Menu has the correct number of elements"() {
-        testKey = "TM-XXXX"
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The User Clicks in the Admin > Menu'
@@ -61,7 +60,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "3. Verify the License Admin Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>License Admin option'
             adminModule.goToLicenseAdmin()
 
@@ -70,7 +68,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "4. Verify the Notices Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Notices option'
             adminModule.goToNoticesAdmin()
 
@@ -79,7 +76,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "5. Verify the Role Permissions Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Role Permissions option'
             adminModule.goToRolePermissions()
 
@@ -88,7 +84,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "6. Verify the Asset Options Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Asset Options option'
             adminModule.goToAssetOptions()
 
@@ -97,7 +92,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "7. Verify the List Companies Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Companies option'
             adminModule.goToListCompanies()
 
@@ -106,7 +100,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "8. Verify the List Staff Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Staff option'
             adminModule.goToAdminListStaff()
 
@@ -115,7 +108,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "9. Verify the List Users Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Users option'
             adminModule.goToListUsers()
 
@@ -124,7 +116,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "10. Verify the Import Accounts Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Import Accounts option'
             adminModule.goToImportAccounts()
 
@@ -142,7 +133,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "12. Verify the List Workflows Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Workflows option'
             adminModule.goToListWorkflows()
 
@@ -160,7 +150,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "14. Verify the List Models Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Models option'
             adminModule.goToListModels()
 
@@ -169,7 +158,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "15. Verify the Export Mfg & Models Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Export Mfg & Models option'
             adminModule.goToExportModels()
 

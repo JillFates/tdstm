@@ -13,7 +13,7 @@ class NoticePage extends Page {
 
     static content = {
         adminModule { module AdminModule}
-        pageHeaderName { $("section", class:"content-header ng-scope").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h1")}
     }
 
 }

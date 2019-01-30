@@ -144,7 +144,7 @@ class CommonsModule extends Module {
     def clickOnKendoPaginationButtonByText(text){
         goToElement kendoGridPaginationButtons.find{it.@title.contains(text)}
         waitFor{kendoGridPaginationButtons.find{it.@title.contains(text)}.click()}
-        waitForLoader 2
+        waitForLoader 3
     }
 
     /**

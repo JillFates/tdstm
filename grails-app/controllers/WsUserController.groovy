@@ -6,9 +6,12 @@ import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
@@ -23,6 +26,7 @@ class WsUserController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
 	PersonService personService
+	PartyRelationshipService partyRelationshipService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -56,6 +60,23 @@ class WsUserController implements ControllerMethods {
         ]
     	renderSuccessJson(model)
     }
+
+	/**
+	 * Used by the Manage Staff dialog.
+	 * @param: id - ID of the person to be requested
+	 * This will return the following:
+	 *    person - All the info associated with the person requested
+	 *    availableTeams - All teams that this person can be assigned to
+	 * @return Success Structure with preferences property containing List<Map>
+	 */
+	def modelForStaffViewEdit(String id) {
+		Project project = getProjectForWs()
+
+		Person person = Person.get(Long.valueOf(id))
+		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
+
+		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
+	}
 
     /**
      * Used to reset all preferences of a user
@@ -116,20 +137,31 @@ class WsUserController implements ControllerMethods {
 
 	/**
 	 * Update the person account that is invoked by the user himself
-	 * @param  : person id and input password
-	 * @return : pass:"no" or the return of the update method
+	 * @param  : map of settings for the person
+	 * @return : the person that has been updated
 	 */
 	@HasPermission(Permission.UserUpdateOwnAccount)
-	def updateAccount(Map personInfo) {
+	def updateAccount() {
 		Map settings = request.JSON
-        //params.id = securityService.currentUserLoginId
         Person person = personService.updatePerson(settings, false)
 		Map preferences = [
-		        START_PAGE : settings.startPage,
-				CURR_POWER_TYPE : settings.powerType
+				START_PAGE     : settings.startPage,
+				CURR_POWER_TYPE: settings.powerType
 		]
 		userPreferenceService.setPreferences(null, preferences)
-		renderSuccessJson()
+		renderSuccessJson(person)
+    }
+
+    /**
+     * Update the person account that is invoked by the admin
+     * @param  : map of settings for the person
+     * @return : the person that has been updated
+     */
+	@HasPermission(Permission.ProjectStaffEdit)
+    def updateAccountAdmin() {
+        Map settings = request.JSON
+        Person person = personService.updatePerson(settings, true)
+        renderSuccessJson(person)
     }
 
 	@HasPermission(Permission.UserGeneralAccess)

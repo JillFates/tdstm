@@ -272,7 +272,7 @@ class ModelService implements ServiceMethods {
 	boolean isValidAlias (String newAlias, Model model, boolean allowLocalDuplicates = false, Manufacturer manufacturer = null, String modelName = null) {
 
 		// if there wasn't enough information supplied
-		if (!model && (!modelName || !manufacturer)) {
+		if (!model && (!modelName && !manufacturer)) {
 			return false
 		}
 

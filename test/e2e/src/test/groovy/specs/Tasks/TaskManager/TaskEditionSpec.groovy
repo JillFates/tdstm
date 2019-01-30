@@ -40,7 +40,7 @@ class TaskEditionSpec extends GebReportingSpec {
         at MenuPage
         tasksModule.goToTasksManager()
         at TaskManagerPage
-        waitFor {tmCreateTaskBtn.click()}
+        waitFor {clickCreateTask()}
         at TaskCreationPage
         waitFor {tcModalLoading.hasClass("ng-hide")}
         tcModalTaskName = taskName
@@ -49,6 +49,8 @@ class TaskEditionSpec extends GebReportingSpec {
         waitFor { tcModalSaveBtn.click() }
         commonsModule.waitForTaskModal()
         at TaskManagerPage
+        // set up starts making sure no event is in context
+        selectEvent("All")
     }
 
     def setup() {
@@ -107,10 +109,10 @@ class TaskEditionSpec extends GebReportingSpec {
             at TaskEditionPage
     }
 
-    def "4. Edit Task - Adding Predeccessor and Successor"() {
+    def "4. Edit Task - Predeccessor and Successor cannot be the same"() {
         given: 'The User is on the Task Edition Page'
             at TaskEditionPage
-        when: 'The User adds some values such as Predecessor and Successor'
+        when: 'The User adds same values as Predecessor and Successor'
             teModalAddPredecessorBtn.click()
             waitFor {teModalPredecessorDD.click()}
             waitFor {teModalPredecessorUl}
@@ -119,26 +121,36 @@ class TaskEditionSpec extends GebReportingSpec {
             teModalAddSuccessorBtn.click()
             waitFor {teModalSuccessorDD.click()}
             waitFor {teModalSuccessorUl}
-            def sucessor = CommonActions.getSelectRandomOption(teModalSuccessorOptions)
-            waitFor {sucessor.click()}
+            def successor = selectSuccessor(true)
+            waitFor {successor.click()}
+        then: 'An alert is displayed, successor and predecessor cannot be the same'
+            withAlert { teModalSaveBtn.click() } =="One or more tasks are assigned as both a Predecessor and Successor which is not allowed."
+    }
+
+    def "5. Edit Task - Adding Predeccessor and Successor"() {
+        given: 'The User is on the Task Edition Page'
+            at TaskEditionPage
+        when: 'The User adds some values such as Predecessor and Successor'
+            waitFor {teModalSuccessorDD.click()}
+            waitFor {teModalSuccessorUl}
+            def successor = selectSuccessor(false)
+            waitFor {successor.click()}
         then: 'The User should remain in the Taks Edition Section'
             at TaskEditionPage
     }
 
-    def "5. Saving the Edited Task"() {
+    def "6. Saving the Edited Task"() {
         given: 'The User is on the Task Edition Page'
             at TaskEditionPage
         when: 'The User clicks the "Save" Button'
             waitFor { teModalSaveBtn.click() }
-
         then: 'The User should be redirected to the Task Details Section'
             at TaskDetailsPage
     }
 
-    def "6. Validating new Task Options"() {
+    def "7. Validating new Task Options"() {
         when: 'The User is on the Task Details Page'
             at TaskDetailsPage
-
         then: 'Proper values should be shown'
             waitFor{tdModalTaskName.text().trim() == taskNameEdit}
             tdModalTaskPerson.text().trim() == taskPerson
@@ -152,7 +164,7 @@ class TaskEditionSpec extends GebReportingSpec {
             at TaskManagerPage
     }
 
-    def "7. Assigning the Task to the Current User"() {
+    def "8. Assigning the Task to the Current User"() {
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User searches by his/her own Name'
@@ -167,7 +179,7 @@ class TaskEditionSpec extends GebReportingSpec {
             at TaskManagerPage
     }
 
-    def "8. Changing the Task Status to Done"() {
+    def "9. Changing the Task Status to Done"() {
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The user clicks the "Done" Status'
@@ -178,7 +190,7 @@ class TaskEditionSpec extends GebReportingSpec {
             waitFor{tmFirstElementStatus == "Completed"}
     }
 
-    def "9. Deleting the  Task"() {
+    def "10. Deleting the  Task"() {
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User clicks the Option to Display the Task'
@@ -190,4 +202,5 @@ class TaskEditionSpec extends GebReportingSpec {
         then: 'The User should be redirected to the Task Manager Section'
             at TaskManagerPage
     }
+
 }

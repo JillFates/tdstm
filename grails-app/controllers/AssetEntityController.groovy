@@ -30,6 +30,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import grails.util.Environment
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -1424,7 +1425,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * Render Summary of assigned and unassgined assets.
+	 * Render Summary of assigned and unassigned assets.
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetSummary() {
@@ -1433,86 +1434,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String justPlanningPref = userPreferenceService.getPreference(null, PREF.ASSET_JUST_PLANNING, "false")
 		Boolean justPlanning = BooleanUtils.toBoolean(justPlanningPref)
 
-		int totalAsset = 0
-		int totalPhysical = 0
-		int totalApplication = 0
-		int totalDatabase = 0
-		int totalFiles = 0
-
-		def moveBundles = MoveBundle.withCriteria {
-			eq('project', project)
-			order('name', 'asc')
-		}
-		List assetSummaryList = []
-
-		for (MoveBundle moveBundle in moveBundles) {
-
-			int physicalCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				eq('assetClass', AssetClass.DEVICE)
-				or {
-					isNull('assetType')
-					not {
-						'in'('assetType', AssetType.virtualServerTypes)
-					}
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int assetCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				and {
-					'in' ('assetType', AssetType.serverTypes)
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int applicationCount = Application.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int databaseCount = Database.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int filesCount = Files.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			totalAsset += assetCount
-			totalPhysical += physicalCount
-			totalApplication += applicationCount
-			totalDatabase += databaseCount
-			totalFiles += filesCount
-
-			if (!justPlanning || assetCount || applicationCount || physicalCount || databaseCount || filesCount) {
-				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
-									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
-			}
-
-		}
-
-		moveBundles = null
-		[assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
-		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
+		return assetEntityService.getAssetSummary(project, justPlanning)
 	}
 
 	/**

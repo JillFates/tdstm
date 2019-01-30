@@ -292,4 +292,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_0/20181203-maintence-retire-date-times-to-dates.groovy'
 	include file: 'version/v4_6_1/20181211-usability-and-style-changes-to-system-views-part1.groovy'
 	include file: 'version/v4_6_1/20190107-add-and-modify-domain-constraints.groovy'
+	include file: 'version/v4_6_1/20181227-add-comments-import-batch-record.groovy'
 }

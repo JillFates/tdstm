@@ -52,7 +52,7 @@ import {
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {DependencyResults} from '../../model/dependencies.model';
-import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {GridColumnModel, SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
 import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
@@ -85,6 +85,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private componentState: BehaviorSubject<ComponentState>;
 	protected readonly actionableAssets = ['assetName', 'dependentName', 'type'];
 	private openAssetsHandler = null;
+	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
 
 	constructor(
 		private route: ActivatedRoute,

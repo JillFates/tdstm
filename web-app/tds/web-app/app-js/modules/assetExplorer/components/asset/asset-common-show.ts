@@ -11,6 +11,7 @@ import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from './asset-common-helper';
+import {WindowService} from '../../../../shared/services/window.service';
 
 declare var jQuery: any;
 
@@ -29,7 +30,8 @@ export class AssetCommonShow implements OnInit {
 		protected prompt: UIPromptService,
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
-		protected preferenceService: PreferenceService) {
+		protected preferenceService: PreferenceService,
+		protected windowService: WindowService) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 			this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -94,5 +96,9 @@ export class AssetCommonShow implements OnInit {
 
 	getGraphUrl(): string {
 		return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
+	}
+
+	openGraphUrl() {
+		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
 	}
 }

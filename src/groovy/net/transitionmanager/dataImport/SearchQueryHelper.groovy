@@ -373,7 +373,7 @@ class SearchQueryHelper {
 	 * @test None
 	 */
 	private static AssetDependency fetchAssetDependencyByAssets(JSONObject fieldsInfo, Map context ) {
-		AssetEntity primary
+		Object primary
 		AssetEntity supporting
 		AssetDependency dependency
 

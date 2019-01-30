@@ -176,7 +176,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
             userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
         }
 
-		Map queryResult = dataviewService.query(project, dataview, userParams)
+		Map queryResult = dataviewService.previewQuery(project, dataview, userParams)
 
         renderSuccessJson(queryResult)
     }
@@ -215,7 +215,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
         if (userParams.validate()){
             Project project = securityService.userCurrentProject
 
-            Map previewQuery = dataviewService.previewQuery(project, userParams)
+            Map previewQuery = dataviewService.previewQuery(project, null, userParams)
             renderSuccessJson(previewQuery)
         } else {
             renderErrorJson("Incorrect json data request")

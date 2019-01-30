@@ -1,23 +1,6 @@
-//menu and other header functions...loaded from projectHeader
+// Menu and other Header functions...loaded from projectHeader
 
-var timerId;
-timerId = window.setTimeout("timeOut()",(60000 * 120));
-
-function resetTimer() {
-	window.clearTimeout(timerId);
-	timerId = window.setTimeout("timeOut()",(60000 * 120));
-}
-function timeOut() {
-	new Ajax.Request('/tdstm/auth/signOut',{asynchronous:true,evalScripts:true,onComplete:function(e){sessionExpireOverlay()}});;
-}
-function sessionExpireOverlay() {
-	window.parent.location = self.location;
-}
-
-$(document).keydown(function(){ resetTimer(); });
-$(document).mousedown(function(){ resetTimer(); });
-
-//Replace the number on the "My Tasks" menu with the number of tasks assigned to the user
+// Replace the number on the "My Tasks" menu with the number of tasks assigned to the user
 /*
 $("#MyTasksMenuId").ready(getTaskCount());
 function getTaskCount(){

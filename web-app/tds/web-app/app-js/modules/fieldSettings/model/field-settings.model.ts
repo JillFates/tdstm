@@ -15,6 +15,7 @@ export class FieldSettingsModel {
 	control?: CUSTOM_FIELD_CONTROL_TYPE;
 	constraints: ConstraintModel;
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	errorMessage?: string;
 
 	constructor() {
 		this.udf = true;

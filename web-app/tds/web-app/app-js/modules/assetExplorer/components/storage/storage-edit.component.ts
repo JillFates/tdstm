@@ -14,7 +14,6 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-
 declare var jQuery: any;
 
 export function StorageEditComponent(template: string, editModel: any, metadata: any): any {

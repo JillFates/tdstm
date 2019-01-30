@@ -22,7 +22,6 @@ export class AssetExplorerViewExportComponent {
 	protected exportFileName = '';
 	protected dataToExport: any[] = [];
 	private allProperties = false;
-
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
