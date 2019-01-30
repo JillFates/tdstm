@@ -426,39 +426,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson data
 	}
 
-	@HasPermission([Permission.CommentView, Permission.TaskView])
-	def listComments() {
-		def assetEntityInstance = AssetEntity.get(params.id)
-		def commentType = params.commentType
-
-        def assetCommentsInstance = []
-
-        if(securityService.hasPermission(Permission.TaskView) && (!commentType || commentType == AssetCommentType.TASK)) {
-            assetCommentsInstance = taskService.findAllByAssetEntity(assetEntityInstance)
-        }
-
-        if(securityService.hasPermission(Permission.CommentView) && (!commentType || commentType == AssetCommentType.COMMENT)) {
-            assetCommentsInstance.addAll(commentService.findAllByAssetEntity(assetEntityInstance))
-        }
-		def assetCommentsList = []
-		def today = new Date()
-		boolean viewUnpublished = securityService.viewUnpublished()
-        boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
-        boolean canEditTasks = securityService.hasPermission(Permission.TaskEdit)
-
-		assetCommentsInstance.each {
-			if (viewUnpublished || it.isPublished)
-				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
-				                     cssClass: it.dueDate < today ? 'Lightpink' : 'White',
-				                     assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
-				                     assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
-				                     canEditComments: canEditComments,
-                                     canEditTasks: canEditTasks]
-		}
-
-		renderAsJson assetCommentsList
-	}
-
 	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
 	def showComment() {
 		def commentList = []
@@ -690,11 +657,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				flash.message = map.error
 			}
 			forward(action: "showComment", params: [id: params.id])
-		} else if (params.view == "myTask") {
-			if (map.error) {
-				flash.message = map.error
-			}
-			forward(action: 'listComment', params: [view: params.view, tab: params.tab])
 		} else if (params.open != "view") {
 			renderAsJson map
 		}
@@ -968,9 +930,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		render (view :'_deviceModelSelect', model:[models : models, forWhom:params.forWhom])
 	}
 
-	/**
-	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
-	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
 		licenseAdminService.checkValidForLicenseOrThrowException()
@@ -1094,90 +1053,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")
 		}
-	}
-
-	/**
-	 * Generates the List of Comments, which leverages a shared closeure with the above listTasks controller.
-	 */
-	@HasPermission(Permission.CommentView)
-	def listComment() {
-		Project project = controllerService.getProjectForPage(this, 'to view Comments')
-		if (!project) return
-
-		def entities = assetEntityService.entityInfo(project)
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		boolean canEditComments = securityService.hasPermission(Permission.AssetEdit)
-
-		[rediectTo: 'comment', servers: entities.servers, applications: entities.applications, dbs: entities.dbs,
-		 files: entities.files, dependencyType: entities.dependencyType, dependencyStatus: entities.dependencyStatus,
-		 assetDependency: new AssetDependency(), moveBundleList: moveBundleList, canEditComments: canEditComments]
-	}
-
-	/**
-	 * Used to generate list of comments using jqgrid
-	 * @return : list of tasks as JSON
-	 */
-	@HasPermission(Permission.CommentView)
-	def listCommentJson() {
-		String sortIndex = params.sidx ?: 'lastUpdated'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
-
-		Project project = securityService.userCurrentProject
-		List<Date> lastUpdatedTime = params.lastUpdated ? AssetComment.executeQuery('''
-			select lastUpdated from AssetComment
-			where project=:project
-			  and commentType=:comment
-			  and str(lastUpdated) like :lastUpdated
-		''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
-
-		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			eq("commentType", AssetCommentType.COMMENT)
-			createAlias("assetEntity","ae")
-			if (params.comment) {
-				ilike('comment', "%$params.comment%")
-			}
-			if (params.commentType) {
-				ilike('commentType', "%$params.commentType%")
-			}
-			if (params.category) {
-				ilike('category', "%$params.category%")
-			}
-			if (lastUpdatedTime) {
-				'in'('lastUpdated',lastUpdatedTime)
-			}
-			if (params.assetType) {
-				ilike('ae.assetType',"%$params.assetType%")
-			}
-			if (params.assetName) {
-				ilike('ae.assetName',"%$params.assetName%")
-			}
-			String sid = sortIndex == 'assetName' || sortIndex  == 'assetType' ? "ae.$sortIndex" : sortIndex
-			order(new Order(sid, sortOrder == 'asc').ignoreCase())
-		}
-
-		int totalRows = assetCommentList.totalCount
-		int numberOfPages = Math.ceil(totalRows / maxRows)
-
-		def results = assetCommentList?.collect {
-			[id: it.id,
-			 cell: ['',
-			        StringUtil.ellipsis(it.comment ?: '', 50).replace("\n", ""),
-			        TimeUtil.formatDate(it.lastUpdated),
-			        it.commentType,
-			        it.assetEntity?.assetName ?:'',
-			        it.assetEntity?.assetType ?:'',
-			        it.category,
-			        it.assetEntity?.id,
-			        it.assetEntity?.assetClass?.toString()
-				]
-			]
-		}
-
-		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
 	/**

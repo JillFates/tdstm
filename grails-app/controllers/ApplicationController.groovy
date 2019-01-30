@@ -495,9 +495,6 @@ class ApplicationController implements ControllerMethods {
 					case 'files':
 						redirect(controller: 'files', action: 'list')
 						break
-					case 'listComment':
-						redirect(controller: 'assetEntity', action: 'listComment' , params: [projectId: project.id])
-						break
 					case 'listTask':
 						render 'Application $application.assetName updated.'
 						break
