@@ -11,14 +11,14 @@ import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
-import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
-import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
-import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
+import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
+import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';
+import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 
 /**
- * Asset Explorer Route States
+ * Asset Manager Route States
  * @class
- * @classdesc To use externally to reference possible state of the Asset Explorer Module
+ * @classdesc To use externally to reference possible state of the Asset Manager Module
  */
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
@@ -36,12 +36,12 @@ export class AssetExplorerStates {
 }
 
 /**
- * Top menu parent section class for all Assets Explorer module.
+ * Top menu parent section class for all Assets Manager module.
  * @type {string}
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
-export const AssetExplorerRoute: Routes = [
+export const AssetManagerRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: AssetExplorerStates.REPORT_SELECTOR.url},
 	{
 		path: AssetExplorerStates.REPORT_SELECTOR.url,
@@ -54,7 +54,7 @@ export const AssetExplorerRoute: Routes = [
 			},
 			requiresAuth: true,
 		},
-		component: AssetExplorerIndexComponent,
+		component: AssetViewManagerComponent,
 		resolve: {
 			reports: ReportsResolveService
 		},
@@ -67,13 +67,13 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.CREATE']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.CREATE']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerCreate',
 			hasPendingChanges: false
 		},
-		component: AssetExplorerViewConfigComponent,
+		component: AssetViewConfigComponent,
 		resolve: {
 			tagList: TagsResolveService,
 			report: ReportResolveService,
@@ -89,13 +89,13 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.EDIT']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.EDIT']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerEdit',
 			hasPendingChanges: false
 		},
-		component: AssetExplorerViewConfigComponent,
+		component: AssetViewConfigComponent,
 		resolve: {
 			tagList: TagsResolveService,
 			report: ReportResolveService,
@@ -111,12 +111,12 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: 'asset/' + AssetExplorerStates.REPORT_SELECTOR.url}, 'ASSET_EXPLORER.SHOW'],
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: ['/asset', 'views']}, 'ASSET_EXPLORER.SHOW'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
 			},
 			requiresAuth: true
 		},
-		component: AssetExplorerViewShowComponent,
+		component: AssetViewShowComponent,
 		resolve: {
 			tagList: TagsResolveService,
 			report: ReportResolveService,
@@ -130,8 +130,8 @@ export const AssetExplorerRoute: Routes = [
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(AssetExplorerRoute)]
+	imports: [RouterModule.forChild(AssetManagerRoute)]
 })
 
-export class AssetExplorerRouteModule {
+export class AssetManagerRouteModule {
 }

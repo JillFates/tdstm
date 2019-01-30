@@ -5,28 +5,27 @@ import {State} from '@progress/kendo-data-query';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import {ViewGroupModel, ViewModel} from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
-import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
-import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
-import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
-import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
-import { AssetQueryParams } from '../../model/asset-query-params';
+import { AssetViewSelectorComponent } from '../asset-view-selector/asset-view-selector.component';
+import { AssetViewSaveComponent } from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import { AssetViewExportComponent } from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+import { AssetQueryParams } from '../../../assetExplorer/model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { AssetExportModel } from '../../model/asset-export-model';
+import { AssetExportModel } from '../../../assetExplorer/model/asset-export-model';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
-	selector: 'asset-explorer-view-show',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
+	selector: 'tds-asset-view-show',
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-show/asset-view-show.component.html'
 })
-export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
+export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	private currentId;
 	private dataSignature: string;
@@ -46,7 +45,7 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 
-	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
+	@ViewChild('select') select: AssetViewSelectorComponent;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -158,7 +157,7 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 
 	protected onSaveAs(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		this.dialogService.open(AssetExplorerViewSaveComponent, [
+		this.dialogService.open(AssetViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
 			{ provide: ViewGroupModel, useValue: selectedData }
 		]).then(result => {
@@ -185,7 +184,7 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 			viewName: this.model.name
 		};
 
-		this.dialogService.open(AssetExplorerViewExportComponent, [
+		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
 		]).then(result => {
 			console.log(result);

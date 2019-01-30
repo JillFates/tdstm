@@ -9,7 +9,7 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 
-import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
+import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
@@ -14,7 +14,7 @@ import {
 	ModalType,
 	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
-import {AssetShowComponent} from '../asset/asset-show.component';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {
 	CUSTOM_FIELD_CONTROL_TYPE,
 	FIELD_NOT_FOUND,
@@ -29,15 +29,15 @@ import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.ser
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
-import {AssetCreateComponent} from '../asset/asset-create.component';
-import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
-import {TaskCommentDialogComponent} from '../task-comment/dialog/task-comment-dialog.component';
-import {SingleCommentModel} from '../single-comment/model/single-comment.model';
-import {SingleCommentComponent} from '../single-comment/single-comment.component';
-import {AssetModalModel} from '../../model/asset-modal.model';
-import {AssetEditComponent} from '../asset/asset-edit.component';
-import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
-import {CloneCLoseModel} from '../../model/clone-close.model';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
+import {TaskCommentDialogComponent} from '../../../assetExplorer/components/task-comment/dialog/task-comment-dialog.component';
+import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
+import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
+import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
+import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-edit.component';
+import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
+import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
@@ -56,9 +56,9 @@ declare var jQuery: any;
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-grid/asset-view-grid.component.html'
 })
-export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
+export class AssetViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
@@ -364,7 +364,7 @@ export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
 			return;
 		}
 		this.dialog.open(AssetCreateComponent, [
-				{ provide: 'ASSET', useValue: assetEntityType }],
+				{provide: 'ASSET', useValue: assetEntityType}],
 			DIALOG_SIZE.LG, false).then(x => {
 			if (x) {
 				this.createDependencyPromise(x.assetClass, 0);

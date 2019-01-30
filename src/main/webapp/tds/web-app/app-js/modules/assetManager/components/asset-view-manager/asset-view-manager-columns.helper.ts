@@ -30,7 +30,7 @@ function addColumn(column: GridColumnModel) {
 /**
  * Handle View Manager columns
  */
-export const ViewManagerColumnsHelper = {
+export const AssetViewManagerColumnsHelper = {
 	/**
 	 * Create the columns used by the view manager
 	 +

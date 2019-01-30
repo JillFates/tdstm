@@ -1,40 +1,34 @@
-import { Component, Inject, ViewChild, OnInit } from '@angular/core';
+import {Component, ViewChild, OnInit} from '@angular/core';
 import {State} from '@progress/kendo-data-query';
 
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
-import { Observable } from 'rxjs';
-import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import {ViewGroupModel, ViewModel} from '../../model/view.model';
-import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
-import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
-import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
-import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
-import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
-import { Permission } from '../../../../shared/model/permission.model';
-import { VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
-import { AssetQueryParams } from '../../model/asset-query-params';
-import { AssetExportModel } from '../../model/asset-export-model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
-import { DictionaryService } from '../../../../shared/services/dictionary.service';
-import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
-import {TagModel} from '../../../assetTags/model/tag.model';
-import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {DomainModel} from '../../../fieldSettings/model/domain.model';
+import {FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
+import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
+import {ViewColumn, QueryColumn} from '../../../assetExplorer/model/view-spec.model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
+import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+import {Permission} from '../../../../shared/model/permission.model';
+import {VIEW_COLUMN_MIN_WIDTH} from '../../../assetExplorer/model/view-spec.model';
+import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
+import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AlertType} from '../../../../shared/model/alert.model';
+import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
 import {clone} from 'ramda';
 
 declare var jQuery: any;
 @Component({
-	selector: 'asset-explorer-View-config',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html'
+	selector: 'tds-asset-view-config',
+	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-config/asset-view-config.component.html'
 })
-export class AssetExplorerViewConfigComponent implements OnInit {
-	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
+export class AssetViewConfigComponent implements OnInit {
+	@ViewChild('select') select: AssetViewSelectorComponent;
 
 	protected data: any;
 	private dataSignature: string;
@@ -80,9 +74,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private notifier: NotifierService,
-		private prompt: UIPromptService,
-		private dictionary: DictionaryService) {
+		private notifier: NotifierService) {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.allFields = this.route.snapshot.data['fields'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -230,7 +222,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected openSaveDialog(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		this.dialogService.open(AssetExplorerViewSaveComponent, [
+		this.dialogService.open(AssetViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
 			{ provide: ViewGroupModel, useValue: selectedData }
 		]).then(result => {
@@ -343,7 +335,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			viewName: this.model.name
 		};
 
-		this.dialogService.open(AssetExplorerViewExportComponent, [
+		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
 		]).then(result => {
 			console.log(result);

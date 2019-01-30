@@ -1,13 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response, Headers} from '@angular/http';
-import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
+import {Response} from '@angular/http';
+import {ViewModel, ViewGroupModel, ViewType} from '../../assetExplorer/model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Permission} from '../../../shared/model/permission.model';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
-import {DeviceModel} from '../components/device/model-device/model/device-model.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

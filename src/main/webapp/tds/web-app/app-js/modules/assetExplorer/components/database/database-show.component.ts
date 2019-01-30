@@ -4,14 +4,13 @@ import { AssetEditComponent } from '../asset/asset-edit.component';
 import { DependecyService } from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetCommonHelper} from '../asset/asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {

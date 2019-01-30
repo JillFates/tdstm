@@ -55,7 +55,7 @@
 			</span>
 			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()" (click)="onExport()">
 				<i class="fa fa-fw fa-download"></i> Export</button>
-			<asset-explorer-view-selector #select="assetExplorerViewSelector"></asset-explorer-view-selector>
+			<tds-asset-view-selector #select="tdsAssetViewSelector"></tds-asset-view-selector>
 			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:5px 10px;float:right;">
 				<i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed"></i>
 			</span>
