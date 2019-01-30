@@ -1,9 +1,7 @@
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
-import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.transform.TypeCheckingMode
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -14,14 +12,12 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
-import com.tdsops.common.security.spring.HasPermission
 /**
  * Handles WS calls of the UserService.
  *
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsUserController')
 class WsUserController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
