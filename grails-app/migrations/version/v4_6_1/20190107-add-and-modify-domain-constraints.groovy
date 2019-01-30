@@ -13,7 +13,7 @@ databaseChangeLog = {
         // 1 - Change the FKC DataScript > ImportBatch - to set NULL on DELETE
         dropForeignKeyConstraint(baseTableName:'import_batch', constraintName:'import_batch_data_script')
         addForeignKeyConstraint(
-                constraintName: 'import_batch_data_script',
+                constraintName: 'fk_import_batch_data_script',
                 baseTableName: 'import_batch',
                 baseColumnNames: 'data_script_id',
                 referencedTableName: 'data_script',
@@ -47,7 +47,7 @@ databaseChangeLog = {
         // 4 - Add FK constraint Action > Task (AssetComment) - to set AssetComment.action NULL on DELETE
         dropForeignKeyConstraint(baseTableName:'asset_comment', constraintName:'FK_ASSET_COMMENT_TO_API_ACTION')
         addForeignKeyConstraint(
-                constraintName: 'FK_ASSET_COMMENT_TO_API_ACTION',
+                constraintName: 'fk_asset_comment_api_action',
                 baseTableName: 'asset_comment',
                 baseColumnNames: 'api_action_id',
                 referencedTableName: 'api_action',
