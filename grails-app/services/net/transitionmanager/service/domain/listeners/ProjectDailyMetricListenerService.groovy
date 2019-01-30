@@ -13,12 +13,12 @@ class ProjectDailyMetricListenerService implements EventBusAware {
 
 	@Listener(ProjectDailyMetric)
 	void onLicensedClientPreUpdate(PreUpdateEvent event) {
-		beforeValidate(event.entity)
+		beforeValidate(event.getEntity())
 	}
 
 	@Listener(ProjectDailyMetric)
 	void onLicensedClientPreInsert(PreInsertEvent event) {
-		beforeValidate(event.entity)
+		beforeValidate(event.getEntity())
 
 	}
 

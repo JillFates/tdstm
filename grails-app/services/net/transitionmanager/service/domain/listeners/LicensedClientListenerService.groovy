@@ -14,7 +14,7 @@ class LicensedClientListenerService implements EventBusAware {
 
 	@Listener(LicensedClient)
 	void onLicensedClientPreUpdate(PreUpdateEvent event) {
-		LicensedClient licensedClient = event.entityAccess.entity
+		LicensedClient licensedClient = event.entityAccess.getEntity()
 		//Convert non standard Json Values (String, Number, Boolean) to the toString representation
 		Closure toBasicType = { input ->
 			switch (input) {
