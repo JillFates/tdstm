@@ -1,3 +1,4 @@
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -6,6 +7,7 @@ import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
@@ -14,6 +16,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -675,6 +678,32 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
+	}
+
+	void '36. can find Dependency by asset using asset.id'() {
+
+		given:
+			AssetEntity asset = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			AssetEntity dependent = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+			AssetDependency dependency = new AssetDependency(
+				asset: asset,
+				dependent: dependent,
+				status: AssetDependencyStatus.VALIDATED
+			).save(flush: true, failOnError: true)
+
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Dependency,
+				project,
+				[
+					new FindCondition('asset', asset.id, FindOperator.eq)
+				]
+			)
+
+		then:
+			results.size() > 0
+			results.contains(dependency.id)
 	}
 
 }
