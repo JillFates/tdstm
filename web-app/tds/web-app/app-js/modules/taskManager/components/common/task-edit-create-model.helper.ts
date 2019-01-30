@@ -2,6 +2,12 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {YesNoList, PriorityList, ITask, TaskStatus} from '../../model/task-edit-create.model';
+import {SingleNoteComponent} from '../../../assetExplorer/components/single-note/single-note.component';
+import {ModalType} from '../../../../shared/model/constants';
+import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {TaskService} from '../../service/task.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -11,7 +17,11 @@ export class TaskEditCreateModelHelper {
 	private dataSignatureDependencyTasks: string;
 	public STATUS = TaskStatus;
 
-	constructor(userTimeZone: string, userCurrentDateFormat: string) {
+	constructor(
+		userTimeZone: string,
+		userCurrentDateFormat: string,
+		private taskManagerService: TaskService,
+		private dialogService: UIDialogService) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
@@ -173,7 +183,7 @@ export class TaskEditCreateModelHelper {
 			comment:  assetComment.comment || '',
 			assetClass: {id: detail.assetClass, text: detail.assetClasses && detail.assetClasses[detail.assetClass] || ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
-			status: assetComment.status,
+			status: assetComment && assetComment.status || '',
 			statusList: [],
 			personList: [],
 			teamList: [],
@@ -252,7 +262,7 @@ export class TaskEditCreateModelHelper {
 	/**
 	 * Get and clean the object that will send to the service update the task
 	 */
-	public getPayloadForUpdate(): any {
+	public getPayloadForUpdateTask(): any {
 		const [Yes, No] = YesNoList;
 		const {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
@@ -309,6 +319,21 @@ export class TaskEditCreateModelHelper {
 			canEdit: true, /* ? */
 			durationLocked: locked ? '1' : '0',
 			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
+			taskNumber: taskNumber.toString(),
+			note: note,
+			id: id
+		};
+	}
+
+	/**
+	 * Get and clean the object that will send to the service to create a not
+	 */
+	public getPayloadForUpdateNote(note: string): any {
+		const { id, taskNumber } = this.model;
+
+		return  {
+			commentId: this.getEmptyStringIfNull(id).toString(),
+			commentType: 'issue',
 			taskNumber: taskNumber.toString(),
 			note: note,
 			id: id
@@ -662,5 +687,34 @@ export class TaskEditCreateModelHelper {
 	public rowStatusColor(context: any) {
 		const status = context.dataItem && context.dataItem.status || '';
 		return 'task-' + status.toLowerCase();
+	}
+
+	/**
+	 * Add a note
+	 */
+	protected createNote(note: string): void {
+		alert('Creating the note');
+	}
+
+	/**
+	 * Open the note modal dialog to capture the note, call the method for save it
+	 */
+	protected onCreateNote(): void {
+		let singleNoteModel: SingleNoteModel = {
+			modal: {
+				title: 'Create Note',
+				type: ModalType.CREATE
+			},
+			note: ''
+		};
+
+		this.dialogService.extra(SingleNoteComponent, [
+			{provide: SingleNoteModel, useValue: singleNoteModel}
+		], false, false)
+			.then(addedNote => {
+				this.createNote(addedNote);
+			}).catch(result => {
+			console.log(result);
+		});
 	}
 }

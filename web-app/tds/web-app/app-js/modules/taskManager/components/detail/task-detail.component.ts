@@ -8,7 +8,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -137,7 +137,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 
-				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
 				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
 				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 

@@ -18,7 +18,7 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
@@ -80,7 +80,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 		this.isEventLocked = false;
 
-		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
 
 		this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 			this.modelHelper.getModelForCreate(this.taskDetailModel)
@@ -331,7 +331,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * Save the changes on the task
 	 */
 	protected onSave(): void {
-		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
+		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdateTask())
 			.subscribe((result) => this.close(result));
 	}
 
@@ -500,28 +500,5 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			}
 		}
 		return dataItem.text;
-	}
-
-	protected onCreateNote(dataItem: any): void {
-		let singleNoteModel: SingleNoteModel = {
-			modal: {
-				title: 'Create Note',
-				type: ModalType.CREATE
-			},
-			note: ''
-		};
-
-		this.dialogService.extra(SingleNoteComponent, [
-			{provide: SingleNoteModel, useValue: singleNoteModel}
-		], false, false)
-		.then(addedNote => {
-			this.hasModelChanges = true;
-			const newNote = ['Pending to save', this.model.personCreateObj, addedNote];
-			this.model.notesList.unshift(newNote);
-			const [dateCreated, createdBy, note] = newNote;
-			this.dataGridTaskNotesHelper.addDataItem({dateCreated, createdBy, note});
-		}).catch(result => {
-			console.log(result);
-		});
 	}
 }

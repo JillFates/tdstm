@@ -54,6 +54,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
+import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 
 @NgModule({
 	imports: [
@@ -97,7 +98,8 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		TaskCreateComponent,
 		TaskEditComponent,
 		TaskDetailComponent,
-		TaskActionsComponent
+		TaskActionsComponent,
+		TaskNotesComponent
 	],
 	providers: [
 		// Resolve
