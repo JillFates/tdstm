@@ -1,6 +1,6 @@
 /**
  * App Settings is an early service injected at the beginning of the App that initialize the App Object that contains
- * multiple information necessary to run the application, like permissions, license management, etc.
+ * multiple information necessary to run the application, like permissions, user info, license management, etc.
  */
 // Angular
 import {Injectable} from '@angular/core';

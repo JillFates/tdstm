@@ -1,10 +1,11 @@
-<header class="main-header">
+<header class="main-header" *ngIf="appSettings">
     <nav class="navbar navbar-static-top">
         <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                     <i class="fa fa-bars"></i>
                 </button>
+                LicenseEnabled: {{appSettings.licenseEnabled}}
                 <!--<g:if test="${isLicenseManagerEnabled}">-->
                     <!--<asset:image id="logo-header" src="images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />-->
                 <!--</g:if>-->

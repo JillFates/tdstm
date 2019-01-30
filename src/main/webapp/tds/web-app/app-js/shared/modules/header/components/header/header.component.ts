@@ -1,6 +1,8 @@
 // Angular
 import {Component} from '@angular/core';
 // Service
+import {AppSettingsService} from '../../../../../modules/security/services/app-settings.service';
+import {AppSettingsModel} from '../../../../../modules/security/model/app-settings.model';
 
 @Component({
 	selector: 'tds-header',
@@ -9,7 +11,15 @@ import {Component} from '@angular/core';
 
 export class HeaderComponent {
 
-	constructor() {
-		//
+	protected appSettings: AppSettingsModel;
+
+	constructor(private appSettingsService: AppSettingsService) {
+		this.getAppSettings();
+	}
+
+	protected getAppSettings(): void {
+		this.appSettingsService.getAppSettings().subscribe( (appSettings: AppSettingsModel) => {
+			this.appSettings = appSettings;
+		});
 	}
 }
