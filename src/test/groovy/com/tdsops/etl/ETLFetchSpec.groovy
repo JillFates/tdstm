@@ -2,19 +2,17 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
+import grails.test.mixin.Mock
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
-
-@TestFor(AssetEntity)
-@TestMixin([DomainClassUnitTestMixin])
+@Mock([AssetEntity, Room, Model, Rack])
 class ETLFetchSpec extends ETLBaseSpec {
 
 	ETLProcessor processor
@@ -110,7 +108,6 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.find ETLDomain.Model by 'manufacturer' with 'PM10' into 'manufacturer'
 
 		and:
-			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
@@ -148,7 +145,6 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.load('Id').with(deviceId)
 
 		and: 'a mocked instance of SearchQueryHelper'
-			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
@@ -179,7 +175,6 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.load('Id').with(deviceId)
 
 		and: 'a mocked instance of SearchQueryHelper'
-			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
@@ -213,7 +208,6 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.load('Id').with(deviceId)
 
 		and:
-			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
@@ -230,7 +224,7 @@ class ETLFetchSpec extends ETLBaseSpec {
 			Map myVar = fetch.fields 'assetName', 'priority' set 'myVar'
 
 		then:
-			with(myVar, Map) {
+			assertWith(myVar, Map) {
 				assetName == 'ACMEVMPROD01'
 				priority == 2
 			}
@@ -250,7 +244,6 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.load('Manufacturer').with('Avocent Biteme')
 
 		and:
-			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity

@@ -6,8 +6,8 @@ export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'security'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
-	{path: 'asset', loadChildren: '../modules/assetExplorer/asset-explorer.module#AssetExplorerModule'},
 	{path: 'assetcomment', loadChildren: '../modules/assetComment/asset-comment.module#AssetCommentModule'},
+	{path: 'asset', loadChildren: '../modules/assetManager/asset-manager.module#AssetManagerModule'},
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},
 	{path: 'provider', loadChildren: '../modules/provider/provider.module#ProviderModule'},
@@ -17,7 +17,8 @@ export const TDSAppRoute: Routes = [
 	{path: 'user', loadChildren: '../modules/user/user.module#UserModule'},
 	{path: 'dependencies', loadChildren: '../modules/dependencies/dependencies.module#DependenciesModule'},
 	{path: 'license/admin', loadChildren: '../modules/licenseAdmin/license-admin.module#LicenseAdminModule'},
-	{path: 'license/manager', loadChildren: '../modules/licenseManager/license-manager.module#LicenseManagerModule'}
+	{path: 'license/manager', loadChildren: '../modules/licenseManager/license-manager.module#LicenseManagerModule'},
+	{path: 'notice', loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'}
 ];
 
 @NgModule({

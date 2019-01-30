@@ -74,7 +74,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "1. Filtering out by the Application already created"() {
-        testKey = "TM-8492"
         given: 'The User displays the Menu Page'
             at MenuPage
         when: 'The User clicks in the Assets > Applications Menu option'
@@ -92,7 +91,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "2. Using the Edit and Cancel Buttons on the Application Modal Windows"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Details Page'
             at AssetDetailsPage
         when: 'The User clicks the "Edit" Button'
@@ -107,13 +105,12 @@ class ApplicationEditionSpec extends GebReportingSpec {
             at ViewPage
     }
 
-    def "3. Using the Edit Button on the Application List section, right on the Left"() {
-        testKey = "TM-8492"
+    def "3. Using the Edit Button on the Application List section,on the leftmost column"() {
         given: 'The User is on the Application List Page'
             at ViewPage
         when: 'The User searches by the App Name already created'
             filterByName appNameOld
-        and: 'The User clicks on the "Edit" Button right on the left'
+        and: 'The User clicks on the "Edit" Button on the leftmost column'
             clickOnEditButtonForFirstAssetDisplayed()
 
         then: 'The Option to edit every Option should be displayed'
@@ -121,7 +118,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "4. Edit Application - Changing Names and Static dropdowns"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
         when: 'The User changes the App Name, description, Bundle and Status values'
@@ -140,7 +136,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "5. Edit Application - Changing dynamic Dropdowns"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
         when: 'The User changes the App SME1, SME2, appOwner values'
@@ -168,11 +163,10 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "6. Edit Application - Adding Support Dependencies"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
         when: 'The User clicks the "Support" Button'
-            commonsModule.goToElement(updateButton) // avoid element not found
+            commonsModule.goToElement(saveButton) // avoid element not found
             aeModalAddSuppBtn.click()
 
         then: 'A New Layout containing different Options should be displayed'
@@ -184,22 +178,25 @@ class ApplicationEditionSpec extends GebReportingSpec {
             aeModalSuppColTitles[6].text().trim() == "Status"
             aeModalSuppList.size() > 0
         when: 'The User completes information related to Frequency, Calls, Name, Bundle, Type and Status'
-            aeModalSuppFreqArrow.click()
+            waitFor { aeModalSuppFreqArrow.click()}
             waitFor { aeModalSelectorValues.find{it.text()==suppFreq}.click() }
-            aeModalSuppClassArrow.click()
+            waitFor { aeModalSuppClassArrow.click()}
             waitFor { aeModalSelectorValues.find{it.text()==suppClass}.click() }
-            aeModalSuppNameArrow.click()
+            waitFor { aeModalSuppNameArrow.click()}
             commonsModule.waitForLoader(2) // assets list is loaded
             waitFor { aeModalSelectorValues.size() > 2 }
             def selector = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2]
+            commonsModule.waitForLoader(2)
             suppName = selector.text()
+            commonsModule.waitForLoader(3)
             selector.click()
-            commonsModule.waitForLoader(1) // bundle associated to asset is loaded
+            commonsModule.waitForLoader(3) // bundle associated to asset is loaded
             aeModalSuppBundleArrow.click()
+            commonsModule.waitForLoader(3)
             waitFor { aeModalSelectorValues.find{it.text()==suppBundle}.click() }
-            aeModalSuppTypeArrow.click()
+            waitFor {aeModalSuppTypeArrow.click()}
             waitFor { aeModalSelectorValues.find{it.text()==suppType}.click() }
-            aeModalSuppStatusArrow.click()
+            waitFor {aeModalSuppStatusArrow.click()}
             waitFor { aeModalSelectorValues.find{it.text()==suppStatus}.click() }
 
         then: 'Every value should be accordingly added'
@@ -212,7 +209,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "7. Edit Application - Adding Dependencies"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
         when: 'The User clicks the "Dependency" Button'
@@ -255,11 +251,10 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "8. Edit Application - Save Changes and close modal"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application Edition Section'
             at AssetEditPage
-        when: 'The User clicks the "Update" Button'
-            clickOnUpdateButton()
+        when: 'The User clicks the "Save" Button'
+            clickOnSaveButton()
 
         then: 'The User should be redirected to the Application Details Pop-Up'
             at AssetDetailsPage
@@ -271,7 +266,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "9. Filter edited Application on List"() {
-        testKey = "TM-8492"
         given: 'The User is on the Application List Page'
             at ViewPage
         when: 'The User searches by the Application already edited'
@@ -284,7 +278,6 @@ class ApplicationEditionSpec extends GebReportingSpec {
     }
 
     def "10. Validate Application Details"() {
-        testKey = "TM-8492"
         when: 'The User is on the Application Details Page'
             at AssetDetailsPage
 

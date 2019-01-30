@@ -88,7 +88,7 @@ class CredentialTestHelper {
 	Credential createAndSaveCredential(Project project, Provider provider) {
 		CredentialCommand credentialCO = createCredentialCO(provider)
 		Credential credential = new Credential()
-		credentialCO.populateDomain(credential)
+		credentialCO.populateDomain(credential, false, ['constraintsMap'])
 		credential.project = project
 		credential.salt = '{sha}'
 

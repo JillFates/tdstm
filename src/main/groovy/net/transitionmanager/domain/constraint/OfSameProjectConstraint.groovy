@@ -1,10 +1,9 @@
 package net.transitionmanager.domain.constraint
 
-import net.transitionmanager.domain.Project
+
 import org.grails.datastore.gorm.validation.constraints.AbstractConstraint
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
-
 /**
  * A custom constraint that makes sure that a property has the same project id as the
  * parent/target object.
@@ -30,26 +29,13 @@ class OfSameProjectConstraint extends AbstractConstraint  {
 	 */
 	@Override
 	protected Object validateParameter(Object constraintParameter) {
-		return constraintParameter instanceof Project
+		return constraintParameter instanceof Boolean && constraintParameter
 	}
 
 	protected void processValidate(Object target, Object propertyValue, Errors errors) {
 		if(parameter && target?.project?.id != propertyValue?.project?.id){
 			super.rejectValue(target,errors,OF_SAME_PROJECT_CODE_MESSAGE_CODE, 'OF_SAME_PROJECT_CODE_MESSAGE_CODE', [])
 		}
-	}
-
-	/**
-	 * This sets the parameter of the constraint which is just a simple enabling flag.
-	 *
-	 * @param param The parameter to set.
-	 */
-	void setParameter(Object param) {
-		if (!(param instanceof Boolean)) {
-			throw new IllegalArgumentException("Parameter for constraint [$name] of property [$constraintPropertyName] of class [$constraintOwningClass] must be a boolean")
-		}
-
-		super.setParameter(param)
 	}
 
 	/**

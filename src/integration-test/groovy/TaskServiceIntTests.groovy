@@ -32,6 +32,7 @@ import test.helper.ApiCatalogTestHelper
 class TaskServiceIntTests extends Specification{
 
     TaskService taskService
+    SecurityService securityService
 
     ApiCatalogTestHelper apiCatalogTestHelper
     AssetTestHelper assetTestHelper

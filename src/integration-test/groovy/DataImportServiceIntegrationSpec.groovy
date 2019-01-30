@@ -89,39 +89,37 @@ class DataImportServiceIntegrationSpec extends Specification {
 	void setupSpec() {
 
 	}
+
 	void setup() {
-		if(!initialized) {
-			whom = personTestHelper.createPerson()
-			project = projectTestHelper.createProject()
-			otherProject = projectTestHelper.createProject()
-			moveBundle = moveBundleTestHelper.createBundle(project, null)
-			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-																		 moveBundleTestHelper.createBundle(otherProject, null))
+		whom = personTestHelper.createPerson()
+		project = projectTestHelper.createProject()
+		otherProject = projectTestHelper.createProject()
+		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
+																	 moveBundleTestHelper.createBundle(otherProject, null))
 
-			def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
-			securityService.assumeUserIdentity(adminUser.username, false)
+		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
+		securityService.assumeUserIdentity(adminUser.username, false)
 
-			context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
-			context.record = new ImportBatchRecord(sourceRowId: 1)
+		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
+		context.record = new ImportBatchRecord(sourceRowId: 1)
 
-			device.assetType = 'Server'
-			device.priority = 6
-			device.purchasePrice = 1.25
-			device.retireDate = new Date()
+		device.assetType = 'Server'
+		device.priority = 6
+		device.purchasePrice = 1.25
+		device.retireDate = new Date()
 
-			device.save()
+		device.save()
 
-			device2.assetType = 'Server'
-			device2.save()
+		device2.assetType = 'Server'
+		device2.save()
 
-			// Create a second project with a device with the same name and type as device above
-			otherProjectDevice.assetName = device.assetName
-			otherProjectDevice.assetType = device.assetType
-			otherProjectDevice.save()
-			initialized = true
-		}
+		// Create a second project with a device with the same name and type as device above
+		otherProjectDevice.assetName = device.assetName
+		otherProjectDevice.assetType = device.assetType
+		otherProjectDevice.save()
 	}
 
 	void '1. give the performQueryAndUpdateFindElement method a spin'() {
@@ -677,7 +675,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			Map assetFieldsInfo = [:]
 
 		when: 'calling the createEntity for a device'
-			Object entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+			Object entity = dataImportService.createEntity(Application, assetFieldsInfo, context)
 		then: 'we should get an AssetEntity'
 			(entity instanceof AssetEntity)
 		and: 'the moveBundle is set to the TBD'
@@ -694,7 +692,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		when: 'the fieldsInfo has a bundle defined'
 			initializeFieldElement('moveBundle', assetFieldsInfo, moveBundle.name)
 		and: 'calling createEntity'
-			entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+			entity = dataImportService.createEntity(Application, assetFieldsInfo, context)
 		then: 'the default bundle should not be assigned'
 			null == entity.moveBundle
 	}

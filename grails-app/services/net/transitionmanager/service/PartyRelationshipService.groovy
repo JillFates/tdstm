@@ -164,25 +164,6 @@ class PartyRelationshipService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to retrieve the Company for which a person is associated as a "STAFF" member
-	 * @param staff  the staff member instance or id
-	 * @return Party - the company Staff is associated with or NULL if no associations
-	 */
-	PartyGroup getCompanyOfStaff(def staff) {
-		def staffRef = StringUtil.toLongIfString(staff)
-		boolean byId = (staffRef instanceof Long)
-		String query = """select pr.partyIdFrom from
-			PartyRelationship pr where
-			pr.partyRelationshipType.id = 'STAFF'
-			and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-			and pr.roleTypeCodeTo.id = 'ROLE_STAFF'
-			and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
-		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff:staffRef])
-
-		return (company ? company[0] : null)
-	}
-
-	/**
 	 * Persons that are staff of the company
 	 * @param company  the company to look up (id or object)
 	 * @param includeDisabled - flag to control if disabled staff are included in list (default false)
@@ -1098,7 +1079,7 @@ class PartyRelationshipService implements ServiceMethods {
 			}
 		}
 		if (projects && sortOn ) {
-			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
+			projects = projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
 		}
 
 		return projects as List
@@ -1156,7 +1137,7 @@ class PartyRelationshipService implements ServiceMethods {
 				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
-				WHERE pr.role_type_code_to_id in ('STAFF')
+				WHERE pr.role_type_code_to_id in ('ROLE_STAFF')
 					AND pr.role_type_code_from_id in ('ROLE_COMPANY')
 					AND pr.party_relationship_type_id in ('ROLE_STAFF')
 					AND pr.party_id_from_id IN ($project.client.id)

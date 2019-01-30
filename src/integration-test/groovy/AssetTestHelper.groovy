@@ -8,39 +8,110 @@
  */
 
 
+import com.tds.asset.Database
+import com.tds.asset.Files
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.SettingService
+import org.apache.commons.lang3.RandomStringUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import grails.util.Holders
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
-import org.springframework.beans.factory.annotation.Autowired
 
 class AssetTestHelper {
-	@Autowired
-	DeviceService deviceService
-
-	@Autowired
-	PersonService personService
-
-	@Autowired
 	SecurityService securityService
+	ProjectService projectService
 
 	Long adminPersonId = 100
+
+	AssetTestHelper(){
+		projectService = Holders.applicationContext.getBean('projectService')
+		securityService = Holders.applicationContext.getBean('securityService')
+	}
+
+	/**
+	 * Simple method for creating a Device with a bare minimum fields set.
+	 * @param project - the project the device will belong to
+	 * @param moveBundle - the bundle the device will be assigned to.
+	 * @param assetType - the asset type for the device.
+	 * @return a device instance
+	 */
+	AssetEntity createDevice(Project project, MoveBundle moveBundle, AssetType assetType) {
+		AssetEntity device = new AssetEntity(
+			assetName: RandomStringUtils.randomAlphabetic(15),
+			project: project,
+			moveBundle: moveBundle,
+			assetType: assetType.toString()
+		)
+
+		if (!device.save(flush: true)) {
+			throw new RuntimeException("createDevice() failed because " + GormUtil.allErrorsString(device))
+		}
+		return device
+	}
+
+
+	/**
+	 * Creates, saves and return a new Database with some basic configuration.
+	 * @param project - the project the database will be assigned to.
+	 * @param bundle - The MoveBundle the application is assigned to. If null, the project's default bundle will be used.
+	 * @return a new Database instance.
+	 */
+	Database createDatabase(Project project, MoveBundle bundle = null) {
+		Database database = new Database(
+			assetName: RandomStringUtils.randomAlphabetic(15),
+			project: project,
+			moveBundle: bundle?: project.projectDefaultBundle
+		)
+
+		if (!database.save(flush: true)) {
+			throw new RuntimeException("createDabase() failed because " + GormUtil.allErrorsString(database))
+		}
+
+		return database
+	}
+
+
+	/**
+	 * Creates, saves and return a new Files with some basic configuration.
+	 * @param project - the project the storage will be assigned to.
+	 * @param bundle - The MoveBundle the application is assigned to. If null, the project's default bundle will be used.
+	 * @return a new Files instance.
+	 */
+	Files createStorage(Project project, MoveBundle bundle = null) {
+		Files storage = new Files(
+			assetName: RandomStringUtils.randomAlphabetic(15),
+			project: project,
+			moveBundle: bundle?: project.projectDefaultBundle
+		)
+
+		if (!storage.save(flush: true)) {
+			throw new RuntimeException("createStorage() failed because " + GormUtil.allErrorsString(storage))
+		}
+
+		return storage
+	}
+
 
 	/**
 	 * Used to create an application and reference the person in all possible properties
 	 * @param person  The person to be referenced
 	 * @param project  The Project to be assigned
+	 * @param bundle - The MoveBundle the application is assigned to. If null, the project's default bundle will be used.
 	 * @return  The newly created Application
 	 */
-	Application createApplication(Person person, Project project) {
+	Application createApplication(Person person, Project project, MoveBundle bundle = null) {
 		String pRef = person.id.toString()
 		Application app = new Application(
 			assetName: RandomStringUtils.randomAlphabetic(15),
@@ -52,10 +123,8 @@ class AssetTestHelper {
 			shutdownBy: pRef,
 			startupBy: pRef,
 			testingBy: pRef,
-			moveBundle: project.projectDefaultBundle
+			moveBundle: bundle?: projectService.getDefaultBundle(project)
 		)
-
-		app.moveBundle = project.getDefaultBundle()
 
 		if (!app.save(flush: true)) {
 			throw new RuntimeException("createApplication() failed because " + GormUtil.allErrorsString(app))
@@ -82,14 +151,14 @@ class AssetTestHelper {
 	 *    not all the possible values have a corresponding keyword.
 	 * @return  The newly created AssetEntity
 	 */
-	public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
+	AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
 		 /* Most the values in this map replicate what the front-end sends to the
 		 back-end when creating a device. */
 		Map defaultValues = [
 			assetName          : RandomStringUtils.randomAlphabetic(15),
 			currentAssetType   : assetType,
-			moveBundle         : project.projectDefaultBundle,
-			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
+			moveBundle         : projectService.getDefaultBundle(project),
+			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : projectService.getDefaultBundle(project).id.toString(),
 			roomSourceId       : "-1",
 			locationSource     : "TBD",
 			roomSource         : "",

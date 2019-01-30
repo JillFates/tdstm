@@ -1,0 +1,67 @@
+<div class="asset-explorer-view-show-component content body">
+    <section class="page-asset-explorer-config">
+        <div>
+            <div class="btn-group"
+                 *ngIf="canShowSaveButton()">
+                <tds-button-save
+                        (click)="save(getSaveButtonId())"
+                        [ngClass]="{'btn-default':!isDirty(),'btn-success':isDirty()}"
+                        [title]="canSave() ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
+                        [attr.id]="getSaveButtonId()">
+                </tds-button-save>
+
+                <button type="button" class="btn dropdown-toggle"
+                        [ngClass]="{'btn': true, 'btn-default': !isDirty(),'btn-success': isDirty(), 'pull-right': true }"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+
+                <ul class="dropdown-menu">
+                    <!-- Save Button -->
+                    <li *ngIf="canSave()">
+                        <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
+                    </li>
+                    <li *ngIf="canSaveAs()">
+                        <a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <tds-button-custom
+                        [icon]="model.isFavorite ? 'star' : 'star-o'"
+                        [title]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+                        class="text-yellow"
+                        isIconButton="true"
+                        (click)="onFavorite()">
+            </tds-button-custom>
+
+            <tds-button-export (click)="onExport()" [id]="'btnExport'"></tds-button-export>
+
+            <tds-asset-view-selector
+                    #select="tdsAssetViewSelector">
+            </tds-asset-view-selector>
+            <tds-button-custom *ngIf="isEditAvailable()"
+                        isIconButton="true"
+                        icon="cog"
+                        tooltip="Configure"
+                        class="pull-right"
+                        (click)="onEdit()">
+            </tds-button-custom>
+        </div>
+        <div class="box-body">
+            <asset-explorer-view-grid
+                    [data]=data
+                    (modelChange)="onQuery()"
+                    (justPlanningChange)="onJustPlanningChange($event)"
+                    [gridState]="gridState"
+                    (gridStateChange)="onGridStateChange($event)"
+                    [fields]="fields"
+                    [edit]="false"
+                    [model]="model.schema"
+                    [viewId]="model.id"
+                    [metadata]="metadata">
+            </asset-explorer-view-grid>
+        </div>
+    </section>
+</div>

@@ -154,7 +154,7 @@ class ProjectController implements ControllerMethods {
 		if (!project) return
 
 		def projectPartners = partyRelationshipService.getProjectPartners(project)
-		PartyGroup company = project.owner
+		PartyGroup company = projectService.getOwner(project)
 
 		def projectDetails
 		def moveBundles
@@ -214,7 +214,7 @@ class ProjectController implements ControllerMethods {
 			Project project = controllerService.getProjectForPage(this)
 			if (!project) return
 
-			PartyGroup company = project.owner
+			PartyGroup company = projectService.getOwner(project)
 
 			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
 			def startDate = params.startDate
@@ -395,7 +395,7 @@ class ProjectController implements ControllerMethods {
 				return
 			}
 
-			project.setOwner(company)
+			projectService.setOwner(project,company)
 
 			// Save the partners to be related to the project
 			projectService.updateProjectPartners(project, partnersIds)
@@ -419,7 +419,7 @@ class ProjectController implements ControllerMethods {
 
 			/* Create and assign the default Bundle for this project. Although the bundle
 			* is assigned in ProjectService::getDefaultBundle, it's done here too for visibility. */
-			project.defaultBundle = project.getProjectDefaultBundle(params.defaultBundleName)
+			project.defaultBundle = projectService.getDefaultBundle(project, (String)params.defaultBundleName)
 			project.save()
 
 			flash.message = "Project $project was created"
@@ -484,11 +484,11 @@ class ProjectController implements ControllerMethods {
 		}
 
 		// Use the passed role or default all staff
-		String staffRole = request.JSON.role ?: 'STAFF'
+		String staffRole = request.JSON.role ?: 'ROLE_STAFF'
 		List<Map> staffList = []
 		String staffQuery = "FROM PartyRelationship p \
 			WHERE p.partyRelationshipType = 'STAFF' AND p.partyIdFrom = :company \
-			AND p.roleTypeCodeFrom.id = 'COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
+			AND p.roleTypeCodeFrom.id = 'ROLE_COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
 
 		// Closure to do query and load the staff into the staffList variable for the given company
 		def getCompanyStaffClosure = { def company ->
@@ -685,7 +685,7 @@ class ProjectController implements ControllerMethods {
 		if (!project) return
 
 		[project: project.name, client: project.client.name,
-		 defaultEmail: StringEscapeUtils.escapeHtml4(grailsApplication.config.grails.mail.default.from),
+		 defaultEmail: StringEscapeUtils.escapeHtml(grailsApplication.config.grails.mail.default.from),
 		 accounts: projectService.getAccountActivationUsers(project), adminEmail: securityService.userLoginPerson.email]
 	}
 
@@ -707,7 +707,7 @@ class ProjectController implements ControllerMethods {
 				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
 					def fromEmail = grailsApplication.config.grails.mail.default.from
-					fromEmail = StringEscapeUtils.escapeHtml4(fromEmail)
+					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
 					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params.customMessage, fromEmail, request.getRemoteAddr())
 					message = "The Account Activation Notification has been sent out to the users."
 				}else{

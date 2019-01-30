@@ -14,6 +14,8 @@ import {FIELD_COLORS} from '../../model/field-settings.model';
 import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
+import {AlertType} from '../../../../shared/model/alert.model';
+import { FieldSettingsService } from '../../service/field-settings.service';
 
 declare var jQuery: any;
 
@@ -40,6 +42,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input('state') gridState: any;
 	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
+	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	public colors = FIELD_COLORS;
@@ -62,6 +65,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
+	protected resettingChanges = false;
+	protected lastEditedControl = null;
 
 	private readonly availableControls = [
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.List, value: CUSTOM_FIELD_CONTROL_TYPE.List},
@@ -76,12 +81,16 @@ export class FieldSettingsGridComponent implements OnInit {
 	constructor(
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private fieldSettingsService: FieldSettingsService) {
 	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
 		this.refresh();
+		this.fieldSettingsService.getFieldSettingsByDomain().subscribe(domains => {
+			this.domains = domains;
+		});
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
@@ -137,11 +146,25 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	}
 
-	protected onCancel(): void {
-		this.cancelEmitter.emit(() => {
-			this.reset();
-			this.refresh();
-		});
+	/**
+	 * On click Cancel button send the message to the host container to cancel the changes
+	 * @param {any} event containing the current event control which has the latest error
+	 */
+	protected onCancel(event: any): void {
+		this.resettingChanges = true;
+		event = event || this.lastEditedControl || null;
+
+		this.cancelEmitter.emit({
+			success: () => {
+				this.reset();
+				this.refresh();
+			},
+			failure: () => {
+				if (event) {
+					this.resettingChanges = false;
+					event.target.focus();
+				}
+			}});
 	}
 
 	/**
@@ -149,6 +172,11 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
+		const targetField = this.data.fields.find((item) => item.field === dataItem.field);
+		if (targetField) {
+			targetField.errorMessage = '';
+		}
+
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
 			domain: this.data.domain,
@@ -200,7 +228,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			model['count'] = this.data.fields.length;
 			model.control = CUSTOM_FIELD_CONTROL_TYPE.String;
 			model.show = true;
-			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
+			let availableOrder = this.data.fields.map(f => f.order).sort((a, b) => a - b).filter(item => !isNaN(item));
 			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.data.fields.push(model);
 			this.onFilter();
@@ -248,8 +276,14 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.applyFilter();
 	}
 
+	/**
+	 * Refresh the changes in the data grid, in addition reset the values of the resettingChanges
+	 * and lastEditeControls variables
+	 */
 	public refresh(): void {
 		this.gridData = process(this.fieldsSettings, this.state);
+		this.resettingChanges = false;
+		this.lastEditedControl = null;
 	}
 
 	/**
@@ -326,8 +360,86 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	}
 
-	protected hasError(label: string) {
-		return label.trim() === '' || this.data.fields.filter(item => item.label === label.trim()).length > 1;
+	/**
+	 * Checks if the given label is an invalid String, and returns true or false respectively.
+	 * The error conditions are:
+	 * 	- The label is an empty String
+	 * 	- The label String matches other label in the fields list.
+	 * 	- The label String matches a field name in the fields list.
+	 * 	- The label String matches other label or field name in the fields list of another domain.
+	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
+	 * 	  e.g. label: "Last Modified or last modified or LastModified". other label: "Last Modified". This comparisons will error.
+	 *
+	 * 	- The label String matches any field names in the list of fields.
+	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
+	 * 	  e.g. label: "Asset Name or asset N ame or AssetName or assetName". some field name: "assetName". This comparisons will error.
+	 *
+	 * @See TM-13505
+	 * @param label
+	 * @returns {boolean}
+	 */
+	protected hasError(dataItem: FieldSettingsModel) {
+		const fields = this.getFieldsExcludingDeleted();
+
+		return dataItem.label.trim() === '' ||
+			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields) ||
+			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
+	}
+
+	/**
+	 * Returns a boolean indicating if the fields contain atleast one field with error
+	 */
+	protected atLeastOneInvalidField(): boolean {
+		const fields = this.getFieldsExcludingDeleted() || [];
+
+		return fields.some((field) => field.errorMessage);
+	}
+
+	/**
+	 * On blur input field controls, it applies the validation rules to the label and name of the field control
+	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
+	 * @param {any} event Context event from the input that launched the change
+	 */
+	protected onBlur(dataItem: FieldSettingsModel, event: any) {
+		dataItem.errorMessage = '';
+		const fields = this.getFieldsExcludingDeleted();
+
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
+			dataItem.errorMessage = 'Another label conflicts with the label "'
+					+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.'
+		} else {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields)) {
+				dataItem.errorMessage =  'A field name conflicts with the label "'
+						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
+			} else {
+				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
+					dataItem.errorMessage = 'A field name or label on another domain conflicts with the shared label "'
+						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
+				}
+			}
+		}
+		if (dataItem.errorMessage)  {
+			if (!this.resettingChanges) {
+				this.lastEditedControl = this.lastEditedControl || event;
+				setTimeout(() => this.lastEditedControl.target.focus(), 0.1);
+			}
+		} else {
+			if (this.lastEditedControl) {
+				if (this.lastEditedControl.target.id === event.target.id)  {
+					this.lastEditedControl = null;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the list of fields excluding fields to be deleted
+	 * @returns {any[]}
+	 */
+	protected getFieldsExcludingDeleted(): any {
+		return this.data.fields
+			.filter((item) => !((this.fieldsToDelete || []).includes(item.field)));
 	}
 
 	/**
@@ -404,4 +516,12 @@ export class FieldSettingsGridComponent implements OnInit {
 		return false;
 	}
 
+	/**
+	 * On esc key pressed open confirmation dialog
+	 */
+	protected onKeyPressed(event: KeyboardEvent): void {
+		if (event.code === 'Escape') {
+			this.onCancel(event);
+		}
+	}
 }

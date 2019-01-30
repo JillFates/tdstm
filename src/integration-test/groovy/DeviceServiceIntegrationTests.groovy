@@ -12,11 +12,13 @@ import spock.lang.Specification
 @Rollback
 class DeviceServiceIntegrationTests extends Specification{
 
-    private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private AssetTestHelper assetHelper = new AssetTestHelper()
+    private ProjectTestHelper projectHelper
+	private AssetTestHelper assetHelper
     private Project project
 
     def setup() {
+        projectHelper = new ProjectTestHelper()
+        assetHelper = new AssetTestHelper()
         projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
     }

@@ -149,6 +149,9 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * Shows the confirmation cancel changes dialog, on success refresh the grid otherwise reset the flag variables
+	 */
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(
@@ -157,10 +160,12 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.refresh();
+					} else {
+						callback.failure();
 					}
 				});
 		} else {
-			callback();
+			callback.success();
 		}
 	}
 
@@ -200,17 +205,24 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	protected isValid(domain: DomainModel): boolean {
-		let values = domain.fields.map(x => x.label);
+		const deletedFields  = this.fieldsToDelete && this.fieldsToDelete[domain.domain] || [];
+
+		const fields =  domain.fields
+			.filter((item) => !(deletedFields.includes(item.field)));
+
+		let values = fields.map(x => x.label);
 
 		// Validates "Field Order" is not null && should be a number on the range of [0, X)
-		let invalidOrderFields = domain.fields.filter(item =>
+		let invalidOrderFields = fields.filter(item =>
 			item.order === null || !ValidationUtils.isValidNumber(item.order) || item.order < 0
 		);
+		let invalidFieldLabels = this.fieldService.checkLabelsAndNamesConflicts(fields, this.domains, domain);
 
-		return domain.fields.filter(item => !item.label.trim() || !item.field).length === 0
+		return fields.filter(item => !item.label.trim() || !item.field).length === 0
 			// Validates "Field Labels" should be unique by domain
 			&& values.filter((l, i) => values.indexOf(l) !== i).length === 0
-			&& invalidOrderFields.length === 0;
+			&& invalidOrderFields.length === 0
+			&& invalidFieldLabels === false;
 	}
 
 	protected onAdd(callback): void {

@@ -38,21 +38,30 @@ class PartyRelationshipServiceTests extends Specification {
 	Person person
 
 	@Shared
-	ProjectTestHelper projectHelper = new ProjectTestHelper()
+	ProjectTestHelper projectHelper
+
+	@Shared
+	boolean initialized = false
 
 	void setup() {
-		def projectHelper = new ProjectTestHelper()
-		project = projectHelper.getProject()
-		moveEvent = projectHelper.getFirstMoveEvent(project)
+		if(!initialized) {
+			projectHelper = new ProjectTestHelper()
+			def projectHelper = new ProjectTestHelper()
+			project = projectHelper.getProject()
+			moveEvent = projectHelper.getFirstMoveEvent(project)
 
-		def personHelper = new PersonTestHelper()
-		byWhom = personHelper.getAdminPerson()
+			def personHelper = new PersonTestHelper()
+			byWhom = personHelper.getAdminPerson()
+
+
+			userLogin = byWhom.userLogin
+			assert userLogin
+
+			person = personHelper.createPerson(byWhom, project.client)
+
+			initialized =true
+		}
 		securityService.assumeUserIdentity(byWhom.userLogin.username, false)
-
-		userLogin = byWhom.userLogin
-		assert userLogin
-
-		person = personHelper.createPerson(byWhom, project.client)
 	}
 
 	void "Test the getTeamRoleTypes"() {
@@ -156,19 +165,7 @@ class PartyRelationshipServiceTests extends Specification {
 	void "Test getCompanyOfStaff"() {
 		// Get company by Person object
 		when:
-			def company = partyRelationshipService.getCompanyOfStaff(byWhom)
-		then:
-			company
-
-		// Get company by id number
-		when:
-			company = partyRelationshipService.getCompanyOfStaff(byWhom.id)
-		then:
-			company
-
-		// Get company by string of number
-		when:
-			company = partyRelationshipService.getCompanyOfStaff("${byWhom.id}")
+			def company = byWhom.company
 		then:
 			company
 	}
@@ -200,11 +197,11 @@ class PartyRelationshipServiceTests extends Specification {
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
-			companies.size() == 3
+			companies.size() == 1
 		and: "There are no duplicated companies"
-			companies.unique { it.id }.size() == 3
+			companies.unique { it.id }.size() == 1
 		and: "It contains the owner"
-			companies.find { it.id == project.owner.id }
+			companies.find { it.id == projectService.getOwner(project).id }
 		and: "It contains the client"
 			companies.find {it.id == project.client.id}
 
@@ -223,11 +220,11 @@ class PartyRelationshipServiceTests extends Specification {
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
-			companies.size() == 2
+			companies.size() == 1
 		and: "There are no duplicated companies"
-			companies.unique {it.id}.size() == 2
+			companies.unique {it.id}.size() == 1
 		and: "It contains the owner"
-			companies.find {it.id == project.owner.id}
+			companies.find {it.id == projectService.getOwner(project).id}
 		and: "It contains the client"
 			companies.find {it.id == project.client.id}
 	}

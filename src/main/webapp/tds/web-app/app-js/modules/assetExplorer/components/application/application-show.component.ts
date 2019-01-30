@@ -4,7 +4,7 @@ import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { DOMAIN, DIALOG_SIZE } from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
@@ -12,7 +12,6 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserManageStaffComponent} from '../../../user/components/manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
@@ -25,8 +24,6 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		template: template
 	})
 	class ApplicationShowComponent extends AssetCommonShow {
-		protected ButtonActions = TDSActionsButton;
-
 		constructor(
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,

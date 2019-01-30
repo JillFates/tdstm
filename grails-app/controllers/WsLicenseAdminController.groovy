@@ -1,21 +1,15 @@
 import com.tdsops.common.security.spring.HasPermission
-import grails.converters.JSON
+import com.tdsops.tm.enums.domain.ProjectStatus
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.License
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.LicenseAdminService
-import com.tdsops.tm.enums.domain.ProjectStatus
-
-import net.transitionmanager.controller.ServiceResults
-
 /**
  * Created by octavio on 11/14/16.
  */
@@ -24,6 +18,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	LicenseCommonService licenseCommonService
 	LicenseAdminService licenseAdminService
 	ProjectService projectService
+	GrailsApplication grailsApplication
 
 	def managerActive(){
 		renderSuccessJson(licenseCommonService.isManagerEnabled())
@@ -77,7 +72,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	/* list the licenses */
 	@HasPermission(Permission.LicenseView)
 	def getLicenses(){
-		renderSuccessJson(License.findAll()*.toJsonMap())
+		renderSuccessJson(License.findAll()*.toJsonMap(grailsApplication))
 	}
 
 	@HasPermission(Permission.LicenseView)
@@ -88,7 +83,7 @@ class WsLicenseAdminController implements ControllerMethods {
 		}
 
 		if (lic) {
-			renderSuccessJson(lic.toJsonMap())
+			renderSuccessJson(lic.toJsonMap(grailsApplication))
 		} else {
 			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
@@ -147,7 +142,7 @@ class WsLicenseAdminController implements ControllerMethods {
 
 		License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environment, projectId, requestNote)
 		licenseAdminService.sendMailRequest(lic)
-		renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
+		renderSuccessJson(id:lic.id, body:lic.toEncodedMessage(grailsApplication))
     }
 
 	/**

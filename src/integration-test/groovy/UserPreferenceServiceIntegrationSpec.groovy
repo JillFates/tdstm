@@ -2,6 +2,7 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import grails.util.GrailsWebMockUtil
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.SecurityService
@@ -35,6 +36,7 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 		person = personHelper.createPerson()
 		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"])
 		securityService.assumeUserIdentity(userLogin.username, false)
+		GrailsWebMockUtil.bindMockWebRequest()
     }
 
 	def '1. Test a user without an existing preference'() {

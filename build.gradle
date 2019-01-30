@@ -11,8 +11,13 @@ buildscript {
 	}
 }
 
+plugins {
+  id "com.gorylenko.gradle-git-properties" version "2.0.0"
+}
+
 version "4.7.0"
 group "tdstm"
+buildDir = 'target'
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -20,6 +25,9 @@ apply plugin: "war"
 apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
+
+integrationTest.reports.html.destination = file("$buildDir/test-integration/test-reports/html")
+test.reports.html.destination = file("$buildDir/test-unit/test-reports/html")
 
 repositories {
 	mavenLocal()
@@ -163,8 +171,6 @@ bootRun {
 	systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
 
-integrationTest.jvmArgs('-Dcom.tdsops.tm.skp=B3c00l')
-
 tasks.withType(Test) {
 	systemProperty "geb.env", System.getProperty('geb.env')
 	systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
@@ -177,10 +183,10 @@ assets {
 	minifyCss = true
 }
 
-[bootRun].each { runTask ->
-    configure(runTask) {
-        systemProperties System.properties
-    }
+[bootRun, integrationTest, runScript, dbmUpdate].each { runTask ->
+	configure(runTask) {
+		systemProperties System.properties
+	}
 }
 
 sourceSets {
@@ -189,4 +195,22 @@ sourceSets {
             srcDir 'grails-app/migrations'
         }
     }
+}
+
+// Customize Git properties plugin.
+gitProperties {
+    // Change date format in git.properties file.
+    dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+    dateFormatTimeZone = 'EST'
+}
+
+grails {
+   pathingJar = true
+}
+
+test {
+    if (project.hasProperty('maxParallelForks'))
+        maxParallelForks = project.maxParallelForks as int
+    if (project.hasProperty('forkEvery'))
+        forkEvery = project.forkEvery as int
 }

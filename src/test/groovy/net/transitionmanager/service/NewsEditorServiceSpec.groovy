@@ -1,11 +1,8 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.StringUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.PartyGroup
@@ -15,10 +12,7 @@ import net.transitionmanager.domain.Project
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(NewsEditorService)
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
-@Mock([PartyGroup, PartyType, Project, MoveEventNews, Person])
-class NewsEditorServiceSpec extends Specification {
+class NewsEditorServiceSpec extends Specification implements ServiceUnitTest<NewsEditorService>, DataTest {
 
 	@Shared
 	Project project
@@ -31,6 +25,10 @@ class NewsEditorServiceSpec extends Specification {
 
 	@Shared
 	Person whom
+
+	void setupSpec(){
+		mockDomains PartyGroup, PartyType, Project, MoveEventNews, Person, MoveEvent
+	}
 
 	void setup() {
 		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true, failOnError: true)

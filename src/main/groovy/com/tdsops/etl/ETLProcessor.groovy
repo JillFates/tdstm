@@ -1576,7 +1576,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			// disallow method definitions
 			methodDefinitionAllowed = false
 			// Empty withe list means forbid imports
-			importsWhitelist = []
+			importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
 			starImportsWhitelist = []
 			// Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
 			tokensWhitelist = [
@@ -1742,8 +1742,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		long used = findCache ? findCache.size() : 0
 		String ratio = String.format('%.1f', (findCache ? findCache.hitCountRate() : 0.0))
 
-		log.info "ETL Transformation Process took ${ago}"
-		log.info "ETL find cache - size ${size}, used ${used}, hit count ratio ${ratio}%"
+		// log.info "ETL Transformation Process took ${ago}"
+		// log.info "ETL find cache - size ${size}, used ${used}, hit count ratio ${ratio}%"
 
 		debugConsole.info("Exection time: ${ago}")
 		debugConsole.info("Cache size ${size}, used ${used}, hit ratio ${ratio}%")

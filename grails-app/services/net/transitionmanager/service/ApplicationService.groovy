@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.Application
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
@@ -93,7 +94,7 @@ class ApplicationService implements ServiceMethods {
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
-				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: Person.constrainedProperties.staffType.inList,
+				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
 		        personList: personList, currentUserId: securityService.currentPersonId] +
 				commonModel
 
@@ -120,7 +121,7 @@ class ApplicationService implements ServiceMethods {
 			moveEventList: moveEventList,
 			availableRoles: availableRoles,
 			partyGroupList: partyGroupList,
-			staffTypes: Person.constrainedProperties.staffType.inList,
+			staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
 			personList: personList
 		] + commonModel
 	}

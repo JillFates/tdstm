@@ -15,6 +15,8 @@ export class LicenseAdminStates {
 	};
 }
 
+const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
+
 export const LicenseAdminRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: LicenseAdminStates.LICENSE_LIST.url},
 	{
@@ -23,7 +25,8 @@ export const LicenseAdminRoute: Routes = [
 			page: {
 				title: 'LICENSE.ADMIN',
 				instruction: '',
-				menu: ['GLOBAL.ADMIN', 'LICENSE.ADMIN']
+				menu: ['GLOBAL.ADMIN', 'LICENSE.ADMIN'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-license-admin', subMenu: true }
 			},
 			requiresAuth: true,
 		},

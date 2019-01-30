@@ -33,13 +33,6 @@ spring {
 	}
 }
 
-endpoints {
-	enabled = false
-	jmx {
-		enabled = true
-	}
-}
-
 grails {
 	project.groupId = appName
 	enable.native2ascii = true
@@ -200,7 +193,10 @@ environments {
 }
 
 endpoints {
+	enabled = true
+
 	jmx {
+		enabled = true
 		jmx['unique-names'] = true
 	}
 }
@@ -386,7 +382,9 @@ grails {
 				[pattern: '/console/**'         , access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
 				[pattern: '/plugins/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
 				[pattern: '/jasper/**'          , access: 'permitAll'],
-				[pattern: '/oauth/access_token' , access: 'permitAll']
+				[pattern: '/oauth/access_token' , access: 'permitAll'],
+				[pattern: '/health/**'          , access: 'ROLE_ADMIN'],
+				[pattern: '/info/**'            , access: 'ROLE_ADMIN']
 			]
 
 			ldap.active = false
@@ -422,11 +420,6 @@ xssSanitizer.enabled = true
 // JPM 5/2018 : TM-10317 - Tried using both formats but the 2nd would not work correctly
 // grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
 grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
-
-//TODO GRAILS UPGRADE port any service that does you autowiring to use GORM events and eliminate this.
-grails.gorm.default.mapping = {
-        autowire true
-}
 
 grails.resources.pattern = '/**'
 

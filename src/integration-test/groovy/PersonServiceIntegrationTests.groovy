@@ -19,6 +19,9 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils as RSU
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.OneToOne
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -66,7 +69,7 @@ class PersonServiceIntegrationTests extends Specification {
 			assetHelper = new AssetTestHelper()
 			project = projectHelper.createProject()
 
-			adminPerson = personHelper.createStaff(project.owner)
+			adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			assert adminPerson
 
 			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
@@ -100,16 +103,16 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.addToProjectSecured(project, adminPerson)
 
 		when: 'creating a person and user as staff for the project owner with USER role'
-			Person newPerson = personHelper.createPerson(adminPerson, project.owner)
+			Person newPerson = personHelper.createPerson(adminPerson, projectService.getOwner(project))
 			personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the person and the accompaning userlogin are created and associated to the project owner'
 			newPerson
 			newPerson.id
 			newPerson.userLogin
 			newPerson.userLogin.id
-			newPerson.company == project.owner
+			newPerson.company == projectService.getOwner(project)
 		and: 'the person is staff of the client'
-			newPerson.company.id == project.owner.id
+			newPerson.company.id == projectService.getOwner(project).id
 		and: 'the person does not have access to the project'
 			!personService.hasAccessToProject(newPerson, project)
 		and: 'the person is not assigned to the project'
@@ -124,7 +127,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'a new project for the newPerson.company as the owner is created'
 			Project newProject = projectHelper.createProject()
-			newProject.owner = newPerson.company
+			projectService.setOwner(newProject, newPerson.company)
 		then: 'the newPerson should not have access to the project'
 			!personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson is not assigned to the project'
@@ -139,7 +142,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'an unrelatedProject is created with the default project.client as the owner'
 			Project unrelatedProject = projectHelper.createProject()
-			unrelatedProject.owner = project.client
+			projectService.setOwner(unrelatedProject, project.client)
 		then: 'the newPerson should not have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 		and: 'the newPerson is not assigned to the unrelatedProject'
@@ -172,7 +175,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'a new project for the newPerson.company as the owner is created'
 			Project newProject = projectHelper.createProject()
-			newProject.owner = newPerson.company
+			projectService.setOwner(newProject, newPerson.company)
 		then: 'the newPerson should not have access to the project'
 			!personService.hasAccessToProject(newPerson, newProject)
 		and: 'the newPerson is not assigned to the project'
@@ -187,7 +190,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'an unrelatedProject is created with the default project.owner as the owner'
 			Project unrelatedProject = projectHelper.createProject()
-			unrelatedProject.owner = project.owner
+			projectService.setOwner(unrelatedProject, projectService.getOwner(project))
 		then: 'the newPerson should not have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 		and: 'the newPerson is not assigned to the unrelatedProject'
@@ -197,7 +200,7 @@ class PersonServiceIntegrationTests extends Specification {
 	def '04. Test partner staff access to a project'() {
 
 		when: 'a partner and partnerStaff with USER role are created '
-			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 			Person newPerson = personHelper.createPerson(adminPerson, partner)
 			UserLogin user = personHelper.createUserLoginWithRoles(newPerson, ["${SecurityRole.ROLE_USER}"])
 		then: 'the partnerStaff should NOT have access to any projects'
@@ -215,12 +218,12 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 
 		when: 'an unrelatedProject is created where the owner is the same as the default project.owner'
-			Project unrelatedProject = projectHelper.createProject(project.owner)
+			Project unrelatedProject = projectHelper.createProject(projectService.getOwner(project))
 		then: 'the partnerStaff should NOT have access to the unrelatedProject'
 			!personService.hasAccessToProject(newPerson, unrelatedProject)
 
 		when: 'a partnerProject is created where the owner is the the default project.owner and the partner company is a partner'
-			Project partnerProject = projectHelper.createProject(project.owner)
+			Project partnerProject = projectHelper.createProject(projectService.getOwner(project))
 			partyRelationshipService.assignPartnerToProject(partner, partnerProject)
 		then: 'the partnerStaff should NOT have access to the partnerProject'
 			!personService.hasAccessToProject(newPerson, partnerProject)
@@ -308,16 +311,16 @@ class PersonServiceIntegrationTests extends Specification {
 		when:
 			Person person = personHelper.createPerson(adminPerson, project.client, null,
 				[lastName:'Buster', firstName:'Brock'],
-				['SYS_ADMIN', 'DB_ADMIN'], ['editor'])
+				['SYS_ADMIN', 'DB_ADMIN'], ['ROLE_editor'])
 
 			personService.addToTeam(person, 'ROLE_SYS_ADMIN')
 			personService.addToTeam(person, 'ROLE_DB_ADMIN')
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
-			teams.contains('SYS_ADMIN')
-			teams.contains('DB_ADMIN')
-			teams[0] == 'DB_ADMIN'   // Should be sorted alphabetical
+			teams.contains('ROLE_SYS_ADMIN')
+			teams.contains('ROLE_DB_ADMIN')
+			teams[0] == 'ROLE_DB_ADMIN'   // Should be sorted alphabetical
 			// Check individually
 			personService.isAssignedToTeam(person, 'ROLE_SYS_ADMIN')
 			personService.isAssignedToTeam(person, 'ROLE_DB_ADMIN')
@@ -506,7 +509,7 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
-			String extraTeam = 'DB_ADMIN'
+			String extraTeam = 'ROLE_DB_ADMIN'
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
 			personService.addToProjectTeam(project.id.toString(), fromPerson.id.toString(), extraTeam, results)
@@ -608,18 +611,17 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 
 		when: 'getting the Person userLogin property'
-			def domainProp = GormUtil.getDomainProperty(Person, 'userLogin')
+			PersistentProperty domainProp = GormUtil.getDomainProperty(Person, 'userLogin')
 		then: 'it should have an association and the owner of relationship'
-			domainProp.isAssociation()
-			domainProp.isOwningSide()
-			domainProp.isOneToOne()
-			domainProp.isHasOne()
+			domainProp instanceof Association
+			domainProp?.owningSide
+			domainProp instanceof OneToOne
 
 		when: 'getting the UserLogin person property'
 			domainProp = GormUtil.getDomainProperty(UserLogin, 'person')
 		then: 'it should have an Association relationship'
-			domainProp.isAssociation()
-			! domainProp.isOwningSide()
+			domainProp instanceof Association
+			!domainProp?.owningSide
 
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]

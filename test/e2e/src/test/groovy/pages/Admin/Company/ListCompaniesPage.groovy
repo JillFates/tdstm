@@ -53,7 +53,7 @@ class ListCompaniesPage extends Page{
     }
 
     def clickOnFirstElement(){
-        nameField[0].click()
+        waitFor{nameField[0].click()}
     }
 
     def validateMessage(text){

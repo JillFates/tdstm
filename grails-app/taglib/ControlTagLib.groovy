@@ -80,9 +80,9 @@ class ControlTagLib {
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
-		sb.append(StringEscapeUtils.escapeHtml4(fieldSpec.label))
+		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (attrs.containsKey("labelSuffix")){
-            sb.append(StringEscapeUtils.escapeHtml4(attrs.labelSuffix))
+            sb.append(StringEscapeUtils.escapeHtml(attrs.labelSuffix))
         }
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
@@ -551,9 +551,9 @@ class ControlTagLib {
 
 		boolean isBlank = StringUtil.isBlank(value)
 		if (! isBlank) {
-			attrib += StringEscapeUtils.escapeHtml4(value)
+			attrib += StringEscapeUtils.escapeHtml(value)
 		} else if (defValue != null) {
-			attrib += StringEscapeUtils.escapeHtml4(defValue)
+			attrib += StringEscapeUtils.escapeHtml(defValue)
 		}
 		attrib += '"'
 
@@ -576,7 +576,7 @@ class ControlTagLib {
 
 		StringBuilder opt = new StringBuilder('<option')
 		opt.append(' value="')
-		opt.append(StringEscapeUtils.escapeHtml4(option))
+		opt.append(StringEscapeUtils.escapeHtml(option))
 		opt.append('"')
 
 		if (selected) {

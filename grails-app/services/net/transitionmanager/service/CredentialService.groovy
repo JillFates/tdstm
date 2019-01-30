@@ -59,7 +59,7 @@ class CredentialService implements ServiceMethods {
 
         // Create the credential and populate it from the Co
         Credential credentialInstance = new Credential()
-        credentialCO.populateDomain(credentialInstance, false, ['password','id', 'version'])
+        credentialCO.populateDomain(credentialInstance, false, ['password','id', 'version', 'constraintsMap'])
 
         setEncryptedPassword(credentialInstance, credentialCO.password)
 

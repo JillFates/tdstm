@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.codec.binary.Base64
 import spock.lang.Narrative
@@ -38,6 +39,7 @@ class LicenseAdminServiceIntegrationTests extends Specification {
     LicenseAdminService licenseAdminService
     SecurityService     securityService
     GrailsApplication   grailsApplication
+    ProjectService      projectService
 
     private String testEmail = 'sample@sampleEmail.com'
     private String testRequestNote = 'Test request note'
@@ -58,7 +60,7 @@ class LicenseAdminServiceIntegrationTests extends Specification {
 
         // Create and admin user to be able to login
         project = projectTestHelper.createProject()
-        adminPerson = personTestHelper.createStaff(project.owner)
+        adminPerson = personTestHelper.createStaff(projectService.getOwner(project))
         adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
     }
 
@@ -85,12 +87,12 @@ class LicenseAdminServiceIntegrationTests extends Specification {
             securityService.hasPermission(adminUser, Permission.AdminUtilitiesAccess)
 
         when: "a new License Request is generated"
-            licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+            licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
         then: "the License Request is created correctly"
             licenseRequest
             licenseRequest.email == testEmail
             licenseRequest.requestNote == testRequestNote
-            licenseRequest.owner == project.owner
+            licenseRequest.owner == projectService.getOwner(project)
             licenseRequest.environment == License.Environment.DEMO //as License.Environment
             licenseRequest.status == License.Status.PENDING
             licenseRequest.method == License.Method.MAX_SERVERS
@@ -133,7 +135,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             License licenseRequest
             securityService.assumeUserIdentity(adminUser.username, false)
             println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
-            licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+            licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
         expect: 'the admin user is logged in and the License Request is created'
             securityService.isLoggedIn()
             securityService.hasPermission(adminUser, Permission.AdminUtilitiesAccess)
@@ -159,7 +161,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
         setup: 'log in with an admin person and create a new License Request so that'
             securityService.assumeUserIdentity(adminUser.username, false)
             println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
-            License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+            License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
         when: "a resubmit can be re-requested"
             boolean resubmited = licenseAdminService.resubmitRequest(licenseRequest.id)
         then: "the request has been resubmited"
@@ -172,16 +174,16 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
         setup: 'log in with an admin person and create a new License Request so that'
             securityService.assumeUserIdentity(adminUser.username, false)
             println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
-            License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
+            License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.DEMO.toString(), project.id, testRequestNote)
 
         when: 'a manualy submit is invoked'
             // TODO check hash returned. Here we can check how the hash is formed
             // Generates a license hash with some parameters. Then, we have to retrieve those parameters,
             // desencrypt them and check that are the same used to generate the license.
-            def encodedLicense = licenseRequest.toEncodedMessage()
+            def encodedLicense = licenseRequest.toEncodedMessage(grailsApplication)
 
             //Encoding strategy
-            def manualEncodeBody = new String(Base64.encodeBase64(Smaz.compress(licenseRequest.toJsonString())))
+            def manualEncodeBody = new String(Base64.encodeBase64(Smaz.compress(licenseRequest.toJsonString(grailsApplication))))
             def manualEncode = "${License.BEGIN_REQ_TAG}\n${manualEncodeBody}\n${License.END_REQ_TAG}"
 
         then: 'an encoded message is generated'

@@ -3,7 +3,6 @@ package com.tdsops.etl
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import grails.core.GrailsDomainClassProperty
 import org.grails.datastore.mapping.model.PersistentProperty
 
 /**

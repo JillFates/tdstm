@@ -145,7 +145,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			return moveBundleService.createBundleIfNotExist(dtv.importValue, project)
 		}
 		if (!dtv.importValue) {
-			return project.getProjectDefaultBundle()
+			return projectService.getDefaultBundle(project)
 		}
 	}
 

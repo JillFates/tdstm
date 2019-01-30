@@ -5,6 +5,9 @@ import java.security.GeneralSecurityException
 import spock.lang.Specification
 
 class AESCodecTests extends Specification {
+	void setupSpec(){
+		System.setProperty("com.tdsops.tm.skp", "B3c00l");
+	}
 
 	/*
 	 * Tests that after encode and decode a value the result is the same

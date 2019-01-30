@@ -1,20 +1,20 @@
-import grails.test.*
-
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
-
-import grails.test.mixin.TestFor
-import spock.lang.Specification
+import com.tdsops.tm.domain.AssetEntityHelper
+import grails.testing.gorm.DataTest
 import spock.lang.Shared
+import spock.lang.Specification
 
-// @TestFor(AssetEntityHelper)
-class AssetEntityHelperUnitTests extends Specification {
+class AssetEntityHelperUnitTests extends Specification implements  DataTest {
 
 	@Shared Application app = new Application()
 	@Shared Database db = new Database()
 	@Shared AssetEntity asset = new AssetEntity()
+
+	void setupSpec() {
+		mockDomains AssetEntity, Application, Database
+	}
 
 	void 'test getPropertyNameByHashReference'(){
 		expect: 'Iterate over the various test cases to get property names reference by hash tag'

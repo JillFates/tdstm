@@ -3,22 +3,21 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.transaction.NotTransactional
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
+import grails.transaction.NotTransactional
 import net.transitionmanager.bulk.change.BulkChangeDate
+import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.bulk.change.BulkChangeNumber
-import net.transitionmanager.bulk.change.BulkChangeReference
-import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
+import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
 import net.transitionmanager.domain.Project
-
 /**
  * This handles taking in a bulk change json and delegating the bulk change to the appropriate service.
  */
@@ -168,7 +167,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		List<Map> actions = []
 		boolean hasCustomFields = false
 
-		List<String> fields = edits.collect { EditCommand edit ->
+		List<String> fields = edits.findResults { EditCommand edit ->
 			field = edit.fieldName
 			service = getBulkClass(type, assetClass.name(), field, fieldMapping, bulkClassMapping)
 
@@ -178,14 +177,20 @@ class BulkAssetChangeService implements ServiceMethods {
 				value = service.coerceBulkValue(currentProject, edit.value)
 			}
 
+			actions << [service: service, field: field, action: edit.action, value: value]
+
+			// Adding so that collections won't be included in the validation, as they can't be validated this way, and their ids are
+			// validated in the coerceBulkValue.
+			if (value instanceof Collection) {
+				return null
+			}
+
 			typeInstance[field] = value
 			typeInstance.project = currentProject
 
 			if (field.startsWith('custom')) {
 				hasCustomFields = true
 			}
-
-			actions << [service: service, field: field, action: edit.action, value: value]
 
 			return field
 		}
@@ -194,7 +199,8 @@ class BulkAssetChangeService implements ServiceMethods {
 			fields << 'custom1'
 		}
 
-		if (!typeInstance.validate(fields)) {
+		//If there are no fields, then only collection fields are being bulk changed, and their ids are validated by coerceBulkValue
+		if (fields && !typeInstance.validate(fields)) {
 			throw new InvalidParamException(GormUtil.allErrorsString(typeInstance))
 		}
 

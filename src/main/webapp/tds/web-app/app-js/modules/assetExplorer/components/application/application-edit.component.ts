@@ -9,7 +9,7 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
@@ -18,7 +18,6 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -38,7 +37,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			sme2: null,
 			appOwner: null
 		};
-		ButtonActions = TDSActionsButton;
 
 		constructor(
 			@Inject('model') model: any,

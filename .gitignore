@@ -19,13 +19,11 @@ run.sh
 .slcache/
 node_modules/
 specs-dist/
-src/main/webapp/css/managerStyle.css
-src/main/webapp/css/tds-style.css
-src/main/webapp/dist/App.js
-src/main/webapp/dist/Vendors.js
 src/main/webapp/tds/web-app/dist/**
-src/main/webapp/tds/web-app/css/tds-style.css
-src/main/webapp/tds/web-app/css/managerStyle.css
+/grails-app/assets/stylesheets/css/tds-tyle.css
+/grails-app/assets/stylesheets/css/managerStyle.css
+/src/main/webapp/tds/web-app/css/tds-style.css
+/src/main/webapp/tds/web-app/css/managerStyle.css
 test/e2e/build
 # ignore local config file!
 tdstm-config.groovy

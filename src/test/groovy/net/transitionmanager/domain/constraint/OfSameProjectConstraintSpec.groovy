@@ -13,7 +13,7 @@ import org.springframework.validation.Errors
 import org.springframework.validation.MapBindingResult
 import spock.lang.Specification
 
-@Mock([PartyGroup, Project, Provider, Credential])
+@Mock([PartyGroup, Project, Provider, Credential, Timezone])
 class OfSameProjectConstraintSpec extends Specification {
 
 	OfSameProjectConstraint ofSameProjectConstraint
@@ -21,10 +21,7 @@ class OfSameProjectConstraintSpec extends Specification {
 	Credential credential2
 
 	def setup() {
-		ofSameProjectConstraint = new OfSameProjectConstraint()
-		ofSameProjectConstraint.setOwningClass(this.class)
-		ofSameProjectConstraint.propertyName = 'test'
-		ofSameProjectConstraint.setParameter(true)
+		ofSameProjectConstraint = new OfSameProjectConstraint(this.class, 'project', true, null)
 
 		Project project1 = [
 			projectCode   : RandomStringUtils.randomAlphabetic(10),
@@ -36,7 +33,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			workflowCode  : 'STD_PROCESS',
 			timezone      : Timezone.findByCode('GMT'),
 			guid          : StringUtil.generateGuid(),
-			client        : [] as PartyGroup
+			client        : [name: 'something'] as PartyGroup
 		] as Project
 
 		project1.save(failOnError: true)
@@ -52,7 +49,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			workflowCode  : 'STD_PROCESS',
 			timezone      : Timezone.findByCode('GMT'),
 			guid          : StringUtil.generateGuid(),
-			client        : [] as PartyGroup
+			client        : [name: 'something else'] as PartyGroup
 		] as Project
 
 		project2.save(failOnError: true)

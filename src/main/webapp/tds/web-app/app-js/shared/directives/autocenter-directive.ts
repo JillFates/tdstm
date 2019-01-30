@@ -1,11 +1,11 @@
 /**
  * UI AutoCenter Directive, center horizontally the attached component
  */
-import {Directive, AfterViewInit, OnInit, ElementRef} from '@angular/core';
+import {Directive, AfterViewInit, OnInit, ElementRef, OnDestroy} from '@angular/core';
 
 declare var jQuery: any;
 @Directive({ selector: '[tds-autocenter]' })
-export class UIAutoCenterDirective implements AfterViewInit, OnInit {
+export class UIAutoCenterDirective implements AfterViewInit, OnInit, OnDestroy {
 	private modalDialog: any;
 	private modalContent: any;
 	constructor(private el: ElementRef) {
@@ -21,6 +21,19 @@ export class UIAutoCenterDirective implements AfterViewInit, OnInit {
 				'display': 'block',
 				'visibility': 'hidden'
 			});
+		}
+	}
+
+	/**
+	 * After the dialog with the auto-center is destroyed, verify the width is set back to the initial one
+	 * This is being used on replace option on ui-dialog.directive.ts where a dialog holder can be the host for several containers
+	 */
+	ngOnDestroy() {
+		if (this.modalDialog) {
+			jQuery(this.modalDialog)
+				.css({
+					'width': ''
+				});
 		}
 	}
 

@@ -66,7 +66,7 @@ class AssetOptionsService {
 	AssetOptions saveAssetOptions(AssetOptionsCommand command) {
 
 		AssetOptions assetOption = new AssetOptions()
-		command.populateDomain(assetOption)
+		command.populateDomain(assetOption, false, ['constraintsMap'])
 
 		if (!assetOption.save(flush: true)) {
 			log.info("Error saving AssetOption: {}", GormUtil.allErrorsString(assetOption))

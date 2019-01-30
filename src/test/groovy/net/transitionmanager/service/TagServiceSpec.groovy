@@ -2,11 +2,8 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.StringUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
@@ -16,16 +13,17 @@ import net.transitionmanager.domain.Tag
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(TagService)
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
-@Mock([PartyGroup, PartyType, Project, Setting, Tag])
-class TagServiceSpec extends Specification {
+class TagServiceSpec extends Specification implements ServiceUnitTest<TagService>, DataTest{
 
 	@Shared
 	Project project
 
 	@Shared
 	PartyGroup partyGroup
+
+	void setupSpec(){
+		mockDomains PartyGroup, PartyType, Project, Setting, Tag
+	}
 
 	void setup() {
 		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true, failOnError: true)

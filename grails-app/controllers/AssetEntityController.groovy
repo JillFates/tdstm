@@ -29,6 +29,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -1297,7 +1298,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * Render Summary of assigned and unassgined assets.
+	 * Render Summary of assigned and unassigned assets.
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetSummary() {
@@ -1306,86 +1307,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String justPlanningPref = userPreferenceService.getPreference(null, PREF.ASSET_JUST_PLANNING, "false")
 		Boolean justPlanning = BooleanUtils.toBoolean(justPlanningPref)
 
-		int totalAsset = 0
-		int totalPhysical = 0
-		int totalApplication = 0
-		int totalDatabase = 0
-		int totalFiles = 0
-
-		def moveBundles = MoveBundle.withCriteria {
-			eq('project', project)
-			order('name', 'asc')
-		}
-		List assetSummaryList = []
-
-		for (MoveBundle moveBundle in moveBundles) {
-
-			int physicalCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				eq('assetClass', AssetClass.DEVICE)
-				or {
-					isNull('assetType')
-					not {
-						'in'('assetType', AssetType.virtualServerTypes)
-					}
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int assetCount = AssetEntity.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				and {
-					'in' ('assetType', AssetType.serverTypes)
-				}
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int applicationCount = Application.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int databaseCount = Database.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			int filesCount = Files.createCriteria().count() {
-				eq('moveBundle', moveBundle)
-				if (justPlanning) {
-					createAlias('moveBundle', 'mb')
-					eq('mb.useForPlanning', justPlanning)
-				}
-			}
-
-			totalAsset += assetCount
-			totalPhysical += physicalCount
-			totalApplication += applicationCount
-			totalDatabase += databaseCount
-			totalFiles += filesCount
-
-			if (!justPlanning || assetCount || applicationCount || physicalCount || databaseCount || filesCount) {
-				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
-									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
-			}
-
-		}
-
-		moveBundles = null
-		[assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
-		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
+		return assetEntityService.getAssetSummary(project, justPlanning)
 	}
 
 	/**
@@ -2738,7 +2660,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					results = qm.domain.executeQuery(rquery, qparams, [max:max, offset:offset, sort:'assetName' ])
 
 					// Convert the columns into a map that Select2 requires
-					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml4(SEU.escapeJava(r[1])) ]}
+					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJava(r[1])) ]}
 				}
 			} else {
 				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
@@ -2933,10 +2855,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 			graphNodes << [
 				id:it.id,
-				name: SEU.escapeHtml4(SEU.escapeJava(it.assetName)),
+				name: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				type:type, assetClass:it.assetClass.toString(),
 				shape:shape, size:size,
-				title: SEU.escapeHtml4(SEU.escapeJava(it.assetName)),
+				title: SEU.escapeHtml(SEU.escapeJava(it.assetName)),
 				color: it == asset ? 'red' : 'grey',
 				parents:[], children:[], checked:false, siblings:[]
 			]

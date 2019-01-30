@@ -16,6 +16,8 @@ export class LicenseManagerStates {
 	};
 }
 
+const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
+
 export const LicenseManagerRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: LicenseManagerStates.LICENSE_LIST.url},
 	{
@@ -24,7 +26,8 @@ export const LicenseManagerRoute: Routes = [
 			page: {
 				title: 'LICENSE.MANAGER',
 				instruction: '',
-				menu: ['GLOBAL.ADMIN', 'LICENSE.MANAGER']
+				menu: ['GLOBAL.ADMIN', 'LICENSE.MANAGER'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-license-manager', subMenu: true }
 			},
 			requiresAuth: true,
 		},

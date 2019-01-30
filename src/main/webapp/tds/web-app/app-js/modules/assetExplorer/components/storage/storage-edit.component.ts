@@ -7,15 +7,13 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
-
 declare var jQuery: any;
 
 export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
@@ -27,7 +25,6 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		]
 	})
 	class StorageShowComponent extends AssetCommonEdit implements OnInit {
-		ButtonActions = TDSActionsButton;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,

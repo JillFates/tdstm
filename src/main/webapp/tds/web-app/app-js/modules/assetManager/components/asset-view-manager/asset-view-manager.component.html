@@ -1,0 +1,120 @@
+<div class="content body">
+	<section class="content page-asset-explorer-index">
+		<div class="row">
+			<div class="col-md-2 asset-explorer-index-left-menu">
+				<div class="box box-primary">
+                        <div class="box-header with-border">
+						<span class="glyphicon glyphicon-th-list"></span>
+						<h3 class="box-title box-title-folder-list">{{'ASSET_EXPLORER.INDEX.SAVED_VIEWS' | translate}}</h3>
+					</div>
+					<div class="box-body no-padding">
+						<ul class="nav nav-pills nav-stacked">
+							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
+								<a (click)="selectFolder(folder)" href="javascript:void(0)">
+									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
+									<span class="label label-primary pull-right">{{folder.items.length}}</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<!-- /.box-body -->
+				</div>
+				<!-- /. box -->
+			</div>
+			<!-- /.col -->
+			<div class="col-md-10 asset-explorer-index-container">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
+                        <div class="box-tools-actions" *ngIf="isCreateAvailable()" style="vertical-align: super;">
+	                        <tds-button-create
+			                        tooltip="Create View"
+			                        class="btn-primary"
+			                        (click)="onCreateReport()">
+	                        </tds-button-create>
+                        </div>
+						<div class="pull-right">
+							<div class="form-group has-feedback search-filter-text">
+								<input type="text" class="form-control input-sm txt-search" [(ngModel)]="searchText" placeholder="Enter view name to filter">
+								<span aria-hidden="true" class="fa fa-times form-control-feedback" (click)="onClearTextFilter()" style="cursor:pointer;color:#000;pointer-events:all"></span>
+							</div>
+						</div>
+						<!-- /.box-tools -->
+					</div>
+					<!-- /.box-header -->
+					<div class="box-body no-padding">
+						<div class="table-responsive">
+							<table class="table table-hover table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
+
+										<th (click)="changeSort(column.property)" *ngFor="let column of gridColumns" [ngClass]="{'text-center': column?.property === 'isFavorite'}">
+											{{ column.label | translate }}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': column?.sort?.isSorting && column.sort.isAscending ,
+												  'k-i-sort-desc-sm': column?.sort?.isSorting && !column.sort.isAscending}"></span>
+										</th>
+									</tr>
+								</thead>
+								<tbody *ngIf="selectedFolder">
+									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
+										<td class="asset-explorer-td-actions">
+											<div class="tds-action-button-set">
+												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
+												    tooltip="Edit View"
+											        (click)="onEditReport(report)">
+												</tds-button-edit>
+
+												<tds-button-delete [style.visibility]="isDeleteAvailable(report) && !report.isSystem ? 'visible' : 'hidden'"
+												    tooltip="Delete View"
+													(click)="onDeleteReport(report)">
+												</tds-button-delete>
+											</div>
+										</td>
+
+										<td class="text-center tds-action-button-set">
+											<tds-button-custom
+											            [icon]="report.isFavorite ? 'star' : 'star-o' "
+											            [title]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+											            class="text-yellow"
+											            isIconButton="true"
+											            (click)="toggleFavorite(report)">
+											</tds-button-custom>
+										</td>
+										<td>
+											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>
+										</td>
+										<td>
+											{{report.createdBy}}
+										</td>
+										<td>
+											{{report.createdOn}}
+										</td>
+										<td>
+											{{report.updatedOn}}
+										</td>
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared"></span>
+										</td>
+
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isSystem"></span>
+										</td>
+										<!-- <td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.subscribe"></span></td> -->
+									</tr>
+								</tbody>
+							</table>
+							<!-- /.table -->
+						</div>
+						<!-- /.report-grid -->
+					</div>
+					<!-- /.box-body -->
+				</div>
+				<!-- /. box -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<!-- /.row -->
+	</section>
+	<!-- /.content -->
+</div>

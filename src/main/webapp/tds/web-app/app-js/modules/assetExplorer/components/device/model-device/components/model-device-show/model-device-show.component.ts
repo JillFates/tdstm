@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {UIDialogService, UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
 import {DeviceModel} from '../../model/device-model.model';
-import {AssetExplorerService} from '../../../../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
 

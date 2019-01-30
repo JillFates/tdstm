@@ -31,16 +31,17 @@
 		</ng-template>
 
 		<!-- Select All column -->
-		<kendo-grid-column [width]="45" [locked]="true" [filterable]="false">
+		<kendo-grid-column class="grid-selectall-checkbox-column"
+                           [width]="SELECT_ALL_COLUMN_WIDTH"
+                           [locked]="true"
+                           [filterable]="false">
 			<ng-template kendoGridHeaderTemplate>
-				<div class="row">
-					<div class="col-md-12 text-center">
-						<tds-checkbox name="assetsSelector"
-						              [hasThirdState]="true"
-						              (changeState)="bulkCheckboxService.changeState(($event))"
-						              id="assetSelector"
-						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-					</div>
+				<div class="row text-center">
+                    <tds-checkbox name="assetsSelector"
+                                  [hasThirdState]="true"
+                                  (changeState)="bulkCheckboxService.changeState(($event))"
+                                  id="assetSelector"
+                                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 				</div>
 			</ng-template>
 

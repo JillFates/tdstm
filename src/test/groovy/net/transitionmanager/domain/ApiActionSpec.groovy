@@ -6,15 +6,14 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import spock.lang.Specification
 import spock.lang.Title
 
-@Mock([ApiAction])
 @Title('Tests for the ApiAction domain class')
-class ApiActionSpec extends Specification {
+class ApiActionSpec extends Specification implements DataTest{
 
 	private Project project
 	private Provider provider
@@ -22,6 +21,10 @@ class ApiActionSpec extends Specification {
 	private ApiAction action
 	private AssetComment task
 	private AssetEntity asset
+
+	void setupSpec(){
+		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetEntity, AssetComment
+	}
 
 	private static final String paramsJson = """
 		[ { "param": "taskId",

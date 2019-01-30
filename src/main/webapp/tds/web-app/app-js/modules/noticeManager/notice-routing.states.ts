@@ -1,46 +1,48 @@
-// import { Ng2StateDeclaration } from '@uirouter/angular';
-// import { NoticeListComponent } from './components/list/notice-list.component';
-// import { HeaderComponent } from '../../shared/modules/header/header.component';
-// import { NoticeService } from './service/notice.service';
-//
-// export class NoticeStates {
-// 	public static readonly LIST = {
-// 		name: 'tds.noticelist',
-// 		url: '/notice/list'
-// 	};
-// }
-//
-// /**
-//  * This state displays the notice list.
-//  * It also provides a nested ui-view (viewport) for child states to fill in.
-//  * The notice are fetched using a resolve.
-//  */
-// export const noticeListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-// 	name: NoticeStates.LIST.name,
-// 	url: NoticeStates.LIST.url,
-// 	data: {
-// 		page: {
-// 			title: 'NOTICE_MANAGER.NOTICE_ADMINISTRATION',
-// 			instruction: '',
-// 			menu: ['NOTICE_MANAGER.ADMIN', 'NOTICE_MANAGER.NOTICE', 'GLOBAL.LIST']
-// 		},
-// 		requiresAuth: true,
-// 		requiresPermission: 'NoticeView'
-// 	},
-// 	views: {
-// 		'headerView@tds': { component: HeaderComponent },
-// 		'containerView@tds': { component: NoticeListComponent }
-// 	},
-// 	resolve: [
-// 		{
-// 			token: 'notices',
-// 			policy: { async: 'RXWAIT' },
-// 			deps: [NoticeService],
-// 			resolveFn: (service: NoticeService) => service.getNoticesList()
-// 		}
-// 	]
-// };
-//
-// export const NOTICE_STATES = [
-// 	noticeListState
-// ];
+// Angular
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {NoticeResolveService} from './resolve/notice-resolve.service';
+// Services
+import {AuthGuardService} from '../security/services/auth.guard.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
+// Components
+import {NoticeListComponent} from './components/list/notice-list.component';
+
+export class NoticeManagerStates {
+	public static readonly NOTICE_LIST = {
+		url: 'list'
+	};
+}
+
+const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
+
+export const NoticeManagerRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: NoticeManagerStates.NOTICE_LIST.url},
+	{
+		path: NoticeManagerStates.NOTICE_LIST.url,
+		data: {
+			page: {
+				title: 'NOTICE.NOTICE_ADMINISTRATION',
+				instruction: '',
+				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'GLOBAL.LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-notice-manager', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: NoticeListComponent,
+		resolve: {
+			notices: NoticeResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+	}
+];
+
+@NgModule({
+	exports: [RouterModule],
+	imports: [RouterModule.forChild(NoticeManagerRoute)]
+})
+
+export class NoticeRouteModule {
+}

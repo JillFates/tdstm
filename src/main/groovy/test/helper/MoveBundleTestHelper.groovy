@@ -19,7 +19,7 @@ class MoveBundleTestHelper {
         String workflowCode = RandomStringUtils.randomAlphabetic(10)
 
         MoveBundle bundle = new MoveBundle([name:name, project:project, workflowCode: workflowCode, useForPlanning: useForPlanning])
-        bundle.save(failOnError:true)
+        bundle.save(failOnError:true, flush: true)
 
         return bundle
 
@@ -41,7 +41,7 @@ class MoveBundleTestHelper {
             bundle.save(flush: true, failOnError:true)
         } else if (!bundle.moveEvent){
             bundle.moveEvent = event
-            bundle.save(flush: true)
+            bundle.save(ffailOnError:true, flush: true)
         }
         return bundle
     }

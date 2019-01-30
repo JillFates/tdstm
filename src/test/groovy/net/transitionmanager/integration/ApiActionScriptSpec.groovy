@@ -273,15 +273,16 @@ class ApiActionScriptSpec extends Specification {
 			AssetComment assetComment = new AssetComment([status: 'Ready'])
 			AssetFacade asset = new AssetFacade(assetEntity, [:], true)
 
-			def taskServiceMock = mockFor(TaskService)
-			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
-			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
-				assetComment.status = 'Completed'
-				assetComment
-			}
+			def taskServiceMock = [
+				getAutomaticPerson: { -> new Person() },
+				setTaskStatus: { AssetComment task, String status, Person whom ->
+					assetComment.status = 'Completed'
+					assetComment
+				}
+			] as TaskService
 
 			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
-			task.taskService = taskServiceMock.createMock()
+			task.taskService = taskServiceMock
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
@@ -318,15 +319,16 @@ class ApiActionScriptSpec extends Specification {
 			AssetComment assetComment = new AssetComment([status: 'Ready'])
 			AssetFacade asset = new AssetFacade(assetEntity, [:], true)
 
-			def taskServiceMock = mockFor(TaskService)
-			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
-			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
-				assetComment.status = 'Completed'
-				assetComment
-			}
+			def taskServiceMock = [
+				getAutomaticPerson: { -> new Person() },
+				setTaskStatus: { AssetComment task, String status, Person whom ->
+					assetComment.status = 'Completed'
+					assetComment
+				}
+			] as TaskService
 
 			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
-			task.taskService = taskServiceMock.createMock()
+			task.taskService = taskServiceMock
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))

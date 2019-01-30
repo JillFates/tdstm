@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <span aria-hidden="true">×</span>
@@ -12,7 +12,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
+            <table style="border:0;" class="assetEntity tds-asset-view-content-table" data-id="${assetEntity?.id}">
 
                 <tr>
                     <td colspan="2" class="dialog-container">
@@ -205,35 +205,36 @@
     </div>
     <div class="modal-footer form-group-center">
         <div class="asset-commands pull-left">
-            <tds-button
-                    [action]="ButtonActions.AssetEdit"
+            <tds-button-edit
+                    tooltip="Edit Asset"
                     class="btn-primary"
+                    [permissions]="['${Permission.AssetEdit}']"
                     (click)="showAssetEditView()">
-            </tds-button>
+            </tds-button-edit>
 
-            <tds-button
-                    [action]="ButtonActions.AssetClone"
+            <tds-button-clone
                     (click)="onCloneAsset()">
-            </tds-button>
+            </tds-button-clone>
 
-            <tds-button
-                    [action]="ButtonActions.ArchitectureGraphShow"
+            <tds-button-custom
+                    icon="sitemap"
+                    title="Arch Graph"
                     (click)="openGraphUrl()">
-            </tds-button>
+            </tds-button-custom>
         </div>
 
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <tds-button
-                    [action]="ButtonActions.AssetDelete"
+            <tds-button-delete
+                    tooltip="Delete Asset"
                     class="btn-danger"
+                    [permissions]="['${Permission.AssetDelete}']"
                     (click)="onDeleteAsset()">
-            </tds-button>
+            </tds-button-delete>
         </tds:hasPermission>
 
-        <tds-button
-                [action]="ButtonActions.AssetClose"
+        <tds-button-close
                 class="pull-right"
                 (click)="cancelCloseDialog()">
-        </tds-button>
+        </tds-button-close>
     </div>
 </div>

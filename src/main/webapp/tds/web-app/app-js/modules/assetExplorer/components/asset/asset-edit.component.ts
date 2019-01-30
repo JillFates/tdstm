@@ -9,17 +9,16 @@ import {
 	Inject
 } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.provider';
-import { DynamicComponent } from '../../../../shared/components/dynamic.component';
+import {Observable} from 'rxjs';
+import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
+import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
-import { DatabaseEditComponent } from '../database/database-edit.component';
-import { StorageEditComponent } from  '../storage/storage-edit.component';
+import {DatabaseEditComponent} from '../database/database-edit.component';
+import {StorageEditComponent} from '../storage/storage-edit.component';
 import {DeviceEditComponent} from '../device/device-edit.component';
-import { ApplicationEditComponent } from '../application/application-edit.component';
+import {ApplicationEditComponent} from '../application/application-edit.component';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {TagModel} from '../../../assetTags/model/tag.model';
 
 @Component({
 	selector: `tds-asset-all-edit`,

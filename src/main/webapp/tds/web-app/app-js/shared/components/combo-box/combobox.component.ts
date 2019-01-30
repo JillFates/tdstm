@@ -105,7 +105,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @param model Item to add
 	 */
 	addToDataSource(model: any): void {
-		if (model.id && !this.datasource.find((item) => item.id === model.id)) {
+		if (model && model.id && !this.datasource.find((item) => item.id === model.id)) {
 			this.datasource.push(model);
 		}
 	}

@@ -82,7 +82,7 @@ class AddTagsToAssetSpec extends GebReportingSpec {
             def randomSelectedTags = selectRandomTag(2)
             randomSelectedTags.each{finalTagsSelectedList.add(it)}
         and: 'The user clicks on update button'
-            clickOnUpdateButton()
+            clickOnSaveButton()
         then: 'Asset details modal is displayed'
             at AssetDetailsPage
         and: 'All selected tags are displayed'

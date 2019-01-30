@@ -64,8 +64,8 @@ class SecurityInterceptor {
 			// TODO : JPM 12/2016 -- need to figure out the moveEventProjectClientStaff permission check here
 			def moveEventProjectClientStaff = PartyRelationship.find(
 				"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
-				"and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY' " +
-				"and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = $securityService.currentPersonId")
+				"and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'ROLE_COMPANY' " +
+				"and p.roleTypeCodeTo = 'ROLE_STAFF' and p.partyIdTo = $securityService.currentPersonId")
 			if (!moveEventProjectClientStaff) {
 				// if not ADMIN check whether user is associated to the Party that is associate to
 				// the Project.client of the moveEvent / MoveBundle

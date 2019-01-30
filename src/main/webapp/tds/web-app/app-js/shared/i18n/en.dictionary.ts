@@ -191,12 +191,13 @@ export const en_DICTIONARY: Object = {
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
-		'PLURAL_NAME': 'Dependencies'
+		'PLURAL_NAME': 'Dependencies',
+		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
-		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
+		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
 		'PROJECT_LIST': 'Project List',
 		'CREATE_CUSTOM': 'Add Custom Field',
 		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
@@ -260,12 +261,13 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
-	'NOTICE_MANAGER': {
+	'NOTICE': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'VIEW_HTML': 'View HTML',
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

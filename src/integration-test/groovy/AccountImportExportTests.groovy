@@ -42,7 +42,7 @@ class AccountImportExportTests extends Specification {
 		project = projectHelper.createProject()
 
 		// Create a user/person with all role codes ['USER', 'SUPERVISOR', 'EDITOR', 'CLIENT_MGR', 'CLIENT_ADMIN', 'ADMIN']
-		adminPerson = personHelper.createStaff(project.owner)
+		adminPerson = personHelper.createStaff(projectService.getOwner(project))
 		assert adminPerson
 		List allRoleCodes = ['ROLE_USER', 'ROLE_SUPERVISOR', 'ROLE_EDITOR', 'ROLE_CLIENT_MGR', 'ROLE_CLIENT_ADMIN', 'ROLE_ADMIN']
 		projectService.addTeamMember(project, adminPerson, allRoleCodes)
@@ -51,7 +51,7 @@ class AccountImportExportTests extends Specification {
 		assert adminUser.username
 
 		// Create a user1/person1 with role codes ['USER', 'SUPERVISOR', 'EDITOR']
-		person1 = personHelper.createStaff(project.owner)
+		person1 = personHelper.createStaff(projectService.getOwner(project))
 		assert person1
 		List userSupervisorEditorRoleCodes = ['ROLE_USER', 'ROLE_SUPERVISOR', 'ROLE_EDITOR']
 		projectService.addTeamMember(project, person1, userSupervisorEditorRoleCodes)
@@ -60,7 +60,7 @@ class AccountImportExportTests extends Specification {
 		assert user1.username
 
 		// Create a user2/person2 with role codes ['SUPERVISOR', 'CLIENT_ADMIN']
-		person2 = personHelper.createStaff(project.owner)
+		person2 = personHelper.createStaff(projectService.getOwner(project))
 		assert person2
 		List supervisorClientAdminRoleCodes = ['ROLE_SUPERVISOR', 'ROLE_CLIENT_ADMIN']
 		projectService.addTeamMember(project, person2, supervisorClientAdminRoleCodes)
@@ -69,7 +69,7 @@ class AccountImportExportTests extends Specification {
 		assert user2.username
 
 		// Create a user3/person3 with role codes ['SUPERVISOR', 'ADMIN']
-		person3 = personHelper.createStaff(project.owner)
+		person3 = personHelper.createStaff(projectService.getOwner(project))
 		assert person3
 		List supervisorAdminRoleCodes = ['ROLE_SUPERVISOR', 'ROLE_ADMIN']
 		projectService.addTeamMember(project, person3, supervisorAdminRoleCodes)
@@ -78,7 +78,7 @@ class AccountImportExportTests extends Specification {
 		assert user3.username
 
 		// Create a user4/person4 with role codes ['USER', 'EDITOR', 'SUPERVISOR', 'CLIENT_MGR', 'CLIENT_ADMIN']
-		person4 = personHelper.createStaff(project.owner)
+		person4 = personHelper.createStaff(projectService.getOwner(project))
 		assert person4
 		List missingAdminRoleCodes = ['ROLE_USER', 'ROLE_EDITOR', 'ROLE_SUPERVISOR', 'ROLE_CLIENT_MGR', 'ROLE_CLIENT_ADMIN']
 		projectService.addTeamMember(project, person4, missingAdminRoleCodes)

@@ -664,7 +664,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				|from: ${lic.email}
 				|Website Name: ${lic.websitename}
 				|
-				|${lic.toEncodedMessage()}
+				|${lic.toEncodedMessage(grailsApplication)}
 			""".stripMargin().trim()
 
 			buff = ""

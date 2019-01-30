@@ -23,6 +23,7 @@ import {
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-license-manager-list',
@@ -134,8 +135,15 @@ export class LicenseListComponent implements OnInit {
 	 */
 	protected onImportLicenseRequest(): void {
 		this.dialogService.open(RequestImportComponent, []).then((license: any) => {
-			this.reloadData();
-			this.openLicenseViewEdit(license);
+
+			setTimeout(() => {
+				this.openLicenseViewEdit(license);
+			}, 1000);
+
+			if (license) {
+				this.reloadData();
+			}
+
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -178,5 +186,6 @@ export class LicenseListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }

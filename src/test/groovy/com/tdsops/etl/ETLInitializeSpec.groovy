@@ -13,7 +13,6 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -31,7 +30,6 @@ import spock.lang.Shared
  *     <li><b>initialize</b></li>
  * </ul>
  */
-@TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLInitializeSpec extends ETLBaseSpec {
 
@@ -114,23 +112,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -160,23 +158,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -206,23 +204,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -252,23 +250,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == 'Apple'
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 							init == 'Apple'
@@ -297,23 +295,23 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(data[0]) {
+					assertWith(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == null
 							originalValue == null
 							init == 'Microsoft'
 						}
 					}
 
-					with(data[1]) {
+					assertWith(data[1]) {
 						rowNum == 2
-						with(fields.appVendor) {
+						assertWith(fields.appVendor) {
 							value == null
 							originalValue == null
 							init == 'Mozilla'
@@ -342,9 +340,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -374,9 +372,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -406,9 +404,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -439,9 +437,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]
@@ -472,9 +470,9 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.finalResult()) {
+			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
-				with(domains[0]) {
+				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					data.collect { it.rowNum } == [1, 2]

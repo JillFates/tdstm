@@ -4,6 +4,9 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.JsonUtil
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.License
@@ -36,7 +39,11 @@ import test.helper.SettingTestHelper
 import test.helper.TagTestHelper
 import org.apache.commons.lang3.RandomStringUtils
 
+@Integration
+@Rollback
 class E2EProjectSpec extends Specification {
+	GrailsApplication grailsApplication
+
 	// Set transactional false to persist at database when spec finishes
 	static transactional = false
 	static final String TARGET_HOSTNAME = 'TDS_TARGET_HOSTNAME'
@@ -49,18 +56,18 @@ class E2EProjectSpec extends Specification {
 	LicenseManagerService licenseManagerService
 	LicensedClient licensedClient
 	private static List<String> browsersInParallel = ["chrome", "firefox"]
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private MoveEventTestHelper eventHelper = new MoveEventTestHelper()
-	private MoveBundleTestHelper bundleHelper = new MoveBundleTestHelper()
-	private ProviderTestHelper providerHelper = new ProviderTestHelper()
-	private DataScriptTestHelper etlScriptHelper = new DataScriptTestHelper()
-	private DataviewTestHelper dataviewHelper = new DataviewTestHelper()
-	private TagTestHelper tagHelper = new TagTestHelper()
-	private ApplicationTestHelper appHelper = new ApplicationTestHelper()
-	private RecipeTestHelper recipeHelper = new RecipeTestHelper()
-	private AssetCommentTestHelper assetCommentsHelper = new AssetCommentTestHelper()
-	private SettingTestHelper settingHelper = new SettingTestHelper()
+	private ProjectTestHelper projectHelper
+	private PersonTestHelper personHelper
+	private MoveEventTestHelper eventHelper
+	private MoveBundleTestHelper bundleHelper
+	private ProviderTestHelper providerHelper
+	private DataScriptTestHelper etlScriptHelper
+	private DataviewTestHelper dataviewHelper
+	private TagTestHelper tagHelper
+	private ApplicationTestHelper appHelper
+	private RecipeTestHelper recipeHelper
+	private AssetCommentTestHelper assetCommentsHelper
+	private SettingTestHelper settingHelper
 	private Project project
 	private List<Project> projectsToBeDeleted = []
 	private UserLogin userLogin1
@@ -101,6 +108,19 @@ class E2EProjectSpec extends Specification {
 	private Date now = new Date()
 
 	void setup(){
+		projectHelper = new ProjectTestHelper()
+		personHelper = new PersonTestHelper()
+		eventHelper = new MoveEventTestHelper()
+		bundleHelper = new MoveBundleTestHelper()
+		providerHelper = new ProviderTestHelper()
+		etlScriptHelper = new DataScriptTestHelper()
+		dataviewHelper = new DataviewTestHelper()
+		tagHelper = new TagTestHelper()
+		appHelper = new ApplicationTestHelper()
+		recipeHelper = new RecipeTestHelper()
+		assetCommentsHelper = new AssetCommentTestHelper()
+		settingHelper = new SettingTestHelper()
+
 		originalData = getJsonObjectFromFile()
 		project = projectHelper.createProject(originalData.e2eProjectData)
 		licenseProject(project)
@@ -122,14 +142,14 @@ class E2EProjectSpec extends Specification {
 			// create company and associate to current project
 			PartyGroup company = projectHelper.createCompany( "${formatToRandomValue(dataFile.companyToBeEdited.name, browser, false)}")
 			companiesToBeDeleted.add(company)
-			partyRelationshipService.assignClientToCompany(company, project.owner)
+			partyRelationshipService.assignClientToCompany(company, projectService.getOwner(project))
 			// create company and associate to current project
 			company = projectHelper.createCompany("${formatToRandomValue(dataFile.companyToBeDeleted.name, browser, false)}")
 			companiesToBeEdited.add(company)
-			partyRelationshipService.assignClientToCompany(company, project.owner)
+			partyRelationshipService.assignClientToCompany(company, projectService.getOwner(project))
 
 			Map sanitizedStaff = sanitizeStaffUserData(browser, dataFile.staffFiltering)
-			staffsFiltering.add(personHelper.createStaff(project.owner, sanitizedStaff))
+			staffsFiltering.add(personHelper.createStaff(projectService.getOwner(project), sanitizedStaff))
 			usersFiltering.add(personHelper.createPersonWithLoginAndRoles(sanitizeStaffUserData(browser, dataFile.userFiltering), project))
 			createApplications(dataFile.applications, project, buildoutBundle)
 			applicationsToBeEdited.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeEdited, browser), project, buildoutBundle))
@@ -171,7 +191,7 @@ class E2EProjectSpec extends Specification {
 	void "Setup E2E Project data"() {
 		expect:
 			Project.findWhere([projectCode: originalData.e2eProjectData.projectCode]) != null
-			License.findWhere([owner: project.owner, status: License.Status.ACTIVE]) != null
+			License.findWhere([owner: projectService.getOwner(project), status: License.Status.ACTIVE]) != null
 			UserLogin.findWhere([username: originalData.userData1.email]) != null
 			UserLogin.findWhere([username: originalData.userData2.email]) != null
 			UserLogin.findWhere([username: originalData.userData3.email]) != null
@@ -238,11 +258,11 @@ class E2EProjectSpec extends Specification {
 	 * @param: project
 	 */
 	private void licenseProject(Project project) {
-		def currentLicense = License.findWhere([owner: project.owner])
+		def currentLicense = License.findWhere([owner: projectService.getOwner(project)])
 		if (!currentLicense){
 			String testEmail = 'sample@sampleEmail.com'
 			String testRequestNote = 'Test request note'
-			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
+			License licenseRequest = licenseAdminService.generateRequest(null, projectService.getOwner(project), testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
 
 			String targetHostName = System.getenv(TARGET_HOSTNAME)
 			if (targetHostName){
@@ -254,7 +274,7 @@ class E2EProjectSpec extends Specification {
 				licenseRequest.websitename = targetWebsiteName
 			}
 
-			String encodedMessage  = licenseRequest.toEncodedMessage()
+			String encodedMessage  = licenseRequest.toEncodedMessage(grailsApplication)
 			licensedClient = licenseManagerService.loadRequest(encodedMessage)
 			licensedClient.type = License.Type.MULTI_PROJECT
 			licensedClient.max  = 100
@@ -277,7 +297,7 @@ class E2EProjectSpec extends Specification {
 	 * @return: JSON object
 	 */
 	private JSONObject getJsonObjectFromFile(){
-		String jsonText = this.getClass().getResource("E2EProjectData.json").text
+		String jsonText = this.getClass().getResource("/E2EProjectData.json").text
 		return new JSONObject(jsonText)
 	}
 

@@ -1,0 +1,198 @@
+<div class="content body">
+	<section class="page-asset-explorer-config field-setting-component">
+		<div>
+			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
+				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+						[disabled]="!isSaveAvailable() || !isValid()"
+						class="btn"
+						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+						(click)="onSave()">
+					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
+				</button>
+
+				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner && !model.isSystem"
+						[disabled]="!isSaveAsAvailable() || !isValid()"
+						class="btn"
+						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 		(click)="onSaveAs()">
+							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
+				</button>
+
+				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li>
+						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
+					</li>
+					<li>
+						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
+					</li>
+				</ul>
+			</div>
+			<ng-template #saveButton>
+				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+						[disabled]="!isSaveAvailable() || !isValid()"
+				 		class="btn"
+						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+						(click)="onSave()">
+							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
+				</button>
+				<button type="button" id="btnSaveAs" *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+				 		[disabled]="!isSaveAsAvailable() || !isValid()"
+						class="btn"
+						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				 		(click)="onSaveAs()">
+							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
+				</button>
+			</ng-template>
+			<button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()">
+				<i class="fa fa-fw fa-times"></i> {{ 'GLOBAL.CANCEL' | translate }}</button>
+			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
+				<i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+			</span>
+			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()" (click)="onExport()">
+				<i class="fa fa-fw fa-download"></i> Export</button>
+			<tds-asset-view-selector #select="tdsAssetViewSelector"></tds-asset-view-selector>
+			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:5px 10px;float:right;">
+				<i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed"></i>
+			</span>
+		</div>
+		<br />
+		<div class="nav-tabs-custom" *ngIf="!collapsed">
+			<!-- Tabs within a box -->
+			<ul class="nav nav-tabs">
+				<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
+					<a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab">Asset Classes</a>
+				</li>
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':isCurrentTab(1)}">
+					<a *ngIf="!isAssetSelected();else fieldsTabLink">Fields</a>
+					<ng-template #fieldsTabLink>
+						<a href="#tab_2" data-toggle="tab" (click)="setCurrentTab(1)" #link>Fields</a>
+					</ng-template>
+				</li>
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected() || !isColumnSelected(),'active':isCurrentTab(2)}">
+					<a *ngIf="!isAssetSelected() || !isColumnSelected();else columnsTabLink">Columns</a>
+					<ng-template #columnsTabLink>
+						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab" #link>Columns</a>
+					</ng-template>
+				</li>
+				<li class="pull-right" role="presentation">
+					<button class="btn btn-default" (click)="onToggleConfig()">
+						<i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i>
+					</button>
+				</li>
+				<li class="pull-right" role="presentation">
+					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}" name="btnPreview"
+					 (click)="previewButtonClicked = true;onPreview()">Preview</button>
+				</li>
+				<!-- <li class="pull-right" role="presentation">
+					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
+				</li> -->
+			</ul>
+			<div class="tab-content" [hidden]="collapsed">
+				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
+					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label>
+					<br>
+					<div class="checkbox" *ngFor="let asset of assetClasses">
+						<label>
+							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]">
+							<tds-ui-svg-icon [name]="getAssetIcon(asset)" [height]="'16'" [width]="'16'"></tds-ui-svg-icon> {{ 'ASSETS.'+asset | translate }}
+						</label>
+					</div>
+					<button class="btn" [disabled]="!isAssetSelected()" (click)="setCurrentTab(1)" onclick="$('a[href=#tab_2]').trigger('click')"
+					 [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}">
+						<i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
+				</div>
+				<div class="tab-pane" id="tab_2" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}">
+					<div class="row">
+						<div class="col-md-4 col-sm-12">
+							<div class="col-sm-9">
+								<div class="form-group has-feedback" style="margin-bottom:0px;">
+									<input type="text" class="form-control" name="search" placeholder="Filter on field name" [(ngModel)]="filterModel.search"
+									 (keyup.enter)="applyFilters()">
+									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
+									 aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<button type="button" class="btn btn-default" id="btnFilter" (click)="applyFilters()">
+									<i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
+							</div>
+						</div>
+						<div class="col-md-8 col-sm-12">
+							<div class="col-md-3 col-sm-6">
+								<div class="form-group">
+									<select name="selected" (change)="applyFilters()" id="selected" class="form-control pd-top-5" [(ngModel)]="filterModel.selected">
+										<option value="all">All Fields</option>
+										<option value="true">Selected</option>
+										<option value="false">Unselected</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-3 col-sm-6">
+								<div class="form-group">
+									<select name="show" (change)="applyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
+										<option value="all">All Classes</option>
+										<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset | translate }} Fields</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to display</label>
+					<div class="row" style="overflow:auto;margin:0 5px;">
+						<div style="position:relative;float:left;height:375px;">
+							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
+								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | uppercase | translate}} Fields</label>
+								<ng-template #defaultField>
+									<label style="width:100%;padding-left:25px;" class="{{field.imp}} text-delimited" title="{{field.label}}">
+										<input type="checkbox" (change)="onFieldSelection(field)" name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+								</ng-template>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(2)" [ngClass]="{'active':isCurrentTab(2)}" id="tab_3">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
+								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="draggableColumns" [navigatable]="false" [animation]="false"
+								 class="row" style="margin-right:0px;" itemClass="item"  (dragEnd)="onDragEnd()">
+									<ng-template let-item="item" let-index="index">
+										<div class="row" style="height: 35px;">
+											<div class="drag-label" style="height: 35px;">
+												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
+												{{item.label}}
+												<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column" [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}" (click)="freezeColumn(item)"></i>
+											</div>
+										</div>
+									</ng-template>
+								</kendo-sortable>
+								<label class="invalid-columns-selection" *ngIf="!hasAtLeastOneNonLockedColumnOrEmpty()">Must have at least one not locked column</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<asset-explorer-view-grid [data]="data"
+                                  (modelChange)="onPreview()"
+                                  (justPlanningChange)="onJustPlanningChange($event)"
+                                  [gridState]="gridState"
+                                  (gridStateChange)="onGridStateChange($event)"
+		                          [fields]="allFields"
+                                  [edit]="true"
+                                  [model]="model.schema"
+		                          [viewId]="model.id"
+                                  [metadata]="metadata">
+        </asset-explorer-view-grid>
+		<!-- /.box-body -->
+		<!-- /.box -->
+		<!-- <a href="javascript:void(0) " (click)="onBackToStart() "><i class="fa fa-chevron-left "></i> Back to View List</a> -->
+	</section>
+</div>

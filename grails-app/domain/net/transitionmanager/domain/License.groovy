@@ -56,9 +56,6 @@ class License {
 		bannerMessage	nullable:true
 	}
 
-	GrailsApplication grailsApplication
-	static transients = ['grailsApplication']
-
 	boolean isActive(){
 		return (hash)? true : false
 	}
@@ -77,7 +74,7 @@ class License {
 	 TODO: Add comments, change all calls to this to toMap()
 	Return a Map of the properties
 	*/
-	Map toJsonMap() {
+	Map toJsonMap(GrailsApplication grailsApplication) {
 		PartyGroup client = getClient()
 		Map dProject = [
 		        id:"",
@@ -125,12 +122,12 @@ class License {
 		return data
 	}
 
-	String toJsonString(){
-		new JsonBuilder( toJsonMap() ).toString()
+	String toJsonString(GrailsApplication grailsApplication){
+		new JsonBuilder( toJsonMap(grailsApplication) ).toString()
 	}
 
-	String toEncodedMessage(){
-		String body = new String(Base64.encodeBase64(Smaz.compress(toJsonString())))
+	String toEncodedMessage(GrailsApplication grailsApplication){
+		String body = new String(Base64.encodeBase64(Smaz.compress(toJsonString(grailsApplication))))
 		return "${BEGIN_REQ_TAG}\n${body}\n${END_REQ_TAG}"
 	}
 

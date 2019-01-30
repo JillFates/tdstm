@@ -5,14 +5,9 @@ import com.tdsops.commons.lang.exception.PersistenceException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.ModelService
-import net.transitionmanager.service.SecurityService
 
 @Slf4j()
 class Model {
-
-	SecurityService securityService
-	ModelService    modelService
 
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
 	String modelName
@@ -104,7 +99,7 @@ class Model {
 	}
 
 	static transients = ['aliases', 'assetsCount', 'manufacturerName',
-	                     'noOfConnectors', 'securityService', 'modelService', 'source', 'valid']
+	                     'noOfConnectors', 'source', 'valid']
 
 	static mapping = {
 		autoTimestamp false
@@ -130,16 +125,6 @@ class Model {
 		lastModified = TimeUtil.nowGMT()
 
 		initializeBladeProperties()
-
-		if (!createdBy) {
-			Person person = securityService.userLoginPerson
-			if (person) {
-				createdBy = person
-			}
-			else {
-				log.info('No user found to associate to the model.')
-			}
-		}
 
 		prependHttp()
 	}
@@ -205,18 +190,6 @@ class Model {
 	 */
 	boolean isValid() {
 		modelStatus == 'valid'
-	}
-
-	/**
-	 * Get a ModelAlias object by name and create one (optionally) if it doesn't exist
-	 * @param name  name of the model alias
-	 * @param createIfNotFound  optional flag to indicating if record should be created (default false)
-	 *
-	 * @deprecated use {@link net.transitionmanager.service.ModelService#findOrCreateAliasByName(net.transitionmanager.domain.Model, java.lang.String, boolean) ModelService} instead.
-	 */
-	@Deprecated
-	ModelAlias findOrCreateAliasByName(String name, boolean createIfNotFound = false) {
-		return modelService.findOrCreateAliasByName(this, name, createIfNotFound)
 	}
 
 	/**

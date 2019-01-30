@@ -2,6 +2,7 @@ import asset.pipeline.grails.AssetProcessorService
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import org.grails.web.mapping.DefaultLinkGenerator
@@ -10,7 +11,7 @@ import test.AbstractUnitSpec
 import java.text.SimpleDateFormat
 
 @TestFor(CustomTagLib)
-@Mock([UserLogin, UserPreference])
+@Mock([UserLogin, UserPreference, Person])
 class CustomTagLibTests extends AbstractUnitSpec {
 
 	// the <tds:convertDate> taglet HTML mockup
@@ -48,9 +49,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/21/2012'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/21/2012'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/21/2012'
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/20/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/20/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/20/2012'
 	}
 
 	void 'Test tds:convertDate tag with LITTLE_ENDIAN'() {
@@ -65,9 +66,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE  | '21/08/2012'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '21/08/2012'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '21/08/2012'
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '20/08/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '20/08/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '20/08/2012'
 	}
 
 	void 'Test tds:convertDateTime tag with MIDDLE_ENDIAN'() {

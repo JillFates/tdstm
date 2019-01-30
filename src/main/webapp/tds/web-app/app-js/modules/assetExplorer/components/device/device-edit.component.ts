@@ -10,7 +10,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
@@ -19,7 +19,6 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 
 declare var jQuery: any;
 
@@ -32,7 +31,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DeviceEditComponent extends DeviceCommonComponent implements OnInit {
-		ButtonActions = TDSActionsButton;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,

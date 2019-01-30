@@ -11,7 +11,6 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
@@ -32,8 +31,8 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import grails.transaction.NotTransactional
 import grails.gorm.transactions.Transactional
+import grails.transaction.NotTransactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -92,6 +91,7 @@ class TaskService implements ServiceMethods {
 	Scheduler quartzScheduler
 	def sequenceService
 	CustomDomainService customDomainService
+	MoveEventService moveEventService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -1227,77 +1227,6 @@ class TaskService implements ServiceMethods {
 	 }
 
 	 /**
-	  * Used to set the state of a task (aka AssetComment) to completed and update any dependencies to the ready state appropriately. This will
-	  * complete predecessor tasks if completePredecessors = true.
-	  * @param task
-	  * @return
-	  */
-	 def completeTask(taskId, userId, boolean completePredecessors=false) {
-		 log.info "completeTask: taskId:$taskId, userId:$userId"
-		 def task = AssetComment.get(taskId)
-		 def tasksToComplete = [task]
-
-		 List<AssetComment> predecessors = getIncompletePredecessors(task)
-
-		 // If we're not going to automatically complete predecessors (Supervisor role only), the we can't do anything
-		 // if there are any incomplete predecessors.
-		 if (!completePredecessors && predecessors) {
-			throw new TaskCompletionException("Unable to complete task [$task.taskNumber] due to incomplete predecessor task # (${predecessors[0].taskNumber})")
-		 }
-
-		 // If automatically completing predecessors, check first to see if there are any on hold and stop
-		 if (completePredecessors) {
-			 // TODO : Runbook - if/when we want to complete all predecessors, perhaps we should do it recursive since this logic only goes one level I believe.
-			 if (predecessors) {
-				 // Scan the list to see if any of the predecessor tasks are on hold because we don't want to do anything if that is the case
-				 boolean hasHold = predecessors.any { it.status == ACS.HOLD }
-				 if (hasHold) {
-					 throw new TaskCompletionException("Unable to complete task [$task.taskNumber] due to predecessor task # (${predecessors[0].taskNumber}) being on Hold")
-				 }
-			 }
-
-			 tasksToComplete += predecessors
-		 }
-
-		// Complete the task(s)
-		tasksToComplete.each { activeTask ->
-			// activeTask.dateResolved = TimeUtil.nowGMT()
-			// activeTask.resolvedBy = userLogin.person
-			setTaskStatus(activeTask, ACS.COMPLETED)
-			if (!save(activeTask)) {
-				throw new TaskCompletionException("Unable to complete task # $activeTask.taskNumber due to " +
-					GormUtil.allErrorsString(activeTask))
-			}
-		}
-
-		//
-		// Now Mark any successors as Ready if all predecessors are Completed
-		//
-		def succDependencies = TaskDependency.findByPredecessor(task)
-		succDependencies?.each { succDepend ->
-			def successorTask = succDepend.assetComment
-
-			// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
-			if ([ACS.PLANNED, ACS.PENDING].contains(successorTask.status)) {
-				// Find all predecessors for the successor, other than the current task, and make sure they are completed
-				List<TaskDependency> predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(successorTask, task)
-				def makeReady = true
-				for (TaskDependency predDependency in predDependencies) {
-					def predTask = predDependency.assetEntity  // TODO BB
-					if (predTask.status != ACS.COMPLETED) makeReady = false
-				}
-				if (makeReady) {
-					successorTask.status = ACS.READY
-					if (!save(successorTask)) {
-						throw new TaskCompletionException("Unable to release task # $successorTask.taskNumber due to " +
-							 GormUtil.allErrorsString(successorTask))
-					 }
-				}
-			}
-		}
-	 } // def completeTask()
-
-	/**
 	 * Used by the several actions to get the roles that is starts with of 'staff'
 	 * @param blank
 	 * @return list of roles that is only starts with 'staff'
@@ -1323,7 +1252,7 @@ class TaskService implements ServiceMethods {
 	 */
 	def genTableHtmlForDependencies(depTasks, task, String dependency){
 		def html = new StringBuilder("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-		def optionList = AssetComment.constrainedProperties.category.inList.toList()
+		def optionList = GormUtil.getConstrainedProperties(AssetComment).category.inList.toList()
 		def i=1
 		depTasks.each { depTask ->
 			def succecessor = dependency == 'predecessor' ? depTask.predecessor : depTask.assetComment
@@ -1903,7 +1832,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Determine the start/completion times for the event
 		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
-		def eventTimes = event ? event.getEventTimes() : [start:null, completion:null]
+		def eventTimes = event ? moveEventService.getEventTimes(event.id) : [start:null, completion:null]
 
 		// TODO : Need to change out the categories to support all ???
 		def categories = GormUtil.asQuoteCommaDelimitedString(ACC.moveDayCategories)

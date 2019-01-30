@@ -10,7 +10,7 @@ import { ManufacturerShowComponent } from './manufacturer/components/manufacture
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
@@ -18,7 +18,6 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
-import {TDSActionsButton} from '../../../../shared/components/button/model/action-button.model';
 import {WindowService} from '../../../../shared/services/window.service';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
@@ -27,7 +26,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		template: template
 	})
 	class DeviceShowComponent extends AssetCommonShow {
-		protected ButtonActions = TDSActionsButton;
 		protected manufacturerName: string;
 
 		constructor(

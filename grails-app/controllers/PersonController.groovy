@@ -2,31 +2,29 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.web.mapping.LinkGenerator
 import net.transitionmanager.command.PersonCO
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
@@ -34,10 +32,8 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PersonController implements ControllerMethods {
 
@@ -53,6 +49,7 @@ class PersonController implements ControllerMethods {
 	UserPreferenceService    userPreferenceService
 	UserService              userService
 	LinkGenerator            grailsLinkGenerator
+	MoveEventService         moveEventService
 
 	/**
 	 * Generates a list view of persons related to company
@@ -572,7 +569,7 @@ class PersonController implements ControllerMethods {
 		StringBuilder companies = new StringBuilder(project.clientId.toString())
 		if (onlyClientStaff == '0') {
 			// Add the owner company and any partner companies associated with the project
-			companies.append(', ').append(project.owner.id)
+			companies.append(', ').append(projectService.getOwner(project).id)
 			def projectPartners = projectService.getPartners(project)
 
 			// log.debug "loadFilteredStaff() phase 5b took ${TimeUtil.elapsed(start)} Get Partners"
@@ -632,7 +629,7 @@ class PersonController implements ControllerMethods {
 							AND pr2.role_type_code_from_id = 'PROJECT'
 						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
 							AND mes.role_id = pr.role_type_code_to_id
-					WHERE pr.role_type_code_from_id in ('COMPANY')
+					WHERE pr.role_type_code_from_id in ('ROLE_COMPANY')
 						AND pr.party_relationship_type_id in ('STAFF')
 						AND pr.party_id_from_id IN ($companies)
 						AND p.active = 'Y'
@@ -713,7 +710,7 @@ class PersonController implements ControllerMethods {
 			for (MoveEvent moveEvent in moveEvents) {
 				Collection<MoveBundle> moveBundles = moveEvent?.moveBundles ?: []
 				List<Date> startDates = moveBundles*.startTime.sort()
-				def eventTimes = moveEvent.eventTimes
+				def eventTimes = moveEventService.getEventTimes(moveEvent.id)
 				startDates?.removeAll([null])
 				if (startDates) {
 					if (startDates[0]) {

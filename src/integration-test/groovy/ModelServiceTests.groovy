@@ -8,14 +8,17 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ModelService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
 
 @Integration
 @Rollback
 class ModelServiceTests extends Specification{
-	
+
 	ModelService modelService
+	ProjectService projectService
+
 	private Project project
 	private Person adminPerson
 	UserLogin adminUser
@@ -27,7 +30,7 @@ class ModelServiceTests extends Specification{
 		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 
-		adminPerson = personHelper.createStaff(project.owner)
+		adminPerson = personHelper.createStaff(projectService.getOwner(project))
 		assert adminPerson
 
 		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])

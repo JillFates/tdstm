@@ -83,7 +83,7 @@ class CredentialValidationExpression {
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.closuresAllowed = false             // disallow closure creation
 		secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-		secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+		secureASTCustomizer.importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']  // Empty withe list means forbid imports
 		secureASTCustomizer.starImportsWhitelist = []
 
 		ImportCustomizer customizer = new ImportCustomizer()
