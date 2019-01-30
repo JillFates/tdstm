@@ -251,7 +251,7 @@ class UserPreferenceService {
      * @return Success Structure with preferences property containing List<Map>
      */
 	@GrailsCompileStatic
-	@Transactional(readOnly=true)
+	@Transactional()
     List<Map> preferenceListForEdit(UserLogin userLogin) {
 		List<Map> preferences = []
 		List brokenPreferences = []
