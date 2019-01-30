@@ -528,7 +528,7 @@ class GormUtil{
 	 * @param propertyName
 	 * @return
 	 */
-	//@Memoized
+	@Memoized
 	static boolean isDomainProperty(Class domainClass, String propertyName) {
 		PersistentEntity persistentEntity = mappingContext().getPersistentEntity(domainClass.name)
 

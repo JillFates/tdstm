@@ -26,6 +26,9 @@ apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
 
+integrationTest.reports.html.destination = file("$buildDir/test-integration/test-reports/html")
+test.reports.html.destination = file("$buildDir/test-unit/test-reports/html")
+
 repositories {
 	mavenLocal()
 	// TDS Private Repository
