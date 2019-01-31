@@ -2,6 +2,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.CommentNote
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
@@ -181,10 +182,20 @@ class WsTaskController implements ControllerMethods {
 				log.error "addNote: $errorMsg"
 				renderErrorJson([errorMsg])
 			}
-			List<CommentNote> notes = CommentNote.where {
-				assetComment == assetComment
-			}.list()
 
+			// Get a list of the Notes associated with the task/comment
+			def notes = []
+			def notesList = CommentNote.createCriteria().list(max: 50) {
+				eq('assetComment', assetComment)
+				order('dateCreated', 'desc')
+			}
+			for (note in notesList) {
+				notes << [
+						TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
+						note.createdBy?.toString(),
+						note.note,
+						note.createdBy?.id]
+			}
 			renderSuccessJson(notes)
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
