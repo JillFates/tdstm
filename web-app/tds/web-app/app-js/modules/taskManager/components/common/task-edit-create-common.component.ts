@@ -331,8 +331,9 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * Save the changes on the task
 	 */
 	protected onSave(): void {
-		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdateTask())
+		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((result) => this.close(result));
+
 	}
 
 	/**

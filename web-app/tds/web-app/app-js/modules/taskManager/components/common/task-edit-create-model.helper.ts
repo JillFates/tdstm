@@ -262,7 +262,7 @@ export class TaskEditCreateModelHelper {
 	/**
 	 * Get and clean the object that will send to the service update the task
 	 */
-	public getPayloadForUpdateTask(): any {
+	public getPayloadForUpdate(): any {
 		const [Yes, No] = YesNoList;
 		const {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
