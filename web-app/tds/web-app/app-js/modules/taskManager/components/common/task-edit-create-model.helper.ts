@@ -692,8 +692,10 @@ export class TaskEditCreateModelHelper {
 	/**
 	 * Add a note
 	 */
-	protected createNote(note: string): void {
+	protected createNote(id: string, note: string): void {
 		alert('Creating the note');
+		this.taskManagerService.addNote(id, note)
+			.subscribe((result) => console.log('The result is:', result));
 	}
 
 	/**
@@ -712,7 +714,7 @@ export class TaskEditCreateModelHelper {
 			{provide: SingleNoteModel, useValue: singleNoteModel}
 		], false, false)
 			.then(addedNote => {
-				this.createNote(addedNote);
+				this.createNote(this.model.id, addedNote);
 			}).catch(result => {
 			console.log(result);
 		});

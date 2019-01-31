@@ -254,7 +254,7 @@ export class TaskService {
 
 	/**
 	 * Update a task
-	 * @param model
+	 * @param payload
 	 * @returns {Observable<any>}
 	 */
 	updateTask(payload: any): Observable<any> {
@@ -263,6 +263,20 @@ export class TaskService {
 			.map(res =>  res && res.json())
 			.catch((error: any) => error);
 	}
+
+	/**
+	 * Add note
+	 * @param {string} id task
+	 * @param {string} note
+	 * @returns {Observable<any>}
+	 */
+	addNote(id: string, note: string): Observable<any> {
+		const url = `${this.baseURL}/ws/task/${id}/addNote`;
+		return this.http.post(url, JSON.stringify({note}))
+			.map(res =>  res && res.json())
+			.catch((error: any) => error);
+	}
+
 
 	/**
 	 * Create a task
