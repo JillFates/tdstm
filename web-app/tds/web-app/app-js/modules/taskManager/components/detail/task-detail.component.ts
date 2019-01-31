@@ -24,6 +24,7 @@ import {DeviceModel} from '../../../assetExplorer/components/device/model-device
 import {ModelDeviceShowComponent} from '../../../assetExplorer/components/device/model-device/components/model-device-show/model-device-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {TaskCreateComponent} from '../create/task-create.component';
 
 @Component({
 	selector: `task-detail`,
@@ -311,4 +312,55 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			});
 		}
 	}
+
+	/**
+	 * Open the Task Create Dialog
+	 * on Success event adding a task it will reload the model
+	 */
+	public onAddTaskDependency(): void {
+		let taskCreateModel: TaskDetailModel = {
+			id: this.model.asset.id, // dataItem.common_id,
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: this.model.assetClass, // dataItem.common_assetClass,
+				assetEntity: this.model.asset.id,  // dataItem.common_id,
+				assetName:  this.model.assetName,  // dataItem && dataItem.common_assetName || '',
+				currentUserId: this.model.assignedTo.id //  this.currentUser.id
+			}
+		};
+
+		this.dialogService.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					const task = {
+						category: result.assetComment.category,
+						desc: result.assetComment.comment,
+						id: result.assetComment.assetEntity.id,
+						model: {
+							id: result.assetComment.id,
+							text: result.assetComment.comment
+						},
+						originalId: '',
+						status: result.assetComment.status,
+						taskId: result.assetComment.id,
+						taskNumber: result.assetComment.taskNumber
+					};
+
+					this.model.predecessorList.unshift(task);
+					this.dataGridTaskPredecessorsHelper.addDataItem(task);
+					console.log('Reloading');
+					// this.loadTaskDetail();
+				}
+
+			}).catch(result => {
+			console.log('Cancel:', result);
+		});
+
+	}
+
 }
