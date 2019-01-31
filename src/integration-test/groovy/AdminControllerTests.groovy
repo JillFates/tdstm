@@ -9,6 +9,7 @@ import net.transitionmanager.service.SecurityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
+import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -20,6 +21,8 @@ import test.helper.PersonTestHelper
  */
 @Integration
 @Rollback
+@Ignore
+// TODO - SL - 01/31: Ignoring this test now, but it needs to be moved to a functional test using GebSpec
 class AdminControllerTests extends Specification {
 
     @Autowired
