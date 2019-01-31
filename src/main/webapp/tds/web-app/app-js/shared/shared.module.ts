@@ -52,6 +52,7 @@ import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.component';
 import {BreadcrumbNavigationComponent} from './modules/header/components/breadcrumb-navigation/breadcrumb-navigation.component';
 import {HeaderComponent} from './modules/header/components/header/header.component';
+import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
 import {CodeMirrorComponent} from './modules/code-mirror/code-mirror.component';
 import {DynamicComponent} from './components/dynamic.component';
 import {CheckActionComponent} from './components/check-action/check-action.component';
@@ -111,6 +112,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UIDialogDirective,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		TranmanMenuComponent,
 		PopupLegendsComponent,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
@@ -165,6 +167,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		EscapeUrlEncodingPipe,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		TranmanMenuComponent,
 		PopupLegendsComponent,
 		DynamicComponent,
 		CodeMirrorComponent,

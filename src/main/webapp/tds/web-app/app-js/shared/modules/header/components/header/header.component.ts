@@ -1,8 +1,8 @@
 // Angular
 import {Component} from '@angular/core';
 // Service
-import {AppSettingsService} from '../../../../../modules/security/services/app-settings.service';
-import {AppSettingsModel} from '../../../../../modules/security/model/app-settings.model';
+import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
 
 @Component({
 	selector: 'tds-header',
@@ -11,15 +11,15 @@ import {AppSettingsModel} from '../../../../../modules/security/model/app-settin
 
 export class HeaderComponent {
 
-	protected appSettings: AppSettingsModel;
+	protected userContext: UserContextModel;
 
-	constructor(private appSettingsService: AppSettingsService) {
-		this.getAppSettings();
+	constructor(private userContextService: UserContextService) {
+		this.getUserContext();
 	}
 
-	protected getAppSettings(): void {
-		this.appSettingsService.getAppSettings().subscribe( (appSettings: AppSettingsModel) => {
-			this.appSettings = appSettings;
+	protected getUserContext(): void {
+		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
+			this.userContext = userContext;
 		});
 	}
 }
