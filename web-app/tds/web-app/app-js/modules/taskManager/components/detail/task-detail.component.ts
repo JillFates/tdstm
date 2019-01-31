@@ -316,8 +316,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	/**
 	 * Open the Task Create Dialog
 	 * on Success event adding a task it will reload the model
+	 * @param {any[]} taskList contains the model array with the task list
+	 * @param {any} gridHelper point out  to the corresponding grid which is using the list
 	 */
-	public onAddTaskDependency(): void {
+	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
 		let taskCreateModel: TaskDetailModel = {
 			id: this.model.asset.id, // dataItem.common_id,
 			modal: {
@@ -325,10 +327,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				type: ModalType.CREATE
 			},
 			detail: {
-				assetClass: this.model.assetClass, // dataItem.common_assetClass,
-				assetEntity: this.model.asset.id,  // dataItem.common_id,
-				assetName:  this.model.assetName,  // dataItem && dataItem.common_assetName || '',
-				currentUserId: this.model.assignedTo.id //  this.currentUser.id
+				assetClass: this.model.assetClass,
+				assetEntity: this.model.asset.id,
+				assetName:  this.model.assetName,
+				currentUserId: this.model.assignedTo.id
 			}
 		};
 
@@ -351,8 +353,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						taskNumber: result.assetComment.taskNumber
 					};
 
-					this.model.predecessorList.unshift(task);
-					this.dataGridTaskPredecessorsHelper.addDataItem(task);
+					taskList.unshift(task);
+					gridHelper.addDataItem(task);
 					console.log('Reloading');
 					// this.loadTaskDetail();
 				}
