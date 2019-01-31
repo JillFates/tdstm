@@ -18,7 +18,6 @@ plugins {
 version "4.7.0"
 group "tdstm"
 
-
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "war"
@@ -26,7 +25,9 @@ apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
 
-
+war {
+    archiveName = "tdstm-${version}.war"
+}
 
 repositories {
 	mavenLocal()
