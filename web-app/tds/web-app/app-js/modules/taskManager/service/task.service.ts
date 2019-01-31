@@ -367,12 +367,15 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getClassForAsset(assetId: string): Observable<any> {
-		return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result.data || null;
-			})
-			.catch((error: any) => error.json());
+		if (assetId) {
+			return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
+				.map((res: Response) => {
+					let result = res.json();
+					return result.data || null;
+				})
+				.catch((error: any) => error.json());
+		}
+		return Observable.empty();
 	}
 
 	/**
