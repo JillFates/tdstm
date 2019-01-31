@@ -17,7 +17,7 @@ plugins {
 
 version "4.7.0"
 group "tdstm"
-buildDir = 'target'
+
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -26,8 +26,7 @@ apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
 
-integrationTest.reports.html.destination = file("$buildDir/test-integration/test-reports/html")
-test.reports.html.destination = file("$buildDir/test-unit/test-reports/html")
+
 
 repositories {
 	mavenLocal()
@@ -214,3 +213,5 @@ test {
     if (project.hasProperty('forkEvery'))
         forkEvery = project.forkEvery as int
 }
+
+test.reports.html.destination = file("target/test-unit/test-reports/html")
