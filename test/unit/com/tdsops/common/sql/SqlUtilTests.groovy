@@ -302,10 +302,10 @@ class SqlUtilTests extends Specification {
 			'Mega&Peta'      | true         || '(?=.*mega)(?=.*peta).*'
 			'Peta&by'        | true         || '(?=.*peta)(?=.*by).*'
 			'by&Peta'        | true         || '(?=.*by)(?=.*peta).*'
-			'@ADMIN'         | true         || '.*(\\@admin).*'
-			'=@ADMIN'        | false        || '^\\@admin$'
-			'!@ADMIN'        | false        || '^\\@admin$'
-			'=@ADMIN|@DBA'   | false        || '^(\\@admin|\\@dba)$'
+			'@ADMIN'         | true         || '.*@admin.*'
+			'@ADMIN'         | false        || '^@ADMIN$'
+			'@ADMIN|@DBA'    | false        || '.*(@ADMIN|@DBA).*'
+			'@ADMIN|@DBA'    | true         || '.*(@admin|@dba).*'
 	}
 
 }

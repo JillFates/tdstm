@@ -574,8 +574,13 @@ class SqlUtil {
 		// 1) Check if filter contains only characters.
 		// If this is the case, we can filter using the most generic expression
 		// e.g.: Mega --> .*Mega.*
-		if (filter.matches(/^[A-Za-z0-9]+/)) {
-			return (fsd.useWildcards?'.*':'^') + filter + (fsd.useWildcards?'.*':'$')
+		if (!filter.contains('|') && !filter.contains(':') && !filter.contains('&') &&
+			!filter.contains('?') && !filter.contains('%') && !filter.contains('$') &&
+			!filter.contains('(') && !filter.contains(')') && !filter.contains('[') &&
+			!filter.contains(']') && !filter.contains('{') && !filter.contains('}') &&
+			!filter.contains('*')
+		) {
+			return (fsd.useWildcards ? '.*' : '^') + filter + (fsd.useWildcards ? '.*' : '$')
 		}
 		// 2) Check if user type an 'Or' expression using '|' character
 		if (filter.contains('|')) {
