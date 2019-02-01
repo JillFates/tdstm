@@ -19,7 +19,7 @@ class EnvironmentService implements InitializingBean, ServiceMethods {
 		if (resource) {
 			build = (resource?.inputStream.text.trim()) ?: ""
 		}
-		version = Metadata.current['tdstm.application.version']
+		version = Metadata.current['info.app.version']
 
 		String versionBuild = "${version}_${build}"
 		buildHash = MessageDigest.getInstance( "MD5" ).digest( versionBuild.bytes ).encodeHex().toString()
