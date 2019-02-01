@@ -2,7 +2,6 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 
-
 enum ETLDomain {
 
 	Application(com.tds.asset.Application),
@@ -20,7 +19,8 @@ enum ETLDomain {
 	Rack(net.transitionmanager.domain.Rack),
 	Bundle(net.transitionmanager.domain.MoveBundle),
 	Room(net.transitionmanager.domain.Room),
-	Files(com.tds.asset.Files)
+	Files(com.tds.asset.Files),
+	Event(net.transitionmanager.domain.MoveEvent)
 
 	private Class<?> clazz
 
