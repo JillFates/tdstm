@@ -12,13 +12,13 @@
                     <a href="/tdstm/admin/home">Admin Portal</a>
                 </li>
                 <li *ngIf="hasPermission(permission.LicenseAdministration)" class="menu-child-item menu-admin-license-admin">
-                    <a href="/tdstm/module/license/admin/list">License Admin</a>
+                    <a [routerLink]="['/license','admin','list']">License Admin</a>
                 </li>
                 <li *ngIf="userContext.licenseEnabled" class="menu-child-item menu-admin-license-manager">
-                    <a href="/tdstm/app/license/manager/list">License Manager</a>
+                    <a [routerLink]="['/license','manager','list']">License Manager</a>
                 </li>
                 <li class="menu-child-item menu-admin-notice-manager">
-                    <a href="/tdstm/module/notice/list">Notices</a>
+                    <a [routerLink]="['/notice','list']">Notices</a>
                 </li>
                 <li *ngIf="hasPermission(permission.RolePermissionView)" class="menu-child-item menu-admin-role">
                     <a href="/tdstm/permissions/show">Role Permissions</a>
@@ -96,10 +96,10 @@
                         <a href="/tdstm/project/userActivationEmailsForm" class="mmlink">User Activation Emails</a>
                     </li>
                     <li class="menu-child-item menu-projects-field-settings">
-                        <a href="/tdstm/module/fieldsettings/list" class="mmlink">Asset Field Settings</a>
+                        <a [routerLink]="['/fieldsettings','list']">Asset Field Settings</a>
                     </li>
                     <li class="menu-child-item menu-projects-tags">
-                        <a href="/tdstm/module/tag/list" class="mmlink">Tags</a>
+                        <a [routerLink]="['/tag','list']">Tags</a>
                     </li>
                 <!-- TODO: ENTIRE SECTION ABOVE </g:if> -->
                 <!-- TODO: <g:else> -->
@@ -112,16 +112,16 @@
                 <li class="divider"></li>
                 <li class="menu-parent-item">Integrations</li>
                 <li class="menu-child-item ">
-                    <a href="/tdstm/module/provider/list" class="mmlink">Providers</a>
+                    <a [routerLink]="['/provider','list']">Providers</a>
                 </li>
                 <li class="menu-child-item ">
-                    <a href="/tdstm/module/credential/list" class="mmlink">Credentials</a>
+                    <a [routerLink]="['/credential','list']">Credentials</a>
                 </li>
                 <li class="menu-child-item ">
-                    <a href="/tdstm/module/datascript/list" class="mmlink">ETL Scripts</a>
+                    <a [routerLink]="['/datascript','list']">ETL Scripts</a>
                 </li>
                 <li class="menu-child-item ">
-                    <a href="/tdstm/module/action/list" class="mmlink">Actions</a>
+                    <a [routerLink]="['/action','list']">Actions</a>
                 </li>
             </ul>
         </li>
@@ -153,49 +153,49 @@
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-asset-manager">
-                    <a href="/tdstm/module/asset/views" class="mmlink">
+                    <a [routerLink]="['/asset','views']">
                         <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> View Manager
                     </a>
                 </li>
                 <li class="divider"></li>
                 <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/1/show" id="1" class="mmlink">
+                    <a [routerLink]="['/asset','views',1,'show']">
                         <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/7/show" id="7" class="mmlink">
+                    <a [routerLink]="['/asset','views',7,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/application_menu.svg"></image></svg> Applications
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-all-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/3/show" id="3" class="mmlink">
+                    <a [routerLink]="['/asset','views',3,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/other_menu.svg"></image></svg> Devices
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-server-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/4/show" id="4" class="mmlink">
+                    <a [routerLink]="['/asset','views',4,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/serverPhysical_menu.svg"></image></svg> Servers
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/2/show" id="2" class="mmlink">
+                    <a [routerLink]="['/asset','views',2,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/database_menu.svg"></image></svg> Databases
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/5/show" id="5" class="mmlink">
+                    <a [routerLink]="['/asset','views',5,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storagePhysical_menu.svg"></image></svg> Storage - Devices
                     </a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
-                    <a href="/tdstm/module/asset/views/6/show" id="6" class="mmlink">
+                    <a [routerLink]="['/asset','views',6,'show']">
                         <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storageLogical_menu.svg"></image></svg> Storage - Logical
                     </a>
                 </li>
                 <li class="divider"></li>
                 <li class="menu-child-item menu-parent-assets-dependencies-list">
-                    <a href="/tdstm/module/dependencies/list" id="list" class="mmlink">
+                    <a [routerLink]="['dependencies','list']">
                         <img src="/tdstm/assets/icons/bricks.png" width="16" height="16" alt="Dependencies"> Dependencies
                     </a>
                 </li>
@@ -223,13 +223,13 @@
                     <a href="/tdstm/assetEntity/exportAssets">Export Assets</a>
                 </li>
                 <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                    <a href="/tdstm/module/importbatch/assets">Import Assets (ETL)</a>
+                    <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>
                 </li>
                 <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets">
                     <a href="/tdstm/assetEntity/assetImport">Import Assets (TM Excel)</a>
                 </li>
                 <li *ngIf="hasPermission(permission.DataTransferBatchView)" class="menu-child-item menu-parent-assets-manage-dep-batches">
-                    <a href="/tdstm/module/importbatch/list" class="mmlink">
+                    <a [routerLink]="['/importbatch','list']">
                         Manage Import Batches (ETL)
                     </a>
                 </li>
