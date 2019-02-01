@@ -541,7 +541,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listComments() {
-		def assetComments = AssetComment.findAllByCommentType(AssetCommentType.COMMENT)
+		def assetComments = AssetComment.findAllWhere(project:securityService.userCurrentProject,commentType:AssetCommentType.COMMENT)
 
 		def assetCommentsList = []
 		def today = new Date()

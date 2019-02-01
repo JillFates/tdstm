@@ -38,7 +38,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
+		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -64,7 +64,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	deleteTaskComment(commentId: any): Observable<any> {
-		return this.http.delete(`${this.baseURL}/ws/task/comment/${commentId}`)
+		return this.http.delete(`${this.baseURL}/ws/asset/comment/${commentId}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -138,7 +138,7 @@ export class TaskService {
 		};
 
 		if (!model.id) {
-			return this.http.post(`${this.baseURL}/ws/task/comment`, JSON.stringify(request))
+			return this.http.post(`${this.baseURL}/ws/asset/comment`, JSON.stringify(request))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -146,7 +146,7 @@ export class TaskService {
 				.catch((error: any) => error.json());
 		} else {
 			request['id'] = model.id;
-			return this.http.put(`${this.baseURL}/ws/task/comment/${model.id}`, JSON.stringify(request))
+			return this.http.put(`${this.baseURL}/ws/asset/comment/${model.id}`, JSON.stringify(request))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -282,7 +282,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getCategories(): Observable<any[]> {
-		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
+		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
 			.map((res: Response) => {
 				let response = res.json();
 				return response && response.data || [];
