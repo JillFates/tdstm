@@ -104,7 +104,7 @@ class DomainClassQueryHelper {
 			}
 		}
 
-		return results
+ 		return results
 	}
 
 	/**
@@ -606,26 +606,34 @@ class DomainClassQueryHelper {
 
 	/**
 	 * <p>When user adds a value in a find command, this function can transform the original value
-	 * defined by user in the correct type.</p>
+	 * defined by user adjusting correctly its type.</p>
 	 * <pre>
 	 *   find Device by 'description' eq 2 into 'id'
 	 * </pre>
-	 * <p>In this case Device.description field is String type. This files converts value 2 in "2"
+	 * <p>In this case {@code Device#description} field is String type. This method converts value 2 in "2"
 	 * in order to avoid errors in find command<p>
-	 * @param value an Object defined by user in find command
+	 * <p>If user tries to use a Collection, then this method transform correctly each one of the collection items</p>
+	 * <pre>
+	 * 	find Device by 'description' inList [2, 3, 4] into 'id'
+	 * </pre>
+	 * <p>In this case {@code Device#description} find command is used in a inList query. In this case,
+	 * this method transforms [2, 3, 4] in ["2", "3", "4"] <p>
+	 * @param value an Object or a collection defined by user in find command
 	 * @param propertyClazz domain property class
 	 * @return value parameter transformed by propertyClazz parameter
+	 * @see AssetEntity#description
 	 */
 	static Object transformValueToDomainPropertyClass(Object value, Class propertyClazz) {
 
-		if (propertyClazz == String) {
-			return value.toString()
-		} else if (propertyClazz == Long) {
-			return NumberUtil.toLongNumber(value)
-		} else if (propertyClazz == Double) {
-			return NumberUtil.toDoubleNumber(value)
-		}
+		Boolean isCollection = Collection.isAssignableFrom(value.getClass())
 
+		if (propertyClazz == String) {
+			return isCollection ? value.collect { it.toString() } : value.toString()
+		} else if (propertyClazz == Long) {
+			return isCollection ? value.collect { NumberUtil.toLongNumber(it) } : NumberUtil.toLongNumber(value)
+		} else if (propertyClazz == Double) {
+			return isCollection ? value.collect { NumberUtil.toDoubleNumber(it) } : NumberUtil.toDoubleNumber(value)
+		}
 		return value
 	}
 

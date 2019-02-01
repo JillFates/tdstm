@@ -548,7 +548,9 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				[
 					new FindCondition(
 						'roomName',
-						[room.roomName, 'anotherValue'],
+						[
+							room.roomName, 'anotherValue'
+						],
 						FindOperator.inList
 					)
 				]

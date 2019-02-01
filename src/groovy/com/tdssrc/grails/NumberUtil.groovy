@@ -90,7 +90,7 @@ class NumberUtil {
 				}
 			}
 
-			if (value.class in [Double, BigDecimal, BigInteger, Integer]) {
+			if (value.class in [Double, BigDecimal, BigInteger, Integer, Float]) {
 				value = value.longValue()
 			}
 
@@ -336,7 +336,6 @@ class NumberUtil {
 			if (!(value instanceof Double)){
 				value = defVal
 			}
-
 		}
 
 		return value
