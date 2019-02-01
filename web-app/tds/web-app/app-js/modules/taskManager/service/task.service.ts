@@ -277,7 +277,6 @@ export class TaskService {
 			.catch((error: any) => error);
 	}
 
-
 	/**
 	 * Create a task
 	 * @param payload model to create

@@ -342,7 +342,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					const task = {
 						category: result.assetComment.category,
 						desc: result.assetComment.comment,
-						id: result.assetComment.assetEntity.id,
+						id: result.assetComment.id,
 						model: {
 							id: result.assetComment.id,
 							text: result.assetComment.comment
@@ -356,7 +356,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					taskList.unshift(task);
 					gridHelper.addDataItem(task);
 					console.log('Reloading');
-					// this.loadTaskDetail();
+					const payload = this.modelHelper.getPayloadForUpdate();
+
+					this.taskManagerService.updateTask(payload)
+						.subscribe((result) => this.loadTaskDetail());
 				}
 
 			}).catch(result => {

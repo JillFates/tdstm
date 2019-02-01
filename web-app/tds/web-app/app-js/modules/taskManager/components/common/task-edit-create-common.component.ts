@@ -333,11 +333,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((result) => this.close(result));
-
 	}
 
 	/**
-	 * Create the t ask
+	 * Create the task
 	*/
 	protected onCreate(): void {
 		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
