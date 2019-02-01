@@ -365,7 +365,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			}).catch(result => {
 			console.log('Cancel:', result);
 		});
+	}
 
+	/**
+	 * Create a note and update the datagrid task notes component
+	 */
+	protected createNote() {
+		this.modelHelper.onCreateNote()
+			.subscribe((result) => {
+				this.model.notesList = result && result.data || [];
+				this.dataGridTaskNotesHelper =
+					new DataGridOperationsHelper(
+						this.modelHelper.generateNotes(this.model.notesList), null, null);
+			});
 	}
 
 }

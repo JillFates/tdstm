@@ -1,3 +1,4 @@
+import {Observable} from 'rxjs';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TaskDetailModel} from '../../model/task-detail.model';
@@ -692,31 +693,36 @@ export class TaskEditCreateModelHelper {
 	/**
 	 * Add a note
 	 */
-	protected createNote(id: string, note: string): void {
-		alert('Creating the note');
-		this.taskManagerService.addNote(id, note)
-			.subscribe((result) => console.log('The result is:', result));
+	protected createNote(id: string, note: string): Observable<any> {
+		return this.taskManagerService.addNote(id, note);
 	}
 
 	/**
 	 * Open the note modal dialog to capture the note, call the method for save it
 	 */
-	protected onCreateNote(): void {
-		let singleNoteModel: SingleNoteModel = {
-			modal: {
-				title: 'Create Note',
-				type: ModalType.CREATE
-			},
-			note: ''
-		};
+	onCreateNote(): Observable<any> {
+		return Observable.create((observer) => {
+			let singleNoteModel: SingleNoteModel = {
+				modal: {
+					title: 'Create Note',
+					type: ModalType.CREATE
+				},
+				note: ''
+			};
 
-		this.dialogService.extra(SingleNoteComponent, [
-			{provide: SingleNoteModel, useValue: singleNoteModel}
-		], false, false)
-			.then(addedNote => {
-				this.createNote(this.model.id, addedNote);
-			}).catch(result => {
-			console.log(result);
+			this.dialogService.extra(SingleNoteComponent, [
+				{provide: SingleNoteModel, useValue: singleNoteModel}
+			], false, false)
+				.then(addedNote => {
+					this.createNote(this.model.id, addedNote)
+						.subscribe((result) => {
+							console.log('The result is:', result);
+							observer.next(result);
+						});
+				}).catch(result => {
+				console.log(result);
+				observer.next(null);
+			});
 		});
 	}
 }
