@@ -373,10 +373,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected createNote() {
 		this.modelHelper.onCreateNote()
 			.subscribe((result) => {
-				this.model.notesList = result && result.data || [];
-				this.dataGridTaskNotesHelper =
-					new DataGridOperationsHelper(
-						this.modelHelper.generateNotes(this.model.notesList), null, null);
+				if (result) {
+					this.model.notesList = result && result.data || [];
+					this.dataGridTaskNotesHelper =
+						new DataGridOperationsHelper(
+							this.modelHelper.generateNotes(this.model.notesList), null, null);
+				}
 			});
 	}
 
