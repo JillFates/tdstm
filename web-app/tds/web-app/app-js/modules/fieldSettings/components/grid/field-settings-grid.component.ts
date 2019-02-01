@@ -406,16 +406,13 @@ export class FieldSettingsGridComponent implements OnInit {
 		const fields = this.getFieldsExcludingDeleted();
 
 		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
-			dataItem.errorMessage = 'Another label conflicts with the label "'
-					+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.'
+			dataItem.errorMessage = 'The label must be different from all other field names and labels'
 		} else {
 			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields)) {
-				dataItem.errorMessage =  'A field name conflicts with the label "'
-						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
+				dataItem.errorMessage = 'The label must be different from all other field names and labels'
 			} else {
 				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
-					dataItem.errorMessage = 'A field name or label on another domain conflicts with the shared label "'
-						+ dataItem.label + '" in field ' + dataItem.field + '. Please rename the label.';
+					dataItem.errorMessage = 'The label must be different from all other field names and labels'
 				}
 			}
 		}
