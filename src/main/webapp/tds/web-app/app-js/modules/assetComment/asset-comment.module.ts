@@ -14,13 +14,13 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {AssetCommentListComponent} from './components/list/asset-comment-list.component';
-import {SingleCommentComponent} from './components/single-comment/single-comment.component';
+import {AssetCommentViewEditComponent} from './components/view-edit/asset-comment-view-edit.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {AssetCommentService} from './service/asset-comment.service';
 import {AssetCommentResolveService} from './resolve/asset-comment-resolve.service';
-import {AssetExplorerService} from '../assetExplorer/service/asset-explorer.service';
+import {AssetExplorerService} from '../assetManager/service/asset-explorer.service';
 import {TaskService} from '../taskManager/service/task.service';
 
 @NgModule({
@@ -40,7 +40,7 @@ import {TaskService} from '../taskManager/service/task.service';
 	],
 	declarations: [
 		AssetCommentListComponent,
-		SingleCommentComponent
+		AssetCommentViewEditComponent
 	],
 	providers: [
 		// Resolve
@@ -55,7 +55,7 @@ import {TaskService} from '../taskManager/service/task.service';
 		AssetCommentListComponent,
 	],
 	entryComponents: [
-		SingleCommentComponent
+		AssetCommentViewEditComponent
 	]
 })
 

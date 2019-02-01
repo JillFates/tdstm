@@ -1,3 +1,26 @@
+import {ModalType} from '../../../shared/model/constants';
+
+export class AssetCommentModel {
+	public id?: string;
+	public modal: {
+		title:  string;
+		type: ModalType
+	}
+	public archive: boolean;
+	public comment: string;
+	public category: string;
+	public assetClass: {
+		id?: string;
+		text?: string;
+	};
+	public asset: {
+		id?: any;
+		text: string;
+	};
+	public lastUpdated?: string;
+	public dateCreated?: string;
+}
+
 export class AssetCommentColumnModel {
 	columns: any[];
 
@@ -43,17 +66,4 @@ export class AssetCommentColumnModel {
 			}
 		];
 	}
-}
-
-export class AssetCommentModel {
-	id?: number;
-	modal?: any;
-	description?: string;
-	archive?: Date;
-	comment?: string;
-	category?: string;
-	assetClass?: any;
-	asset?: any;
-	lastUpdated?: Date;
-	dateCreated?: Date;
 }

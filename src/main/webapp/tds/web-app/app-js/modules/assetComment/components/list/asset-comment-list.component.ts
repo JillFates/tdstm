@@ -10,8 +10,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
 import {AssetCommentColumnModel, AssetCommentModel} from '../../model/asset-comment.model';
-import {SingleCommentModel} from '../single-comment/model/single-comment.model';
-import {SingleCommentComponent} from '../single-comment/single-comment.component';
+import {AssetCommentViewEditComponent} from '../view-edit/asset-comment-view-edit.component';
 
 declare var jQuery: any;
 
@@ -129,7 +128,7 @@ export class AssetCommentListComponent implements OnInit {
 	 * @param {number} actionType
 	 */
 	private openAssetCommentDialogViewEdit(comment: any, type: ModalType): void {
-		let singleCommentModel: SingleCommentModel = {
+		let commentModel: AssetCommentModel = {
 			id: comment.commentInstance.id,
 			modal: {
 				title: 'Comment Detail',
@@ -149,8 +148,8 @@ export class AssetCommentListComponent implements OnInit {
 			dateCreated: comment.commentInstance.dateCreated
 		};
 
-		this.dialogService.extra(SingleCommentComponent, [
-			{provide: SingleCommentModel, useValue: singleCommentModel}
+		this.dialogService.extra(AssetCommentViewEditComponent, [
+			{provide: AssetCommentModel, useValue: commentModel}
 		]).then(result => {
 			this.reloadData();
 		}).catch(result => {

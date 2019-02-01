@@ -13,8 +13,7 @@ import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 export class AssetCommentService {
 
 	private jobProgressUrl = '../ws/progress';
-	private readonly dataIngestionUrl = '../ws/dataingestion';
-	private listCommentUrl = this.dataIngestionUrl + '/assetComment/list';
+	private readonly listCommentUrl = '../ws/asset/comment';
 
 	constructor(private http: HttpInterceptor) {
 	}
