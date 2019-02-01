@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import grails.gorm.transactions.Transactional
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.openssl.PEMReader
+import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.PasswordFinder
 import org.bouncycastle.util.encoders.Base64
 
@@ -97,7 +97,7 @@ class QzSignService {
 
 	private static KeyPair readKeyPair(File privateKeyFile, char [] keyPassword) throws IOException {
 		FileReader fileReader = new FileReader(privateKeyFile)
-		PEMReader r = new PEMReader(fileReader, new DefaultPasswordFinder(keyPassword))
+		PEMParser r = new PEMParser(fileReader, new DefaultPasswordFinder(keyPassword))
 		try {
 			return (KeyPair) r.readObject()
 		} catch (IOException ex) {

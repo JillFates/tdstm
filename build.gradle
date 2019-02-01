@@ -38,7 +38,13 @@ repositories {
 }
 
 configurations {
-    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+	all {
+		exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		exclude module: 'bcmail-jdk14'
+		exclude module: 'bcprov-jdk14'
+		exclude module: 'bctsp-jdk14'
+	}
+
 }
 
 dependencies {
