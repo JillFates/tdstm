@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import grails.test.hibernate.HibernateSpec
+import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Person
@@ -17,8 +17,9 @@ import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
+import spock.lang.Specification
 
-class ApiActionServiceSpec  extends HibernateSpec implements ServiceUnitTest<ApiActionService> {
+class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<ApiActionService>, DataTest {
 
 	def setup() {
 		defineBeans {

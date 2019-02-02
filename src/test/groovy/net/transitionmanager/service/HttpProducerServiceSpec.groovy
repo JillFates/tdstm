@@ -4,10 +4,9 @@ import com.stehno.ersatz.ErsatzServer
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.ThreadLocalUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
+import grails.testing.web.GrailsWebUnitTest
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.domain.ApiAction
@@ -23,10 +22,7 @@ import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(HttpProducerService)
-@TestMixin(GrailsUnitTestMixin)
-@Mock([Project, Provider, ApiCatalog, ApiAction, FileSystemService, CoreService, SecurityService])
-class HttpProducerServiceSpec extends Specification {
+class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<HttpProducerService>, DataTest, GrailsWebUnitTest {
 
 	private Project project
 	private Provider provider
@@ -34,6 +30,10 @@ class HttpProducerServiceSpec extends Specification {
 	private ApiAction action
 	@Shared
 	private ErsatzServer ersatz
+
+	static doWithConfig(c) {
+		c.graph.tmpDir = '/tmp/'
+	}
 
 	private static final String paramsJson = """
 		[
@@ -46,6 +46,19 @@ class HttpProducerServiceSpec extends Specification {
 	"""
 
 	def setupSpec() {
+		mockDomains Project, Provider, ApiCatalog, ApiAction
+
+		defineBeans {
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+				transactionManager = ref('transactionManager')
+			}
+			settingService(SettingService)
+		}
+
 		// http://stehno.com/ersatz/
 		// http://guides.grails.org/grails-mock-http-server/guide/index.html
 		ersatz = new ErsatzServer()
@@ -191,7 +204,6 @@ class HttpProducerServiceSpec extends Specification {
 	void 'Test http service execute call return error'() {
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test400'
-			println '>>>>>>>> ' + action
 			ActionRequest actionRequest = getActionRequest(action)
 			ApiActionResponse actionResponse = service.executeCall(actionRequest)
 		then:
