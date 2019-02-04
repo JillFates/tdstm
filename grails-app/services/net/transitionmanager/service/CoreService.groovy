@@ -4,6 +4,7 @@ import grails.util.Environment
 import grails.util.Metadata
 import org.grails.core.exceptions.GrailsConfigurationException
 import org.grails.config.NavigableMap
+import org.springframework.beans.factory.annotation.Value
 
 /**
  * Methods considered core to the application functionality
@@ -16,6 +17,8 @@ class CoreService implements ServiceMethods {
 	// TODO - Refactor the tempDirProperty to not be tied to graph
 	static final String tempDirProperty = 'graph.tmpDir'
 
+	@Value('${graph.tmpDir}')
+	String temporaryDirectory
 
 	/**
 	 * Used to retrieve the name of the application
@@ -90,7 +93,7 @@ class CoreService implements ServiceMethods {
 	 * should use for writing files to.
 	 */
 	String getAppTempDirectory() {
-		String tmpDir = getConfigSetting(tempDirProperty)
+		String tmpDir = temporaryDirectory
 		if (! tmpDir) {
 			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($tempDirProperty)")
 		}

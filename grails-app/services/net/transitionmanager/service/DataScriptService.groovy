@@ -132,7 +132,7 @@ class DataScriptService implements ServiceMethods{
 
 	     // Check if the Sample File is still available, if not delete the temporary data
 	     if ( dataScript.sampleFilename ) {
-		     if ( ! FileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
+		     if ( ! fileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
 			     dataScript.sampleFilename = ''
 			     dataScript.originalSampleFilename = ''
 			     dataScript.save()
@@ -395,7 +395,7 @@ class DataScriptService implements ServiceMethods{
 	 * @return the File handle of the file
 	 */
 	private File tempFile(String filename) throws FileNotFoundException {
-		File inputFile = FileSystemService.openTempFile(filename)
+		File inputFile = fileSystemService.openTempFile(filename)
 		if (! inputFile.exists()) {
 			throw new FileNotFoundException(inputFile.toString())
 		}
