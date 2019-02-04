@@ -1761,18 +1761,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Retrieve the bundles associated with the selected event (if any).
 		List<Long> bundleIds = getBundleIds(contextObj)
 
-		return AssetEntity.where {
-			if (tagIds) {
-				tagAssets.tag.id in tagIds
-			}
-			if (bundleIds) {
-				moveBundle.id in bundleIds
-			}
+		return AssetEntity.createCriteria().list {
+			eq (moveBundle.useForPlanning, true)
+			or {
+				if (tagIds) {
+					'in' (tagAssets.tag.id, tagIds)
+					// Assets must belong to a planning bundle.
 
-			// Assets must belong to a planning bundle.
-			moveBundle.useForPlanning == true
-
-		}.list()
+				}
+				if (bundleIds) {
+					'in' (moveBundle.id, bundleIds)
+				}
+			}
+		}
 	}
 
 	/**
@@ -4267,15 +4268,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			String join = ''
 
+			List<String> tagsOrEvent = []
 			if (contextObject.tag) {
-				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
+				tagsOrEvent.add('t.id in (:tags)')
 				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
 			}
 
 			if (map.bIds) {
-				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
+				tagsOrEvent.add('a.moveBundle.id IN (:bIds)')
 			}
+
+			String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
+
+			where = SqlUtil.appendToWhere(where, tagsOrEventStr)
 
 			// Assemble the SQL and attempt to execute it
 			try {
