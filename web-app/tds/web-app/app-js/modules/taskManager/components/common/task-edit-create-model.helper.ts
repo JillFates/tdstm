@@ -260,6 +260,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
@@ -329,6 +330,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
