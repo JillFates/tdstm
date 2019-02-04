@@ -954,7 +954,7 @@ class DataImportService implements ServiceMethods {
 
 		// Add default values for an assetEntity
 		if (AssetEntity.isAssignableFrom(domainClass)) {
-			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
+			entity = customDomainService.setCustomFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
 		}
 
 		// moveBundle

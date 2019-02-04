@@ -69,7 +69,7 @@ class CustomDomainServiceSpec extends Specification {
 			entity.project = defaultProject
 
 		expect: 'service set default field values'
-			service.setFieldsDefaultValue(fieldSpecProject, domainClass, entity).custom6 == fieldDefaultValue
+			service.setCustomFieldsDefaultValue(fieldSpecProject, domainClass, entity).custom6 == fieldDefaultValue
 
 		where:
 			domainClass || fieldDefaultValue
