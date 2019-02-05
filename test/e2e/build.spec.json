@@ -54,6 +54,7 @@
     "specs.Projects.Project.ProjectCreationDefaultTagsSpec",
     "specs.Projects.Project.ProjectCreationSpec",
     "specs.Projects.Project.ProjectListCleanUpSpec",
+    "specs.Projects.Providers.ProviderCleanUpSpec",
     "specs.Projects.Providers.ProviderCreationSpec",
     "specs.Projects.Providers.ProviderDeletionSpec",
     "specs.Projects.Providers.ProviderEditionSpec",
