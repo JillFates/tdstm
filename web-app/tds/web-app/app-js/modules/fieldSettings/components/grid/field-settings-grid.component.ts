@@ -404,15 +404,16 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected onBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
+		const message = 'The label must be different from all other field names and labels'
 
 		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
-			dataItem.errorMessage = 'The label must be different from all other field names and labels'
+			dataItem.errorMessage = message
 		} else {
 			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields)) {
-				dataItem.errorMessage = 'The label must be different from all other field names and labels'
+				dataItem.errorMessage = message
 			} else {
 				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
-					dataItem.errorMessage = 'The label must be different from all other field names and labels'
+					dataItem.errorMessage = message
 				}
 			}
 		}
