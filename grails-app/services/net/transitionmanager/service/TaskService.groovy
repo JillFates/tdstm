@@ -948,10 +948,13 @@ class TaskService implements ServiceMethods {
 	/**
 	 * Used to add a note to a task
 	 * @param task	The task (aka AssetComment) to add a note to
-	 * @param person	The Person object that is creating the note
+	 * @param person  The Person object that is creating the note
 	 * @param note	A String that represents the note
+	 * @param isAudit  Optional - 1 if the note is added by an automatic audit process,
+	 * 0 if it's added manually (default is 1)
+	 * @return 'true' is the note was added successfully, 'false' otherwise.
 	 */
-	def addNote(AssetComment task, Person person, String note, int isAudit = 1) {
+	Boolean addNote(AssetComment task, Person person, String note, int isAudit = 1) {
 		def taskNote = new CommentNote(createdBy: person, note: note, isAudit: isAudit, assetComment: task)
 		taskNote.validate()
 		if (taskNote.hasErrors()) {
@@ -961,6 +964,24 @@ class TaskService implements ServiceMethods {
 
 		task.addToNotes(taskNote)
 		true
+	}
+
+	/**
+	 * Used to get the list of notes associated to a task
+	 * @param task	The task (aka AssetComment) to get the notes from
+	 * @return The list of CommentNote associated to task.
+	 */
+	List<CommentNote> getNotes(AssetComment task) {
+		List notesList = []
+		if (!task) {
+			log.error "getNotes: 'task' parameter cannot be null."
+		} else {
+			notesList = CommentNote.createCriteria().list(max: 50) {
+				eq('assetComment', task)
+				order('dateCreated', 'desc')
+			}
+		}
+		return notesList
 	}
 
 	/**

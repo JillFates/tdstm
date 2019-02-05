@@ -184,11 +184,8 @@ class WsTaskController implements ControllerMethods {
 			}
 
 			// Get a list of the Notes associated with the task/comment
-			def notes = []
-			def notesList = CommentNote.createCriteria().list(max: 50) {
-				eq('assetComment', assetComment)
-				order('dateCreated', 'desc')
-			}
+			List notes = []
+			List notesList = taskService.getNotes(assetComment)
 			for (note in notesList) {
 				notes << [
 						TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
