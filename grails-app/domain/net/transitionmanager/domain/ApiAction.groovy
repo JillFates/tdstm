@@ -1,6 +1,8 @@
 package net.transitionmanager.domain
 
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -112,6 +114,21 @@ class ApiAction {
 
 	Date lastUpdated
 
+	// An enum of the types of actions
+	ActionType actionType = ActionType.WEB_API
+
+	// 	The script to be executed
+	String script
+
+	// The commandline to used to invoke the script if necessary
+	String commandLine
+
+	// Flag that the action should be invoked remotely
+	Boolean isRemote = false
+
+	// How the authentication for remote scripts will be performed
+	RemoteCredentialMethod remoteCredentialMethod
+
 	static belongsTo = [
 		project: Project,
 		provider: Provider,
@@ -126,8 +143,8 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointUrl nullable: true, blank: true, validator: ApiAction.&endpointUrlValidator
-		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
+		endpointUrl nullable: true, blank: true, range: 0..1024, validator: ApiAction.&endpointUrlValidator
+		docUrl nullable: true, blank: true, range: 0..1024, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
@@ -141,6 +158,11 @@ class ApiAction {
 		timeout min:0
 		useWithAsset range: 0..1
 		useWithTask range: 0..1
+		actionType nullable: false
+		script range: 0..65535
+		commandLine range: 0..1024
+		isRemote nullable: false
+		remoteCredentialMethod nullable: true
 	}
 
 	static mapping = {
@@ -151,8 +173,8 @@ class ApiAction {
 			asyncQueue 		sqlType: 'varchar(64)'
 			name 			sqlType: 'varchar(64)'
 			methodParams	sqlType: 'text'
-			endpointUrl		sqlType: 'varchar(255)'
-			docUrl			sqlType: 'varchar(255)'
+			endpointUrl		sqlType: 'varchar(1024)'
+			docUrl			sqlType: 'varchar(1024)'
 			httpMethod		sqlType: 'varchar(10)'
 		}
 	}
