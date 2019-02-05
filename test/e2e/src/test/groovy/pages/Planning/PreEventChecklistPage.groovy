@@ -1,7 +1,7 @@
 package pages.Planning
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 
 class PreEventChecklistPage extends Page {
 
@@ -13,7 +13,7 @@ class PreEventChecklistPage extends Page {
 
     static content = {
         preEventPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         preEventChecklistPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
     }
 

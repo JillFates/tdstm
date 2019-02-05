@@ -1,7 +1,7 @@
 package pages.Tasks.TaskManager
 
 import geb.Page
-import modules.TasksModule
+import modules.TasksMenuModule
 
 class TaskManagerPage extends Page{
 
@@ -30,7 +30,7 @@ class TaskManagerPage extends Page{
         tmTaskDoneBtn (wait:true, required:false)   { $("a", "ng-click":"doAction(button)").find("span",text:"Done")}
         tmTaskDetailBtn (wait:true, required:false)   { $("a", "ng-click":"doAction(button)").find("span",text:"Details...")}
         tmTaskAssignMeBtn (wait:true, required:false) { $("a", "ng-click":"doAction(button)").find("span",text:"Assign To Me")}
-        tasksModule { module TasksModule}
+        tasksModule { module TasksMenuModule}
         moveEvent {$("#moveEventId")}
     }
 

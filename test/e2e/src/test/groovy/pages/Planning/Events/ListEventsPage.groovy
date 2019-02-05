@@ -6,8 +6,8 @@ package pages.Planning.Events
  */
 
 import geb.Page
-import modules.PlanningModule
-import modules.ProjectsModule
+import modules.PlanningMenuModule
+import modules.ProjectsMenuModule
 
 class ListEventsPage extends Page {
 
@@ -20,7 +20,7 @@ class ListEventsPage extends Page {
 
     static content = {
         listEventsPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         listEventsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createEventBtn {$("input", value:"Create Event")}
         eventList {$("table#moveEventListIdGrid")}
@@ -28,7 +28,7 @@ class ListEventsPage extends Page {
         names {eventList.find("a")}
         nameFilter {$("input#gs_name")}
 
-        projModule {module ProjectsModule}
+        projModule {module ProjectsMenuModule}
     }
 
     def clickCreateEvent(){

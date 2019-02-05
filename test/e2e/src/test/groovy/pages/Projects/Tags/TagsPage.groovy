@@ -3,7 +3,7 @@ package pages.Projects.Tags
 import geb.Page
 import utils.CommonActions
 import modules.CommonsModule
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 import geb.waiting.WaitTimeoutException
 
 class TagsPage extends Page{
@@ -43,7 +43,7 @@ class TagsPage extends Page{
         firstTagColorDropdown { firstTagColor.find("span.k-i-arrow-s")}
         firstTagColors { $("div.k-list-scroller").find("li.k-item")}
         commonsModule { module CommonsModule}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
     }
 
     def filterByName(name){

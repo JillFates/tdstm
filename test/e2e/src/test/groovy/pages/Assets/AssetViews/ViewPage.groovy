@@ -4,8 +4,14 @@ import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
 import utils.CommonActions
-import modules.AssetsModule
+import modules.AssetsMenuModule
 import geb.waiting.WaitTimeoutException
+
+/**
+ * This class represents {{host}}/tdstm/module/asset/views/{{viewNumber}}/show
+ * where a view lists its assets as configured in Asset View manager.
+ *
+ */
 
 class ViewPage extends Page{
 
@@ -25,7 +31,7 @@ class ViewPage extends Page{
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
         commonsModule { module CommonsModule }
-        assetsModule { module AssetsModule }
+        assetsModule { module AssetsMenuModule }
         createViewModule {module CreateViewModule}
         viewMgrBreadCrumb {$('a', text: "View Manager")}
         //starOn {$("fa text-yellow fa-star")}
@@ -61,28 +67,69 @@ class ViewPage extends Page{
         gridHeader {$(".k-grid-header")}
         editAssetButtons { $("button", title: "Edit Asset")}
         cloneAssetButtons { $("button", title: "Clone")}
+
+        saveBtn                      {$("button", text:"Save")}
+        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
+        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
+        saveAs                       {$("a",text:"Save As")}
+
+        //>>>>GRID
+
+       previewGrid                  {$(class:"k-widget k-grid k-grid-lockedcolumns.find(input)")}
+       fieldCollection              {$("div",id:"tab_2")}
+       previewRows {$("tbody")[1]}
+       firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
+       tableHeaderNames {$('th label')}
+
+   }
+
+   def clickSaveOptions(){
+       commonsModule.waitForLoader(5)
+       waitFor{saveOptions.click()}
+   }
+
+   def clickSaveAs(){
+       waitFor{clickSaveOptions()}
+       waitFor{saveAs.click()}
+   }
+
+   def firstSave(){
+       waitFor{saveBtn.click()}
+   }
+
+    /**
+     * this one is different from the first save since we only need to wait for the loader in the
+     * following save actions. Else execution might fail.
+     */
+    def clickSave(){//THIS ONE SHOULD BE COVERED IN PAGE VIEW
+        waitFor{saveBtn.click()}
+        commonsModule.waitForLoader()
     }
 
-    def getRandomAssetDataAndClickOnIt(){
-        //waitFor asset details to be displayed
-        commonsModule.waitForLoader(5)
-        def dataList = []
-        def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
-        def assetName =assetNames[assetIndex].text()
-        dataList.add(assetName)
-        def rowData =getRowData(assetIndex)
-        dataList.addAll(rowData)
-        interact {
-            moveToElement(assetNames[assetIndex])
-        }
-        assetNames[assetIndex].click()
-        dataList
-    }
-    /**
-     * Clicks on THE FIRST asset with that name
-     * @param name
-     * @return
-     */
+   def verifyButtonIsDefaultWithNoChanges(){//MOVED FROM CREATE VIEW MODULE
+       waitFor{saveBtn.jquery.attr("class").contains("btn-default")}
+   }
+
+   def getRandomAssetDataAndClickOnIt(){
+       //waitFor asset details to be displayed
+       commonsModule.waitForLoader(5)
+       def dataList = []
+       def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
+       def assetName =assetNames[assetIndex].text()
+       dataList.add(assetName)
+       def rowData =getRowData(assetIndex)
+       dataList.addAll(rowData)
+       interact {
+           moveToElement(assetNames[assetIndex])
+       }
+       assetNames[assetIndex].click()
+       dataList
+   }
+   /**
+    * Clicks on THE FIRST asset with that name
+    * @param name
+    * @return
+    */
     def openAssetByName(name){
         filterByName(name)
         // verify exact match and no other was found with same name
@@ -165,7 +212,9 @@ class ViewPage extends Page{
     }
 
     def clickOnGear(){
+        commonsModule.waitForLoader 5
         waitFor{gearBtn.click()}
+        commonsModule.waitForLoader 10
     }
 
     /*
@@ -259,7 +308,6 @@ class ViewPage extends Page{
         } else {
             verifySelectedAssetsTextDisplayed()
         }
-
     }
 
     def clickOnJustPlanningCheckbox(){
@@ -552,5 +600,21 @@ class ViewPage extends Page{
 
     def clickOnFirstAssetCloneActionButton(){
         waitFor{cloneAssetButtons[0].click()}
+    }
+
+    def expectedColumnsDisplayed(List names){//MOVED FROM CREATE VIEW MODULE
+        names.each{
+            tableHeaderNames.contains(it)
+        }
+    }
+
+    def validateFilteredRows(String txt){//MOVED FROM CREATE VIEW MODULE
+        previewRows.each{
+            it.contains(txt)
+        }
+    }
+
+    def filterPreviewByText(String txt){//OK
+        firstPreviewFilter=txt
     }
 }

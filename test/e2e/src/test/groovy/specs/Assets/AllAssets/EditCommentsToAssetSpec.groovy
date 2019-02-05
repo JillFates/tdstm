@@ -18,6 +18,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 import utils.CommonActions
 
+
 @Stepwise
 class EditCommentsToAssetSpec extends GebReportingSpec {
 
@@ -47,6 +48,7 @@ class EditCommentsToAssetSpec extends GebReportingSpec {
         at MenuPage
         waitFor { assetsModule.goToApplications() }
         at ViewPage
+        commonsModule.waitForLoader 5
         clickOnCreateButton()
         at AssetCreatePage
         createApplication appDataMap

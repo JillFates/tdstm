@@ -1,7 +1,7 @@
 package pages.Projects
 
 import geb.Page
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ActionsPage extends Page {
 
@@ -11,7 +11,7 @@ class ActionsPage extends Page {
 
     static content = {
         modaltitle { $("section", class:"content-header").find("h1")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
         createActionBtn {$("button", class:"btn btn-default" , id:"btnCreate")}
     }
 

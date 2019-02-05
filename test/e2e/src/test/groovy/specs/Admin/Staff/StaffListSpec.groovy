@@ -10,7 +10,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-    @Stepwise
+@Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount

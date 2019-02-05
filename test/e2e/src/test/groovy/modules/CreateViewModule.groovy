@@ -1,4 +1,4 @@
-package modules
+ package modules
 
 import geb.Module
 import modules.CommonsModule
@@ -19,10 +19,10 @@ class CreateViewModule extends Module {
         previewBtn                   {$("button",text:"Preview")}
         filterBtn                    {$("button",text:"Filter")}
         clearSearchBtn               {searchField.siblings()}
-        saveBtn                      {$("button", text:"Save")}
-        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
-        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
-        saveAs                       {$("a",text:"Save As")}
+//        saveBtn                      {$("button", text:"Save")}
+//        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
+//        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
+//        saveAs                       {$("a",text:"Save As")}
         closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
         assetsClasses                {$("a",text:"Asset Classes")}
@@ -38,23 +38,6 @@ class CreateViewModule extends Module {
         fieldsFilter                 { $("select#selected") }
         tcModalEventSelector         { tcModalWindow.find("select#moveEvent")}
 
-        //>>>>GRID
-        previewGrid                  {$(class:"k-widget k-grid k-grid-lockedcolumns.find(input)")}
-        fieldCollection              {$("div",id:"tab_2")}
-        previewRows {$("tbody")[1]}
-        firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
-        tableHeaderNames {$('th label')}
-
-    }
-
-    def clickSaveOptions(){
-        commonsModule.waitForLoader(5)
-        waitFor{saveOptions.click()}
-    }
-
-    def clickSaveAs(){
-        waitFor{clickSaveOptions()}
-        waitFor{saveAs.click()}
     }
 
     def clickSpecificCheckbox(String name){
@@ -63,10 +46,6 @@ class CreateViewModule extends Module {
 
     def clickOnCloseViewEdition(){
         waitFor{closeViewEdition.click()}
-    }
-
-    def filterPreviewByText(String txt){
-        firstPreviewFilter=txt
     }
 
     def selectApplication(){
@@ -93,7 +72,7 @@ class CreateViewModule extends Module {
         waitFor{previewBtn.click()}
     }
 
-    def String searchFieldName(){
+    def String searchFieldName(){//OK
         def checkboxes = $("div.row input")
         def num =Math.abs(new Random().nextInt() % checkboxes.size()-4)-1
         def name =checkboxes[num].parent().text()
@@ -102,7 +81,7 @@ class CreateViewModule extends Module {
         name
     }
 
-    def clearSearch(){
+    def clearSearch(){//OK
         clearSearchBtn.click()
     }
 
@@ -110,19 +89,7 @@ class CreateViewModule extends Module {
         fieldsFilter=value
     }
 
-    def firstSave(){
-        waitFor{saveBtn.click()}
-    }
-    /**
-     * this one is different from the first save since we only need to wait for the loader in the
-     * following save actions. Else execution might fail.
-     */
-    def clickSave(){
-        waitFor{saveBtn.click()}
-        commonsModule.waitForLoader()
-    }
-
-    def selectRandomCheckboxes(){
+    def selectRandomCheckboxes(){//ok
         def checkboxes = $("div.row input")
         def willSelect =Math.abs(new Random().nextInt() % 5)+1
         for(int i = 1;i<willSelect+1;i++) {
@@ -134,7 +101,7 @@ class CreateViewModule extends Module {
         }
     }
 
-    def boolean selectedCheckboxesDisplayed(){
+    def boolean selectedCheckboxesDisplayed(){//OK
         boolean isChecked=true
         def selectedChecks =  $("div.nav-tabs-custom", type:"checkbox")
         for (int j=0;j<selectedChecks.size();j++){
@@ -159,7 +126,7 @@ class CreateViewModule extends Module {
     }
 
     //validates the name (label)of the filtered checkbox
-    def boolean filteredFieldMatchesDisplay(String value){
+    def boolean filteredFieldMatchesDisplay(String value){//OK
         def selectedChecks =  $("div.content.body input")
         //discards first input which is name filter field
         return selectedChecks[1].parent().text().trim().contains(value.trim())
@@ -204,12 +171,12 @@ class CreateViewModule extends Module {
      * validates the basic elements in the Fields tab are displayed as a way
      * to make sure we are in the fields tab
      */
-    def validateFieldsTab(){
+    def validateFieldsTab(){//ok
         previewBtn.displayed
         fieldsFilter.displayed
     }
 
-    def getListOfSelectedFields() {
+    def getListOfSelectedFields() {//OK
         def listOfFields= []
         def checks = $("div.content.body input")
         checks.each {
@@ -220,19 +187,4 @@ class CreateViewModule extends Module {
         listOfFields
     }
 
-    def expectedColumnsDisplayed(List names){
-        names.each{
-            tableHeaderNames.contains(it)
-        }
-    }
-
-    def validateFilteredRows(String txt){
-        previewRows.each{
-            it.contains(txt)
-        }
-    }
-
-    def verifyButtonIsDefaultWithNoChanges(){
-        waitFor{saveBtn.jquery.attr("class").contains("btn-default")}
-    }
 }

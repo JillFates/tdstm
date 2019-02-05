@@ -3,6 +3,10 @@ package modules
 import geb.Module
 import utils.CommonActions
 
+/**
+ * This class represents the grid containing the list of views in view manager and functionalities
+ * within that grid or its header
+ */
 class ViewsModule extends Module {
 
     static content = {

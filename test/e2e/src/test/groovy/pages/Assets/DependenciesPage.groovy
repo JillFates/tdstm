@@ -2,7 +2,7 @@ package pages.Assets
 
 import geb.Page
 import modules.CommonsModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 
 class DependenciesPage extends Page {
 
@@ -16,7 +16,7 @@ class DependenciesPage extends Page {
     static content = {
         dependenciesPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
         dependenciesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
-        assetsModule { module AssetsModule}
+        assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }
 
