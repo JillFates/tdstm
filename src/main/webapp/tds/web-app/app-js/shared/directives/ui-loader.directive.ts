@@ -25,6 +25,7 @@ export class UILoaderDirective {
 		this.httpRequestHandlerInitial();
 		this.httpRequestHandlerCompleted();
 		this.httpRequestHandlerCompletedWithErrors();
+		this.notificationRouteChange();
 		this.loaderConfig = this.loaderService.loaderConfig;
 	}
 
@@ -34,6 +35,13 @@ export class UILoaderDirective {
 
 	isInProgress(): boolean {
 		return this.loaderConfig.inProgress;
+	}
+
+	notificationRouteChange(): void {
+		this.notifierService.on('notificationRouteChange', (event) => {
+			// No idle period, show loader as soon as possible
+			this.loaderService.show();
+		});
 	}
 
 	httpRequestHandlerInitial() {

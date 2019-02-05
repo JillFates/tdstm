@@ -4,7 +4,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
@@ -42,6 +42,21 @@ export class TDSAppComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.handleTransitions();
+	}
+
+	/**
+	 * Listen to the Transitions
+	 */
+	private handleTransitions(): void {
+		// As soon as a transition start
+		this.router.events.subscribe((event) => {
+				this.notifierService.broadcast({
+					name: 'notificationRouteChange'
+				});
+			});
+
+		// Specific filter to get the information from the current Page of the latest request event
 		this.router.events
 			.filter((event) => event instanceof NavigationEnd)
 			.map(() => this.activatedRoute)
