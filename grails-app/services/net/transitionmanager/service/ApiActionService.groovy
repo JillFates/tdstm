@@ -281,6 +281,7 @@ class ApiActionService implements ServiceMethods {
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
 		Map optionalRequestParams = [
 			actionId: action.id,
+			projectId: action.project.id,
 			producesData: action.producesData,
 			credentials: action.credential?.toMap(),
 			apiAction: apiActionToMap(action)

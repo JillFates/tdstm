@@ -305,7 +305,8 @@ class Person extends Party {
 				tdsLink: tdsLink,
 				travelOK: travelOK,
 				teams: teams,
-				staffType: staffType
+				staffType: staffType,
+				personImageURL: personImageURL
 		]
 		return data.asImmutable()
 	}

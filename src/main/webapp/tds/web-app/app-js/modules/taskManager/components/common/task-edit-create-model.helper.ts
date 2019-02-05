@@ -260,6 +260,10 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
+		const predecessorTasks = predecessorList.filter((task) => task.id);
+		const successorTasks = successorList.filter((task) => task.id);
+
 		const deletedItems = this.model.deletedPredecessorList
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
@@ -300,10 +304,10 @@ export class TaskEditCreateModelHelper {
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
 			manageDependency: '1',
-			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
-				.concat(this.getTaskEdited(predecessorList, originalPredecessorList)),
-			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
-				.concat(this.getTaskEdited(successorList, originalSuccessorList)),
+			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
+				.concat(this.getTaskEdited(predecessorTasks, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
+				.concat(this.getTaskEdited(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '',
 			canEdit: true, /* ? */
@@ -326,6 +330,10 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
+		const predecessorTasks = predecessorList.filter((task) => task.id);
+		const successorTasks = successorList.filter((task) => task.id);
+
 		const deletedItems = this.model.deletedPredecessorList
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
@@ -366,10 +374,10 @@ export class TaskEditCreateModelHelper {
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
 			manageDependency: '1',
-			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
-				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
-			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
-				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
+			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
+				.concat(this.getTaskPrevious(predecessorTasks, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
+				.concat(this.getTaskPrevious(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '',
 			canEdit: true, /* ? */
@@ -388,31 +396,39 @@ export class TaskEditCreateModelHelper {
 
 	/**
 	 * Determine if predecessor/succesor collections contain changes
+	 * Ignore blank tasks
 	 * @returns {boolean}
 	 */
 	hasDependencyTasksChanges(): boolean {
-		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+		const predecessors = this.model.predecessorList.filter((task) => task.id);
+		const successors = this.model.successorList.filter((task) => task.id);
+
+		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors, successors});
 	}
 
 	/**
 	 * Determine if array predecessor contains duplicated tasks
+	 * It ignores blanks
 	 * @returns {boolean}
 	 */
 	hasDuplicatedPredecessors(): boolean {
-		return this.hasDuplicates(this.model.predecessorList);
+		const predecessorList = this.model.predecessorList.filter((item) => item.id);
+		return this.hasDuplicates(predecessorList);
 	}
 
 	/**
 	 * Determine if array successors contains duplicated tasks
+	 * It ignores blanks
 	 * @returns {boolean}
 	 */
 	hasDuplicatedSuccessors(): boolean {
-		return this.hasDuplicates(this.model.successorList);
+		const successorList = this.model.successorList.filter((item) => item.id);
+		return this.hasDuplicates(successorList);
 	}
 
 	/**
 	 * Determine if the array of objects passed as argument has duplicated id properties
-	 * @param {any[]} array
+	 * @param {any[]} array with values
 	 * @returns {boolean}
 	 */
 	private hasDuplicates(array: any[]): boolean {
@@ -487,11 +503,13 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
-	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
+	 * Determine if predecessor/successor collections contains invalid data, like duplicates
+	 * Ignore blank tasks
 	 * @returns {boolean}
 	 */
 	hasInvalidTasksDependencies(): boolean {
-		const {predecessorList, successorList} = this.model;
+		const predecessorList = this.model.predecessorList.filter((task) => task.id);
+		const successorList = this.model.successorList.filter((task) => task.id);
 
 		return this.hasDuplicates(predecessorList) ||
 			this.hasDuplicates(successorList) ||
