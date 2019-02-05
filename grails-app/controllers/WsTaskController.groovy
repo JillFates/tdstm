@@ -208,7 +208,16 @@ class WsTaskController implements ControllerMethods {
 
 	}
 
-
+	/**
+	 * Endpoint that returns a list of tasks matching the filters provided. Some of available parameters are:
+	 * - project (id)
+	 * - event (id)
+	 * - justMyTasks (1, Y)
+	 * - justRemaining (1, Y)
+	 * - justActionable (1, Y)
+	 * - viewUnpublished (1, Y)
+	 * @return a list with a Map representation of each task.
+	 */
 	@HasPermission(Permission.TaskView)
 	def list() {
 		/* This will contain a reference to, either the user's project, or the project specified as
