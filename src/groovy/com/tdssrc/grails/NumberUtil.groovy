@@ -90,7 +90,7 @@ class NumberUtil {
 				}
 			}
 
-			if (value.class in [Double, BigDecimal, BigInteger, Integer]) {
+			if (value.class in [Double, BigDecimal, BigInteger, Integer, Float]) {
 				value = value.longValue()
 			}
 
@@ -130,12 +130,22 @@ class NumberUtil {
 	 * @return the Long value if valid else null
 	 */
 	static Long toPositiveLong(value, Long defVal = null) {
-		Long result = toLong(value, defVal)
-		if (result != null && result < 0) {
-			defVal
+		Long result
+
+		if (value instanceof Long) {
+			result = value
+		} else if (value?.class in [Float, BigDecimal, BigInteger, Integer, Double]) {
+			result = value.longValue()
+		} else if (value instanceof CharSequence) {
+			result = (value.isLong() ? value.toLong() : defVal)
+		} else {
+			result = defVal
 		}
-		else {
-			result
+
+		if (result != null && result < 0) {
+			return defVal
+		} else {
+			return result
 		}
 	}
 
@@ -294,5 +304,40 @@ class NumberUtil {
 		} catch (java.lang.NumberFormatException e) {
 		}
 		return result
+	}
+
+	/**
+	 * Convert various types into a Double value. If value param is a number with Decimal,
+	 * it also returns the Double-part of the decimal value
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Long value if valid else null
+	 */
+	static Double toDoubleNumber(value, Double defVal = null) {
+
+		if(value == null) {
+			value = defVal
+		} else {
+
+			if (value instanceof CharSequence) {
+				if( value.isDouble() ){
+					value = value.toDouble()
+				} else if( value.isBigDecimal() ) {
+					value = value.toBigDecimal()
+				} else if( value.isLong() ) {
+					value = value.toLong()
+				}
+			}
+
+			if (value.class in [Float, BigDecimal, BigInteger, Integer, Long]) {
+				value = value.toDouble()
+			}
+
+			if (!(value instanceof Double)){
+				value = defVal
+			}
+		}
+
+		return value
 	}
 }

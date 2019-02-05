@@ -17,6 +17,8 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public availableTeamNames;
 	public salaryOptions;
 	public activeOptions;
+	public defaultImageURL = '../images/blankPerson.jpg'
+	public currentImageURL;
 	private teamKeys;
 	private savedPersonModel;
 
@@ -102,6 +104,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 					travelOK: 0,
 					teams: [],
 					staffType: [],
+					personImageURL: ''
 				};
 
 				this.personModel = Object.assign({}, defaultPerson, this.personModel);
@@ -115,6 +118,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 				});
 				this.savedPersonModel = Object.assign({}, this.personModel, this.savedPersonModel);
 				this.availableTeamNames = result.availableTeams.map(a => a.description);
+				this.currentImageURL = this.personModel.personImageURL;
 				// Populate the key map so we can reference which ids apply to which descriptions
 				for (let i = 0; i < result.availableTeams.length; i++) {
 					this.teamKeys[result.availableTeams[i].description] = result.availableTeams[i].id;
