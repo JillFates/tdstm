@@ -107,7 +107,7 @@ export class TaskCommentComponent implements OnInit {
 	public createComment(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
-				title: 'Create Comment',
+				title: 'Comment Create',
 				type: ModalType.CREATE
 			},
 			archive: false,

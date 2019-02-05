@@ -180,7 +180,8 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 			companies: [],
 			teams: [] ,
 			staffType: [],
-			selectedTeams: []
+			selectedTeams: [],
+			personImageURL: ''
 		};
 		this.personModel = Object.assign({},  defaultPerson, this.personModel)
 		this.dataSignature = JSON.stringify(this.personModel);

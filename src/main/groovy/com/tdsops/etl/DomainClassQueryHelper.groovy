@@ -104,7 +104,7 @@ class DomainClassQueryHelper {
 			}
 		}
 
-		return results
+ 		return results
 	}
 
 	/**
@@ -432,7 +432,7 @@ class DomainClassQueryHelper {
 
 				// Why is Project being queried ONLY if query is by reference ID?
 				if (GormUtil.isDomainProperty(propertyClazz, 'project')) {
-					where += " and ${property}.project =:${namedParameter}_project \n"
+					where += " and ${DOMAIN_ALIAS}.${condition.propertyName}.project =:${namedParameter}_project \n"
 					hqlParams[namedParameter + '_project'] = project
 				}
 				return where
@@ -519,75 +519,77 @@ class DomainClassQueryHelper {
 		String namedParameter,
 		Map<String, ?> hqlParams) {
 
-		String sentence
-
 		// Small numbers loaded from JSON are Integer and need to be forced to Long for HQL
 		if (property.endsWith('.id')) {
 			condition.value = NumberUtil.toPositiveLong(condition.value, 0)
 		}
 
+		Class propertyClazz = GormUtil.getDomainPropertyType(clazz, condition.propertyName)
+		Object value = transformValueToDomainPropertyClass(condition.value, propertyClazz)
+		String sentence
+
 		switch (condition.operator){
 			case FindOperator.eq:
 				sentence = " ${property} = :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.ne:
 				sentence = " ${property} != :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.nseq: //TODO: Review it with John
 				sentence = " ${property} != :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.lt:
 				sentence = " ${property} < :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.le:
 				sentence = " ${property} <= :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.gt:
 				sentence = " ${property} > :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.ge:
 				sentence = " ${property} >= :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.like:
 				sentence = " ${property} like :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.notLike:
 				sentence = " ${property} not like :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.contains:
 				sentence = " ${property} like :${namedParameter}\n"
-				hqlParams[namedParameter] = '%' + condition.value + '%'
+				hqlParams[namedParameter] = '%' + value + '%'
 				break
 			case FindOperator.notContains:
 				sentence = " ${property} not like :${namedParameter}\n"
-				hqlParams[namedParameter] = '%' + condition.value + '%'
+				hqlParams[namedParameter] = '%' + value + '%'
 				break
 			case FindOperator.inList:
 				sentence = " ${property} in :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.notInList:
 				sentence = " ${property} not in :${namedParameter}\n"
-				hqlParams[namedParameter] = condition.value
+				hqlParams[namedParameter] = value
 				break
 			case FindOperator.between:
 				sentence = " ${property} between :${namedParameter}_first and :${namedParameter}_last\n"
-				hqlParams[namedParameter + '_first'] = condition.value.first()
-				hqlParams[namedParameter + '_last'] = condition.value.last()
+				hqlParams[namedParameter + '_first'] = value.first()
+				hqlParams[namedParameter + '_last'] = value.last()
 				break
 			case FindOperator.notBetween:
 				sentence = " ${property} not between :${namedParameter}_first and :${namedParameter}_last\n"
-				hqlParams[namedParameter + '_first'] = condition.value.first()
-				hqlParams[namedParameter + '_last'] = condition.value.last()
+				hqlParams[namedParameter + '_first'] = value.first()
+				hqlParams[namedParameter + '_last'] = value.last()
 				break
 			case FindOperator.isNull:
 				sentence = " ${property} is null\n"
@@ -595,13 +597,44 @@ class DomainClassQueryHelper {
 			case FindOperator.isNotNull:
 				sentence = " ${property} is not null\n"
 				break
-
 			default:
 				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")
-
 		}
 
 		return checkAndAddAliases(clazz, property, namedParameter, sentence)
+	}
+
+	/**
+	 * <p>When user adds a value in a find command, this function can transform the original value
+	 * defined by user adjusting correctly its type.</p>
+	 * <pre>
+	 *   find Device by 'description' eq 2 into 'id'
+	 * </pre>
+	 * <p>In this case {@code Device#description} field is String type. This method converts value 2 in "2"
+	 * in order to avoid errors in find command<p>
+	 * <p>If user tries to use a Collection, then this method transform correctly each one of the collection items</p>
+	 * <pre>
+	 * 	find Device by 'description' inList [2, 3, 4] into 'id'
+	 * </pre>
+	 * <p>In this case {@code Device#description} find command is used in a inList query. In this case,
+	 * this method transforms [2, 3, 4] in ["2", "3", "4"] <p>
+	 * @param value an Object or a collection defined by user in find command
+	 * @param propertyClazz domain property class
+	 * @return value parameter transformed by propertyClazz parameter
+	 * @see AssetEntity#description
+	 */
+	static Object transformValueToDomainPropertyClass(Object value, Class propertyClazz) {
+
+		Boolean isCollection = Collection.isAssignableFrom(value.getClass())
+
+		if (propertyClazz == String) {
+			return isCollection ? value.collect { it.toString() } : value.toString()
+		} else if (propertyClazz == Long) {
+			return isCollection ? value.collect { NumberUtil.toLongNumber(it) } : NumberUtil.toLongNumber(value)
+		} else if (propertyClazz == Double) {
+			return isCollection ? value.collect { NumberUtil.toDoubleNumber(it) } : NumberUtil.toDoubleNumber(value)
+		}
+		return value
 	}
 
 	/**
