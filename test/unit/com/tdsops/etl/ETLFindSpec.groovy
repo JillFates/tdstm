@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
+import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 /**
@@ -113,9 +114,9 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -133,10 +134,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -157,12 +158,12 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						with(fields['id'].find, FindResult){
+						with(fields['id'].find, FindResult) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -174,11 +175,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					with(data[1], RowResult) {
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						with(fields['id'].find, FindResult){
+						with(fields['id'].find, FindResult) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -192,7 +193,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -200,7 +201,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -256,12 +257,12 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						with(fields['id'].find, FindResult){
+						with(fields['id'].find, FindResult) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -273,11 +274,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					with(data[1], RowResult) {
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						with(fields['id'].find, FindResult){
+						with(fields['id'].find, FindResult) {
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -291,14 +292,14 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
 				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -309,20 +310,20 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -342,10 +343,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -413,7 +414,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 14.29
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -423,7 +424,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [with] keyword is not found"() {
@@ -505,7 +506,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'Incorrect structure for find command at line 7'
 				startLine == 7
 				endLine == 7
@@ -515,7 +516,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found"() {
@@ -525,20 +526,20 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> assetEntities = [
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -553,15 +554,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
-					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
-					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -579,10 +580,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					  GMDEMO,
-					  dataSet,
-					  debugConsole,
-					  validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -597,7 +598,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'find/elseFind statement is missing required [into] keyword at line 6'
 				startLine == 6
 				endLine == 6
@@ -607,7 +608,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found in find with multiple fields"() {
@@ -637,7 +638,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'Incorrect structure for find command at line 9'
 				startLine == 9
 				endLine == 9
@@ -647,30 +648,30 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void "test exception when [find operation] keywords are not found"(){
+	void "test exception when [find operation] keywords are not found"() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -685,15 +686,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -711,10 +712,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -730,7 +731,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'find/elseFind statement is missing required [find operation] keyword at line 6'
 				startLine == 6
 				endLine == 6
@@ -740,7 +741,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables'() {
@@ -750,20 +751,20 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -778,15 +779,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -810,10 +811,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -867,11 +868,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 
 						fields.size() == 2
 
-						with(fields['asset'].find, FindResult){
+						with(fields['asset'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -908,7 +909,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 7.14
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -918,7 +919,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
@@ -1043,11 +1044,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 
 						fields.size() == 2
 
-						with(fields['asset'].find, FindResult){
+						with(fields['asset'].find, FindResult) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -1084,7 +1085,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 7.14
 				get('Application', [new FindCondition('id', '151954')]) == [151954l]
@@ -1094,7 +1095,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can grab the reference to the FINDINGS to be used later'() {
@@ -1104,20 +1105,20 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -1133,15 +1134,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -1159,10 +1160,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1199,7 +1200,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value for a findId'() {
@@ -1209,9 +1210,9 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -1229,10 +1230,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1264,7 +1265,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -1272,7 +1273,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
@@ -1282,10 +1283,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					dataSet,
-					debugConsole,
-					validator)
+				GroovyMock(Project),
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1301,7 +1302,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'No project selected in the user context at line 8'
 				startLine == 8
 				endLine == 8
@@ -1311,7 +1312,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if find command uses an invalid Find Operator'() {
@@ -1340,7 +1341,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'Unrecognized find criteria operator [equality] specified. Options are [eq, ne, nseq, lt, le, gt, ge, like, notLike, contains, notContains, inList, notInList, between, notBetween, isNull, isNotNull] at line 8'
 				startLine == 8
 				endLine == 8
@@ -1350,7 +1351,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
@@ -1360,8 +1361,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<Application> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 1l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 2l, appVendor: 'Apple', assetName: "ACME Data Center", project: GMDEMO]
+				[assetClass: AssetClass.APPLICATION, id: 1l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 2l, appVendor: 'Apple', assetName: "ACME Data Center", project: GMDEMO]
 			].collect {
 				Application mock = Mock()
 				mock.getId() >> it.id
@@ -1377,18 +1378,22 @@ class ETLFindSpec extends ETLBaseSpec {
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')) {
-					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+					applications.findAll {
+						it.getId() == namedParams.id && it.project.id == namedParams.project.id
+					}*.getId()
 				} else {
-					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+					applications.findAll {
+						it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id
+					}*.getId()
 				}
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1499,7 +1504,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with (etlProcessor.findCache) {
+			with(etlProcessor.findCache) {
 				size() == 4
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -1507,7 +1512,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can collect error messages in find command'() {
@@ -1609,7 +1614,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
@@ -1669,10 +1674,12 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				if (namedParams.containsKey('id')){
+				if (namedParams.containsKey('id')) {
 					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
-				} else if (namedParams.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }*.getId()
+				} else if (namedParams.containsKey('assetName')) {
+					return assetEntities.findAll {
+						it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName
+					}*.getId()
 				}
 			}
 
@@ -1708,7 +1715,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
 
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'You cannot use isApplication with more than one results in FINDINGS at line 14'
 				startLine == 14
 				endLine == 14
@@ -1718,7 +1725,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Rack domain instances and find Rooms associated'() {
@@ -1839,7 +1846,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Devices with locationSource, Rooms and Racks'() {
@@ -1925,7 +1932,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if the find/elseFind command is incorrectly formatted'() {
@@ -1981,7 +1988,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'Unrecognized command for with args [room] for the find / elseFind command at line 10'
 				startLine == 10
 				endLine == 10
@@ -1991,7 +1998,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using integer transformation'() {
@@ -2017,7 +2024,9 @@ class ETLFindSpec extends ETLBaseSpec {
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				assert NumberUtil.isaNumber(namedParams.id)
-				applications.findAll { it.id.toInteger() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.id.toInteger() == namedParams.id && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -2075,7 +2084,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -2083,7 +2092,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using number transformation'() {
@@ -2165,7 +2174,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == [152254l]
@@ -2173,7 +2182,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 0 results'() {
@@ -2252,7 +2261,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2260,7 +2269,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 1 result'() {
@@ -2353,7 +2362,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2361,7 +2370,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with more than 1 results'() {
@@ -2454,7 +2463,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('id', '152254')]) == []
@@ -2462,7 +2471,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-10678')
@@ -2586,14 +2595,14 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 3
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 2
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2610,14 +2619,14 @@ class ETLFindSpec extends ETLBaseSpec {
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'ERP']])
 							}
-							with(create){
+							with(create) {
 								assetName == 'ERP'
 
 							}
 						}
 
 					}
-					with(data[1]){
+					with(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2634,7 +2643,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'Oracle7-Cluster']])
 							}
-							with(create){
+							with(create) {
 								assetName == 'Oracle7-Cluster'
 
 							}
@@ -2646,7 +2655,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id'] as Set
 					data.size() == 2
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2663,14 +2672,14 @@ class ETLFindSpec extends ETLBaseSpec {
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'xraysrv001']])
 							}
-							with(create){
+							with(create) {
 								assetName == 'xraysrv001'
 
 							}
 						}
 
 					}
-					with(data[1]){
+					with(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2687,7 +2696,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								matchOn == null
 								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zuludb01']])
 							}
-							with(create){
+							with(create) {
 								assetName == 'zuludb01'
 
 							}
@@ -2703,7 +2712,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2734,7 +2743,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -2762,14 +2773,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2819,15 +2830,15 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [new FindCondition('appVendor','Microsoft')]) == [152253l]
+				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
 				get('Application', [new FindCondition('appVendor', 'Mozilla')]) == []
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2858,7 +2869,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -2884,14 +2897,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -2941,7 +2954,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
@@ -2949,7 +2962,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2980,7 +2993,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -3006,14 +3021,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3064,7 +3079,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3095,7 +3110,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -3125,14 +3142,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3152,7 +3169,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
-							with(create){
+							with(create) {
 								assetClass == ETLDomain.Application.name()
 								appVendor == 'Mozilla'
 								appTech == 'NGM'
@@ -3164,7 +3181,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3195,7 +3212,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -3225,14 +3244,14 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
@@ -3252,7 +3271,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query.size() == 1
 								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 							}
-							with(update){
+							with(update) {
 								assetClass == ETLDomain.Application.name()
 								appVendor == 'Microsoft'
 								appTech == '(xlsx updated)'
@@ -3264,7 +3283,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3295,7 +3314,9 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
@@ -3321,7 +3342,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 2
 
 				with(domains[0]) {
@@ -3334,7 +3355,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['description'] as Set
 					data.size() == 1
-					with(data[0]){
+					with(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
@@ -3358,7 +3379,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
@@ -3366,7 +3387,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3412,7 +3433,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldLabelMap == ['id': 'Id']
 					data.size() == 2
 
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 1
@@ -3420,7 +3441,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == '152254'
 							value == '152254'
 							init == null
@@ -3429,7 +3450,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3438,7 +3459,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1], RowResult){
+					with(data[1], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 1
@@ -3446,7 +3467,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == '152255'
 							value == '152255'
 							init == null
@@ -3455,7 +3476,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3466,7 +3487,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with(etlProcessor.findCache) {
 				size() == 0
 				hitCountRate() == 0
 			}
@@ -3487,10 +3508,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate('''
@@ -3521,7 +3542,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3536,10 +3557,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate('''
@@ -3570,7 +3591,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3592,10 +3613,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate('''
@@ -3621,7 +3642,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3629,27 +3650,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						with(fields['assetName'], FieldResult) {
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3662,7 +3683,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3670,27 +3691,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						with(fields['assetName'], FieldResult) {
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3702,7 +3723,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3724,10 +3745,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate('''
@@ -3753,7 +3774,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3761,27 +3782,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						with(fields['assetName'], FieldResult) {
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3794,7 +3815,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					with(data[0], RowResult){
+					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3802,27 +3823,27 @@ class ETLFindSpec extends ETLBaseSpec {
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						with(fields['assetName'], FieldResult){
+						with(fields['assetName'], FieldResult) {
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						with(fields['id'], FieldResult){
+						with(fields['id'], FieldResult) {
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							with(find, FindResult){
+							with(find, FindResult) {
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3834,7 +3855,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -3849,9 +3870,9 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -3869,10 +3890,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -3954,7 +3975,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -3969,9 +3990,9 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -3989,10 +4010,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -4077,7 +4098,68 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.findCache == null
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-12428')
+	@Unroll
+	void "test can throw an exception when user uses undefined variable statement #etlSentence"() {
+
+		setup:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+			""".stripIndent())
+
+		when:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+			etlProcessor.evaluate("""
+					console on
+					read labels
+					domain Application
+					iterate {
+						$etlSentence 
+					}
+				""".stripIndent())
+
+		then:
+			def e = thrown expectedException
+			ETLProcessor.getErrorMessage(e).message == errorMessage
+
+		cleanup:
+			if (fileName) service.deleteTemporaryFile(fileName)
+
+		where:
+			etlSentence                                                   || expectedException     | errorMessage
+			"find Application by 'id' eq undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' ne undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' nseq undefinedVar into 'id'"        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' lt undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' le undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' gt undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' ge undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' like undefinedVar into 'id'"        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notLike undefinedVar into 'id'"     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' contains undefinedVar into 'id'"    || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notContains undefinedVar into 'id'" || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' inList undefinedVar into 'id'"      || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notInList undefinedVar into 'id'"   || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' between undefinedVar into 'id'"     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notBetween undefinedVar into 'id'"  || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' is undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' not undefinedVar into 'id'"         || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract undefinedVar"                                        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"load undefinedVar"                                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"init undefinedVar"                                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"initialize undefinedVar"                                     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 load undefinedVar"                                 || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 init undefinedVar"                                 || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 initialize undefinedVar"                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
 	}
 }
 
