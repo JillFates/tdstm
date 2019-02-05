@@ -50,7 +50,7 @@ databaseChangeLog = {
 
 		// add new columns to api_action table
 		sql (""" 
-				ALTER TABLE `api_action` ADD COLUMN `action_type` VARCHAR(15) DEFAULT 'WebAPI'; 
+				ALTER TABLE `api_action` ADD COLUMN `action_type` VARCHAR(15) DEFAULT 'WEB_API'; 
 				ALTER TABLE `api_action` ADD COLUMN `script` MEDIUMTEXT;
 				ALTER TABLE `api_action` ADD COLUMN `command_line` VARCHAR(1024);
 				ALTER TABLE `api_action` ADD COLUMN `is_remote` BOOLEAN DEFAULT FALSE NOT NULL;
