@@ -24,4 +24,5 @@ export class PersonModel {
 	public teams: any[];
 	public staffType: any[];
 	public selectedTeams: any[];
+	public personImageURL: string;
 }
