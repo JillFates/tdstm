@@ -1764,15 +1764,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		List<Long> bundleIds = getBundleIds(contextObj)
 
 		return AssetEntity.createCriteria().list {
-			eq (moveBundle.useForPlanning, true)
+			createAlias('moveBundle', 'mb')
+			if (tagIds) {
+				createAlias('tagAssets', 'ta')
+				createAlias('ta.tag', 't')
+			}
+			eq ('mb.useForPlanning', true)
 			or {
 				if (tagIds) {
-					'in' (tagAssets.tag.id, tagIds)
+					'in' ('t.id', tagIds)
 					// Assets must belong to a planning bundle.
 
 				}
 				if (bundleIds) {
-					'in' (moveBundle.id, bundleIds)
+					'in' ('mb.id', bundleIds)
 				}
 			}
 		}
