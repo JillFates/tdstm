@@ -267,6 +267,10 @@ class SqlUtilTests extends Specification {
 			'%obyte'         || 'AE.scale IN :scale'     || [SizeScale.KB] // ends with obyte
 			'%obyt*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains obyt
 			'%ob*t*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains ob*t
+			'=@ADMIN'        || ' 1 = 0'                 || null
+			'!@ADMIN'        || ' 1 = 0'                 || null
+			'=@ADMIN|@DBA'   || ' 1 = 0'                 || null
+
 	}
 
 	@Unroll
