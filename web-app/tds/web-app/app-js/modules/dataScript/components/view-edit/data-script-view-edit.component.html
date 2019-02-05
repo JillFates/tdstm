@@ -13,12 +13,20 @@
 						<div class="form-group">
 							<label for="dataScriptProvider" class="col-sm-2 control-label">Provider:
 								<span class="is-required" *ngIf="modalType !== actionTypes.VIEW">*</span>
-							</label>
-							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<kendo-dropdownlist #dataScriptProvider id="dataScriptProvider" name="dataScriptProvider" class="form-control" [data]="providerList"
-								 [textField]="'name'" [valueField]="'id'" [defaultItem]="dataScriptModel.provider" [(ngModel)]="dataScriptModel.provider" required
-								 class="form-control"
-								 [ngClass]="{'has-error': dataScriptForm.touched && dataScriptModel.provider && !dataScriptModel.provider.id}"></kendo-dropdownlist>
+								<kendo-dropdownlist *ngIf="providerList && providerList.length > 0"
+													#dataScriptProvider
+													id="dataScriptProvider"
+													name="dataScriptProvider"
+													class="form-control"
+													[data]="providerList"
+													[textField]="'name'"
+													[valueField]="'id'"
+													[defaultItem]="dataScriptModel.provider"
+													[(ngModel)]="dataScriptModel.provider"
+													required
+													class="form-control"
+													[ngClass]="{'has-error': dataScriptForm.touched && (dataScriptModel.provider && !dataScriptModel.provider.id) }">
+								</kendo-dropdownlist>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 								<label class="control-label label-detail">{{dataScriptModel.provider.name}}</label>
