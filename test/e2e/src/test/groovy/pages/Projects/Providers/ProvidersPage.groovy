@@ -85,6 +85,10 @@ class ProvidersPage extends Page{
                 providersToDelete--
             }
         }
+        else{
+            println("There are no providers to delete")
+            true
+        }
     }
 
 }

@@ -21,6 +21,7 @@ class ProviderCleanUpSpec extends GebReportingSpec{
 
     def testKey
     static testCount
+    static provName = "E2E Provider"
 
     def setupSpec() {
         testCount = 0
@@ -43,6 +44,8 @@ class ProviderCleanUpSpec extends GebReportingSpec{
     def "1. Provider Cleanup is done"() {
         when: 'The User is on the Providers Page'
             at ProvidersPage
+        and: 'Filters the Providers by the E2E-created Providers'
+            filterByName provName
         and: 'The cleanup of providers is done' //A max of 8 providers are deleted by run
             cleanUpProviders()
         then: 'The cleanup is done and we remain on the Providers page'
