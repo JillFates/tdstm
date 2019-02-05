@@ -7,7 +7,7 @@
 		</td>
 	</tr>
 	<g:if test="${changingPassword}">
-		<tr class="prop js-password">
+		<tr class="prop passwordsEditFields">
 			<td valign="top" class="name">
 				<label for="oldPasswordId">Old Password:</label>
 			</td>
@@ -47,7 +47,7 @@
 			</ul>
 		</td>
 	</tr>
-	<tr>
+	<tr class="passwordsEditFields">
 		<td valign="top" class="name">
 			<label for="passwordId">
 				Confirm <g:if test="${changingPassword}">new </g:if>password:&nbsp;
@@ -63,7 +63,7 @@
 			</g:hasErrors>
 		</td>
 	</tr>
-	<tr class="passwordConfirmField">
+	<tr class="passwordConfirmField passwordsEditFields">
 		<td></td>
 		<td>
 			<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
