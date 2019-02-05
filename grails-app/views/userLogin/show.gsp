@@ -104,7 +104,7 @@
 							<td nowrap="nowrap" valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'failedLoginAttempts')}</td>
 						</tr>
 
-						<tr class="prop passwordsEditFields">
+						<tr class="prop">
 							<td valign="top" class="name">Locked Out Until:</td>
 							<td nowrap="nowrap" valign="middle" class="value">
 								<g:if test="${userLoginInstance?.lockedOutUntil}">
