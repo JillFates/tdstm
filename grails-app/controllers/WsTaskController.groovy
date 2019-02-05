@@ -1,15 +1,19 @@
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 
@@ -22,9 +26,10 @@ import net.transitionmanager.service.TaskService
 @Slf4j
 class WsTaskController implements ControllerMethods {
 
-	TaskService taskService
 	CommentService commentService
+	ProjectService projectService
 	QzSignService qzSignService
+	TaskService taskService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -200,6 +205,41 @@ class WsTaskController implements ControllerMethods {
 		// Save the comment.
 		saveOrUpdateComment()
 		renderSuccessJson()
+
+	}
+
+
+	@HasPermission(Permission.TaskView)
+	def list() {
+		/* This will contain a reference to, either the user's project, or the project specified as
+		a parameter (given that they have access to it). */
+		Project project
+		// Check if the user passed a project id.
+		Long projectId = params.long('project')
+		if (projectId) {
+			// Determine if the user has access to the specified project.
+			if (projectService.hasAccessToProject(null, projectId)) {
+				project = fetchDomain(Project, ['id': projectId])
+			} else {
+				throw new EmptyResultException('The user does not have access to the requested project.')
+			}
+		} else {
+			// If no project was specified, use the user's current project.
+			project = getProjectForWs()
+		}
+
+		// If the params map has an event, validate that it exists and belongs to the project.
+		Long eventId = params.long('event')
+		if (eventId) {
+			// We don't need the reference, just to validate that it exists and fail if it doesn't.
+			GormUtil.findInProject(project, MoveEvent, eventId, true)
+		}
+
+		Map results = commentService.filterTasks(project, params)
+		List<Map> tasks = results.tasks.collect {AssetComment task ->
+			task.toMap()
+		}
+		renderSuccessJson(tasks)
 
 	}
 

@@ -8,7 +8,9 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.BooleanUtils
@@ -30,54 +32,49 @@ class AssetCommentQueryBuilder {
 	/**
 	 * Map with the parameters for the query.
 	 */
-	Map whereParams
+	private Map whereParams
 
 	/**
 	 * Map with the params map used when calling this method.
 	 */
-	Map requestParams
+	private Map requestParams
 
 	/**
 	 * Current project.
 	 */
-	Project project
+	private Project project
 
 	/**
 	 * Query for retrieving all matching tasks.
 	 */
-	String query
+	private String query
 
 	/**
 	 * Query for retrieving the total number of records matching the filtering criteria. This needs to be done in
 	 * a second query since the master query will contain pagination info and, unlike Criteria, we don't have
 	 * access to the totalCount of records.
 	 */
-	String countQuery
+	private String countQuery
 
 	/**
 	 * Sorting expression for the queries.
 	 */
-	String sorting
+	private String sorting
 
 	/**
 	 * Name of the field used for sorting.
 	 */
-	String sortIndex
+	private String sortIndex
 
 	/**
 	 * Sorting order (asc or desc)
 	 */
-	String sortOrder
-
-	/**
-	 * Flag to restrict only to published tasks.
-	 */
-	boolean viewUnpublished
+	private String sortOrder
 
 	/**
 	 * Flag that keeps track of invalid filter such as non-existent enum strings.
 	 */
-	boolean invalidCriterion = false
+	private boolean invalidCriterion = false
 
 	/**
 	 * Constructor that takes all the parameters required for building the query for tasks.
@@ -88,9 +85,8 @@ class AssetCommentQueryBuilder {
 	 * @param sortOrder - asc/desc order for sorting the results.
 	 * @param viewUnpublished - when set to true, this flag will limit the results to only those that are unpublished.
 	 */
-	AssetCommentQueryBuilder(Project project, Map params, String sortIndex, String sortOrder, boolean viewUnpublished) {
+	AssetCommentQueryBuilder(Project project, Map params, String sortIndex, String sortOrder) {
 		this.project = project
-		this.viewUnpublished = viewUnpublished
 		this.sortIndex = sortIndex
 		this.sortOrder = sortOrder
 		requestParams = params
@@ -157,11 +153,6 @@ class AssetCommentQueryBuilder {
 	 * constructing the corresponding clause for every parameter.
 	 */
 	private void processParameters() {
-
-		// If the viewUnpublished flags wasn't set, limit the query only to published tasks.
-		if (!viewUnpublished) {
-			whereClauses << "ac.isPublished = true"
-		}
 
 		// Iterate over the filters provided by the user creating the corresponding where clause.
 		for (param in requestParams.keySet()) {
@@ -290,24 +281,6 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
-	 * if justMyTasks was set to '1', use the current person to narrow down search results.
-	 */
-	Closure justMyTasksBuilder = { String field, Map fieldMap ->
-		if (requestParams[field] == '1') {
-			processField(field, fieldMap, '=', ":${field}", securityService.loadCurrentPerson())
-		}
-	}
-
-	/**
-	 * If the justRemaining is set to '1', then filter all tasks with a status other than completed.
-	 */
-	Closure justRemainingBuilder = { String field, Map fieldMap ->
-		if (requestParams[field] == '1') {
-			processField(field, fieldMap, '!=', ":${field}", AssetCommentStatus.COMPLETED)
-		}
-	}
-
-	/**
 	 * Add a filter by MoveEvent if:
 	 * - The user selected an event (the param is not null and something other than zero). If the selected
 	 *      event is valid and different from the user preference, the preference is updated.
@@ -364,6 +337,47 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
+	 * Closure that handles the viewUnpublished parameter. If it's not present or it's set to false,
+	 * the results will be limited to published tasks.
+	 */
+	Closure viewUnpublishedBuilder = { String field, Map fieldMap ->
+		Boolean viewUnpublished = StringUtil.toBoolean(requestParams[field])
+		// If the viewUnpublished param is false or wasn't set, limit the query only to published tasks.
+		if (!viewUnpublished) {
+			whereClauses << "ac.isPublished = true"
+		}
+	}
+
+	/**
+	 * if justMyTasks was set to '1', use the current person to narrow down search results.
+	 */
+	Closure justMyTasksBuilder = { String field, Map fieldMap ->
+		if (StringUtil.toBoolean(requestParams[field])) {
+			Person person =  securityService.loadCurrentPerson()
+			List<String> assignedTeams = personService.getPersonTeamCodes(person)
+			List<String> clauses = []
+			clauses.add('ac.assignedTo = :currentPerson')
+			if (assignedTeams) {
+				clauses.add('(ac.assignedTo IS NULL AND ac.role IN (:assignedTeams))')
+				whereParams['assignedTeams'] = assignedTeams
+			}
+			whereClauses << "(${clauses.join(' OR ')})"
+			whereParams['currentPerson'] = person
+		}
+	}
+
+	/**
+	 * If the given parameter is set, this closure will build an IN expression.
+	 */
+	Closure inListIfSet = { String field, Map fieldMap ->
+		if (StringUtil.toBoolean(requestParams[field])) {
+			String namedParameter = "${field}List"
+			whereClauses << "${fieldMap['property']} in (:${namedParameter})"
+			whereParams[namedParameter] = fieldMap['values']
+		}
+	}
+
+	/**
 	 * Return the SecurityService instance.
 	 * @return securityService from the container
 	 */
@@ -377,6 +391,14 @@ class AssetCommentQueryBuilder {
 	 */
 	private static UserPreferenceService getUserPreferenceService() {
 		ApplicationContextHolder.getBean('userPreferenceService', UserPreferenceService)
+	}
+
+	/**
+	 * Return the PersonService instance from the container.
+	 * @return the personService bean from the container.
+	 */
+	private static PersonService getPersonService() {
+		ApplicationContextHolder.getBean('personService', PersonService)
 	}
 
 
@@ -413,8 +435,9 @@ class AssetCommentQueryBuilder {
 		'isPublished':          [property: 'ac.isPublished', builder: boolEqBuilder],
 		'isResolved':           [property: 'ac.dateResolved', builder: zeroIsNullBuilder ],
 		'hardAssigned':         [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
-		'justMyTasks':          [property: 'ac.assignedTo', builder: justMyTasksBuilder],
-		'justRemaining':        [property: 'ac.status', builder: justRemainingBuilder],
+		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.actionableStatusList],
+		'justMyTasks':          [builder: justMyTasksBuilder],
+		'justRemaining':        [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.justRemainingStatusList],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
 		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
@@ -425,6 +448,7 @@ class AssetCommentQueryBuilder {
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
+		'viewUnpublished':      [builder: viewUnpublishedBuilder],
 		'workflowTransition':   [property: 'ac.workflowTransition.id', builder: eqBuilder, joinTable: 'ac.workflowTransition'],
 	]
 

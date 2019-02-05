@@ -348,6 +348,55 @@ class AssetComment {
 		!(status in [ COMPLETED, TERMINATED ])
 	}
 
+	/**
+	 * This method gives a Map representation of the AssetComment including the most
+	 * useful fields. commentType is not included.
+	 * @return
+	 */
+	Map toMap() {
+		Map actionMap = null
+		if (apiAction) {
+			actionMap = [
+			    id: apiAction.id,
+				name: apiAction.name
+			]
+		}
+
+		Map assetMap = null
+		if (assetEntity) {
+			assetMap = [
+			    id: assetEntity.id,
+				name: assetEntity.assetName
+			]
+		}
+
+		Map assignedMap = null
+		if (assignedTo) {
+			assignedMap = [
+			    id: assignedTo.id,
+				name: assignedTo.toString()
+			]
+		}
+		return [
+		    id: id,
+			taskNumber: taskNumber,
+			title: comment,
+			status: status,
+			lastUpdated: lastUpdated,
+			action: actionMap,
+			asset: assetMap,
+			assignedTo: assignedMap,
+			estStart: estStart,
+			estFinish: estFinish,
+			actFinish: actFinish,
+			durationInMinutes: durationInMinutes(),
+			team: role,
+			isPublished: isPublished,
+			isActionInvocable: isActionInvocable(),
+			isAutomatic: isAutomatic()
+		]
+	}
+
 	// task Manager column header names and its labels
 	static final Map<String, String> taskCustomizeFieldAndLabel = [
 		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
