@@ -18,7 +18,7 @@
 								<kendo-dropdownlist #dataScriptProvider id="dataScriptProvider" name="dataScriptProvider" class="form-control" [data]="providerList"
 								 [textField]="'name'" [valueField]="'id'" [(ngModel)]="dataScriptModel.provider" required
 								 class="form-control"
-								 [ngClass]="{'has-error': dataScriptForm.touched && !dataScriptModel.provider.id}"></kendo-dropdownlist>
+								 [ngClass]="{'has-error': dataScriptForm.touched && dataScriptModel.provider && !dataScriptModel.provider.id}"></kendo-dropdownlist>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 								<label class="control-label label-detail">{{dataScriptModel.provider.name}}</label>
