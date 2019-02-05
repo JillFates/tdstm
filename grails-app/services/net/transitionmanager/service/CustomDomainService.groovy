@@ -28,7 +28,6 @@ class CustomDomainService implements ServiceMethods {
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
     SettingService settingService
-    def jdbcTemplate
 
     /**
      * This method retrieves the specs for the standard fields.
@@ -253,28 +252,18 @@ class CustomDomainService implements ServiceMethods {
      */
     List<String> getDistinctAssetCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
         assert project
-        StringBuilder query = new StringBuilder("SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} ")
-        query.append("FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ")
+        return AssetEntity.where {
+            project == project
 
-        // If shared then it won't filter on the individual asset class in order to get all distinct values
-        if (!shared) {
-            query.append(" AND asset_class = ? ")
-        }
+            if (!shared) {
+                assetClass == assetClass
+            }
 
-        // Set the sort order to be case sensitive
-        query.append(") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC")
+            projections {
+                distinct(fieldName)
+            }
 
-        List<String> result = []
-        List<Map<String, Object>> values = null
-        if (shared) {
-            values = jdbcTemplate.queryForList(query.toString(), project.id)
-        } else {
-            values = jdbcTemplate.queryForList(query.toString(), project.id, assetClass.toString())
-        }
-        for (Map<String, Object> value : values) {
-            result.add(value[fieldName])
-        }
-        return result
+        }.list([sort: fieldName, order: 'asc'])
     }
 
     /**
