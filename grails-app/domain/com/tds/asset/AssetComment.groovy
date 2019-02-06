@@ -1,5 +1,6 @@
 package com.tds.asset
 
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -360,7 +361,9 @@ class AssetComment {
 			    id: apiAction.id,
 				name: apiAction.name,
 				isRemote: false,
-				type: 'Api'
+				type: 'Api',
+				invokedAt: apiActionInvokedAt,
+				completedAt: apiActionCompletedAt
 			]
 		}
 
@@ -368,7 +371,9 @@ class AssetComment {
 		if (assetEntity) {
 			assetMap = [
 			    id: assetEntity.id,
-				name: assetEntity.assetName
+				name: assetEntity.assetName,
+				class: assetEntity.assetClass.toString() ?: '',
+				type: assetEntity.assetType ?: ''
 			]
 		}
 
@@ -385,10 +390,13 @@ class AssetComment {
 			title: comment,
 			status: status,
 			statusUpdated: statusUpdated,
+			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
 			lastUpdated: lastUpdated,
+			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),
 			action: actionMap,
 			asset: assetMap,
 			assignedTo: assignedMap,
+			category: category ?: '',
 			dateCreated: dateCreated,
 			hardAssigned: hardAssigned == 1,
 			estDurationMinutes: durationInMinutes(),
@@ -396,10 +404,10 @@ class AssetComment {
 			estFinish: estFinish,
 			actStart: actStart,
 			actFinish: actFinish,
-			team: role,
+			team: role ?: '',
 			isPublished: isPublished,
 			isActionInvocable: isActionInvocable(),
-			isAutomatic: isAutomatic()
+			isAutomatic: isAutomatic(),
 		]
 
 	}
