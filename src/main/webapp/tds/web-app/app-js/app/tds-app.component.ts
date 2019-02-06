@@ -71,6 +71,9 @@ export class TDSAppComponent implements OnInit {
 					name: 'notificationRouteNavigationEnd',
 					route: event
 				});
+				this.notifierService.broadcast( {
+					name: 'httpRequestCompleted'
+				});
 			});
 	}
 }

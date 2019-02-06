@@ -1,7 +1,6 @@
 <!-- Collect the nav links, forms, and other content for toggling -->
 <div class="collapse navbar-collapse pull-left navbar-ul-container navbar-ul-container-full-menu" id="navbar-collapse">
-    <!-- TODO: entire UL <g:if test="${currProject}"> -->
-    <ul class="nav navbar-nav">
+    <ul class="nav navbar-nav" *ngIf="userContext.project">
         <li *ngIf="hasPermission(permission.AdminMenuView)" class="dropdown menu-parent-admin">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin
                 <span class="caret"></span>
@@ -81,31 +80,23 @@
                 <li class="menu-child-item menu-projects-active-projects">
                     <a href="/tdstm/project/list?active=active" class="mmlink">Active Projects</a>
                 </li>
-                <!-- TODO: ENTIRE SECTION DOWN <g:if test="${currProject}"> -->
-                    <li class="menu-child-item menu-projects-current-project">
-                        <a href="/tdstm/projectUtil/index" class="mmlink">
-                            TM-Demo Details
-                            <!-- TODO: <g:if test="${currProject.name.size()>20}">${currProject.name.substring(0,20)+'...'}</g:if>-->
-                            <!-- TODO: <g:else>${currProject.name}</g:else> Details-->
-                        </a>
-                    </li>
-                    <li class="menu-child-item menu-projects-project-staff">
-                        <a href="/tdstm/person/manageProjectStaff" class="mmlink">Project Staff</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.UserSendActivations)" class="menu-child-item menu-projects-user-activation">
-                        <a href="/tdstm/project/userActivationEmailsForm" class="mmlink">User Activation Emails</a>
-                    </li>
-                    <li class="menu-child-item menu-projects-field-settings">
-                        <a [routerLink]="['/fieldsettings','list']">Asset Field Settings</a>
-                    </li>
-                    <li class="menu-child-item menu-projects-tags">
-                        <a [routerLink]="['/tag','list']">Tags</a>
-                    </li>
-                <!-- TODO: ENTIRE SECTION ABOVE </g:if> -->
-                <!-- TODO: <g:else> -->
-                    <!--<li class="menu-child-warn">No Project Selected</li>-->
-                <!--</g:else>-->
-
+                <li class="menu-child-item menu-projects-current-project">
+                    <a href="/tdstm/projectUtil/index" class="mmlink">
+                        <span class="menu-link-project-name">{{userContext.project.name}}</span>
+                    </a>
+                </li>
+                <li class="menu-child-item menu-projects-project-staff">
+                    <a href="/tdstm/person/manageProjectStaff" class="mmlink">Project Staff</a>
+                </li>
+                <li *ngIf="hasPermission(permission.UserSendActivations)" class="menu-child-item menu-projects-user-activation">
+                    <a href="/tdstm/project/userActivationEmailsForm" class="mmlink">User Activation Emails</a>
+                </li>
+                <li class="menu-child-item menu-projects-field-settings">
+                    <a [routerLink]="['/fieldsettings','list']">Asset Field Settings</a>
+                </li>
+                <li class="menu-child-item menu-projects-tags">
+                    <a [routerLink]="['/tag','list']">Tags</a>
+                </li>
                 <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
                     <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a>
                 </li>
@@ -250,11 +241,9 @@
                 <li class="menu-child-item menu-parent-planning-event-list">
                     <a href="/tdstm/moveEvent/list">List Events</a>
                 </li>
-                <!-- TODO: <g:if test="${currProject && moveEvent}">-->
-                    <!--<li class="menu-child-item menu-parent-planning-event-detail-list">-->
-                        <!--<g:link controller="moveEvent" action="show" id="${moveEvent.id}">${moveEvent.name} Event Details</g:link>-->
-                    <!--</li>-->
-                <!--</g:if>-->
+                <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
+                    <a href="/tdstm/moveEvent/show/{{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
+                </li>
                 <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
                     <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
                 </li>
@@ -272,11 +261,9 @@
                 <li class="menu-child-item menu-parent-planning-list-bundles">
                     <a href="/tdstm/moveBundle/list">List Bundles</a>
                 </li>
-                <!-- TODO: <g:if test="${currProject && moveBundle}">-->
-                    <!--<li class="menu-child-item menu-parent-planning-selected-bundle">-->
-                        <!--<g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link>-->
-                    <!--</li>-->
-                <!--</g:if>-->
+                <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
+                    <a href="/tdstm/moveBundle/show/{{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
+                </li>
                 <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
                     <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a>
                 </li>

@@ -9,6 +9,7 @@ import {HttpModule} from '@angular/http';
 import {TDSAppComponent} from './tds-app.component';
 // Service
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
+import {UserService} from '../modules/security/services/user.service';
 import {UserContextService} from '../modules/security/services/user-context.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
@@ -33,6 +34,7 @@ import {UserModule} from '../modules/user/user.module';
 	],
 	providers: [
 		AuthGuardService,
+		UserService,
 		UserContextService,
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
 		{

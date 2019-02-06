@@ -27,9 +27,9 @@
                    <li class="dropdown notifications-menu">
                        <!-- Menu toggle button -->
                         <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
-                            <!--<g:if test="${currProject}"> ${currProject.name} </g:if>-->
-                            <!--<g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>-->
-                            <!--<g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>-->
+                            <span *ngIf="userContext.project">{{userContext.project.name}}</span>
+                            <span *ngIf="userContext.event">{{userContext.event.name}}</span>
+                            <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
                         </a>
                     </li>
                     <li>
@@ -45,7 +45,7 @@
                             <!-- The user image in the navbar-->
                             <img src="/tdstm/assets/images/personIcon.png" class="user-image" alt="TDS">
                             <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                            <span class="hidden-xs user-name">{{userContext.userInfo.username}}</span>
+                            <span class="hidden-xs user-name">{{userContext.person.firstName}}</span>
                         </a>
                         <ul class="dropdown-menu user-dialog-dropdown-menu">
                             <!-- Menu Body -->

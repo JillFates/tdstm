@@ -20,7 +20,6 @@ import {UILoaderService} from '../shared/services/ui-loader.service';
 import {PersonService} from './services/person.service';
 import {PermissionService} from './services/permission.service';
 import {WindowService} from './services/window.service';
-import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
 import {ButtonsFactoryService} from './services/buttons-factory.service';
@@ -235,7 +234,6 @@ export class SharedModule {
 				WindowService,
 				BulkChangeService,
 				BulkCheckboxService,
-				UserService,
 				TranslatePipe,
 				ButtonsFactoryService,
 				{

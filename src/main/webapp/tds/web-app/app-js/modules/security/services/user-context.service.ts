@@ -7,7 +7,7 @@ import {Injectable} from '@angular/core';
 // Model
 import {UserContextModel, USER_CONTEXT_REQUEST} from '../model/user-context.model';
 // Services
-import {UserService} from '../../../shared/services/user.service';
+import {UserService} from './user.service';
 import {PermissionService} from '../../../shared/services/permission.service';
 // Others
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -35,18 +35,17 @@ export class UserContextService {
 	 */
 	public initializeUserContext() {
 		let contextPromises = [];
-		contextPromises.push(this.userService.getUserInfo());
+		contextPromises.push(this.userService.getUserContext());
 		contextPromises.push(this.userService.getLicenseManagerEnabled());
 		contextPromises.push(this.permissionService.getPermissions());
 
 		return new Promise((resolve) => {
 			Observable.forkJoin(contextPromises)
 				.subscribe((contextResponse: any) => {
-					this.userContextSubject.next({
-						userInfo: contextResponse[USER_CONTEXT_REQUEST.USER_INFO],
-						licenseEnabled: contextResponse[USER_CONTEXT_REQUEST.LICENSE_ENABLED],
-						permissions: contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS]
-					});
+					let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
+					userContext.licenseEnabled = contextResponse[USER_CONTEXT_REQUEST.LICENSE_ENABLED];
+					userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
+					this.userContextSubject.next(userContext);
 					resolve(true);
 				});
 		})

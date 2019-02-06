@@ -27,22 +27,6 @@
 
     <g:layoutHead />
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('.licensing-error-warning').popover({placement: 'bottom', container: 'body' });
-            $('.licensing-error-warning').click(function(event) { event.preventDefault(); });
-        });
-
-        function updateEventHeader( e ){
-        	console.warn('HERE, HERE');
-        	console.log(e);
-            var newsAndStatus = eval("(" + e.responseText + ")")
-            $("#head_mycrawlerId").html(newsAndStatus[0].news);
-            $("#head_crawler").addClass(newsAndStatus[0].cssClass)
-            $("#moveEventStatus").html(newsAndStatus[0].status)
-        }
-
-    </script>
 </head>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->

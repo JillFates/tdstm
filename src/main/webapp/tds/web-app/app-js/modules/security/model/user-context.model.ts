@@ -1,7 +1,13 @@
 export class UserContextModel {
-	userInfo: Object;
+	bundle: any;
+	dateFormat: string;
+	event: any;
+	person: any;
+	project: any;
+	timezone: string;
+	user: any;
 	licenseEnabled: boolean;
-	permissions: any[]
+	permissions: any[];
 }
 
 export enum USER_CONTEXT_REQUEST {
