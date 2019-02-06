@@ -47,11 +47,13 @@ class LicenseAdminServiceIntegrationTests extends Specification {
     private Project project
     private Person adminPerson
     UserLogin adminUser
-    private ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-    private PersonTestHelper personTestHelper = new PersonTestHelper()
+    private ProjectTestHelper projectTestHelper
+    private PersonTestHelper personTestHelper
 
 
     void setup() {
+        projectTestHelper = new ProjectTestHelper()
+        personTestHelper = new PersonTestHelper()
         // Enable the License Admin to be able to issue license requests
         grailsApplication.config.tdstm.license = [
                 enabled : true,

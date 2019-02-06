@@ -18,7 +18,7 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
@@ -26,6 +26,10 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
+import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
+import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
+import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
+import {SingleNoteComponent} from '../../../assetExplorer/components/single-note/single-note.component';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
@@ -76,7 +80,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 		this.isEventLocked = false;
 
-		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
 
 		this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 			this.modelHelper.getModelForCreate(this.taskDetailModel)
@@ -332,7 +336,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	/**
-	 * Create the t ask
+	 * Create the task
 	*/
 	protected onCreate(): void {
 		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
@@ -497,4 +501,20 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		}
 		return dataItem.text;
 	}
+
+	/**
+	 * Create a note and update the datagrid task notes component
+	 */
+	protected createNote() {
+		this.modelHelper.onCreateNote()
+			.subscribe((result) => {
+				if (result) {
+					this.model.notesList = result && result.data || [];
+					this.dataGridTaskNotesHelper =
+						new DataGridOperationsHelper(
+							this.modelHelper.generateNotes(this.model.notesList), null, null);
+				}
+			});
+	}
+
 }

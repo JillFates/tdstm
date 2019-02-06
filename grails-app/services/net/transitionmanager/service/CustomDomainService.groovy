@@ -538,7 +538,7 @@ class CustomDomainService implements ServiceMethods {
      * @param entity an instance of an AssetEntity hierarchy
      * @return entity instance with default values assigned
      */
-    Object setFieldsDefaultValue(FieldSpecProject fieldSpecProject, Class domainClass, Object entity) {
+    Object setCustomFieldsDefaultValue(FieldSpecProject fieldSpecProject, Class domainClass, Object entity) {
         Map<String, FieldSpec> fieldSpecMap = fieldSpecProject.getAllCustomFields(domainClass.getSimpleName())
         fieldSpecMap.each { String fieldName, FieldSpec fieldSpec ->
             entity[fieldName] = fieldSpec.defaultValue
