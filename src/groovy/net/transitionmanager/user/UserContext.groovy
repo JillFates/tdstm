@@ -52,12 +52,12 @@ class UserContext {
 				firstName: person.firstName,
 				fullName: person.toString()
 			],
-			currentProject: [
+			project: [
 			    id: project.id,
 				name: project.name
 			],
-			currentEvent: eventMap,
-			currentBundle: bundleMap,
+			event: eventMap,
+			bundle: bundleMap,
 			timezone: timezone,
 			dateFormat: dateFormat
 		]
