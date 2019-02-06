@@ -1,6 +1,6 @@
 package net.transitionmanager.dataview
 
-
+import com.tdsops.tm.enums.domain.AssetClass
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import net.transitionmanager.service.InvalidParamException
