@@ -289,6 +289,7 @@ class AssetCommentQueryBuilder {
 	Closure moveEventBuilder = { String field, Map fieldMap ->
 		Long moveEventId
 		String fieldValue = requestParams[field]
+		println "moveEventBuilder -- field $field -- $fieldValue"
 		if (fieldValue != null && fieldValue != '0') {
 			moveEventId = NumberUtil.toPositiveLong(fieldValue)
 			// If the parameter is null, used the user preference.

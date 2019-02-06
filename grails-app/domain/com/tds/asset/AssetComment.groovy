@@ -349,16 +349,18 @@ class AssetComment {
 	}
 
 	/**
-	 * This method gives a Map representation of the AssetComment including the most
-	 * useful fields. commentType is not included.
-	 * @return
+	 * This method generates a Map representation of the AssetComment including the most
+	 * useful fields for a Task. commentType is not included.
+	 * @return Map of the task attributes of the domain object
 	 */
-	Map toMap() {
+	Map taskToMap() {
 		Map actionMap = null
 		if (apiAction) {
 			actionMap = [
 			    id: apiAction.id,
-				name: apiAction.name
+				name: apiAction.name,
+				isRemote: false,
+				type: 'Api'
 			]
 		}
 
@@ -382,19 +384,24 @@ class AssetComment {
 			taskNumber: taskNumber,
 			title: comment,
 			status: status,
+			statusUpdated: statusUpdated,
 			lastUpdated: lastUpdated,
 			action: actionMap,
 			asset: assetMap,
 			assignedTo: assignedMap,
+			dateCreated: dateCreated,
+			hardAssigned: hardAssigned == 1,
+			estDurationMinutes: durationInMinutes(),
 			estStart: estStart,
 			estFinish: estFinish,
+			actStart: actStart,
 			actFinish: actFinish,
-			durationInMinutes: durationInMinutes(),
 			team: role,
 			isPublished: isPublished,
 			isActionInvocable: isActionInvocable(),
 			isAutomatic: isAutomatic()
 		]
+
 	}
 
 	// task Manager column header names and its labels
