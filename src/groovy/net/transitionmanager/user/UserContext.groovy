@@ -49,6 +49,7 @@ class UserContext {
 		    ],
 			person: [
 			    id: person.id,
+				firstName: person.firstName,
 				fullName: person.toString()
 			],
 			currentProject: [
