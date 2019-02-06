@@ -3,7 +3,7 @@ package pages.Projects.ETLScripts
 import geb.Page
 import modules.CommonsModule
 import geb.Browser
-import modules.ProjectsMenuModule
+import modules.ProjectsModule
 
 class ETLScriptsPage extends Page {
     static at = {
@@ -28,7 +28,7 @@ class ETLScriptsPage extends Page {
         commonsModule { module CommonsModule }
         //First Element of the Datascripts Table
         firstDS(wait:true) { $("tr" ,  class:"k-state-selected").find("td")[1]}
-        dsTableRows { $('tr[data-kendo-grid-item-index]')}
+        dsTableRows (required:false){ $('tr[data-kendo-grid-item-index]')}
         refreshGridIcon { $('span.glyphicon-refresh')}
         firstDSName { dsTableRows[0].find("td", "aria-colindex": "2")}
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
@@ -36,7 +36,23 @@ class ETLScriptsPage extends Page {
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
         firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
         projectsModule { module ProjectsMenuModule}
+        trashIconList {$(".fa.fa-fw.fa-trash")}
+        confirmationModal {$("div.modal-dialog.modal-sm")}
+        confirmYes {confirmationModal.find("button.btn.btn-primary.pull-left")}
+        noRecordsMessage (required:false){$("tr.k-grid-norecords")}
+
+
     }
+
+    /**
+     * Deletes a script based on its position
+     * @author ingrid
+     */
+    def deleteByPosition(position){
+        trashIconList[position].click()
+        waitFor{confirmYes.click()}
+    }
+
 
     def filterByName(name){
         scrollLeft()
