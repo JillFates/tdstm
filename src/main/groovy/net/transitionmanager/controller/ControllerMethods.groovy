@@ -93,6 +93,7 @@ trait ControllerMethods {
 	}
 
 	void renderAsJson(data) {
+		response.addHeader('content-type', 'application/json')
 		render(data as JSON)
 	}
 

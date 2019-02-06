@@ -754,6 +754,13 @@ class DataImportService implements ServiceMethods {
 			case ETLDomain.Files:
 			case ETLDomain.Storage:
 			case ETLDomain.Task:
+			case ETLDomain.Manufacturer:
+			case ETLDomain.Model:
+			case ETLDomain.Room:
+			case ETLDomain.Rack:
+			case ETLDomain.Person:
+			case ETLDomain.Bundle:
+			case ETLDomain.Event:
 				processEntityRecord(batch, record, context, recordCount)
 				break
 
@@ -954,7 +961,7 @@ class DataImportService implements ServiceMethods {
 
 		// Add default values for an assetEntity
 		if (AssetEntity.isAssignableFrom(domainClass)) {
-			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
+			entity = customDomainService.setCustomFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
 		}
 
 		// moveBundle

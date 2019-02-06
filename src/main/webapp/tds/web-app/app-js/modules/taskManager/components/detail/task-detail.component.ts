@@ -8,7 +8,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -24,6 +24,7 @@ import {DeviceModel} from '../../../assetExplorer/components/device/model-device
 import {ModelDeviceShowComponent} from '../../../assetExplorer/components/device/model-device/components/model-device-show/model-device-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {TaskCreateComponent} from '../create/task-create.component';
 
 @Component({
 	selector: `task-detail`,
@@ -137,7 +138,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 
-				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
 				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
 				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
@@ -311,4 +312,74 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			});
 		}
 	}
+
+	/**
+	 * Open the Task Create Dialog
+	 * on Success event adding a task it will reload the model
+	 * @param {any[]} taskList contains the model array with the task list
+	 * @param {any} gridHelper point out  to the corresponding grid which is using the list
+	 */
+	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
+		let taskCreateModel: TaskDetailModel = {
+			id: this.model.asset.id, // dataItem.common_id,
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: this.model.assetClass,
+				assetEntity: this.model.asset.id,
+				assetName:  this.model.assetName,
+				currentUserId: this.model.assignedTo.id
+			}
+		};
+
+		this.dialogService.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					const task = {
+						category: result.assetComment.category,
+						desc: result.assetComment.comment,
+						id: result.assetComment.id,
+						model: {
+							id: result.assetComment.id,
+							text: result.assetComment.comment
+						},
+						originalId: '',
+						status: result.assetComment.status,
+						taskId: result.assetComment.id,
+						taskNumber: result.assetComment.taskNumber
+					};
+
+					taskList.unshift(task);
+					gridHelper.addDataItem(task);
+					console.log('Reloading');
+					const payload = this.modelHelper.getPayloadForUpdate();
+
+					this.taskManagerService.updateTask(payload)
+						.subscribe((result) => this.loadTaskDetail());
+				}
+
+			}).catch(result => {
+			console.log('Cancel:', result);
+		});
+	}
+
+	/**
+	 * Create a note and update the datagrid task notes component
+	 */
+	protected createNote() {
+		this.modelHelper.onCreateNote()
+			.subscribe((result) => {
+				if (result) {
+					this.model.notesList = result && result.data || [];
+					this.dataGridTaskNotesHelper =
+						new DataGridOperationsHelper(
+							this.modelHelper.generateNotes(this.model.notesList), null, null);
+				}
+			});
+	}
+
 }
