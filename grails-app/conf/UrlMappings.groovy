@@ -339,7 +339,7 @@ class UrlMappings {
 
 
 		"/ws/task" {
-			controller = 'wsTask'
+			controller = 'task'
 			action = [
 			    GET: 'list'
 			]
