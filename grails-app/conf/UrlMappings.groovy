@@ -345,13 +345,6 @@ class UrlMappings {
 			]
 		}
 
-		"/api/task" {
-			controller = 'wsTask'
-			action = [
-				GET: 'list'
-			]
-		}
-
 		/**
 		 * AssetComment CRUD endpoints
 		 */
