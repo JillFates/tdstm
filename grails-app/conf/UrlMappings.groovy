@@ -434,6 +434,13 @@ class UrlMappings {
 			action = [GET: "getUser"]
 		}
 
+		"/ws/user/context" {
+			controller = 'user'
+			action = [
+				GET: 'context'
+			]
+		}
+
 		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
 			action = [ GET: "modelForPreferenceManager" ]
