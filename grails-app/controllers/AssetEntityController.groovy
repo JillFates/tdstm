@@ -1202,8 +1202,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		// Determine if only unpublished tasks need to be fetched.
 		boolean viewUnpublished = securityService.viewUnpublished()
 
+		params['viewUnpublished'] = viewUnpublished
+
 		// Fetch the tasks and the total count.
-		Map filterResults = commentService.filterTasks(project, params, viewUnpublished, sortIndex, sortOrder, maxRows, rowOffset)
+		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder, maxRows, rowOffset)
 
 		List<AssetComment> tasks = filterResults.tasks
 		Date today = new Date().clearTime()

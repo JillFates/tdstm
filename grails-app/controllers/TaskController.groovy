@@ -5,6 +5,7 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -30,6 +31,7 @@ import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.GraphvizService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.TaskService
@@ -77,6 +79,7 @@ class TaskController implements ControllerMethods {
 	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
+	ProjectService projectService
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
@@ -1113,9 +1116,51 @@ digraph runbook {
 		render(view: "_showTask", model: [])
 	}
 
+	/**
+	 * Endpoint that returns a list of tasks matching the filters provided. Some of available parameters are:
+	 * - project (id)
+	 * - event (id)
+	 * - justMyTasks (1, Y)
+	 * - justRemaining (1, Y)
+	 * - justActionable (1, Y)
+	 * - viewUnpublished (1, Y)
+	 * @return a list with a Map representation of each task.
+	 */
 	@HasPermission(Permission.TaskView)
 	def list() {
-		render(view: "_list", model: [])
+		// This will contain a reference to, either the user's project, or the project specified as
+		// a parameter (given that they have access to it)
+		Project project
+
+		// Check if the user passed a project id
+		Long projectId = params.long('projectId')
+		if (projectId) {
+			// Determine if the user has access to the specified project.
+			if (projectService.hasAccessToProject(null, projectId)) {
+				project = Project.get(projectId)
+			} else {
+				throw new EmptyResultException('Project not found')
+			}
+		} else {
+			// If no project was specified, use the user's current project.
+			project = getProjectForWs()
+		}
+
+		// If the params map has an event, validate that it exists and belongs to the project.
+		String eventIdParam = 'eventId'
+		Long eventId = params.long(eventIdParam)
+		if (eventId) {
+			// We don't need the reference, just to validate that it exists and fail if it doesn't.
+			GormUtil.findInProject(project, MoveEvent, eventId, true)
+			params.put('moveEvent', eventId)
+			params.remove(eventIdParam)
+		}
+
+		Map results = commentService.filterTasks(project, params)
+		List<Map> tasks = results.tasks.collect {AssetComment task ->
+			task.taskToMap()
+		}
+		renderSuccessJson(tasks)
 	}
 
 	/**

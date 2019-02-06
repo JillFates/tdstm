@@ -24,9 +24,9 @@ import net.transitionmanager.service.TaskService
 @Slf4j
 class WsTaskController implements ControllerMethods {
 
-	TaskService taskService
 	CommentService commentService
 	QzSignService qzSignService
+	TaskService taskService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before

@@ -337,6 +337,14 @@ class UrlMappings {
 			action = [GET:'qzCertificate']
 		}
 
+
+		"/ws/task" {
+			controller = 'task'
+			action = [
+			    GET: 'list'
+			]
+		}
+
 		/**
 		 * AssetComment CRUD endpoints
 		 */
