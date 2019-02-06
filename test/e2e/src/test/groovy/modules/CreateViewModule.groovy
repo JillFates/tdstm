@@ -19,10 +19,6 @@ class CreateViewModule extends Module {
         previewBtn                   {$("button",text:"Preview")}
         filterBtn                    {$("button",text:"Filter")}
         clearSearchBtn               {searchField.siblings()}
-//        saveBtn                      {$("button", text:"Save")}
-//        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
-//        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
-//        saveAs                       {$("a",text:"Save As")}
         closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
         assetsClasses                {$("a",text:"Asset Classes")}
@@ -72,7 +68,7 @@ class CreateViewModule extends Module {
         waitFor{previewBtn.click()}
     }
 
-    def String searchFieldName(){//OK
+    def String searchFieldName(){
         def checkboxes = $("div.row input")
         def num =Math.abs(new Random().nextInt() % checkboxes.size()-4)-1
         def name =checkboxes[num].parent().text()
@@ -81,7 +77,7 @@ class CreateViewModule extends Module {
         name
     }
 
-    def clearSearch(){//OK
+    def clearSearch(){
         clearSearchBtn.click()
     }
 
@@ -89,7 +85,7 @@ class CreateViewModule extends Module {
         fieldsFilter=value
     }
 
-    def selectRandomCheckboxes(){//ok
+    def selectRandomCheckboxes(){
         def checkboxes = $("div.row input")
         def willSelect =Math.abs(new Random().nextInt() % 5)+1
         for(int i = 1;i<willSelect+1;i++) {
@@ -101,7 +97,7 @@ class CreateViewModule extends Module {
         }
     }
 
-    def boolean selectedCheckboxesDisplayed(){//OK
+    def boolean selectedCheckboxesDisplayed(){
         boolean isChecked=true
         def selectedChecks =  $("div.nav-tabs-custom", type:"checkbox")
         for (int j=0;j<selectedChecks.size();j++){
@@ -126,7 +122,7 @@ class CreateViewModule extends Module {
     }
 
     //validates the name (label)of the filtered checkbox
-    def boolean filteredFieldMatchesDisplay(String value){//OK
+    def boolean filteredFieldMatchesDisplay(String value){
         def selectedChecks =  $("div.content.body input")
         //discards first input which is name filter field
         return selectedChecks[1].parent().text().trim().contains(value.trim())
@@ -171,12 +167,12 @@ class CreateViewModule extends Module {
      * validates the basic elements in the Fields tab are displayed as a way
      * to make sure we are in the fields tab
      */
-    def validateFieldsTab(){//ok
+    def validateFieldsTab(){
         previewBtn.displayed
         fieldsFilter.displayed
     }
 
-    def getListOfSelectedFields() {//OK
+    def getListOfSelectedFields() {
         def listOfFields= []
         def checks = $("div.content.body input")
         checks.each {

@@ -602,19 +602,19 @@ class ViewPage extends Page{
         waitFor{cloneAssetButtons[0].click()}
     }
 
-    def expectedColumnsDisplayed(List names){//MOVED FROM CREATE VIEW MODULE
+    def expectedColumnsDisplayed(List names){
         names.each{
             tableHeaderNames.contains(it)
         }
     }
 
-    def validateFilteredRows(String txt){//MOVED FROM CREATE VIEW MODULE
+    def validateFilteredRows(String txt){
         previewRows.each{
             it.contains(txt)
         }
     }
 
-    def filterPreviewByText(String txt){//OK
+    def filterPreviewByText(String txt){
         firstPreviewFilter=txt
     }
 }
