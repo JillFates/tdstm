@@ -47,7 +47,7 @@ class AuditService implements InitializingBean {
 			params = filterParams(params)
 
 			String paramsMsg = params.size() ? params.toString() + ' :' : ''
-			String user = springSecurityService.principal.name ?: 'ANONYMOUS_USER'
+			String user = springSecurityService.principal.username ?: 'ANONYMOUS_USER'
 			String remoteIp = HtmlUtil.getRemoteIp(request)
 			log.info 'USER_ACTIVITY: {} invoked {} {} {}', 
 				user, request.method, auditUri, remoteIp
@@ -90,7 +90,7 @@ class AuditService implements InitializingBean {
 
 	void logSecurityViolation(String username = null, message) {
 		if (username == null) {
-			username = springSecurityService.principal.name ?: 'ANONYMOUS_USER'
+			username = springSecurityService.principal.username ?: 'ANONYMOUS_USER'
 		}
 		log.info 'SECURITY_VIOLATION: {} by {}', message, username
 	}

@@ -2527,7 +2527,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	@HasPermission(Permission.AssetView)
 	def classForAsset() {
-		renderSuccessJson(assetClass: AssetClass.getClassOptionForAsset(AssetEntity.load(params.id)))
+		renderSuccessJson(assetClass: AssetClass.getClassOptionForAsset(fetchDomain(AssetEntity, params)))
 	}
 
 	@HasPermission(Permission.AssetExport)

@@ -1,11 +1,13 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ProgressCallback
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.FileSystemUtil
@@ -321,7 +323,8 @@ class DataImportService implements ServiceMethods {
 			errorList: JsonUtil.toJson( (rowData.errors ?: []) ),
 			warn: (rowData.warn ? 1 : 0),
 			duplicateReferences: dupsFound,
-			fieldsInfo: JsonUtil.toJson(rowData.fields)
+			fieldsInfo: JsonUtil.toJson(rowData.fields),
+			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
 		if (! batchRecord.save(failOnError:false)) {
@@ -751,6 +754,13 @@ class DataImportService implements ServiceMethods {
 			case ETLDomain.Files:
 			case ETLDomain.Storage:
 			case ETLDomain.Task:
+			case ETLDomain.Manufacturer:
+			case ETLDomain.Model:
+			case ETLDomain.Room:
+			case ETLDomain.Rack:
+			case ETLDomain.Person:
+			case ETLDomain.Bundle:
+			case ETLDomain.Event:
 				processEntityRecord(batch, record, context, recordCount)
 				break
 
@@ -801,17 +811,24 @@ class DataImportService implements ServiceMethods {
 					// Determine the correct Operation that was performed and if the record should be saved
 					Boolean shouldBeSaved = true
 					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
-					if ( record.operation == ImportOperationEnum.UPDATE && ! GormUtil.hasUnsavedChanges(entity) ) {
+					if ( record.operation == ImportOperationEnum.UPDATE && ! GormUtil.hasUnsavedChanges(entity) && !record.hasComments()) {
 						record.operation = ImportOperationEnum.UNCHANGED
 						shouldBeSaved = false
 					}
 
-					// log.debug "processEntityRecord() Saving the Dependency"
 					if (shouldBeSaved) {
+
 						if (entity.save(failOnError:false)) {
+
+							if (record.hasComments()) {
+								List<String> comments = record.commentsAsList()
+								log.info "processEntityRecord() record ${record.id} contains comments ${}"
+								saveCommentsForEntity(comments, entity, context)
+								entity.lastUpdated = new Date()
+							}
 							// If we still have a dependency record then the process must have finished
 							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-							//    Note that I was running to some strange issues of casting that prevented from doing this originally
+							// Note that I was running to some strange issues of casting that prevented from doing this originally
 							// record.status = ImportBatchRecordStatusEnum.COMPLETED
 							record.status = ImportBatchStatusEnum.COMPLETED
 						} else {
@@ -846,6 +863,24 @@ class DataImportService implements ServiceMethods {
 		}
 	}
 
+	/**
+	 * Saves {@code AssetComment} List for domain classes. It creates instances using {@code AssetCommentType.COMMENT} type
+	 * @param comments a {@code List} of {@code String} values.
+	 * @param entity an instance of a domain to be used to link new instances of {@code AssetComment}.
+	 * @param context a {@code Map}  with context information.
+	 * 			It contains project field used in {@code AssetComment} creation.
+	 */
+	void saveCommentsForEntity(List<String> comments, Object entity, Map context) {
+		comments.each { String comment ->
+			new AssetComment(
+				project: context.project,
+				comment: comment,
+				commentType: AssetCommentType.COMMENT,
+				assetEntity: entity
+			).save(failOnError: true)
+		}
+	}
+  
 	/**
 	 * This method should be used after any SearchQueryHelper.findEntityByMetaData calls to record errors
 	 * into the field or import batch record errors appropriately.
@@ -926,7 +961,7 @@ class DataImportService implements ServiceMethods {
 
 		// Add default values for an assetEntity
 		if (AssetEntity.isAssignableFrom(domainClass)) {
-			entity = customDomainService.setFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
+			entity = customDomainService.setCustomFieldsDefaultValue(context.fieldSpecProject, domainClass, entity)
 		}
 
 		// moveBundle

@@ -6,9 +6,11 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.MoveEventStaff
@@ -20,6 +22,7 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.security.Permission
+import net.transitionmanager.user.UserContext
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
 
@@ -713,5 +716,48 @@ class UserService implements ServiceMethods {
 			)
 			userLoginProjectAccess.save(failOnError: true)
 		}
+	}
+
+	/**
+	 * Populate a UserContext object with the following information:
+	 * - User Login
+	 * - Person
+	 * - Project
+	 * - MoveEvent
+	 * - MoveBundle
+	 * - Timezone
+	 * - Date Format
+	 * @return a UserContext instance that gathers the user's most relevant information.
+	 */
+	UserContext getUserContext() {
+		Project project = securityService.getUserCurrentProject()
+		UserLogin userLogin = securityService.getUserLogin()
+		Person person = securityService.loadCurrentPerson()
+		MoveEvent moveEvent
+		String eventPref = userPreferenceService.getMoveEventId(userLogin)
+		if (eventPref) {
+			moveEvent = GormUtil.findInProject(project, MoveEvent, NumberUtil.toPositiveLong(eventPref), true)
+		}
+		MoveBundle moveBundle
+		String bundlePref = userPreferenceService.getMoveBundleId()
+		if (bundlePref) {
+			moveBundle = GormUtil.findInProject(project, MoveBundle, NumberUtil.toPositiveLong(bundlePref), true)
+		}
+
+		String timezone = userPreferenceService.getTimeZone(userLogin, TimeUtil.defaultTimeZone)
+		String dateFormat = userPreferenceService.getDateFormat(userLogin)
+		if (!dateFormat) {
+			dateFormat = TimeUtil.defaultFormatType
+		}
+		Map contextParams = [
+		    person: person,
+			userLogin: userLogin,
+			project: project,
+			moveEvent: moveEvent,
+			moveBundle: moveBundle,
+			timezone: timezone,
+			dateFormat: dateFormat
+		]
+		return new UserContext(contextParams)
 	}
 }

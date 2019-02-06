@@ -62,8 +62,6 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 
 		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
 
-		fileSystemService.onApplicationEvent(null)
-
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetFileName = fileName
 		sixRowsDataSetOS << 'device id,model name,manufacturer name\n'

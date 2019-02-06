@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 import grails.testing.gorm.DomainUnitTest
 import groovy.json.internal.LazyMap
 import net.transitionmanager.domain.Project
+import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -29,7 +30,7 @@ class DomainClassQueryHelperSpec extends Specification implements DomainUnitTest
 			DomainClassQueryHelper.getNamedParameterForField(domain, new FindCondition(field, value)) == result
 
 		where:
-			domain                | field            | value      || result
+			domain               | field            | value      || result
 			ETLDomain.Device     | 'id'             | 123        || 'id'
 			ETLDomain.Device     | 'id'             | 432165l    || 'id'
 			ETLDomain.Device     | 'manufacturer'   | 'IBM'      || 'manufacturer_name'
@@ -115,5 +116,46 @@ class DomainClassQueryHelperSpec extends Specification implements DomainUnitTest
 			'isNull'    | lazy  | 3
 			'isNull'    | '123' | 3
 
+	}
+
+	@See('TM-13978')
+	@Unroll
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can convert Device #propertyName field correctly with value #findConditionValue'() {
+
+		given:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				assert namedParams[propertyName] == hqlNamedParam
+				return []
+			}
+
+		expect:
+			DomainClassQueryHelper.where(
+				ETLDomain.Device,
+				project,
+				[
+					new FindCondition(propertyName, findConditionValue)
+				],
+				true
+			).size() == 0
+
+		where:
+			propertyName    | findConditionValue || hqlNamedParam
+			'description'   | 22                 || '22'
+			'description'   | 22f                || '22.0'
+			'description'   | 22d                || '22.0'
+			'description'   | 22l                || '22'
+			'description'   | '22'               || '22'
+			'id'            | 12                 || 12l
+			'id'            | 12f                || 12l
+			'id'            | 12d                || 12l
+			'id'            | 12l                || 12l
+			'id'            | '12'               || 12l
+			'purchasePrice' | 22                 || 22d
+			'purchasePrice' | 22f                || 22d
+			'purchasePrice' | 22d                || 22d
+			'purchasePrice' | 22l                || 22d
+			'purchasePrice' | '22'               || 22d
 	}
 }

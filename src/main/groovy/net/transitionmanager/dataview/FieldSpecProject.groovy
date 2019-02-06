@@ -1,6 +1,6 @@
 package net.transitionmanager.dataview
 
-
+import com.tdsops.tm.enums.domain.AssetClass
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import net.transitionmanager.service.InvalidParamException
@@ -82,7 +82,7 @@ class FieldSpecProject {
 	 * @see FieldSpec#isCustom()
 	 */
 	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
-		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(assetClassName.toUpperCase())
-		return allFieldSpecs.findAll { it.value.isCustom() }
+		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(AssetClass.getDomainForAssetType(assetClassName).toUpperCase())
+		return allFieldSpecs.findAll { it.value?.isCustom() }
 	}
 }

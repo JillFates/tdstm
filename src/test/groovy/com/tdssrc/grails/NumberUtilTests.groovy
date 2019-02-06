@@ -174,11 +174,93 @@ class NumberUtilTests extends Specification {
 		expect:
 			result == NumberUtil.toDouble(value, precision, defValue)
 		where:
-			value       | precision	| defValue	| result
-			'123.1236'	| null		| null		| 123.1236
-			'123.1236'	| 3			| null		| 123.124
-			null		| 2			| 5.0		| 5.0
-			'foo'		| 2			| 5.0		| 5.0
+			value      | precision | defValue | result
+			'123.1236' | null      | null     | 123.1236
+			'123.1236' | 3         | null     | 123.124
+			null       | 2         | 5.0      | 5.0
+			'foo'      | 2         | 5.0      | 5.0
 	}
 
+	@Unroll
+	def 'test toLongNumber transformation with value #value and default value #defaultValue to #result'() {
+
+		expect:
+			result == NumberUtil.toLongNumber(value, defaultValue)
+
+		where:
+			value                   | defaultValue || result
+			12                      | 12l          || 12l
+			12                      | null         || 12l
+			'12'                    | 12l          || 12l
+			'12'                    | null         || 12l
+			12l                     | 12l          || 12l
+			12l                     | null         || 12l
+			12f                     | 12l          || 12l
+			12f                     | null         || 12l
+			12d                     | 12l          || 12l
+			12d                     | null         || 12l
+			null                    | 12l          || 12l
+			null                    | null         || null
+			new BigDecimal('12.12') | 12l          || 12l
+			new BigDecimal('12.12') | null         || 12l
+	}
+
+	@Unroll
+	def 'test toDoubleNumber transformation with value #value and default value #defaultValue to #result'() {
+
+		expect:
+			result == NumberUtil.toDoubleNumber(value, defaultValue)
+
+		where:
+			value                   | defaultValue || result
+			12                      | 12d          || 12d
+			12                      | null         || 12d
+			'12'                    | 12d          || 12d
+			'12'                    | null         || 12d
+			12l                     | 12d          || 12d
+			12l                     | null         || 12d
+			12f                     | 12d          || 12d
+			12f                     | null         || 12d
+			12d                     | 12d          || 12d
+			12d                     | null         || 12d
+			null                    | 12d          || 12d
+			null                    | null         || null
+			new BigDecimal('12.12') | 12d          || 12.12d
+			new BigDecimal('12.12') | null         || 12.12d
+
+	}
+
+	@Unroll
+	def 'test toPositiveLong transformation with value #value and default value #defaultValue to #result'() {
+
+		expect:
+			result == NumberUtil.toPositiveLong(value, defaultValue)
+
+		where:
+			value                   | defaultValue || result
+			12                      | 12l          || 12l
+			12                      | null         || 12l
+			-12                     | 12l          || 12l
+			-12                     | null         || null
+			'12'                    | 12l          || 12l
+			'12'                    | null         || 12l
+			'-12'                   | 12l          || 12l
+			'-12'                   | null         || null
+			12l                     | 12l          || 12l
+			12l                     | null         || 12l
+			-12l                    | 12l          || 12l
+			-12l                    | null         || null
+			12f                     | 12l          || 12l
+			12f                     | null         || 12l
+			-12f                    | 12l          || 12l
+			-12f                    | null         || null
+			12d                     | 12l          || 12l
+			12d                     | null         || 12l
+			-12d                    | 12l          || 12l
+			-12d                    | null         || null
+			null                    | 12l          || 12l
+			null                    | null         || null
+			new BigDecimal('12.12') | 12l          || 12l
+			new BigDecimal('12.12') | null         || 12l
+	}
 }

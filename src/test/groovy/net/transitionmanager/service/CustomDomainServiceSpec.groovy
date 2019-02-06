@@ -1,6 +1,10 @@
 package net.transitionmanager.service
 
 import com.tds.asset.Application
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
@@ -13,6 +17,7 @@ import net.transitionmanager.domain.Timezone
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<CustomDomainService>, DataTest {
 
@@ -45,10 +50,10 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 		defaultProject.save(failOnError: true)
 
 		[
-			'Application': applicationJsonFieldSpec,
-			'Device'     : '{"fields":[],"domain":"DEVICE"}',
-			'Database'   : '{"fields":[],"domain":"DATABASE"}',
-			'Storage'    : '{"fields":[],"domain":"STORAGE"}'
+			'Application': createJSONFieldSpecFor(AssetClass.APPLICATION),
+			'Device'     : createJSONFieldSpecFor(AssetClass.DEVICE),
+			'Database'   : createJSONFieldSpecFor(AssetClass.DATABASE),
+			'Storage'    : createJSONFieldSpecFor(AssetClass.STORAGE),
 		].each {
 			Setting setting = new Setting()
 			setting.project = defaultProject
@@ -61,21 +66,27 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 		fieldSpecProject = service.createFieldSpecProject(defaultProject)
 	}
 
-	void 'test can set default custom field values for an instance of Application Asset'() {
+	@Unroll
+	void 'test can set default custom field values for an instance of #domainClass'() {
 
-		given: 'an instance of an asset entity hierarchy'
-			Class domainClass = Application
+		setup: 'an instance of an asset entity hierarchy'
 			Object entity = domainClass.newInstance()
 			entity.project = defaultProject
 
-		when: 'service set default field values'
-			entity = service.setFieldsDefaultValue(fieldSpecProject, domainClass, entity)
+		expect: 'service set default field values'
+			service.setCustomFieldsDefaultValue(fieldSpecProject, domainClass, entity).custom6 == fieldDefaultValue
 
-		then: 'entity contains correct default value defined in field spec'
-			entity.custom6 == 'Yes'
+		where:
+			domainClass || fieldDefaultValue
+			Application || 'Yes'
+			AssetEntity || 'Yes'
+			Database    || 'Yes'
+			Files       || 'Yes'
 	}
 
-	private static final String applicationJsonFieldSpec = """
+
+	private static String createJSONFieldSpecFor(AssetClass assetClass) {
+		return """
 		{
 		   "planMethodology":"",
 		   "fields":[
@@ -101,35 +112,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 				 "udf":1
 			  }
 		   ],
-		   "domain":"APPLICATION"
+		   "domain":"${assetClass.name()}"
 		}"""
-
-
-	private static final Map applicationJsonFieldMap = [
-		"planMethodology": "",
-		"fields"         : [
-			[
-				"bulkChangeActions": [
-					"replace"
-				],
-				"constraints"      : [
-					"required": 1,
-					"values"  : [
-						"Yes",
-						"No"
-					]
-				],
-				"control"          : "YesNo",
-				"default"          : "Yes",
-				"field"            : "custom6",
-				"imp"              : "B",
-				"label"            : "Free",
-				"order"            : 23,
-				"shared"           : 0,
-				"show"             : 1,
-				"udf"              : 1
-			]
-		],
-		"domain"         : "APPLICATION"
-	]
+	}
 }

@@ -17,7 +17,6 @@ plugins {
 
 version "4.7.0"
 group "tdstm"
-buildDir = 'target'
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -26,8 +25,9 @@ apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
 
-integrationTest.reports.html.destination = file("$buildDir/test-integration/test-reports/html")
-test.reports.html.destination = file("$buildDir/test-unit/test-reports/html")
+war {
+    archiveName = "tdstm-${version}.war"
+}
 
 repositories {
 	mavenLocal()
@@ -38,7 +38,13 @@ repositories {
 }
 
 configurations {
-    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+	all {
+		exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		exclude module: 'bcmail-jdk14'
+		exclude module: 'bcprov-jdk14'
+		exclude module: 'bctsp-jdk14'
+	}
+
 }
 
 dependencies {
@@ -108,9 +114,7 @@ dependencies {
 		exclude group: 'org.apache.hadoop:hadoop-common'
 	}
 
-//	testCompile('com.stehno.ersatz:ersatz:1.7.0') {
-//		exclude group: 'ch.qos.logback:logback-classic'
-//	}
+	testCompile 'com.stehno.ersatz:ersatz:1.9.0:safe@jar'
 
 	compile 'org.grails.plugins:ajax-tags:1.0.0.RC1' //TODO remove once we remove the GSP UI 2018-12-1
 	compile "org.grails.plugins:converters"
@@ -120,7 +124,7 @@ dependencies {
 	compile 'org.grails.plugins:quartz:2.0.13'
 	compile 'org.grails.plugins:spring-security-core:3.2.3'
 	compile 'org.grails.plugins:spring-security-ldap:3.0.2'
-	//compile 'org.grails.plugins:greenmail:2.0.0.RC2'
+	compile 'org.grails.plugins:greenmail:2.0.0.RC2'
 
 
 	compile ('org.grails.plugins:spring-security-rest:2.0.0.RC1') {
@@ -214,3 +218,5 @@ test {
     if (project.hasProperty('forkEvery'))
         forkEvery = project.forkEvery as int
 }
+
+test.reports.html.destination = file("target/test-unit/test-reports/html")

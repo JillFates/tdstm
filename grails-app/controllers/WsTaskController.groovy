@@ -1,8 +1,7 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
@@ -164,16 +163,40 @@ class WsTaskController implements ControllerMethods {
 	}
 
 	/**
-	 * Create or Update an AssetComment
-	 * @param id
-	 * @param command
+	 * @See TM-13937
+	 * Adds a note to a task and returns the list of notes associated to that Task.
+	 * @param id  The task id
+	 * @param note  The note text
+	 * @return  The list of notes associated to the Task.
 	 */
-	private void saveOrUpdateComment() {
-		// Retrieve the project for the user.
-		Project project = getProjectForWs()
-		// Populate the command object with the data coming from the request
-		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
-		// Save or update the comment
-		commentService.saveOrUpdateAssetComment(project, command)
+	@HasPermission(Permission.CommentEdit)
+	def addNote() {
+		AssetComment assetComment = fetchDomain(AssetComment, params)
+		if (assetComment) {
+			Map requestParams = request.JSON
+			Person whom = securityService.loadCurrentPerson()
+			Boolean status = taskService.addNote(assetComment, whom, requestParams.note, 0)
+			if (!status) {
+				def errorMsg = " There was a problem when creating Note for Task whithz id - $params.id "
+				log.error "addNote: $errorMsg"
+				renderErrorJson([errorMsg])
+			}
+
+			// Get a list of the Notes associated with the task/comment
+			List notes = []
+			List notesList = taskService.getNotes(assetComment)
+			for (note in notesList) {
+				notes << [
+						TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
+						note.createdBy?.toString(),
+						note.note,
+						note.createdBy?.id]
+			}
+			renderSuccessJson(notes)
+		} else {
+			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
+			log.error "addNote: $errorMsg"
+			renderErrorJson([errorMsg])
+		}
 	}
 }

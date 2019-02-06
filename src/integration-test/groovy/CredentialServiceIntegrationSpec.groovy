@@ -94,7 +94,7 @@ class CredentialServiceIntegrationSpec extends Specification{
             def foundCredentials = credentialService.findAllByProject(project)
         then:
             foundCredentials
-            1 == foundCredentials.size()
+            3 == foundCredentials.size()
     }
 
     void '5. find credential by provider returns a list of credentials'() {

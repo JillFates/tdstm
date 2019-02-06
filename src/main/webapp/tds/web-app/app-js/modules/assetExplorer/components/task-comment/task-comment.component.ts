@@ -107,7 +107,7 @@ export class TaskCommentComponent implements OnInit {
 	public createComment(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
-				title: 'Create Comment',
+				title: 'Comment Create',
 				type: ModalType.CREATE
 			},
 			archive: false,
@@ -255,7 +255,7 @@ export class TaskCommentComponent implements OnInit {
 
 		this.taskManagerService.getTaskDetails(dataItem.commentInstance.id)
 			.subscribe((res) => {
-				let modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.preferenceService.getUserCurrentDateFormatOrDefault());
+				let modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.preferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
