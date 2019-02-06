@@ -168,8 +168,8 @@ class AssetComment {
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
 		score nullable: true
-		apiActionPercentDone nullable: true, size: 0..100
-		taskPercentDone nullable: false, size: 0..100
+		apiActionPercentDone nullable: true, range: 0..100
+		taskPercentDone nullable: false, range: 0..100
 	}
 
 	static mapping = {

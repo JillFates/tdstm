@@ -143,8 +143,8 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointUrl nullable: true, blank: true, range: 0..1024, validator: ApiAction.&endpointUrlValidator
-		docUrl nullable: true, blank: true, range: 0..1024, validator: ApiAction.&docUrlValidator
+		endpointUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&endpointUrlValidator
+		docUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
@@ -159,23 +159,25 @@ class ApiAction {
 		useWithAsset range: 0..1
 		useWithTask range: 0..1
 		actionType nullable: false
-		script range: 0..65535
-		commandLine range: 0..1024
+		script nullable: true, size: 0..65535
+		commandLine nullable: true, size: 0..1024
 		isRemote nullable: false
 		remoteCredentialMethod nullable: true
 	}
 
 	static mapping = {
 		columns {
-			connectorMethod 	sqlType: 'varchar(64)'
-			callbackMode 	sqlType: 'varchar(64)'
-			callbackMethod	sqlType: 'varchar(64)'
-			asyncQueue 		sqlType: 'varchar(64)'
-			name 			sqlType: 'varchar(64)'
-			methodParams	sqlType: 'text'
-			endpointUrl		sqlType: 'varchar(1024)'
-			docUrl			sqlType: 'varchar(1024)'
-			httpMethod		sqlType: 'varchar(10)'
+			connectorMethod 		sqlType: 'varchar(64)'
+			callbackMode 			sqlType: 'varchar(64)'
+			callbackMethod			sqlType: 'varchar(64)'
+			asyncQueue 				sqlType: 'varchar(64)'
+			name 					sqlType: 'varchar(64)'
+			methodParams			sqlType: 'text'
+			endpointUrl				sqlType: 'varchar(1024)'
+			docUrl					sqlType: 'varchar(1024)'
+			httpMethod				sqlType: 'varchar(10)'
+			actionType				sqlType: 'varchar(15)'
+			remoteCredentialMethod	sqlType: 'varchar(15)'
 		}
 	}
 
