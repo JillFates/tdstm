@@ -406,6 +406,11 @@ class UrlMappings {
 			action = [POST:"resetAction"]
 		}
 
+		"/ws/task/$id/addNote" {
+			controller = "wsTask"
+			action = [POST:"addNote"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [
