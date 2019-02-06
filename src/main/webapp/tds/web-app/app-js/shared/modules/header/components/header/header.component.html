@@ -11,14 +11,7 @@
                 <img *ngIf="!userContext.licenseEnabled && !userContext.imageId" id="logo-header" src="/tdstm/assets/images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
             </div>
 
-            <!--<g:if test="${isLicenseManagerEnabled}">-->
-                <!--<g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />-->
-            <!--</g:if>-->
-            <!--<g:else>-->
-                <!--<g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />-->
-            <tds-tranman-menu *ngIf="!userContext.licenseEnabled"></tds-tranman-menu>
-            <!--</g:else>-->
-
+            <tds-tranman-menu></tds-tranman-menu>
 
             <!-- Navbar Right Menu -->
             <div class="navbar-custom-menu">
