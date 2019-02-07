@@ -1671,7 +1671,6 @@ div.centered {
 }
 
 div#dependencyDivId {
-	overflow-x: scroll;
 	overflow-y: visible;
 	margin-left: 112px;
 }
