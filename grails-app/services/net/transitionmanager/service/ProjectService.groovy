@@ -8,6 +8,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -24,6 +25,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
+import grails.util.Holders
 import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
@@ -63,6 +65,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -1809,4 +1812,20 @@ class ProjectService implements ServiceMethods {
 	}
 
 
+	/**
+	 * Return the URL for the project's logo (or the default url).
+	 * @param project
+	 * @return a String with the path to the project's logo.
+	 */
+	String getProjectLogoUrl(Project project) {
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
+		String logoUrl
+		ApplicationTagLib atl = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+		if (projectLogo) {
+			logoUrl = atl.createLink(controller: 'project', action: 'showImage', id: projectLogo.id)
+		} else {
+			logoUrl = atl.resource(dir:'images',file:'TMHeaderLogo.png')
+		}
+		return logoUrl
+	}
 }
