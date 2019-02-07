@@ -9,6 +9,7 @@ import {SingleNoteModel} from '../../../assetExplorer/components/single-note/mod
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -17,17 +18,22 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
 	public STATUS = TaskStatus;
+	CREATE_PREDECESSOR = '';
+	CREATE_SUCCESSOR = '';
 
 	constructor(
 		userTimeZone: string,
 		userCurrentDateFormat: string,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private translate: TranslatePipe) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
 		this.userCurrentDateFormat = userCurrentDateFormat;
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+		this.CREATE_PREDECESSOR = this.translate.transform('TASK_MANAGER.CREATE_PREDECESSOR');
+		this.CREATE_SUCCESSOR = this.translate.transform('TASK_MANAGER.CREATE_SUCCESSOR');
 	}
 
 	/**

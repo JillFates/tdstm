@@ -341,7 +341,7 @@
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
                                                 <tds-button-add class="button-header-grid float-right"
-                                                            [tooltip]="'Add Predecessor'"
+                                                            [tooltip]="modelHelper.CREATE_PREDECESSOR"
                                                             [id]="'btnAddPredecessor'"
                                                             (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
                                                 </tds-button-add>
@@ -389,7 +389,7 @@
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
                                                 <tds-button-add class="button-header-grid float-right"
-                                                            [tooltip]="'Add Successor'"
+                                                            [tooltip]="modelHelper.CREATE_SUCCESSOR"
                                                             [id]="'btnAddSuccessor'"
                                                             (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
                                                 </tds-button-add>
