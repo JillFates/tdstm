@@ -52,6 +52,22 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types into a Float value
+	 * @param value - the value to be converted to a Float
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Float value if valid else null
+	 */
+	static Float toFloat(value, Float defVal = null) {
+		if (value instanceof Float) {
+			return value
+		} else if (value instanceof CharSequence && value.isFloat()) {
+			return value.toFloat()
+		} else {
+			return defVal
+		}
+	}
+
+	/**
 	 * Convert various types into a BigDecimal value
 	 * @param value - the value to be converted to a BigDecimal
 	 * @param defVal - the value to set to if it can't be converted (default null)
