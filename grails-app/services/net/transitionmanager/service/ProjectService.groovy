@@ -87,8 +87,15 @@ class ProjectService implements ServiceMethods {
 	ProviderService providerService
 	CredentialService credentialService
 	DataScriptService dataScriptService
+	LicenseCommonService licenseCommonService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
+
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+
+	static final String DEFAULT_PROJECT_LOGO_LIC_MGR_ENABLED = 'TMHeaderLogoManager.png'
+
+	static final String DEFAULT_PROJECT_LOGO_LIC_MGR_DISABLED = 'TMHeaderLogoManager.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1820,11 +1827,17 @@ class ProjectService implements ServiceMethods {
 	String getProjectLogoUrl(Project project) {
 		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
 		String logoUrl
-		ApplicationTagLib atl = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+		ApplicationTagLib atl = ApplicationContextHolder.getBean('applicationTagLib', ApplicationTagLib)
 		if (projectLogo) {
 			logoUrl = atl.createLink(controller: 'project', action: 'showImage', id: projectLogo.id)
 		} else {
-			logoUrl = atl.resource(dir:'images',file:'TMHeaderLogo.png')
+			String filename
+			if (licenseCommonService.isManagerEnabled()) {
+				filename = DEFAULT_PROJECT_LOGO_LIC_MGR_ENABLED
+			} else {
+				filename = DEFAULT_PROJECT_LOGO_LIC_MGR_DISABLED
+			}
+			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}
 		return logoUrl
 	}
