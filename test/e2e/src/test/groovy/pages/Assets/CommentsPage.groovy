@@ -2,7 +2,7 @@ package pages.Assets
 
 import geb.Page
 import modules.CommonsModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 
 class CommentsPage extends Page {
 
@@ -16,7 +16,7 @@ class CommentsPage extends Page {
     static content = {
         commentsPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
         commentsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        assetsModule { module AssetsModule}
+        assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }
 

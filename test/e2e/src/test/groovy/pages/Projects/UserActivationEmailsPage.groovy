@@ -1,7 +1,7 @@
 package pages.Projects
 
 import geb.Page
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class UserActivationEmailsPage extends Page {
 
@@ -15,7 +15,7 @@ class UserActivationEmailsPage extends Page {
         modaltitle { $("section", class:"content-header").find("h1")}
         customMessage {$("textarea", name:"customMessage")}
         sendActivationEmail {$("input" , type:"submit" , value:"Send Activation Emails")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
 
     }
 

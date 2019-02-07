@@ -2,7 +2,7 @@ package pages.Projects.Project
 
 import geb.Page
 import modules.MenuModule
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ProjectDetailsPage extends Page {
 
@@ -22,7 +22,7 @@ class ProjectDetailsPage extends Page {
         pdEditBtn { $("input", type:"submit",class:"edit", name:"_action_Edit")}
         pdDeleteBtn { $("input", type:"submit",class:"delete", name:"_action_Delete")}
         pdFieldSetBtn { $("input", type:"button",class:"show")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
     }
 
     def waitForProjectCreatedMessage(projName){

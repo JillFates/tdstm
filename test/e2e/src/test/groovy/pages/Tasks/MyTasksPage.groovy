@@ -2,7 +2,7 @@ package pages.Tasks
 
 import geb.Page
 import modules.CommonsModule
-import modules.TasksModule
+import modules.TasksMenuModule
 import pages.Tasks.*
 
 class MyTasksPage extends Page {
@@ -17,7 +17,7 @@ class MyTasksPage extends Page {
     static content = {
         myTasksPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
         myTasksPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        tasksModule { module TasksModule}
+        tasksModule { module TasksMenuModule}
         commonsModule { module CommonsModule }
     }
 

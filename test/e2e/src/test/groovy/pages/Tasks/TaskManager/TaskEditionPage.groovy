@@ -1,7 +1,7 @@
 package pages.Tasks.TaskManager
 
 import geb.Page
-import modules.TasksModule
+import modules.TasksMenuModule
 import utils.CommonActions
 import pages.Tasks.*
 
@@ -42,7 +42,7 @@ class TaskEditionPage extends Page{
         teModalSuccessorUl {$('.k-animation-container')[1].find("ul", "aria-hidden":"false")}
         teModalPredecessorOptions {teModalPredecessorUl.find("li")}
         teModalSuccessorOptions {teModalSuccessorUl.find("li")}
-        tasksModule { module TasksModule}
+        tasksModule { module TasksMenuModule}
     }
     /**
      * This method select a successor. The boolean parameter will define

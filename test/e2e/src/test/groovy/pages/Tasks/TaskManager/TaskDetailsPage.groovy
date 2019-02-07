@@ -1,7 +1,7 @@
 package pages.Tasks.TaskManager
 
 import geb.Page
-import modules.TasksModule
+import modules.TasksMenuModule
 import pages.Tasks.*
 
 class TaskDetailsPage extends Page {
@@ -30,6 +30,6 @@ class TaskDetailsPage extends Page {
         tdModalEditBtn { tdModalWindow.find("button","ng-click":"editComment();")}
         tdModalDeleteBtn { tdModalWindow.find("button","ng-click":"deleteComment()")}
         tdModalCloseBtn { tdModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
-        tasksModule { module TasksModule}
+        tasksModule { module TasksMenuModule}
     }
 }

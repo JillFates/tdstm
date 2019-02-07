@@ -1,4 +1,4 @@
-package modules
+ package modules
 
 import geb.Module
 import modules.CommonsModule
@@ -19,10 +19,6 @@ class CreateViewModule extends Module {
         previewBtn                   {$("button",text:"Preview")}
         filterBtn                    {$("button",text:"Filter")}
         clearSearchBtn               {searchField.siblings()}
-        saveBtn                      {$("button", text:"Save")}
-        saveOptions                  {$("button.btn.dropdown-toggle.btn-success")}//once the button has turned green
-        saveOptionsGrey              {$("button.btn.dropdown-toggle.btn-default")}
-        saveAs                       {$("a",text:"Save As")}
         closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
         assetsClasses                {$("a",text:"Asset Classes")}
@@ -38,23 +34,6 @@ class CreateViewModule extends Module {
         fieldsFilter                 { $("select#selected") }
         tcModalEventSelector         { tcModalWindow.find("select#moveEvent")}
 
-        //>>>>GRID
-        previewGrid                  {$(class:"k-widget k-grid k-grid-lockedcolumns.find(input)")}
-        fieldCollection              {$("div",id:"tab_2")}
-        previewRows {$("tbody")[1]}
-        firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
-        tableHeaderNames {$('th label')}
-
-    }
-
-    def clickSaveOptions(){
-        commonsModule.waitForLoader(5)
-        waitFor{saveOptions.click()}
-    }
-
-    def clickSaveAs(){
-        waitFor{clickSaveOptions()}
-        waitFor{saveAs.click()}
     }
 
     def clickSpecificCheckbox(String name){
@@ -63,10 +42,6 @@ class CreateViewModule extends Module {
 
     def clickOnCloseViewEdition(){
         waitFor{closeViewEdition.click()}
-    }
-
-    def filterPreviewByText(String txt){
-        firstPreviewFilter=txt
     }
 
     def selectApplication(){
@@ -108,18 +83,6 @@ class CreateViewModule extends Module {
 
     def filterFields(String value){
         fieldsFilter=value
-    }
-
-    def firstSave(){
-        waitFor{saveBtn.click()}
-    }
-    /**
-     * this one is different from the first save since we only need to wait for the loader in the
-     * following save actions. Else execution might fail.
-     */
-    def clickSave(){
-        waitFor{saveBtn.click()}
-        commonsModule.waitForLoader()
     }
 
     def selectRandomCheckboxes(){
@@ -220,19 +183,4 @@ class CreateViewModule extends Module {
         listOfFields
     }
 
-    def expectedColumnsDisplayed(List names){
-        names.each{
-            tableHeaderNames.contains(it)
-        }
-    }
-
-    def validateFilteredRows(String txt){
-        previewRows.each{
-            it.contains(txt)
-        }
-    }
-
-    def verifyButtonIsDefaultWithNoChanges(){
-        waitFor{saveBtn.jquery.attr("class").contains("btn-default")}
-    }
 }

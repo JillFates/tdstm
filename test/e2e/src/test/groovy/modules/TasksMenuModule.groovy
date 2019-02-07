@@ -2,6 +2,10 @@ package modules
 
 import geb.Module
 
+/**
+ * This class represents the USER MENU SECTION in the upper right part of the application
+ */
+
 class MenuModule extends Module {
 
     static content = {

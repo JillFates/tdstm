@@ -2,7 +2,7 @@ package pages.Assets
 
 import geb.Page
 import modules.CommonsModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 
 class AssetImportExcelPage extends Page {
 
@@ -15,7 +15,7 @@ class AssetImportExcelPage extends Page {
     static content = {
         assetImportPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
         assetImportBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        assetsModule { module AssetsModule}
+        assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }
 

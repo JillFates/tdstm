@@ -5,7 +5,7 @@ import modules.CreateViewModule
 import modules.ViewsModule
 import modules.CommonsModule
 import modules.MenuModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 
 class AssetViewsPage extends Page{
     static int favLimit=10
@@ -34,7 +34,7 @@ class AssetViewsPage extends Page{
         allViewsModule { module ViewsModule}
         createViewModule { module CreateViewModule}
         common { module CommonsModule}
-        assetsModule { module AssetsModule }
+        assetsModule { module AssetsMenuModule }
 
         avPageTitle { $("h1")}
         //>>>>>>>>>>BUTTONS
@@ -85,8 +85,10 @@ class AssetViewsPage extends Page{
      * is to get a pop up
      */
     def getFavLimitPopUp(){
-        while ((getFavCounter()<favLimit)){
+        def counter=getFavCounter()
+        while (getFavCounter()<favLimit){
             allViewsModule.favRandomFavs()
+            counter=getFavCounter()
         }
         allViewsModule.setFirstNonFavViewAsFav()
         favLimitPopUpIsPresent()

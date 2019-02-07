@@ -107,7 +107,8 @@ class ViewManagerCreationSpec extends GebReportingSpec {
     }
     def "10. Validate created View is listed"() {
         given: "User saves the created view"
-            waitFor{createViewModule.firstSave()}
+            at ViewPage
+            waitFor{firstSave()}
             at SaveViewPage
             waitFor{enterName(viewName)}
             waitFor{clickSave()}

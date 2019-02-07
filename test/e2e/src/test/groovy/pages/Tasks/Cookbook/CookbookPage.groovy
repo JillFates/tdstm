@@ -2,7 +2,7 @@ package pages.Tasks.Cookbook
 
 import geb.Page
 import modules.CommonsModule
-import modules.TasksModule
+import modules.TasksMenuModule
 import geb.waiting.WaitTimeoutException
 
 class CookbookPage extends Page {
@@ -48,7 +48,7 @@ class CookbookPage extends Page {
         taskGenerationTabContent { $("div[ui-view=taskBatchStart]")}
         taskGenerationTabRecipeName { taskGenerationTabContent.find("p")}
         commonsModule { module CommonsModule }
-        tasksModule { module TasksModule}
+        tasksModule { module TasksMenuModule}
     }
 
     def clickOnCreateButton(){

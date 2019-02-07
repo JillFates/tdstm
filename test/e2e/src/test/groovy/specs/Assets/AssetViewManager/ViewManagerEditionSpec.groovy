@@ -31,15 +31,16 @@ class ViewManagerEditionSpec extends GebReportingSpec {
         at AssetViewsPage
         //Creates a view to use in validations
         allViewsModule.clickCreateView()
+        at ViewPage
         createViewModule.selectApplication()
         createViewModule.clickNext()
         createViewModule.clickSpecificCheckbox("Name")
-        createViewModule.firstSave()
+        firstSave()
         at SaveViewPage
         enterName(randStr)
         clickSave()
-        createViewModule.verifyButtonIsDefaultWithNoChanges()
         at ViewPage
+        verifyButtonIsDefaultWithNoChanges()
         clickViewManagerBreadCrumb()
     }
 
@@ -123,13 +124,13 @@ class ViewManagerEditionSpec extends GebReportingSpec {
             at ViewPage
             expectedColumns = createViewModule.getListOfSelectedFields()
         when: "User saves the changes made"
-            createViewModule.clickSave()
+            clickSave()
             waitFor { clickViewManagerBreadCrumb() }
             at AssetViewsPage
             waitFor { allViewsModule.openViewByName(selectedView) }
             at ViewPage
         then: "The selected fields are now displayed as columns"
-            createViewModule.expectedColumnsDisplayed(expectedColumns)
+            expectedColumnsDisplayed(expectedColumns)
     }
 
     def "10. Filter by application name"() {
@@ -139,8 +140,8 @@ class ViewManagerEditionSpec extends GebReportingSpec {
             waitFor{allViewsModule.openViewByName(randStr)}
             at ViewPage
         when: "User filters a name in the grid"
-            waitFor{createViewModule.filterPreviewByText(partialViewName)}
+            waitFor{filterPreviewByText(partialViewName)}
         then: "The rows displayed will contain the filtered text"
-            createViewModule.validateFilteredRows(partialViewName)
+            validateFilteredRows(partialViewName)
     }
 }

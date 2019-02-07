@@ -2,7 +2,7 @@ package pages.Assets.AssetViewManager
 
 import geb.Page
 import modules.MenuModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 import modules.CommonsModule
 import modules.CreateViewModule
 
@@ -21,7 +21,7 @@ class SaveViewPage extends Page{
         menuModule { module MenuModule }
         commonsModule { module CommonsModule }
         createViewModule { module CreateViewModule }
-        assetsModule { module AssetsModule }
+        assetsModule { module AssetsMenuModule }
         sharedView {$("input", name:"shared")}
     }
 
@@ -29,6 +29,7 @@ class SaveViewPage extends Page{
         waitFor{nameField.displayed}
         nameField = value
         waitFor{saveBtn.displayed}
+        commonsModule.waitForLoader(1)
     }
 
     def clickSave(){

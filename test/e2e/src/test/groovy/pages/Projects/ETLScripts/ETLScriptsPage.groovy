@@ -3,7 +3,7 @@ package pages.Projects.ETLScripts
 import geb.Page
 import modules.CommonsModule
 import geb.Browser
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ETLScriptsPage extends Page {
     static at = {
@@ -35,7 +35,7 @@ class ETLScriptsPage extends Page {
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
         firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
     }
 
     def filterByName(name){

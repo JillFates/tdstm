@@ -1,7 +1,7 @@
 package pages.Planning.Events
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 import modules.CommonsModule
 
 /**
@@ -21,7 +21,7 @@ class CreateEventPage extends Page {
 
     static content = {
         eventCreationPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         eventDetailsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         bundleList {$("#moveBundleList")}
         nameField {$("#name")}

@@ -2,7 +2,7 @@ package pages.Projects.Project
 
 import geb.Page
 import modules.CommonsModule
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 import geb.waiting.WaitTimeoutException
 
 class ProjectListPage extends Page {
@@ -40,7 +40,7 @@ class ProjectListPage extends Page {
         projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
         projectDeletedMessage { $("#messageDivId")}
         showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule}
     }
 

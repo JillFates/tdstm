@@ -5,7 +5,10 @@ import pages.Tasks.*
 import pages.Tasks.TaskManager.*
 import pages.Cookbook.*
 
-class TasksModule extends Module {
+/**
+ * This represents the Menu section of TASKS
+ */
+class TasksMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}

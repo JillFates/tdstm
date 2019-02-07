@@ -2,7 +2,7 @@ package pages.Reports
 
 import geb.Page
 import modules.CommonsModule
-import modules.ReportsModule
+import modules.ReportsMenuModule
 
 class ApplicationEventResultsPage extends Page {
 
@@ -15,7 +15,7 @@ class ApplicationEventResultsPage extends Page {
     static content = {
         applicationEventResultsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
         applicationEventResultsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        reportsModule { module ReportsModule}
+        reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }
 
