@@ -406,6 +406,11 @@ class UrlMappings {
 			action = [POST:"resetAction"]
 		}
 
+		"/ws/task/$id/addNote" {
+			controller = "wsTask"
+			action = [POST:"addNote"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [
@@ -427,6 +432,13 @@ class UrlMappings {
 		"/ws/user" {
 			controller = "wsUser"
 			action = [GET: "getUser"]
+		}
+
+		"/ws/user/context" {
+			controller = 'user'
+			action = [
+				GET: 'context'
+			]
 		}
 
 		"/ws/user/modelForPreferenceManager" {

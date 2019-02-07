@@ -289,6 +289,8 @@ export const en_DICTIONARY: Object = {
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager',
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
+		'CREATE_PREDECESSOR': 'Create new predecessor task',
+		'CREATE_SUCCESSOR': 'Create new successor task',
 		'EDIT': {
 			'REQUIRED_FIELD': 'Field is required',
 			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',

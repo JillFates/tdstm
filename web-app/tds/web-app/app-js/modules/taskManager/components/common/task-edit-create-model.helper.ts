@@ -1,7 +1,15 @@
+import {Observable} from 'rxjs';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {YesNoList, PriorityList, ITask, TaskStatus} from '../../model/task-edit-create.model';
+import {SingleNoteComponent} from '../../../assetExplorer/components/single-note/single-note.component';
+import {ModalType} from '../../../../shared/model/constants';
+import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {TaskService} from '../../service/task.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -10,13 +18,22 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
 	public STATUS = TaskStatus;
+	CREATE_PREDECESSOR = '';
+	CREATE_SUCCESSOR = '';
 
-	constructor(userTimeZone: string, userCurrentDateFormat: string) {
+	constructor(
+		userTimeZone: string,
+		userCurrentDateFormat: string,
+		private taskManagerService: TaskService,
+		private dialogService: UIDialogService,
+		private translate: TranslatePipe) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
 		this.userCurrentDateFormat = userCurrentDateFormat;
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+		this.CREATE_PREDECESSOR = this.translate.transform('TASK_MANAGER.CREATE_PREDECESSOR');
+		this.CREATE_SUCCESSOR = this.translate.transform('TASK_MANAGER.CREATE_SUCCESSOR');
 	}
 
 	/**
@@ -173,7 +190,7 @@ export class TaskEditCreateModelHelper {
 			comment:  assetComment.comment || '',
 			assetClass: {id: detail.assetClass, text: detail.assetClasses && detail.assetClasses[detail.assetClass] || ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
-			status: assetComment.status,
+			status: assetComment && assetComment.status || '',
 			statusList: [],
 			personList: [],
 			teamList: [],
@@ -260,6 +277,10 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
+		const predecessorTasks = predecessorList.filter((task) => task.id);
+		const successorTasks = successorList.filter((task) => task.id);
+
 		const deletedItems = this.model.deletedPredecessorList
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
@@ -300,15 +321,30 @@ export class TaskEditCreateModelHelper {
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
 			manageDependency: '1',
-			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
-				.concat(this.getTaskEdited(predecessorList, originalPredecessorList)),
-			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
-				.concat(this.getTaskEdited(successorList, originalSuccessorList)),
+			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
+				.concat(this.getTaskEdited(predecessorTasks, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
+				.concat(this.getTaskEdited(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '',
 			canEdit: true, /* ? */
 			durationLocked: locked ? '1' : '0',
 			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
+			taskNumber: taskNumber.toString(),
+			note: note,
+			id: id
+		};
+	}
+
+	/**
+	 * Get and clean the object that will send to the service to create a not
+	 */
+	public getPayloadForUpdateNote(note: string): any {
+		const { id, taskNumber } = this.model;
+
+		return  {
+			commentId: this.getEmptyStringIfNull(id).toString(),
+			commentType: 'issue',
 			taskNumber: taskNumber.toString(),
 			note: note,
 			id: id
@@ -326,6 +362,10 @@ export class TaskEditCreateModelHelper {
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
+		// ignore blank tasks
+		const predecessorTasks = predecessorList.filter((task) => task.id);
+		const successorTasks = successorList.filter((task) => task.id);
+
 		const deletedItems = this.model.deletedPredecessorList
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
@@ -366,10 +406,10 @@ export class TaskEditCreateModelHelper {
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
 			manageDependency: '1',
-			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
-				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
-			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
-				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
+			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
+				.concat(this.getTaskPrevious(predecessorTasks, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
+				.concat(this.getTaskPrevious(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '',
 			canEdit: true, /* ? */
@@ -388,10 +428,14 @@ export class TaskEditCreateModelHelper {
 
 	/**
 	 * Determine if predecessor/succesor collections contain changes
+	 * Ignore blank tasks
 	 * @returns {boolean}
 	 */
 	hasDependencyTasksChanges(): boolean {
-		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+		const predecessors = this.model.predecessorList.filter((task) => task.id);
+		const successors = this.model.successorList.filter((task) => task.id);
+
+		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors, successors});
 	}
 
 	/**
@@ -491,11 +535,13 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
-	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
+	 * Determine if predecessor/successor collections contains invalid data, like duplicates
+	 * Ignore blank tasks
 	 * @returns {boolean}
 	 */
 	hasInvalidTasksDependencies(): boolean {
-		const {predecessorList, successorList} = this.model;
+		const predecessorList = this.model.predecessorList.filter((task) => task.id);
+		const successorList = this.model.successorList.filter((task) => task.id);
 
 		return this.hasDuplicates(predecessorList) ||
 			this.hasDuplicates(successorList) ||
@@ -666,5 +712,41 @@ export class TaskEditCreateModelHelper {
 	public rowStatusColor(context: any) {
 		const status = context.dataItem && context.dataItem.status || '';
 		return 'task-' + status.toLowerCase();
+	}
+
+	/**
+	 * Add a note
+	 */
+	protected createNote(id: string, note: string): Observable<any> {
+		return this.taskManagerService.addNote(id, note);
+	}
+
+	/**
+	 * Open the note modal dialog to capture the note, call the method for save it
+	 */
+	onCreateNote(): Observable<any> {
+		return Observable.create((observer) => {
+			let singleNoteModel: SingleNoteModel = {
+				modal: {
+					title: 'Create Note',
+					type: ModalType.CREATE
+				},
+				note: ''
+			};
+
+			this.dialogService.extra(SingleNoteComponent, [
+				{provide: SingleNoteModel, useValue: singleNoteModel}
+			], false, false)
+				.then(addedNote => {
+					this.createNote(this.model.id, addedNote)
+						.subscribe((result) => {
+							console.log('The result is:', result);
+							observer.next(result);
+						});
+				}).catch(result => {
+				console.log(result);
+				observer.next(null);
+			});
+		});
 	}
 }

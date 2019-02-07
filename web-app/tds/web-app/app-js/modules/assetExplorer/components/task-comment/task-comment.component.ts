@@ -17,6 +17,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `task-comment`,
@@ -48,7 +49,13 @@ export class TaskCommentComponent implements OnInit {
 	private showAllComments: boolean;
 	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
-	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
+	constructor(
+		private taskService: TaskCommentService,
+		private dialogService: UIDialogService,
+		public promptService: UIPromptService,
+		public taskManagerService: TaskService,
+		private preferenceService: PreferenceService,
+		private translate: TranslatePipe) {
 		this.getPreferences();
 	}
 
@@ -255,7 +262,11 @@ export class TaskCommentComponent implements OnInit {
 
 		this.taskManagerService.getTaskDetails(dataItem.commentInstance.id)
 			.subscribe((res) => {
-				let modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.preferenceService.getUserCurrentDateFormatOrDefault());
+				let modelHelper = new TaskEditCreateModelHelper(
+					this.userTimeZone,
+					this.preferenceService.getUserCurrentDateFormatOrDefault(),
+					this.taskManagerService, this.dialogService,
+					this.translate);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',

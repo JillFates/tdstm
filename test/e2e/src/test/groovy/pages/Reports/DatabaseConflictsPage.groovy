@@ -2,7 +2,7 @@ package pages.Reports
 
 import geb.Page
 import modules.CommonsModule
-import modules.ReportsModule
+import modules.ReportsMenuModule
 
 class DatabaseConflictsPage extends Page {
 
@@ -16,7 +16,7 @@ class DatabaseConflictsPage extends Page {
     static content = {
         databaseConflictsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
         databaseConflictsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        reportsModule { module ReportsModule}
+        reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }
 

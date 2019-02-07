@@ -2,7 +2,7 @@ package pages.Assets
 
 import geb.Page
 import modules.CommonsModule
-import modules.AssetsModule
+import modules.AssetsMenuModule
 
 class ArchitectureGraphPage extends Page {
 
@@ -16,7 +16,7 @@ class ArchitectureGraphPage extends Page {
     static content = {
         architecturePageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
         architecturePageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
-        assetsModule { module AssetsModule}
+        assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }
 

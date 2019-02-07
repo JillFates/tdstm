@@ -31,6 +31,8 @@
                                             <span *ngIf="!editing" class="personShow" id="firstNameId" class="asset_details_block_task">{{personModel.firstName}}</span>
                                             <input *ngIf="editing" name="firstName" [(ngModel)]="personModel.firstName"/>
                                         </td>
+
+                                        <td rowspan="2"><img [src]="currentImageURL" (error)="currentImageURL = defaultImageURL" height="60" width="60"/></td>
                                     </tr>
 
                                     <tr class="prop">
@@ -61,6 +63,12 @@
                                         <td valign="top" class="value" colspan="2">
                                             <span *ngIf="!editing" class="personShow" id="emailId">{{personModel.email}}</span>
                                             <input *ngIf="editing" name="email" [(ngModel)]="personModel.email"/>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="editing" class="prop">
+                                        <td valign="top" class="name"><span>Image Url:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <input name="imageUrl" [(ngModel)]="personModel.personImageURL" (input)="currentImageURL=personModel.personImageURL"/>
                                         </td>
                                     </tr>
                                     <tr class="prop">

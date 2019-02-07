@@ -1,7 +1,7 @@
 package pages.Planning.Bundle
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 import modules.MenuModule
 
 /**
@@ -23,7 +23,7 @@ class BundleDetailPage extends Page {
         nameValue {details.find(".name", text:"Name:").next()}
         workFlowCodeValue {details.find(".name", text:"WorkFlow Code").next()}
         descriptionValue {details.find(".name", text:"Description:").next()}
-        planningModule {module PlanningModule }
+        planningModule {module PlanningMenuModule }
         menuModule {module MenuModule }
         planningCheck {$("input#useForPlanning")}
         listbundles {$("a.list")}

@@ -43,6 +43,7 @@ import {AssetDependencyComponent} from './components/asset-dependency/asset-depe
 import {AssetDependencyShowComponent} from './components/asset-dependency/show/asset-dependency-show.component';
 import {AssetDependencyEditComponent} from './components/asset-dependency/edit/asset-dependency-edit.component';
 import {SingleCommentComponent} from './components/single-comment/single-comment.component';
+import {SingleNoteComponent} from './components/single-note/single-note.component';
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
 import {ManufacturerShowComponent} from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
@@ -53,6 +54,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
+import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 
 @NgModule({
 	imports: [
@@ -86,6 +88,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
 		SingleCommentComponent,
+		SingleNoteComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
@@ -95,7 +98,8 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		TaskCreateComponent,
 		TaskEditComponent,
 		TaskDetailComponent,
-		TaskActionsComponent
+		TaskActionsComponent,
+		TaskNotesComponent
 	],
 	providers: [
 		// Resolve
@@ -130,6 +134,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
+		SingleNoteComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,

@@ -59,10 +59,10 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
             //need to search for one that has not been shared yet and click on it
             allViewsModule.clickOnNonSharedView()
             at ViewPage
-            waitFor{clickOnGear()}
+            clickOnGear()
             //A change is needed for the saving options to be clickable
             createViewModule.clickSpecificCheckbox("CNN")
-            createViewModule.clickSaveAs()
+            clickSaveAs()
             at SaveViewPage
             enterName(viewName)
             setViewAsShared()
