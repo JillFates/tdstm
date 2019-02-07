@@ -22,6 +22,8 @@ class UserContext {
 
 	String dateFormat
 
+	String logoUrl
+
 
 	/**
 	 * Create and return a map representation of the User's context with only a selection of fields.
@@ -54,7 +56,8 @@ class UserContext {
 			],
 			project: [
 			    id: project.id,
-				name: project.name
+				name: project.name,
+				logoUrl: logoUrl
 			],
 			event: eventMap,
 			bundle: bundleMap,
