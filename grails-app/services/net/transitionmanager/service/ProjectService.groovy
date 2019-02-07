@@ -1033,7 +1033,7 @@ class ProjectService implements ServiceMethods {
 			select pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType = 'PROJ_PARTNER'
 			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-			  and pr.roleTypeCodeTo = 'PARTNER'
+			  and pr.roleTypeCodeTo = 'ROLE_PARTNER'
 			  and pr.partyIdFrom = :project
 		''', [project: project])
 	}

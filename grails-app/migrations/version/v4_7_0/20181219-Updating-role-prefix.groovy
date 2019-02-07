@@ -19,7 +19,12 @@ databaseChangeLog = {
 	changeSet(author: "tpelletier", id: "20191219 TM-13321-3") {
 			comment('fixing party role prefix ROLE_.')
 			sql('UPDATE party_relationship SET role_type_code_from_id = CONCAT("ROLE_", role_type_code_from_id), role_type_code_to_id = CONCAT("ROLE_", role_type_code_to_id);')
-		}
+	}
+
+	changeSet(author: "jdanahy", id: "20191219 TM-13991") {
+		comment('Fixing role type to add ROLE_ prefix')
+		sql('UPDATE role_type SET type = CONCAT("ROLE_", type);')
+	}
 }
 
 
