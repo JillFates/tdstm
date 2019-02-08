@@ -18,6 +18,7 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserLoginProjectAccess
@@ -755,7 +756,8 @@ class UserService implements ServiceMethods {
 			moveEvent: moveEvent,
 			moveBundle: moveBundle,
 			timezone: timezone,
-			dateFormat: dateFormat
+			dateFormat: dateFormat,
+			logoUrl: projectService.getProjectLogoUrl(project)
 		]
 		return new UserContext(contextParams)
 	}

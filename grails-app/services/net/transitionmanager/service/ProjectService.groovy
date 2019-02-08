@@ -6,8 +6,8 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -63,6 +63,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -84,8 +85,15 @@ class ProjectService implements ServiceMethods {
 	ProviderService providerService
 	CredentialService credentialService
 	DataScriptService dataScriptService
+	LicenseCommonService licenseCommonService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
+
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo.png'
+
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1809,4 +1817,26 @@ class ProjectService implements ServiceMethods {
 	}
 
 
+	/**
+	 * Return the URL for the project's logo (or the default url).
+	 * @param project
+	 * @return a String with the path to the project's logo.
+	 */
+	String getProjectLogoUrl(Project project) {
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
+		String logoUrl
+		ApplicationTagLib atl = ApplicationContextHolder.getBean('applicationTagLib', ApplicationTagLib)
+		if (projectLogo) {
+			logoUrl = atl.createLink(controller: 'project', action: 'showImage', id: projectLogo.id)
+		} else {
+			String filename
+			if (licenseCommonService.isManagerEnabled()) {
+				filename = DEFAULT_TRANSITIONMANAGER_LOGO
+			} else {
+				filename = DEFAULT_LIC_MANAGER_LOGO
+			}
+			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
+		}
+		return logoUrl
+	}
 }
