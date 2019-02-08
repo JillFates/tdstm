@@ -91,9 +91,9 @@ class ProjectService implements ServiceMethods {
 
 	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
 
-	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo.png'
 
-	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogo.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
