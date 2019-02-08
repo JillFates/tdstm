@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil

@@ -4,7 +4,6 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person

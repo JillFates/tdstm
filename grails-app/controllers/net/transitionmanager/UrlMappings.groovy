@@ -342,7 +342,7 @@ class UrlMappings {
 		 */
 
 		"/ws/asset/comment/$id" {
-			controller = "wsAssset"
+			controller = "wsAsset"
 			action = [
 				DELETE:'deleteComment',
 				PUT: 'updateComment'
