@@ -128,6 +128,7 @@ class HttpProducerServiceSpec extends Specification {
 				callbackMode: CallbackMode.DIRECT,
 				httpMethod: ApiActionHttpMethod.GET,
 				endpointUrl: 'http://zzz.about.yyy',
+				reactionScripts: '',
 				provider: provider,
 				project: project
 		)

@@ -91,6 +91,12 @@ class AssetComment {
 	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
 	String apiActionSettings
 
+	// The percentage of the action duration that has been completed (set by API call)
+	Integer apiActionPercentDone = 0
+
+	// The percentage of the task that has been completed (manually set by users)
+	Integer taskPercentDone = 0
+
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
 	// The belongsTo would delete both Tasks and Comments when deleting Assets with the delete method. However
@@ -163,6 +169,8 @@ class AssetComment {
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
 		score nullable: true
+		apiActionPercentDone nullable: true, range: 0..100
+		taskPercentDone nullable: false, range: 0..100
 	}
 
 	static mapping = {
