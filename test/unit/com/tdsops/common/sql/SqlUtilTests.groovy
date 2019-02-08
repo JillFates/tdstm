@@ -241,35 +241,40 @@ class SqlUtilTests extends Specification {
 		expect:
 			SqlUtil.parseParameter(fsd)
 
-		and: "contains an hql query"
+		and: "search contains an hql query"
 			fsd.sqlSearchExpression == sqlSearchExpression
 
-		and: 'contains parameters'
+		and: 'contains search parameters'
 			fsd.sqlSearchParameters?.scale == sqlSearchParameters
 
 		where:
-			filter           || sqlSearchExpression      || sqlSearchParameters
-			'Mega'           || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'%Mega%'         || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'=Mega'          || ' 1 = 0'                 || null
-			'=Megabyte'      || 'AE.scale IN :scale'     || [SizeScale.MB]
-			'!Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
-			'-Mega'          || 'AE.scale NOT IN :scale' || [SizeScale.MB]
-			'Mega|Peta|Giga' || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.GB, SizeScale.PB]
-			'Mega:Peta'      || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.PB]
-			'Mega&Peta'      || ' 1 = 0'                 || null
-			'byte'           || 'AE.scale IN :scale'     || [SizeScale.KB, SizeScale.MB, SizeScale.GB, SizeScale.TB, SizeScale.PB]
-			'FUBAR'          || ' 1 = 0'                 || null
-			'%ga%'           || 'AE.scale IN :scale'     || [SizeScale.MB, SizeScale.GB]
-			'*FUBAR*'        || ' 1 = 0'                 || null
-			'Peta&by'        || 'AE.scale IN :scale'     || [SizeScale.PB]
-			'P%'             || 'AE.scale IN :scale'     || [SizeScale.PB] // starts with P
-			'%obyte'         || 'AE.scale IN :scale'     || [SizeScale.KB] // ends with obyte
-			'%obyt*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains obyt
-			'%ob*t*'         || 'AE.scale IN :scale'     || [SizeScale.KB] // contains ob*t
-			'=@ADMIN'        || ' 1 = 0'                 || null
-			'!@ADMIN'        || ' 1 = 0'                 || null
-			'=@ADMIN|@DBA'   || ' 1 = 0'                 || null
+			filter                         || sqlSearchExpression      | sqlSearchParameters
+			'Mega'                         || 'AE.scale IN :scale'     | [SizeScale.MB]
+			'%Mega%'                       || 'AE.scale IN :scale'     | [SizeScale.MB]
+			'=Mega'                        || ' 1 = 0'                 | null
+			'=Megabyte'                    || 'AE.scale IN :scale'     | [SizeScale.MB]
+			'!Mega'                        || 'AE.scale NOT IN :scale' | [SizeScale.MB]
+			'-Mega'                        || 'AE.scale NOT IN :scale' | [SizeScale.MB]
+			'Mega|Peta|Giga'               || 'AE.scale IN :scale'     | [SizeScale.MB, SizeScale.GB, SizeScale.PB]
+			'=Mega|Peta|Giga'              || ' 1 = 0'                 | null
+			'!Mega|Peta|Giga'              || 'AE.scale NOT IN :scale' | [SizeScale.MB, SizeScale.GB, SizeScale.PB]
+			'!=Mega|Peta|Giga'             || ' 1 = 0'                 | null
+			'!=Megabyte|Petabyte|Gigabyte' || 'AE.scale NOT IN :scale' | [SizeScale.MB, SizeScale.GB, SizeScale.PB]
+			'!=Kilobyte|Megabyte'          || 'AE.scale NOT IN :scale' | [SizeScale.KB, SizeScale.MB]
+			'Mega:Peta'                    || 'AE.scale IN :scale'     | [SizeScale.MB, SizeScale.PB]
+			'Mega&Peta'                    || ' 1 = 0'                 | null
+			'byte'                         || 'AE.scale IN :scale'     | [SizeScale.KB, SizeScale.MB, SizeScale.GB, SizeScale.TB, SizeScale.PB]
+			'FUBAR'                        || ' 1 = 0'                 | null
+			'%ga%'                         || 'AE.scale IN :scale'     | [SizeScale.MB, SizeScale.GB]
+			'*FUBAR*'                      || ' 1 = 0'                 | null
+			'Peta&by'                      || 'AE.scale IN :scale'     | [SizeScale.PB]
+			'P%'                           || 'AE.scale IN :scale'     | [SizeScale.PB] // starts with P
+			'%obyte'                       || 'AE.scale IN :scale'     | [SizeScale.KB] // ends with obyte
+			'%obyt*'                       || 'AE.scale IN :scale'     | [SizeScale.KB] // contains obyt
+			'%ob*t*'                       || 'AE.scale IN :scale'     | [SizeScale.KB] // contains ob*t
+			'=@ADMIN'                      || ' 1 = 0'                 | null
+			'!@ADMIN'                      || ' 1 = 0'                 | null
+			'=@ADMIN|@DBA'                 || ' 1 = 0'                 | null
 
 	}
 
@@ -299,16 +304,19 @@ class SqlUtilTests extends Specification {
 			'%obyte*'        | true         || '.*obyte.*'
 			'%ob%te%'        | true         || '.*ob.*te.*'
 			'%ob*te*'        | true         || '.*ob.*te.*'
+			'Mega|Peta'      | false        || '^(Mega|Peta)$'
 			'Mega|Peta'      | true         || '.*(mega|peta).*'
 			'Mega|Peta|Giga' | true         || '.*(mega|peta|giga).*'
 			'Mega:Peta'      | true         || '.*(mega|peta).*'
+			'Mega:Peta'      | false        || '^(Mega|Peta)$'
 			'Mega:Peta:Giga' | true         || '.*(mega|peta|giga).*'
-			'Mega&Peta'      | true         || '(?=.*mega)(?=.*peta).*'
-			'Peta&by'        | true         || '(?=.*peta)(?=.*by).*'
-			'by&Peta'        | true         || '(?=.*by)(?=.*peta).*'
+			'Mega&Peta'      | true         || '.*(?=.*mega)(?=.*peta).*'
+			'Peta&by'        | true         || '.*(?=.*peta)(?=.*by).*'
+			'Peta&by'        | false        || '^(?=.*Peta)(?=.*by)$'
+			'by&Peta'        | true         || '.*(?=.*by)(?=.*peta).*'
 			'@ADMIN'         | true         || '.*@admin.*'
 			'@ADMIN'         | false        || '^@ADMIN$'
-			'@ADMIN|@DBA'    | false        || '.*(@ADMIN|@DBA).*'
+			'@ADMIN|@DBA'    | false        || '^(@ADMIN|@DBA)$'
 			'@ADMIN|@DBA'    | true         || '.*(@admin|@dba).*'
 	}
 

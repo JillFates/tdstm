@@ -402,14 +402,21 @@ class SqlUtil {
 		fieldSearchData.useWildcards = true
 
 		switch (fieldSearchData.filter) {
-			/* Scenario 1: Starts with '=' */
+			/* Scenario 1: Starts with '!=' */
+			case ~/^(!=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(2)
+				fieldSearchData.useWildcards = false
+				operator = 'NOT IN'
+				break
+
+			/* Scenario 2: Starts with '=' */
 			case ~/^(=).*/:
 				fieldSearchData.filter = fieldSearchData.filter.substring(1)
 				fieldSearchData.useWildcards = false
 				operator = 'IN'
 				break
 
-			/* Starts with '-' or '!' */
+			/* Scenario 3: Starts with '-' or '!' */
 			case ~/^(-|!).*/:
 				fieldSearchData.filter = fieldSearchData.filter.substring(1)
 				operator = 'NOT IN'
@@ -568,8 +575,15 @@ class SqlUtil {
 	static String convertFilterToRegex(FieldSearchData fsd) {
 
 		String filter = fsd.getFilter()
+		String begining = '^'
+		String end = '$'
+
+		// useWildcards = false means use exact match
+		// useWildcards = true means use not exact match
 		if (fsd.useWildcards) {
 			filter = filter.toLowerCase()
+			begining = '.*'
+			end = '.*'
 		}
 		// 1) Check if filter contains only characters.
 		// If this is the case, we can filter using the most generic expression
@@ -580,40 +594,41 @@ class SqlUtil {
 			!filter.contains(']') && !filter.contains('{') && !filter.contains('}') &&
 			!filter.contains('*')
 		) {
-			return (fsd.useWildcards ? '.*' : '^') + filter + (fsd.useWildcards ? '.*' : '$')
+			return begining + filter + end
 		}
-		// 2) Check if user type an 'Or' expression using '|' character
-		if (filter.contains('|')) {
-			return '.*(' + filter + ').*'
-		}
-		// 3) Check if user type an 'OR' expression using ':' character
-		// 'Petabyte'.matches(/.*(by|Peta).*/)
-		if (filter.contains(':')) {
-			return '.*(' + filter.replaceAll(':', '|') + ').*'
-		}
-		// 4) Check if user type an 'AND' expression using '&' character
-		// 'Petabyte'.matches(/(?=.*by)(?=.*Peta).*/)
-		if (filter.contains('&')) {
-			List<String> parts = filter.split('&').collect { "(?=.*$it)" }
-			return parts.join() + '.*'
-		}
-		// 5) Escape  regular expression characters / ' () ? .* $ {}
+
+		// 2) Escape  regular expression characters / ' () ? .* $ {}
 		String specialCharRegex = /[\$\?\.\{\}\(\)\[\]]/
 		String regex = filter.replaceAll(specialCharRegex, '\\\\$0')
 
-		// 6) Translate % or * characters for the .* - any character sequence
+		// 3) Translate % or * characters for the .* - any character sequence
 		regex = regex.replace('*', '.*')
 		regex = regex.replace('%', '.*')
 
+		// 4) Check if user type an 'Or' expression using '|' character
+		if (filter.contains('|')) {
+			return begining + '(' + filter + ')' + end
+		}
+		// 5) Check if user type an 'OR' expression using ':' character
+		// 'Petabyte'.matches(/.*(by|Peta).*/)
+		if (filter.contains(':')) {
+			return begining + '(' + filter.replaceAll(':', '|') + ')' + end
+		}
+		// 6) Check if user type an 'AND' expression using '&' character
+		// 'Petabyte'.matches(/(?=.*by)(?=.*Peta).*/)
+		if (filter.contains('&')) {
+			List<String> parts = filter.split('&').collect { "(?=.*$it)" }
+			return begining + parts.join() + end
+		}
 		// 7) check if filter starts with a word character, short for [a-zA-Z_0-9]
 		if (regex.matches(/^\w.*/)) {
 			regex = '^' + regex
 		}
-
 		// 8) Check if filter ends with a word character, short for [a-zA-Z_0-9]
 		if (regex.matches(/.*\w$/)) {
 			regex = regex + '$'
 		}
+
 		return regex
 	}
 
