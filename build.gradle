@@ -220,3 +220,7 @@ test {
 }
 
 test.reports.html.destination = file("target/test-unit/test-reports/html")
+test.reports.junitXml.destination = file("target/test-reports/")
+integrationTest.reports.html.enabled = true
+integrationTest.reports.html.destination = file("target/test-integration/test-reports/html")
+integrationTest.reports.junitXml.destination = file("target/test-reports/")
