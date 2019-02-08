@@ -371,7 +371,7 @@ class CustomTagLib implements InitializingBean {
 			String stateMessage = licenseAdminService.getLicenseStateMessage()
 			if(stateMessage) {
 				// Bootstrap converts the html entities into real elements
-				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/app/license/admin/list&apos;&quot;"
+				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/module/license/admin/list&apos;&quot;"
 				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message' style='word-wrap: break-word;'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
 			}
 		}
