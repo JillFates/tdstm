@@ -25,12 +25,9 @@
                             <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
                         </a>
                     </li>
-                    <li>
-                        <!--<g:if test="${!isLicenseManagerEnabled}">-->
-                            <!--<tds:licenseWarning />-->
-                        <!--</g:if>-->
+                    <li *ngIf="userContext.licenseEnabled">
+                        <tds-license-warning></tds-license-warning>
                     </li>
-
                     <!-- User Account Menu -->
                     <li class="dropdown user user-menu">
                         <!-- Menu Toggle Button -->

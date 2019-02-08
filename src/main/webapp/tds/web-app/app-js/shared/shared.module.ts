@@ -52,6 +52,7 @@ import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.compo
 import {BreadcrumbNavigationComponent} from './modules/header/components/breadcrumb-navigation/breadcrumb-navigation.component';
 import {HeaderComponent} from './modules/header/components/header/header.component';
 import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
+import {LicenseWarningComponent} from './modules/header/components/license-warning/license-warning.component';
 import {CodeMirrorComponent} from './modules/code-mirror/code-mirror.component';
 import {DynamicComponent} from './components/dynamic.component';
 import {CheckActionComponent} from './components/check-action/check-action.component';
@@ -112,6 +113,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
 		TranmanMenuComponent,
+		LicenseWarningComponent,
 		PopupLegendsComponent,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
@@ -167,6 +169,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
 		TranmanMenuComponent,
+		LicenseWarningComponent,
 		PopupLegendsComponent,
 		DynamicComponent,
 		CodeMirrorComponent,
