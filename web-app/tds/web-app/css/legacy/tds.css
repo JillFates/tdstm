@@ -1669,7 +1669,6 @@
 }
 
 .old-legacy-content div#dependencyDivId {
-	overflow-x: scroll;
 	overflow-y: visible;
 	margin-left: 112px;
 }
