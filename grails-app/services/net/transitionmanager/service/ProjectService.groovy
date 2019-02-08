@@ -6,7 +6,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tds.asset.AssetClass
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
@@ -25,7 +24,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
-import grails.util.Holders
 import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
@@ -93,9 +91,9 @@ class ProjectService implements ServiceMethods {
 
 	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
 
-	static final String DEFAULT_PROJECT_LOGO_LIC_MGR_ENABLED = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogoManager.png'
 
-	static final String DEFAULT_PROJECT_LOGO_LIC_MGR_DISABLED = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1833,9 +1831,9 @@ class ProjectService implements ServiceMethods {
 		} else {
 			String filename
 			if (licenseCommonService.isManagerEnabled()) {
-				filename = DEFAULT_PROJECT_LOGO_LIC_MGR_ENABLED
+				filename = DEFAULT_TRANSITIONMANAGER_LOGO
 			} else {
-				filename = DEFAULT_PROJECT_LOGO_LIC_MGR_DISABLED
+				filename = DEFAULT_LIC_MANAGER_LOGO
 			}
 			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}
