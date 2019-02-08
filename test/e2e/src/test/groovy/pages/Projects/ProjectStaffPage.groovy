@@ -1,7 +1,7 @@
 package pages.Projects
 
 import geb.Page
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ProjectStaffPage extends Page {
 
@@ -19,7 +19,7 @@ class ProjectStaffPage extends Page {
         onlyClientStaff { $('b#onlyClientStaffLabel')}
         onlyAssignedLabel { $('b#onlyAssignedLabel')}
         projectLabel { $('b#projectLabel')}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
 
     }
 

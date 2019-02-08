@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
+import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 /**
@@ -4011,6 +4012,68 @@ class ETLFindSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
+
+
+	@See('TM-12428')
+	@Unroll
+	void "test can throw an exception when user uses undefined variable statement #etlSentence"() {
+
+		setup:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+			""".stripIndent())
+
+		when:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+			etlProcessor.evaluate("""
+					console on
+					read labels
+					domain Application
+					iterate {
+						$etlSentence 
+					}
+				""".stripIndent())
+
+		then:
+			def e = thrown expectedException
+			ETLProcessor.getErrorMessage(e).message == errorMessage
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+
+		where:
+			etlSentence                                                   || expectedException     | errorMessage
+			"find Application by 'id' eq undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' ne undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' nseq undefinedVar into 'id'"        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' lt undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' le undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' gt undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' ge undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' like undefinedVar into 'id'"        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notLike undefinedVar into 'id'"     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' contains undefinedVar into 'id'"    || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notContains undefinedVar into 'id'" || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' inList undefinedVar into 'id'"      || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notInList undefinedVar into 'id'"   || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' between undefinedVar into 'id'"     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' notBetween undefinedVar into 'id'"  || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' is undefinedVar into 'id'"          || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"find Application by 'id' not undefinedVar into 'id'"         || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract undefinedVar"                                        || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"load undefinedVar"                                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"init undefinedVar"                                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"initialize undefinedVar"                                     || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 load undefinedVar"                                 || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 init undefinedVar"                                 || ETLProcessorException | 'No such property: undefinedVar at line 6'
+			"extract 1 initialize undefinedVar"                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
+	}
 }
-
-

@@ -35,6 +35,7 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         at MenuPage
         waitFor { assetsModule.goToApplications() }
         at ViewPage
+        commonsModule.waitForLoader 5
         clickOnCreateButton()
         at AssetCreatePage
         createApplication appDataMap

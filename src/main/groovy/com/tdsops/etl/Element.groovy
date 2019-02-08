@@ -126,6 +126,19 @@ class Element implements RangeChecker, ETLCommand {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	extract 1 load aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element load(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Creates an instance of {@code Element} to manage next step in chain method
 	 * @param fieldName a field name used to continue with the extract ... load 'comments' command
 	 * @return an instance of {@code Element}
@@ -190,6 +203,34 @@ class Element implements RangeChecker, ETLCommand {
 	 */
 	Element init(String initValue) {
 		return initialize(initValue)
+	}
+
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	extract 1 init aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element init(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	extract 1 initialize aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element initialize(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**

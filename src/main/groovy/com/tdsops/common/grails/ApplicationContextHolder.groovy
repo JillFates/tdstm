@@ -3,6 +3,9 @@ package com.tdsops.common.grails
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.GrailsPluginManager
+import grails.util.Holders
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.springframework.context.ApplicationContextAware
 import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -23,8 +26,27 @@ class ApplicationContextHolder implements ApplicationContextAware {
 		getInstance().@applicationContext
 	}
 
+	/**
+	 * Return a bean from the container given its name and/or class.
+	 * Bear in mind that some beans, such as ApplicationTagLib, are not available in the application context,
+	 * but in the main context.
+	 *
+	 * @param name
+	 * @param type
+	 * @return
+	 */
 	static <T> T getBean(String name, Class<T> type = null) {
-		(T) (type ? getApplicationContext().getBean(name, type) : getApplicationContext().getBean(name))
+		T bean
+		try {
+			bean = (T) (type ? getApplicationContext().getBean(name, type) : getApplicationContext().getBean(name))
+		} catch (NoSuchBeanDefinitionException noSuchBeanDefinitionException) {
+			if (type) {
+				bean = (T) Holders.grailsApplication.mainContext.getBean(type)
+			} else {
+				throw noSuchBeanDefinitionException
+			}
+		}
+		return bean
 	}
 
  	static Object getService(String name) {

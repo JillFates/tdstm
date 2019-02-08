@@ -3,19 +3,19 @@ package net.transitionmanager.domain
 class RoleType {
 
 	/** Code that represent User Security Group types */
-	public static final String SECURITY = 'SECURITY'
+	public static final String SECURITY = 'ROLE_SECURITY'
 
 	/** Code that represent Person Team types */
-	public static final String TEAM = 'TEAM'
+	public static final String TEAM = 'ROLE_TEAM'
 
 	/** Code that represents Project type roles */
-	public static final String PROJECT = 'PROJECT'
+	public static final String PROJECT = 'ROLE_PROJECT'
 
 	/** Code that represents Party roles */
-	public static final String PARTY = 'PARTY'
+	public static final String PARTY = 'ROLE_PARTY'
 
 	/** Code that represents Application roles - do not think this is utilized */
-	public static final String APP = 'APP'
+	public static final String APP = 'ROLE_APP'
 
 	String id
 	String description
@@ -59,7 +59,7 @@ class RoleType {
 	}
 
 	def beforeValidate() {
-		if (level == null && type != 'SECURITY') {
+		if (level == null && type != 'ROLE_SECURITY') {
 			level = 0
 		}
 	}

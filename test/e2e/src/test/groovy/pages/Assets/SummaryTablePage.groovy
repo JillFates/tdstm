@@ -1,6 +1,6 @@
 package pages.Assets
 import geb.Page
-import modules.AssetsModule
+import modules.AssetsMenuModule
 import modules.CommonsModule
 
 class SummaryTablePage extends Page {
@@ -11,7 +11,7 @@ class SummaryTablePage extends Page {
 
     static content = {
         modaltitle { $("section", class:"content-header").find("h1")[0]}
-        assetsModule { module AssetsModule}
+        assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
         justPlanningCheckbox {$("input",  id:"justPlanning")}
 

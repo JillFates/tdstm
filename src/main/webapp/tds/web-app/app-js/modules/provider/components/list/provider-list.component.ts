@@ -23,6 +23,7 @@ declare var jQuery: any;
 	`]
 })
 export class ProviderListComponent implements OnInit {
+	protected gridColumns: any[];
 
 	private state: State = {
 		sort: [{
@@ -66,6 +67,7 @@ export class ProviderListComponent implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.providerColumnModel = new ProviderColumnModel(`{0:${dateFormat}}`);
+				this.gridColumns = this.providerColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
 

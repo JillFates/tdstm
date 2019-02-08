@@ -612,10 +612,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Extracts an element from dataSource by its column name
 	 * <code>
 	 *      domain Application
-	 *      iterate {*          extract 'column name' load 'appName'
-	 *
+	 *  iterate {
+	 *  	extract 'column name' load 'appName'
 	 *          extract 'assets.device' load 'assetName'
-	 *}* <code>
+	 *	}
+	 * <code>
 	 * @param columnName
 	 * @return an instance of Element
 	 */
@@ -632,6 +633,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		checkColumnName(rootColumnName)
 		currentColumnIndex = columnsMap[labelToFieldName(rootColumnName)].index
 		doExtract(columnNamePath)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	extract aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element extract(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -662,6 +676,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		} else {
 			return loadElement(fieldName)
 		}
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	load aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element load(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**
@@ -825,6 +852,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	}
 
 	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	initialize aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Map<String, ?> initialize(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
 	 * 	iterate {
@@ -839,6 +879,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	Map<String, ?> init(final String field) {
 		validateStack()
 		initialize(field)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	init aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Map<String, ?> init(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
 	/**

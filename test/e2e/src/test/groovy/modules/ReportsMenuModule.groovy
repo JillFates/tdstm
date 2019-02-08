@@ -3,7 +3,7 @@ package modules
 import geb.Module
 
 
-class ReportsModule extends Module {
+class ReportsMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}

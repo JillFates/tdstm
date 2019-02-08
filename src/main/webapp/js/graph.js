@@ -473,10 +473,16 @@ var GraphUtil = (function ($) {
     // Restyles the first row of the dependency group table to handle fullscreen mode
     public.moveDependencyGroups = function () {
         if (public.hasDependencyGroups()) {
-            if (public.isFullscreen())
+            if (public.isFullscreen()){
                 $('#dependencyDivId').addClass('floating');
-            else
+                $('#dependencyDivId').css('overflow-x', '');
+                setTimeout(function(){
+                    $('#dependencyDivId').css('overflow-x', 'scroll');
+                }, 500);
+            }
+            else{
                 $('#dependencyDivId').removeClass('floating');
+            }
             setGroupTablePosition();
         }
     }

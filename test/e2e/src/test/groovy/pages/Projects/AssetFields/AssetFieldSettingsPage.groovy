@@ -1,7 +1,7 @@
 package pages.Projects.AssetFields
 
 import geb.Page
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 import modules.CommonsModule
 import utils.CommonActions
 
@@ -17,7 +17,7 @@ class AssetFieldSettingsPage extends Page {
 
     static content = {
         pagetitle { $("section", class:"content-header").find("h1")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule }
         contentContainer { $("div.field-setting-component")}
         navTabs { contentContainer.find("ul.nav-tabs li a")}

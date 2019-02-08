@@ -1,7 +1,7 @@
 package pages.Planning
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 
 class ExportRunbookPage extends Page {
 
@@ -13,7 +13,7 @@ class ExportRunbookPage extends Page {
 
     static content = {
         exportRunbookPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         exportRunbookPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
     }
 

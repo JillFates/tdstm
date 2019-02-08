@@ -1,6 +1,6 @@
 package com.tdssrc.grails
 
-import spock.lang.IgnoreRest
+
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -262,5 +262,16 @@ class NumberUtilTests extends Specification {
 			null                    | null         || null
 			new BigDecimal('12.12') | 12l          || 12l
 			new BigDecimal('12.12') | null         || 12l
+	}
+
+	def 'Test toFloat method'() {
+		expect:
+			result == NumberUtil.toFloat(value, defValue)
+		where:
+			value       | defValue || result
+			'123.1236f' | 5.0f     || 123.1236f
+			'123.1236f' | null     || 123.1236f
+			null        | 5.0f     || 5.0f
+			123.23f     | 5.0f     || 123.23f
 	}
 }

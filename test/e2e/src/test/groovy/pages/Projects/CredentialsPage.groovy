@@ -1,7 +1,7 @@
 package pages.Projects
 
 import geb.Page
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 
 class CredentialsPage extends Page{
@@ -14,7 +14,7 @@ class CredentialsPage extends Page{
     static content = {
         pageHeaderName { $("section", class:"content-header").find("h1")}
         createBtn(wait:true) { $('button#btnCreate')}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
     }
 
 

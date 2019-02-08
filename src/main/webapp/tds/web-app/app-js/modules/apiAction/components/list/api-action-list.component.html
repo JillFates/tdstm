@@ -22,19 +22,33 @@
 						<button class="btn btn-default" id="btnCreate" type="button" (click)="onCreate()" *ngIf="isCreateAvailable()"><span class="glyphicon glyphicon-plus button-create-action" aria-hidden="true"></span> {{ 'API_ACTION.CREATE_ACTION' | translate }}</button>
 						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
-					<kendo-grid-column *ngFor="let column of apiActionColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+					<!-- Action -->
+					<kendo-grid-command-column [width]="108" [locked]="true">
 						<ng-template kendoGridHeaderTemplate>
-							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
+							<div class="text-center">
+								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
 							</div>
 						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+						<ng-template kendoGridCellTemplate
+						             let-dataItem
+						             let-rowIndex="rowIndex">
 							<div class="text-center">
 								<button class="btn btn-default" (click)="onEdit(dataItem)" *ngIf="isEditAvailable()"><span class="glyphicon glyphicon-pencil"></span></button>
 								<button class="btn btn-default" (click)="onDelete(dataItem)" *ngIf="isDeleteAvailable()"><span class="fa fa-fw fa-trash"></span></button>
 							</div>
 						</ng-template>
+					</kendo-grid-command-column>
+
+
+					<!-- Configured View Columns (*ngFor) -->
+					<kendo-grid-column *ngFor="let column of gridColumns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+						<ng-template kendoGridHeaderTemplate>
+							<div class="sortable-column" (click)="onClickTemplate($event)">
+								<label> {{column.label}}</label>
+							</div>
+						</ng-template>
+
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 						</ng-template>

@@ -6,7 +6,7 @@ package pages.Planning.Events
  */
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 
 class EventDetailsPage extends Page {
 
@@ -19,7 +19,7 @@ class EventDetailsPage extends Page {
 
     static content = {
         eventDetailsPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         eventDetailsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         eventCreatedMessage (required:false) {$("div.message")[0]}
         eventListBtn {$("a.list")}
