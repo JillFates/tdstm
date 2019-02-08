@@ -2,7 +2,7 @@ package pages.Projects.Providers
 
 import geb.Page
 import modules.CommonsModule
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ProvidersPage extends Page{
     static at = {
@@ -28,7 +28,7 @@ class ProvidersPage extends Page{
         firstProviderEditPencilBtn(wait:true) {$("div", class: "text-center").find("span", class: "glyphicon glyphicon-pencil")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
-        projectsModule { module ProjectsModule}
+        projectsModule { module ProjectsMenuModule}
         arrayOfProviders {$(class:"k-virtual-content").find(class:"k-grid-table-wrap", role:"presentation").find("tbody", role:"presentation").find("tr")}
 
     }

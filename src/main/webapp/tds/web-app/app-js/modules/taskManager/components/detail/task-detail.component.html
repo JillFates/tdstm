@@ -203,7 +203,7 @@
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessors ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
                                                         <tds-button-add class="button-header-grid float-right"
                                                                         title="Create"
-                                                                        [tooltip]="'Create new predecessor task'"
+                                                                        [tooltip]="modelHelper.CREATE_PREDECESSOR"
                                                                         [id]="'btnAddPredecessor'"
                                                                         (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
                                                         </tds-button-add>
@@ -248,7 +248,7 @@
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
                                                     <tds-button-add class="button-header-grid float-right"
                                                                     title="Create"
-                                                                    [tooltip]="'Create new successor task'"
+                                                                    [tooltip]="modelHelper.CREATE_SUCCESSOR"
                                                                     [id]="'btnAddSuccessor'"
                                                                     (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
                                                     </tds-button-add>

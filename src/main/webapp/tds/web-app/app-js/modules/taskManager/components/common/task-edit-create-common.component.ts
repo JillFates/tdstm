@@ -80,7 +80,12 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 		this.isEventLocked = false;
 
-		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault(), this.taskManagerService, this.dialogService);
+		this.modelHelper = new TaskEditCreateModelHelper(
+			this.userTimeZone,
+			this.userPreferenceService.getUserCurrentDateFormatOrDefault(),
+			this.taskManagerService,
+			this.dialogService,
+			this.translatePipe);
 
 		this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 			this.modelHelper.getModelForCreate(this.taskDetailModel)

@@ -30,6 +30,7 @@ import {ActivatedRoute} from '@angular/router';
 	`]
 })
 export class CredentialListComponent implements OnInit {
+	protected gridColumns: any[];
 
 	private state: State = {
 		sort: [{
@@ -73,6 +74,7 @@ export class CredentialListComponent implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.credentialColumnModel = new CredentialColumnModel(`{0:${dateFormat}}`);
+				this.gridColumns = this.credentialColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
 

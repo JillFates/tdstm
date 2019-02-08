@@ -1,7 +1,7 @@
 package pages.Planning.Bundle
 
 import geb.Page
-import modules.PlanningModule
+import modules.PlanningMenuModule
 import modules.CommonsModule
 import org.openqa.selenium.Keys
 
@@ -16,7 +16,7 @@ class ListBundlesPage extends Page {
 
     static content = {
         listBundlesPageTitle { $("section", class:"content-header").find("h1")}
-        planningModule { module PlanningModule}
+        planningModule { module PlanningMenuModule}
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}

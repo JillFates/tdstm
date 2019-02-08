@@ -7,7 +7,7 @@
 		</td>
 	</tr>
 	<g:if test="${changingPassword}">
-		<tr class="prop js-password">
+		<tr class="prop passwordsEditFields">
 			<td valign="top" class="name">
 				<label for="oldPasswordId">Old Password:</label>
 			</td>

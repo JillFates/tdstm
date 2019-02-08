@@ -2,7 +2,7 @@
 <div style="margin-top: 10px;">
 	<div id="dependencyBundleDetailGroupContainer">
 		<div style="border: 1px solid #63A242; margin-left: 0px;">
-		<div id="dependencyDivId" style="overflow-x:auto;">
+		<div id="dependencyDivId">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 				<tr id="dependencyGroupsRowId" class="odd">
 

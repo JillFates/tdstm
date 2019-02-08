@@ -22,6 +22,7 @@ import {ActivatedRoute} from '@angular/router';
 	`]
 })
 export class DataScriptListComponent implements OnInit {
+	protected gridColumns: any[];
 
 	private state: State = {
 		sort: [{
@@ -76,6 +77,7 @@ export class DataScriptListComponent implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${dateFormat}}`);
+				this.gridColumns = this.dataScriptColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
 

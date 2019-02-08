@@ -30,7 +30,7 @@ import {ActivatedRoute} from '@angular/router';
 	`]
 })
 export class APIActionListComponent implements OnInit {
-
+	protected gridColumns: any[];
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -75,6 +75,7 @@ export class APIActionListComponent implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.apiActionColumnModel = new APIActionColumnModel(`{0:${dateFormat}}`);
+				this.gridColumns = this.apiActionColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
 

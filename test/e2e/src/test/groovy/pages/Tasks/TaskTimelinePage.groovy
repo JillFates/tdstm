@@ -2,7 +2,7 @@ package pages.Tasks
 
 import geb.Page
 import modules.CommonsModule
-import modules.TasksModule
+import modules.TasksMenuModule
 import pages.Tasks.Cookbook.CookbookPage
 import pages.Tasks.*
 

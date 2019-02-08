@@ -13,8 +13,6 @@
 						<div class="form-group">
 							<label for="dataScriptProvider" class="col-sm-2 control-label">Provider:
 								<span class="is-required" *ngIf="modalType !== actionTypes.VIEW">*</span>
-							</label>
-							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 								<kendo-dropdownlist *ngIf="providerList && providerList.length > 0"
 													#dataScriptProvider
 													id="dataScriptProvider"
@@ -23,6 +21,7 @@
 													[data]="providerList"
 													[textField]="'name'"
 													[valueField]="'id'"
+													[defaultItem]="dataScriptModel.provider"
 													[(ngModel)]="dataScriptModel.provider"
 													required
 													class="form-control"
@@ -89,7 +88,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveDataScript()"
-		 class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || !isUnique || !dataScriptModel.provider.id">
+		 class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || !isUnique || (dataScriptModel.provider && !dataScriptModel.provider.id)">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditDataScript()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
