@@ -1,4 +1,4 @@
-<header class="main-header">
+<header class="main-header header-component">
     <nav class="navbar navbar-static-top">
         <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseEnabled}">
             <div class="navbar-header">
@@ -23,7 +23,7 @@
                             <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
                         </a>
                     </li>
-                    <li *ngIf="userContext.licenseEnabled">
+                    <li *ngIf="!userContext.licenseEnabled">
                         <tds-license-warning></tds-license-warning>
                     </li>
                     <!-- User Account Menu -->
