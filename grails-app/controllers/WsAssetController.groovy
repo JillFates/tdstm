@@ -547,7 +547,6 @@ class WsAssetController implements ControllerMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 		def assetComments = commentService.listAssetComments(project, viewUnpublished)
 		List<Map> assetCommentsList = []
-
 		def today = new Date()
 		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
 
