@@ -95,7 +95,7 @@ export class BulkCheckboxService {
 				let bulkIds = getBulkIds;
 				return bulkIds(params)
 					.subscribe((result: any) => {
-						const assets = result && (result.assets || result.dependencies) || [];
+						const assets = result && (result.assets || (result.dependencies || result.data)) || [];
 						// TODO side effect
 						const selectedAssetsIds = assets
 							.map((asset) => asset[this.idFieldName])
