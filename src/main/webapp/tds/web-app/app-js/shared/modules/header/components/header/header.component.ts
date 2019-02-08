@@ -1,8 +1,17 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
+// Component
+import {UserPreferencesComponent} from '../../../../../modules/user/components/preferences/user-preferences.component';
+import {UserEditPersonComponent} from '../../../../../modules/user/components/edit-person/user-edit-person.component';
+import {UserDateTimezoneComponent} from '../../../../../modules/user/components/date-timezone/user-date-timezone.component';
 // Service
 import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UIDialogService} from '../../../../services/ui-dialog.service';
+// Model
 import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {PersonModel} from '../../../../components/add-person/model/person.model';
+import {PasswordChangeModel} from '../../../../components/password-change/model/password-change.model';
+import {DIALOG_SIZE} from '../../../../model/constants';
 
 declare var jQuery: any;
 
@@ -16,7 +25,8 @@ export class HeaderComponent implements OnInit {
 	protected userContext: UserContextModel;
 
 	constructor(
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private dialogService: UIDialogService) {
 		this.getUserContext();
 	}
 
@@ -33,6 +43,27 @@ export class HeaderComponent implements OnInit {
 	protected getUserContext(): void {
 		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
 			this.userContext = userContext;
+		});
+	}
+
+	protected openPrefModal(): void {
+		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			//
+		});
+	}
+
+	protected openEditPersonModal(): void {
+		this.dialogService.open(UserEditPersonComponent, [
+			{provide: PersonModel, useValue: {}},
+			{provide: PasswordChangeModel, useValue: {}}
+		]).catch(result => {
+			//
+		});
+	}
+
+	protected openDateTimezoneModal(): void {
+		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
+			//
 		});
 	}
 }

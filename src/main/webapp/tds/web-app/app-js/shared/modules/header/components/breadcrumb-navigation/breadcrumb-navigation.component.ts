@@ -6,15 +6,8 @@ import {Title} from '@angular/platform-browser';
 import {NotifierService} from '../../../../services/notifier.service';
 import {TaskService} from '../../../../../modules/taskManager/service/task.service';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
-// Component
-import {UserDateTimezoneComponent} from '../../../../../modules/user/components/date-timezone/user-date-timezone.component';
-import {UserPreferencesComponent} from '../../../../../modules/user/components/preferences/user-preferences.component';
-import {UserEditPersonComponent} from '../../../../../modules/user/components/edit-person/user-edit-person.component';
 // Models
 import {ASSET_MENU_CSS_TREE} from '../../model/asset-menu.model';
-import {PersonModel} from '../../../../components/add-person/model/person.model';
-import {PasswordChangeModel} from '../../../../components/password-change/model/password-change.model';
-import {DIALOG_SIZE} from '../../../../model/constants';
 // Other
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
@@ -27,10 +20,6 @@ declare var jQuery: any;
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <ng-container *ngIf="pageMetaData">
-                <!-- Used for the user preferences until fully converted to angular -->
-                <span (click)="openPrefModal()" class="open-pref-modal"></span>
-                <span (click)="openEditPersonModal()" class="open-edit-person-modal"></span>
-                <span (click)="openDateTimezoneModal()" class="open-datetimezone-modal"></span>
                 <h1>
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
@@ -70,7 +59,6 @@ export class BreadcrumbNavigationComponent {
 		private notifierService: NotifierService,
 		private titleService: Title,
 		promptService: UIPromptService,
-		private dialogService: UIDialogService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
@@ -162,33 +150,5 @@ export class BreadcrumbNavigationComponent {
 				}
 			}
 		}
-	}
-
-	/**
-	 * This is a hack to open the modal window properly before the user menu is angular.
-	 */
-	public openPrefModal(): void {
-		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
-			if (result) {
-				console.error(result);
-			}
-		});
-	}
-
-	public openEditPersonModal(): void {
-		this.dialogService.open(UserEditPersonComponent, [
-			{provide: PersonModel, useValue: {}},
-			{provide: PasswordChangeModel, useValue: {}}
-		]).catch(result => {
-			if (result) {
-				console.error(result);
-			}
-		});
-	}
-
-	public openDateTimezoneModal(): void {
-		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
-			console.error(result);
-		});
 	}
 }

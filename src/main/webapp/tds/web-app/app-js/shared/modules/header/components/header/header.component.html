@@ -6,9 +6,7 @@
                     <i class="fa fa-bars"></i>
                 </button>
                 <!-- LOGO -->
-                <img *ngIf="userContext.licenseEnabled && !userContext.imageId" id="logo-header" src="/tdstm/assets/images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />
-                <img *ngIf="!userContext.licenseEnabled && userContext.imageId" src="/tdstm/project/showImage/{{userContext.imageId}}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
-                <img *ngIf="!userContext.licenseEnabled && !userContext.imageId" id="logo-header" src="/tdstm/assets/images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
+                <img id="logo-header" [src]="userContext.project.logoUrl" alt="TransitionManager" border="0" />
             </div>
 
             <tds-tranman-menu></tds-tranman-menu>
@@ -41,9 +39,9 @@
                             <!-- Menu Body -->
                             <li class="user-body">
                                 <ul class="list-group">
-                                    <li class="list-group-item"><a href="#" style="cursor: pointer;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a></li>
-                                    <li class="list-group-item"><a href="#" style="cursor: pointer;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
-                                    <li class="list-group-item"><a href="#" style="cursor: pointer;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
+                                    <li class="list-group-item"><a (click)="openEditPersonModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a></li>
+                                    <li class="list-group-item"><a (click)="openPrefModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                    <li class="list-group-item"><a (click)="openDateTimezoneModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
                                 </ul>
                             </li>
                             <!-- Menu Footer-->
