@@ -541,10 +541,10 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listComments() {
-		def assetComments = AssetComment.findAllWhere(project:securityService.userCurrentProject,commentType:AssetCommentType.COMMENT)
+		List<AssetComment> assetComments = AssetComment.findAllWhere(project:securityService.userCurrentProject,commentType:AssetCommentType.COMMENT)
 
-		def assetCommentsList = []
-		def today = new Date()
+		List<Map> assetCommentsList = []
+		Date today = new Date()
 		boolean viewUnpublished = securityService.viewUnpublished()
 		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
 
