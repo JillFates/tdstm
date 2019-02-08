@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
+import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import grails.test.spock.IntegrationSpec
 import grails.validation.ValidationException
 import net.transitionmanager.command.CredentialCommand
@@ -42,19 +43,21 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             ProjectRequiredException e = thrown()
     }
 
-    // TODO : JPM 2/2018 : Enable once we solve the Mocking for SecurityService.getUserCurrentProject
-    // void '2. test create credential without provider throws exception'() {
-    //     setup:
-    //         Project project = projectTestHelper.createProject()
-    //         credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+    void '2. test create credential without provider throws exception'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            Project project2 = projectTestHelper.createProject()
+            Provider provider = providerTestHelper.createProvider(project2)
+            CredentialCommand credentialCO = credentialTestHelper.createCredentialCO(provider)
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
-    //     when: 'creating a Credential with no provider specified'
-    //         credentialService.create(credentialCO)
-    //     then: 'an InvalidParamException exception should be thrown'
-    //         InvalidParamException e = thrown()
-    //     and: 'the message should contain invalid provider'
-    //         e.message ==~ /Invalid provider param.*/
-    // }
+        when: 'creating a Credential with no provider specified'
+            credentialService.create(credentialCO)
+        then: 'an InvalidParamException exception should be thrown'
+            InvalidParamException e = thrown()
+        and: 'the message should contain invalid provider'
+            e.message ==~ /Invalid Provider specified*/
+    }
 
     void '3. find credential id returns credential'() {
         setup:
@@ -117,52 +120,49 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             thrown EmptyResultException
     }
 
-    // TODO : JPM 2/2018 : Enable once we solve the Mocking for SecurityService.getUserCurrentProject
-    // void '7. update an existing credential'() {
-    //     setup:
-    //         Project project = projectTestHelper.createProject()
-    //         credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+    void '7. update an existing credential'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
-    //         Provider provider = providerTestHelper.createProvider(project)
-    //         Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
-    //         final Long id = credential.id
-        
-    //     when: 'updating a Credential with a new name'
-    //         final String newCredentialName = "***Credential name updated***"
-    //         CredentialCommand credentialCO = new CredentialCommand()
-    //         credentialCO.populateFromDomain(credential)
-    //         credentialCO.name = newCredentialName
-    //         credentialCO.version = credential.version
-    //         Credential updatedCredential = credentialService.update(id, credentialCO)
-    //     then: 'the returned credential should have the new name'
-    //         newCredentialName == updatedCredential.name
-    //     and: 'querying the database should return the new name'
-    //         newCredentialName == credentialService.findById(id).name
-    // }
+            Provider provider = providerTestHelper.createProvider(project)
+            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
+            final Long id = credential.id
 
-    // TODO : JPM 2/2018 : Enable once we solve the Mocking for SecurityService.getUserCurrentProject
-    // void '8. update an existing credential by passing an outdated version number throws DomainUpdateException'() {
-    //     setup:
-    //         Project project = projectTestHelper.createProject()
-    //         credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+        when: 'updating a Credential with a new name'
+            final String newCredentialName = "***Credential name updated***"
+            CredentialCommand credentialCO = new CredentialCommand()
+            credentialCO.populateFromDomain(credential)
+            credentialCO.name = newCredentialName
+            // credentialCO.version = credential.version
+            Credential updatedCredential = credentialService.update(id, credentialCO, credential.version)
+        then: 'the returned credential should have the new name'
+            newCredentialName == updatedCredential.name
+        and: 'querying the database should return the new name'
+            newCredentialName == credentialService.findById(id).name
+    }
 
-    //         Provider provider = providerTestHelper.createProvider(project)
-    //         Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
-    //         final Long id = credential.id
+    void '8. update an existing credential by passing an outdated version number throws DomainUpdateException'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
-    //         CredentialCommand credentialCO = new CredentialCommand()
-    //         credentialCO.populateFromDomain(credential)
-    //         credentialCO.version = -1
+            Provider provider = providerTestHelper.createProvider(project)
+            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
+            final Long id = credential.id
 
-    //     when: 'a Credential is updated with an outdated version number'
-    //         credentialService.update(id, credentialCO)
+            CredentialCommand credentialCO = new CredentialCommand()
+            credentialCO.populateFromDomain(credential)
+            // credentialCO.version = -1
 
-    //     then: 'a DomainUpdateException shouold be thrown'
-    //         DomainUpdateException e thrown
-    //     and: 'the message should reflect that'
-    //         'Someone else modified' == e.message
+        when: 'a Credential is updated with an outdated version number'
+            credentialService.update(id, credentialCO, credential.version - 1)
 
-    // }
+        then: 'a DomainUpdateException shouold be thrown'
+            DomainUpdateException e = thrown()
+        and: 'the message should reflect that'
+            'The Credential was updated by someone while you were editting therefore your changes were not saved.' == e.message
+    }
 
     void '9. saving credential with valid and invalid sessionName property value'() {
         setup:
@@ -208,4 +208,75 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
         then: 'validation exception is thrown'
             thrown ValidationException
     }
+
+    void '10. trying to authenticate using JWT token with GET HTTP method throws exception'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            Provider provider = providerTestHelper.createProvider(project)
+            CredentialCommand credentialCO = credentialTestHelper.createCredentialCO(provider)
+            credentialCO.authenticationMethod = AuthenticationMethod.JWT
+            credentialCO.httpMethod = CredentialHttpMethod.GET
+            credentialCO.renewTokenUrl = 'https://localhost'
+
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+            Credential credential = credentialService.create(credentialCO)
+
+        when: 'perform authenticate with given credentials'
+            def resp = credentialService.authenticate(credential)
+
+        then: 'exception is thrown'
+            RuntimeException e = thrown()
+        and: 'error message should indicate that JWT with GET method is not supported'
+            e.message ==~ /JWT authentication and GET HTTP method not supported/
+
+    }
+
+    void '11. trying to authenticate using Cookie and FORM_VARS with GET HTTP method throws exception'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            Provider provider = providerTestHelper.createProvider(project)
+            CredentialCommand credentialCO = credentialTestHelper.createCredentialCO(provider)
+            credentialCO.authenticationMethod = AuthenticationMethod.COOKIE
+            credentialCO.requestMode = AuthenticationRequestMode.FORM_VARS
+            credentialCO.httpMethod = CredentialHttpMethod.GET
+            credentialCO.renewTokenUrl = 'https://localhost'
+            credentialCO.sessionName = 'JSESSIONID@cookie:JSESSIONID'
+
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+            Credential credential = credentialService.create(credentialCO)
+
+        when: 'perform authenticate with given credentials'
+            def resp = credentialService.authenticate(credential)
+
+        then: 'exception is thrown'
+            RuntimeException e = thrown()
+        and: 'error message should indicate that Cookie and FORM_VARS with GET method is not supported'
+            e.message ==~ /Cookie authentication with form variables and GET HTTP method is not supported/
+
+    }
+
+    void '12. trying to authenticate using Header and FORM_VARS with GET HTTP method throws exception'() {
+        setup:
+            Project project = projectTestHelper.createProject()
+            Provider provider = providerTestHelper.createProvider(project)
+            CredentialCommand credentialCO = credentialTestHelper.createCredentialCO(provider)
+            credentialCO.authenticationMethod = AuthenticationMethod.HEADER
+            credentialCO.requestMode = AuthenticationRequestMode.FORM_VARS
+            credentialCO.httpMethod = CredentialHttpMethod.GET
+            credentialCO.renewTokenUrl = 'https://localhost'
+            credentialCO.sessionName = 'access_token@header:access_token'
+
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+            Credential credential = credentialService.create(credentialCO)
+
+        when: 'perform authenticate with given credentials'
+            def resp = credentialService.authenticate(credential)
+
+        then: 'exception is thrown'
+            RuntimeException e = thrown()
+        and: 'error message should indicate that Header and FORM_VARS with GET method is not supported'
+            e.message ==~ /Header authentication with form variables and GET HTTP method is not supported/
+
+    }
+
 }
