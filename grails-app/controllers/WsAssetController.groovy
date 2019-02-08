@@ -24,6 +24,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
+import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.DeviceService
@@ -42,6 +43,7 @@ class WsAssetController implements ControllerMethods {
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
 	AssetService assetService
+	CommentService commentService
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
@@ -541,11 +543,12 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listComments() {
-		def assetComments = AssetComment.findAllWhere(project:securityService.userCurrentProject,commentType:AssetCommentType.COMMENT)
-
-		def assetCommentsList = []
-		def today = new Date()
+		def project = securityService.userCurrentProject
 		boolean viewUnpublished = securityService.viewUnpublished()
+		def assetComments = commentService.listAssetComments(project, viewUnpublished)
+		List<Map> assetCommentsList = []
+
+		def today = new Date()
 		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
 
 		assetComments.each {

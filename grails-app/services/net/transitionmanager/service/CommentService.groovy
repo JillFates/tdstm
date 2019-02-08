@@ -849,4 +849,15 @@ class CommentService implements ServiceMethods {
 		]
 
 	}
+
+	List<AssetComment> listAssetComments(Project project, boolean viewUnpublished) {
+		List<AssetComment> comments = AssetComment.where {
+			project == project
+			commentType == AssetCommentType.COMMENT
+			assetEntity != null
+			if (!viewUnpublished) {
+				isPublished == true
+			}
+		}.list()
+	}
 }
