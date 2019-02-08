@@ -11,7 +11,7 @@ import utils.CommonActions
 class CreateCommentPage extends Page{
     static at = {
         commentsModal.displayed
-        modalTitle.text().contains("Create Comment")
+        modalTitle.text().contains("Comment Create")
         saveButton.present
         cancelButton.displayed
         textArea.displayed
