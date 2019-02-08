@@ -8,7 +8,9 @@ import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.CredentialService
+import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
 import org.codehaus.groovy.grails.commons.GrailsApplication
