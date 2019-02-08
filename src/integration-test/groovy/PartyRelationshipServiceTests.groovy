@@ -3,6 +3,7 @@ import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
@@ -197,9 +198,9 @@ class PartyRelationshipServiceTests extends Specification {
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		then: "The List has three objects"
-			companies.size() == 1
+			companies.size() == 3
 		and: "There are no duplicated companies"
-			companies.unique { it.id }.size() == 1
+			companies.unique { it.id }.size() == 3
 		and: "It contains the owner"
 			companies.find { it.id == projectService.getOwner(project).id }
 		and: "It contains the client"
@@ -219,10 +220,10 @@ class PartyRelationshipServiceTests extends Specification {
 			Project project = projectHelper.createProject()
 		when: "Asking for the companies for the project "
 			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
-		then: "The List has three objects"
-			companies.size() == 1
+		then: "The List has two objects"
+			companies.size() == 2
 		and: "There are no duplicated companies"
-			companies.unique {it.id}.size() == 1
+			companies.unique {it.id}.size() == 2
 		and: "It contains the owner"
 			companies.find {it.id == projectService.getOwner(project).id}
 		and: "It contains the client"
