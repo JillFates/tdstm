@@ -426,7 +426,12 @@ class SqlUtil {
 		Object paramValue = parseEnumParameter(fieldSearchData)
 		if (paramValue) {
 			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
-			fieldSearchData.sqlSearchExpression = expression
+			if (operator == 'NOT IN') {
+				fieldSearchData.sqlSearchExpression = '( ' + expression + ' OR ' + fieldSearchData.whereProperty + ' IS NULL )'
+			} else {
+				fieldSearchData.sqlSearchExpression = expression
+			}
+
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
 		} else {
 			// Particular Scenario. Because we are filtering here and not in the SQL sentence directly,
