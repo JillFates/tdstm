@@ -600,7 +600,6 @@ class UrlMappings {
 			]
 		}
 
-		//Gets que request Hash  --- OLB 161207 Change Hash to request...
 		"/ws/license/$id/hash" {
 			controller = "wsLicenseAdmin"
 			action = [

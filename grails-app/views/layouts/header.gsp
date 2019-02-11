@@ -3,14 +3,6 @@
 <!DOCTYPE html>
 <html>
 <%
-    def moveBundle = tds.currentMoveBundle() ?: null
-    def moveEvent = tds.currentMoveEvent() ?: null
-    def currProject = tds.currentProject() ?: null
-    def room = tds.currentRoom() ?: null // GONE
-    def person = tds.currentPerson() ?: null
-    String partyGroup = tds.partyGroup() ?: null // GONE
-    String setImage = tds.setImage() ?: null
-    def userLogin = tds.userLogin() ?: null
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
     def buildInfo = environmentService.getVersionText()
