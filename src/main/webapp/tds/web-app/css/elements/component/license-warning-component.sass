@@ -6,3 +6,38 @@ div.license-warning-component
   a.licensing-error-warning
     i
       margin-top: 8px
+
+i.licensing-error-warning
+  color: $warningLicense
+  font-size: 18px
+
+div.license-warning-message-button
+  text-align: center
+  margin-top: 10px
+
+.licensing-banner-message
+  text-align: center
+  .callout
+    color: #DB8700
+    background: none
+    padding: 4px 12px 4px 12px
+    font-size: 14px
+    position: absolute
+    left: 0
+    right: 0
+    margin: auto
+
+@media(min-width: 992px)
+  .licensing-banner-message
+    float: initial !important
+    max-width: 400px
+    margin: 0 auto
+    position: relative !important
+    top: -25px !important
+
+@media (max-width: 991px)
+  .content-header>.breadcrumb.licensing-banner-message
+    background: none
+    .callout
+      margin-right: 0px
+      position: initial !important
