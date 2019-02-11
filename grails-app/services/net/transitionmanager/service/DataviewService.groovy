@@ -9,10 +9,12 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
+import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -583,17 +585,19 @@ class DataviewService implements ServiceMethods {
 				Map row = [:]
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
-					if(dataviewSpec.columns[index].property == 'tagAssets'){
+					Map column = dataviewSpec.columns[index]
+
+					if (column.property == 'tagAssets'){
 						cell = handleTags(cell)
 					}
-					if(dataviewSpec.columns[index].property == 'scale'){
+					if (column.property == 'scale'){
 						if (cell) {
 							cell = cell.value
 						}
 					}
 
-					if (dataviewSpec.columns[index]) {
-						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+					if (column) {
+						row["${column.domain}${DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER}${column.property}"] = cell
 					}
 				}
 
@@ -718,10 +722,12 @@ class DataviewService implements ServiceMethods {
 				// Trigger the parsing of the parameter.
 				SqlUtil.parseParameter(fieldSearchData)
 
-				// Add the condition and its parameters only if there are parameters for the query.
-				if (fieldSearchData.sqlSearchParameters) {
+				if (fieldSearchData.sqlSearchExpression) {
 					// Append the where clause to the list of conditions.
 					whereConditions << fieldSearchData.sqlSearchExpression
+				}
+
+				if (fieldSearchData.sqlSearchParameters) {
 					// Add the parameters required for this field.
 					whereParams += fieldSearchData.sqlSearchParameters
 				}
@@ -800,7 +806,7 @@ class DataviewService implements ServiceMethods {
 		Class type = transformations[column.property].type
 		FieldSpec fieldSpec = column.fieldSpec
 
-		if(fieldSpec?.isCustom()){
+		if (fieldSpec?.isCustom()) {
 			type = fieldSpec.getClassType()
 		}
 
@@ -1083,6 +1089,7 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: ""],
 		'sourceBladePosition': [property: "AE.sourceBladePosition", type: Integer, namedParameter: 'sourceBladePosition', join: ""],
 		'targetBladePosition': [property: "AE.targetBladePosition", type: Integer, namedParameter: 'targetBladePosition', join: ""],
+		'scale' : [property: 'AE.scale', type: SizeScale, namedParameter: 'scale', join: ''],
 		'size': [property: "AE.size", type: Integer, namedParameter: 'size', join: ""],
 		'rateOfChange': [property: "AE.rateOfChange", type: Integer, namedParameter: 'rateOfChange', join: ""],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
