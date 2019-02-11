@@ -369,9 +369,6 @@ class FilesController implements ControllerMethods {
 				case "application":
 					redirect(controller:'application', action:"list")
 					break
-				case "listComment":
-					redirect(controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
-					break
 				case "listTask":
 					render "Storage $filesInstance.assetName updated."
 					break

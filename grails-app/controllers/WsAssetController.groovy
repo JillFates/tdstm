@@ -1,8 +1,12 @@
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.AssetCommentType
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -21,6 +25,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
+import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.DeviceService
@@ -39,6 +44,7 @@ class WsAssetController implements ControllerMethods {
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
 	AssetService assetService
+	CommentService commentService
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
@@ -490,4 +496,70 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
 	}
 
+
+	/**
+	 * Return a list with all the AssetCommentCategory values.
+	 */
+	@HasPermission(Permission.TaskBatchView)
+	def assetCommentCategories() {
+		renderSuccessJson(AssetCommentCategory.list)
+	}
+
+	/**
+	 * Delete a comment given its id.
+	 */
+	@HasPermission(Permission.CommentDelete)
+	def deleteComment(Long id) {
+		// Retrieve the project for the current user.
+		Project project = getProjectForWs()
+		// Delete the comment
+		commentService.deleteComment(project, id)
+		renderSuccessJson()
+
+	}
+
+	/**
+	 * Update an AssetComment
+	 */
+	@HasPermission(Permission.CommentEdit)
+	def updateComment(Long id) {
+		// Update the comment.
+		saveOrUpdateComment()
+		renderSuccessJson()
+	}
+
+	/**
+	 * Update an AssetComment
+	 */
+	@HasPermission(Permission.CommentCreate)
+	def saveComment() {
+		// Save the comment.
+		saveOrUpdateComment()
+		renderSuccessJson()
+
+	}
+
+	/**
+	 * Get all the comments associated with the current project
+	 */
+	@HasPermission(Permission.CommentView)
+	def listComments() {
+		def project = securityService.userCurrentProject
+		boolean viewUnpublished = securityService.viewUnpublished()
+		def assetComments = commentService.listAssetComments(project, viewUnpublished)
+		List<Map> assetCommentsList = []
+		def today = new Date()
+		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
+
+		assetComments.each {
+			if ((viewUnpublished || it.isPublished) && it.assetEntity)
+				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
+									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
+									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
+									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
+									 canEditComments: canEditComments]
+		}
+
+		renderAsJson assetCommentsList
+	}
 }

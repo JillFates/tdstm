@@ -1,11 +1,9 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.CommentNote
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
@@ -199,61 +197,5 @@ class WsTaskController implements ControllerMethods {
 			log.error "addNote: $errorMsg"
 			renderErrorJson([errorMsg])
 		}
-	}
-
-	/**
-	 * Return a list with all the AssetCommentCategory values.
-	 */
-	@HasPermission(Permission.TaskBatchView)
-	def assetCommentCategories() {
-		renderSuccessJson(AssetCommentCategory.list)
-	}
-
-	/**
-	 * Delete a comment given its id.
-	 */
-	@HasPermission(Permission.CommentDelete)
-	def deleteComment(Long id) {
-		// Retrieve the project for the current user.
-		Project project = getProjectForWs()
-		// Delete the comment
-		commentService.deleteComment(project, id)
-		renderSuccessJson()
-
-	}
-
-	/**
-	 * Update an AssetComment
-	 */
-	@HasPermission(Permission.CommentEdit)
-	def updateComment(Long id) {
-		// Update the comment.
-		saveOrUpdateComment()
-		renderSuccessJson()
-	}
-
-	/**
-	 * Update an AssetComment
-	 */
-	@HasPermission(Permission.CommentCreate)
-	def saveComment() {
-		// Save the comment.
-		saveOrUpdateComment()
-		renderSuccessJson()
-
-	}
-
-	/**
-	 * Create or Update an AssetComment
-	 * @param id
-	 * @param command
-	 */
-	private void saveOrUpdateComment() {
-		// Retrieve the project for the user.
-		Project project = getProjectForWs()
-		// Populate the command object with the data coming from the request
-		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
-		// Save or update the comment
-		commentService.saveOrUpdateAssetComment(project, command)
 	}
 }

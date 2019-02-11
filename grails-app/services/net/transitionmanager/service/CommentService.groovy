@@ -849,4 +849,21 @@ class CommentService implements ServiceMethods {
 		]
 
 	}
+
+  	/**
+	 * Find and return the comments for this project.
+	 * @param project - user's project
+	 * @param viewUnpublished - whether or not unpublished commments should be included in the list.
+	 * @return a list of comments for the project.
+	 */
+	List<AssetComment> listAssetComments(Project project, boolean viewUnpublished) {
+		return AssetComment.where {
+			project == project
+			commentType == AssetCommentType.COMMENT
+			assetEntity != null
+			if (!viewUnpublished) {
+				isPublished == true
+			}
+		}.list()
+	}
 }

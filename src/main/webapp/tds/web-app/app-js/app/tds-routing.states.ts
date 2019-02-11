@@ -6,6 +6,7 @@ export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'security'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
+	{path: 'assetcomment', loadChildren: '../modules/assetComment/asset-comment.module#AssetCommentModule'},
 	{path: 'asset', loadChildren: '../modules/assetManager/asset-manager.module#AssetManagerModule'},
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},

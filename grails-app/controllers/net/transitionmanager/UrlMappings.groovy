@@ -166,8 +166,8 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/task/assetCommentCategories" {
-			controller = "wsTask"
+		"/ws/asset/assetCommentCategories" {
+			controller = "wsAsset"
 			action = [
 			    GET : 'assetCommentCategories'
 			]
@@ -341,17 +341,18 @@ class UrlMappings {
 		 * AssetComment CRUD endpoints
 		 */
 
-		"/ws/task/comment/$id" {
-			controller = "wsTask"
+		"/ws/asset/comment/$id" {
+			controller = "wsAsset"
 			action = [
 				DELETE:'deleteComment',
 				PUT: 'updateComment'
 			]
 		}
 
-		"/ws/task/comment" {
-			controller = 'wsTask'
+		"/ws/asset/comment" {
+			controller = 'wsAsset'
 			action = [
+				GET: "listComments",
 			    POST: 'saveComment'
 			]
 		}
