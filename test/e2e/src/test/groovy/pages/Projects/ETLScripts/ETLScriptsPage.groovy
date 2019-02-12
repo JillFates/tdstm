@@ -2,7 +2,7 @@ package pages.Projects.ETLScripts
 
 import geb.Page
 import modules.CommonsModule
-import modules.ProjectsModule
+import modules.ProjectsMenuModule
 
 class ETLScriptsPage extends Page {
     static at = {
