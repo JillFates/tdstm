@@ -860,6 +860,8 @@ class DataImportService implements ServiceMethods {
 			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
 			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg
 			throw new DomainUpdateException("Unable to update row $recordCount due to " + domainUpdateErrorMsg)
+		} else {
+			log.info "Record saved in database ID: ${record?.id}"
 		}
 	}
 
@@ -870,6 +872,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context a {@code Map}  with context information.
 	 * 			It contains project field used in {@code AssetComment} creation.
 	 */
+	@Transactional(noRollbackFor=[Throwable])
 	void saveCommentsForEntity(List<String> comments, Object entity, Map context) {
 		comments.each { String comment ->
 			new AssetComment(
@@ -911,6 +914,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context
 	 * @return the entity that is found or created, or null if an error occurs. The error is recorded in the fieldsInfo Map appropriately.
 	 */
+	@Transactional(noRollbackFor=[Throwable])
 	private Object findOrCreateEntity(Map fieldsInfo, Map context ) {
 		Object entity
 		log.debug 'findOrCreateEntity() called'
@@ -945,6 +949,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context
 	 * @return the newly minted entity instance
 	 */
+	@Transactional(noRollbackFor=[Throwable])
 	Object createEntity(Class domainClass, Map fieldsMap, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
@@ -1007,7 +1012,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsToIgnore - a List of field names that should not be bound
 	 * @return true if binding did not encounter any errors
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
 		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
 		//		  JPM 8/2018 : Believe that this may already work. Need to test and remove TODO if so..
@@ -1181,7 +1186,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the JSON data from the import batch record
 	 * @return a String containing an error that occurred otherwise null
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	String setNonReferenceField(Object domain, String fieldName, Object valueToSet, Boolean isInitValue=false, Map fieldsInfo=null) {
 		String errorMsg
 		Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
@@ -1316,7 +1321,7 @@ class DataImportService implements ServiceMethods {
 	 * @param isInitValue - flag if the value being set is an initialize only value (optional default false)
 	 * @param fieldsInfo - the JSON data from the import batch record (optional)
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	void _recordChangeOnField( Object domainInstance, String fieldName, Object newValue, Boolean isInitValue=false, Map fieldsInfo = null) {
 		Object existingValue = domainInstance[fieldName]
 		Boolean isNewEntity = (! domainInstance.id)
@@ -1353,7 +1358,7 @@ class DataImportService implements ServiceMethods {
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	private void resetRecordAndFieldsInfoErrors(ImportBatchRecord record, Map fieldsInfo) {
 		record.errorCount = 0
 		record.resetErrors()
@@ -1375,7 +1380,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map of the fields that came from the ETL process
 	 * @return true if an error was recognized otherwise false
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	private Boolean recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
 		boolean errorsFound = ! domain.validate()
 
@@ -1406,7 +1411,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context that has a reference to the ImportBatchRecord that the error may be stuffed into
 	 * @param errorMsg - the obvious error message
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	private void addErrorToFieldsInfoOrRecord(String propertyName, Map fieldsInfo, Map context, CharSequence errorMsg) {
 		if (propertyName && fieldsInfo[propertyName]) {
 			fieldsInfo[propertyName].errors << errorMsg.toString()
@@ -1418,7 +1423,7 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * Used to access the error list for the infoFields of a particular field/property
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	private List getFieldsInfoFieldErrors(String propertyName, Map fieldsInfo) {
 		return fieldsInfo[propertyName].errors
 	}
@@ -1430,7 +1435,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map of fields from the ETL process
 	 * @return the number of errors found
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	private Integer tallyNumberOfErrors(ImportBatchRecord record, Map fieldsInfo) {
 		Integer count = 0
 		for (field in fieldsInfo) {
@@ -1449,7 +1454,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context containing all the goodies for the process
 	 * @return the newly minted domain object or null if an error occurred
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	Object createReferenceEntityFromWhenNotFound(String referenceFieldName, Map fieldsInfo, Map context) {
 		Object entity
 		List<String> errorMsgs = []
@@ -1519,7 +1524,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context containing all the goodies for the process
 	 * @return a list of any errors that were encountered
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	List<String> updateReferenceEntityFromWhenFound(Object entity, Map fieldsValueMap, Map context) {
 		List<String> errMsgs = []
 
@@ -1559,7 +1564,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the grand poopa of objects for the Import Process
 	 * @return null if successful otherwise a string containing the error message that occurred
 	 */
-	@Transactional(noRollbackFor=[Exception])
+	@Transactional(noRollbackFor=[Throwable])
 	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context, String referenceFieldName = '') {
 		String errorMsg = null
 		log.debug 'setDomainPropertyWithValue() called with {}.{}',
