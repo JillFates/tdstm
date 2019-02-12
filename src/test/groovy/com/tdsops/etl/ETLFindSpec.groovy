@@ -4046,7 +4046,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				service.deleteTemporaryFile(fileName)
+				fileSystemService.deleteTemporaryFile(fileName)
 			}
 
 		where:
