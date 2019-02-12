@@ -358,4 +358,19 @@ class AssetComment {
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
 		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
 	].asImmutable()
+
+	Map toCommentMap() {
+		Map dataMap = [
+				assetEntityId: assetEntity.id,
+				assetName: assetEntity.assetName,
+				assetType: assetEntity.assetType,
+				createdBy: [id:createdBy.id, name: createdBy.toString()],
+				comment: comment,
+				category: category,
+				lastUpdated: lastUpdated,
+				dateCreated: dateCreated,
+				assignedTo: assignedTo?.toString() ?: '',
+		]
+		return dataMap
+	}
 }
