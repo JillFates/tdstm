@@ -18,7 +18,7 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
     static testCount
     static baseName = "E2E DS"
     static maxAllowed=3
-    static maxNumberToBeDeleted=10
+    static maxNumberToBeDeleted=5
     static success=true
 
     def setupSpec() {
