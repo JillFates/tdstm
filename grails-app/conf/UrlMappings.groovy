@@ -593,6 +593,7 @@ class UrlMappings {
 		}
 
 		///// LICENSES Admin API (Client Side) /////////
+
 		"/ws/license" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -606,6 +607,17 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
+			constraints {
+				id(matches:/[0-9]{1,}/)
+			}
+		}
+
+		// Licensing Information
+		"/ws/license/info" {
+			controller = "license"
+			action = [
+			        GET: "info"
+			]
 		}
 
 		//Gets que request Hash  --- OLB 161207 Change Hash to request...
@@ -616,7 +628,7 @@ class UrlMappings {
 			]
 		}
 
-		//Requests
+		// Requests
 		"/ws/license/request" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -624,7 +636,7 @@ class UrlMappings {
 			]
 		}
 
-		//Resubmit License Request
+		// Resubmit License Request
 		"/ws/license/$id/email/request" {
 			controller = "wsLicenseAdmin"
 			action = [
