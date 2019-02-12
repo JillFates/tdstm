@@ -26,6 +26,7 @@ import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.command.UserUpdatePasswordCommand
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Permissions
 import net.transitionmanager.domain.Person
@@ -51,6 +52,7 @@ import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
+@Slf4j()
 class SecurityService implements ServiceMethods, InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
@@ -208,6 +210,65 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	boolean isChangePendingStatusAllowed() {
 		hasPermission(Permission.TaskChangeStatus)
 	}
+
+	/**
+	 * Used to determine if the user has access to the specified project
+	 * @param project - a Project domain instance
+	 * @param userLogin - the userLogin domain instance of the current user (optional)
+	 * @return true if the user has rights to access the project otherswise false
+	 */
+	Boolean hasAccessToProject(Project project, UserLogin userLogin = null) {
+		return hasAccessToProject(project.id, userLogin)
+	}
+
+	/**
+	 * Used to determine if the user has access to the specified project
+	 * @param projectId - the ID of the Project to check access to
+	 * @param userLogin - the userLogin domain instance of the current user (optional)
+	 * @return true if the user has rights to access the project otherswise false
+	 */
+	Boolean hasAccessToProject(Long projectId, UserLogin userLogin = null) {
+		return projectId in ( getUserProjectIds(projectId, userLogin) )
+	}
+
+	/**
+	 * Returns a list of project ids that the user has access to
+	 * @param projectId - used to only look for a particular projectId (optional)
+	 * @param userLogin - the user to lookup projects for or null to use the authenticated user
+	 * @return List of project IDs that the user has access to
+	 */
+	List<Long> getUserProjectIds(Long projectId = null, UserLogin userLogin = null) {
+		Person person = userLogin ? userLogin.person : getUserLoginPerson()
+		List<Long> projectIds = []
+		Boolean showAllProjPerm = hasPermission(Permission.ProjectShowAll)
+		Boolean hasAccessToDefaultProject = securityService.hasPermission(person, Permission.ProjectManageDefaults)
+
+		if (showAllProjPerm) {
+			// Find all the projects that are available for the user's company as client or as partner or owner
+			projectIds = partyRelationshipService.companyProjects(person.getCompany()).id
+		} else {
+			// Find the projects that the user has been assigned to
+			projectIds = PartyRelationship.where {
+				partyRelationshipType.id == 'PROJ_STAFF'
+				roleTypeCodeFrom.id == 'PROJECT'
+				roleTypeCodeTo.id == 'STAFF'
+				partyIdTo.id == person.id
+				if (projectId) {
+					partyIdFrom.id == projectId
+				}
+			}.projections {
+				distinct('partyIdFrom.id')
+			}.list()
+		}
+
+		// If the user has access to the default project, it should be included in the list.
+		if  (hasAccessToDefaultProject && (projectId == Project.DEFAULT_PROJECT_ID || ! projectId) ) {
+			projectIds << Project.DEFAULT_PROJECT_ID
+		}
+
+		return projectIds
+	}
+
 
 	/**
 	 * Get the UserLogin object of the currently logged in user or null if user is not logged in

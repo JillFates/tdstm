@@ -9,15 +9,19 @@ import groovy.time.TimeCategory
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import spock.lang.Ignore
 import spock.lang.See
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
+import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 @Stepwise
@@ -26,18 +30,29 @@ import spock.util.mop.ConfineMetaClassChanges
 class SecurityServiceTests extends Specification {
 
 	// IOC
+	ProjectService projectService
 	SecurityService securityService
 
 	private static final List<String> privRoles = ["${SecurityRole.ROLE_ADMIN}", "${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 	private static final List<String> userRole = ["${SecurityRole.ROLE_USER}"]
 
-	private PersonTestHelper personHelper
+	private PersonTestHelper personHelper = new PersonTestHelper()
+	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+
+	@Shared
 	private Person privPerson
+	@Shared
 	private UserLogin privUser
+	@Shared
 	private Person unPrivPerson
+	@Shared
 	private UserLogin unPrivUser
+	@Shared
 	private Person userRolePerson
+	@Shared
 	private UserLogin userRoleUser
+	@Shared
+	private Project project
 
 	void setup(){
 		personHelper = new PersonTestHelper()
@@ -45,21 +60,37 @@ class SecurityServiceTests extends Specification {
 
 	// Helper methods to build up person/user accounts
 
-	private void createPrivAccount() {
+	private void createPrivAccount(Project project=null) {
 		// Create a new person and login that has a couple of security roles
 		privPerson = personHelper.createPerson()
 		privUser = personHelper.createUserLoginWithRoles(privPerson, privRoles)
+		if (project) {
+			privPerson = personHelper.createPerson(null, project.client, project)
+			privUser = personHelper.createUserLoginWithRoles(privPerson, privRoles)
+		} else {
+			privPerson = personHelper.createPerson()
+			privUser = personHelper.createUserLoginWithRoles(privPerson, privRoles)
+		}
 	}
 
-	private void createUnPrivAccount() {
+	private void createUnPrivAccount(Project project=null) {
 		// Create a new person and login that has no security roles
+		if (project) {
+			unPrivPerson = personHelper.createPerson(null, project.client, project)
+			unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
+		} else {
 		unPrivPerson = personHelper.createPerson()
 		unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
 	}
+	}
 
-	private void createUserAccount() {
+	private void createUserAccount(Project project=null) {
 		// Create a new person and login that has ONLY the 'USER' security role
+		if (project) {
+			userRolePerson = personHelper.createPerson(null, project.client, project)
+		} else {
 		userRolePerson = personHelper.createPerson()
+		}
 		userRoleUser = personHelper.createUserLoginWithRoles(userRolePerson, userRole)
 	}
 
@@ -506,5 +537,64 @@ class SecurityServiceTests extends Specification {
         	permissions.containsKey(Permission.UserGeneralAccess)
         and:'the map should also contain the Permission.UserDelete permission'
         	permissions.containsKey(Permission.UserDelete)
+    }
+
+	@Unroll
+	def '19. Calling getUserProjectIds method for Unprivileged user' () {
+		given:'a user whom is authenticated and has only been assigned the User role'
+			project = projectHelper.createProject()
+			createUnPrivAccount(project)
+			securityService.assumeUserIdentity(unPrivUser.username, false)
+
+		when:'the getUserProjectIds with no parameters'
+			List<Long>projectIds = securityService.getUserProjectIds()
+		then:'the list should only contain the users project'
+			1 == projectIds.size()
+			project.id == projectIds[0]
+
+		when: 'calling getUserProjectIds with parameters'
+			projectIds = securityService.getUserProjectIds(project.id, unPrivUser)
+		then:'the list should only contain the users project'
+			1 == projectIds.size()
+			project.id == projectIds[0]
+		and: 'calling hasAccessToProject with various parameters should result as expected'
+			// Note that these were originally implemented as expect/where but wouldn't work correctly
+			securityService.hasAccessToProject(project.id, null)
+			securityService.hasAccessToProject(project.id, unPrivUser)
+			false == securityService.hasAccessToProject(0, null)
+			false == securityService.hasAccessToProject(0, unPrivUser)
+			false == securityService.hasAccessToProject(project.DEFAULT_PROJECT_ID, unPrivUser)
+    }
+
+	@Unroll
+    def '20. Testin getUserProjectIds and hasAccessToProject methods for Privileged user' () {
+		given:'a user whom is authenticated and has only been assigned the User role'
+			project = projectHelper.createProject()
+			createPrivAccount(project)
+			securityService.assumeUserIdentity(privUser.username, false)
+		when:'the getUserProjectIds with no parameters'
+			List<Long>projectIds = securityService.getUserProjectIds()
+		then:'the list should only contain the users project'
+			projectIds.size() > 1
+			projectIds.contains(Project.DEFAULT_PROJECT_ID)
+			projectIds.contains(project.id)
+
+		when:'the getUserProjectIds with parameters'
+			projectIds = securityService.getUserProjectIds(project.id, privUser)
+		then:'the list should only contain the users project'
+			1 == projectIds.size()
+			project.id == projectIds[0]
+
+		when: 'calling hasAccessToProject without user'
+			Boolean access = securityService.hasAccessToProject(project.id)
+		then: 'should have access'
+			access
+		and: 'calling hasAccessToProject with various parameters should result as expected'
+			// Note that these were originally implemented as expect/where but wouldn't work correctly
+			securityService.hasAccessToProject(project.id, null)
+			securityService.hasAccessToProject(project.id, privUser)
+			false == securityService.hasAccessToProject(0, privUser)
+			false == securityService.hasAccessToProject(0, privUser)
+			securityService.hasAccessToProject(project.DEFAULT_PROJECT_ID, privUser)
     }
 }
