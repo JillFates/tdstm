@@ -63,7 +63,6 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 		TMDEMO = projectTestHelper.createProject(null)
 
 		validator = createDomainClassFieldsValidator()
-
 		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
@@ -82,14 +81,14 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				mock.getId() >> it.id
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
+				mock.getProjectId() >> it.project.id
 				mock
 			}
 
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll { it.getId() == namedParams.id && it.getProjectId() == namedParams.project.getId() }*.getId()
 			}
 
 		and:
@@ -180,7 +179,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				mock.getAssetName() >> it.assetName
 				mock.getEnvironment() >> it.environment
 				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
+				mock.getProjectId() >> it.project
 				mock
 			}
 
@@ -207,14 +206,14 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+				assetEntities.findAll { it.getId() == namedParams.id && it.getProjectId() == namedParams.project.id }*.getId()
 			}
 
 		and:
 			GroovyMock(AssetDependency, global: true)
 			AssetDependency.getName() >> { 'com.tds.asset.AssetDependency' }
 			AssetDependency.executeQuery(_, _) >> { String query, Map namedParams ->
-				assetDependencies.findAll { it.id == namedParams.id }
+				assetDependencies.findAll { it.getId() == namedParams.id }
 			}
 
 		and:
@@ -314,7 +313,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				mock.getAssetName() >> it.assetName
 				mock.getEnvironment() >> it.environment
 				mock.getBundle() >> it.bundle
-				mock.getProject() >> it.project
+				mock.getProjectId() >> it.project.id
 				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
 				mock
 			}
@@ -366,11 +365,12 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			// Validates command: set comment with 'Asset results found'
 			results.domains[0].data[0..results.domains[0].data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 
-			etlProcessor.findCachesize() == 14
-				etlProcessor.findCachehitCountRate() == 0
-				[1..14].each {
-					etlProcessor.findCacheget(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
-				}
+			etlProcessor.findCache.size() == 14
+
+			etlProcessor.findCache.hitCountRate() == 0
+			[1..14].each {
+				etlProcessor.findCache.get(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
+			}
 
 		cleanup:
 			if(fileName){
@@ -389,11 +389,11 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
+				AssetEntity mock = new AssetEntity()
+				mock.id = it.id
+				mock.assetClass = it.assetClass
+				mock.assetName = it.assetName
+				mock.project = it.project
 				mock
 			}
 
@@ -513,13 +513,13 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
 					[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
 			].collect {
-				Application mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
-				mock.getAppVendor() >> it.appVendor
+				Application mock = new Application()
+				mock.id = it.id
+				mock.assetClass = it.assetClass
+				mock.assetName = it.assetName
+				mock.assetName = it.assetName
+				mock.project = it.project
+				mock.appVendor = it.appVendor
 				mock
 			}
 
@@ -655,19 +655,20 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
 				mock.getEnvironment() >> it.environment
-				mock.getProject() >> it.project
+				mock.getProjectId() >> it.project.id
 				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
 				mock
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				if(namedParams.containsKey('id')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
-				} else if(namedParams.containsKey('assetName')){
+				if (namedParams.containsKey('id')){
+					return assetEntities.findAll { it.getProjectId() == GMDEMO.id && it.id == namedParams.id }*.getId()
+				} else if (namedParams.containsKey('assetName')){
 					return assetEntities.findAll {
-						it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName
+						it.getProjectId() == GMDEMO.id && it.getAssetName() == namedParams.assetName
 					}*.getId()
 				}
 			}
@@ -688,20 +689,19 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					extract 'AssetDependencyId' load 'id'
 					extract 'AssetId' load 'asset'
 
-					find Asset by 'assetName' eq SOURCE.AssetName into 'asset'
+					find Application by 'assetName' eq SOURCE.AssetName into 'asset'
 					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
 
 					if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
-					    set comment with 'Asset results found'
+					    set commentVar with 'Asset results found'
 					} else {
-					    set comment with 'Asset results not found'
+					    set commentVar with 'Asset results not found'
 					}
 				}
 			""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
-
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
 
@@ -734,14 +734,13 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
-				mock
+				AssetEntity assetEntity = new AssetEntity()
+				assetEntity.id = it.id
+				assetEntity.assetClass = it.assetClass
+				assetEntity.assetName = it.assetName
+				assetEntity.environment = it.environment
+				assetEntity.project = it.project
+				assetEntity
 			}
 
 		and:
@@ -1085,14 +1084,14 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
-				mock
+				AssetEntity assetEntity = new AssetEntity()
+				assetEntity.id = it.id
+				assetEntity.assetClass = it.assetClass
+				assetEntity.assetName = it.assetName
+				assetEntity.environment = it.environment
+				assetEntity.project = it.project
+				assetEntity
+
 			}
 
 		and:
