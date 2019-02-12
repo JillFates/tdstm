@@ -21,6 +21,7 @@ import {PreEventCheckListSelectorComponent} from './components/event-checklist/p
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
+import {ReportsService} from './service/reports.service';
 
 @NgModule({
 	imports: [
@@ -43,6 +44,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 		PreEventCheckListSelectorComponent
 	],
 	providers: [
+		ReportsService,
 		// Resolve
 		// TagsResolveService,
 		ModuleResolveService,

@@ -33,6 +33,7 @@ import {
 	DataStateChangeEvent
 } from '@progress/kendo-angular-grid';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ReportsService} from '../../service/reports.service';
 
 declare var jQuery: any;
 
@@ -51,11 +52,17 @@ export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	constructor(
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private reportsService: ReportsService) {
 	}
 
 	ngOnInit() {
 		// on init
+		this.reportsService.getEvents()
+			.subscribe((results) => {
+				console.log('Events');
+				console.log(results);
+			})
 	}
 
 	/**
