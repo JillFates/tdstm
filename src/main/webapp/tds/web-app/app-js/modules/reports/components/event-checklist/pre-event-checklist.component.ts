@@ -55,11 +55,13 @@ export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		// on init
 	}
 
 	/**
 	 * Emit the destroy event to complete and close all current observables
 	 */
 	ngOnDestroy() {
+		// on destroy
 	}
 }

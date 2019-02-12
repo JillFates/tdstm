@@ -19,7 +19,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
+// import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 
 @NgModule({
@@ -40,10 +40,11 @@ import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 		ReportsRouteModule
 	],
 	declarations: [
+		PreEventCheckListSelectorComponent
 	],
 	providers: [
 		// Resolve
-		TagsResolveService,
+		// TagsResolveService,
 		ModuleResolveService,
 		TranslatePipe
 	],
@@ -51,5 +52,5 @@ import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 	entryComponents: []
 })
 
-export class PreEventCheckListModule {
+export class ReportsModule {
 }

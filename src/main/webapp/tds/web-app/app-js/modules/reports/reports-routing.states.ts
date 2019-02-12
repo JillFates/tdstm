@@ -4,7 +4,6 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
-import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -14,24 +13,24 @@ import {PreEventCheckListSelectorComponent} from './components/event-checklist/p
  * Top menu parent section class for all Dependencies module.
  * @type {string}
  */
-const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
+const TOP_MENU_PARENT_SECTION = 'menu-parent-planning';
 
 export class ReportStates {
-	public static readonly LIST = {
-		url: 'list'
+	public static readonly PRE_EVENT_CHECK_LIST = {
+		url: 'preEventCheckList'
 	};
 }
 
 export const ReportsRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: ReportStates.LIST.url},
+	{path: '', pathMatch: 'full', redirectTo: ReportStates.PRE_EVENT_CHECK_LIST.url},
 	{
-		path: ReportStates.LIST.url,
+		path: ReportStates.PRE_EVENT_CHECK_LIST.url,
 		data: {
 			page: {
-				title: 'DEPENDENCIES.LIST_TITLE',
+				title: 'REPORTS.PRE_EVENT_CHECKLIST',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', 'DEPENDENCIES.MENU_TITLE'],
-				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list', subMenu: true }
+				menu: ['REPORTS.REPORTS', 'REPORTS.PRE_EVENT_CHECKLIST'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list2', subMenu: true }
 			},
 			requiresAuth: true,
 		},
@@ -40,9 +39,7 @@ export const ReportsRoute: Routes = [
 			AuthGuardService,
 			ModuleResolveService,
 			PreferencesResolveService],
-		resolve: {
-			tagList: TagsResolveService
-		},
+		resolve: {},
 		runGuardsAndResolvers: 'always'
 	}
 ];
