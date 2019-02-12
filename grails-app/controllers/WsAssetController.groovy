@@ -548,17 +548,10 @@ class WsAssetController implements ControllerMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 		def assetComments = commentService.listAssetComments(project, viewUnpublished)
 		List<Map> assetCommentsList = []
-		def today = new Date()
-		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
 
-		assetComments.each {
-			if ((viewUnpublished || it.isPublished) && it.assetEntity)
-				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
-									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
-									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
-									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
-									 canEditComments: canEditComments]
-		}
+		assetCommentsList = assetComments
+			.findAll{ ((viewUnpublished || it.isPublished) && it.assetEntity) }
+			.collect { it.toCommentMap() }
 
 		renderAsJson assetCommentsList
 	}
