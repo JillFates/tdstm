@@ -279,7 +279,7 @@ class ImportBatchRecord {
 		List errors = (errorList ? JsonUtil.parseJsonList(errorList) : [])
 		errors << error
 		errorList = JsonUtil.toJson(errors)
-		errorCount = errors.size()
+		errorCount++
 	}
 
 	/**
