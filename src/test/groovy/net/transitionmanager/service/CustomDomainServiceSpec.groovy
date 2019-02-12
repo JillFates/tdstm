@@ -22,16 +22,16 @@ import spock.lang.Unroll
 class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<CustomDomainService>, DataTest {
 
 	@Shared
-	Project defaultProject
+	Project          defaultProject
 	@Shared
 	FieldSpecProject fieldSpecProject
 
-	void setupSpec(){
+	void setupSpec() {
 		mockDomains Application, Project, Setting
 	}
 
 	void setup() {
-		service.settingService = [getAsMap: {Project project, SettingType type, String key -> applicationJsonFieldMap} ] as SettingService
+		service.settingService = [getAsMap: { Project project, SettingType type, String key -> applicationJsonFieldMap }] as SettingService
 		defaultProject = new Project()
 
 		defaultProject.with {
@@ -115,4 +115,32 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 		   "domain":"${assetClass.name()}"
 		}"""
 	}
+
+	private static final Map applicationJsonFieldMap = [
+		"planMethodology": "",
+		"fields"         : [
+			[
+				"bulkChangeActions": [
+					"replace"
+				],
+				"constraints"      : [
+					"required": 1,
+					"values"  : [
+						"Yes",
+						"No"
+					]
+				],
+				"control"          : "YesNo",
+				"default"          : "Yes",
+				"field"            : "custom6",
+				"imp"              : "B",
+				"label"            : "Free",
+				"order"            : 23,
+				"shared"           : 0,
+				"show"             : 1,
+				"udf"              : 1
+			]
+		],
+		"domain"         : "APPLICATION"
+	]
 }
