@@ -2,7 +2,6 @@ package pages.Projects.ETLScripts
 
 import geb.Page
 import modules.CommonsModule
-import geb.Browser
 import modules.ProjectsModule
 
 class ETLScriptsPage extends Page {
@@ -28,7 +27,7 @@ class ETLScriptsPage extends Page {
         commonsModule { module CommonsModule }
         //First Element of the Datascripts Table
         firstDS(wait:true) { $("tr" ,  class:"k-state-selected").find("td")[1]}
-        dsTableRows (required:false){ $('tr[data-kendo-grid-item-index]')}
+        dsTableRows (required:false){ $("DIV.k-grid-table-wrap")[1].find("tr")}
         refreshGridIcon { $('span.glyphicon-refresh')}
         firstDSName { dsTableRows[0].find("td", "aria-colindex": "2")}
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
@@ -39,7 +38,7 @@ class ETLScriptsPage extends Page {
         trashIconList {$(".fa.fa-fw.fa-trash")}
         confirmationModal {$("div.modal-dialog.modal-sm")}
         confirmYes {confirmationModal.find("button.btn.btn-primary.pull-left")}
-        noRecordsMessage (required:false){$("tr.k-grid-norecords")}
+        noRecordsMessage (required:false){$("tr.k-grid-norecords", text:"No records available.")}
 
 
     }

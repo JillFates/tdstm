@@ -1,7 +1,6 @@
 package specs.Projects.ETLScripts
 
 import geb.spock.GebReportingSpec
-import utils.CommonActions
 import pages.Projects.ETLScripts.*
 import spock.lang.Stepwise
 import pages.Login.LoginPage
@@ -48,15 +47,15 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
             def count = 0
             while (count<maxNumberToBeDeleted && dsTableRows.size()>maxAllowed){
                 //execution speed needs to be reduced in order to avoid attempting to delete the same script twice
-                commonsModule.waitForLoader 7
+                commonsModule.waitForLoader 7 //needed to allow for elements to be displayed as expected
                 deleteByPosition(0)
                 count = count + 1
-                commonsModule.waitForLoader 5
+                commonsModule.waitForLoader 7 //needed to allow time for loader
             }
             if (count==maxNumberToBeDeleted){
                 return dsTableRows.size()>3
             }else{
-                return dsTableRows.size()==3
+                return dsTableRows.size()<=3
             }
         }
     }
@@ -64,43 +63,11 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
     def "1. The user deletes ETLScripts"() {
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
-            filterByName("tyjdtyjdfj")
+            filterByName(baseName)
         when: 'The user deletes ETLScripts'
             def validateResult = deleteETLScripts()
         then: 'The operation is successful'
             validateResult==success
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
