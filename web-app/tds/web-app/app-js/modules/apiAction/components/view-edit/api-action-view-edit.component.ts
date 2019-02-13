@@ -749,7 +749,8 @@ export class APIActionViewEditComponent implements OnInit {
 				dataItem.currentFieldList = fieldSpecs.fields;
 				dataItem.sourceFieldList = fieldSpecs.fields;
 				let property = dataItem.currentFieldList.find((field) => {
-					return field.field === dataItem.fieldName;
+					const fieldName = dataItem.fieldName.toLowerCase();
+					return field.field.toLowerCase() === fieldName || field.label.toLowerCase() === fieldName;
 				});
 				if (property) {
 					dataItem.fieldName = property;
