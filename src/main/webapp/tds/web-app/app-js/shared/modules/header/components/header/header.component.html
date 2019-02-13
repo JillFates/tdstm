@@ -1,0 +1,59 @@
+<header class="main-header header-component">
+    <nav class="navbar navbar-static-top">
+        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseEnabled}">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <!-- LOGO -->
+                <img id="logo-header" [src]="userContext.project.logoUrl" alt="TransitionManager" border="0" />
+            </div>
+
+            <tds-tranman-menu></tds-tranman-menu>
+
+            <!-- Navbar Right Menu -->
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                    <!-- Notifications Menu -->
+                   <li class="dropdown notifications-menu">
+                       <!-- Menu toggle button -->
+                        <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
+                            <span *ngIf="userContext.project">{{userContext.project.name}}</span>
+                            <span *ngIf="userContext.event">{{userContext.event.name}}</span>
+                            <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
+                        </a>
+                    </li>
+                    <li *ngIf="userContext.licenseEnabled">
+                        <tds-license-warning></tds-license-warning>
+                    </li>
+                    <!-- User Account Menu -->
+                    <li class="dropdown user user-menu">
+                        <!-- Menu Toggle Button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <!-- The user image in the navbar-->
+                            <img src="/tdstm/assets/images/personIcon.png" class="user-image" alt="TDS">
+                            <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                            <span class="hidden-xs user-name">{{userContext.person.firstName}}</span>
+                        </a>
+                        <ul class="dropdown-menu user-dialog-dropdown-menu">
+                            <!-- Menu Body -->
+                            <li class="user-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item"><a (click)="openEditPersonModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a></li>
+                                    <li class="list-group-item"><a (click)="openPrefModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
+                                    <li class="list-group-item"><a (click)="openDateTimezoneModal()" style="cursor: pointer;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
+                                </ul>
+                            </li>
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-right">
+                                    <a href="/tdstm/auth/signOut" class="btn btn-default btn-flat"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-custom-menu -->
+        </div><!-- /.container-fluid -->
+    </nav>
+</header>

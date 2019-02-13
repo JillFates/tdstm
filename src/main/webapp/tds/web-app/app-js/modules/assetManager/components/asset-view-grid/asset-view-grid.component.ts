@@ -39,7 +39,7 @@ import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asse
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
-import {UserService} from '../../../../shared/services/user.service';
+import {UserService} from '../../../security/services/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
@@ -684,7 +684,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	}
 
 	private getCurrentUser() {
-		this.userService.getUserInfo()
+		this.userService.getUserContext()
 			.subscribe( (user: any) => {
 				this.currentUser = user;
 			}, (error: any) => console.log(error));
