@@ -1702,34 +1702,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Used to find assets associated with a given context object. When the context contains one or more tags
-	 * then the query will be based solely on Tags and it will find assets associated with ANY of the tags. The event will
-	 * not affect the query with Tags. If only an event is specified then the search will be for any asset associated to planning
-	 * bundles assigned to the event.
+	 * Used to find assets associated with a given context object based on selected event and tags.
 	 * @param context - the context object to find associated assets for
 	 * @return list of assets
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
-		List<AssetEntity> assets = []
 
-		if (contextObj.tag) {
-			// Query the TagAsset to get list of Assets with ANY of the tags
-			assets = TagAsset.where {
-					tag.id in contextObj.getTagIds()
-					asset.moveBundle.useForPlanning == true }.projections {
-				}.projections {
-					property 'asset'
-				}.list()
-		} else {
-			// Legacy get assets by event
+		// Fetch the tags selected by the user running the Task Generation.
+		List<Long> tagIds = contextObj.getTagIds()
+		// Retrieve the bundles associated with the selected event (if any).
 			List<Long> bundleIds = getBundleIds(contextObj)
 
+		return AssetEntity.createCriteria().list {
+			createAlias('moveBundle', 'mb')
+			if (tagIds) {
+				createAlias('tagAssets', 'ta')
+				createAlias('ta.tag', 't')
+			}
+			eq ('mb.useForPlanning', true)
+			or {
+				if (tagIds) {
+					'in' ('t.id', tagIds)
+					// Assets must belong to a planning bundle.
+
+				}
 			if (bundleIds) {
-				assets = AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
+					'in' ('mb.id', bundleIds)
+				}
 			}
 		}
-
-		return assets
 	}
 
 	/**
@@ -4185,21 +4186,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
 
-			map.bIds = getBundleIds(contextObject, project, filter)
+
+			List bundleIds = getBundleIds(contextObject, project, filter)
+
+			if(bundleIds) {
+				map.bIds = bundleIds
+			}
+
 			String join = ''
 
+			List<String> tagsOrEvent = []
 			if (contextObject.tag) {
-				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
+				tagsOrEvent.add('t.id in (:tags)')
 				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
-
-				// When using tags, bundles are going to be ignored
-				map.remove('bIds')
-			} else if (map.bIds) {
-				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
-			} else {
-				throw new IllegalArgumentException('The selected event has no assigned bundles')
 			}
+
+			if (map.bIds) {
+				tagsOrEvent.add('a.moveBundle.id IN (:bIds)')
+			}
+
+			String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
+
+			where = SqlUtil.appendToWhere(where, tagsOrEventStr)
 
 			// Assemble the SQL and attempt to execute it
 			try {

@@ -274,6 +274,11 @@ class SqlUtil {
 			return
 		}
 
+		if (isEnumerationField(fieldSearchData)) {
+			handleEnumerationField(fieldSearchData)
+			return
+		}
+
 		/* We're handling 1-char long filters individually because the
 		* switch below has cases where it asks for the second char, which
 		* would break the app. */
@@ -302,12 +307,12 @@ class SqlUtil {
 					buildSingleValueParameter(fieldSearchData, operator)
 
 					/* Scenario 3: Starts with '<>' */
-				}else if (originalFilter ==~ /^<>.*/) {
+				} else if (originalFilter ==~ /^<>.*/) {
 					fieldSearchData.filter = originalFilter.substring(2)
 					buildDistinctParameter(fieldSearchData)
 
 					/* Scenario 4: Starts with '<' or '>' and any literal follows. */
-				}else{
+				} else {
 					fieldSearchData.filter = originalFilter.substring(1)
 					String operator = originalFilter[0]
 					buildSingleValueParameter(fieldSearchData, operator)
@@ -382,6 +387,58 @@ class SqlUtil {
 				break
 		}
 
+	}
+
+	/**
+	 * <p>It handles Enumeration filtering in Asset views.</p>
+	 * <p>Using an instance of {@code FieldSearchData} it can prepare the HQL part that manages enumeration filters.</p>
+	 * After calculate several scenarios, it can save that result in {@code fieldSearchData.sqlSearchExpression}
+	 *
+	 * @param fieldSearchData an instance of {@code FieldSearchData}
+	 */
+	private static void handleEnumerationField(FieldSearchData fieldSearchData) {
+
+		String operator = 'IN'
+		fieldSearchData.useWildcards = true
+
+		switch (fieldSearchData.filter) {
+			/* Scenario 1: Starts with '!=' */
+			case ~/^(!=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(2)
+				fieldSearchData.useWildcards = false
+				operator = 'NOT IN'
+				break
+
+			/* Scenario 2: Starts with '=' */
+			case ~/^(=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				fieldSearchData.useWildcards = false
+				operator = 'IN'
+				break
+
+			/* Scenario 3: Starts with '-' or '!' */
+			case ~/^(-|!).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				operator = 'NOT IN'
+				break
+		}
+
+		Object paramValue = parseEnumParameter(fieldSearchData)
+		if (paramValue) {
+			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
+			if (operator == 'NOT IN') {
+				fieldSearchData.sqlSearchExpression = '( ' + expression + ' OR ' + fieldSearchData.whereProperty + ' IS NULL )'
+			} else {
+				fieldSearchData.sqlSearchExpression = expression
+			}
+
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+		} else {
+			// Particular Scenario. Because we are filtering here and not in the SQL sentence directly,
+			// we need to solve those cases where filter does not match with any of the enumeration values.
+			// Then, to manage this case, we simply add a false where clause, expecting an empty list of results.
+			fieldSearchData.sqlSearchExpression = " 1 = 0"
+		}
 	}
 
 	/**
@@ -491,6 +548,96 @@ class SqlUtil {
 	}
 
 	/**
+	 * Parse Enum parameters from {@code FieldSearchData}
+	 * @param value
+	 * @param useWildcards
+	 * @return a list of values to be used filtering {@code Enum} values
+	 */
+	private static List parseEnumParameter(FieldSearchData fsd) {
+		Class type = fsd.getType()
+		String regex = convertFilterToRegex(fsd)
+		List coincidences = type.values().findAll { enumeration ->
+			String enumValue = enumeration.value
+			if (fsd.useWildcards) {
+				enumValue = enumValue.toLowerCase()
+			}
+			enumValue =~ /$regex/
+		}
+		return coincidences?:null
+	}
+
+	/**
+	 * Transform a String filter typed by user in a valid regular expression
+	 * <pre>
+	 *     'P%'      ^P.*
+	 *     '%obyte'  .*obyte$
+	 *     '%obyt*'  .*obyte.*
+	 *     '%ob*t*'  .*ob.*te.*
+	* </pre>
+	 * @param filter
+	 * @return
+	 */
+	static String convertFilterToRegex(FieldSearchData fsd) {
+
+		String filter = fsd.getFilter()
+		String begining = '^'
+		String end = '$'
+
+		// useWildcards = false means use exact match
+		// useWildcards = true means use not exact match
+		if (fsd.useWildcards) {
+			filter = filter.toLowerCase()
+			begining = '.*'
+			end = '.*'
+		}
+		// 1) Check if filter contains only characters.
+		// If this is the case, we can filter using the most generic expression
+		// e.g.: Mega --> .*Mega.*
+		if (!filter.contains('|') && !filter.contains(':') && !filter.contains('&') &&
+			!filter.contains('?') && !filter.contains('%') && !filter.contains('$') &&
+			!filter.contains('(') && !filter.contains(')') && !filter.contains('[') &&
+			!filter.contains(']') && !filter.contains('{') && !filter.contains('}') &&
+			!filter.contains('*')
+		) {
+			return begining + filter + end
+		}
+
+		// 2) Escape  regular expression characters / ' () ? .* $ {}
+		String specialCharRegex = /[\$\?\.\{\}\(\)\[\]]/
+		String regex = filter.replaceAll(specialCharRegex, '\\\\$0')
+
+		// 3) Translate % or * characters for the .* - any character sequence
+		regex = regex.replace('*', '.*')
+		regex = regex.replace('%', '.*')
+
+		// 4) Check if user type an 'Or' expression using '|' character
+		if (filter.contains('|')) {
+			return begining + '(' + filter + ')' + end
+		}
+		// 5) Check if user type an 'OR' expression using ':' character
+		// 'Petabyte'.matches(/.*(by|Peta).*/)
+		if (filter.contains(':')) {
+			return begining + '(' + filter.replaceAll(':', '|') + ')' + end
+		}
+		// 6) Check if user type an 'AND' expression using '&' character
+		// 'Petabyte'.matches(/(?=.*by)(?=.*Peta).*/)
+		if (filter.contains('&')) {
+			List<String> parts = filter.split('&').collect { "(?=.*$it)" }
+			return begining + parts.join() + end
+		}
+		// 7) check if filter starts with a word character, short for [a-zA-Z_0-9]
+		if (regex.matches(/^\w.*/)) {
+			regex = '^' + regex
+		}
+		// 8) Check if filter ends with a word character, short for [a-zA-Z_0-9]
+		if (regex.matches(/.*\w$/)) {
+			regex = regex + '$'
+		}
+
+		return regex
+	}
+
+	/**
 	 * Parses the string parameter and replaces wildcards accordingly.
 	 * @param value - the parameter
 	 * @param useWildcards - flag if wildcards should be used.
@@ -553,6 +700,14 @@ class SqlUtil {
 	}
 
 	/**
+	 * Determine if the field being used for filtering is Enumeration.
+	 * @param fsd an instance of {@code FieldSearchData}
+	 * @return true if {@code FieldSearchData#domain} is Enum type
+	 */
+	private static boolean isEnumerationField(FieldSearchData fsd) {
+		return fsd.type?.isEnum()
+	}
+	/**
 	 * Determine if the field being used for filtering is numeric.
 	 * @param fsd
 	 * @return
@@ -565,8 +720,6 @@ class SqlUtil {
 		if(fieldSpec?.isCustom()){
 			isNumeric = fieldSpec.isNumeric()
 		} else {
-
-
 
 			def properties = fsd.domain.metaClass.properties
 			// Look up the field type using the column.

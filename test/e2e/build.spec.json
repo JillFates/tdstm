@@ -51,6 +51,7 @@
     "specs.Projects.ETLScripts.ETLScriptsDesignerTransformWithPastedDataSpec",
     "specs.Projects.ETLScripts.ETLScriptsEditionSpec",
     "specs.Projects.ETLScripts.ETLScriptsListSpec",
+    "specs.Projects.ETLScripts.ETLScriptsCleanUpSpec",
     "specs.Projects.Project.ProjectCreationDefaultTagsSpec",
     "specs.Projects.Project.ProjectCreationSpec",
     "specs.Projects.Project.ProjectListCleanUpSpec",
