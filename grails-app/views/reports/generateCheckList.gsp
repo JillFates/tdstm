@@ -354,7 +354,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<g:render template="${project.runbookOn == 0  ? 'workflowTeamList' : 'functionTasks' }" model="[bundleMap:bundleMap]"> </g:render>
+					<g:render template="${project.runbookOn == 0  ? '/reports/workflowTeamList' : '/reports/functionTasks' }" model="[bundleMap:bundleMap]"> </g:render>
 				</td>
 			</tr>
 			<%--<tr>
