@@ -36,8 +36,8 @@ class SecurityServiceTests extends Specification {
 	private static final List<String> privRoles = ["${SecurityRole.ROLE_ADMIN}", "${SecurityRole.ROLE_EDITOR}", "${SecurityRole.ROLE_USER}"]
 	private static final List<String> userRole = ["${SecurityRole.ROLE_USER}"]
 
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper
+	private ProjectTestHelper projectHelper
 
 	@Shared
 	private Person privPerson
@@ -56,6 +56,7 @@ class SecurityServiceTests extends Specification {
 
 	void setup(){
 		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
 	}
 
 	// Helper methods to build up person/user accounts

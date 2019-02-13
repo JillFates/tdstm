@@ -7,7 +7,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 
 @Secured('isAuthenticated()')
-@Slf4j()
 class LicenseController implements ControllerMethods {
 
 	// IOC

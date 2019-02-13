@@ -52,7 +52,6 @@ import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
-@Slf4j()
 class SecurityService implements ServiceMethods, InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
@@ -250,8 +249,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			// Find the projects that the user has been assigned to
 			projectIds = PartyRelationship.where {
 				partyRelationshipType.id == 'PROJ_STAFF'
-				roleTypeCodeFrom.id == 'PROJECT'
-				roleTypeCodeTo.id == 'STAFF'
+				roleTypeCodeFrom.id == 'ROLE_PROJECT'
+				roleTypeCodeTo.id == 'ROLE_STAFF'
 				partyIdTo.id == person.id
 				if (projectId) {
 					partyIdFrom.id == projectId
@@ -1587,7 +1586,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	PartyRole assignRoleCode(Person person, String roleCode) {
 		RoleType rt = RoleType.get(roleCode)
-		if (!rt || rt.type != RoleType.SECURITY) {
+		if (!rt || rt.type != RoleType.SECURITY ) {
 			throw new InvalidParamException("Invalid role code $roleCode specified")
 		}
 
