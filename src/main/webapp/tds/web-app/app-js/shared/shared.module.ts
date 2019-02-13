@@ -20,7 +20,6 @@ import {UILoaderService} from '../shared/services/ui-loader.service';
 import {PersonService} from './services/person.service';
 import {PermissionService} from './services/permission.service';
 import {WindowService} from './services/window.service';
-import {UserService} from './services/user.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
 import {ButtonsFactoryService} from './services/buttons-factory.service';
@@ -49,27 +48,30 @@ import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 // Shared Components
-import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
-import { HeaderComponent } from './modules/header/header.component';
-import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
-import { DynamicComponent } from './components/dynamic.component';
-import { CheckActionComponent } from './components/check-action/check-action.component';
-import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
-import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
-import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
-import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
-import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
-import { AddPersonComponent } from './components/add-person/add-person.component';
-import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
-import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
-import { AkaComponent } from './components/aka/aka.component';
-import { PasswordChangeComponent } from './components/password-change/password-change.component';
-import { ConnectorComponent } from './components/connector/connector.component';
-import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
-import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
-import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
-import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
-import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
+import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.component';
+import {BreadcrumbNavigationComponent} from './modules/header/components/breadcrumb-navigation/breadcrumb-navigation.component';
+import {HeaderComponent} from './modules/header/components/header/header.component';
+import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
+import {LicenseWarningComponent} from './modules/header/components/license-warning/license-warning.component';
+import {CodeMirrorComponent} from './modules/code-mirror/code-mirror.component';
+import {DynamicComponent} from './components/dynamic.component';
+import {CheckActionComponent} from './components/check-action/check-action.component';
+import {URLViewerComponent} from './components/url-viewer/url-viewer.component';
+import {TDSComboBoxComponent} from './components/combo-box/combobox.component';
+import {TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
+import {SupportsDependsComponent} from './components/supports-depends/supports-depends.component';
+import {DependentCommentComponent} from './components/dependent-comment/dependent-comment.component';
+import {AddPersonComponent} from './components/add-person/add-person.component';
+import {DateRangeSelectorComponent} from './components/date-range-selector/date-range-selector.component';
+import {AssetTagSelectorComponent} from './components/asset-tag-selector/asset-tag-selector.component';
+import {AkaComponent} from './components/aka/aka.component';
+import {PasswordChangeComponent} from './components/password-change/password-change.component';
+import {ConnectorComponent} from './components/connector/connector.component';
+import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
+import {TDSDateControlComponent} from './components/custom-control/date-time/date-control.component';
+import {TDSDateTimeControlComponent} from './components/custom-control/date-time/datetime-control.component';
+import {TDSNumberControlComponent} from './components/custom-control/number/number-control.component';
+import {TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 import {BulkChangeButtonComponent} from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -108,7 +110,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		NumericPipe,
 		EscapeUrlEncodingPipe,
 		UIDialogDirective,
+		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		TranmanMenuComponent,
+		LicenseWarningComponent,
 		PopupLegendsComponent,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
@@ -161,7 +166,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DatePipe,
 		NumericPipe,
 		EscapeUrlEncodingPipe,
+		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		TranmanMenuComponent,
+		LicenseWarningComponent,
 		PopupLegendsComponent,
 		DynamicComponent,
 		CodeMirrorComponent,
@@ -229,7 +237,6 @@ export class SharedModule {
 				WindowService,
 				BulkChangeService,
 				BulkCheckboxService,
-				UserService,
 				TranslatePipe,
 				ButtonsFactoryService,
 				{

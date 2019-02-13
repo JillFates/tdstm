@@ -1,13 +1,16 @@
 /**
  * TDS App
  */
+// Angular
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
+import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, APP_INITIALIZER} from '@angular/core';
 import {HttpModule} from '@angular/http';
 import {TDSAppComponent} from './tds-app.component';
 // Service
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
+import {UserService} from '../modules/security/services/user.service';
+import {UserContextService} from '../modules/security/services/user-context.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
@@ -31,7 +34,15 @@ import {UserModule} from '../modules/user/user.module';
 	],
 	providers: [
 		AuthGuardService,
-		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
+		UserService,
+		UserContextService,
+		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
+		{
+			provide: APP_INITIALIZER,
+			useFactory: (provider: UserContextService) => () => provider.initializeUserContext(),
+			deps: [UserContextService],
+			multi: true
+		}
 	],
 	bootstrap: [
 		TDSAppComponent

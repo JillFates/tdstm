@@ -601,7 +601,6 @@ class UrlMappings {
 			]
 		}
 
-		//Gets que request Hash  --- OLB 161207 Change Hash to request...
 		"/ws/license/$id/hash" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -686,6 +685,14 @@ class UrlMappings {
 		///// LICENSES Manager API (BackOffice) /////////
 
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
+
+		//load a request HASH from a client, returns JSON object
+		"/ws/manager/license/enabled" {
+			controller = "wsLicenseManager"
+			action = [
+					GET: "getLicenseManagerEnabled"
+			]
+		}
 
 		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license/request" {
