@@ -1345,8 +1345,8 @@ digraph runbook {
 		}
 		// log.info "listComment() sort=$params.sort, order=$params.order"
 
-		def isCleaner = partyRelationshipService.staffHasFunction(project, person.id, 'CLEANER')
-		def isMoveTech = partyRelationshipService.staffHasFunction(project, person.id, 'MOVE_TECH')
+		def isCleaner = partyRelationshipService.staffHasFunction(project, person.id, 'ROLE_CLEANER')
+		def isMoveTech = partyRelationshipService.staffHasFunction(project, person.id, 'ROLE_MOVE_TECH')
 
 		if (params.event) {
 			userPreferenceService.setPreference(PREF.MYTASKS_MOVE_EVENT_ID,
@@ -1481,7 +1481,7 @@ function goBack() { window.history.back() }
 		// Determine the cart quantity
 		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
 		// the logistics and transport people that the cart is ready to wrap up.
-		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "CLEANER" && assetComment.status != COMPLETED) {
+		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "ROLE_CLEANER" && assetComment.status != COMPLETED) {
 			def cart = taskService.getCartQuantities(moveEvent, assetComment.assetEntity.cart)
 			if (cart && (cart.total - cart.done) == 1) {
 				// Only set the cartQty if we're printing the LAST set of labels for a cart (done is 1 less than total)
@@ -1500,7 +1500,7 @@ function goBack() { window.history.back() }
 			return
 		}
 
-		def isCleaner = partyRelationshipService.staffHasFunction(project, securityService.currentPersonId, 'CLEANER')
+		def isCleaner = partyRelationshipService.staffHasFunction(project, securityService.currentPersonId, 'ROLE_CLEANER')
 		def canPrint = isCleaner
 
 		def noteList = assetComment.notes.sort{it.dateCreated}

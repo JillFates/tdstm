@@ -77,7 +77,7 @@
 				form.bundleId.value = bundleId;
 				form.teamId.value = teamId;
 				form.location.value = location;
-				if (role == "CLEANER") {
+				if (role == "ROLE_CLEANER") {
 					form.action = "logisticsHome";
 				}
 				form.submit();
