@@ -43,11 +43,35 @@ interface ComponentState {
 @Component({
 	selector: 'tds-event-checklist',
 	template: `
-		<div>Event CheckList</div>
+		<div style="width: 30%">
+			<div>
+				<kendo-dropdownlist
+					name="event"
+					class="form-control"
+					[data]="model.events"
+					[textField]="'text'"
+					[valueField]="'id'"
+					[(ngModel)]="model.defaultEvent">
+				</kendo-dropdownlist>
+			</div>
+			<div>Output:</div>
+			<div>
+				<input type="radio" id="output" name="output" checked>
+				<label for="output">Web</label>
+			</div>
+			<div>
+				<!--<tds-button-custom tooltip="Create Comment" icon="comment-o" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-custom>-->
+				<tds-button-custom tooltip="Generate report" icon="check-double" ></tds-button-custom>
+			</div>
+		</div>
 	`
 })
 export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	protected state: ComponentState;
+	protected model = {
+		events: [],
+		defaultEvent: {id: null, text: ''}
+	};
 
 	constructor(
 		private route: ActivatedRoute,
@@ -57,11 +81,14 @@ export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		const commonCalls = [this.reportsService.getEvents(), this.reportsService.getDefaults()];
+
 		// on init
-		this.reportsService.getEvents()
+		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
-				console.log('Events');
-				console.log(results);
+				const [events, defaults] = results;
+				this.model.events = events.map((item) => ({id: item.id.toString(), text: item.name}));
+				this.model.defaultEvent.id = pathOr(null, ['preferences', 'TASK_CREATE_EVENT'], defaults);
 			})
 	}
 

@@ -33,4 +33,16 @@ export class ReportsService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	/**
+	 * Get the default values for the events ui
+	 */
+	getDefaults(): Observable<any> {
+		return this.http.get(`${this.baseURL}/ws/task/taskCreateDefaults`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
 }
