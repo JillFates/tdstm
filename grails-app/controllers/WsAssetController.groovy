@@ -544,13 +544,10 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listComments() {
-		def project = securityService.userCurrentProject
+		Project project = securityService.userCurrentProject
 		boolean viewUnpublished = securityService.viewUnpublished()
-		def assetComments = commentService.listAssetComments(project, viewUnpublished)
-		List<Map> assetCommentsList = []
+		List<AssetComment> assetComments = commentService.listAssetComments(project, viewUnpublished)
 
-		assetCommentsList = assetComments.collect { it.toCommentMap() }
-
-		renderSuccessJson(assetCommentsList)
+		renderSuccessJson(assetComments.toCommentMap())
 	}
 }
