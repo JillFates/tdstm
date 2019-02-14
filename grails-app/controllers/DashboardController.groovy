@@ -76,7 +76,7 @@ class DashboardController implements ControllerMethods {
 			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
 			def projectLogo = ProjectLogo.findByProject(project)
 			def timeToUpdate = userPreferenceService.getPreference(PREF.DASHBOARD_REFRESH)
-			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = $moveEvent.id ORDER BY mb.startTime ")
+			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = $moveEvent ORDER BY mb.startTime ")
 
 			// handle the view unpublished tasks checkbox
 			if (params.containsKey('viewUnpublished')) {
