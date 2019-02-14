@@ -1,7 +1,8 @@
 package com.tdssrc.grails
 
-import com.tdsops.common.grails.ApplicationContextHolder
+
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import grails.util.Holders
 import org.apache.commons.validator.UrlValidator
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.web.context.request.RequestContextHolder
@@ -17,7 +18,7 @@ class HtmlUtil {
 	static private ApplicationTagLib TAG_LIB = null
 
 	static private ApplicationTagLib getTagLib(){
-		if(!TAG_LIB) TAG_LIB = ApplicationContextHolder.getApplicationContext().getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+		if(!TAG_LIB) TAG_LIB = Holders.applicationContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
 		return TAG_LIB
 	}
 
