@@ -37,7 +37,7 @@ export class AssetCommentColumnModel {
 				label: 'Description',
 				property: 'comment',
 				type: 'text',
-				width: 744
+				width: 574
 			},
 			{
 				label: 'Asset',
@@ -54,6 +54,12 @@ export class AssetCommentColumnModel {
 			{
 				label: 'Category',
 				property: 'category',
+				type: 'text',
+				width: 170
+			},
+			{
+				label: 'Archived',
+				property: 'isResolved',
 				type: 'text',
 				width: 170
 			},

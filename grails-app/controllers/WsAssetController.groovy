@@ -547,7 +547,10 @@ class WsAssetController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		boolean viewUnpublished = securityService.viewUnpublished()
 		List<AssetComment> assetComments = commentService.listAssetComments(project, viewUnpublished)
+		List<Map> assetCommentsList = assetComments
+				.findAll{ ((viewUnpublished || it.isPublished) && it.assetEntity) }
+				.collect { it.toCommentMap() }
 
-		renderSuccessJson(assetComments.toCommentMap())
+		renderAsJson (assetCommentsList)
 	}
 }

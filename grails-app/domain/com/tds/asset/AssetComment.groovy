@@ -370,6 +370,7 @@ class AssetComment {
 				lastUpdated: lastUpdated,
 				dateCreated: dateCreated,
 				assignedTo: assignedTo?.toString() ?: '',
+				isResolved: dateResolved ? 'Yes' : 'No'
 		]
 		return dataMap
 	}
