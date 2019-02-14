@@ -145,9 +145,9 @@ class ETLFindSpec extends ETLBaseSpec {
 				iterate {
 					domain Application
 					load 'environment' with 'Production'
-					extract 'application id' load 'id'
+					extract 'application id' load 'Id'
 
-					find Application by 'id' with SOURCE.'application id' into 'id'
+					find Application by 'Id' with SOURCE.'application id' into 'Id'
 				}
 			""".stripIndent())
 
@@ -246,7 +246,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					load 'environment' with 'Production'
 					extract 'application id' load 'id'
 
-					find Application by 'id' eq SOURCE.'application id' into 'id'
+					find Application by 'Id' eq SOURCE.'application id' into 'Id'
 				}
 			""".stripIndent())
 
@@ -921,7 +921,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
+	void 'test can Ia domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
