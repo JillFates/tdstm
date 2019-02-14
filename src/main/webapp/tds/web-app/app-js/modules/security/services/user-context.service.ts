@@ -36,14 +36,14 @@ export class UserContextService {
 	public initializeUserContext() {
 		let contextPromises = [];
 		contextPromises.push(this.userService.getUserContext());
-		contextPromises.push(this.userService.getLicenseManagerEnabled());
+		contextPromises.push(this.userService.getLicenseInfo());
 		contextPromises.push(this.permissionService.getPermissions());
 
 		return new Promise((resolve) => {
 			Observable.forkJoin(contextPromises)
 				.subscribe((contextResponse: any) => {
 					let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-					userContext.licenseEnabled = contextResponse[USER_CONTEXT_REQUEST.LICENSE_ENABLED];
+					userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
 					userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
 					this.userContextSubject.next(userContext);
 					resolve(true);
