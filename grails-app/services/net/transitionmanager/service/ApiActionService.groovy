@@ -384,7 +384,7 @@ class ApiActionService implements ServiceMethods {
 			// Retrieve the corresponding API Action instance
 			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
 
-			// Make sure nobody changed it while the user was editting the data
+			// Make sure nobody changed it while the user was editing the data
 			GormUtil.optimisticLockCheck(apiAction, version, 'API Action')
 		} else {
 			apiAction = new ApiAction(project: project)
@@ -637,11 +637,16 @@ class ApiActionService implements ServiceMethods {
 		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
-		// If all the properties are required, the entry for the ConnectorClass has to be overriden with the following map.
+		// If all the properties are required, the entry for the ConnectorClass has to be overwritten with the following map.
 		if (!minimalInfo) {
 			AbstractConnector connector = connectorInstanceForAction(apiAction)
 			apiActionMap.connectorClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
 			apiActionMap.version = apiAction.version
+			apiActionMap.actionType = [id: apiAction.actionType.name(), name: apiAction.actionType.getType()]
+			apiActionMap.remoteCredentialMethod = null
+			if (apiAction.remoteCredentialMethod) {
+				apiActionMap.remoteCredentialMethod = [id: apiAction.remoteCredentialMethod.name(), name: apiAction.remoteCredentialMethod.getCredentialMethod()]
+			}
 		}
 
 		return apiActionMap
