@@ -1,9 +1,7 @@
 import {
 	ChangeDetectorRef,
 	Component,
-	OnInit,
-	OnDestroy,
-	ViewEncapsulation
+	OnInit
 } from '@angular/core';
 
 import {
@@ -12,32 +10,14 @@ import {
 } from '@angular/platform-browser';
 
 import {
-	BehaviorSubject,
 	Observable,
-	Subject
 } from 'rxjs';
 
 import {
-	map,
-	mergeMap,
-	scan,
-	switchMap,
-	takeUntil,
-	withLatestFrom,
-} from 'rxjs/operators';
-import {
-	clone,
-	compose,
 	pathOr,
 } from 'ramda';
 
 import {ActivatedRoute} from '@angular/router';
-import {State as GridState} from '@progress/kendo-data-query';
-import {GridComponent} from '@progress/kendo-angular-grid';
-import {
-	GridDataResult,
-	DataStateChangeEvent
-} from '@progress/kendo-angular-grid';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
 
@@ -45,7 +25,6 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-event-checklist',
-	// encapsulation: ViewEncapsulation.None,
 	template: `
 		<div class="pre-event-checklist">
 			<div class="report-controls">
@@ -84,7 +63,7 @@ declare var jQuery: any;
 		</div>
 	`
 })
-export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
+export class PreEventCheckListSelectorComponent implements OnInit {
 	protected model = {
 		events: [],
 		defaultEvent: {id: null, text: ''}
@@ -112,19 +91,12 @@ export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Emit the destroy event to complete and close all current observables
+	 * Call the endpoint to generate the pre-event-checklist report
+	 * @param {string} eventId Report id to generate
 	 */
-	ngOnDestroy() {
-		// on destroy
-	}
-
-	onGenerateReport(eventId: string) {
-		console.log('Generating event:', eventId);
+	onGenerateReport(eventId: string): void {
 		this.reportsService.getPreventsCheckList(eventId)
 			.subscribe((content) => {
-				console.log('The result is');
-				console.log(content);
-				console.log('---------------');
 				this.html =  this.sanitizer.bypassSecurityTrustHtml(content);
 			});
 	}

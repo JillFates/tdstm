@@ -46,7 +46,6 @@ import {ReportsService} from './service/reports.service';
 	providers: [
 		ReportsService,
 		// Resolve
-		// TagsResolveService,
 		ModuleResolveService,
 		TranslatePipe
 	],

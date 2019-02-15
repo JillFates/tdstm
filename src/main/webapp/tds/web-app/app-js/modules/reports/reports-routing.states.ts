@@ -10,7 +10,7 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 
 /**
- * Top menu parent section class for all Dependencies module.
+ * Top menu parent section class for all Reports module.
  * @type {string}
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-planning';

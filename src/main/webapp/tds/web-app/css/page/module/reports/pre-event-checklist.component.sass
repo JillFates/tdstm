@@ -1,12 +1,17 @@
 .pre-event-checklist
-  background-color: #fff
+  $report-primary-background-color: #fff
+  $report-primary-foreground-color: #000
+  $report-alternate-background-color: #e0e0e0
+  $report-secondary-background-color: #CCCCCC
+
+  background-color: $report-primary-background-color
   .report-controls
     margin-left: 15px
     padding-top: 10px
     margin-top: 5px
     .k-dropdown
       span
-        background-color: #fff
+        background-color: $report-primary-background-color
     .actions
       display: flex
       flex-direction: row
@@ -18,8 +23,8 @@
     border-spacing: 2px;
     border-collapse: initial;
   th
-    background: #CCCCCC
-    color: #000
+    background: $report-secondary-background-color
+    color: $report-primary-foreground-color
     font-size: 12px
     font-weight: bold
     line-height: 16px
@@ -28,7 +33,7 @@
     padding: 2px 6px
 
   .odd
-    background: #e0e0e0
+    background: $report-alternate-background-color
 
   .generated-check-list
     padding: 0 15px

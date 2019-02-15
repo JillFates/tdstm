@@ -37,6 +37,7 @@ export class ReportsService {
 	/**
 	 *
 	 * Get the report prevents checklist
+	 * @param {string} eventId Report id to generate
 	 * @returns {Observable<any>}
 	 */
 	getPreventsCheckList(eventId: string): Observable<any> {

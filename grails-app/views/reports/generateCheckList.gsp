@@ -1,10 +1,5 @@
 <%@page expressionCodec="none" %>
-<style>
-
-</style>
 <div class="generated-check-list">
-
-
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>${project.name} : ${moveEvent.name }</b>
 		</div>
@@ -482,10 +477,3 @@
 
 </div>
 
-<script>
-	$(document).ready(function() {
-	    currentMenuId = "#reportsMenu";
-		$('.menu-reports-pre-checklist').addClass('active');
-		$('.menu-parent-reports').addClass('active');
-	});
-</script>
