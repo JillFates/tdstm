@@ -48,31 +48,36 @@ declare var jQuery: any;
 	// encapsulation: ViewEncapsulation.None,
 	template: `
 		<div class="pre-event-checklist">
-			<div>
+			<div class="report-controls">
 				<div style="width: 20%">
-					<kendo-dropdownlist
-							name="event"
-							class="form-control"
-							[data]="model.events"
-							[textField]="'text'"
-							[valueField]="'id'"
-							[(ngModel)]="model.defaultEvent">
-					</kendo-dropdownlist>
-				</div>
-				<div>
-					<div>Output:</div>
 					<div>
-						<input type="radio" id="output" name="output" checked>
-						<label for="output">Web</label>
+						<kendo-dropdownlist
+								name="event"
+								class="form-control"
+								[data]="model.events"
+								[textField]="'text'"
+								[valueField]="'id'"
+								[(ngModel)]="model.defaultEvent">
+						</kendo-dropdownlist>
 					</div>
-				</div>
-				<div>
-					<tds-button-custom
-							(click)="onGenerateReport(model.defaultEvent.id)"
-							title="Generate"
-							tooltip="Generate report"
-							icon="check-double">
-					</tds-button-custom>
+					<div class="actions">
+						<div>
+							<div>Output:</div>
+							<div>
+								<input type="radio" id="output" name="output" checked>
+								<label for="output">Web</label>
+							</div>
+						</div>
+						<div>
+							<tds-button-custom
+									class="btn-primary"
+									(click)="onGenerateReport(model.defaultEvent.id)"
+									title="Generate"
+									tooltip="Generate report"
+									icon="check-square">
+							</tds-button-custom>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div [innerHTML]="html"></div>

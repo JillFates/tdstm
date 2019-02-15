@@ -1,8 +1,22 @@
 .pre-event-checklist
   background-color: #fff
-  .k-dropdown
-    span
-      background-color: #fff
+  .report-controls
+    margin-left: 15px
+    padding-top: 10px
+    margin-top: 5px
+    .k-dropdown
+      span
+        background-color: #fff
+    .actions
+      display: flex
+      flex-direction: row
+      width: 100%
+      justify-content: space-between
+      margin-top: 10px
+  table
+    background-color: transparent;
+    border-spacing: 2px;
+    border-collapse: initial;
   th
     background: #CCCCCC
     color: #000
@@ -10,13 +24,11 @@
     font-weight: bold
     line-height: 16px
     padding: 2px 6px
+  td
+    padding: 2px 6px
 
   .odd
     background: #e0e0e0
 
-  div.content-wrapper
-    div.container
-      .generated-check-list
-        table
-          border-spacing: 2px
-          border-collapse: initial
+  .generated-check-list
+    padding: 0 15px
