@@ -3,7 +3,13 @@ import {
 	Component,
 	OnInit,
 	OnDestroy,
+	ViewEncapsulation
 } from '@angular/core';
+
+import {
+	DomSanitizer,
+	SafeHtml
+} from '@angular/platform-browser';
 
 import {
 	BehaviorSubject,
@@ -37,43 +43,51 @@ import {ReportsService} from '../../service/reports.service';
 
 declare var jQuery: any;
 
-interface ComponentState {
-}
-
 @Component({
 	selector: 'tds-event-checklist',
+	// encapsulation: ViewEncapsulation.None,
 	template: `
-		<div style="width: 30%">
+		<div class="pre-event-checklist">
 			<div>
-				<kendo-dropdownlist
-					name="event"
-					class="form-control"
-					[data]="model.events"
-					[textField]="'text'"
-					[valueField]="'id'"
-					[(ngModel)]="model.defaultEvent">
-				</kendo-dropdownlist>
+				<div style="width: 20%">
+					<kendo-dropdownlist
+							name="event"
+							class="form-control"
+							[data]="model.events"
+							[textField]="'text'"
+							[valueField]="'id'"
+							[(ngModel)]="model.defaultEvent">
+					</kendo-dropdownlist>
+				</div>
+				<div>
+					<div>Output:</div>
+					<div>
+						<input type="radio" id="output" name="output" checked>
+						<label for="output">Web</label>
+					</div>
+				</div>
+				<div>
+					<tds-button-custom
+							(click)="onGenerateReport(model.defaultEvent.id)"
+							title="Generate"
+							tooltip="Generate report"
+							icon="check-double">
+					</tds-button-custom>
+				</div>
 			</div>
-			<div>Output:</div>
-			<div>
-				<input type="radio" id="output" name="output" checked>
-				<label for="output">Web</label>
-			</div>
-			<div>
-				<!--<tds-button-custom tooltip="Create Comment" icon="comment-o" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-custom>-->
-				<tds-button-custom tooltip="Generate report" icon="check-double" ></tds-button-custom>
-			</div>
+			<div [innerHTML]="html"></div>
 		</div>
 	`
 })
 export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
-	protected state: ComponentState;
 	protected model = {
 		events: [],
 		defaultEvent: {id: null, text: ''}
 	};
+	protected html: SafeHtml;
 
 	constructor(
+		private sanitizer: DomSanitizer,
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
@@ -97,5 +111,16 @@ export class PreEventCheckListSelectorComponent implements OnInit, OnDestroy {
 	 */
 	ngOnDestroy() {
 		// on destroy
+	}
+
+	onGenerateReport(eventId: string) {
+		console.log('Generating event:', eventId);
+		this.reportsService.getPreventsCheckList(eventId)
+			.subscribe((content) => {
+				console.log('The result is');
+				console.log(content);
+				console.log('---------------');
+				this.html =  this.sanitizer.bypassSecurityTrustHtml(content);
+			});
 	}
 }

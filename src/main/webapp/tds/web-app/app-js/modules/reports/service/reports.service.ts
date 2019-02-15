@@ -35,6 +35,21 @@ export class ReportsService {
 	}
 
 	/**
+	 *
+	 * Get the report prevents checklist
+	 * @returns {Observable<any>}
+	 */
+	getPreventsCheckList(eventId: string): Observable<any> {
+		const payload = { moveEvent: eventId };
+		return this.http.post(`${this.baseURL}/ws/reports/generateCheckList`, JSON.stringify(payload))
+			.map((res: Response) => {
+				return res && res.text()  || '';
+
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get the default values for the events ui
 	 */
 	getDefaults(): Observable<any> {
