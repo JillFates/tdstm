@@ -58,36 +58,36 @@ class Application extends AssetEntity {
 
 	static constraints = {
 
-		appAccess nullable: true
-		appFunction nullable: true
-		appSource nullable: true
-		appTech nullable: true
-		appVendor nullable: true
-		appVersion nullable: true
-		businessUnit nullable: true
+		appAccess nullable: true, size: 0..255
+		appFunction nullable: true, size: 0..255
+		appSource nullable: true, size: 0..255
+		appTech nullable: true, size: 0..255
+		appVendor nullable: true, size: 0..255
+		appVersion nullable: true, size: 0..255
+		businessUnit nullable: true, size: 0..255
 		criticality nullable: true, size: 0..25, inList: CRITICALITY
-		drRpoDesc nullable: true
-		drRtoDesc nullable: true
-		latency nullable: true
-		license nullable: true
-		moveDowntimeTolerance nullable: true
-		shutdownBy nullable: true
+		drRpoDesc nullable: true, size: 0..255
+		drRtoDesc nullable: true, size: 0..255
+		latency nullable: true, size: 0..255
+		license nullable: true, size: 0..255
+		moveDowntimeTolerance nullable: true, size: 0..255
+		shutdownBy nullable: true, size: 0..255
 		shutdownDuration nullable: true
 		shutdownFixed nullable: true
 		sme nullable: true
 		sme2 nullable: true
-		startupBy nullable: true
+		startupBy nullable: true, size: 0..255
 		startupDuration nullable: true
 		startupFixed nullable: true
-		startupProc nullable: true
-		testingBy nullable: true
+		startupProc nullable: true, size: 0..255
+		testingBy nullable: true, size: 0..255
 		testingDuration nullable: true
 		testingFixed nullable: true
-		testProc nullable: true
-		url nullable: true
-		useFrequency nullable: true
-		userCount nullable: true
-		userLocations nullable: true
+		testProc nullable: true, size: 0..255
+		url nullable: true, size: 0..255
+		useFrequency nullable: true, size: 0..255
+		userCount nullable: true, size: 0..255
+		userLocations nullable: true, size: 0..255
 	}
 
 	static mapping = {

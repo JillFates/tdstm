@@ -26,7 +26,7 @@ class Rack {
 
 	static constraints = {
 		front blank: true, nullable: true, inList: ['L', 'R', 'T', 'B']
-		location blank: true, nullable: true
+		location blank: true, nullable: true, size: 0..255
 		manufacturer nullable: true
 		model nullable: true
 		powerA nullable: true
