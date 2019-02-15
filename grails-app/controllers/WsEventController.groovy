@@ -1,3 +1,4 @@
+import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -21,6 +22,19 @@ class WsEventController implements ControllerMethods {
 
 	MoveEventService moveEventService
 
+	/**
+	 * List all available Move Events for the user's current project including more detailed list of fields.
+	 */
+	@HasPermission(Permission.EventView)
+	def index() {
+		Project project = getProjectForWs()
+		List<MoveEvent> events = moveEventService.listMoveEvents(project)
+		List<Map> eventsMap = events.collect { event ->
+			GormUtil.domainObjectToMap(event, MoveEvent.TMR_EVENT_FIELDS, null, false)
+		}
+		renderSuccessJson(eventsMap)
+	}
+
 	@HasPermission(Permission.EventView)
 	def listEventsAndBundles() {
 		renderSuccessJson(list: eventService.listEventsAndBundles())
@@ -43,7 +57,7 @@ class WsEventController implements ControllerMethods {
 		Project project = getProjectForWs()
 		List<MoveEvent> events = moveEventService.listMoveEvents(project)
 		List<Map> eventsMap = events.collect { event ->
-			[id: event.id, name: event.name]
+			GormUtil.domainObjectToMap(event, MoveEvent.BASIC_EVENT_FIELDS, null, false)
 		}
 		renderSuccessJson(eventsMap)
 	}
