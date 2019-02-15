@@ -324,12 +324,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
                                 <li class="menu-child-item menu-planning-pre-checklist">
-                                    <g:link controller="reports" action="preMoveCheckList">Pre-event Checklist</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-                                <li class="menu-child-item menu-planning-pre-checklist2">
-                                    <g:link controller="module" action="reports" id="preEventCheckList" elementId="preEventCheckList">Pre-event Checklist2</g:link>
+                                    <g:link controller="module" action="reports" id="preEventCheckList" elementId="preEventCheckList">Pre-event Checklist</g:link>
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-planning-export-runbook">

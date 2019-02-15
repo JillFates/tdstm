@@ -30,7 +30,7 @@ export const ReportsRoute: Routes = [
 				title: 'REPORTS.PRE_EVENT_CHECKLIST',
 				instruction: '',
 				menu: ['REPORTS.REPORTS', 'REPORTS.PRE_EVENT_CHECKLIST'],
-				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list2', subMenu: true }
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-planning-pre-checklist', subMenu: true }
 			},
 			requiresAuth: true,
 		},
