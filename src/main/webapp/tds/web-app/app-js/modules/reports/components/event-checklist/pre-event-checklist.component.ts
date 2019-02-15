@@ -28,7 +28,7 @@ declare var jQuery: any;
 	template: `
 		<div class="pre-event-checklist">
 			<div class="report-controls">
-				<div style="width: 20%">
+				<div class="event-selector">
 					<div>
 						<kendo-dropdownlist
 								name="event"
