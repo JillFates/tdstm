@@ -29,15 +29,15 @@ class MoveBundle extends Party {
 
 	static constraints = {
 		completionTime nullable: true
-		description nullable: true
+		description nullable: true, size: 0..255
 		moveEvent nullable: true
-		name blank: false, unique: ['project']
+		name blank: false, unique: ['project'], size: 0..255
 		operationalOrder range: 1..25
 		sourceRoom nullable: true
 		startTime nullable: true
 		targetRoom nullable: true
 		tasksCreated nullable: true
-		workflowCode blank: false
+		workflowCode blank: false, size: 0..255
 	}
 
 	static mapping = {

@@ -27,16 +27,16 @@ class Room {
 	static mappedBy = [sourceAssets: 'roomSource', targetAssets: 'roomTarget']
 
 	static constraints = {
-		address nullable: true
-		city nullable: true
-		country nullable: true
-		location blank: false
+		address nullable: true, size: 0..255
+		city nullable: true, size: 0..255
+		country nullable: true, size: 0..255
+		location blank: false, size: 0..255
 		postalCode nullable: true, size: 0..12
 		roomDepth nullable: true
-		roomName blank: false
+		roomName blank: false, size: 0..255
 		roomWidth nullable: true
 		source range: 0..1
-		stateProv nullable: true
+		stateProv nullable: true, size: 0..255
 	}
 
 	static mapping = {

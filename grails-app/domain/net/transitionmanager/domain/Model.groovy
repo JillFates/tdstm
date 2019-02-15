@@ -73,20 +73,20 @@ class Model {
 		bladeRows nullable: true
 		createdBy nullable: true
 		depth nullable: true
-		description nullable: true
+		description nullable: true, size: 0..255
 		endOfLifeDate nullable: true
-		endOfLifeStatus nullable: true
+		endOfLifeStatus nullable: true, size: 0..255
 		height nullable: true
-		layoutStyle nullable: true
-		modelFamily nullable: true
-		modelName blank: false, unique: ['manufacturer']
+		layoutStyle nullable: true, size: 0..255
+		modelFamily nullable: true, size: 0..255
+		modelName blank: false, unique: ['manufacturer'], size: 0..255
 		modelStatus nullable: true, inList: ['new', 'full', 'valid']
 		powerDesign nullable: true
 		powerNameplate nullable: true
 		powerUse nullable: true
-		productLine nullable: true
+		productLine nullable: true, size: 0..255
 		roomObject nullable: true
-		sourceURL nullable: true
+		sourceURL nullable: true, size: 0..255
 		updatedBy nullable: true
 		usize nullable: true, inList: 1..52
 		validatedBy nullable: true
