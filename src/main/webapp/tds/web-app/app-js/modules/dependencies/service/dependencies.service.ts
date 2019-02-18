@@ -1,10 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-
-import {PermissionService} from '../../../shared/services/permission.service';
-import {Dependency, DependencyResults} from '../model/dependencies.model';
-import {AssetTagSelectorComponent} from '../../../shared/components/asset-tag-selector/asset-tag-selector.component';
+import {HttpClient} from '@angular/common/http';
+import {DependencyResults} from '../model/dependencies.model';
 
 import {map} from 'rxjs/operators';
 
@@ -18,7 +15,7 @@ export interface DependenciesRequestParams {
 @Injectable()
 export class DependenciesService {
 	private readonly BASE_URL = '/tdstm/ws/asset';
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
+	constructor(private http: HttpClient) {}
 
 	/**
 	 * Get the dependencies matched by the reques parameters
@@ -44,8 +41,7 @@ export class DependenciesService {
 		return this.http.post(endpoint, JSON.stringify(payload))
 			.pipe(
 				map((response: any) => {
-					const results = response.json();
-					let {dependencies = [], total = 0} = (results && results.data) || {};
+					let {dependencies = [], total = 0} = (response && response.data) || {};
 					return {data: dependencies, total};
 				})
 			)

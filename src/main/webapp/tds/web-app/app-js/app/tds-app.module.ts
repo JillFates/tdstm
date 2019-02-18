@@ -5,7 +5,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, APP_INITIALIZER} from '@angular/core';
-import {HttpModule} from '@angular/http';
+import {HttpClientModule} from '@angular/common/http';
 import {TDSAppComponent} from './tds-app.component';
 // Service
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
@@ -22,7 +22,7 @@ import {UserModule} from '../modules/user/user.module';
 	imports: [
 		// Angular Modules
 		BrowserModule,
-		HttpModule,
+		HttpClientModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
 		TaskManagerModule,

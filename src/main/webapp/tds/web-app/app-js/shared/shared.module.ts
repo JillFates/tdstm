@@ -1,4 +1,5 @@
 import {NgModule, ModuleWithProviders} from '@angular/core';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -9,8 +10,6 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
-// TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
-import {HttpServiceProvider} from '../shared/providers/http-interceptor.provider';
 // Shared Services
 import {PreferenceService} from '../shared/services/preference.service';
 import {NotifierService} from '../shared/services/notifier.service';
@@ -25,6 +24,7 @@ import {BulkCheckboxService} from './services/bulk-checkbox.service';
 import {ButtonsFactoryService} from './services/buttons-factory.service';
 import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
 import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
+import {HttpRequestInterceptor} from './providers/http-request-interceptor.provider';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -229,7 +229,13 @@ export class SharedModule {
 				// Services
 				PersonService,
 				NotifierService,
-				HttpServiceProvider,
+				{
+					provide: HTTP_INTERCEPTORS,
+					useClass: HttpRequestInterceptor,
+					useFactory: (notifierService: NotifierService) => new HttpRequestInterceptor(notifierService),
+					deps: [NotifierService],
+					multi: true
+				},
 				UIPromptService,
 				UISVGIconDirectiveDirective,
 				UIFloatingHeaderKGridDirective,

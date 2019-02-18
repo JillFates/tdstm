@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {ProviderModel} from '../model/provider.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
@@ -15,21 +14,20 @@ export class ProviderService {
 	private jobProgressUrl = '../ws/progress';
 	private readonly dataIngestionUrl = '../ws/dataingestion';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/provider/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let providerModels = response && response.status === 'success' && response.data;
 				providerModels.forEach((r) => {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveProvider(model: ProviderModel): Observable<ProviderModel> {
@@ -40,18 +38,16 @@ export class ProviderService {
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			return this.http.put(`${this.dataIngestionUrl}/provider/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -61,20 +57,18 @@ export class ProviderService {
 			postRequest['providerId'] = model.id;
 		}
 		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteProvider(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -169,8 +163,7 @@ export class ProviderService {
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
 		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

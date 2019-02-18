@@ -1,7 +1,7 @@
+// Angular
+import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {AssetCommentModel} from '../model/asset-comment.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
@@ -15,19 +15,18 @@ export class AssetCommentService {
 	private jobProgressUrl = '../ws/progress';
 	private readonly listCommentUrl = '../ws/asset/comment';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getAssetComments(): Observable<AssetCommentModel[]> {
 		return this.http.get(`${this.listCommentUrl}`)
-			.map((res: Response) => {
-				let commentModels = res.json();
-				commentModels.forEach((r) => {
+			.map((response: any) => {
+				response.forEach((r) => {
 					r.commentInstance.lastUpdated = ((r.commentInstance.lastUpdated) ? new Date(r.commentInstance.lastUpdated) : '');
 				});
-				return commentModels;
+				return response;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 
 	}
 
@@ -123,8 +122,7 @@ export class AssetCommentService {
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
 		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }
