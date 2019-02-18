@@ -196,14 +196,14 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event/$projectId?" {
+			controller = "event"
+			action = [GET: "index"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
-		}
-
-		"/ws/event" {
-			controller = "wsEvent"
-			action = [GET: "index"]
 		}
 
 		"/ws/moveEventNews/$id?" {

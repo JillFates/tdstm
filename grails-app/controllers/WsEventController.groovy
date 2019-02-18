@@ -22,19 +22,6 @@ class WsEventController implements ControllerMethods {
 
 	MoveEventService moveEventService
 
-	/**
-	 * List all available Move Events for the user's current project including more detailed list of fields.
-	 */
-	@HasPermission(Permission.EventView)
-	def index() {
-		Project project = getProjectForWs()
-		List<MoveEvent> events = moveEventService.listMoveEvents(project)
-		List<Map> eventsMap = events.collect { event ->
-			GormUtil.domainObjectToMap(event, MoveEvent.TMR_EVENT_FIELDS, null, false)
-		}
-		renderSuccessJson(eventsMap)
-	}
-
 	@HasPermission(Permission.EventView)
 	def listEventsAndBundles() {
 		renderSuccessJson(list: eventService.listEventsAndBundles())
