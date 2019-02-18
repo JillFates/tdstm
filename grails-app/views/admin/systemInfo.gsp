@@ -17,6 +17,8 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 
+	<h3>FQDN: </h3>${fqdn}
+
 	<h3>Memory Usage (Kb):</h3>
 	<br>
 	<pre style="width: 280px;">
