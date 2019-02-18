@@ -5,9 +5,10 @@ import {Title} from '@angular/platform-browser';
 // Service
 import {NotifierService} from '../../../../services/notifier.service';
 import {TaskService} from '../../../../../modules/taskManager/service/task.service';
-import {UIDialogService} from '../../../../services/ui-dialog.service';
+import {UserContextService} from '../../../../../modules/security/services/user-context.service';
 // Models
 import {ASSET_MENU_CSS_TREE} from '../../model/asset-menu.model';
+import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
 // Other
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
@@ -24,13 +25,13 @@ declare var jQuery: any;
                     {{pageMetaData.title | translate}}
                     <small>{{pageMetaData.instruction | translate}}</small>
                 </h1>
-                <div class="breadcrumb licensing-banner-message">
-	                <div class="callout">                     
-		                <p> <strong></strong></p>                   
-	                </div>
+                <div class="breadcrumb licensing-banner-message" *ngIf="userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
+                    <div class="callout">
+                        <p><strong>{{userContext.licenseInfo.license.banner}}</strong></p>
+                    </div>
                 </div>
                 <ol class="breadcrumb">
-                    <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}" >
+                    <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}">
                         <a *ngIf="!last && menu.navigateTo" [routerLink]="menu.navigateTo">{{(menu.text || menu) | translate}}</a>
                         <a *ngIf="!last && !menu.navigateTo">{{(menu.text || menu) | translate}}</a>
                         <ng-container *ngIf="last">
@@ -44,7 +45,9 @@ declare var jQuery: any;
         <tds-ui-prompt></tds-ui-prompt>
 	`,
 	providers: [TranslatePipe],
-	styles: [`.font-weight-bold { font-weight: bold; }`]
+	styles: [`.font-weight-bold {
+        font-weight: bold;
+    }`]
 })
 
 export class BreadcrumbNavigationComponent {
@@ -56,6 +59,7 @@ export class BreadcrumbNavigationComponent {
 		menu: Array<string>,
 		topMenu: any
 	};
+	protected userContext: UserContextModel;
 
 	constructor(
 		private taskService: TaskService,
@@ -64,7 +68,8 @@ export class BreadcrumbNavigationComponent {
 		private notifierService: NotifierService,
 		private titleService: Title,
 		promptService: UIPromptService,
-		private renderer: Renderer2) {
+		private renderer: Renderer2,
+		private userContextService: UserContextService) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
@@ -94,6 +99,7 @@ export class BreadcrumbNavigationComponent {
 		}
 
 		this.headerListeners();
+		this.getUserContext();
 	}
 
 	/**
@@ -155,5 +161,11 @@ export class BreadcrumbNavigationComponent {
 				}
 			}
 		}
+	}
+
+	protected getUserContext(): void {
+		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 }

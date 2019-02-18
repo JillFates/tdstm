@@ -11,7 +11,7 @@ import {Response} from '@angular/http';
 export class UserService {
 
 	private userUrl = '../ws/user';
-	private licenseManagerUrl = '../ws/manager';
+	private licenseUrl = '../ws';
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -27,8 +27,8 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
-	getLicenseManagerEnabled(): Observable<any> {
-		return this.http.get(`${this.licenseManagerUrl}/license/enabled`)
+	getLicenseInfo(): Observable<any> {
+		return this.http.get(`${this.licenseUrl}/license/info`)
 			.map((res: Response) => {
 				let result = res.json();
 				if (result && result.status === 'success') {

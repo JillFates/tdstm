@@ -11,7 +11,25 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-license-warning',
-	templateUrl: '../tds/web-app/app-js/shared/modules/header/components/license-warning/license-warning.component.html',
+	template: `
+        <div class="license-warning-component">
+            <a class='licensing-error-warning btn' href="#"
+               data-html="true"
+               data-toggle="popover"
+               tabindex="0"
+               attr.data-trigger="focus"
+               attr.data-content="
+		            <div class='license-warning-message' style='word-wrap: break-word;'>
+		                <p>{{userContext.licenseInfo.license.message}}</p>
+		            </div>
+		            <div class='license-warning-message-button'>
+		                <button type='button' class='btn btn-primary' onClick='location.href=&quot;/tdstm/module/license/admin/list&quot;'>Administer License</button>
+		            </div>
+        	">
+                <i class="fa fa-fw fa-warning licensing-error-warning"></i>
+            </a>
+        </div>
+	`
 })
 
 export class LicenseWarningComponent implements AfterContentInit {
@@ -25,12 +43,14 @@ export class LicenseWarningComponent implements AfterContentInit {
 	}
 
 	ngAfterContentInit(): void {
-		jQuery('.licensing-error-warning').popover({placement: 'bottom', container: 'body' });
-		jQuery('.licensing-error-warning').click(function(event) { event.preventDefault(); });
+		jQuery('.licensing-error-warning').popover({placement: 'bottom', container: 'body'});
+		jQuery('.licensing-error-warning').click(function (event) {
+			event.preventDefault();
+		});
 	}
 
 	protected getUserContext(): void {
-		this.appSettingsService.getUserContext().subscribe( (userContext: UserContextModel) => {
+		this.appSettingsService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
 	}
