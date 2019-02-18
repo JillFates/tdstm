@@ -9,7 +9,7 @@ import {
 	Inject
 } from '@angular/core';
 
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 

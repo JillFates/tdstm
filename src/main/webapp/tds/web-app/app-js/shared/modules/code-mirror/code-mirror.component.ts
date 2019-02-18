@@ -1,4 +1,5 @@
 import {Component, ViewChild, ElementRef, Output, EventEmitter, Input, OnInit} from '@angular/core';
+import * as CodeMirror from 'codemirror/lib/codemirror';
 
 @Component({
 	selector: 'code-mirror',
@@ -12,7 +13,6 @@ export class CodeMirrorComponent implements OnInit {
 	@Input() mode;
 	@Output() modelChange = new EventEmitter<string>();
 	instance;
-	CodeMirror;
 
 	/**
 	 * This stores (cache) the line errores currently present in the component.
@@ -24,19 +24,15 @@ export class CodeMirrorComponent implements OnInit {
 	 * Get Code Mirror when initializing the component
 	 */
 	ngOnInit(): void {
-		this.getCodeMirrorLibrary().then(component => {
-			this.CodeMirror = component.default;
-
-			this.instance = this.CodeMirror.fromTextArea(this.el.nativeElement, {
-				mode: this.mode,
-				lineNumbers: true
-			});
-			this.instance.setValue(this.model);
-			this.instance.on('change', () => {
-				this.change.emit({newValue: this.instance.getValue(), oldValue: this.model});
-				this.modelChange.emit(this.instance.getValue());
-			});
-		})
+		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
+			mode: this.mode,
+			lineNumbers: true
+		});
+		this.instance.setValue(this.model);
+		this.instance.on('change', () => {
+			this.change.emit({newValue: this.instance.getValue(), oldValue: this.model});
+			this.modelChange.emit(this.instance.getValue());
+		});
 	}
 
 	/**
@@ -68,17 +64,5 @@ export class CodeMirrorComponent implements OnInit {
 			this.instance.removeLineClass(line, 'background', 'line-with-syntax-errors');
 		}
 		this.currentErrorLines = [];
-	}
-
-	/**
-	 * Get Code Mirror Async
-	 * @returns {any}
-	 */
-	public getCodeMirrorLibrary(): any {
-		return import(
-			/* webpackChunkName: "vendors-codemirror" */
-			/* webpackMode: "lazy" */
-			'codemirror/lib/codemirror')
-			.catch(error => 'An error occurred while loading the component');
 	}
 }
