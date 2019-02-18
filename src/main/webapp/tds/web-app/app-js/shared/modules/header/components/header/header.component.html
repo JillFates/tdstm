@@ -1,6 +1,6 @@
 <header class="main-header header-component">
     <nav class="navbar navbar-static-top">
-        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseEnabled}">
+        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseInfo.license.isManager}">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                     <i class="fa fa-bars"></i>
@@ -23,7 +23,7 @@
                             <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
                         </a>
                     </li>
-                    <li *ngIf="userContext.licenseEnabled">
+                    <li *ngIf="!userContext.licenseInfo.license.isManager && !userContext.licenseInfo.license.isValid">
                         <tds-license-warning></tds-license-warning>
                     </li>
                     <!-- User Account Menu -->
