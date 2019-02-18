@@ -9,14 +9,19 @@ import {
 	HttpRequest,
 	HttpResponse
 } from '@angular/common/http';
-import {Observable} from 'rxjs';
+// Model
 import {ERROR_STATUS} from '../model/constants';
 import {AlertType} from '../model/alert.model';
+// Service
 import {NotifierService} from '../services/notifier.service';
+// Other
+import {Observable, throwError} from 'rxjs';
+import {map, catchError, finalize} from 'rxjs/operators';
 
 export class HttpRequestInterceptor implements HttpInterceptor {
 
-	constructor(private notifierService: NotifierService) {}
+	constructor(private notifierService: NotifierService) {
+	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
@@ -24,17 +29,19 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 			name: 'httpRequestInitial'
 		});
 
-		return next.handle(request).do((event: HttpEvent<any>) => {
-			if (event instanceof HttpResponse) {
-				// Detects if the user has been rejected do time Session expiration
-				if (event.headers.get('x-login-url')) {
-					window.location.href = event.headers.get('x-login-url');
+		return next.handle(request).pipe(
+			map((event: HttpEvent<any>) => {
+				if (event instanceof HttpResponse) {
+					// Detects if the user has been rejected do time Session expiration
+					if (event.headers.get('x-login-url')) {
+						window.location.href = event.headers.get('x-login-url');
+					}
+					// Handle Errors
+					this.intercept200Errors(event);
 				}
-				// Handle Errors
-				this.intercept200Errors(event);
-			}
-		}, (error: any) => {
-			if (error instanceof HttpErrorResponse) {
+				return event;
+			}),
+			catchError((error: HttpErrorResponse) => {
 				let errorMessage = error.message;
 
 				if (error && error.status === 404) {
@@ -47,12 +54,12 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					name: AlertType.DANGER,
 					message: errorMessage
 				});
-			}
-		}, () => {
-			this.notifierService.broadcast({
-				name: 'httpRequestCompleted',
-			});
-		});
+				return throwError(error);
+			}), finalize(() => {
+				this.notifierService.broadcast({
+					name: 'httpRequestCompleted',
+				});
+			}));
 
 	}
 
