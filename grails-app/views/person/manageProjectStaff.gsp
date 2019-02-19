@@ -6,27 +6,18 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
-		<g:javascript src="angular/angular.js" />
-		<asset:javascript src="angular/plugins/angular-ui.js"/>
-		<asset:javascript src="angular/plugins/angular-resource.js" />
-		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}"></script>
+
+		<g:render template="/layouts/responsiveAngularResources" />
+
 		<g:javascript src="asset.comment.js" />
-		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<asset:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
-		<asset:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-		<asset:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+
 		<g:javascript src="projectStaff.js" />
 		<asset:stylesheet href="css/tds.css" />
 		<asset:stylesheet href="css/qvga.css" />
-		<asset:stylesheet href="css/ui.datepicker.css" />
-		<asset:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-		<asset:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
-		<title>Project Staff</title>
 
+		<title>Project Staff</title>
 
 		<asset:stylesheet href="css/jquery.autocomplete.css" />
 		<asset:stylesheet href="css/ui.accordion.css" />
@@ -36,7 +27,6 @@
 		<asset:stylesheet href="css/ui.datepicker.css" />
 		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
 		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
-		<asset:stylesheet href="components/comment/comment.css" />
 		<asset:stylesheet href="css/spinner.css" />
 
 	</head>
