@@ -29,8 +29,8 @@
 		<input type="hidden" name="model" id="model" value="${assetEntity?.model}" />
 		<input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
 		<input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
-		<input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" />
-		<input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" />
+		<input type="hidden" name="room" id="room" value="${assetEntity?.targetRoomName}" />
+		<input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRackName}" />
 		<input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" />
 		<input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
@@ -224,10 +224,10 @@
 						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
 						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-						<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-					  	<dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-						<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-						<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+						<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+					  	<dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRackName}/${assetComment?.assetEntity.targetRackPosition}</dd>
+						<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoomName}</dd>
+						<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoomName}</dd>
 						<g:if test="${location == 'source'}">			   	
 					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
