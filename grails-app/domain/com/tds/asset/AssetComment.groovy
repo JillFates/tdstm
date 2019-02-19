@@ -359,7 +359,7 @@ class AssetComment {
 		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
 	].asImmutable()
 
-	Map toCommentMap() {
+	Map toMap() {
 		Map dataMap = [
 				assetEntityId: assetEntity.id,
 				assetName: assetEntity.assetName,

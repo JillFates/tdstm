@@ -5,12 +5,9 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.AssetCommentType
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -32,7 +29,6 @@ import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.UserPreferenceService
 
-import java.text.DateFormat
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -547,10 +543,6 @@ class WsAssetController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		boolean viewUnpublished = securityService.viewUnpublished()
 		List<AssetComment> assetComments = commentService.listAssetComments(project, viewUnpublished)
-		List<Map> assetCommentsList = assetComments
-				.findAll{ ((viewUnpublished || it.isPublished) && it.assetEntity) }
-				.collect { it.toCommentMap() }
-
-		renderAsJson (assetCommentsList)
+		renderAsJson (assetComments*.toMap() )
 	}
 }
