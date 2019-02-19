@@ -321,6 +321,248 @@
 							</div>
 						</form>
 					</div>
+					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.httpAPI)" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}" id="tab_httpAPI">
+						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
+							<div class="box-body">
+								<div class="row">
+									<div class="col-md-7">
+										<div class="form-group">
+											<label for="httpTabApiActionDictionary" class="col-sm-3 control-label">Dictionary:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist id="httpTabApiActionDictionary"  name="httpTabApiActionDictionary" class="form-control"
+												                    tabindex="4"
+												                    [data]="dictionaryList"
+												                    (open)="onOpenDictionary()"
+												                    (valueChange)="onDictionaryValueChange($event)"
+												                    [textField]="'name'"
+												                    [valueField]="'id'"
+												                    [(ngModel)]="apiActionModel.dictionary"
+												                    required class="form-control"
+												                    [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.dictionary?.id == 0}">
+												</kendo-dropdownlist>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="httpTabApiActionMethod" class="col-sm-3 control-label">Method:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist id="httpTabApiActionMethod" name="httpTabApiActionMethod" class="form-control"
+												                    tabindex="5"
+												                    [data]="agentMethodList"
+												                    [textField]="'name'"
+												                    [valueField]="'id'"
+												                    (open)="onOpenAgentMethod()"
+												                    (valueChange)="onMethodValueChange($event)"
+												                    [(ngModel)]="apiActionModel.agentMethod"
+												                    [disabled]="!apiActionModel.dictionary.id"
+												                    required [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.agentMethod?.id == '0'}">
+													<ng-template kendoDropDownListItemTemplate let-dataItem>
+														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
+													</ng-template>
+												</kendo-dropdownlist>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.agentMethod.name}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="httpTabApiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist id="httpTabApiActionCredentials" name="httpTabApiActionCredentials" class="form-control"
+												                    tabindex="6"
+												                    [data]="providerCredentialList"
+												                    [textField]="'name'"
+												                    [valueField]="'id'"
+												                    [disabled]="apiActionModel.provider.id === 0"
+												                    [(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-5">
+										<div class="form-check">
+											<label class="form-check-label aligned-label" for="httpTabApiActionPollingInterval">
+												<input type="checkbox" id="httpTabApiActionPollingInterval" name="httpTabApiActionPollingInterval"
+												       tabindex="10"
+												       [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
+												Polling
+											</label>
+											<popup-polling></popup-polling>
+										</div>
+										<div class="form-group intervals-content">
+											<label class="col-sm-4 control-label">Interval:</label>
+											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-numerictextbox
+														name="apiActionFrequencyValue"
+														tabindex="11"
+														[format]="'n'"
+														[min]="0"
+														[max]="100"
+														[(ngModel)]="apiActionModel.polling.frequency.value"
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
+												</kendo-numerictextbox>
+											</div>
+											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist
+														name="apiActionFrequencyInterval"
+														tabindex="12"
+														[data]="intervals"
+														[(ngModel)]="selectedInterval.interval"
+														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
+														[required]="apiActionModel.isPolling">
+												</kendo-dropdownlist>
+											</div>
+											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
+											</div>
+										</div>
+										<div class="form-group intervals-content">
+											<label class="col-sm-4 control-label">Assume Lapsed After:</label>
+											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-numerictextbox
+														name="apiActionAssumeLapsedAfterValue"
+														tabindex="13"
+														[format]="'n'"
+														[min]="0"
+														[max]="100"
+														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
+												</kendo-numerictextbox>
+											</div>
+											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist
+														name="apiActionAssumeLapsedAfterInterval"
+														tabindex="14"
+														[data]="intervals"
+														[(ngModel)]="selectedLapsed.interval"
+														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
+														[required]="apiActionModel.isPolling">
+												</kendo-dropdownlist>
+											</div>
+											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
+											</div>
+										</div>
+										<div class="form-group intervals-content">
+											<label class="col-sm-4 control-label">Assume Stalled After:</label>
+											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-numerictextbox
+														name="apiActionAssmeStalledAfterValue"
+														tabindex="15"
+														[format]="'n'"
+														[min]="0"
+														[max]="100"
+														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
+												</kendo-numerictextbox>
+											</div>
+											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist
+														name="apiActionAssmeStalledAfterInterval"
+														tabindex="16"
+														[data]="intervals"
+														[(ngModel)]="selectedStalled.interval"
+														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
+														[required]="apiActionModel.isPolling">
+												</kendo-dropdownlist>
+											</div>
+											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
+											</div>
+										</div>
+										<div class="form-check">
+											<label for="httpTabApiActionProduceData" class="form-check-label aligned-label">
+												<input id="httpTabApiActionProduceData" type="checkbox" name="httpTabApiActionProduceData"
+												       tabindex="17"
+												       [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
+												Provides Data
+											</label>
+											<popup-provides-data></popup-provides-data>
+										</div>
+										<div class="form-group intervals-content">
+											<label for="httpTabApiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
+											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist id="httpTabApiActionDefaultDataScript" name="httpTabApiActionDefaultDataScript" class="form-control"
+												                    tabindex="18"
+												                    [data]="providerDatascriptList"
+												                    [textField]="'name'"
+												                    [valueField]="'id'"
+												                    [(ngModel)]="apiActionModel.defaultDataScript"
+												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
+												                    [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
+											</div>
+											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
+											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text" id="httpTabApiEndpointURL" name="httpTabApiEndpointURL" class="form-control"
+												       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
+											</div>
+											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label">
+												Http Method:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div *ngIf="modalType !== actionTypes.VIEW"
+											     class="col-sm-9" style="width: 39%;">
+												<kendo-dropdownlist id="httpTabHttpMethodList" name="httpTabHttpMethodList" class="form-control"
+												                    tabindex="8"
+												                    [data]="httpMethodList"
+												                    required
+												                    [ngClass]="{'has-error':  !httpAPIForm.form.valid && apiActionModel.httpMethod === 'Select...'}"
+												                    [(ngModel)]="apiActionModel.httpMethod">
+												</kendo-dropdownlist>
+											</div>
+											<div *ngIf="modalType === actionTypes.VIEW"
+											     class="col-sm-9">
+												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== 'Select...' ? apiActionModel.httpMethod : ''}}</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label for="httpTabApiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
+											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text" id="httpTabApiDocURL" name="httpTabApiDocURL" class="form-control"
+												       tabindex="9"
+												       [(ngModel)]="apiActionModel.docUrl" maxlength="1024" />
+											</div>
+											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
 					<div class="tab-pane no-padding api-action-parameters-form" *ngIf="isCurrentTab(tabsEnum.Parameters)" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
 						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body no-padding ">
