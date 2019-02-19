@@ -23,7 +23,7 @@
 						   (click)="setCurrentTab(tabsEnum.httpAPI)" data-toggle="tab"><span>HTTP API</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
-							<a><span>HTTP API</span></a>
+							<a class="tab-disabled"><span>HTTP API</span></a>
 						</ng-template>
 					</li>
 					<li role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.script)}">
@@ -31,7 +31,7 @@
 							(click)="setCurrentTab(tabsEnum.script)" data-toggle="tab"><span>Script</span>
 						</a>
 						<ng-template #labelTemplateScript>
-							<a><span>Script</span></a>
+							<a class="tab-disabled"><span>Script</span></a>
 						</ng-template>
 					</li>
 				</ul>
