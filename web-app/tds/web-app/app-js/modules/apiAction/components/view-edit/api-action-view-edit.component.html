@@ -12,13 +12,7 @@
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
                         <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
 					</li>
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
-						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">Parameters</a>
-					</li>
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
-						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
-					</li>
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}">
+					<li *ngIf="originalModel.actionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
 						   (click)="setCurrentTab(tabsEnum.httpAPI)" data-toggle="tab"><span>HTTP API</span>
 						</a>
@@ -26,13 +20,19 @@
 							<a class="tab-disabled"><span>HTTP API</span></a>
 						</ng-template>
 					</li>
-					<li role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.script)}">
+					<li *ngIf="originalModel.actionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.script)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
-							(click)="setCurrentTab(tabsEnum.script)" data-toggle="tab"><span>Script</span>
+						   (click)="setCurrentTab(tabsEnum.script)" data-toggle="tab"><span>Script</span>
 						</a>
 						<ng-template #labelTemplateScript>
 							<a class="tab-disabled"><span>Script</span></a>
 						</ng-template>
+					</li>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
+						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">Parameters</a>
+					</li>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
+						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
 					</li>
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">

@@ -157,8 +157,6 @@ export class APIActionViewEditComponent implements OnInit {
 	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
-		console.log('HERE THE ACTION TYPE IS', this.originalModel.actionType);
-		console.log('-----------');
 
 		// set the default empty values for dictionary in case it is not defined
 		if (!this.apiActionModel.dictionary) {

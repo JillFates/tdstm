@@ -111,7 +111,6 @@ export class APIActionListComponent implements OnInit {
 	 */
 	protected onCreate(): void {
 		let apiActionModel = new APIActionModel();
-		// this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 
 		if (this.hasEarlyAccessTMRPermission) {
 			this.openAPIActionTypeDialog()
@@ -119,10 +118,7 @@ export class APIActionListComponent implements OnInit {
 					apiActionModel.actionType = action;
 					setTimeout(() => this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE), 500);
 				})
-				.catch((error) => {
-					console.log('The error is');
-					console.log(error);
-				});
+				.catch((error) => console.log(error));
 		} else {
 			this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 		}
