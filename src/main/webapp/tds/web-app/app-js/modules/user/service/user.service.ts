@@ -42,6 +42,16 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
+	fetchModelForUserDashboard() {
+		return this.http.get(`${this.userPreferenceUrl}/modelForUserDashboard`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	/**
 	 * Used to retrieve all of the model data that will be used by the manage staff component
 	 */

@@ -1,0 +1,134 @@
+<div class="user-dashboard-component">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span>Project:</span>
+            <kendo-dropdownlist></kendo-dropdownlist>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6 cell-container">
+                <kendo-grid
+                        [data]="eventList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <span>Events - Your assigned events and your team</span>
+                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of eventColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            test
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <kendo-grid
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <span>Task Summary - Active tasks assigned to you</span>
+                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column field="Test"
+                                       format="string"
+                                       [width]="100">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label> Test</label>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            test
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <span>{{summaryDetail}}</span>
+            </div>
+            <div class="col-md-6 cell-container">
+                <kendo-grid
+                        [data]="eventNewsList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <span>Event News - Active news for your events</span>
+                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of eventNewsColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            test
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <kendo-grid
+                        [data]="applicationList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <span>Applications - Your applications as an SME or Owner</span>
+                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of applicationColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            test
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+
+                <kendo-grid
+                        [data] = "activePersonList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <span>Active People - Currently active people on this project</span>
+                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of activePersonColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            test
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+            </div>
+        </div>
+    </div>
+</div>

@@ -452,6 +452,11 @@ class UrlMappings {
 			action = [ GET: "modelForStaffViewEdit" ]
 		}
 
+		"/ws/user/modelForUserDashboard" {
+			controller = "wsUser"
+			action = [ GET: "modelForUserDashboard" ]
+		}
+
         "/ws/user/mapAreas" {
             controller = "wsUser"
             action = [GET: "getMapAreas"]

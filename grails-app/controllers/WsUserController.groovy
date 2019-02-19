@@ -1,3 +1,5 @@
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
@@ -9,9 +11,15 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.UserService
+
+import java.text.DateFormat
+
 /**
  * Handles WS calls of the UserService.
  *
@@ -23,6 +31,7 @@ class WsUserController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	PersonService personService
 	PartyRelationshipService partyRelationshipService
+	UserService userService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -72,6 +81,73 @@ class WsUserController implements ControllerMethods {
 		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
 
 		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
+	}
+
+	def modelForUserDashboard() {
+		Project project = getProjectForWs()
+		Person person = currentPerson()
+
+		// Task Stuff
+		def taskList = []
+		def taskSummary = userService.getTaskSummary(project)
+		DateFormat formatter = TimeUtil.createFormatter("MM/dd kk:mm")
+
+		taskSummary.taskList.each { task ->
+			task.item.estFinish?.clearTime()
+			taskList.add([
+					projectName: task.projectName,
+					taskId: task.item.id,
+					task: ((task.item.taskNumber)? task.item.taskNumber + " - " : "") + task.item.comment,
+					css: task.css,
+					overDue: (task.item.dueDate && task.item.dueDate < TimeUtil.nowGMT()? 'task_overdue' : ''),
+					assetClass: task.item.assetClass.toString(),
+					assetId: task.item.assetId,
+					related: task.item.assetName,
+					dueEstFinish: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone,
+							(task.item.estFinish != null? task.item.estFinish : new Date()), formatter),
+					status: task.item.status
+			])
+		}
+
+		def dueTaskCount = taskSummary.dueTaskCount
+
+		def summaryDetail = 'No active tasks were found.'
+		if (taskSummary.taskList.size() > 0) {
+			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${dueTaskCount} ${(dueTaskCount == 1) ? ('is') : ('are')} overdue)"
+		}
+
+		// Active People
+
+		def activePeople = userService.getActivePeople(project).collect { login ->
+			[personId: login.personId, projectName: login.projectName,
+			 personName: login.personName, lastActivity: login.lastActivity]
+		}
+
+		// Event News
+
+		List eventNews = []
+		if (project) {
+			userService.getEventNews(project).each { news ->
+				eventNews << [eventId: news.moveEvent.id, projectName: news.moveEvent.project.name,
+						   date: news.dateCreated, event: news.moveEvent.name, news: news.message]
+			}
+		}
+
+		// Events
+
+		def events = userService.getEventDetails(project).values().collect { value -> [
+				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
+				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
+				days: value.daysToGo + ' days', teams: value.teams]
+		}
+		renderSuccessJson(
+				applications: Application.findAllByAppOwnerOrSmeOrSme2(person, person, person),
+				tasks: taskList,
+				summaryDetail: summaryDetail,
+				activePeople: activePeople,
+				eventNews: eventNews,
+				events: events
+		)
 	}
 
     /**

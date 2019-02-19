@@ -17,12 +17,14 @@ import {UserListComponent} from './components/list/user-list.component';
 import {UserPreferencesComponent} from './components/preferences/user-preferences.component';
 import {UserEditPersonComponent} from './components/edit-person/user-edit-person.component';
 import {UserDateTimezoneComponent} from './components/date-timezone/user-date-timezone.component';
+import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {UserService} from './service/user.service';
 import {UserManageStaffComponent} from './components/manage-staff/user-manage-staff.component';
+import {GridModule} from '@progress/kendo-angular-grid';
 
 @NgModule({
 	imports: [
@@ -33,7 +35,8 @@ import {UserManageStaffComponent} from './components/manage-staff/user-manage-st
 		// Route
 		UserRouteModule,
 		// Kendo
-		DropDownsModule
+		DropDownsModule,
+		GridModule
 	],
 	providers: [
 		// Resolve
@@ -47,7 +50,8 @@ import {UserManageStaffComponent} from './components/manage-staff/user-manage-st
 		UserListComponent,
 		UserPreferencesComponent,
 		UserEditPersonComponent,
-		UserManageStaffComponent
+		UserManageStaffComponent,
+		UserDashboardComponent
 	],
 	exports: [
 		UserDateTimezoneComponent,
