@@ -38,7 +38,7 @@ module.exports = function (env) {
 				NODE_ENV: '"production"'
 			}),
 			new webpack.ContextReplacementPlugin(
-				/\@angular(\\|\/)core(\\|\/)esm5/,
+				/\@angular(\\|\/)core(\\|\/)fesm5/,
 				path.resolve(__dirname, "app-js")
 			)
 		],

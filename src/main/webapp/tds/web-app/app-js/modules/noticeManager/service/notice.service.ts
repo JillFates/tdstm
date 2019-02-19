@@ -1,14 +1,12 @@
 import {Injectable} from '@angular/core';
-import {Response, Headers, RequestOptions} from '@angular/http';
+import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {NotifierService} from '../../../shared/services/notifier.service';
 import {NoticeModel} from '../model/notice.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
-import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name NoticeService

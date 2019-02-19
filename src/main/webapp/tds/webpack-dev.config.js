@@ -45,7 +45,7 @@ module.exports = function (env) {
 				exclude: ['vendor.js', 'polyfills.js']
 			}),
 			new webpack.ContextReplacementPlugin(
-				/\@angular(\\|\/)core(\\|\/)esm5/,
+				/\@angular(\\|\/)core(\\|\/)fesm5/,
 				path.resolve(__dirname, "app-js")
 			)
 			// Uncomment if you want to take a peek to the structure of dependencies

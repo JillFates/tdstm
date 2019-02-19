@@ -15,7 +15,7 @@ export class ObjectUtils {
 		const propNames = R.keys(destination);
 		for (let i = 0; i < propNames.length; i++) {
 			let property = propNames[i];
-			const hasProperty = R.has(property);
+			const hasProperty = R.has(property.toString());
 			if (hasProperty(source)) {
 				if (R.is(Object, composed[property])) {
 					composed[property] = ObjectUtils.compose(composed[property], source[property]);
