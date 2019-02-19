@@ -30,8 +30,8 @@
 <asset:stylesheet src="angular-support.css" />
 <asset:javascript src="angular-support" />
 
-<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'tinymce.min.js')}"></script>
-<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'theme.min.js')}"></script>
+<script rel="prefetch" src="${resource(dir: 'js/tinymce', file: 'tinymce.min.js')}"></script>
+<script rel="prefetch" src="${resource(dir: 'js/tinymce', file: 'theme.min.js')}"></script>
 
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
