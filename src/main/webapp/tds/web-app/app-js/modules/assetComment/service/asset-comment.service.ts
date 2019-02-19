@@ -23,7 +23,8 @@ export class AssetCommentService {
 			.map((res: Response) => {
 				let commentModels = res.json();
 				commentModels.forEach((r) => {
-					r.commentInstance.lastUpdated = ((r.commentInstance.lastUpdated) ? new Date(r.commentInstance.lastUpdated) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 				});
 				return commentModels;
 			})

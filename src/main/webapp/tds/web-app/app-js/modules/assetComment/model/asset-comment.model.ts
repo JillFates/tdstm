@@ -35,22 +35,15 @@ export class AssetCommentColumnModel {
 			},
 			{
 				label: 'Description',
-				property: 'commentInstance.comment',
+				property: 'comment',
 				type: 'text',
-				width: 798
-			},
-			{
-				label: 'Updated',
-				property: 'commentInstance.lastUpdated',
-				type: 'date',
-				format: dateFormat,
-				width: 170
+				width: 574
 			},
 			{
 				label: 'Asset',
 				property: 'assetName',
 				type: 'text',
-				width: 455
+				width: 170
 			},
 			{
 				label: 'AssetType',
@@ -60,7 +53,33 @@ export class AssetCommentColumnModel {
 			},
 			{
 				label: 'Category',
-				property: 'commentInstance.category',
+				property: 'category',
+				type: 'text',
+				width: 170
+			},
+			{
+				label: 'Archived',
+				property: 'isResolved',
+				type: 'text',
+				width: 170
+			},
+			{
+				label: 'Updated',
+				property: 'lastUpdated',
+				type: 'date',
+				format: dateFormat,
+				width: 170
+			},
+			{
+				label: 'Created',
+				property: 'dateCreated',
+				type: 'date',
+				format: dateFormat,
+				width: 170
+			},
+			{
+				label: 'CreatedBy',
+				property: 'createdBy.name',
 				type: 'text',
 				width: 170
 			}
