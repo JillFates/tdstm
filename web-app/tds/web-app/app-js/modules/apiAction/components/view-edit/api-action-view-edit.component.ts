@@ -50,7 +50,6 @@ declare var jQuery: any;
 	`]
 })
 export class APIActionViewEditComponent implements OnInit {
-
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;

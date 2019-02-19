@@ -1,0 +1,18 @@
+<div tds-autofocus tds-handle-escape (escPressed)="onCancelDialog()" class="modal-content api-action-type-selector-component" >
+	<div class="modal-header">
+		<h4 class="modal-title">Please select</h4>
+	</div>
+	<div class="modal-body">
+		<input type="radio" value="webAPI" name="gender" (ngModel)="selection"> Male
+		<input type="radio" value="script" name="gender" (ngModel)="selection"> Female
+	</div>
+
+	<div class="modal-footer form-group-center">
+		<tds-button-custom icon="step-forward" title="Next" class="btn-primary pull-left" (click)="onSave()">
+		</tds-button-custom>
+
+		<tds-button-cancel class="pull-right" (click)="onCancelDialog()">
+		</tds-button-cancel>
+	</div>
+</div>
+

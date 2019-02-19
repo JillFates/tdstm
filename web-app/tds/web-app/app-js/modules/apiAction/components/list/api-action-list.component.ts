@@ -20,6 +20,9 @@ import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.comp
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {APIActionTypeSelectorComponent} from '../action-type-selector/api-action-type-selector.component';
+import {APIActionType} from '../../model/api-action.model';
 
 @Component({
 	selector: 'api-action-list',
@@ -56,6 +59,8 @@ export class APIActionListComponent implements OnInit {
 	private interval = INTERVAL;
 	private openLastItemId = 0;
 	public dateFormat = '';
+	protected createActionText = '';
+	protected hasEarlyAccessTMRPermission: boolean;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -63,11 +68,14 @@ export class APIActionListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private preferenceService: PreferenceService,
+		private translate: TranslatePipe) {
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['apiActions'];
 		this.gridData = process(this.resultSet, this.state);
+		this.createActionText = this.translate.transform('API_ACTION.CREATE_ACTION');
 	}
 
 	ngOnInit() {
@@ -102,8 +110,21 @@ export class APIActionListComponent implements OnInit {
 	 * Create a new API Action
 	 */
 	protected onCreate(): void {
-		let apiActionModel = new APIActionModel();
-		this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
+		if (this.hasEarlyAccessTMRPermission) {
+			this.openAPIActionTypeDialog()
+				.then((type: APIActionType) => {
+					console.log('The result 2 is');
+					console.log(type);
+				})
+				.catch((error) => {
+					console.log('The error is');
+					console.log(error);
+				});
+		} else {
+			let apiActionModel = new APIActionModel();
+			this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
+		}
+
 	}
 
 	/**
@@ -230,5 +251,14 @@ export class APIActionListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	/**
+	 * Open The Dialog to select the API action type
+	 * @param {APIActionModel} apiActionModel
+	 * @param {number} actionType
+	 */
+	private openAPIActionTypeDialog(): any {
+		return this.dialogService.open(APIActionTypeSelectorComponent, [], DIALOG_SIZE.SM, false);
 	}
 }

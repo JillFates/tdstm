@@ -17,6 +17,7 @@ import {APIActionListComponent} from './components/list/api-action-list.componen
 import {APIActionViewEditComponent} from './components/view-edit/api-action-view-edit.component';
 import {PopupPollingComponent} from './popups/popup-polling.component';
 import {PopupProvidesDataComponent} from './popups/popup-provides-data.component';
+import {APIActionTypeSelectorComponent} from './components/action-type-selector/api-action-type-selector.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {APIActionResolveService} from './resolve/api-action-resolve.service';
@@ -43,7 +44,8 @@ import {CustomDomainService} from '../fieldSettings/service/custom-domain.servic
 		APIActionListComponent,
 		APIActionViewEditComponent,
 		PopupPollingComponent,
-		PopupProvidesDataComponent
+		PopupProvidesDataComponent,
+		APIActionTypeSelectorComponent
 	],
 	providers: [
 		// Resolve
@@ -55,7 +57,8 @@ import {CustomDomainService} from '../fieldSettings/service/custom-domain.servic
 	],
 	exports: [],
 	entryComponents: [
-		APIActionViewEditComponent
+		APIActionViewEditComponent,
+		APIActionTypeSelectorComponent
 	]
 })
 

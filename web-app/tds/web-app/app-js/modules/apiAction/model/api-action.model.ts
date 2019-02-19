@@ -279,3 +279,8 @@ export enum EventReactionType {
 	PRE = 'PRE',
 	FINAL = 'FINAL'
 };
+
+export enum APIActionType {
+	HTTP_API,
+	SCRIPT
+}
