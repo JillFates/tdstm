@@ -37,7 +37,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			statusbar: false,
 			menu: {},
 			height: 250,
-			skin_url: '../../dist/js/vendors/tinymce/lightgray',
+			skin_url: '../../js/tinymce/lightgray',
 			setup: editor => {
 				this.editor = editor;
 				editor.on('keyup', () => this.saveContent());
