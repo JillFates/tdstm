@@ -9,18 +9,34 @@
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
-                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(0)) && modalType !== actionTypes.VIEW}">Info</span></a>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
+                        <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
 					</li>
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(1)}">
-						<a href="#tab_2" (click)="setCurrentTab(1)" data-toggle="tab">Parameters</a>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
+						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">Parameters</a>
 					</li>
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(2)}">
-						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
+						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
+					</li>
+					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}">
+						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
+						   (click)="setCurrentTab(tabsEnum.httpAPI)" data-toggle="tab"><span>HTTP API</span>
+						</a>
+						<ng-template #labelTemplateHttpAPI>
+							<a><span>HTTP API</span></a>
+						</ng-template>
+					</li>
+					<li role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.script)}">
+						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
+							(click)="setCurrentTab(tabsEnum.script)" data-toggle="tab"><span>Script</span>
+						</a>
+						<ng-template #labelTemplateScript>
+							<a><span>Script</span></a>
+						</ng-template>
 					</li>
 				</ul>
-				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(1)}">
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
+				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
+					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.Info)" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_info">
 						<form name="apiActionForm" role="form" data-toggle="validator" #apiActionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -305,7 +321,7 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane no-padding api-action-parameters-form" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}" id="tab_2">
+					<div class="tab-pane no-padding api-action-parameters-form" *ngIf="isCurrentTab(tabsEnum.Parameters)" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
 						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body no-padding ">
 								<kendo-grid
@@ -401,7 +417,7 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(2)" [ngClass]="{'active':isCurrentTab(2)}" id="tab_3">
+					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.Reactions)" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
 						<form name="apiActionReactionForm" role="form" data-toggle="validator" #apiActionReactionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -674,7 +690,7 @@
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
 		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm ">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
+		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>

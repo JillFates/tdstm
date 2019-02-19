@@ -110,18 +110,20 @@ export class APIActionListComponent implements OnInit {
 	 * Create a new API Action
 	 */
 	protected onCreate(): void {
+		let apiActionModel = new APIActionModel();
+		// this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
+
 		if (this.hasEarlyAccessTMRPermission) {
 			this.openAPIActionTypeDialog()
-				.then((type: APIActionType) => {
-					console.log('The result 2 is');
-					console.log(type);
+				.then((action: APIActionType) => {
+					apiActionModel.actionType = action;
+					setTimeout(() => this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE), 500);
 				})
 				.catch((error) => {
 					console.log('The error is');
 					console.log(error);
 				});
 		} else {
-			let apiActionModel = new APIActionModel();
 			this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 		}
 
@@ -199,7 +201,10 @@ export class APIActionListComponent implements OnInit {
 	 * @param {APIActionModel} apiActionModel
 	 * @param {number} actionType
 	 */
-	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number, originalModel?: APIActionModel): void {
+	private openAPIActionDialogViewEdit(
+		apiActionModel: APIActionModel,
+		actionType: number,
+		originalModel?: APIActionModel): void {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }

@@ -126,10 +126,15 @@ export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'applic
 
 // Setting content type Accepted, default 'application/json'
 // request.config.setProperty('Accept', 'application/xml;q=0.9')`;
+export enum APIActionType {
+	HTTP_API,
+	SCRIPT
+}
 
 export class APIActionModel {
 	id?: number;
 	name: string;
+	actionType: APIActionType;
 	description: string;
 	agentMethod?: AgentMethodModel;
 	httpMethod: string;
@@ -279,8 +284,3 @@ export enum EventReactionType {
 	PRE = 'PRE',
 	FINAL = 'FINAL'
 };
-
-export enum APIActionType {
-	HTTP_API,
-	SCRIPT
-}

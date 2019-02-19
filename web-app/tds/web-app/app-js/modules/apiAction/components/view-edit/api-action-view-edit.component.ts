@@ -4,6 +4,7 @@ import {
 	APIActionModel,
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
+	APIActionType,
 	EventReaction,
 	EventReactionType,
 	EVENT_BEFORE_CALL_TEXT
@@ -26,6 +27,14 @@ import {Observable} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 
 declare var jQuery: any;
+
+enum NavigationTab {
+	Info,
+	Parameters,
+	Reactions,
+	httpAPI,
+	script
+}
 
 @Component({
 	selector: 'api-action-view-edit',
@@ -59,6 +68,7 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
+	protected tabsEnum = NavigationTab;
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -132,6 +142,7 @@ export class APIActionViewEditComponent implements OnInit {
 	};
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
+	protected EnumAPIActionType = APIActionType;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -146,6 +157,8 @@ export class APIActionViewEditComponent implements OnInit {
 	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
+		console.log('HERE THE ACTION TYPE IS', this.originalModel.actionType);
+		console.log('-----------');
 
 		// set the default empty values for dictionary in case it is not defined
 		if (!this.apiActionModel.dictionary) {
@@ -419,6 +432,10 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 		}
 		this.currentTab = num;
+	}
+
+	protected isTabEnabled(actionType: APIActionType): boolean {
+		return this.originalModel.actionType === actionType;
 	}
 
 	/**
