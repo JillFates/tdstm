@@ -81,8 +81,8 @@ enum AssetClass {
 	 * @return the name of the class option
 	 */
 	@CompileDynamic
-	static String getClassOptionForAsset(asset) {
-		getClassOptionForAsset(asset?.assetClass, asset?.assetType)
+	static String getClassOptionForAsset(AssetEntity asset) {
+		getClassOptionForAsset(asset?.assetClass, asset.getAssetType())
 	}
 
 	/**
