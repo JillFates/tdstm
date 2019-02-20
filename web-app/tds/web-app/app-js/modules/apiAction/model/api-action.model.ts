@@ -134,7 +134,9 @@ export enum APIActionType {
 export class APIActionModel {
 	id?: number;
 	name: string;
-	actionType: APIActionType;
+	tabActionType?: APIActionType;
+	actionType?: string;
+	remoteInvocation?: boolean;
 	description: string;
 	agentMethod?: AgentMethodModel;
 	httpMethod: string;

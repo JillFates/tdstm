@@ -115,14 +115,13 @@ export class APIActionListComponent implements OnInit {
 		if (this.hasEarlyAccessTMRPermission) {
 			this.openAPIActionTypeDialog()
 				.then((action: APIActionType) => {
-					apiActionModel.actionType = action;
+					apiActionModel.tabActionType = action;
 					setTimeout(() => this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE), 500);
 				})
 				.catch((error) => console.log(error));
 		} else {
 			this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 		}
-
 	}
 
 	/**

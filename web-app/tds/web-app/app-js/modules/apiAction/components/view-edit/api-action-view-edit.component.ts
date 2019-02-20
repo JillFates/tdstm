@@ -32,8 +32,8 @@ enum NavigationTab {
 	Info,
 	Parameters,
 	Reactions,
-	httpAPI,
-	script
+	HttpAPI,
+	Script
 }
 
 @Component({
@@ -95,6 +95,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public selectedStalled = {value: 0, interval: ''};
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
+	protected actionTypesList = [];
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -190,9 +191,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected prepareFormListener(): void {
 		setTimeout(() => {
-			this.apiActionForm.valueChanges.subscribe(val => {
-				this.verifyIsValidForm();
-			});
+			if (this.apiActionForm) {
+				this.apiActionForm.valueChanges.subscribe(val => {
+					this.verifyIsValidForm();
+				});
+			}
 			this.verifyIsValidForm();
 		}, 100);
 	}
@@ -238,6 +241,12 @@ export class APIActionViewEditComponent implements OnInit {
 				this.httpMethodList.push(...result.data.httpMethod);
 				if (!this.apiActionModel.httpMethod) {
 					this.apiActionModel.httpMethod = this.httpMethodList[0];
+				}
+				if (result && result.data.actionTypes) {
+					const keys = Object.keys(result.data.actionTypes);
+					keys.forEach((key: string) => {
+						this.actionTypesList.push({id: key, value: result.data.actionTypes[key]});
+					});
 				}
 			},
 			(err) => console.log(err));
@@ -433,7 +442,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	protected isTabEnabled(actionType: APIActionType): boolean {
-		return this.originalModel.actionType === actionType;
+		return this.originalModel.tabActionType === actionType;
 	}
 
 	/**

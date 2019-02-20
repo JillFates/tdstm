@@ -9,20 +9,23 @@
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
+					<li *ngIf="!originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
                         <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
 					</li>
-					<li *ngIf="originalModel.actionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}">
+					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
+						<a href="#tab_simpleInfo" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
+					</li>
+					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
-						   (click)="setCurrentTab(tabsEnum.httpAPI)" data-toggle="tab"><span>HTTP API</span>
+						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab"><span>HTTP API</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
 							<a class="tab-disabled"><span>HTTP API</span></a>
 						</ng-template>
 					</li>
-					<li *ngIf="originalModel.actionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.script)}">
+					<li *ngIf="originalModel.tabActionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
-						   (click)="setCurrentTab(tabsEnum.script)" data-toggle="tab"><span>Script</span>
+						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab"><span>Script</span>
 						</a>
 						<ng-template #labelTemplateScript>
 							<a class="tab-disabled"><span>Script</span></a>
@@ -36,7 +39,7 @@
 					</li>
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.Info)" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_info">
+					<div *ngIf="!originalModel.tabActionType && isCurrentTab(tabsEnum.Info)" class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_info">
 						<form name="apiActionForm" role="form" data-toggle="validator" #apiActionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -321,7 +324,100 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.httpAPI)" [ngClass]="{'active':isCurrentTab(tabsEnum.httpAPI)}" id="tab_httpAPI">
+					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.Info)" class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_simpleInfo">
+						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment">
+							<div class="box-body">
+								<div class="row">
+									<div class="col-md-7">
+										<div class="form-group">
+											<label for="simpleApiActionName" class="col-sm-3 control-label">Name:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text"
+												       id="simpleApiActionName"
+												       name="simpleApiActionName"
+												       class="form-control"
+												       tabindex="1" autofocus
+												       [(ngModel)]="apiActionModel.name"
+												       required [ngClass]="{'has-error': (!simpleInfoForm.form.valid && simpleInfoForm.touched) && apiActionModel.name.length <= 0}" />
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.name}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="simpleApiActionProvider" class="col-sm-3 control-label">Provider:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist #simpleApiActionProvider
+												                    tabindex="2"
+												                    id="simpleApiActionProvider"
+												                    name="simpleApiActionProvider"
+												                    (valueChange)="onProviderValueChange($event, false)"
+												                    [data]="providerList"
+												                    [textField]="'name'"
+												                    [valueField]="'id'"
+												                    [(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!simpleInfoForm.form.valid && simpleInfoForm.touched) && apiActionModel.provider?.id == 0}"></kendo-dropdownlist>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="simpleApiActionDescription" class="col-sm-3 control-label">Description:</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<textarea type="text" id="simpleApiActionDescription" name="simpleApiActionDescription" class="form-control"
+												          tabindex="3"
+												          [(ngModel)]="apiActionModel.description"></textarea>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.description}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="simpleApiActionType" class="col-sm-3 control-label">Type:
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<kendo-dropdownlist #simpleApiActionType
+												                    tabindex="2"
+												                    id="simpleApiActionType"
+												                    name="simpleApiActionType"
+												                    [data]="actionTypesList"
+												                    [textField]="'value'"
+												                    [valueField]="'id'"
+												                    [(ngModel)]="apiActionModel.actionType"
+												                    class="form-control"></kendo-dropdownlist>
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.actionType}}</label>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
+											</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="checkbox"
+												       id="simpleApiActionRemote"
+												       name="simpleApiActionRemote"
+												       [(ngModel)]="apiActionModel.remoteInvocation"
+												       [disabled]="true"
+												       class="form-check-input aligned-checkbox" />
+
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.remoteInvocation}}</label>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.HttpAPI)" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
 						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
