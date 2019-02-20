@@ -111,6 +111,7 @@ export class APIActionListComponent implements OnInit {
 	 */
 	protected onCreate(): void {
 		let apiActionModel = new APIActionModel();
+		// this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 
 		if (this.hasEarlyAccessTMRPermission) {
 			this.openAPIActionTypeDialog()

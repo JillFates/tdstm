@@ -136,6 +136,8 @@ export class APIActionModel {
 	name: string;
 	tabActionType?: APIActionType;
 	actionType?: string;
+	commandLine?: string;
+	script?: any;
 	remoteInvocation?: boolean;
 	description: string;
 	agentMethod?: AgentMethodModel;
@@ -183,6 +185,7 @@ export class APIActionModel {
 	docUrl?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
+	remoteCredentialMethod?: any;
 
 	constructor() {
 		this.name = '';

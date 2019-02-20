@@ -96,6 +96,8 @@ export class APIActionViewEditComponent implements OnInit {
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
 	protected actionTypesList = [];
+	protected  remoteCredentials = [];
+	protected defaultItem = {id: '', value: 'Please Select'};
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -242,12 +244,23 @@ export class APIActionViewEditComponent implements OnInit {
 				if (!this.apiActionModel.httpMethod) {
 					this.apiActionModel.httpMethod = this.httpMethodList[0];
 				}
+
 				if (result && result.data.actionTypes) {
+					this.actionTypesList = [];
 					const keys = Object.keys(result.data.actionTypes);
 					keys.forEach((key: string) => {
 						this.actionTypesList.push({id: key, value: result.data.actionTypes[key]});
 					});
 				}
+
+				if (result && result.data.remoteCredentialMethods) {
+					this.remoteCredentials = [];
+					const keys = Object.keys(result.data.remoteCredentialMethods);
+					keys.forEach((key: string) => {
+						this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+					});
+				}
+
 			},
 			(err) => console.log(err));
 	}

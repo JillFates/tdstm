@@ -24,7 +24,7 @@
 						</ng-template>
 					</li>
 					<li *ngIf="originalModel.tabActionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
-						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
+						<a href="#tab_script" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
 						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab"><span>Script</span>
 						</a>
 						<ng-template #labelTemplateScript>
@@ -417,7 +417,7 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.HttpAPI)" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
+					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.HttpAPI)"  class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
 						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -669,7 +669,59 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane no-padding api-action-parameters-form" *ngIf="isCurrentTab(tabsEnum.Parameters)" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
+
+					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.Script)"  class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}" id="tab_script">
+						<form name="scriptForm" role="form" data-toggle="validator" #scriptForm='ngForm' class="form-horizontal left-alignment">
+							<div class="box-body">
+								<div class="row">
+									<div class="form-group">
+										<label for="scriptCommandLine" class="col-sm-2 control-label">Command Line:</label>
+										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+											<input type="text" id="scriptCommandLine" name="scriptCommandLine" class="form-control"
+											       [(ngModel)]="apiActionModel.commandLine" maxlength="1024" />
+										</div>
+										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+											<label class="control-label label-detail">{{apiActionModel.commandLine}}</label>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<label for="scriptCredentials" class="col-sm-2 control-label">Credentials:</label>
+										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+											<kendo-dropdownlist id="scriptCredentials"
+											                    name="scriptCredentials"
+											                    [defaultItem]="defaultItem"
+											                    class="form-control"
+											                    [data]="remoteCredentials"
+											                    [textField]="'value'"
+											                    [valueField]="'id'"
+											                    [(ngModel)]="apiActionModel.remoteCredentialMethod"></kendo-dropdownlist>
+										</div>
+										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
+										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+											<code-mirror #scriptCode
+											             id="scriptCode"
+											             [mode]="scriptCode.mode"
+											             [(model)]="apiActionModel.script">
+											</code-mirror>
+										</div>
+										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div *ngIf="isCurrentTab(tabsEnum.Parameters)" class="tab-pane no-padding api-action-parameters-form" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
 						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body no-padding ">
 								<kendo-grid
@@ -765,7 +817,7 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(tabsEnum.Reactions)" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
+					<div *ngIf="isCurrentTab(tabsEnum.Reactions)" class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
 						<form name="apiActionReactionForm" role="form" data-toggle="validator" #apiActionReactionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
