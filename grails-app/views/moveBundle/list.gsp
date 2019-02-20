@@ -139,7 +139,7 @@
 						filterable: {
 							cell: {
 								template: function(args) {
-									args.element.kendoDatePicker({ 
+									args.element.kendoDatePicker({
 										animation: false, format:tdsCommon.kendoDateFormat()
 									});
 								},
@@ -154,7 +154,7 @@
 						filterable: {
 							cell: {
 								template: function(args) {
-									args.element.kendoDatePicker({ 
+									args.element.kendoDatePicker({
 										animation: false, format:tdsCommon.kendoDateFormat()
 									});
 								},
@@ -216,6 +216,8 @@
 			loadGridBundleList();
 		});
 	</script>
+
+	<g:render template="../layouts/chromeAutofillBug" />
 
 	</body>
 </html>
