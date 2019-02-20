@@ -12,9 +12,10 @@ class PasswordService {
 		if (!user) {
 			user = getUserLogin()
 		}
+
 		if (user.forcePasswordChange != 'Y') {
 			user.forcePasswordChange = 'Y'
-			user.save(failOnError: true)
+			user.save(failOnError: true, flush:true )
 		}
 	}
 
