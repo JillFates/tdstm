@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "1fb8df41-4400-4908-bed4-58d1c69f9cb2",
+		"name": "User Context",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login User Context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b17bc48-14e9-43d1-bed2-e730da57442f",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Expected Data is returned\", function () {",
+							"  var response = JSON.parse(responseBody);",
+							"  var userId = response.data.user.id;",
+							"  var person = response.data.person.id;",
+							"",
+							"  pm.expect(userId).to.not.eql(null);",
+							"  pm.expect(person).to.not.eql(null);",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/user/context",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"user",
+						"context"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "06be5f65-1486-421a-8c1c-c81539942073",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "03862798-b1e2-4ce8-a386-7ce56320bec3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "ec2a067f-5952-45da-aea4-9310831e0d29",
+			"key": "secondID",
+			"value": "999999999999999999999",
+			"type": "string"
+		}
+	]
+}

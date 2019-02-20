@@ -47,14 +47,14 @@ class MoveEvent {
 		actualCompletionTime nullable: true
 		actualStartTime nullable: true
 		calcMethod blank: false, inList: [METHOD_LINEAR, METHOD_MANUAL]
-		description nullable: true
+		description nullable: true, size: 0..255
 		estCompletionTime nullable: true
 		estStartTime nullable: true
-		name blank: false
+		name blank: false, size: 0..255
 		newsBarMode blank: false, inList: ['auto', 'on', 'off']
 		revisedCompletionTime nullable: true
-		runbookBridge1 nullable: true
-		runbookBridge2 nullable: true
+		runbookBridge1 nullable: true, size: 0..255
+		runbookBridge2 nullable: true, size: 0..255
 		runbookRecipe nullable: true
 		runbookStatus nullable: true, inList: ['Pending', 'Draft', 'Final', 'Done']
 		runbookVersion nullable: true
