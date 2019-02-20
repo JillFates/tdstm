@@ -35,6 +35,8 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.support.DefaultTransactionStatus
+
 /**
  * DataImportService - contains the methods for dealing with data importing from the ETL process;
  * interacting with the Import Batch management; and posting of data into various domains.
@@ -636,14 +638,16 @@ class DataImportService implements ServiceMethods {
 					id in recordSetIds
 				}.list(sortBy: 'id')
 
-				ImportBatchRecord.withNewTransaction { status ->
+				ImportBatchRecord.withNewTransaction { DefaultTransactionStatus status ->
 					for (record in records) {
 						context.record = record
 						rowsProcessed++
 						processBatchRecord(batch, record, context, rowsProcessed)
 					}
 					log.debug 'processBatch({}) clearing Hibernate Session', batchId
-					GormUtil.flushAndClearSession()
+					if(!records*.hasErrors()) {
+						GormUtil.flushAndClearSession()
+					}
 				}
 
 				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
@@ -781,12 +785,14 @@ class DataImportService implements ServiceMethods {
 	 * @throws DomainUpdateException when unable to save the record with updates to it
 	 */
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
+		Object entity
+
 		try {
 			Map fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
-			Object entity = findOrCreateEntity(fieldsInfo, context)
+			entity = findOrCreateEntity(fieldsInfo, context)
 
 			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
@@ -852,6 +858,14 @@ class DataImportService implements ServiceMethods {
 		} catch (e) {
 			record.addError(e.getMessage())
 			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e, 80)
+
+			try {
+				entity.discard()
+			}catch(Exception en){
+				//discard throws an exception java.lang.IllegalStateException: cannot generate an EntityKey when id is null.
+				//We need to to the discard to get the errors to be populated correctly, but we don't care about this error.
+				log.debug('Discarding entity had an error.',en)
+			}
 		}
 
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
