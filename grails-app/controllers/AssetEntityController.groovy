@@ -2982,15 +2982,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 				query.append(qm.domain.name + ' AS a ')
 
-				def doJoin = qm.containsKey('assetType')
 				def notIn = qm.containsKey('notIn') && qm.notIn
-				if (doJoin) {
 					if (notIn) {
 						query.append('LEFT OUTER JOIN a.model AS m ')
-					} else {
-						query.append('JOIN a.model AS m ')
 					}
-				}
 
 				if (assetClass)
 					query.append('WHERE a.project=:project AND a.assetClass=:assetClass ')
@@ -3002,12 +2997,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					qparams.q = "%$params.q%"
 				}
 
-				if (doJoin) {
-					if (notIn) {
-						query.append("AND COALESCE(m.assetType,'') NOT ")
-					} else {
-						query.append("AND m.assetType ")
-					}
+				if (notIn) {
+					query.append("AND COALESCE(m.assetType,'') NOT ")
 					query.append('IN (:assetType)')
 					qparams.assetType = qm.assetType
 				}
