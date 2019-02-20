@@ -290,7 +290,8 @@
                     },
                     {
                         field: "status",
-                        title: "Status"
+                        title: "Status",
+
                     },
                     {
                         field: "action",
@@ -327,5 +328,8 @@
         loadManageAssetImportBatchesList();
 
     </script>
+
+    <g:render template="../layouts/chromeAutofillBug" />
+
     </body>
 </html>

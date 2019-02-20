@@ -191,6 +191,8 @@
     <%-- DIV for editing User date and timezone --%>
     <div id="userTimezoneDivId" style="display: none;" title="${tds.currentPersonName()} Date and Timezone"></div>
 
+    <g:render template="../layouts/chromeAutofillBug" />
+
 </body>
 </html>
 <%
