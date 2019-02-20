@@ -22,7 +22,8 @@ export class AssetCommentService {
 		return this.http.get(`${this.listCommentUrl}`)
 			.map((response: any) => {
 				response.forEach((r) => {
-					r.commentInstance.lastUpdated = ((r.commentInstance.lastUpdated) ? new Date(r.commentInstance.lastUpdated) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 				});
 				return response;
 			})
