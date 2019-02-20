@@ -331,7 +331,9 @@
 												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionDictionary"  name="httpTabApiActionDictionary" class="form-control"
+												<kendo-dropdownlist id="httpTabApiActionDictionary"
+												                    name="httpTabApiActionDictionary"
+												                    class="form-control"
 												                    tabindex="4"
 												                    [data]="dictionaryList"
 												                    (open)="onOpenDictionary()"
@@ -352,7 +354,9 @@
 												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionMethod" name="httpTabApiActionMethod" class="form-control"
+												<kendo-dropdownlist id="httpTabApiActionMethod"
+												                    name="httpTabApiActionMethod"
+												                    class="form-control"
 												                    tabindex="5"
 												                    [data]="agentMethodList"
 												                    [textField]="'name'"
@@ -374,7 +378,9 @@
 										<div class="form-group">
 											<label for="httpTabApiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionCredentials" name="httpTabApiActionCredentials" class="form-control"
+												<kendo-dropdownlist id="httpTabApiActionCredentials"
+												                    name="httpTabApiActionCredentials"
+												                    class="form-control"
 												                    tabindex="6"
 												                    [data]="providerCredentialList"
 												                    [textField]="'name'"
@@ -384,6 +390,38 @@
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
+											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text" id="httpTabApiEndpointURL" name="httpTabApiEndpointURL" class="form-control"
+												       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label">
+												Http Method:
+												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											</label>
+											<div *ngIf="modalType !== actionTypes.VIEW"
+											     class="col-sm-8">
+												<kendo-dropdownlist id="httpTabHttpMethodList"
+												                    name="httpTabHttpMethodList"
+												                    class="form-control"
+												                    tabindex="8"
+												                    [data]="httpMethodList"
+												                    required
+												                    [ngClass]="{'has-error':  !httpAPIForm.form.valid && apiActionModel.httpMethod === 'Select...'}"
+												                    [(ngModel)]="apiActionModel.httpMethod">
+												</kendo-dropdownlist>
+											</div>
+											<div *ngIf="modalType === actionTypes.VIEW"
+											     class="col-sm-8">
+												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== 'Select...' ? apiActionModel.httpMethod : ''}}</label>
 											</div>
 										</div>
 									</div>
@@ -513,36 +551,8 @@
 								</div>
 								<div class="row">
 									<div class="col-md-12">
-										<div class="form-group">
-											<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
-											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="httpTabApiEndpointURL" name="httpTabApiEndpointURL" class="form-control"
-												       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
-											</div>
-											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label">
-												Http Method:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
-											</label>
-											<div *ngIf="modalType !== actionTypes.VIEW"
-											     class="col-sm-9" style="width: 39%;">
-												<kendo-dropdownlist id="httpTabHttpMethodList" name="httpTabHttpMethodList" class="form-control"
-												                    tabindex="8"
-												                    [data]="httpMethodList"
-												                    required
-												                    [ngClass]="{'has-error':  !httpAPIForm.form.valid && apiActionModel.httpMethod === 'Select...'}"
-												                    [(ngModel)]="apiActionModel.httpMethod">
-												</kendo-dropdownlist>
-											</div>
-											<div *ngIf="modalType === actionTypes.VIEW"
-											     class="col-sm-9">
-												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== 'Select...' ? apiActionModel.httpMethod : ''}}</label>
-											</div>
-										</div>
+
+
 									</div>
 								</div>
 								<div class="row">
