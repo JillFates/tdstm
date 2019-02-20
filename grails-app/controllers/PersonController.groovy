@@ -97,12 +97,12 @@ class PersonController implements ControllerMethods {
 		def companyId
 		def personInstanceList
 		def filterParams = [
-			firstname  : params.firstname,
-			middlename : params.middlename,
-			lastname   : params.lastname,
-			userLogin  : params.userLogin,
-			email      : params.email,
-			company    : params.company,
+			firstname  : params.firztname,
+			middlename : params.m1ddlename,
+			lastname   : params.laztname,
+			userLogin  : params.uzerLogin,
+			email      : params.zmail,
+			company    : params.zompany,
 			dateCreated: params.dateCreated,
 			lastUpdated: params.lastUpdated,
 			modelScore : params.modelScore

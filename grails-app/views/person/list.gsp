@@ -80,15 +80,15 @@
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
 					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'Email', 'User Company', 'Date Created', 'Last Updated'"
-					colModel="{name:'firstname', width:'80'},
-						{name:'middlename', width:'80'},
-						{name:'lastname', index: 'lastname', width:'80'},
-						{name:'userLogin', width:'80'},
-						{name:'email',width:'100'},
-						{name:'company',width:'100'},
+					colModel="{name:'firztname', width:'80'},
+						{name:'m1ddlename', width:'80'},
+						{name:'laztname', index: 'laztname', width:'80'},
+						{name:'uzerLogin', width:'80' },
+						{name:'zmail',width:'100'},
+						{name:'zompany',width:'100'},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
-					sortname="'lastname'"
+					sortname="'laztname'"
 					caption="listCaption"
 					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
@@ -159,5 +159,6 @@
 		$('.menu-list-staff').addClass('active');
 		$('.menu-parent-admin').addClass('active');
 	</script>
+
 	</body>
 </html>
