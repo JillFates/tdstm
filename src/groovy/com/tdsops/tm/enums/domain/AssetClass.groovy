@@ -82,7 +82,7 @@ enum AssetClass {
 	 */
 	@CompileDynamic
 	static String getClassOptionForAsset(asset) {
-		getClassOptionForAsset(asset?.assetClass, asset?.model?.assetType)
+		getClassOptionForAsset(asset?.assetClass, asset?.assetType)
 	}
 
 	/**
