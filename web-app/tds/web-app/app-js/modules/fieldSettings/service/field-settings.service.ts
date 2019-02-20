@@ -75,12 +75,13 @@ export class FieldSettingsService {
 	 * 	  e.g. 	label: "Last Modified or last modified or LastModified".
 	 * 	  		other label: "Last Modified".
 	 * 	  		This comparisons will error.
-	 * NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
-	 * when the label compares to itself.
 	 *
 	 * @param The label string to be compared with the list of existing labels.
+	 * @param The list of fields.
 	 */
 	conflictsWithAnotherLabel(label: string, fields: any): boolean {
+		// NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
+		// when the label compares to itself.
 		return fields.filter(
 		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
 	}
@@ -92,13 +93,11 @@ export class FieldSettingsService {
 	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
 	 * 	  e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
 	 * @param  The label string to be compared with the list of existing field names.
+	 * @param The list of fields.
 	 */
-	conflictsWithAnotherFieldName(field: any, fields: any): boolean {
-		const label = field && field.label || '';
-		return fields.some(
-				item => !equals(field, item) && item.field.replace(/\s/g, '')
-					.toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
-		);
+	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
+		return fields.filter(
+				item => item.field.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 0;
 	}
 
 	/**
