@@ -89,3 +89,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 		}
 	}
 }
+
+export function HTTPFactory(notifierService: NotifierService) {
+	return new HttpRequestInterceptor(notifierService);
+}

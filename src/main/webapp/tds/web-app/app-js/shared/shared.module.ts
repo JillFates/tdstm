@@ -24,7 +24,7 @@ import {BulkCheckboxService} from './services/bulk-checkbox.service';
 import {ButtonsFactoryService} from './services/buttons-factory.service';
 import {ValidationRulesFactoryService} from './services/validation-rules-factory.service';
 import {ValidationRulesDefinitionsService} from './services/validation-rules-definitions.service';
-import {HttpRequestInterceptor} from './providers/http-request-interceptor.provider';
+import {HttpRequestInterceptor, HTTPFactory} from './providers/http-request-interceptor.provider.';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -232,7 +232,7 @@ export class SharedModule {
 				{
 					provide: HTTP_INTERCEPTORS,
 					useClass: HttpRequestInterceptor,
-					useFactory: (notifierService: NotifierService) => new HttpRequestInterceptor(notifierService),
+					useFactory: HTTPFactory,
 					deps: [NotifierService],
 					multi: true
 				},
