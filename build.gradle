@@ -15,7 +15,7 @@ plugins {
   id "com.gorylenko.gradle-git-properties" version "2.0.0"
 }
 
-version "4.7.0"
+version "4.7.0-alpha"
 group "tdstm"
 
 apply plugin: "eclipse"
