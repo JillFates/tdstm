@@ -1185,6 +1185,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/generateCheckList" {
+			controller = "wsReports"
+			action = [
+					POST: "generateCheckList"
+			]
+		}
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
