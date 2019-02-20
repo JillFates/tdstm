@@ -921,7 +921,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can Ia domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
+	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
