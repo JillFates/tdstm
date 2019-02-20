@@ -1,20 +1,32 @@
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.spock.IntegrationSpec
+import grails.gorm.transactions.Rollback
+import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import spock.lang.Shared
+import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
 
-class AssetDependencyIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class AssetDependencyIntegrationSpec extends Specification {
 
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
-	Project project
+	@Shared
+	AssetEntityTestHelper assetEntityTestHelper
+	@Shared
+	ProjectTestHelper      projectTestHelper
+	@Shared
+	MoveBundleTestHelper   moveBundleTestHelper
+
+	Project    project
 	MoveBundle moveBundle
 
 	def setup() {
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
 		project = projectTestHelper.createProject()
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 	}
