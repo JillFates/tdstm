@@ -158,7 +158,7 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			<g:select from="${assetEntityInstance.constrainedProperties.validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}"
+			<g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetEntityInstance.class).validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}"
 			noSelection="${['':' Please Select']}" />
 		</td>
 	</tr>

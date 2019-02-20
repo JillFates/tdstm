@@ -13,7 +13,7 @@
 			<tr>
 				<td>Usize:</td>
 				<td><g:select id="usizeId" name="usize"
-						from="${modelInstance.constrainedProperties.usize.inList}"
+						from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(modelInstance.class).usize.inList}"
 						value="${modelInstance.usize}"></g:select></td>
 			</tr>
 			<tr>

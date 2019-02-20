@@ -1,3 +1,4 @@
+<%@ page import="com.tdssrc.grails.GormUtil" %>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -24,9 +25,9 @@
               <tr class="prop">
                   <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
                   <td>
-                    <g:select id="type" name="type" 
-                      from="${roleTypeInstance.constrainedProperties.type.inList}" value="${roleTypeInstance.type}"
-                      noSelection="${['':'Please select']}" onchange="typeChanged()">
+                    <g:select id="type" name="type"
+                              from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(roleTypeInstance.class).type.inList}" value="${roleTypeInstance.type}"
+                              noSelection="${['':'Please select']}" onchange="typeChanged()">
                     </g:select>
                   </td>
               </tr>

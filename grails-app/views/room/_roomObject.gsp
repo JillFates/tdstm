@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="com.tdssrc.grails.GormUtil; net.transitionmanager.domain.Rack" %>
 
 <table>
 <g:set var="rack_id" value="${rack.id?:rackId }"></g:set>
@@ -10,7 +10,7 @@
 		<td>X/Y/Facing:</td>
 		<td><input id="roomXDivId_${rack_id}" size="2" value="${rack.roomX}"  onkeyup="changeRackPosition(${rack_id},this.value, 'left')" onchange="changeRackRoomDetails(${rack_id},this.value,'roomX')"/>
 			<input id="roomYDivId_${rack_id}" size="2" value="${rack.roomY}"  onkeyup="changeRackPosition(${rack_id},this.value, 'top')" onchange="changeRackRoomDetails(${rack_id},this.value,'roomY')"/>
-			<g:select id="frontIdDiv_${rack}" name="frontIdDiv_${rack}" from="${Rack.constrainedProperties.front.inList}" onchange="updateRackStyle(${rack_id}, this.value, jQuery('#rackTypeId_'+${rack_id}).val());changeRackRoomDetails(${rack_id},this.value,'front');" style="width:40px;"></g:select></td>
+			<g:select id="frontIdDiv_${rack}" name="frontIdDiv_${rack}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(Rack.class).front.inList}" onchange="updateRackStyle(${rack_id}, this.value, jQuery('#rackTypeId_'+${rack_id}).val());changeRackRoomDetails(${rack_id},this.value,'front');" style="width:40px;"></g:select></td>
 	</tr>
 	<tr>
 		<td>Power A/B/C:(${tds.powerTypeShort()})<span id="unitsId"></span></td>
@@ -21,7 +21,7 @@
 	</tr>
 	<tr>
 		<td>Type :</td>
-		<td><g:select id="rackTypeDivId_${rack_id}" name="rackTypeDivId_${rack_id}" from="${Rack.constrainedProperties.rackType.inList}" value="${rack.rackType}"
+		<td><g:select id="rackTypeDivId_${rack_id}" name="rackTypeDivId_${rack_id}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(Rack.class).rackType.inList}" value="${rack.rackType}"
 			onchange=" changeRackRoomDetails(${rack_id},this.value,'rackType'); updateRackStyle(${rack_id}, jQuery('#frontId_'+${rack_id}).val(), this.value); " style="width:100px;">
 		</g:select></td>
 	</tr>

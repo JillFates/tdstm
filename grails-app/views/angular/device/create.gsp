@@ -315,13 +315,13 @@
                                             [value]="model.asset.maintExpDate">
                                         </tds-date-control>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constrainedProperties.validation.inList as JSON}[0]" />
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetInstance.class).validation.inList as JSON}[0]" />
                                     <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
 											    [tabIndex]="40"
                                                 class="tm-input-control"
                                                 name="modelAssetValidation"
-                                                [data]="${assetInstance.constrainedProperties.validation.inList as JSON}"
+                                                [data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetInstance.class).validation.inList as JSON}"
                                                 [(ngModel)]="model.asset.validation">
                                         </kendo-dropdownlist>
                                     </td>
