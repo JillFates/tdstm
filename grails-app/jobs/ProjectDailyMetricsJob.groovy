@@ -1,4 +1,3 @@
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.ProjectService
 import org.quartz.JobExecutionContext
 
@@ -19,11 +18,6 @@ class ProjectDailyMetricsJob {
 	ProjectService projectService
 
 	void execute(JobExecutionContext context) {
-		try {
-			projectService.activitySnapshot()
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
-		}
+		projectService.activitySnapshot()
 	}
 }

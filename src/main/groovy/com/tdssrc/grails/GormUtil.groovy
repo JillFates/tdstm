@@ -29,7 +29,6 @@ import org.grails.orm.hibernate.cfg.CompositeIdentity
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.orm.hibernate.cfg.Mapping
-import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -303,7 +302,6 @@ class GormUtil{
 	static flushAndClearSession(SessionFactory sessionFactory) {
 		sessionFactory.currentSession.flush()
 		sessionFactory.currentSession.clear()
-		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 
 	/**
@@ -332,16 +330,6 @@ class GormUtil{
 
 	private static Session getCurrentSession() {
 		Room.withSession { Session session -> session }
-	}
-
-	/**
-	 * Frees up memory that is allocated in local threads when GORM is used in background processes where
-	 * there is no HTTP Request object in the Session. This is a known problem documented in the blog post
-	 * http://burtbeckwith.com/blog/?p=73.
-	 */
-	static void releaseLocalThreadMemory() {
-		// TODO BB remove for 3.x
-		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 
 	/**

@@ -147,7 +147,7 @@
 													[tabIndex]="33"
 													class="tm-input-control"
 													name="modelAssetValidation"
-													[data]="${assetInstance.constrainedProperties.validation.inList as JSON}"
+													[data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetInstance.class).validation.inList as JSON}"
 													[(ngModel)]="model.asset.validation">
 												</kendo-dropdownlist>
 											</td>

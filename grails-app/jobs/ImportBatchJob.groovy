@@ -1,6 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
-import com.tdssrc.grails.GormUtil
 import grails.events.EventPublisher
 import grails.transaction.NotTransactional
 import groovy.util.logging.Slf4j
@@ -51,8 +50,6 @@ class ImportBatchJob extends SecureJob implements EventPublisher {
 				// if there is a next batch to process, then trigger an application event to schedule it
 				notify(NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy))
 			}
-
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 

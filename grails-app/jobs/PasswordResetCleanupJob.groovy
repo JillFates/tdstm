@@ -1,5 +1,4 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.SecurityService
 import org.quartz.JobExecutionContext
 
@@ -25,9 +24,6 @@ class PasswordResetCleanupJob {
 		catch (e) {
 			log.error "execute() encountered exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			// progressService.fail(progressKey, e.message))
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

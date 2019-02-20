@@ -125,7 +125,7 @@
                                     <label for="active">Active:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'active','errors')}">
-                                    <g:select id="active" name="active" from="${personInstance.constrainedProperties.active.inList}" value="${personInstance.active}" ></g:select>
+                                    <g:select id="active" name="active" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(personInstance.class).active.inList}" value="${personInstance.active}" ></g:select>
                                 <g:hasErrors bean="${personInstance}" field="active">
 					            <div class="errors">
 					                <g:renderErrors bean="${personInstance}" as="list" field="active"/>
