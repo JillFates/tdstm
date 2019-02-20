@@ -1,5 +1,4 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
 import org.quartz.JobExecutionContext
@@ -42,9 +41,6 @@ class AssetImportProcessJob extends SecureJob {
 		catch (e) {
 			log.error "execute() received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.update(progressKey, 100, ProgressService.FAILED, e.message)
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

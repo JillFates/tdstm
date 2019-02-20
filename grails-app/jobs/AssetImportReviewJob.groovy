@@ -1,8 +1,7 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
-import org.quartz.JobExecutionContext					
+import org.quartz.JobExecutionContext
 
 class AssetImportReviewJob {
 
@@ -42,9 +41,6 @@ class AssetImportReviewJob {
 		catch (e) {
 			log.error "execute() received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.fail(progressKey, e.message)
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

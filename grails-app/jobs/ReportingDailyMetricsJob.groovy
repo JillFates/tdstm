@@ -1,8 +1,5 @@
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.MetricReportingService
-import net.transitionmanager.service.ProjectService
 import org.quartz.JobExecutionContext
-
 /**
  * A job to run the daily reporting metrics from the metricReportingService.
  */
@@ -23,11 +20,6 @@ class ReportingDailyMetricsJob {
 	MetricReportingService metricReportingService
 
 	void execute(JobExecutionContext context) {
-		try {
-			metricReportingService.generateDailyMetrics()
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
-		}
+		metricReportingService.generateDailyMetrics()
 	}
 }
