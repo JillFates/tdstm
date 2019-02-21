@@ -90,12 +90,10 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.PersonStaffList)
 	def listJson() {
 
-		String sortIndex = params.sidx ?: 'lastname'
-		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
 		int currentPage = params.int('page', 1)
 		int rowOffset = (currentPage - 1) * maxRows
-		def companyId
+		Long companyId
 		def personInstanceList
 		def filterParams = [
 			firstname  : params.firztname,
@@ -109,12 +107,35 @@ class PersonController implements ControllerMethods {
 			modelScore : params.modelScore
 		]
 
-		// Validate that the user is sorting by a valid column
-		if (!(sortIndex in filterParams)) {
-			sortIndex = 'lastname'
+		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
+		// seem to work in jqgrid.
+		Map chromeAutocompleteFieldNameSubs = [
+			firztname: 'firstname',
+			m1ddlename: 'middlename',
+			laztname: 'lastname',
+			uzerLogin: 'userLogin',
+			zompany: 'company',
+			zmail: 'email'
+		]
+
+		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
+		List sortableFields = [
+			'dateCreated',
+			'modelScore'
+		]
+
+		// Deal with determining the Sort Column
+		String sortIndex = 'lastname'
+		if (chromeAutocompleteFieldNameSubs.containsKey(params.sidx)) {
+			sortIndex = chromeAutocompleteFieldNameSubs.get(params.sidx)
+		} else if (sortableFields.contains(params.sidx)) {
+			sortIndex = params.sidx
 		}
 
-		def query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
+		// Deal with Sort Order
+		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
+
+		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
 			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, p.email as email,
 			pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
 			IFNULL(p.model_score, 0) AS modelScore
@@ -128,7 +149,7 @@ class PersonController implements ControllerMethods {
 
 		if (params.id && params.id != "All") {
 			// If companyId is requested
-			companyId = params.id
+			companyId = params.long('id')
 		}
 		if (!companyId && params.id != "All") {
 			// Still if no companyId found trying to get companyId from the session
@@ -146,20 +167,22 @@ class PersonController implements ControllerMethods {
 				", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
 
 		// Handle the filtering by each column's text field
-		def firstWhere = true
+		List queryParams = []
+		Boolean firstWhere = true
 		filterParams.each {
 			if (it.value) {
 				if (firstWhere) {
-					query.append(" WHERE people.$it.key LIKE '%$it.value%'")
+					query.append(" WHERE ")
 					firstWhere = false
+				} else {
+					query.append(" AND ")
 				}
-				else {
-					query.append(" AND people.$it.key LIKE '%$it.value%'")
-				}
+				query.append("people.${it.key} LIKE ?")
+				queryParams << "%${it.value.trim()}%"
 			}
 		}
 
-		personInstanceList = jdbcTemplate.queryForList(query.toString())
+		personInstanceList = jdbcTemplate.queryForList(query.toString(), queryParams as Object[])
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = personInstanceList.size()
