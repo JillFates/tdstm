@@ -17,7 +17,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'date-timezone-modal',
-	templateUrl: '../tds/web-app/app-js/modules/user/components/date-timezone/user-date-timezone.component.html'
+	templateUrl: 'user-date-timezone.component.html'
 })
 export class UserDateTimezoneComponent implements OnInit {
 	public currentUserName;
@@ -103,7 +103,7 @@ export class UserDateTimezoneComponent implements OnInit {
 	/**
 	 * Close the Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 
 		if (this.dateTimezoneData !== JSON.stringify({
 			timezone: this.selectedTimezone,

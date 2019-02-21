@@ -21,14 +21,14 @@ import {DataScriptModel} from '../../model/data-script.model';
 
 @Component({
 	selector: 'data-script-sample-data',
-	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/sample-data/data-script-sample-data.component.html',
+	templateUrl: 'data-script-sample-data.component.html',
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	protected originalFileName: any = { temporary: null, fileUploaded: null};
-	protected OPTIONS: any = {
+	public OPTIONS: any = {
 		FILE: 'file',
 		SERVICE: 'service',
 		CSV: 'csv',
@@ -53,17 +53,17 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		filename: null,
 	};
 
-	private autoETL = false;
-	private assetClassOptions: Array<any> = [
+	public autoETL = false;
+	public assetClassOptions: Array<any> = [
 		{ text: 'Select a class', value:  -1 },
 		{ text: 'Application', value: 0 },
 		{ text: 'Device', value: 1 }
 	];
-	private assetClassSelected = this.assetClassOptions[0];
+	public assetClassSelected = this.assetClassOptions[0];
 	private apiActionOptions = [];
 
 	constructor(
-		@Inject('etlScript') protected etlScriptModel: DataScriptModel,
+		@Inject('etlScript') public etlScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
@@ -92,7 +92,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * On Continue button click.
 	 * Set the current sample data upload type and close the dialog.
 	 */
-	private onContinue(): void {
+	public onContinue(): void {
 		let filename: any = { temporaryFileName: null, originalFileName: null};
 		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
 			filename.temporaryFileName = this.csv.filename;
@@ -114,7 +114,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * Filename should not be empty for the current selection.
 	 * @returns {boolean}
 	 */
-	private validForm(): boolean {
+	public validForm(): boolean {
 		if (this.OPTIONS.selected === this.OPTIONS.CSV && this.csv.filename) {
 			return true;
 		} else if (this.OPTIONS.selected === this.OPTIONS.SERVICE && this.webService.filename) {
@@ -212,7 +212,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	/**
 	 * On Cancel Close Dialog Popup Component.
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 }

@@ -67,7 +67,7 @@ export class ManufacturerShowComponent extends UIExtraDialog {
 	/***
 	 * Close the Active Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 

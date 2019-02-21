@@ -41,10 +41,10 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	`]
 })
 export class AssetViewExportComponent {
-	private columns: any[];
-	protected fileName = 'asset_explorer';
-	protected exportFileName = '';
-	protected dataToExport: any[] = [];
+	public columns: any[];
+	public fileName = 'asset_explorer';
+	public exportFileName = '';
+	public dataToExport: any[] = [];
 	private allProperties = false;
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
@@ -83,7 +83,7 @@ export class AssetViewExportComponent {
 	/**
 	 * Transform the Data information
 	 */
-	private getExportData(): void {
+	public getExportData(): void {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {

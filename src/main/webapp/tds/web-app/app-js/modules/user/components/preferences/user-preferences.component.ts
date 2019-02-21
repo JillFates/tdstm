@@ -4,7 +4,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 
 @Component({
 	selector: 'user-preferences',
-	templateUrl: '../tds/web-app/app-js/modules/user/components/preferences/user-preferences.component.html'
+	templateUrl: 'user-preferences.component.html'
 })
 export class UserPreferencesComponent implements OnInit {
 	public preferenceList;
@@ -36,7 +36,7 @@ export class UserPreferencesComponent implements OnInit {
 	/**
 	 * Close the Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 
 	}

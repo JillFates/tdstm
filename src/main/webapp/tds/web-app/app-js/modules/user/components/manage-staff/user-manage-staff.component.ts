@@ -8,7 +8,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 
 @Component({
 	selector: 'user-manage-staff',
-	templateUrl: '../tds/web-app/app-js/modules/user/components/manage-staff/user-manage-staff.component.html'
+	templateUrl: 'user-manage-staff.component.html'
 })
 export class UserManageStaffComponent extends UIExtraDialog {
 	public modalOptions: DecoratorOptions;
@@ -38,7 +38,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	}
 
 	// Decide whether or not to launch the confirmation dialogue before closing
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -56,7 +56,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	}
 
 	// Decide what to do when the cancel button is clicked
-	protected handleCancelButton() {
+	public handleCancelButton() {
 		if (this.editing) {
 			if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 				this.promptService.open(

@@ -11,7 +11,7 @@ import {Observable} from 'rxjs';
 
 @Component({
 	selector: 'tds-license-create',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/request/request-license.component.html',
+	templateUrl: 'request-license.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -19,9 +19,9 @@ import {Observable} from 'rxjs';
 	`]
 })
 export class RequestLicenseComponent implements OnInit {
-	protected requestLicense = new RequestLicenseModel();
-	protected environmentList: any = [];
-	protected projectList: any = [];
+	public requestLicense = new RequestLicenseModel();
+	public environmentList: any = [];
+	public projectList: any = [];
 	private dataSignature: string;
 
 	constructor(
@@ -34,7 +34,7 @@ export class RequestLicenseComponent implements OnInit {
 	/**
 	 * Create Edit a Provider
 	 */
-	protected onCreateRequestLicense(): void {
+	public onCreateRequestLicense(): void {
 		this.licenseAdminService.createRequestLicense(this.requestLicense).subscribe( (newLicense: any) => {
 			this.activeDialog.close(this.requestLicense);
 		});
@@ -62,14 +62,14 @@ export class RequestLicenseComponent implements OnInit {
 	 * Change the client based on the selected project
 	 * @param selectedProject
 	 */
-	protected onProjectSelect(selectedProject: any): void {
+	public onProjectSelect(selectedProject: any): void {
 		this.requestLicense.clientName = selectedProject.client.name;
 	}
 
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

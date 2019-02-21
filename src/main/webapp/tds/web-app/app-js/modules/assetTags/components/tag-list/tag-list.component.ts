@@ -15,12 +15,12 @@ import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tag-list',
-	templateUrl: '../tds/web-app/app-js/modules/assetTags/components/tag-list/tag-list.component.html',
+	templateUrl: 'tag-list.component.html',
 	providers: [TranslatePipe]
 })
 export class TagListComponent {
 
-	protected gridSettings: DataGridOperationsHelper;
+	public gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
 	protected colorList: Array<string>;
 	protected duplicateName = false;

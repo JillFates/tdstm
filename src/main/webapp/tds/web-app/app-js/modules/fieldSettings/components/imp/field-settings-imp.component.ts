@@ -4,7 +4,7 @@ import { FIELD_COLORS } from '../../model/field-settings.model';
 
 @Component({
 	selector: 'field-settings-imp',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/imp/field-settings-imp.component.html',
+	templateUrl: 'field-settings-imp.component.html',
 	styles: [`
 		span { padding:0 5px; cursor: pointer;}
     `]

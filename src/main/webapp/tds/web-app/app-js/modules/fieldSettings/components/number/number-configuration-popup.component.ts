@@ -6,16 +6,16 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 
 @Component({
 	selector: 'number-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/number/number-configuration-popup.component.html',
+	templateUrl: 'number-configuration-popup.component.html',
 })
 
 export class NumberConfigurationPopupComponent {
 
 	private readonly MIN_EXAMPLE_VALUE = -10000;
 	private readonly MAX_EXAMPLE_VALUE = 10000;
-	protected model: NumberConfigurationConstraintsModel;
-	protected localMinRange: number;
-	protected exampleValue: number;
+	public model: NumberConfigurationConstraintsModel;
+	public localMinRange: number;
+	public exampleValue: number;
 
 	constructor(
 		public field: FieldSettingsModel,
@@ -29,7 +29,7 @@ export class NumberConfigurationPopupComponent {
 	/**
 	 * On Min range value changes.
 	 */
-	protected onMinRangeChange($event): void {
+	public onMinRangeChange($event): void {
 		this.model.minRange = ($event === null) ? 0 : $event;
 		this.onFormatChange();
 	}
@@ -38,14 +38,14 @@ export class NumberConfigurationPopupComponent {
 	 * On Allow Negatives changes.
 	 * @param $event
 	 */
-	protected onAllowNegativesChange($event): void {
+	public onAllowNegativesChange($event): void {
 		this.onFormatChange();
 	}
 
 	/**
 	 * When any configuration changes, recalculate the number format.
 	 */
-	protected onFormatChange(): void {
+	public onFormatChange(): void {
 		if (this.localMinRange !== null || this.model.maxRange !== null) {
 			this.model.allowNegative = false;
 		}
@@ -73,7 +73,7 @@ export class NumberConfigurationPopupComponent {
 	/**
 	 * On button save click
 	 */
-	protected onSave(): void {
+	public onSave(): void {
 		delete this.model.isDefaultConfig;
 		this.field.constraints = { ...this.model } as any;
 		this.activeDialog.dismiss();
@@ -82,7 +82,7 @@ export class NumberConfigurationPopupComponent {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 }

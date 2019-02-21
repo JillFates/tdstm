@@ -22,38 +22,38 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'import-assets',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/import-assets/import-assets.component.html'
+	templateUrl: 'import-assets.component.html'
 })
 export class ImportAssetsComponent implements OnInit {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
-	private actionOptions = [];
-	private dataScriptOptions = [];
-	private selectedActionOption = -1;
-	private selectedScriptOption = -1;
-	private fetchResult: any;
-	private fetchInProcess = false;
-	private fetchInputUsed: 'action' | 'file' = 'action';
-	protected transformResult: ApiResponseModel;
-	protected transformInProcess = false;
-	private importResult: any;
-	private importInProcess = false;
-	private fetchFileContent: any;
-	private transformFileContent: any;
+	public dataScriptOptions = [];
+	public selectedActionOption = -1;
+	private transformInterval: any;
+	public importResult: any;
+	public importInProcess = false;
+	public fetchFileContent: any;
+	public transformFileContent: any;
 	private viewDataType: string;
-	protected uiConfig: any = {
+	protected transformProgress = {
+		progressKey: null,
+		currentProgress: 0,
+	};
+	protected IMPORT_BATCH_STATES = ImportBatchStates;
+	public transformResult: ApiResponseModel;
+	public transformInProcess = false;
+	public actionOptions = [];
+	public fetchResult: any;
+	public fetchInProcess = false;
+	public fetchInputUsed: 'action' | 'file' = 'action';
+	public selectedScriptOption = -1;
+	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
+	public uiConfig: any = {
 		labelColSize: 3,
 		inputColSize: 3,
 		buttonColSize: 1,
 		urlColSize: 2
 	};
-	protected transformProgress = {
-		progressKey: null,
-		currentProgress: 0,
-	};
-	private transformInterval: any;
-	protected IMPORT_BATCH_STATES = ImportBatchStates;
 
 	constructor(
 		private importAssetsService: ImportAssetsService,
@@ -73,7 +73,7 @@ export class ImportAssetsComponent implements OnInit {
 	 * Fetch button clicked event.
 	 * Calls the process of fetch.
 	 */
-	private onFetch(): void {
+	public onFetch(): void {
 		this.fetchInProcess = true;
 		this.fetchResult = null;
 		this.fetchFileContent = null;
@@ -102,7 +102,7 @@ export class ImportAssetsComponent implements OnInit {
 	 * Event when action script select changes its value.
 	 * @param event
 	 */
-	private onActionScriptChange(event: any): void {
+	public onActionScriptChange(event: any): void {
 		let matchedScript = this.dataScriptOptions.find( script => script.id === event.defaultDataScriptId );
 		if (matchedScript) {
 			this.selectedScriptOption = matchedScript;
@@ -113,7 +113,7 @@ export class ImportAssetsComponent implements OnInit {
 	 * Transform button clicked event.
 	 * Calls Transform process on endpoint.
 	 */
-	protected onTransform(): void {
+	public onTransform(): void {
 		this.transformInProcess = true;
 		this.transformResult = null;
 		this.transformFileContent = null;
@@ -197,7 +197,7 @@ export class ImportAssetsComponent implements OnInit {
 	 * Import button clicked event.
 	 * Calls Import process on endpoint.
 	 */
-	private onImport(): void {
+	public onImport(): void {
 		this.importInProcess = true;
 		this.importResult = null;
 		this.importAssetsService.postImport(this.transformResult.data.filename).subscribe( (result) => {
@@ -264,11 +264,11 @@ export class ImportAssetsComponent implements OnInit {
 	 * Clear clicked event.
 	 * Clears out most of results peformed on the page.
 	 */
-	private onClear(): void {
+	public onClear(): void {
 		this.removeFileByUID();
 	}
 
-	private disableTransformButton() {
+	public disableTransformButton() {
 		return !this.selectedScriptOption || this.selectedScriptOption === -1
 			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === ApiResponseModel.API_ERROR;
 	}
@@ -278,11 +278,11 @@ export class ImportAssetsComponent implements OnInit {
 		this.fetchFileContent = null;
 	}
 
-	private onSelectFile(e?: any): void {
+	public onSelectFile(e?: any): void {
 		this.file.fileUID = e.files[0].uid;
 	}
 
-	private onRemoveFile(e: RemoveEvent): void {
+	public onRemoveFile(e: RemoveEvent): void {
 		if (!this.fetchResult || !this.fetchResult.filename) {
 			return;
 		}
@@ -305,7 +305,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.importResult = null;
 	}
 
-	private onUploadFile(e: UploadEvent): void {
+	public onUploadFile(e: UploadEvent): void {
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
@@ -317,7 +317,7 @@ export class ImportAssetsComponent implements OnInit {
 		}
 	}
 
-	private completeEventHandler(e: SuccessEvent) {
+	public completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
 		if (response.operation === 'delete') { // file deleted successfully
 			// console.log(response.data);

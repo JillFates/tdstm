@@ -13,7 +13,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: `tds-task-create`,
-	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html',
+	templateUrl: 'task-create.component.html',
 	styles: []
 })
 export class TaskCreateComponent extends TaskEditCreateCommonComponent  implements OnInit {

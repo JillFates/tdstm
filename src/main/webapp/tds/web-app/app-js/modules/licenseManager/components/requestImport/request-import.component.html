@@ -1,6 +1,6 @@
 <div class="modal-content data-script-view-edit-component"  #requestImportLicenseContainer>
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<button (click)="cancelCloseDialog($event)" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
 		<h4 class="modal-title">{{ 'LICENSE.IMPORT_LICENSE_REQUEST' | translate }}</h4>
 	</div>
 	<div class="modal-body">
@@ -17,7 +17,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button (click)="requestImportLicense()" [disabled]="!requestImportLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Import</button>
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+		<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span>{{'GLOBAL.CANCEL' | translate }}</span>
 		</button>

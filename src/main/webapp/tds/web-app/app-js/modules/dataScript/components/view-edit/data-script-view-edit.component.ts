@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef, Inject} from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/debounceTime';
@@ -18,7 +18,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 const DEBOUNCE_MILLISECONDS = 800;
 @Component({
 	selector: 'data-script-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/view-edit/data-script-view-edit.component.html',
+	templateUrl: 'data-script-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -43,7 +43,7 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	constructor(
 		public originalModel: DataScriptModel,
-		public modalType: ActionType,
+		@Inject('modalType') public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
@@ -143,7 +143,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

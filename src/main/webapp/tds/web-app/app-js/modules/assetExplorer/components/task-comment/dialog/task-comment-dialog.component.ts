@@ -52,13 +52,13 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 })
 export class TaskCommentDialogComponent {
 	constructor(
-		protected assetModalModel: AssetModalModel,
+		public assetModalModel: AssetModalModel,
 		public activeDialog: UIActiveDialogService,
 		@Inject('currentUserId') private currentUserId: number) {}
 	/**
 	 * Close the Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 }

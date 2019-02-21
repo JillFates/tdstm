@@ -6,14 +6,14 @@ import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'import-batch-record-summary',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-summary.component.html'
+	templateUrl: 'import-batch-record-summary.component.html'
 })
 export class ImportBatchRecordSummaryComponent {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 
-	protected importBatchPreferences = {};
+	public importBatchPreferences = {};
 	public importBatchPrefEnum = IMPORT_BATCH_PREFERENCES;
 	public userTimeZone: string;
 
@@ -42,11 +42,11 @@ export class ImportBatchRecordSummaryComponent {
 	/**
 	 * Returns true if batch record got errors.
 	 */
-	protected batchHasErrors(): boolean {
+	public batchHasErrors(): boolean {
 		return this.batchRecord.errorCount > 0 || (this.batchRecord.errorList && this.batchRecord.errorList.length > 0)
 	}
 
-	protected toggleSummary(): void {
+	public toggleSummary(): void {
 		this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.TWISTIE_COLLAPSED] = !this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.TWISTIE_COLLAPSED];
 		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( r => { /**/});
 	}

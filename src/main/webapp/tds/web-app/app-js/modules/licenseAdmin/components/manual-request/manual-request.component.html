@@ -1,4 +1,4 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in tds-ui-modal-decorator" id="licenseManualRequest" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog($event)" class="modal fade in tds-ui-modal-decorator" id="licenseManualRequest" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
 		<div class="modal-content"
 			 tds-ui-modal-decorator=""
@@ -6,7 +6,7 @@
 			 [style.width.px]="517"
 			 [style.height.px]="405">
 			<div class="modal-header">
-				<button type="button" (click)="cancelCloseDialog()" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<button type="button" (click)="cancelCloseDialog($event)" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 				<h4 class="modal-title">Email License</h4>
 			</div>
 			<div class="modal-body">
@@ -24,7 +24,7 @@
 			<div class="modal-footer form-group-center">
 				<a style="color: #fff;" href="mailto:{{licenseEmail.toEmail}}?cc={{licenseEmail.ccEmail}}&subject={{licenseEmail.subject}}&body={{licenseEmail.body | tdsEscapeURLEncoding}}" target="_top"><button type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-envelope"></i> Email Request</button></a>
 				<button [copy-clipboard]="licenseEmail.body" type="button" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
-				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+				<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>{{'GLOBAL.CLOSE' | translate }}</span>
 				</button>

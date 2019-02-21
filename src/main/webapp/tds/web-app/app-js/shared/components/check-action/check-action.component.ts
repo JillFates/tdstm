@@ -63,7 +63,7 @@ export class CheckActionComponent implements DoCheck {
 	/**
 	 * Return the event so it can be managed by the Parent
 	 */
-	protected onCheckThumbBindAction(): void {
+	public onCheckThumbBindAction(): void {
 		this.onCallback.emit();
 	}
 
@@ -71,7 +71,7 @@ export class CheckActionComponent implements DoCheck {
 	 * Returns the correct icon based on the button state.
 	 * @returns {string}
 	 */
-	protected getIcon(): string {
+	public getIcon(): string {
 		switch (this.model.state) {
 			case CHECK_ACTION.UNKNOWN: return 'fa fa-thumbs-o-up';
 			case CHECK_ACTION.VALID: return 'fa fa-check green';

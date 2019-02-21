@@ -60,7 +60,7 @@ import { Component } from '@angular/core';
 })
 
 export class PopupLegendsComponent {
-	private show = false;
+	public show = false;
 
 	public onToggle(): void {
 		this.show = !this.show;

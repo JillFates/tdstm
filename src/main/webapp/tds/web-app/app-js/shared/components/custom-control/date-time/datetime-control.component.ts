@@ -52,12 +52,12 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-ddThh:mm:ssZ
  */
 export class TDSDateTimeControlComponent extends TDSCustomControl implements OnInit, OnChanges {
+	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
 	protected outputFormat: string;
-	protected displayFormat: string;
-	protected dateValue: Date;
 	protected selectedDate;
 	protected selectedTime;
-	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+	public displayFormat: string;
+	public dateValue: Date;
 
 	constructor(
 		private userPreferenceService: PreferenceService,

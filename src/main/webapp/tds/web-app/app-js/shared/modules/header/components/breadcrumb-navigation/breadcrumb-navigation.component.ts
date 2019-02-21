@@ -54,14 +54,14 @@ declare var jQuery: any;
 
 export class BreadcrumbNavigationComponent {
 
-	private pageMetaData: {
+	protected userContext: UserContextModel;
+	public pageMetaData: {
 		id: any,
 		title: string,
 		instruction: string,
 		menu: Array<string>,
 		topMenu: any
 	};
-	protected userContext: UserContextModel;
 
 	constructor(
 		private taskService: TaskService,

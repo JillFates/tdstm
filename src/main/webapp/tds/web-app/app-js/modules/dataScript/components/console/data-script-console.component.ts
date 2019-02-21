@@ -8,7 +8,7 @@ const DIALOG_ID = '#viewConsole';
 
 @Component({
 	selector: 'data-script-console',
-	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/console/data-script-console.component.html'
+	templateUrl: 'data-script-console.component.html'
 })
 export class DataScriptConsoleComponent extends UIExtraDialog implements AfterViewInit {
 	public isWindowMaximized = false;
@@ -26,7 +26,7 @@ export class DataScriptConsoleComponent extends UIExtraDialog implements AfterVi
 	/**
 	 * On close dialog store position/size settings.
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 

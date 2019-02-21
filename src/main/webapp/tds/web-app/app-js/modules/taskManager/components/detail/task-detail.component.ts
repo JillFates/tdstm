@@ -28,7 +28,7 @@ import {TaskCreateComponent} from '../create/task-create.component';
 
 @Component({
 	selector: `task-detail`,
-	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/detail/task-detail.component.html',
+	templateUrl: 'task-detail.component.html',
 	styles: []
 })
 export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
@@ -38,19 +38,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected dateFormatTime: string;
 	protected userTimeZone: string;
 	protected currentUserId: number;
-	protected modelHelper: TaskEditCreateModelHelper;
-	protected dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
-	protected dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
-	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
-	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
+	public modelHelper: TaskEditCreateModelHelper;
+	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskNotesHelper: DataGridOperationsHelper;
+	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
-	protected collapsedTaskDetail = false;
+	public collapsedTaskDetail = false;
 	protected hasCookbookPermission = false;
-	protected hasEditTaskPermission = false;
-	protected hasDeleteTaskPermission = false;
-	protected modalOptions: DecoratorOptions;
-	protected model: any = {};
-	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
+	public hasEditTaskPermission = false;
+	public hasDeleteTaskPermission = false;
+	public modalOptions: DecoratorOptions;
+	public model: any = {};
+	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 
 	constructor(
@@ -182,7 +182,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	/**
 	 * Close Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss(this.hasChanges);
 	}
 	/**
@@ -375,7 +375,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	/**
 	 * Create a note and update the datagrid task notes component
 	 */
-	protected createNote() {
+	public createNote() {
 		this.modelHelper.onCreateNote()
 			.subscribe((result) => {
 				if (result) {

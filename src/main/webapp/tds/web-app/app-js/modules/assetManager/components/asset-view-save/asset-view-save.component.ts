@@ -68,7 +68,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class AssetViewSaveComponent implements AfterViewInit {
 	model: ViewModel;
-	private isUnique = true;
+	public isUnique = true;
 	constructor(
 		model: ViewModel,
 		private favorites: ViewGroupModel,
@@ -95,17 +95,17 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		}
 	}
 
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 
-	protected confirmCloseDialog() {
+	public confirmCloseDialog() {
 		this.assetExpService.saveReport(this.model)
 			.subscribe(result => result && this.activeDialog.close(result),
 			error => this.activeDialog.dismiss(error));
 	}
 
-	protected isValid(): boolean {
+	public isValid(): boolean {
 		return this.model.name && this.model.name.trim() !== '' && this.isUnique;
 	}
 
@@ -113,7 +113,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	 * Disable the System View checkbox if the user does not have the proper permission
 	 * @returns {boolean}
 	 */
-	private isSystemCreatePermitted(): boolean {
+	public isSystemCreatePermitted(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
 	}
 
@@ -126,7 +126,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		}
 	}
 
-	protected onFavorite() {
+	public onFavorite() {
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
@@ -148,7 +148,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	}
 
-	protected onNameChanged() {
+	public onNameChanged() {
 		this.validateUniquenessDataViewByName(this.model.name);
 	}
 

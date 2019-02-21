@@ -9,7 +9,7 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 
 @Component({
 	selector: `asset-comment-view-edit`,
-	templateUrl: '../tds/web-app/app-js/modules/assetComment/components/view-edit/asset-comment-view-edit.component.html',
+	templateUrl: 'asset-comment-view-edit.component.html',
 	styles: []
 })
 export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnInit {
@@ -94,7 +94,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

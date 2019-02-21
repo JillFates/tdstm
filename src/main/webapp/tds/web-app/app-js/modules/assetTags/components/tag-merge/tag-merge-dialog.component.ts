@@ -9,7 +9,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tag-merge-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/assetTags/components/tag-merge/tag-merge-dialog.component.html',
+	templateUrl: 'tag-merge-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
 	},
@@ -17,13 +17,13 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 })
 export class TagMergeDialogComponent {
 
-	protected tagList: Array<TagModel> = [];
-	protected mergeToTag: TagModel;
+	public tagList: Array<TagModel> = [];
+	public mergeToTag: TagModel;
 
 	private readonly MERGE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.MERGE_CONFIRMATION';
 
 	constructor(
-		protected tagModel: TagModel,
+		public tagModel: TagModel,
 		private tagService: TagService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
@@ -51,7 +51,7 @@ export class TagMergeDialogComponent {
 	/**
 	 * On Merge button click, prompts a confirmation, then does the merge operation if confirmed.
 	 */
-	protected onMerge(): void {
+	public onMerge(): void {
 		this.promptService.open(
 			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
 			this.translatePipe.transform(this.MERGE_CONFIRMATION),
@@ -83,7 +83,7 @@ export class TagMergeDialogComponent {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.close(false);
 	}
 

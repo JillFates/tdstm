@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, QueryList, ElementRef} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, QueryList, ElementRef, Inject} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
@@ -18,7 +18,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'credential-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/credential/components/view-edit/credential-view-edit.component.html',
+	templateUrl: 'credential-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -78,7 +78,7 @@ export class CredentialViewEditComponent {
 	};
 	constructor(
 		public originalModel: CredentialModel,
-		public modalType: ActionType,
+		@Inject('modalType') public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
@@ -210,7 +210,7 @@ export class CredentialViewEditComponent {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

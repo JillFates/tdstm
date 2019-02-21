@@ -19,7 +19,7 @@ import {Component, Input} from '@angular/core';
 
 export class PopupAssetMessageComponent {
 	@Input() message: string;
-	private show = false;
+	public show = false;
 
 	public onToggle(): void {
 		this.show = !this.show;

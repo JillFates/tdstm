@@ -17,7 +17,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'provider-list',
-	templateUrl: '../tds/web-app/app-js/modules/provider/components/list/provider-list.component.html',
+	templateUrl: 'provider-list.component.html',
 	styles: [`
         #btnCreateProvider { margin-left: 16px; }
 	`]

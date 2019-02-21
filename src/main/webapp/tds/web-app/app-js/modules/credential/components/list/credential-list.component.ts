@@ -23,7 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'credential-list',
-	templateUrl: '../tds/web-app/app-js/modules/credential/components/list/credential-list.component.html',
+	templateUrl: 'credential-list.component.html',
 	styles: [`
 		#btnCreate { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }

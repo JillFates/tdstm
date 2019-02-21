@@ -47,7 +47,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	readonly CATEGORY_BY_TEAM = 'Team';
 	readonly CATEGORY_BY_NAMED_STAFF = 'Named Staff';
 	protected source: any[] ;
-	protected data: any;
+	public data: any;
 
 	ngOnInit() {
 		this.source = [];

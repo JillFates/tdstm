@@ -86,7 +86,7 @@ export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

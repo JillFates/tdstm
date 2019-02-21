@@ -67,15 +67,15 @@ export class DependentCommentComponent extends UIExtraDialog {
 	/**
 	 * On EscKey Pressed close the dialog.
 	 */
-	onEscKeyPressed(): void {
+	public onEscKeyPressed(): void {
 		this.cancelCloseDialog();
 	}
 
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 
-	protected onUpdateComment(): void {
+	public onUpdateComment(): void {
 		this.close(this.assetCommentModel);
 	}
 

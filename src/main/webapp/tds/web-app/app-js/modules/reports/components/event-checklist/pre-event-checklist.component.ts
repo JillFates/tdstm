@@ -64,11 +64,11 @@ declare var jQuery: any;
 	`
 })
 export class PreEventCheckListSelectorComponent implements OnInit {
-	protected model = {
+	public model = {
 		events: [],
 		defaultEvent: {id: null, text: ''}
 	};
-	protected html: SafeHtml;
+	public html: SafeHtml;
 
 	constructor(
 		private sanitizer: DomSanitizer,

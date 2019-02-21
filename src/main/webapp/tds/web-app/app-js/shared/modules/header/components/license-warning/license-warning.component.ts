@@ -33,8 +33,9 @@ declare var jQuery: any;
 })
 
 export class LicenseWarningComponent implements AfterContentInit {
-	protected userContext: UserContextModel;
+
 	protected permission: Permission = Permission;
+	public userContext: UserContextModel;
 
 	constructor(
 		private appSettingsService: UserContextService,

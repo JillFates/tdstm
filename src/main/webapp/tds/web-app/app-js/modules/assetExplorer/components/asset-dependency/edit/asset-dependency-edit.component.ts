@@ -4,7 +4,7 @@ import {DependencyType, Dependency} from '../model/asset-dependency.model';
 
 @Component({
 	selector: 'asset-dependency-edit',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/asset-dependency/edit/asset-dependency-edit.component.html'
+	templateUrl: 'asset-dependency-edit.component.html'
 })
 export class AssetDependencyEditComponent implements OnInit {
 	@Output() change: EventEmitter<any> = new EventEmitter<any>();
@@ -14,11 +14,11 @@ export class AssetDependencyEditComponent implements OnInit {
 	@Input() statusList: string[] = [];
 	@Input() typeList: string[] = [];
 	@Input() directionList: string[] = [];
-	protected DependencyType = DependencyType;
+	public DependencyType = DependencyType;
 
-	protected dependencies = {
-		a: {},
-		b: {}
+	public dependencies = {
+		a: <any>{},
+		b: <any>{}
 	};
 
 	ngOnInit() {
@@ -28,7 +28,7 @@ export class AssetDependencyEditComponent implements OnInit {
 
 	/**
 	 * Extract the dependency elements used by the form
-	 * @param {any} dependency Dependency containing all the informacion
+	 * @param {any} dependency Dependency containing all the information
 	 * @return {DependencyResults)
 	 */
 	private getDependencyElements(dependency: any): Dependency {
@@ -50,7 +50,7 @@ export class AssetDependencyEditComponent implements OnInit {
 	 * @param {DependencyType} type Type of dependency thas was changed
 	 * @return {void)
 	 */
-	protected notifyChanges(type: DependencyType): void {
+	public notifyChanges(type: DependencyType): void {
 		this.change.emit({type, dependencies: this.dependencies});
 	}
 }

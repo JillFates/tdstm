@@ -5,7 +5,7 @@ import { Connector } from './model/connector.model';
 	selector: 'tds-connector',
 	template: `
         <div class="tds-connector-component">
-            <button class="add-connector" (click)="onAdd('')">Add Connector</button>
+            <button class="add-connector" (click)="onAdd()">Add Connector</button>
             <div>
                 <div class="header">
                     <div class="delete-command">&nbsp;</div>

@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 @Component({
 	selector: `single-comment`,
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/single-comment/single-comment.component.html',
+	templateUrl: 'single-comment.component.html',
 	styles: []
 })
 export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
@@ -97,7 +97,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

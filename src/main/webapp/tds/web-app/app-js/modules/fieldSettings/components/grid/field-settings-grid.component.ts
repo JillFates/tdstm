@@ -23,7 +23,7 @@ declare var jQuery: any;
 	selector: 'field-settings-grid',
 	encapsulation: ViewEncapsulation.None,
 	exportAs: 'fieldSettingsGrid',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
+	templateUrl: 'field-settings-grid.component.html',
 	styles: [`
 		.k-grid { height:calc(100vh - 225px); }
 		tr .text-center { text-align: center; }
@@ -44,9 +44,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
-	private gridData: GridDataResult;
+	public gridData: GridDataResult;
 	public colors = FIELD_COLORS;
-	private state: State = {
+	public state: State = {
 		sort: [{
 			dir: 'asc',
 			field: 'order'
@@ -61,9 +61,9 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	};
 
-	private isEditing = false;
+	public isEditing = false;
 	private isFilterDisabled = false;
-	private sortable: boolean | object = { mode: 'single' };
+	public sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
@@ -93,7 +93,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
-	protected dataStateChange(state: DataStateChangeEvent): void {
+	public dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
 		this.refresh();
 	}
