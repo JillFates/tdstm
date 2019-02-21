@@ -255,10 +255,10 @@
 							<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
 							<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 							<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-							<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+							<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRackName}/${assetComment?.assetEntity.targetRackPosition}</dd>
+							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoomName}</dd>
+							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoomName}</dd>
 							<g:if test="${location == 'source'}">
 						   	<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>
@@ -272,7 +272,7 @@
 					</g:else>
 						<g:each in="${customs}" var="custom" status="i" >
 							<g:if test="${assetComment?.assetEntity?.(custom.field)}">
-								<dt>${project.(custom.field) ?: custom.field }:</dt>
+								<dt>${custom.label ?: custom.field }:</dt>
 								<dd>&nbsp;<tds:textAsLink text="${assetComment?.assetEntity.(custom.field)}" target="_new"/></dd>
 							</g:if>
 						</g:each>
