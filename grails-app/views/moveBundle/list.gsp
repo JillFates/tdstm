@@ -219,7 +219,5 @@
 		});
 	</script>
 
-	<g:render template="../layouts/chromeAutofillBug" />
-
 	</body>
 </html>
