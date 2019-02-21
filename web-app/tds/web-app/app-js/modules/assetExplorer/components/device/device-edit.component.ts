@@ -42,6 +42,8 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		private showBladeTargetInput: 'none'|'new'|'select' = 'none';
 		private bladeSourceOptions: Array<any> = [];
 		private bladeTargetOptions: Array<any> = [];
+		private readonly SET_TO_NULL = '0';
+		private readonly CREATE_NEW = '-1';
 
 		constructor(
 			@Inject('model') model: any,
@@ -108,73 +110,11 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 */
 		private onUpdate(): void {
 			let modelRequest = R.clone(this.model);
-
-			// currentAssetType, manufacturerId, modelId
-			modelRequest.asset.manufacturerId = null;
-			if ( this.model.asset.manufacturerSelectValue.id > 0 ) {
-				modelRequest.asset.manufacturerId = this.model.asset.manufacturerSelectValue.id.toString();
-			}
-			modelRequest.asset.currentAssetType = null;
-			if (this.model.asset.assetTypeSelectValue.id) {
-				modelRequest.asset.currentAssetType = this.model.asset.assetTypeSelectValue.id.toString();
-			}
-			modelRequest.asset.modelId = null;
-			if (this.model.asset.modelSelectValue.id > 0) {
-				modelRequest.asset.modelId = this.model.asset.modelSelectValue.id.toString();
-			}
-
-			// roomSourceId, roomSource(new room)
-			modelRequest.asset.roomSourceId = '0';
-			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
-				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
-			}
-			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
-			delete modelRequest.asset.newRoomSource;
-
-			// roomTargetId, roomTarget(new room)
-			modelRequest.asset.roomTargetId = '0';
-			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
-				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
-			}
-			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
-			delete modelRequest.asset.newRoomTarget;
-
-			// rackSourceId, rackSource (new rack)
-			modelRequest.asset.rackSourceId = '-1';
-			if (this.model.asset.rackSource && this.model.asset.rackSource.id > 0) {
-				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
-			}
-			modelRequest.asset.rackSource = this.model.asset.newRackSource;
-			delete modelRequest.asset.newRackSource;
-
-			// rackTargetId, rackTarget(new rack)
-			modelRequest.asset.rackTargetId = '-1';
-			if (this.model.asset.rackTarget && this.model.asset.rackTarget.id > 0) {
-				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
-			}
-			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
-			delete modelRequest.asset.newRackTarget;
-
-			// sourceChassis
-			if (this.model.asset.sourceChassis && this.model.asset.sourceChassis.id > 0) {
-				modelRequest.asset.sourceChassis = this.model.asset.sourceChassis.id.toString();
-			} else {
-				modelRequest.asset.sourceChassis = '0';
-			}
-
-			// targetChassis
-			if (this.model.asset.targetChassis && this.model.asset.targetChassis.id > 0) {
-				modelRequest.asset.targetChassis = this.model.asset.targetChassis.id.toString();
-			} else {
-				modelRequest.asset.targetChassis = '0';
-			}
+			this.prepareModelRequestToSave(modelRequest);
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-
-			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
 
 			// Custom Fields
 			this.model.customs.forEach((custom: any) => {
@@ -383,6 +323,87 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 */
 		protected onRoomTargetValueChange(event: any): void {
 			this.toggleAssetTypeFields();
+		}
+
+		/**
+		 * Cleanup parameter previous send them
+		 * @param modelRequest
+		 */
+		protected prepareModelRequestToSave(modelRequest: any): void {
+			// currentAssetType, manufacturerId, modelId
+			modelRequest.asset.manufacturerId = null;
+			if ( this.model.asset.manufacturerSelectValue.id > 0 ) {
+				modelRequest.asset.manufacturerId = this.model.asset.manufacturerSelectValue.id.toString();
+			}
+			modelRequest.asset.currentAssetType = null;
+			if (this.model.asset.assetTypeSelectValue.id) {
+				modelRequest.asset.currentAssetType = this.model.asset.assetTypeSelectValue.id.toString();
+			}
+			modelRequest.asset.modelId = null;
+			if (this.model.asset.modelSelectValue.id > 0) {
+				modelRequest.asset.modelId = this.model.asset.modelSelectValue.id.toString();
+			}
+
+			// roomSourceId, roomSource(new room)
+			modelRequest.asset.roomSourceId = this.SET_TO_NULL;
+			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
+				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
+			}
+			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
+			if (this.model.asset.newRoomSource) {
+				modelRequest.asset.roomSourceId = this.CREATE_NEW;
+			}
+			delete modelRequest.asset.newRoomSource;
+
+			// roomTargetId, roomTarget(new room)
+			modelRequest.asset.roomTargetId = this.SET_TO_NULL;
+			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
+				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
+			}
+			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
+			if (this.model.asset.newRoomTarget) {
+				modelRequest.asset.roomTargetId = this.CREATE_NEW;
+			}
+			delete modelRequest.asset.newRoomTarget;
+
+			// rackSourceId, rackSource (new rack)
+			modelRequest.asset.rackSourceId = this.SET_TO_NULL;
+			if (this.model.asset.rackSource && this.model.asset.rackSource.id > 0) {
+				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
+			}
+			modelRequest.asset.rackSource = this.model.asset.newRackSource;
+			if (this.model.asset.newRackSource) {
+				modelRequest.asset.rackSourceId = this.CREATE_NEW;
+			}
+			delete modelRequest.asset.newRackSource;
+
+			// rackTargetId, rackTarget(new rack)
+			modelRequest.asset.rackTargetId = this.SET_TO_NULL;
+			if (this.model.asset.rackTarget && this.model.asset.rackTarget.id > 0) {
+				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
+			}
+			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
+			if (this.model.asset.newRackTarget) {
+				modelRequest.asset.rackTargetId = this.CREATE_NEW;
+			}
+			delete modelRequest.asset.newRackTarget;
+
+			// sourceChassis
+			if (this.model.asset.sourceChassis && this.model.asset.sourceChassis.id > 0) {
+				modelRequest.asset.sourceChassis = this.model.asset.sourceChassis.id.toString();
+			} else {
+				modelRequest.asset.sourceChassis = this.SET_TO_NULL;
+			}
+
+			// targetChassis
+			if (this.model.asset.targetChassis && this.model.asset.targetChassis.id > 0) {
+				modelRequest.asset.targetChassis = this.model.asset.targetChassis.id.toString();
+			} else {
+				modelRequest.asset.targetChassis = this.SET_TO_NULL;
+			}
+
+			// Scale Format
+			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
 		}
 
 	}
