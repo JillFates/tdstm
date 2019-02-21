@@ -30,12 +30,6 @@ class TdsPasswordEncoder implements PasswordEncoder {
 			return false
 		}
 
-		// checkLegacyPassword
-
-		if (grailsApplication.config.getProperty('tdstm.security.localUser.forceUseNewEncryption', Boolean)) {
-			passwordService.forcePasswordChange()
-		}
-
-		true
+		return true
 	}
 }
