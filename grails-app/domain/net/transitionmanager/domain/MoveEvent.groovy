@@ -11,7 +11,7 @@ class MoveEvent {
 	public static final String METHOD_LINEAR = 'L'
 	public static final String METHOD_MANUAL = 'M'
 	public static final List<String> BASIC_EVENT_FIELDS = ['id', 'name']
-	public static final List<String> TMR_EVENT_FIELDS = BASIC_EVENT_FIELDS + ['description', 'dateCreated', 'lastUpdated', 'estStartTime', 'estCompletionTime']
+	public static final List<String> DETAILED_LIST_FIELDS = BASIC_EVENT_FIELDS + ['description', 'dateCreated', 'lastUpdated', 'estStartTime', 'estCompletionTime']
 
 	JdbcTemplate jdbcTemplate
 

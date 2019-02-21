@@ -18,11 +18,11 @@ class EventController implements ControllerMethods {
 	 * List all available Move Events for the user's current project including more detailed list of fields.
 	 */
 	@HasPermission(Permission.EventView)
-	def index(Long projectId) {
-		Project project = getProjectForWs(projectId)
+	def index() {
+		Project project = getProjectForWs()
 		List<MoveEvent> events = moveEventService.listMoveEvents(project)
 		List<Map> eventsMap = events.collect { event ->
-			GormUtil.domainObjectToMap(event, MoveEvent.TMR_EVENT_FIELDS, null, false)
+			GormUtil.domainObjectToMap(event, MoveEvent.DETAILED_LIST_FIELDS, null, false)
 		}
 		renderSuccessJson(eventsMap)
 	}
