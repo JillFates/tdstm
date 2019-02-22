@@ -45,7 +45,11 @@
 						</ng-template>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
-						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">Parameters</a>
+						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">
+							<span [ngClass]="{ 'invalid-form': (!validParametersForm && !isCurrentTab(tabsEnum.Parameters)) && modalType !== actionTypes.VIEW}">
+								Parameters
+							</span>
+						</a>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
 						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
