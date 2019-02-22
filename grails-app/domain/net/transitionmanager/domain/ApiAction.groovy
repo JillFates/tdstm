@@ -136,16 +136,21 @@ class ApiAction {
 	]
 
 	static constraints = {
-		connectorMethod size: 1..64
+		actionType nullable: false
+		apiCatalog nullable: true
 		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
+		commandLine nullable: true, size: 0..1024
+		connectorMethod size: 1..64
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
 		endpointUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&endpointUrlValidator
 		docUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&docUrlValidator
+		httpMethod nullable: true
 		isPolling range: 0..1
+		isRemote nullable: false
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
 		name size: 1..64, unique: 'project'
@@ -155,14 +160,11 @@ class ApiAction {
 		provider validator: providerValidator
 		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
 		reactionScriptsValid range: 0..1
+		remoteCredentialMethod nullable: true
+		script nullable: true, size: 0..65535
 		timeout min:0
 		useWithAsset range: 0..1
 		useWithTask range: 0..1
-		actionType nullable: false
-		script nullable: true, size: 0..65535
-		commandLine nullable: true, size: 0..1024
-		isRemote nullable: false
-		remoteCredentialMethod nullable: true
 	}
 
 	static mapping = {
@@ -220,15 +222,15 @@ class ApiAction {
 		try {
 			list = getMethodParamsListOrException()
 		} catch (e) {
-// TODO : JPM 3/2018 : DO NOT trap exceptions like this and pretend that it didn't happen. Users have no clue what went wrong
+			// TODO : JPM 3/2018 : DO NOT trap exceptions like this and pretend that it didn't happen. Users have no clue what went wrong
 			log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 		}
 		return list
 	}
 
-//
-// TODO : JPM 3/2018 : The getListMethodParams method name is really confusing with getMethodParamsList. Naming needs to be sorted out to be more intuitive.
-//		getMethodParamsAsListOfMap and getMethodParamsAsListOfObject ??
+	//
+	// TODO : JPM 3/2018 : The getListMethodParams method name is really confusing with getMethodParamsList. Naming needs to be sorted out to be more intuitive.
+	//		getMethodParamsAsListOfMap and getMethodParamsAsListOfObject ??
 
 	/**
 	 * return a list of ApiActionMethodParams from the methodParams JSON field

@@ -4,6 +4,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -640,7 +641,7 @@ class ApiActionService implements ServiceMethods {
 		// If all the properties are required, the entry for the ConnectorClass has to be overwritten with the following map.
 		if (!minimalInfo) {
 			AbstractConnector connector = connectorInstanceForAction(apiAction)
-			apiActionMap.connectorClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
+			apiActionMap.connectorClass = [id: apiAction.apiCatalog?.id, name: apiAction.apiCatalog?.name]
 			apiActionMap.version = apiAction.version
 			apiActionMap.actionType = [id: apiAction.actionType.name(), name: apiAction.actionType.getType()]
 			apiActionMap.remoteCredentialMethod = null
@@ -681,7 +682,13 @@ class ApiActionService implements ServiceMethods {
 		if (count > 0) {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
 		}
-	}
+
+		// Blank out the apiCatalog if not selected for scripts
+		if (cmdObj.actionType != ActionType.WEB_API.name()) {
+			cmdObj.apiCatalog?.discard()
+			cmdObj.apiCatalog = null
+		}
+ 	}
 
 	/**
 	 * Clone any existing api actions associated to sourceProject (if any),
