@@ -61,6 +61,7 @@ enum NavigationTab {
 export class APIActionViewEditComponent implements OnInit {
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
+	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
@@ -122,7 +123,7 @@ export class APIActionViewEditComponent implements OnInit {
 			value: 'User Defined'
 		}
 	];
-	private currentTab = 0;
+	private currentTab: NavigationTab = NavigationTab.Info;
 	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
@@ -146,6 +147,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
+	protected formValidStates = {
+		simpleInfoForm: { isValid: false, isSubmitted: false}
+	};
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -193,6 +197,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected prepareFormListener(): void {
 		setTimeout(() => {
+			if (this.simpleInfoForm) {
+				this.simpleInfoForm.valueChanges
+					.subscribe(() => this.setValidStateSimpleInfoForm());
+			}
+
 			if (this.apiActionForm) {
 				this.apiActionForm.valueChanges.subscribe(val => {
 					this.verifyIsValidForm();
@@ -434,16 +443,23 @@ export class APIActionViewEditComponent implements OnInit {
 		return this.currentTab === num;
 	}
 
-	protected setCurrentTab(num: number): void {
+	protected setCurrentTab(tab: NavigationTab): void {
+		// on leave previous tab, validate it
+		if (this.currentTab === NavigationTab.Info && this.simpleInfoForm) {
+			this.setValidStateSimpleInfoForm();
+		}
+
+		// ------------------
+
 		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();
 		}
-		if (num === 0) {
+		if (tab === NavigationTab.Info) {
 			this.prepareFormListener();
 		}
 
-		if (num === 2) {
+		if (tab === NavigationTab.Reactions) {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
@@ -451,7 +467,8 @@ export class APIActionViewEditComponent implements OnInit {
 				});
 			});
 		}
-		this.currentTab = num;
+
+		this.currentTab = tab;
 	}
 
 	protected isTabEnabled(actionType: APIActionType): boolean {
@@ -936,6 +953,15 @@ export class APIActionViewEditComponent implements OnInit {
 			} else {
 				eventReaction.value = '';
 			}
+		}
+	}
+
+	setValidStateSimpleInfoForm(): void {
+		if (this.simpleInfoForm) {
+			const isValidForm =  R.pathOr(false, ['form', 'valid'],  this.simpleInfoForm);
+			const isValidProvider =  R.pathOr(false, ['form', 'controls', 'simpleApiActionProvider', 'value', 'id'],  this.simpleInfoForm);
+
+			this.formValidStates.simpleInfoForm.isValid =  Boolean(isValidForm && isValidProvider);
 		}
 	}
 

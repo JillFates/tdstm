@@ -39,6 +39,7 @@ import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-
 import {UIAutoCenterDirective} from './directives/autocenter-directive';
 import {InputPasteDirective} from './directives/input-paste.directive';
 import {CopyClipboardDirective} from './directives/copy-clipboard.directive';
+import {UIRequiredComplexValueDirective} from './directives/required-complex-value';
 // Shared Pipes
 import {DateTimePipe} from './pipes/datetime.pipe';
 import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
@@ -126,6 +127,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
+		UIRequiredComplexValueDirective,
 		InputPasteDirective,
 		CopyClipboardDirective,
 		AkaComponent,
@@ -176,6 +178,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
+		UIRequiredComplexValueDirective,
 		AkaComponent,
 		ConnectorComponent,
 		PopupModule,

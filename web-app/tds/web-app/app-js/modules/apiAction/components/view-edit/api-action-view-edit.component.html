@@ -12,8 +12,13 @@
 					<li *ngIf="!originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
                         <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
 					</li>
+
 					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
-						<a href="#tab_simpleInfo" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
+						<a href="#tab_simpleInfo" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
+							<span [ngClass]="{ 'invalid-form': (!formValidStates.simpleInfoForm.isValid && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
+								Info
+							</span>
+						</a>
 					</li>
 					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
@@ -324,9 +329,20 @@
 							</div>
 						</form>
 					</div>
-					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.Info)" class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_simpleInfo">
+
+
+
+
+					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.Info)"
+					     class="tab-pane"
+					     style="padding-left:15px"
+					     [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}"
+					     id="tab_simpleInfo">
 						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
+								<div class="row">
+									@@REMOVE: {{formValidStates.simpleInfoForm.isValid}}
+								</div>
 								<div class="row">
 									<div class="col-md-7">
 										<div class="form-group">
@@ -340,7 +356,8 @@
 												       class="form-control"
 												       tabindex="1" autofocus
 												       [(ngModel)]="apiActionModel.name"
-												       required [ngClass]="{'has-error': (!simpleInfoForm.form.valid && simpleInfoForm.touched) && apiActionModel.name.length <= 0}" />
+												       required
+												       [ngClass]="{'has-error':  !simpleInfoForm.form.controls?.simpleApiActionName?.valid}" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.name}}</label>
@@ -359,7 +376,10 @@
 												                    [data]="providerList"
 												                    [textField]="'name'"
 												                    [valueField]="'id'"
-												                    [(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!simpleInfoForm.form.valid && simpleInfoForm.touched) && apiActionModel.provider?.id == 0}"></kendo-dropdownlist>
+												                    requiredComplexValue propertyName="id"
+												                    [(ngModel)]="apiActionModel.provider"
+												                    required class="form-control"
+												                    [ngClass]="{'has-error':  !simpleInfoForm.form.controls?.simpleApiActionProvider?.valid}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
@@ -368,7 +388,10 @@
 										<div class="form-group">
 											<label for="simpleApiActionDescription" class="col-sm-3 control-label">Description:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea type="text" id="simpleApiActionDescription" name="simpleApiActionDescription" class="form-control"
+												<textarea type="text"
+												          id="simpleApiActionDescription"
+												          name="simpleApiActionDescription"
+												          class="form-control"
 												          tabindex="3"
 												          [(ngModel)]="apiActionModel.description"></textarea>
 											</div>
@@ -417,6 +440,10 @@
 							</div>
 						</form>
 					</div>
+
+
+
+
 					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.HttpAPI)"  class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
 						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
