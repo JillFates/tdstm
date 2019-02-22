@@ -149,9 +149,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
-		simpleInfoForm: { isValid: false, isSubmitted: false, setupValidators: false},
-		httpAPIForm: {isValid: false, isSubmitted: false, setupValidators: false},
-		scriptForm: { isValid: true, isSubmitted: false, setupValidators: false},
+		simpleInfoForm: { isValid: false, isSubmitted: false, isConfiguredValidators: false},
+		httpAPIForm: {isValid: false, isSubmitted: false, isConfiguredValidators: false},
+		scriptForm: { isValid: true, isSubmitted: false, isConfiguredValidators: false},
 	};
 
 	constructor(
@@ -201,7 +201,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected prepareFormListener(): void {
 		setTimeout(() => {
 			if (this.simpleInfoForm) {
-				this.formValidStates.simpleInfoForm.setupValidators = true;
+				this.formValidStates.simpleInfoForm.isConfiguredValidators = true;
 				this.simpleInfoForm.valueChanges
 					.subscribe(() => this.setValidStateSimpleInfoForm());
 			}
@@ -455,23 +455,26 @@ export class APIActionViewEditComponent implements OnInit {
 		// set validators for current tab
 		// ------------------
 		if (tab === NavigationTab.HttpAPI) {
-			if (!this.formValidStates.httpAPIForm.setupValidators) {
+			if (!this.formValidStates.httpAPIForm.isConfiguredValidators) {
 				setTimeout(() => {
 					if (this.httpAPIForm) {
 						this.httpAPIForm.valueChanges
-							.subscribe(() => this.setValidStatehttpAPIForm());
-						this.formValidStates.httpAPIForm.setupValidators = true;
+							.subscribe(() => this.setValidStateHttpAPIForm());
+						this.formValidStates.httpAPIForm.isConfiguredValidators = true;
 					}
 				}, 1000);
 			} else {
-				this.setValidStatehttpAPIForm();
+				this.setValidStateHttpAPIForm();
 			}
 		}
 
 		// on leave previous tab, validate it
 		// ------------------
-		if (this.currentTab === NavigationTab.Info && this.simpleInfoForm) {
+		if (this.currentTab === NavigationTab.Info) {
 			this.setValidStateSimpleInfoForm();
+		}
+		if (this.currentTab === NavigationTab.HttpAPI) {
+			this.setValidStateHttpAPIForm();
 		}
 
 		// ------------------
@@ -983,7 +986,7 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
-	setValidStatehttpAPIForm(): void {
+	setValidStateHttpAPIForm(): void {
 		if (this.httpAPIForm) {
 			this.formValidStates.httpAPIForm.isValid =  this.httpAPIForm.valid;
 		}

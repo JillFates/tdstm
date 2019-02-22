@@ -29,7 +29,7 @@
 					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
 						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">HTTP API</span>
+							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">HTTP API</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
 							<a class="tab-disabled"><span>HTTP API</span></a>
