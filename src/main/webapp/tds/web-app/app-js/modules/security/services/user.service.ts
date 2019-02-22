@@ -3,9 +3,8 @@
  * For more specific endpoint, changes should be done on its specific module instead
  */
 import {Injectable} from '@angular/core';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
 
 @Injectable()
 export class UserService {
@@ -13,28 +12,24 @@ export class UserService {
 	private userUrl = '../ws/user';
 	private licenseUrl = '../ws';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getUserContext(): Observable<any> {
 		return this.http.get(`${this.userUrl}/context`)
-			.map((res: Response) => {
-				let result = res.json();
-				if (result && result.status === 'success') {
-					return result.data;
+			.map((response: any) => {
+				if (response && response.status === 'success') {
+					return response.data;
 				}
-			})
-			.catch((error: any) => error.json());
+			}).catch((error: any) => error);
 	}
 
 	getLicenseInfo(): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/license/info`)
-			.map((res: Response) => {
-				let result = res.json();
-				if (result && result.status === 'success') {
-					return result.data;
+			.map((response: any) => {
+				if (response && response.status === 'success') {
+					return response.data;
 				}
-			})
-			.catch((error: any) => error.json());
+			}).catch((error: any) => error);
 	}
 }

@@ -1,7 +1,6 @@
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchRecordModel} from '../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
@@ -12,7 +11,7 @@ export class ImportBatchService {
 	private readonly importBatchUrl = '../ws/import/batch';
 	private readonly batchProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -21,10 +20,8 @@ export class ImportBatchService {
 	 */
 	getImportBatches(): Observable<any> {
 		return this.http.get(this.importBatchesUrl)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -32,17 +29,12 @@ export class ImportBatchService {
 	 * @returns {Observable<any>}
 	 */
 	deleteImportBatches(ids: Array<number>): Observable<any> {
-		let body = JSON.stringify({ids: ids} );
-		const headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({
-			headers: headers,
-			body : body
-		});
-		return this.http.delete(this.importBatchesUrl, options)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'}), body: JSON.stringify({ids: ids} )
+		};
+		return this.http.delete(this.importBatchesUrl, httpOptions)
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -52,10 +44,8 @@ export class ImportBatchService {
 	 */
 	getImportBatch(id: number): Observable<any> {
 		return this.http.get(`${this.importBatchUrl}/${id}`)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -65,10 +55,8 @@ export class ImportBatchService {
 	 */
 	deleteImportBatch(id: number): Observable<any> {
 		return this.http.delete(`${this.importBatchesUrl}/${id}`)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -78,10 +66,8 @@ export class ImportBatchService {
 	 */
 	archiveImportBatch(id: number): Observable<any> {
 		return this.http.put(`${this.importBatchesUrl}/archive/${id}`, null)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -95,10 +81,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -108,10 +92,8 @@ export class ImportBatchService {
 	 */
 	unArchiveImportBatch(id: number): Observable<any> {
 		return this.http.put(`${this.importBatchesUrl}/unarchive/${id}`, null)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -125,10 +107,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -142,10 +122,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -159,10 +137,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -172,10 +148,8 @@ export class ImportBatchService {
 	 */
 	getImportBatchProgress(id: number): Observable<ApiResponseModel> {
 		return this.http.get(`${this.importBatchUrl}/${id}/progress`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -189,10 +163,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -202,10 +174,8 @@ export class ImportBatchService {
 	 */
 	getImportBatchRecords(id: number): Observable<ApiResponseModel> {
 		return this.http.get(this.importBatchUrl + `/${id}/records`)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -216,14 +186,14 @@ export class ImportBatchService {
 	 */
 	getImportBatchRecordUpdated(batchId: number, id: number): Observable<{} | ImportBatchRecordModel> {
 		return this.http.get(this.importBatchUrl + `/${batchId}/records`)
-			.map( (res: Response) => {
-				const batchRecords: Array<ImportBatchRecordModel> = res.json().data;
+			.map( (response: any) => {
+				const batchRecords: Array<ImportBatchRecordModel> = response.data;
 				let match: ImportBatchRecordModel = batchRecords.find( (item: ImportBatchRecordModel) => {
 					return item.id === id;
 				});
 				return match;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -233,10 +203,8 @@ export class ImportBatchService {
 	 */
 	getImportBatchRecordFieldDetail(batchId: number, id: number): Observable<ApiResponseModel> {
 		return this.http.get(this.importBatchUrl + `/${batchId}/record/${id}`)
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -250,10 +218,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -267,10 +233,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -284,10 +248,8 @@ export class ImportBatchService {
 			ids: ids
 		};
 		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
-			.map( (res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map( (response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -300,7 +262,7 @@ export class ImportBatchService {
 			fieldsInfo: fieldsValues
 		};
 		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

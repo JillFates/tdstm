@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
-import {HttpInterceptor} from '../providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -12,7 +11,7 @@ export class BulkChangeService {
 	// todo make URL work with a FQPN
 	private readonly BASE_URL = '../ws/bulkChange';
 
-	constructor(private http: HttpInterceptor) {}
+	constructor(private http: HttpClient) {}
 
 	/**
 	 * GET - Build the url passing arg variable segments
@@ -28,8 +27,8 @@ export class BulkChangeService {
 	 */
 	getFields(): Observable<any[]> {
 		return this.http.get(this.getURL('fields'))
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -49,9 +48,8 @@ export class BulkChangeService {
 		};
 
 		return this.http.put(this.getURL(), JSON.stringify(payload))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
 			.catch((error: any) => {
 				return error;
@@ -74,11 +72,10 @@ export class BulkChangeService {
 	 */
 	bulkDeleteAssets(ids: string[]): Observable<any> {
 		return this.http.post(`../ws/asset/deleteAssets`, JSON.stringify({ids: ids}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -88,8 +85,8 @@ export class BulkChangeService {
 	 */
 	bulkDeleteDependencies(ids: string[]): Observable<any> {
 		return this.http.post(`/tdstm/wsAsset/bulkDeleteDependencies`, JSON.stringify({dependencies: ids}))
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -98,13 +95,13 @@ export class BulkChangeService {
 	 */
 	getActions(): Observable<any[]> {
 		return this.http.get(this.getURL('actions'))
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	getAssetListOptions(assetClass: string): Observable<any> {
 		return this.http.get(`../ws/asset/defaultCreateModel/${assetClass}`)
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

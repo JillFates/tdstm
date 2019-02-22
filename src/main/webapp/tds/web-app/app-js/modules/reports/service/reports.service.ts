@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Response, RequestOptions, Headers} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
@@ -16,22 +15,20 @@ export class ReportsService {
 	private baseURL = '/tdstm';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
-	 *
 	 * Get events list
 	 * @returns {Observable<any>}
 	 */
 	getEvents(): Observable<any[]> {
 		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				return response && response.data || [];
 
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -43,11 +40,11 @@ export class ReportsService {
 	getPreventsCheckList(eventId: string): Observable<any> {
 		const payload = { moveEvent: eventId };
 		return this.http.post(`${this.baseURL}/ws/reports/generateCheckList`, JSON.stringify(payload))
-			.map((res: Response) => {
-				return res && res.text()  || '';
+			.map((response: any) => {
+				return response && response.text()  || '';
 
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -55,10 +52,9 @@ export class ReportsService {
 	 */
 	getDefaults(): Observable<any> {
 		return this.http.get(`${this.baseURL}/ws/task/taskCreateDefaults`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 }

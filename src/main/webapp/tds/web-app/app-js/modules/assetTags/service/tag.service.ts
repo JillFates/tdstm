@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {Headers, RequestOptions, Response} from '@angular/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {TagModel} from '../model/tag.model';
 
 @Injectable()
@@ -10,7 +9,7 @@ export class TagService {
 
 	private readonly tagURL = '../ws/tag';
 
-	constructor(private http: HttpInterceptor) {}
+	constructor(private http: HttpClient) {}
 
 	/**
 	 * GET - List of Tags
@@ -18,17 +17,16 @@ export class TagService {
 	 */
 	getTags(): Observable<ApiResponseModel> {
 		return this.http.get(this.tagURL)
-			.map((res: Response) => {
-				let jsonResult = res.json();
-				let models: Array<TagModel> = jsonResult && jsonResult.status === ApiResponseModel.API_SUCCESS && jsonResult.data;
+			.map((response: any) => {
+				let models: Array<TagModel> = response && response.status === ApiResponseModel.API_SUCCESS && response.data;
 				models = models.sort( (item1, item2) => this.sortTagsByColorThenByName(item1, item2));
 				models.forEach((model: TagModel) => {
 					model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : null);
 					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
 				});
-				return jsonResult;
+				return response;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -38,10 +36,8 @@ export class TagService {
 	 */
 	getTag(tagId: number): Observable<ApiResponseModel> {
 		return this.http.get(`${this.tagURL}/${tagId}`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -51,11 +47,10 @@ export class TagService {
 	 */
 	getTagByMoveBundleId(moveBundleId: number): Observable<ApiResponseModel> {
 		return this.http.get(`${this.tagURL}?moveBundleId=${moveBundleId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -65,11 +60,10 @@ export class TagService {
 	 */
 	getTagByMoveEventId(moveEventId: number): Observable<ApiResponseModel> {
 		return this.http.get(`${this.tagURL}?moveEventId=${moveEventId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -84,10 +78,8 @@ export class TagService {
 			color: tagModel.color
 		};
 		return this.http.put(`${this.tagURL}/${tagModel.id}`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -102,10 +94,8 @@ export class TagService {
 			color: tagModel.color
 		};
 		return this.http.post(this.tagURL, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -115,10 +105,8 @@ export class TagService {
 	 */
 	deleteTag(tagId: number): Observable<ApiResponseModel> {
 		return this.http.delete(`${this.tagURL}/${tagId}`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -128,10 +116,8 @@ export class TagService {
 	 */
 	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
 		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -140,10 +126,9 @@ export class TagService {
 	 */
 	getAssetTags(assetId: number): Observable<ApiResponseModel> {
 		return this.http.get(`${this.tagURL}/asset/${assetId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				if (result.data) {
-					let data = result.data.map(item => {
+			.map((response: any) => {
+				if (response.data) {
+					let data = response.data.map(item => {
 						let tagModel: any = {};
 						tagModel.id = item.tagId;
 						tagModel.name = item.name;
@@ -155,11 +140,11 @@ export class TagService {
 						return tagModel;
 					});
 					// sort tags by color then by name.
-					result.data = data.sort((item1, item2) => this.sortTagsByColorThenByName(item1, item2));
+					response.data = data.sort((item1, item2) => this.sortTagsByColorThenByName(item1, item2));
 				}
-				return result;
+				return response;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -198,10 +183,8 @@ export class TagService {
 			'assetId': assetId
 		};
 		return this.http.post(`${this.tagURL}/asset`, JSON.stringify(request))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -209,19 +192,13 @@ export class TagService {
 	 * @returns {Observable<ApiResponseModel>}
 	 */
 	deleteAssetTags(idsToDelete: Array<number>): Observable<ApiResponseModel> {
-		let body = JSON.stringify({
-			ids: idsToDelete
-		});
-		let headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({
-			headers: headers,
-			body : body
-		});
-		return this.http.delete(`${this.tagURL}/asset`, options)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'}), body: JSON.stringify({ids: idsToDelete})
+		};
+
+		return this.http.delete(`${this.tagURL}/asset`, httpOptions)
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**

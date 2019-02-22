@@ -1,15 +1,13 @@
 import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Headers, RequestOptions, Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {PreferenceService} from '../../../shared/services/preference.service';
 import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel} from '../../apiAction/model/api-action.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
-import {HttpResponse} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
@@ -22,21 +20,20 @@ export class CredentialService {
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/provider/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let providerModels = response && response.status === 'success' && response.data;
 				providerModels.forEach((r) => {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private transformApiActionModel(model: any): void {
@@ -68,9 +65,8 @@ export class CredentialService {
 
 	getCredentials(): Observable<CredentialModel[]> {
 		return this.http.get(`${this.credentialUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let credentialModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let credentialModels = response && response.status === 'success' && response.data;
 
 				credentialModels.forEach((model) => {
 					// r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
@@ -81,7 +77,7 @@ export class CredentialService {
 				});
 				return credentialModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -90,13 +86,12 @@ export class CredentialService {
 	 */
 	getCredential(id: number): Observable<CredentialModel> {
 		return this.http.get(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let model = response && response.status === 'success' && response.data;
 				this.processCredentialModel(model);
 				return model;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private processCredentialModel(model): void {
@@ -112,11 +107,10 @@ export class CredentialService {
 	 */
 	getCredentialEnumsConfig(): Observable<any> {
 		return this.http.get(`${this.credentialUrl}/enums`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveCredential(model: CredentialModel): Observable<CredentialModel> {
@@ -151,20 +145,18 @@ export class CredentialService {
 
 		if (!model.id) {
 			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
+				.map((response: any) => {
+					let dataItem = (response && response.status === 'success' && response.data);
 					return dataItem;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			postRequest.version = model.version;
 			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -175,11 +167,10 @@ export class CredentialService {
 	 */
 	validateAuthentication(credentialId: number): Observable<any> {
 		return this.http.post(`${this.credentialUrl}/test/${credentialId}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -192,9 +183,8 @@ export class CredentialService {
 			expression: validateExpression
 		};
 		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				let errorResult = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let errorResult = response && response.status === 'success' && response.data;
 				let errors = '';
 				if (errorResult['errors']) {
 					errorResult['errors'].forEach((error: string) => {
@@ -206,16 +196,15 @@ export class CredentialService {
 					error: errors
 				};
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteCredential(id: number): Observable<string> {
 		return this.http.delete(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	checkSyntax(script: string, filename: string): Observable<any> {
@@ -224,37 +213,32 @@ export class CredentialService {
 			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
+		const httpOptions = {
+			headers: new HttpHeaders({})
+		};
+
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, httpOptions)
+			.map((response: any) => {
+				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
-		let body = JSON.stringify({filename: filename} );
-		let headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({
-			headers: headers,
-			body : body
-		});
-		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
-			.map((res: Response) => {
-				let response = res.json();
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'}), body: JSON.stringify({filename: filename} )
+		};
+		return this.http.delete(`${this.fileSystemUrl}/delete`, httpOptions)
+			.map((response: any) => {
 				response.operation = 'delete';
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 	private getUserPreference(preferenceName: string): Observable<any> {
 		return this.preferenceService.getPreference(preferenceName);
