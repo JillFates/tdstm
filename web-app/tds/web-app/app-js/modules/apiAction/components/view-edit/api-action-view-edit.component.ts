@@ -72,6 +72,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
+	private WEB_API = 'WEB_API';
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -150,9 +151,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
-		simpleInfoForm: { isValid: false, isSubmitted: false, isConfiguredValidators: false},
-		httpAPIForm: {isValid: false, isSubmitted: false, isConfiguredValidators: false},
-		scriptForm: { isValid: false, isSubmitted: false, isConfiguredValidators: false},
+		simpleInfoForm: { isValid: false, isConfiguredValidators: false},
+		httpAPIForm: {isValid: false, isConfiguredValidators: false},
+		scriptForm: { isValid: false, isConfiguredValidators: false},
 	};
 
 	constructor(
@@ -265,8 +266,11 @@ export class APIActionViewEditComponent implements OnInit {
 					this.actionTypesList = [];
 					const keys = Object.keys(result.data.actionTypes);
 					keys.forEach((key: string) => {
-						this.actionTypesList.push({id: key, value: result.data.actionTypes[key]});
+						this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
 					});
+					if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
+						this.apiActionModel.actionType = { id: this.WEB_API};
+					}
 				}
 
 				if (result && result.data.remoteCredentialMethods) {
@@ -361,6 +365,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.getModalTitle();
 					this.apiActionModel.id = result.id;
 					this.apiActionModel.version = result.version;
+					this.apiActionModel.actionType = result.actionType;
 					this.dataSignature = JSON.stringify(this.apiActionModel);
 					this.dataParameterListSignature = JSON.stringify(this.parameterList);
 				}
@@ -1036,5 +1041,10 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 
 		return (this.validInfoForm && this.validParametersForm);
+	}
+
+	onDebug(): void {
+		console.log(this);
+		console.log('message');
 	}
 }

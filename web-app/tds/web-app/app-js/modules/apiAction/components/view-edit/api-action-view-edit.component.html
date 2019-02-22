@@ -438,13 +438,16 @@
 												                    id="simpleApiActionType"
 												                    name="simpleApiActionType"
 												                    [data]="actionTypesList"
-												                    [textField]="'value'"
+												                    [textField]="'name'"
 												                    [valueField]="'id'"
+												                    [disabled]="originalModel.tabActionType === EnumAPIActionType.HTTP_API"
 												                    [(ngModel)]="apiActionModel.actionType"
 												                    class="form-control"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.actionType}}</label>
+												<label class="control-label label-detail">
+													{{apiActionModel.actionType && apiActionModel.actionType.name}}
+												</label>
 											</div>
 										</div>
 
@@ -771,9 +774,9 @@
 									<div class="form-group">
 										<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<code-mirror #scriptCode
+											<code-mirror #codeMirror
 											             id="scriptCode"
-											             [mode]="scriptCode.mode"
+											             [mode]="codeMirror.mode"
 											             [(model)]="apiActionModel.script">
 											</code-mirror>
 										</div>
@@ -972,7 +975,11 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[0].open">
 												<div class="col-sm-12">
-													<code-mirror #codeMirror id="apiActionStatusDetermination" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[0].value"></code-mirror>
+													<code-mirror #codeMirror
+													             id="apiActionStatusDetermination"
+													             [mode]="codeMirror.mode"
+													             [(model)]="apiActionModel.eventReactions[0].value">
+													</code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[0].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
@@ -1170,5 +1177,6 @@
 				<span>{{'GLOBAL.CANCEL' | translate }}</span>
 			</span>
 		</button>
+		<button (click)="onDebug()"></button>
 	</div>
 </div>

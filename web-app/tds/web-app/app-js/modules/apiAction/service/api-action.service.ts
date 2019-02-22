@@ -222,6 +222,7 @@ export class APIActionService {
 			description: model.description,
 			provider: { id: model.provider.id },
 			apiCatalog: { id: model.dictionary.id },
+			actionType: model.actionType,
 			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
