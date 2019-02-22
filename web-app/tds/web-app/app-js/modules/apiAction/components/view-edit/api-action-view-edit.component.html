@@ -8,7 +8,8 @@
 	<div class="modal-body">
 		<div class="row">
 			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
-			<div>@@ HTTP API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
+			<div>@@ WEB API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
+			<div>@@ SCRIPT VALID: {{formValidStates.scriptForm.isValid}}</div>
 			<div>@@ INFO: {{validInfoForm}}</div>
 			<div>@@ PARAMETERS: {{validParametersForm}}</div>
 		</div>
@@ -29,17 +30,21 @@
 					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
 						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">HTTP API</span>
+							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
-							<a class="tab-disabled"><span>HTTP API</span></a>
+							<a class="tab-disabled"><span>WebAPI</span></a>
 						</ng-template>
 					</li>
 
 					<li *ngIf="originalModel.tabActionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
 						<a href="#tab_script" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
-						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab"><span>Script</span>
+						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab">
+							<span [ngClass]="{ 'invalid-form': (!formValidStates.scriptForm.isValid && formValidStates.scriptForm.isConfiguredValidators && !isCurrentTab(tabsEnum.Script)) && modalType !== actionTypes.VIEW}">
+								Script
+							</span>
 						</a>
+
 						<ng-template #labelTemplateScript>
 							<a class="tab-disabled"><span>Script</span></a>
 						</ng-template>
@@ -750,9 +755,12 @@
 											                    [defaultItem]="defaultItem"
 											                    class="form-control"
 											                    [data]="remoteCredentials"
+											                    required
+											                    requiredComplexValue propertyName="id"
 											                    [textField]="'value'"
 											                    [valueField]="'id'"
-											                    [(ngModel)]="apiActionModel.remoteCredentialMethod"></kendo-dropdownlist>
+											                    [(ngModel)]="apiActionModel.remoteCredentialMethod">
+											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>

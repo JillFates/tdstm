@@ -13,7 +13,7 @@ import {APIActionType} from '../../model/api-action.model';
 			</div>
 			<div class="modal-body">
 				<div>
-					<input type="radio" [value]="actionTypeEnum.HTTP_API" name="actionType" [(ngModel)]="model.actionType"> HTTP API
+					<input type="radio" [value]="actionTypeEnum.HTTP_API" name="actionType" [(ngModel)]="model.actionType"> WebAPI
 				</div>
 				<div>
 					<input type="radio" [value]="actionTypeEnum.SCRIPT" name="actionType" [(ngModel)]="model.actionType"> Script

@@ -61,6 +61,7 @@ enum NavigationTab {
 export class APIActionViewEditComponent implements OnInit {
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
+	@ViewChild('scriptForm') scriptForm: NgForm;
 	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
 	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
@@ -151,7 +152,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected formValidStates = {
 		simpleInfoForm: { isValid: false, isSubmitted: false, isConfiguredValidators: false},
 		httpAPIForm: {isValid: false, isSubmitted: false, isConfiguredValidators: false},
-		scriptForm: { isValid: true, isSubmitted: false, isConfiguredValidators: false},
+		scriptForm: { isValid: false, isSubmitted: false, isConfiguredValidators: false},
 	};
 
 	constructor(
@@ -176,6 +177,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
+		this.apiActionModel.script = this.apiActionModel.script || '';
 
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 		this.dataParameterListSignature = '';
@@ -468,6 +470,20 @@ export class APIActionViewEditComponent implements OnInit {
 			}
 		}
 
+		if (tab === NavigationTab.Script) {
+			if (!this.formValidStates.scriptForm.isConfiguredValidators) {
+				setTimeout(() => {
+					if (this.scriptForm) {
+						this.scriptForm.valueChanges
+							.subscribe(() => this.setValidStateScriptForm());
+						this.formValidStates.scriptForm.isConfiguredValidators = true;
+					}
+				}, 1000);
+			} else {
+				this.setValidStateScriptForm();
+			}
+		}
+
 		// on leave previous tab, validate it
 		// ------------------
 		if (this.currentTab === NavigationTab.Info) {
@@ -475,6 +491,10 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 		if (this.currentTab === NavigationTab.HttpAPI) {
 			this.setValidStateHttpAPIForm();
+		}
+
+		if (this.currentTab === NavigationTab.Script) {
+			this.setValidStateScriptForm();
 		}
 
 		// ------------------
@@ -989,6 +1009,12 @@ export class APIActionViewEditComponent implements OnInit {
 	setValidStateHttpAPIForm(): void {
 		if (this.httpAPIForm) {
 			this.formValidStates.httpAPIForm.isValid =  this.httpAPIForm.valid;
+		}
+	}
+
+	setValidStateScriptForm(): void {
+		if (this.scriptForm) {
+			this.formValidStates.scriptForm.isValid =  this.scriptForm.valid;
 		}
 	}
 

@@ -137,6 +137,7 @@ export class APIActionModel {
 	tabActionType?: APIActionType;
 	actionType?: string;
 	commandLine?: string;
+	isRemote?: boolean;
 	script?: any;
 	remoteInvocation?: boolean;
 	description: string;
