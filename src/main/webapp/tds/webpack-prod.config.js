@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+let AngularCompilerPlugin = require( "@ngtools/webpack" ).AngularCompilerPlugin;
 
 module.exports = function (env) {
 
@@ -26,8 +27,8 @@ module.exports = function (env) {
 		},
 		module: {
 			rules: [
-				{test: /\.tsx?$/, loader: 'ts-loader'},
-				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
+				{test: /(\.ngfactory\.js|\.ngstyle\.js|\.ts)$/, loader: "@ngtools/webpack"},
+				{test: /\.html$/i, loader: 'html-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
@@ -37,23 +38,12 @@ module.exports = function (env) {
 			new webpack.DefinePlugin({
 				NODE_ENV: '"production"'
 			}),
-			new webpack.ContextReplacementPlugin(
-				/\@angular(\\|\/)core(\\|\/)fesm5/,
-				path.resolve(__dirname, "app-js")
-			)
+			new AngularCompilerPlugin({
+				tsConfigPath: 'tsconfig.json',
+				entryModule: 'web-app/app-js/app/tds-app.module#TDSAppModule',
+				sourceMap: false
+			})
 		],
-		optimization: {
-			splitChunks: {
-				automaticNameDelimiter: '-',
-				cacheGroups: {
-					commons: {
-						test: /[\\/]node_modules[\\/]/,
-						name: "vendor",
-						chunks: 'all'
-					}
-				}
-			}
-		},
 		cache: true,
 		context: __dirname
 	}

@@ -4,7 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
-
+let AngularCompilerPlugin = require( "@ngtools/webpack" ).AngularCompilerPlugin;
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
@@ -29,8 +29,8 @@ module.exports = function (env) {
 		},
 		module: {
 			rules: [
-				{test: /\.tsx?$/, loader: 'ts-loader'},
-				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
+				{test: /(\.ngfactory\.js|\.ngstyle\.js|\.ts)$/, loader: "@ngtools/webpack"},
+				{test: /\.html$/i, loader: 'html-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
@@ -44,25 +44,14 @@ module.exports = function (env) {
 				filename: '[name].js.map',
 				exclude: ['vendor.js', 'polyfills.js']
 			}),
-			new webpack.ContextReplacementPlugin(
-				/\@angular(\\|\/)core(\\|\/)fesm5/,
-				path.resolve(__dirname, "app-js")
-			)
+			new AngularCompilerPlugin({
+				tsConfigPath: 'tsconfig.json',
+				entryModule: 'web-app/app-js/app/tds-app.module#TDSAppModule',
+				sourceMap: true
+			})
 			// Uncomment if you want to take a peek to the structure of dependencies
 			// new BundleAnalyzerPlugin()
 		],
-		optimization: {
-			splitChunks: {
-				automaticNameDelimiter: '-',
-				cacheGroups: {
-					commons: {
-						test: /[\\/]node_modules[\\/]/,
-						name: "vendor",
-						chunks: 'all'
-					}
-				}
-			}
-		},
 		cache: true,
 		context: __dirname,
 		watch: true,
