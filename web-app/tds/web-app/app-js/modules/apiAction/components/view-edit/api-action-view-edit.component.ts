@@ -506,11 +506,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected verifyIsValidForm(): void {
 		// Test API Action Form
 		if (this.apiActionForm) {
-			this.validInfoForm = this.apiActionForm.valid &&
-				(this.apiActionModel.agentMethod.id !== '0'
-					&& this.apiActionModel.dictionary.id !== 0
-					&& this.apiActionModel.provider.id !== 0
-					&& this.apiActionModel.httpMethod !== 'Select...');
+			this.validInfoForm = this.apiActionForm.valid;
 
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {
