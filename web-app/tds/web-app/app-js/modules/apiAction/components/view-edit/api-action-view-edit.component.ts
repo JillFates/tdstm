@@ -150,7 +150,8 @@ export class APIActionViewEditComponent implements OnInit {
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
 		simpleInfoForm: { isValid: false, isSubmitted: false, setupValidators: false},
-		httpAPIForm: {isValid: false, isSubmitted: false, setupValidators: false}
+		httpAPIForm: {isValid: false, isSubmitted: false, setupValidators: false},
+		scriptForm: { isValid: true, isSubmitted: false, setupValidators: false},
 	};
 
 	constructor(
@@ -992,4 +993,23 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
+	canSave(): boolean {
+		if (this.originalModel.tabActionType === APIActionType.HTTP_API) {
+			return (
+				this.formValidStates.simpleInfoForm.isValid &&
+				this.formValidStates.httpAPIForm.isValid &&
+				this.validParametersForm
+			)
+		}
+
+		if (this.originalModel.tabActionType === APIActionType.SCRIPT) {
+			return (
+				this.formValidStates.simpleInfoForm.isValid &&
+				this.formValidStates.scriptForm.isValid &&
+				this.validParametersForm
+			)
+		}
+
+		return (this.validInfoForm && this.validParametersForm);
+	}
 }

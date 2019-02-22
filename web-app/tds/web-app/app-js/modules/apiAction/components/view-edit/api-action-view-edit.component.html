@@ -9,6 +9,8 @@
 		<div class="row">
 			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
 			<div>@@ HTTP API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
+			<div>@@ INFO: {{validInfoForm}}</div>
+			<div>@@ PARAMETERS: {{validParametersForm}}</div>
 		</div>
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
@@ -711,7 +713,10 @@
 									<div class="form-group">
 										<label for="scriptCommandLine" class="col-sm-2 control-label">Command Line:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<input type="text" id="scriptCommandLine" name="scriptCommandLine" class="form-control"
+											<input type="text"
+											       id="scriptCommandLine"
+											       name="scriptCommandLine"
+											       class="form-control"
 											       [(ngModel)]="apiActionModel.commandLine" maxlength="1024" />
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
@@ -1122,7 +1127,8 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm ">
+		 class="btn btn-primary pull-left"
+		        [disabled]="!canSave()">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
