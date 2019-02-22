@@ -194,7 +194,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	private getModalTitle(): void {
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Action' : (this.modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail');
 	}
 
 	/**
