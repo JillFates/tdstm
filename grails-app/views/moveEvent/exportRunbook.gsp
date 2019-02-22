@@ -49,7 +49,7 @@
 			if (moveEvent) {
 			boo = true;
 			jQuery.ajax({
-				url: '/moveEvent/runbookStats',
+				url: contextPath + '/moveEvent/runbookStats',
 				data: {'id':moveEvent, 'viewUnpublished':($('#viewUnpublishedId').is(':checked') ? 1 : 0)},
 				type:'POST',
 				complete: function(e) {
