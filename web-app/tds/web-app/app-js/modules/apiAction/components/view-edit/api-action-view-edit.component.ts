@@ -62,6 +62,7 @@ export class APIActionViewEditComponent implements OnInit {
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
 	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
+	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
@@ -148,7 +149,8 @@ export class APIActionViewEditComponent implements OnInit {
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
-		simpleInfoForm: { isValid: false, isSubmitted: false}
+		simpleInfoForm: { isValid: false, isSubmitted: false, setupValidators: false},
+		httpAPIForm: {isValid: false, isSubmitted: false, setupValidators: false}
 	};
 
 	constructor(
@@ -198,6 +200,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected prepareFormListener(): void {
 		setTimeout(() => {
 			if (this.simpleInfoForm) {
+				this.formValidStates.simpleInfoForm.setupValidators = true;
 				this.simpleInfoForm.valueChanges
 					.subscribe(() => this.setValidStateSimpleInfoForm());
 			}
@@ -207,6 +210,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.verifyIsValidForm();
 				});
 			}
+
 			this.verifyIsValidForm();
 		}, 100);
 	}
@@ -444,7 +448,27 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	protected setCurrentTab(tab: NavigationTab): void {
+		console.log('Set current tab');
+		console.log('-----');
+
+		// set validators for current tab
+		// ------------------
+		if (tab === NavigationTab.HttpAPI) {
+			if (!this.formValidStates.httpAPIForm.setupValidators) {
+				setTimeout(() => {
+					if (this.httpAPIForm) {
+						this.httpAPIForm.valueChanges
+							.subscribe(() => this.setValidStatehttpAPIForm());
+						this.formValidStates.httpAPIForm.setupValidators = true;
+					}
+				}, 1000);
+			} else {
+				this.setValidStatehttpAPIForm();
+			}
+		}
+
 		// on leave previous tab, validate it
+		// ------------------
 		if (this.currentTab === NavigationTab.Info && this.simpleInfoForm) {
 			this.setValidStateSimpleInfoForm();
 		}
@@ -529,7 +553,7 @@ export class APIActionViewEditComponent implements OnInit {
 				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: '0', name: 'Select...'});
+						this.agentMethodList.push({id: 0, name: 'Select...'});
 
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
@@ -958,10 +982,13 @@ export class APIActionViewEditComponent implements OnInit {
 
 	setValidStateSimpleInfoForm(): void {
 		if (this.simpleInfoForm) {
-			const isValidForm =  R.pathOr(false, ['form', 'valid'],  this.simpleInfoForm);
-			const isValidProvider =  R.pathOr(false, ['form', 'controls', 'simpleApiActionProvider', 'value', 'id'],  this.simpleInfoForm);
+			this.formValidStates.simpleInfoForm.isValid =  this.simpleInfoForm.valid;
+		}
+	}
 
-			this.formValidStates.simpleInfoForm.isValid =  Boolean(isValidForm && isValidProvider);
+	setValidStatehttpAPIForm(): void {
+		if (this.httpAPIForm) {
+			this.formValidStates.httpAPIForm.isValid =  this.httpAPIForm.valid;
 		}
 	}
 

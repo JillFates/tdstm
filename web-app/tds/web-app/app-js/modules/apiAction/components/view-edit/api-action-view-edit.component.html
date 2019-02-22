@@ -6,6 +6,10 @@
 		<h4 class="modal-title">{{modalTitle}}</h4>
 	</div>
 	<div class="modal-body">
+		<div class="row">
+			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
+			<div>@@ HTTP API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
+		</div>
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
@@ -22,12 +26,14 @@
 					</li>
 					<li *ngIf="originalModel.tabActionType" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
-						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab"><span>HTTP API</span>
+						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
+							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">HTTP API</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
 							<a class="tab-disabled"><span>HTTP API</span></a>
 						</ng-template>
 					</li>
+
 					<li *ngIf="originalModel.tabActionType" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
 						<a href="#tab_script" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
 						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab"><span>Script</span>
@@ -341,9 +347,6 @@
 						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
-									@@REMOVE: {{formValidStates.simpleInfoForm.isValid}}
-								</div>
-								<div class="row">
 									<div class="col-md-7">
 										<div class="form-group">
 											<label for="simpleApiActionName" class="col-sm-3 control-label">Name:
@@ -378,8 +381,8 @@
 												                    [valueField]="'id'"
 												                    requiredComplexValue propertyName="id"
 												                    [(ngModel)]="apiActionModel.provider"
-												                    required class="form-control"
-												                    [ngClass]="{'has-error':  !simpleInfoForm.form.controls?.simpleApiActionProvider?.valid}"></kendo-dropdownlist>
+												                    required class="form-control">
+												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
@@ -442,9 +445,8 @@
 					</div>
 
 
-
-
-					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.HttpAPI)"  class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
+					<div *ngIf="originalModel.tabActionType && isCurrentTab(tabsEnum.HttpAPI)"  class="tab-pane" style="padding-left:15px"
+					     [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
 						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -464,8 +466,9 @@
 												                    [textField]="'name'"
 												                    [valueField]="'id'"
 												                    [(ngModel)]="apiActionModel.dictionary"
-												                    required class="form-control"
-												                    [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.dictionary?.id == 0}">
+												                    requiredComplexValue propertyName="id"
+												                    required
+												                    class="form-control">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -485,10 +488,11 @@
 												                    [textField]="'name'"
 												                    [valueField]="'id'"
 												                    (open)="onOpenAgentMethod()"
+												                    requiredComplexValue propertyName="id"
 												                    (valueChange)="onMethodValueChange($event)"
 												                    [(ngModel)]="apiActionModel.agentMethod"
 												                    [disabled]="!apiActionModel.dictionary.id"
-												                    required [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.agentMethod?.id == '0'}">
+												                    required>
 													<ng-template kendoDropDownListItemTemplate let-dataItem>
 														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
 													</ng-template>
@@ -518,7 +522,10 @@
 										<div class="form-group">
 											<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="httpTabApiEndpointURL" name="httpTabApiEndpointURL" class="form-control"
+												<input type="text"
+												       id="httpTabApiEndpointURL"
+												       name="httpTabApiEndpointURL"
+												       class="form-control"
 												       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -538,7 +545,7 @@
 												                    tabindex="8"
 												                    [data]="httpMethodList"
 												                    required
-												                    [ngClass]="{'has-error':  !httpAPIForm.form.valid && apiActionModel.httpMethod === 'Select...'}"
+												                    requiredCustomEmpty empty="Select..."
 												                    [(ngModel)]="apiActionModel.httpMethod">
 												</kendo-dropdownlist>
 											</div>
