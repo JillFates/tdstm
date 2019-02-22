@@ -25,11 +25,15 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
+		const authReq = request.clone({
+			setHeaders: { 'Content-Type': 'application/json' }
+		});
+
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'
 		});
 
-		return next.handle(request).pipe(
+		return next.handle(authReq).pipe(
 			map((event: HttpEvent<any>) => {
 				if (event instanceof HttpResponse) {
 					// Detects if the user has been rejected do time Session expiration
