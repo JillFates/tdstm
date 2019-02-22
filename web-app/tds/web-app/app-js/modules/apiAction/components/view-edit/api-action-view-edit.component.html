@@ -6,6 +6,7 @@
 		<h4 class="modal-title">{{modalTitle}}</h4>
 	</div>
 	<div class="modal-body">
+		<!--
 		<div class="row">
 			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
 			<div>@@ WEB API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
@@ -13,6 +14,7 @@
 			<div>@@ INFO: {{validInfoForm}}</div>
 			<div>@@ PARAMETERS: {{validParametersForm}}</div>
 		</div>
+		-->
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
@@ -184,7 +186,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
 											</div>
 										</div>
 									</div>
@@ -343,7 +345,7 @@
                                             </div>
                                             <div *ngIf="modalType === actionTypes.VIEW"
                                                  class="col-sm-9">
-                                                <label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== 'Select...' ? apiActionModel.httpMethod : ''}}</label>
+                                                <label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
                                             </div>
                                         </div>
 									</div>
@@ -464,7 +466,9 @@
 
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.remoteInvocation}}</label>
+												<label class="control-label label-detail">
+													{{apiActionModel.remoteInvocation ? 'Yes' : 'No'}}
+												</label>
 											</div>
 										</div>
 
@@ -544,7 +548,7 @@
 												                    [(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -579,7 +583,7 @@
 											</div>
 											<div *ngIf="modalType === actionTypes.VIEW"
 											     class="col-sm-8">
-												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== 'Select...' ? apiActionModel.httpMethod : ''}}</label>
+												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
 											</div>
 										</div>
 									</div>
@@ -766,7 +770,7 @@
 											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
 										</div>
 									</div>
 								</div>
@@ -781,7 +785,7 @@
 											</code-mirror>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
+											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
 										</div>
 									</div>
 								</div>
@@ -949,14 +953,14 @@
 														<input  type="checkbox" name="apiActionBeforeCall"
 																(change)="onEventReactionSelect(apiActionModel.eventReactions[7])"
 																[(ngModel)]="apiActionModel.eventReactions[7].selected"
-																[disabled]="(apiActionModel.eventReactions[7].value.length > 0 && apiActionModel.eventReactions[7].value !== eventBeforeCallText) || modalType === actionTypes.VIEW"> Before API Call
+																[disabled]="(apiActionModel.eventReactions[7].value.length > 0 && apiActionModel.eventReactions[7].value !== eventBeforeCallText) || modalType === actionTypes.VIEW">Before Invocation
 													</label>
 												</div>
 											</div>
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Action
+														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Invocation
 													</label>
 												</div>
 											</div>
@@ -1111,7 +1115,7 @@
 										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel()">Customize:</label>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected">
 											<div class="form-group">
-												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before API Call <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
+												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(7)" [(model)]="apiActionModel.eventReactions[7]" (onClick)="verifyCode(apiActionModel.eventReactions[7])"></tds-check-action>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
@@ -1131,7 +1135,7 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected">
 											<div class="form-group">
-												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Action <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
+												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(8)" [(model)]="apiActionModel.eventReactions[8]" (onClick)="verifyCode(apiActionModel.eventReactions[8])"></tds-check-action>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">

@@ -73,6 +73,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
+	protected PLEASE_SELECT = 'Select...';
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -141,11 +142,11 @@ export class APIActionViewEditComponent implements OnInit {
 	public checkActionModel = CHECK_ACTION;
 	private lastSelectedDictionaryModel: DictionaryModel = {
 		id: 0,
-		name: 'Select...'
+		name: this.PLEASE_SELECT
 	};
 	private lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: '0',
-		name: 'Select...'
+		name: this.PLEASE_SELECT
 	};
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
@@ -226,7 +227,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.providerList.push({ id: 0, name: 'Select...' });
+					this.providerList.push({ id: 0, name: this.PLEASE_SELECT });
 					this.apiActionModel.provider = this.providerList[0];
 					this.modifySignatureByProperty('provider');
 				}
@@ -244,7 +245,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getAPIActionEnums().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.dictionaryList.push({ id: 0, name: 'Select...' });
+					this.dictionaryList.push({ id: 0, name: this.PLEASE_SELECT });
 					this.apiActionModel.dictionary = this.dictionaryList[0];
 					this.modifySignatureByProperty('dictionary');
 				}
@@ -252,11 +253,11 @@ export class APIActionViewEditComponent implements OnInit {
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 					this.onDictionaryValueChange(this.apiActionModel.dictionary);
 				} else {
-					this.agentMethodList.push({ id: '0', name: 'Select...' });
+					this.agentMethodList.push({ id: '0', name: this.PLEASE_SELECT });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
 				}
-				this.httpMethodList.push('Select...');
+				this.httpMethodList.push(this.PLEASE_SELECT);
 				this.httpMethodList.push(...result.data.httpMethod);
 				if (!this.apiActionModel.httpMethod) {
 					this.apiActionModel.httpMethod = this.httpMethodList[0];
@@ -270,6 +271,9 @@ export class APIActionViewEditComponent implements OnInit {
 					});
 					if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
 						this.apiActionModel.actionType = { id: this.WEB_API};
+						this.apiActionModel.remoteInvocation = false;
+					} else {
+						this.apiActionModel.remoteInvocation = true;
 					}
 				}
 
@@ -292,7 +296,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getCredentials().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
-					this.agentCredentialList.push({ id: 0, name: 'Select...' });
+					this.agentCredentialList.push({ id: 0, name: this.PLEASE_SELECT });
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
 				}
@@ -310,7 +314,7 @@ export class APIActionViewEditComponent implements OnInit {
 			(result: any) => {
 				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
 				if (this.modalType === ActionType.CREATE) {
-					this.datascriptList.push({ id: 0, name: 'Select...' });
+					this.datascriptList.push({ id: 0, name: this.PLEASE_SELECT });
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
@@ -578,7 +582,7 @@ export class APIActionViewEditComponent implements OnInit {
 				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: 'Select...'});
+						this.agentMethodList.push({id: 0, name: this.PLEASE_SELECT});
 
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
@@ -594,7 +598,7 @@ export class APIActionViewEditComponent implements OnInit {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', name: 'Select...'});
+				this.agentMethodList.push({id: '0', name: this.PLEASE_SELECT});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -739,12 +743,12 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Populate only the Credentials that are related to the provider
 		this.providerCredentialList = new Array<CredentialModel>();
-		this.providerCredentialList.push({id: 0, name: 'Select...'});
+		this.providerCredentialList.push({id: 0, name: this.PLEASE_SELECT});
 		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
 
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({id: 0, name: 'Select...'});
+		this.providerDatascriptList.push({id: 0, name: this.PLEASE_SELECT});
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
 
 		if (previousValue) {
