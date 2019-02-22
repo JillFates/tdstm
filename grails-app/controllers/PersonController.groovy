@@ -340,7 +340,7 @@ class PersonController implements ControllerMethods {
 			params.teams = params.list("function")
 			Person person = personService.updatePerson(params, true)
 			if (params.tab) {
-				forward(action: 'loadGeneral', params :[tab: params.tab, personId:person.id])
+				forward(action: 'loadGeneral', params :[personId:person.id])
 			} else {
 				renderAsJson(name: person.firstName, tz: tzId)
 			}

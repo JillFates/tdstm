@@ -82,7 +82,7 @@
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" value="${assetComment.category}"></g:select>
+				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" value="${assetComment.category}"></g:select>
 				<g:if test="${assetComment.moveEvent}">
 		   		  <span style="margin-left:60px;">Move Event:</span>
 		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
@@ -107,11 +107,11 @@
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
 					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
 					</g:if>
 					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
 					</g:else>
 				</td>	

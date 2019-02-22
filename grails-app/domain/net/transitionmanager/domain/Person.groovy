@@ -42,25 +42,25 @@ class Person extends Party {
 
 	static constraints = {
 		active blank: false, inList: ['Y', 'N']
-		country nullable: true
-		department nullable: true
+		country nullable: true, size: 0..255
+		department nullable: true, size: 0..255
 		email matches: "(?:[a-zA-Z0-9!#\\\$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#\\\$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(([0-9a-f]{1,4}:){7}([0-9a-f]){1,4}|(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\]))", nullable: true
 		firstName blank: false, size: 1..34
-		keyWords nullable: true
+		keyWords nullable: true, size: 0..255
 		lastName size: 0..34
-		location nullable: true
+		location nullable: true, size: 0..255
 		middleName size: 0..20
-		mobilePhone nullable: true, phoneNumber: true
+		mobilePhone nullable: true, phoneNumber: true, size: 0..255
 		modelScore nullable: true
 		nickName nullable: true, size: 0..34
-		personImageURL nullable: true
+		personImageURL nullable: true, size: 0..255
 		staffType blank: false, inList: ['Contractor', 'Hourly', 'Salary']
-		stateProv nullable: true
-		tdsLink nullable: true
-		tdsNote nullable: true
+		stateProv nullable: true, size: 0..255
+		tdsLink nullable: true, size: 0..255
+		tdsNote nullable: true, size: 0..255
 		title nullable: true, size: 0..34
 		travelOK range: 0..1
-		workPhone nullable: true, phoneNumber: true
+		workPhone nullable: true, phoneNumber: true, size: 0..255
 		userLogin nullable: true
 	}
 

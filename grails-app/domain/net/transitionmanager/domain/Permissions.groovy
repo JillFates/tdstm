@@ -26,10 +26,10 @@ class Permissions {
 	static constraints = {
 		description nullable: true
 		permissionItem blank: false, unique: true
-		rolePermissions cascade: 'all-delete-orphan'
 	}
 
 	static mapping = {
 		version false
+		rolePermissions cascade: 'all-delete-orphan'
 	}
 }

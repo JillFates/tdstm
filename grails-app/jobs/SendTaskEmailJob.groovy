@@ -1,11 +1,9 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.CommentService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 import org.quartz.TriggerKey
 import org.quartz.spi.MutableTrigger
-
 /**
  * Sends email messages by invoking commentService.sendTaskEmail(params) with the
  * context parameters. This uses the TDSTM-Email Quartz group that will allow
@@ -63,9 +61,6 @@ class SendTaskEmailJob {
 			}
 		}catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

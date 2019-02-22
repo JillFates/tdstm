@@ -13,8 +13,8 @@ class Files extends AssetEntity {
 	String LUN
 
 	static constraints = {
-		fileFormat nullable: true
-		LUN(nullable: true)
+		fileFormat nullable: true, size: 0..255
+		LUN(nullable: true, size: 0..255)
 	}
 
 	static mapping = {

@@ -223,21 +223,21 @@ class AssetEntity {
 	static hasMany = [comments: AssetComment, tagAssets: TagAsset]
 
 	static constraints = {
-		application nullable: true
-		assetName blank: false
-		shortName nullable: true
-		assetType nullable: true
+		application nullable: true, size: 0..255
+		assetName blank: false, size: 0..255
+		shortName nullable: true, size: 0..255
+		assetType nullable: true, size: 0..255
 		priority nullable: true, validator: inList(optionsClosure(PRIORITY_OPTION), 'priority')
 		planStatus nullable: true, validator: inList(optionsClosure(STATUS_OPTION), 'planStatus')
 		purchaseDate nullable: true
 		purchasePrice nullable: true
-		department nullable: true
-		costCenter nullable: true
-		maintContract nullable: true
+		department nullable: true, size: 0..255
+		costCenter nullable: true, size: 0..255
+		maintContract nullable: true, size: 0..255
 		maintExpDate nullable: true
 		retireDate nullable: true
-		description nullable: true
-		supportType nullable: true
+		description nullable: true, size: 0..255
+		supportType nullable: true, size: 0..255
 		environment nullable: true, size: 0..20, validator: inList(optionsClosure(ENVIRONMENT_OPTION), 'environment')
 
 		// we can save some redundant space by dynamically setting all 96 columns to be nullable in a loop;
@@ -249,12 +249,12 @@ class AssetEntity {
 
 		project nullable: false
 
-		serialNumber nullable: true
-		assetTag nullable: true
+		serialNumber nullable: true, size: 0..255
+		assetTag nullable: true, size: 0..255
 		manufacturer nullable: true
 		model nullable: true
-		ipAddress nullable: true
-		os nullable: true
+		ipAddress nullable: true, size: 0..255
+		os nullable: true, size: 0..255
 		usize nullable: true
 
 		sourceRackPosition nullable: true
@@ -265,10 +265,10 @@ class AssetEntity {
 		targetChassis nullable: true
 		targetBladePosition nullable: true
 
-		virtualHost nullable: true
-		truck nullable: true
-		cart nullable: true
-		shelf nullable: true
+		virtualHost nullable: true, size: 0..255
+		truck nullable: true, size: 0..255
+		cart nullable: true, size: 0..255
+		shelf nullable: true, size: 0..255
 		railType nullable: true, inList: RAIL_TYPES
 
 		// TODO : owner should not be nullable - remove and test
@@ -277,13 +277,13 @@ class AssetEntity {
 		rackSource nullable: true
 		roomTarget nullable: true
 		rackTarget nullable: true
-		appOwner nullable: true
-		appSme nullable: true
+		appOwner nullable: true, size: 0..255
+		appSme nullable: true, size: 0..255
 
 		// MoveBundleAsset fields
 		validation size: 0..20, inList: ValidationType.list
 		dependencyBundle nullable: true
-		externalRefId nullable: true
+		externalRefId nullable: true, size: 0..255
 
 		size nullable: true
 		scale nullable: true, inList: SizeScale.keys
