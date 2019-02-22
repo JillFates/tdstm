@@ -1046,9 +1046,4 @@ export class APIActionViewEditComponent implements OnInit {
 
 		return (this.validInfoForm && this.validParametersForm);
 	}
-
-	onDebug(): void {
-		console.log(this);
-		console.log('message');
-	}
 }
