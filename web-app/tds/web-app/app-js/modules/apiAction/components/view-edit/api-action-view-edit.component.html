@@ -7,6 +7,7 @@
 	</div>
 	<div class="modal-body"
 	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
+		<!--
 		<div class="row">
 			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
 			<div>@@ WEB API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
@@ -14,6 +15,7 @@
 			<div>@@ INFO: {{validInfoForm}}</div>
 			<div>@@ PARAMETERS: {{validParametersForm}}</div>
 		</div>
+		-->
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
@@ -300,8 +302,8 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
-																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
-																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
+																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0">
+												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
                                                 <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
@@ -381,8 +383,7 @@
 												       class="form-control"
 												       tabindex="1" autofocus
 												       [(ngModel)]="apiActionModel.name"
-												       required
-												       [ngClass]="{'has-error':  !simpleInfoForm.form.controls?.simpleApiActionName?.valid}" />
+												       required/>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.name}}</label>
@@ -434,6 +435,7 @@
 												                    id="simpleApiActionType"
 												                    name="simpleApiActionType"
 												                    [data]="actionTypesList"
+												                    (valueChange)="onChangeType($event)"
 												                    required
 												                    requiredComplexValue propertyName="id"
 												                    [textField]="'name'"
@@ -695,8 +697,7 @@
 												                    [textField]="'name'"
 												                    [valueField]="'id'"
 												                    [(ngModel)]="apiActionModel.defaultDataScript"
-												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
-												                    [ngClass]="{'has-error':  (!httpAPIForm.form.valid && httpAPIForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
+												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
@@ -1165,6 +1166,7 @@
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
 			<span class="fa fa-fw fa-trash"></span> Delete</button>
+
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">

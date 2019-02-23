@@ -133,11 +133,18 @@ export class APIActionViewEditComponent implements OnInit {
 	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
-			name: 'groovy' // Looks like we lack of JS support for coloring
+			name: 'Groovy' // Looks like we lack of JS support for coloring
 		},
 		rows: 10,
 		cols: 4
 	};
+
+	protected languages = {
+		GROOVY_SCRIPT : 'Groovy',
+		POWER_SHELL : 'PowerShell',
+		UNIX_SHELL : 'Shell'
+	};
+
 	public validInfoForm = false;
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
@@ -169,7 +176,7 @@ export class APIActionViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
-		// this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 	}
 
 	ngOnInit(): void {
@@ -186,7 +193,6 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
 
-		this.dataSignature = JSON.stringify(this.apiActionModel);
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
 
@@ -222,6 +228,7 @@ export class APIActionViewEditComponent implements OnInit {
 			}
 
 			this.verifyIsValidForm();
+			this.dataSignature = JSON.stringify(this.apiActionModel);
 		}, 100);
 	}
 
@@ -554,14 +561,6 @@ export class APIActionViewEditComponent implements OnInit {
 		// Test API Action Form
 		if (this.apiActionForm) {
 			this.validInfoForm = this.apiActionForm.valid;
-
-			if (!this.validInfoForm && !this.initFormLoad) {
-				for (let i in this.apiActionForm.controls) {
-					if (this.apiActionForm.controls[i]) {
-						this.apiActionForm.controls[i].markAsTouched();
-					}
-				}
-			}
 			this.initFormLoad = false;
 		}
 		if (this.editModeFromView) {
@@ -967,7 +966,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	private modifySignatureByProperty(property: any): void {
-		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.apiActionModel[property]);
+		if (this.dataSignature) {
+			this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.apiActionModel[property]);
+		}
 	}
 
 	/**
@@ -1045,7 +1046,7 @@ export class APIActionViewEditComponent implements OnInit {
 	canSave(): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
 
-		if (actionTypeId === this.WEB_API) {
+		if (this.hasEarlyAccessTMRPermission &&  actionTypeId === this.WEB_API) {
 			return (
 				this.formValidStates.simpleInfoForm.isValid &&
 				this.formValidStates.httpAPIForm.isValid &&
@@ -1053,7 +1054,7 @@ export class APIActionViewEditComponent implements OnInit {
 			)
 		}
 
-		if (actionTypeId !== null && actionTypeId !== this.WEB_API) {
+		if (this.hasEarlyAccessTMRPermission && actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
 				this.formValidStates.simpleInfoForm.isValid &&
 				this.formValidStates.scriptForm.isValid &&
@@ -1061,6 +1062,14 @@ export class APIActionViewEditComponent implements OnInit {
 			)
 		}
 
-		return (this.validInfoForm && this.validParametersForm);
+		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm);
+	}
+
+	onChangeType(type: any): void {
+		const language = this.languages[type.id];
+
+		if (language) {
+			this.codeMirror.mode.name = language
+		}
 	}
 }
