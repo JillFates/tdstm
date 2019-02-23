@@ -5,7 +5,8 @@
 		</button>
 		<h4 class="modal-title">{{modalTitle}}</h4>
 	</div>
-	<div class="modal-body">
+	<div class="modal-body"
+	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
 		<div class="row">
 			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
 			<div>@@ WEB API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
@@ -67,8 +68,7 @@
 								<div class="row">
 									<div class="col-md-7">
 										<div class="form-group">
-											<label for="apiActionName" class="col-sm-3 control-label">Name:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="apiActionName" class="col-sm-3 control-label required-field">Name:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<input type="text"
@@ -84,8 +84,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="apiActionProvider" class="col-sm-3 control-label">Provider:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="apiActionProvider" class="col-sm-3 control-label required-field">Provider:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
@@ -120,8 +119,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="apiActionDictionary" class="col-sm-3 control-label">Dictionary:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="apiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist id="apiActionDictionary"
@@ -143,8 +141,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="apiActionMethod" class="col-sm-3 control-label">Method:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="apiActionMethod" class="col-sm-3 control-label required-field">Method:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist id="apiActionMethod"
@@ -325,9 +322,8 @@
 											</div>
 										</div>
                                         <div class="form-group">
-                                            <label for="httpMethodList" class="col-sm-3 control-label url-label">
+                                            <label for="httpMethodList" class="col-sm-3 control-label url-label required-field">
                                                 Http Method:
-                                                <span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
                                             </label>
                                             <div *ngIf="modalType !== actionTypes.VIEW"
                                                  class="col-sm-9" style="width: 39%;">
@@ -376,8 +372,7 @@
 								<div class="row">
 									<div class="col-md-7">
 										<div class="form-group">
-											<label for="simpleApiActionName" class="col-sm-3 control-label">Name:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="simpleApiActionName" class="col-sm-3 control-label required-field">Name:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<input type="text"
@@ -394,8 +389,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="simpleApiActionProvider" class="col-sm-3 control-label">Provider:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="simpleApiActionProvider" class="col-sm-3 control-label required-field">Provider:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #simpleApiActionProvider
@@ -430,7 +424,8 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="simpleApiActionType" class="col-sm-3 control-label required-field">
+											<label for="simpleApiActionType"
+											       class="col-sm-3 control-label required-field">
 												Type:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
@@ -485,8 +480,7 @@
 								<div class="row">
 									<div class="col-md-7">
 										<div class="form-group">
-											<label for="httpTabApiActionDictionary" class="col-sm-3 control-label">Dictionary:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="httpTabApiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist id="httpTabApiActionDictionary"
@@ -509,8 +503,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="httpTabApiActionMethod" class="col-sm-3 control-label">Method:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
+											<label for="httpTabApiActionMethod" class="col-sm-3 control-label required-field">Method:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist id="httpTabApiActionMethod"
@@ -566,9 +559,8 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label">
+											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label required-field">
 												Http Method:
-												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div *ngIf="modalType !== actionTypes.VIEW"
 											     class="col-sm-8">
@@ -756,7 +748,7 @@
 								</div>
 								<div class="row">
 									<div class="form-group">
-										<label for="scriptCredentials" class="col-sm-2 control-label">Credentials:</label>
+										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 											<kendo-dropdownlist id="scriptCredentials"
 											                    name="scriptCredentials"

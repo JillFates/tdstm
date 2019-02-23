@@ -169,7 +169,7 @@ export class APIActionViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
-		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
+		// this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 	}
 
 	ngOnInit(): void {

@@ -72,7 +72,8 @@
   .k-widget.ng-invalid
     .k-input
       color: gray
-  .required-field::after
-    content: "*"
-    color: $color-message-error--red
-    margin-left: 4px
+  .modal-body.is-edit-mode
+    .required-field::after
+      content: "*"
+      color: $color-message-error--red
+      margin-left: 4px
