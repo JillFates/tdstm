@@ -71,4 +71,8 @@
     cursor: not-allowed
   .k-widget.ng-invalid
     .k-input
-      color: $grey
+      color: gray
+  .required-field::after
+    content: "*"
+    color: $color-message-error--red
+    margin-left: 4px

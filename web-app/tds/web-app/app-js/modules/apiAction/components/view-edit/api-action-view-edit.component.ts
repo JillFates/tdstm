@@ -10,6 +10,7 @@ import {
 	EVENT_BEFORE_CALL_TEXT
 } from '../../model/api-action.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
+import {Permission} from '../../../../shared/model/permission.model';
 import {APIActionService} from '../../service/api-action.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
@@ -25,6 +26,7 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import * as R from 'ramda';
 import {Observable} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 declare var jQuery: any;
 
@@ -156,15 +158,18 @@ export class APIActionViewEditComponent implements OnInit {
 		httpAPIForm: {isValid: false, isConfiguredValidators: false},
 		scriptForm: { isValid: false, isConfiguredValidators: false},
 	};
+	protected hasEarlyAccessTMRPermission = false;
 
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
 		public promptService: UIPromptService,
+		public permissionService: PermissionService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 	}
 
 	ngOnInit(): void {
@@ -529,7 +534,17 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	protected isTabEnabled(actionType: APIActionType): boolean {
-		return this.originalModel.tabActionType === actionType;
+		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
+
+		if (actionType === APIActionType.HTTP_API) {
+			return actionTypeId === this.WEB_API;
+		}
+
+		if (actionType === APIActionType.SCRIPT) {
+			return actionTypeId !== null && actionTypeId !== this.WEB_API;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1028,7 +1043,9 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	canSave(): boolean {
-		if (this.originalModel.tabActionType === APIActionType.HTTP_API) {
+		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
+
+		if (actionTypeId === this.WEB_API) {
 			return (
 				this.formValidStates.simpleInfoForm.isValid &&
 				this.formValidStates.httpAPIForm.isValid &&
@@ -1036,7 +1053,7 @@ export class APIActionViewEditComponent implements OnInit {
 			)
 		}
 
-		if (this.originalModel.tabActionType === APIActionType.SCRIPT) {
+		if (actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
 				this.formValidStates.simpleInfoForm.isValid &&
 				this.formValidStates.scriptForm.isValid &&
