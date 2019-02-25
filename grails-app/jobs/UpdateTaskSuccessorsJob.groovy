@@ -1,20 +1,18 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskNonTranService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 import org.quartz.TriggerKey
 import org.quartz.spi.MutableTrigger
-
 /**
  * Invokes TaskService.sendTaskEmail(params) with the context parameters. This
  * uses the TDSTM-Email Quartz group that will allow several emails to be sent concurrently.
  */
 class UpdateTaskSuccessorsJob {
 
-	def group = 'tdstm-task-update'
-	def concurrent = false
+	static group = 'tdstm-task-update'
+	static concurrent = false
 	static triggers = {}
 
 	TaskNonTranService taskNonTranService
@@ -64,8 +62,6 @@ class UpdateTaskSuccessorsJob {
 			}
 		}catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-		}finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

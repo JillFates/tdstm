@@ -105,7 +105,7 @@
             </tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" value="${assetComment.category}"></g:select>
+				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" value="${assetComment.category}"></g:select>
 				<g:if test="${assetComment.moveEvent}">
 		   		  <span style="margin-left:60px;">Move Event:</span>
 		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
@@ -132,11 +132,11 @@
 				</td>
 				<td id="statusEditTrId_${assetComment.id}">
 					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']" onChange="showResolve()" disabled="true"></g:select>
 					</g:if>
 					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']" onChange="showResolve()"></g:select>
 					</g:else>
 				</td>
@@ -255,10 +255,10 @@
 							<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
 							<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 							<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-							<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+							<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRackName}/${assetComment?.assetEntity.targetRackPosition}</dd>
+							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoomName}</dd>
+							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoomName}</dd>
 							<g:if test="${location == 'source'}">
 						   	<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>
@@ -272,7 +272,7 @@
 					</g:else>
 						<g:each in="${customs}" var="custom" status="i" >
 							<g:if test="${assetComment?.assetEntity?.(custom.field)}">
-								<dt>${project.(custom.field) ?: custom.field }:</dt>
+								<dt>${custom.label ?: custom.field }:</dt>
 								<dd>&nbsp;<tds:textAsLink text="${assetComment?.assetEntity.(custom.field)}" target="_new"/></dd>
 							</g:if>
 						</g:each>

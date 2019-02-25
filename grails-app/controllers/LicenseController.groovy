@@ -1,9 +1,6 @@
-import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
-import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 
 @Secured('isAuthenticated()')

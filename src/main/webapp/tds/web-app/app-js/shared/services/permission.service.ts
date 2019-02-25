@@ -9,7 +9,7 @@ import {Injectable} from '@angular/core';
 // Other
 import {Observable} from 'rxjs';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {HttpInterceptor} from '../providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class PermissionService {
@@ -21,7 +21,7 @@ export class PermissionService {
 	/**
 	 * @param http
 	 */
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -30,11 +30,10 @@ export class PermissionService {
 	 */
 	public getPermissions(): Observable<any> {
 		if (this.permissionsList.getValue().length === 0) {
-			return this.http.get(this.permissionUrl).map((res) => {
-				let result = res.json();
-				this.permissionsList.next(result.data);
-				return result.data;
-			}).catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			return this.http.get(this.permissionUrl).map((response: any) => {
+				this.permissionsList.next(response.data);
+				return response.data;
+			}).catch((error: any) => Observable.throw(error || 'Server error'));
 		}
 		return Observable.from(this.permissions);
 	}

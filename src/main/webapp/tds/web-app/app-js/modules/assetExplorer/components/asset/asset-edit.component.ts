@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 
 import {Observable} from 'rxjs';
-import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
 import {DatabaseEditComponent} from '../database/database-edit.component';
@@ -32,7 +32,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 		inj: Injector,
 		comp: Compiler,
 		mod: NgModuleRef<any>,
-		private http: HttpInterceptor,
+		private http: HttpClient,
 		private tagService: TagService,
 		@Inject('ID') private modelId: number,
 		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
@@ -44,9 +44,9 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 			Observable.zip(
 				this.http.get(`../ws/asset/editTemplate/${this.modelId}`),
 				this.http.get(`../ws/asset/editModel/${this.modelId}`))
-				.subscribe(res => {
-					let template = res[0].text();
-					let model = res[1].json();
+				.subscribe((response: any) => {
+					let template = response[0].text();
+					let model = response[1];
 
 					switch (this.asset) {
 						case 'APPLICATION':

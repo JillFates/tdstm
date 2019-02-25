@@ -1,3 +1,5 @@
+// Angular
+import {HttpClient} from '@angular/common/http';
 import {
 	Component,
 	AfterViewInit,
@@ -10,7 +12,6 @@ import {
 } from '@angular/core';
 
 import {Observable} from 'rxjs';
-import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
 import {DatabaseCreateComponent} from '../database/database-create.component';
@@ -32,7 +33,7 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 		inj: Injector,
 		comp: Compiler,
 		mod: NgModuleRef<any>,
-		private http: HttpInterceptor,
+		private http: HttpClient,
 		private tagService: TagService,
 		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
 		super(inj, comp, mod);
@@ -43,9 +44,9 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 			Observable.zip(
 				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
 				this.http.get(`../ws/asset/defaultCreateModel/${this.asset}`))
-				.subscribe(res => {
-					let template = res[0].text();
-					let model = res[1].json();
+				.subscribe((response: any) => {
+					let template = response[0].text();
+					let model = response[1];
 
 					// Get the default custom values
 					const customs = {};

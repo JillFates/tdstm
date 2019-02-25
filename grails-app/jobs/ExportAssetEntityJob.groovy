@@ -1,4 +1,3 @@
-import com.tdssrc.grails.GormUtil
 import com.tdsops.common.lang.ExceptionUtil
 import net.transitionmanager.service.AssetExportService
 import net.transitionmanager.service.ProgressService
@@ -8,7 +7,7 @@ import org.quartz.JobExecutionContext
 class ExportAssetEntityJob {
 
 	// Quartz Properties
-	def group = 'tdstm-export-asset'
+	static group = 'tdstm-export-asset'
 	// def concurrent = false
 	static triggers = { }
 
@@ -28,8 +27,6 @@ class ExportAssetEntityJob {
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.fail(dataMap.key, e.getMessage())
-		} finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

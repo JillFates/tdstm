@@ -24,8 +24,8 @@ class CoreService implements ServiceMethods {
 	 * Used to retrieve the name of the application
 	 * @throws GrailsConfigurationException if application name is not found
 	 */
-	String getAppName() {
-		String name = Metadata.current.getApplicationName()
+	String getAppName(String overrideAppNameForTesting=null) {
+		String name = Metadata.current.getApplicationName() ?: overrideAppNameForTesting
 		if (!name) {
 			throw new GrailsConfigurationException("Unable to determine application name")
 		}
@@ -77,8 +77,8 @@ class CoreService implements ServiceMethods {
 	 * @return The property setting or null if not defined
 	 * @throws GrailsConfigurationException if application name or app configuration not found
 	 */
-	def getAppConfigSetting(String setting) {
-		return getConfigSetting(getAppName() + '.' + setting)
+	def getAppConfigSetting(String setting, String overrideAppNameForTesting=null) {
+		return getConfigSetting(getAppName(overrideAppNameForTesting) + '.' + setting)
 	}
 
 	/**

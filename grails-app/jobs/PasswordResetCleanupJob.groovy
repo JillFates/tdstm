@@ -1,5 +1,4 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.SecurityService
 import org.quartz.JobExecutionContext
 
@@ -11,7 +10,8 @@ class PasswordResetCleanupJob {
 		// This is used to test running the job 2 minutes after the application starts
 		// cron name: 'passwordResetCleanupJob', cronExpression: "15 0/2 * * * ?"
 	}
-	def group = 'tdstm-password-reset-cleanup'
+
+	static group = 'tdstm-password-reset-cleanup'
 
 	SecurityService securityService
 
@@ -25,9 +25,6 @@ class PasswordResetCleanupJob {
 		catch (e) {
 			log.error "execute() encountered exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			// progressService.fail(progressKey, e.message))
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

@@ -14,6 +14,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.security.CustomSecurityProvider
 import net.transitionmanager.task.TaskFacade
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -35,6 +36,8 @@ beans = {
 	applicationContextHolder(ApplicationContextHolder) { bean ->
 		bean.factoryMethod = 'getInstance'
 	}
+
+
 
 	permissionEvaluator(TdsPermissionEvaluator)
 
@@ -69,6 +72,17 @@ beans = {
 		accessDeniedHandler = ref('accessDeniedHandler')
 		authenticationTrustResolver = ref('authenticationTrustResolver')
 		throwableAnalyzer = ref('throwableAnalyzer')
+	}
+
+	daoAuthenticationProvider(CustomSecurityProvider){
+		passwordService = ref('passwordService')
+		userDetailsService = ref('userDetailsService')
+		passwordEncoder = ref('passwordEncoder')
+		saltSource = ref('saltSource')
+		preAuthenticationChecks = ref('preAuthenticationChecks')
+		postAuthenticationChecks = ref('postAuthenticationChecks')
+		authoritiesMapper = ref('authoritiesMapper')
+		userCache = ref('userCache')
 	}
 
 	securityBeanFactoryPostProcessor(SecurityBeanFactoryPostProcessor)

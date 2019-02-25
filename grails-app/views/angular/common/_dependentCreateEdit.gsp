@@ -116,7 +116,7 @@
 					<%-- Dataflow --%>
 					<td>
 						<g:select name="dataFlowFreq_dependent_${dependent.id}"
-							value="${dependent.dataFlowFreq}" from="${dependent.constrainedProperties.dataFlowFreq.inList}"
+							value="${dependent.dataFlowFreq}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(dependent.class).dataFlowFreq.inList}"
 						></g:select>
 					</td>
 

@@ -1,12 +1,11 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.ProgressService
 import org.quartz.JobExecutionContext
 
 class GenerateDependencyGroupsJob {
 
-	def group = 'tdstm-dependency-groups'
+	static group = 'tdstm-dependency-groups'
 	static triggers = {}
 
 	MoveBundleService moveBundleService
@@ -46,9 +45,6 @@ class GenerateDependencyGroupsJob {
 		catch (e) {
 			log.error "execute() moveBundleService.generateDependencyGroups received exception $e.message\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.fail(progressKey, e.message)
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

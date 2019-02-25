@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Response, RequestOptions, Headers } from '@angular/http';
 import {BehaviorSubject, Observable} from 'rxjs';
-import { HttpInterceptor } from '../providers/http-interceptor.provider';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 import {catchError, map} from 'rxjs/operators';
 
@@ -42,7 +41,7 @@ export class PreferenceService {
 	private preferencesList = new BehaviorSubject([]);
 	private currentPreferences = this.preferencesList.asObservable();
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	// query a set of user preferences passed as arg variables
@@ -52,23 +51,21 @@ export class PreferenceService {
 
 	getPreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.pipe(map((res: Response) => {
-				let response = res.json();
+			.pipe(map((response: any) => {
 				Object.keys(response.data.preferences).forEach((key) => {
 					this.preferences[key] = response.data.preferences[key];
 				});
 				return this.preferences;
 			}))
-			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
+			.pipe(catchError((error: any) => Observable.throw(error || 'Server error')));
 	}
 
 	getSinglePreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.pipe(map((res: Response) => {
-				let response = res.json();
+			.pipe(map((response: any) => {
 				return response.data.preferences[preferenceCode];
 			}))
-			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
+			.pipe(catchError((error: any) => Observable.throw(error || 'Server error')));
 	}
 
 	/**
@@ -77,12 +74,11 @@ export class PreferenceService {
 	 * @param value
 	 */
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/x-www-form-urlencoded');
-		const requestOptions = new RequestOptions({headers: headers});
-
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'})
+		};
 		const body = `code=${preferenceCode}&value=${value}`;
-		return this.http.post(this.preferenceUrlPost, body, requestOptions);
+		return this.http.post(this.preferenceUrlPost, body, httpOptions);
 	}
 
 	/**

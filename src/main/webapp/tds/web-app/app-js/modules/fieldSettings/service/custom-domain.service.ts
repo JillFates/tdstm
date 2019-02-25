@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {Response} from '@angular/http';
 import {Observable} from 'rxjs';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/forkJoin';
@@ -7,7 +6,7 @@ import 'rxjs/add/operator/bufferCount';
 import {FieldSettingsModel} from '../model/field-settings.model';
 import {DomainModel} from '../model/domain.model';
 import {DOMAIN} from '../../../shared/model/constants';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {SortUtils} from '../../../shared/utils/sort.utils';
 
 import 'rxjs/add/operator/map';
@@ -15,26 +14,25 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class CustomDomainService {
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getDistinctValues(domain: string, field: FieldSettingsModel): Observable<string[]> {
 		return this.http.post(`../wsCustomDomain/distinctValues/${domain}`, JSON.stringify({ fieldSpec: field }))
-			.map(res => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	getCommonFieldSpecs(): Observable<DomainModel[]> {
 		return this.http.get('../ws/customDomain/fieldSpecsWithCommon')
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let domains: DomainModel[] = Object.keys(response).map(key => {
 					response[key].domain = response[key].domain.toUpperCase();
 					return response[key];
 				});
 				return domains as any;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -46,9 +44,8 @@ export class CustomDomainService {
 	 */
 	getFieldSpecsPerDomain(domainsFields: any = 'task'): Observable<DomainModel[]> {
 		return this.http.get(`../ws/apiAction/fields?domains=${domainsFields}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let resultSet = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let resultSet = response && response.status === 'success' && response.data;
 				let domains: DomainModel[] = [];
 				if (resultSet.domains) {
 					resultSet.domains.forEach(d => {
@@ -77,7 +74,7 @@ export class CustomDomainService {
 				}
 				return domains as any;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -116,16 +113,10 @@ export class CustomDomainService {
 	}
 
 	getInvalidValues(domain: string, field: FieldSettingsModel): Observable<string[]> {
-		// return this.http.post(`../wsCustomDomain/invalidValues/${domain}`, JSON.stringify(field))
-		//     .map(res => res.json())
-		//     .catch((error: any) => error.json());
 		return Observable.from(['value1', 'value2', 'value3', 'value4']).bufferCount(4);
 	}
 
 	checkConstraints(domain: string, field: FieldSettingsModel): Observable<boolean> {
-		// return this.http.post(`../wsCustomDomain/checkConstraints/${domain}`, JSON.stringify(field))
-		//     .map(res => res.json())
-		//     .catch((error: any) => error.json());
 		return Observable.from([true]);
 	}
 
