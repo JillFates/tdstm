@@ -444,6 +444,17 @@ quartz {
     jdbcStore = false
 }
 
+testing {
+	foo {
+		intVal = 123
+		stringVal = 'abc'
+		configVal {
+			intVal = 123
+			stringVal = 'abc'
+		}
+	}
+}
+
 /*
 The parameter url-exclude-pattern is a regular expression to exclude some urls from monitoring as written above.
  */

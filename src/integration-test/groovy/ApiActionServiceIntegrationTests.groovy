@@ -243,7 +243,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 		then: "This API Action should no longer exist"
 			apiActionService.find(apiAction.id, project) == null
 		and: "There's no ApiAction for this project"
-			apiActionService.list(project).size() == 2
+			apiActionService.list(project).size() == 0
 	}
 
 	def "7. tests deleting an API Action for a different project"() {
@@ -255,8 +255,8 @@ class ApiActionServiceIntegrationTests extends Specification{
 			List<Map> actions1 = apiActionService.list(project)
 			List<Map> actions2 = apiActionService.list(project2)
 		then: "Both lists of actions have only one element"
-			actions1.size() == 3
-			actions2.size() == 3
+			actions1.size() == 1
+			actions2.size() == 1
 		and: "Each list contains the expected element"
 			actions1.get(0)["id"] == apiAction1.id || actions1.get(1)["id"] == apiAction1.id || actions1.get(2)["id"] == apiAction1.id
 			actions2.get(0)["id"] == apiAction2.id || actions2.get(1)["id"] == apiAction2.id || actions2.get(2)["id"] == apiAction2.id
@@ -265,9 +265,9 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiActionService.delete(apiAction1.id, project, true)
 			actions2 = apiActionService.list(project2)
 		then: "The corresponding project doesn't have any API Action left"
-			apiActionService.list(project).size() == 2
+			apiActionService.list(project).size() == 0
 		and: "The other project still has its API Action"
-			actions2.size() == 3
+			actions2.size() == 1
 			actions2.get(0)["id"] == apiAction2.id || actions2.get(1)["id"] == apiAction2.id || actions2.get(2)["id"] == apiAction2.id
 
 		when: "Trying to delete an API Action that belongs to some other project"

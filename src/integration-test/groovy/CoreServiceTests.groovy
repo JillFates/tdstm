@@ -1,5 +1,6 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import grails.util.Metadata
 import net.transitionmanager.service.CoreService
 import org.grails.core.exceptions.GrailsConfigurationException
 import org.grails.config.NavigableMap
@@ -13,7 +14,7 @@ class CoreServiceTests extends Specification {
 
 	void "getAppName"() {
 		expect: 'Should return the application name'
-		coreService.getAppName() == 'tdstm'
+			coreService.getAppName() == Metadata.current.getApplicationName()
 	}
 
 	void "getAppConfig"() {
