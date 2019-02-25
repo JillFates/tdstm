@@ -65,6 +65,7 @@
 						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'uzername'"
 					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
+					postData="{activeUsers: function() { return jQuery('#showActiveId').val(); }}"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"
 					showPager="true">
@@ -104,12 +105,12 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			<div>
-				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}, activeUsers:${activeUsers}]']">
+				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}, activeUsers:${activeUsers}]']" autocomplete="off">
 					<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}" optionKey="id" optionValue="name" noSelection="['All':'All']" />
 					<input id="showActiveId" name="activeUsers" hidden="hidden" value="${(session.getAttribute('InActive'))}" />
+					<jqgrid:wrapper id="userLoginId" />
 				</g:form>
 			</div>
-			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
 
