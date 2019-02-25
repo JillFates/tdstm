@@ -41,8 +41,8 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get(`../ws/asset/showTemplate/${this.modelId}`).subscribe((res: any) => {
-				let template = res.text();
+			this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}).subscribe((response: any) => {
+				let template = response;
 				const additionalImports = [AssetExplorerModule];
 				switch (this.asset) {
 					case 'APPLICATION':
