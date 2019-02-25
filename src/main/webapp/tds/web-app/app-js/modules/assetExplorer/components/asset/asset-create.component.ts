@@ -45,7 +45,7 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
 				this.http.get(`../ws/asset/defaultCreateModel/${this.asset}`))
 				.subscribe((response: any) => {
-					let template = response[0].text();
+					let template = response[0];
 					let model = response[1];
 
 					// Get the default custom values
