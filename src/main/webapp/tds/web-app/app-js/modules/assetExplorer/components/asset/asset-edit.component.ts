@@ -45,7 +45,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 				this.http.get(`../ws/asset/editTemplate/${this.modelId}`),
 				this.http.get(`../ws/asset/editModel/${this.modelId}`))
 				.subscribe((response: any) => {
-					let template = response[0].text();
+					let template = response[0];
 					let model = response[1];
 
 					switch (this.asset) {
