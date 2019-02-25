@@ -21,7 +21,6 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
@@ -29,7 +28,6 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import groovy.time.TimeDuration
-import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -77,9 +75,8 @@ import net.transitionmanager.service.UserService
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
-import org.apache.commons.lang3.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
-import org.hibernate.criterion.Order
+import org.apache.commons.lang3.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl

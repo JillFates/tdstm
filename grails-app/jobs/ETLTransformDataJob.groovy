@@ -11,7 +11,7 @@ import org.quartz.JobExecutionContext
  */
 @Slf4j
 class ETLTransformDataJob {
-	def group = 'tdstm-etl-transform-data'
+	static group = 'tdstm-etl-transform-data'
 	static triggers = {}
 
 	ProgressService progressService

@@ -10,7 +10,7 @@ import org.quartz.JobExecutionContext
 @Slf4j
 class ImportBatchJob extends SecureJob implements EventPublisher {
 	static final String NEXT_BATCH_READY = 'NEXT_BATCH_READY'
-	String group = 'tdstm-import-batch'
+	static String group = 'tdstm-import-batch'
 	static triggers = {}
 
 	DataImportService dataImportService

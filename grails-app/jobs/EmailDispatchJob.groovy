@@ -4,7 +4,7 @@ import org.quartz.JobExecutionContext
 
 class EmailDispatchJob extends SecureJob {
 
-	def group = 'tdstm-send-email'
+	static group = 'tdstm-send-email'
 	static triggers = {}
 
 	EmailDispatchService emailDispatchService

@@ -439,8 +439,10 @@ Turn on Grails Service monitoring by adding 'spring' in displayed-counters param
  */
 javamelody.'displayed-counters' = 'http,sql,error,log,spring,jsp'
 
-
-
+quartz {
+    autoStartup = true
+    jdbcStore = false
+}
 
 /*
 The parameter url-exclude-pattern is a regular expression to exclude some urls from monitoring as written above.

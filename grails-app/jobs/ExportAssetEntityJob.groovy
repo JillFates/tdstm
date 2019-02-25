@@ -7,7 +7,7 @@ import org.quartz.JobExecutionContext
 class ExportAssetEntityJob {
 
 	// Quartz Properties
-	def group = 'tdstm-export-asset'
+	static group = 'tdstm-export-asset'
 	// def concurrent = false
 	static triggers = { }
 

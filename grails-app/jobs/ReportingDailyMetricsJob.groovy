@@ -14,7 +14,7 @@ class ReportingDailyMetricsJob {
 	}
 
 	// Quartz Properties
-	def group = 'tdstm-reporting-daily-metrics'
+	static group = 'tdstm-reporting-daily-metrics'
 
 	// IOC services
 	MetricReportingService metricReportingService

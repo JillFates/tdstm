@@ -10,7 +10,7 @@ import org.quartz.spi.MutableTrigger
  */
 class GenerateTasksJob {
 
-	def group = 'tdstm-generate-tasks'
+	static group = 'tdstm-generate-tasks'
 	static triggers = {}
 
 	TaskService taskService

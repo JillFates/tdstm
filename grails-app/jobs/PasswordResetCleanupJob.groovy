@@ -10,7 +10,8 @@ class PasswordResetCleanupJob {
 		// This is used to test running the job 2 minutes after the application starts
 		// cron name: 'passwordResetCleanupJob', cronExpression: "15 0/2 * * * ?"
 	}
-	def group = 'tdstm-password-reset-cleanup'
+
+	static group = 'tdstm-password-reset-cleanup'
 
 	SecurityService securityService
 

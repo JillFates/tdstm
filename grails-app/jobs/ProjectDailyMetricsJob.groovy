@@ -12,7 +12,7 @@ class ProjectDailyMetricsJob {
 	}
 
 	// Quartz Properties
-	def group = 'tdstm-project-daily-metrics'
+	static group = 'tdstm-project-daily-metrics'
 
 	// IOC services
 	ProjectService projectService

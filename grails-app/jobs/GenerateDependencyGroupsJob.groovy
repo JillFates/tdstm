@@ -5,7 +5,7 @@ import org.quartz.JobExecutionContext
 
 class GenerateDependencyGroupsJob {
 
-	def group = 'tdstm-dependency-groups'
+	static group = 'tdstm-dependency-groups'
 	static triggers = {}
 
 	MoveBundleService moveBundleService
