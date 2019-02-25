@@ -55,15 +55,15 @@
 					colNames="'Actions', 'Username', 'Person', 'Roles', 'Company', 'Local User', 'Last Login', 'Date Created', 'Expiry Date'"
 					colModel="
 						{name:'act', index: 'act' , sortable: false, ${true ? 'formatter:actionFormatter,' :''} search:false, width:'50', fixed:true},
-						{name:'username', index: 'username', width:'80'},
+						{name:'uzername', index: 'uzername', width:'80'},
 						{name:'fullname', width:'100'},
 						{name:'roles',width:'100'},
-						{name:'company', width:'100'},
+						{name:'zompany', width:'100'},
 						{name:'isLocal', width:'80', fixed:true},
-						{name:'lastLogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'last1ogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
-					sortname="'username'"
+					sortname="'uzername'"
 					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"

@@ -29,8 +29,8 @@
 		<g:if test="${assetEntity.hasProperty('model')}"><input type="hidden" name="model" id="model" value="${assetEntity?.model}" /></g:if>
 		<g:if test="${assetEntity.hasProperty('cart')}"><input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" /></g:if>
 		<g:if test="${assetEntity.hasProperty('shelf')}"><input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" /></g:if>
-		<g:if test="${assetEntity.hasProperty('targetRoom')}"><input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" /></g:if>
-		<g:if test="${assetEntity.hasProperty('targetRack')}"><input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('targetRoomName')}"><input type="hidden" name="room" id="room" value="${assetEntity?.targetRoomName}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('targetRackName')}"><input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRackName}" /></g:if>
 		<g:if test="${assetEntity.hasProperty('targetRackPosition')}"><input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" /></g:if>
 		<input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
@@ -224,10 +224,10 @@
 						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
 						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-		                <g:if test="${assetComment?.assetEntity.hasProperty('sourceRack')}"><dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd></g:if>
-					  	<g:if test="${assetComment?.assetEntity.hasProperty('targetRack')}"><dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd></g:if>
-						<g:if test="${assetComment?.assetEntity.hasProperty('sourceRoom')}"><dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd></g:if>
-						<g:if test="${assetComment?.assetEntity.hasProperty('targetRoom')}"><dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd></g:if>
+		                <g:if test="${assetComment?.assetEntity.hasProperty('sourceRackName')}"><dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd></g:if>
+					  	<g:if test="${assetComment?.assetEntity.hasProperty('targetRackName')}"><dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRackName}/${assetComment?.assetEntity.targetRackPosition}</dd></g:if>
+						<g:if test="${assetComment?.assetEntity.hasProperty('sourceRoomName')}"><dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoomName}</dd></g:if>
+						<g:if test="${assetComment?.assetEntity.hasProperty('targetRoomName')}"><dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoomName}</dd></g:if>
 						<g:if test="${location == 'source'}">			   	
 					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
