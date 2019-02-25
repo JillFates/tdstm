@@ -80,15 +80,15 @@
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
 					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'Email', 'User Company', 'Date Created', 'Last Updated'"
-					colModel="{name:'firztname', width:'80'},
-						{name:'m1ddlename', width:'80'},
-						{name:'laztname', index: 'laztname', width:'80'},
-						{name:'uzerLogin', width:'80' },
-						{name:'zmail',width:'100'},
-						{name:'zompany',width:'100'},
-						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
-						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
-					sortname="'laztname'"
+					colModel="{name:'firstname', width:'80'},
+						{name:'middlename', width:'80'},
+						{name:'lastname', index: 'lastname', width:'80'},
+						{name:'userLogin', width:'130' },
+						{name:'email',width:'220'},
+						{name:'company',width:'130'},
+						{name:'dateCreated',width:'100', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'lastUpdated',width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
+					sortname="'lastname'"
 					caption="listCaption"
 					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
@@ -150,10 +150,10 @@
 		<div id="messageId" class="message nodisplay"></div>
 		<span id="spinnerId" class="nodisplay">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		<div>
-			<g:form name="personForm" id="formId" url="[action:'list', controller:'person', params:'[companyId:${companyId}]']">
+			<g:form name="personForm" id="formId" url="[action:'list', controller:'person', params:'[companyId:${companyId}]']" autocomplete="off">
 				<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
-			</g:form>
 			<jqgrid:wrapper id="personId" />
+			</g:form>
 		</div>
 	</div>
 
