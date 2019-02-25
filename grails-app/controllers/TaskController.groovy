@@ -317,7 +317,7 @@ class TaskController implements ControllerMethods {
 			}
 
 			if (securityService.hasPermission(Permission.ActionInvoke)) {
-				if (comment.isActionInvocable() && !comment.isAutomatic() ) {
+				if (comment.isActionInvocableLocally() && !comment.isAutomatic() ) {
 					actionBar << [
 						label: 'Invoke',
 						icon: 'ui-icon-gear',

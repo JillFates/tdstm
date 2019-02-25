@@ -118,41 +118,41 @@ class ApiActionSpec extends Specification {
 			task.status = AssetCommentStatus.READY
 			task.apiActionInvokedAt = new Date()
 		then: 'the task action should not be invocable because it was already invoked'
-			! task.isActionInvocable()
+			! task.isActionInvocableLocally()
 
 		when: 'the apiActionCompletedAt property is set'
 			task.apiActionInvokedAt = new Date()
 			task.apiActionCompletedAt = new Date()
 		then: 'the task action should not be invocable because it was already invoked and completed'
-			! task.isActionInvocable()
+			! task.isActionInvocableLocally()
 
 		when: 'the task status is not Ready or Started'
 			task.status = AssetCommentStatus.PENDING
 			task.apiActionInvokedAt = null
 			task.apiActionCompletedAt = null
 		then: 'the task action should not be invocable'
-			! task.isActionInvocable()
+			! task.isActionInvocableLocally()
 
 		when: 'the task status is READY and has not been previously invoked'
 			task.status = AssetCommentStatus.READY
 			task.apiActionInvokedAt = null
 			task.apiActionCompletedAt = null
 		then: 'the task action should be invocable'
-			task.isActionInvocable()
+			task.isActionInvocableLocally()
 
 		when: 'the task status is set to STARTED'
 			task.status = AssetCommentStatus.STARTED
 		then: 'the task action should still be invocable'
-			task.isActionInvocable()
+			task.isActionInvocableLocally()
 
 		when: 'the task status is set to COMPLETED'
 			task.status = AssetCommentStatus.COMPLETED
 		then: 'the task action should not be invocable since people may jump directly to COMPLETED'
-			! task.isActionInvocable()
+			! task.isActionInvocableLocally()
 
 		when: 'the task apiAction property is not set'
 			task.apiAction = null
 		then: 'the task action should not be invocable'
-			! task.isActionInvocable()
+			! task.isActionInvocableLocally()
 	}
 }

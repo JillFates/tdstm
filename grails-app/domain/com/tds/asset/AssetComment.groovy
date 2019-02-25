@@ -1,12 +1,11 @@
 package com.tds.asset
 
-import com.tdsops.tm.enums.domain.AssetClass
+
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
-import grails.util.Environment
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -17,9 +16,6 @@ import org.apache.commons.lang3.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.TimeScale.M
 
 class AssetComment {
@@ -302,7 +298,7 @@ class AssetComment {
 	}
 
 	/*
-	 * Used to determine if the task action can be invoked either manually or by the automatic mechanism
+	 * Used to determine if the task action can be invoked locally
 	 *
 	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
 	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
@@ -311,8 +307,22 @@ class AssetComment {
 	 *
 	 * @return true if action can be invoked
 	 */
-	boolean isActionInvocable() {
-		apiAction && !apiActionInvokedAt && status in [READY, STARTED]
+	Boolean isActionInvocableLocally() {
+		return hasAction() && !apiAction.isRemote && status in [READY, STARTED]
+	}
+
+	/*
+	 * Used to determine if the task action can be invoked remotely
+	 *
+	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
+	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
+	 * will turn to STARTED otherwise marked DONE if successful.
+	 * With both manual/user or automatic tasks, if the invocation fails the status should change to HOLD
+	 *
+	 * @return true if action can be invoked
+	 */
+	Boolean isActionInvocableRemotely() {
+		return hasAction() && apiAction.isRemote && status in [READY, STARTED]
 	}
 
 	/*
@@ -393,11 +403,11 @@ class AssetComment {
 			]
 		}
 		return [
-		    id: id,
-			taskNumber: taskNumber,
-			title: comment,
-			status: status,
-			statusUpdated: statusUpdated,
+				id: id,
+				taskNumber: taskNumber,
+				title: comment,
+				status: status,
+				statusUpdated: statusUpdated,
 			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
 			lastUpdated: lastUpdated,
 			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),
@@ -414,7 +424,7 @@ class AssetComment {
 			actFinish: actFinish,
 			team: role ?: '',
 			isPublished: isPublished,
-			isActionInvocable: isActionInvocable(),
+			isActionInvocable: isActionInvocableLocally(),
 			isAutomatic: isAutomatic(),
 		]
 
