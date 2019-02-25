@@ -96,39 +96,20 @@ class PersonController implements ControllerMethods {
 		Long companyId
 		def personInstanceList
 		def filterParams = [
-			firstname  : params.firztname,
-			middlename : params.m1ddlename,
-			lastname   : params.laztname,
-			userLogin  : params.uzerLogin,
-			email      : params.zmail,
-			company    : params.zompany,
+			firstname  : params.firstname,
+			middlename : params.middlename,
+			lastname   : params.lastname,
+			userLogin  : params.userLogin,
+			email      : params.email,
+			company    : params.company,
 			dateCreated: params.dateCreated,
 			lastUpdated: params.lastUpdated,
 			modelScore : params.modelScore
 		]
 
-		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
-		// seem to work in jqgrid.
-		Map chromeAutocompleteFieldNameSubs = [
-			firztname: 'firstname',
-			m1ddlename: 'middlename',
-			laztname: 'lastname',
-			uzerLogin: 'userLogin',
-			zompany: 'company',
-			zmail: 'email'
-		]
-
-		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
-		List sortableFields = [
-			'dateCreated',
-			'modelScore'
-		]
-
 		// Deal with determining the Sort Column
 		String sortIndex = 'lastname'
-		if (chromeAutocompleteFieldNameSubs.containsKey(params.sidx)) {
-			sortIndex = chromeAutocompleteFieldNameSubs.get(params.sidx)
-		} else if (sortableFields.contains(params.sidx)) {
+		if (filterParams.containsKey(params.sidx)) {
 			sortIndex = params.sidx
 		}
 

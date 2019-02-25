@@ -64,61 +64,33 @@ class UserLoginController implements ControllerMethods {
 		int currentPage = params.int('page', 1)
 		int rowOffset = (currentPage - 1) * maxRows
 
-		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
-		// seem to work in jqgrid.
-		Map chromeAutocompleteFieldNameSubs = [
-			uzername: 'username',
-			zompany: 'company',
-			last1ogin: 'lastLogin'
-		]
-
-		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
-		List sortableFields = [
-			'fullname',
-			'roles',
-			'dateCreated',
-			'expiryDate'
+		Long companyId
+		List<UserLogin> userLogins = []
+		def filterParams = [
+			username: params.username,
+			fullname: params.fullname,
+			roles: params.roles,
+			company: params.company,
+			lastLogin: params.lastLogin,
+			dateCreated: params.dateCreated,
+			expiryDate: params.expiryDate
 		]
 
 		// Deal with sorting
 		String sortIndex = 'username'
-		if (chromeAutocompleteFieldNameSubs.containsKey(params.sidx)) {
-			sortIndex = chromeAutocompleteFieldNameSubs[params.sidx]
-
-		} else if (sortableFields.contains(params.sidx)) {
+		if (filterParams.containsKey(params.sidx)) {
 			sortIndex = params.sidx
 		}
 
 		// Deal with order
 		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
 
+		String presentDate = TimeUtil.nowGMTSQLFormat()
 
-		def companyId
-		List<UserLogin> userLogins = []
-		def filterParams = [
-			username: params.uzername,
-			fullname: params.fullname,
-			roles: params.roles,
-			company: params.zompany,
-			lastLogin: params.last1ogin,
-			dateCreated: params.dateCreated,
-			expiryDate: params.expiryDate
-		]
+		String active = ['Y', 'N'].contains(params.activeUsers) ?  params.activeUsers : 'Y'
+		//?: session.getAttribute("InActive")
 
-		// Validate that the user is sorting by a valid column
-		if (!sortIndex in filterParams) {
-			sortIndex = 'username'
-		}
-
-		def presentDate = TimeUtil.nowGMTSQLFormat()
-
-		def active = params.activeUsers ?: session.getAttribute("InActive")
-		if (!active) {
-			active = 'Y'
-		}
-
-
-		def query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
+		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
 			FROM person p
@@ -135,7 +107,7 @@ class UserLoginController implements ControllerMethods {
 		if (securityService.hasPermission(Permission.UserListAll)) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
-				companyId = params.id
+				companyId = params.long('id')
 			}
 			if (!companyId && params.id != "All") {
 				// Still if no companyId found trying to get companyId from the session
