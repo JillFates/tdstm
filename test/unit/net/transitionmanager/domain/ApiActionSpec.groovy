@@ -55,6 +55,7 @@ class ApiActionSpec extends Specification {
 				callbackMethod: 'updateTaskState',
 				callbackMode: CallbackMode.MESSAGE,
 				httpMethod: ApiActionHttpMethod.GET,
+				isRemote: false,
 				project: project
 		)
 		if (action.hasErrors()) {
@@ -111,7 +112,7 @@ class ApiActionSpec extends Specification {
 			paramsList[0].desc
 	}
 
-	def '3. Test for AssetComment.actionInvocable'() {
+	def '3. Test for AssetComment.actionInvocableLocally'() {
 		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
 
 		when: 'the apiActionInvokedAt property is set'
@@ -154,5 +155,53 @@ class ApiActionSpec extends Specification {
 			task.apiAction = null
 		then: 'the task action should not be invocable'
 			! task.isActionInvocableLocally()
+	}
+
+	def '4. Test for AssetComment.actionInvocableRemotely'() {
+		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
+		setup:
+			task.apiAction.isRemote = true
+
+		when: 'the apiActionInvokedAt property is set'
+			task.status = AssetCommentStatus.READY
+			task.apiActionInvokedAt = new Date()
+		then: 'the task action should not be invocable because it was already invoked'
+			! task.isActionInvocableRemotely()
+
+		when: 'the apiActionCompletedAt property is set'
+			task.apiActionInvokedAt = new Date()
+			task.apiActionCompletedAt = new Date()
+		then: 'the task action should not be invocable because it was already invoked and completed'
+			! task.isActionInvocableRemotely()
+
+		when: 'the task status is not Ready or Started'
+			task.status = AssetCommentStatus.PENDING
+			task.apiActionInvokedAt = null
+			task.apiActionCompletedAt = null
+		then: 'the task action should not be invocable'
+			! task.isActionInvocableRemotely()
+
+		when: 'the task status is READY and has not been previously invoked'
+			task.status = AssetCommentStatus.READY
+			task.apiActionInvokedAt = null
+			task.apiActionCompletedAt = null
+		then: 'the task action should be invocable'
+			task.isActionInvocableRemotely()
+
+		when: 'the task status is set to STARTED'
+			task.status = AssetCommentStatus.STARTED
+		then: 'the task action should still be invocable'
+			task.isActionInvocableRemotely()
+
+		when: 'the task status is set to COMPLETED'
+			task.status = AssetCommentStatus.COMPLETED
+		then: 'the task action should not be invocable since people may jump directly to COMPLETED'
+			! task.isActionInvocableRemotely()
+
+		when: 'the task apiAction property is not set'
+			task.apiAction = null
+		then: 'the task action should not be invocable'
+			! task.isActionInvocableRemotely()
+
 	}
 }

@@ -308,7 +308,7 @@ class AssetComment {
 	 * @return true if action can be invoked
 	 */
 	Boolean isActionInvocableLocally() {
-		return hasAction() && !apiAction.isRemote && status in [READY, STARTED]
+		return hasAction() && !apiActionInvokedAt && !apiAction.isRemote && status in [READY, STARTED]
 	}
 
 	/*
@@ -322,7 +322,7 @@ class AssetComment {
 	 * @return true if action can be invoked
 	 */
 	Boolean isActionInvocableRemotely() {
-		return hasAction() && apiAction.isRemote && status in [READY, STARTED]
+		return hasAction() && !apiActionInvokedAt && apiAction.isRemote && status in [READY, STARTED]
 	}
 
 	/*
