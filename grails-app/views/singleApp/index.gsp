@@ -30,6 +30,7 @@
         </tds-app>
 
         <script src="${resource(dir: 'tds/web-app/dist', file: 'polyfills.js')}?_b=${buildHash}"></script>
+        <script src="${resource(dir: 'tds/web-app/dist', file: 'vendor.js')}?_b=${buildHash}"></script>
         <script src="${resource(dir: 'tds/web-app/dist', file: 'app.js')}?_b=${buildHash}"></script>
 
     </body>

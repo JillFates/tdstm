@@ -36,6 +36,17 @@ module.exports = function (env) {
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
+		optimization: {
+			splitChunks: {
+				cacheGroups: {
+					commons: {
+						test: /[\\/]node_modules[\\/]/,
+						name: "vendor",
+						chunks: "all"
+					}
+				}
+			}
+		},
 		plugins: [
 			new webpack.DefinePlugin({
 				NODE_ENV: '"development"'
@@ -47,7 +58,8 @@ module.exports = function (env) {
 			new AngularCompilerPlugin({
 				tsConfigPath: 'tsconfig.json',
 				entryModule: 'web-app/app-js/app/tds-app.module#TDSAppModule',
-				sourceMap: true
+				sourceMap: true,
+				skipCodeGeneration: true
 			})
 			// Uncomment if you want to take a peek to the structure of dependencies
 			// new BundleAnalyzerPlugin()

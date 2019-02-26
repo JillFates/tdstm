@@ -34,6 +34,17 @@ module.exports = function (env) {
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
+		optimization: {
+			splitChunks: {
+				cacheGroups: {
+					commons: {
+						test: /[\\/]node_modules[\\/]/,
+						name: "vendor",
+						chunks: "all"
+					}
+				}
+			}
+		},
 		plugins: [
 			new webpack.DefinePlugin({
 				NODE_ENV: '"production"'
@@ -41,7 +52,8 @@ module.exports = function (env) {
 			new AngularCompilerPlugin({
 				tsConfigPath: 'tsconfig.json',
 				entryModule: 'web-app/app-js/app/tds-app.module#TDSAppModule',
-				sourceMap: false
+				sourceMap: false,
+				skipCodeGeneration: true
 			})
 		],
 		cache: true,
