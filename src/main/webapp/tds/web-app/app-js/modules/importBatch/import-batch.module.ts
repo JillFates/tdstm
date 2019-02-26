@@ -2,7 +2,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
@@ -34,8 +34,6 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		// TODO: Only for Kendo Upload at this point
-		HttpClientModule,
 		// Kendo
 		GridModule,
 		DropDownsModule,
