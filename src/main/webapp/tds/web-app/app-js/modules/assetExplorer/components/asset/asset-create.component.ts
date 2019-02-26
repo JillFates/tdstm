@@ -42,7 +42,7 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
-				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
+				this.http.get(`../ws/asset/createTemplate/${this.asset}`, {responseType: 'text'}),
 				this.http.get(`../ws/asset/defaultCreateModel/${this.asset}`))
 				.subscribe((response: any) => {
 					let template = response[0];
@@ -79,6 +79,9 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 
 						}
 					}, 700);
+				}, (error) => {
+					console.error('Error: ');
+					console.error(error);
 				});
 		});
 	}
