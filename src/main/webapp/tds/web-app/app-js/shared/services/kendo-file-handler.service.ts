@@ -8,21 +8,18 @@ import 'rxjs/add/operator/catch';
 export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
 export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 
+export const FILE_SYSTEM_URL = '../ws/fileSystem';
+export const ETL_SCRIPT_UPLOAD_URL = '../ws/fileSystem/uploadFileETLDesigner';
+export const ASSET_IMPORT_UPLOAD_URL = '../ws/fileSystem/uploadFileETLAssetImport';
+
 @Injectable()
 export class KendoFileHandlerService {
-
-	private fileSystemUrl = '../ws/fileSystem';
-	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
-	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
 
 	constructor(private http: HttpClient) {
 	}
 
 	uploadETLScriptFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const httpOptions = {
-			headers: new HttpHeaders({'Content-Type': 'application/json'})
-		};
-		return this.http.post(this.ETLScriptUploadURL, formdata, httpOptions)
+		return this.http.post(ETL_SCRIPT_UPLOAD_URL, formdata)
 			.map((response: any) => {
 				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
@@ -30,23 +27,17 @@ export class KendoFileHandlerService {
 	}
 
 	uploadAssetImportFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const httpOptions = {
-			headers: new HttpHeaders({'Content-Type': 'application/json'})
-		};
-		return this.http.post(this.assetImportUploadURL, formdata, httpOptions)
+		return this.http.post(ASSET_IMPORT_UPLOAD_URL, formdata)
 			.map((response: any) => {
-				return new HttpResponse({status: 200, body: { data : response.data } });
+				return new HttpResponse({status: 200, body: {data: response.data}});
 			})
 			.catch((error: any) => error);
 	}
 
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const httpOptions = {
-			headers: new HttpHeaders({'Content-Type': 'application/json'})
-		};
-		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, httpOptions)
+		return this.http.post(`${FILE_SYSTEM_URL}/uploadFile`, formdata)
 			.map((response: any) => {
-				return new HttpResponse({status: 200, body: { data : response.data } });
+				return new HttpResponse({status: 200, body: {data: response.data}});
 			})
 			.catch((error: any) => error);
 	}
@@ -56,7 +47,7 @@ export class KendoFileHandlerService {
 			headers: new HttpHeaders({'Content-Type': 'application/json'}), body: JSON.stringify({filename: filename} )
 		};
 
-		return this.http.delete(`${this.fileSystemUrl}/delete`, httpOptions)
+		return this.http.delete(`${FILE_SYSTEM_URL}/delete`, httpOptions)
 			.map((response: any) => {
 				response.operation = 'delete';
 				return new HttpResponse({status: 200, body: { data : response } });

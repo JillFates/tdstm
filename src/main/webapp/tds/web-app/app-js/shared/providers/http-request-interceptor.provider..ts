@@ -15,6 +15,7 @@ import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../mod
 import {AlertType} from '../model/alert.model';
 // Service
 import {NotifierService} from '../services/notifier.service';
+import {FILE_SYSTEM_URL, ETL_SCRIPT_UPLOAD_URL, ASSET_IMPORT_UPLOAD_URL} from '../services/kendo-file-handler.service';
 // Other
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
@@ -26,8 +27,13 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		// Kendo
-		if (request.url === FILE_UPLOAD_SAVE_URL || request.url === FILE_UPLOAD_REMOVE_URL) {
+		// kendo-file-upload.service.ts
+		if (
+			request.url === FILE_UPLOAD_SAVE_URL ||
+			request.url === FILE_UPLOAD_REMOVE_URL ||
+			request.url === FILE_SYSTEM_URL ||
+			request.url === ETL_SCRIPT_UPLOAD_URL ||
+			request.url === ASSET_IMPORT_UPLOAD_URL) {
 			// Continue its flows so it can be catch by another Interceptor
 			return next.handle(request);
 		}
@@ -41,6 +47,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	 * @param next
 	 */
 	private handleRequest(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
 		const authReq = request.clone({
 			setHeaders: { 'Content-Type': 'application/json' }
 		});
