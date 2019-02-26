@@ -500,35 +500,9 @@ class TaskService implements ServiceMethods {
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
 	 * @param id - the id of the task to mark as started
+	 * @param whom - the id whos invoking the action
+	 * @param remoteInvocation - whether is a remote or local api action invokation
 	 */
-	@NotTransactional
-	void markTaskStarted__(Long id) {
-		try {
-			AssetComment.withTransaction { TransactionStatus ts ->
-				log.debug "Attempting to mark asset comment as started for task.id={}", id
-
-				def taskWithLock = AssetComment.lock(id)
-				log.debug 'Locked out AssetComment: {}', taskWithLock
-
-				if (taskWithLock.status in [ACS.STARTED, ACS.HOLD, ACS.COMPLETED]) {
-					throw new Exception('Another user invoked the action before')
-				}
-
-				// Update the task so that the we track that the action was invoked
-				taskWithLock.apiActionInvokedAt = new Date()
-
-				// Update the task so that we track the task started at
-				taskWithLock.actStart = taskWithLock.apiActionInvokedAt
-
-				// Make sure that the status is STARTED instead
-				taskWithLock.status = AssetCommentStatus.STARTED
-				taskWithLock.save(flush: true, failOnError: true)
-			}
-		} catch (Exception e) {
-			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
-			throw new CannotAcquireLockException('Another user invoked the action before')
-		}
-	}
 	@NotTransactional
 	void markActionStarted(Long id, Person whom, Boolean remoteInvocation = false) {
 		log.debug "Attempting to action as started for task.id={}", id
@@ -578,7 +552,7 @@ class TaskService implements ServiceMethods {
 			taskWithLock.status = AssetCommentStatus.STARTED
 			taskWithLock.save(flush: true, failOnError: true)
 
-			addNote(taskWithLock, whom, "Invoked action ${task.apiAction.name}")
+			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${remoteInvocation ? 'Remotely' : 'Locally'})")
 		}
 	}
 

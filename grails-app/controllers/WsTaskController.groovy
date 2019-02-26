@@ -155,6 +155,7 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeRemoteAction() {
+		Project project = getProjectForWs()
 		AssetComment assetComment = fetchDomain(AssetComment, params)
 		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
 		Map<String,?> actionRequestMap = actionRequest.toMap()

@@ -1157,7 +1157,7 @@ digraph runbook {
 		}
 
 		Map results = commentService.filterTasks(project, params)
-		List<Map> tasks = results.tasks.collect {AssetComment task ->
+		List<Map> tasks = results.tasks.collect { AssetComment task ->
 			task.taskToMap()
 		}
 		renderSuccessJson(tasks)

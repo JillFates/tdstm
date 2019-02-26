@@ -240,6 +240,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action
 	 * @return
 	 */
+	@Transactional(noRollbackFor=[Throwable])
 	ActionRequest createActionRequest(ApiAction action) {
 		if (!action) {
 			throw new InvalidRequestException('No action was provided to the invoke command')
@@ -275,6 +276,9 @@ class ApiActionService implements ServiceMethods {
 			} catch (ApiActionException preScriptException) {
 				log.error('Error invoking PRE script from DataScript: {}', ExceptionUtil.stackTraceToString(preScriptException))
 				throw preScriptException
+			} finally {
+				// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
+				ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 			}
 		}
 
@@ -657,9 +661,7 @@ class ApiActionService implements ServiceMethods {
 
 		if (ActionType.WEB_API == apiAction.actionType) {
 			properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
-		}
-
-		if (ActionType.WEB_API != apiAction.actionType) {
+		} else {
 			properties << ['commandLine', 'script', 'remoteCredentialMethod']
 		}
 
