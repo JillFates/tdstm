@@ -118,11 +118,14 @@ export class FieldSettingsService {
 		if (field.shared === true) {
 			for (let domain of filteredDomains) {
 				let fields = domain.fields;
+				const filteredFields = fields.filter((field) => {
+					return !(field instanceof FieldSettingsModel);
+				});
 				let x = 0;
-					conflicts = fields.filter(item =>
+					conflicts = filteredFields.filter(item =>
 					item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim() ||
 							this.conflictsWithAnotherFieldName(field.label, fields));
-					if (conflicts.length > 1) { // The field is also added automatically in the other domains field lists, so > 1 is used
+					if (conflicts.length > 0) { // The field is also added automatically in the other domains field lists, so > 1 is used
 						return true;
 					}
 			}

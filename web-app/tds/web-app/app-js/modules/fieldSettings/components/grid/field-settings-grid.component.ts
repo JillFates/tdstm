@@ -388,7 +388,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * Returns a boolean indicating if the fields contain atleast one field with error
+	 * Returns a boolean indicating if the fields contain at least one field with error
 	 */
 	protected atLeastOneInvalidField(): boolean {
 		const fields = this.getFieldsExcludingDeleted() || [];
