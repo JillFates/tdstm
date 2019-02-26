@@ -19,19 +19,19 @@ export class SupportOnColumnsModel {
 				label: 'Frequency',
 				property: 'dataFlowFreq',
 				type: 'text',
-				width: 100
+				width: 90
 			},
 			{
 				label: 'Class',
 				property: 'assetClass',
 				type: 'text',
-				width: 130
+				width: 120
 			},
 			{
 				label: 'Name',
 				property: 'assetName',
 				type: 'text',
-				width: 195
+				width: 235
 			},
 			{
 				label: 'Bundle',
@@ -43,13 +43,13 @@ export class SupportOnColumnsModel {
 				label: 'Type',
 				property: 'type',
 				type: 'text',
-				width: 130
+				width: 120
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 130
+				width: 120
 			}
 		];
 	}
