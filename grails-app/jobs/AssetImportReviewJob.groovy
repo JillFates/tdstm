@@ -5,7 +5,7 @@ import org.quartz.JobExecutionContext
 
 class AssetImportReviewJob {
 
-	def group = 'tdstm-asset-import-review'
+	static group = 'tdstm-asset-import-review'
 	static triggers = {}
 
 	ImportService importService

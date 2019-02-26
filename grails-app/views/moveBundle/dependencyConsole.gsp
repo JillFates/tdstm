@@ -423,6 +423,8 @@
 					dependencyDiv.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
 				else
 					dependencyDiv.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
+
+                $('#dependencyDivId').css('overflow-x', 'scroll');
 			}
 
 			$(document).ready(function () {

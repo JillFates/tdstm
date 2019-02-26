@@ -13,8 +13,8 @@ class SendTaskEmailJob {
 
 	static triggers = {}
 
-	def group = 'tdstm'
-	def concurrent = false
+	static group = 'tdstm'
+	static concurrent = false
 
 	CommentService commentService
 

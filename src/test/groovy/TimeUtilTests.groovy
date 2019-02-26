@@ -229,12 +229,11 @@ class TimeUtilTests extends AbstractUnitSpec {
 	void 'Test formatDate(String tzId, Date dateValue, DateFormat formatter)'() {
 		given:
 		// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
-		long oneDay = 60 * 60 * 24 * 1000
-		Timestamp timestamp = new Timestamp(oneDay).clearTime()
+		Timestamp timestamp = new Timestamp(0L).clearTime()
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
-
+		def result = TimeUtil.formatDate('GMT', timestamp, formatter)
 		expect:
-		TimeUtil.formatDate('GMT', timestamp, formatter) == '01/01/1970'
+		 result == '01/01/1970'
 	}
 
 	void 'Test formatDateTime(dateValue, DateFormat formatter)'() {
@@ -249,8 +248,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 	void 'Test formatDateTime(String tzId, Date dateValue, DateFormat formatter)'() {
 		given:
 		// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
-		long oneDay = 60 * 60 * 24 * 1000
-		Timestamp timestamp = new Timestamp(oneDay).clearTime()
+		Timestamp timestamp = new Timestamp(0L).clearTime()
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:
@@ -262,8 +260,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 		// TM-4823
 		given:
 		// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
-		long oneDay = 60 * 60 * 24 * 1000
-		Long timeAsLong = new Timestamp(oneDay).clearTime().time
+		Long timeAsLong = new Timestamp(0L).clearTime().time
 		def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
 
 		expect:

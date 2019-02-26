@@ -11,8 +11,8 @@ import org.quartz.spi.MutableTrigger
  */
 class UpdateTaskSuccessorsJob {
 
-	def group = 'tdstm-task-update'
-	def concurrent = false
+	static group = 'tdstm-task-update'
+	static concurrent = false
 	static triggers = {}
 
 	TaskNonTranService taskNonTranService

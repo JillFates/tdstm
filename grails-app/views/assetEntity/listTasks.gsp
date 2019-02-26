@@ -358,8 +358,8 @@
                     </div>
                 </div>
                 <div class="timeline-wrapper text-right pull-right">
-                    <tdsactionbutton id="graph" label="View Task Graph" icon="${assetPath(src: 'icons/tds_task_graph.png')}" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
-                    <tdsactionbutton id="timeline" label="View Timeline" icon="${assetPath(src: 'icons/timeline_marker.png')}" link="/task/taskTimeline"></tdsactionbutton>
+                    <tdsactionbutton id="graph" label="View Task Graph" icon="${assetPath(src: 'icons/tds_task_graph.png')}" link="/tdstm/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>
+                    <tdsactionbutton id="timeline" label="View Timeline" icon="${assetPath(src: 'icons/timeline_marker.png')}" link="/tdstm/task/taskTimeline"></tdsactionbutton>
                     <g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
                 </div>
             </div>

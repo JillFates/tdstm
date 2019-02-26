@@ -1,5 +1,6 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import grails.util.Metadata
 import net.transitionmanager.service.CoreService
 import org.grails.core.exceptions.GrailsConfigurationException
 import org.grails.config.NavigableMap
@@ -13,12 +14,12 @@ class CoreServiceTests extends Specification {
 
 	void "getAppName"() {
 		expect: 'Should return the application name'
-		coreService.getAppName() == 'tdstm'
+			coreService.getAppName() == Metadata.current.getApplicationName()
 	}
 
 	void "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
-		coreService.getAppConfig() != null
+		coreService.getAppConfig('tdstm') != null
 
 		when:
 		coreService.getAppConfig('bogusAppName')
@@ -44,27 +45,27 @@ class CoreServiceTests extends Specification {
 
 	void "getAppConfigSetting"() {
 		when:
-		def setting = coreService.getAppConfigSetting('testing.foo.intVal')
+		def setting = coreService.getAppConfigSetting('testing.foo.intVal', 'tdstm')
 
 		then: 'Should return Integer valid setting from grails-app/conf/Config.groovy'
 		setting == 123
 		setting instanceof Integer
 
 		when:
-		setting = coreService.getAppConfigSetting('testing.foo.stringVal')
+		setting = coreService.getAppConfigSetting('testing.foo.stringVal', 'tdstm')
 
 		then: 'Should return String valid setting from grails-app/conf/Config.groovy'
 		setting == 'abc'
 		setting instanceof String
 
 		when:
-		setting = coreService.getAppConfigSetting('testing.foo.configVal')
+		setting = coreService.getAppConfigSetting('testing.foo.configVal', 'tdstm')
 
 		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
 		setting instanceof NavigableMap
 
 		when:
-		setting = coreService.getAppConfigSetting('testing.foo.man.choo')
+		setting = coreService.getAppConfigSetting('testing.foo.man.choo', 'tdstm')
 
 		then: 'Missing settings should return null value'
 		setting == null

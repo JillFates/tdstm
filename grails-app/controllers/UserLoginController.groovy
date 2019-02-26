@@ -62,16 +62,50 @@ class UserLoginController implements ControllerMethods {
 
 	@HasPermission(Permission.UserView)
 	def listJson() {
-		String sortIndex = params.sidx ?: 'username'
-		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
 		int currentPage = params.int('page', 1)
 		int rowOffset = (currentPage - 1) * maxRows
 
+		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
+		// seem to work in jqgrid.
+		Map chromeAutocompleteFieldNameSubs = [
+			uzername: 'username',
+			zompany: 'company',
+			last1ogin: 'lastLogin'
+		]
+
+		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
+		List sortableFields = [
+			'fullname',
+			'roles',
+			'dateCreated',
+			'expiryDate'
+		]
+
+		// Deal with sorting
+		String sortIndex = 'username'
+		if (chromeAutocompleteFieldNameSubs.containsKey(params.sidx)) {
+			sortIndex = chromeAutocompleteFieldNameSubs[params.sidx]
+
+		} else if (sortableFields.contains(params.sidx)) {
+			sortIndex = params.sidx
+		}
+
+		// Deal with order
+		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
+
+
 		def companyId
-		List<UserLogin> userLogins
-		def filterParams = [username: params.username, fullname: params.fullname, roles: params.roles, company: params.company,
-		                    lastLogin: params.lastLogin, dateCreated: params.dateCreated, expiryDate: params.expiryDate]
+		List<UserLogin> userLogins = []
+		def filterParams = [
+			username: params.uzername,
+			fullname: params.fullname,
+			roles: params.roles,
+			company: params.zompany,
+			lastLogin: params.last1ogin,
+			dateCreated: params.dateCreated,
+			expiryDate: params.expiryDate
+		]
 
 		// Validate that the user is sorting by a valid column
 		if (!sortIndex in filterParams) {
@@ -120,31 +154,32 @@ class UserLoginController implements ControllerMethods {
 			query.append(" GROUP BY p.person_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 
 			// Handle the filtering by each column's text field
-			def firstWhere = true
-			for (it in filterParams) {
+			Boolean firstWhere = true
+			List<String> queryParams = []
+			filterParams.each {
 				if (it.value) {
 					if (firstWhere) {
-						query.append(" WHERE users.$it.key LIKE '%$it.value%'")
+						query.append(" WHERE ")
 						firstWhere = false
+					} else {
+						query.append(" AND ")
 					}
-					else {
-						query.append(" AND users.$it.key LIKE '%$it.value%'")
-					}
+					query.append("users.${it.key} LIKE ?")
+					queryParams << "%${it.value.trim()}%"
 				}
 			}
-			log.debug "listJson() Query for User Login List: $query"
-			userLogins = jdbcTemplate.queryForList(query.toString())
-		} else {
-			userLogins = []
+
+			userLogins = jdbcTemplate.queryForList(query.toString(), queryParams as Object[])
 		}
 
 		// Limit the returned results to the user's page size and number
 		def totalRows = userLogins.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if (totalRows > 0)
+		if (totalRows > 0) {
 			userLogins = userLogins[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
-		else
+		} else {
 			userLogins = []
+		}
 
 		String acceptImgTag = '<img src="' + "$grailsLinkGenerator.serverBaseURL/assets/icons/accept.png" + '"></img>'
 		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.

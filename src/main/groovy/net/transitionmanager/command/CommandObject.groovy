@@ -57,6 +57,6 @@ trait CommandObject implements Validateable {
 	 * @return a map of all of the property/values
 	 */
 	private Map commandProperties() {
-		this.properties.findAll{ !['metaClass','class', 'constraints', 'errors'].contains(it.key)}
+		this.properties.findAll{ !['metaClass','class', 'constraints', 'constraintsMap',  'errors'].contains(it.key)}
 	}
 }

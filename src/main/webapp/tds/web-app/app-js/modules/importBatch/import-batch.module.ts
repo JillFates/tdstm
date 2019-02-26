@@ -2,7 +2,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
@@ -26,7 +25,6 @@ import {ImportBatchListComponent} from './components/list/import-batch-list.comp
 import {ImportBatchDetailDialogComponent} from './components/detail/import-batch-detail-dialog.component';
 import {ImportBatchRecordDialogComponent} from './components/record/import-batch-record-dialog.component';
 import {ImportAssetsComponent} from './components/import-assets/import-assets.component';
-import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 
 @NgModule({
 	imports: [
@@ -34,8 +32,6 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		// TODO: Only for Kendo Upload at this point
-		HttpClientModule,
 		// Kendo
 		GridModule,
 		DropDownsModule,
@@ -57,12 +53,7 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 		ModuleResolveService,
 		ImportBatchService,
 		ImportAssetsService,
-		DataScriptService,
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: KendoFileUploadInterceptor,
-			multi: true
-		}
+		DataScriptService
 	],
 	exports: [
 		ImportBatchListComponent,

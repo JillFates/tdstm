@@ -5,7 +5,7 @@ import org.quartz.JobExecutionContext
 
 class AssetImportProcessJob extends SecureJob {
 
-	def group = 'tdstm-asset-import-process'
+	static group = 'tdstm-asset-import-process'
 	static triggers = {}
 
 	ImportService importService

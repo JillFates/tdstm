@@ -22,6 +22,7 @@ declare var jQuery: any;
                         [valueField]="'id'"
                         [placeholder]="placeholder"
                         [filterable]="true"
+                        [title]="model?.text || ''"
                         (valueChange)="onValueChange($event)"
                         (selectionChange)="onSelectionChange($event)"
                         (filterChange)="onFilterChange($event)"

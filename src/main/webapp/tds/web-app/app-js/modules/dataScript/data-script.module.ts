@@ -2,7 +2,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Route Module
@@ -38,8 +38,6 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		// TODO: Only for Kendo Upload at this point
-		HttpClientModule,
 		// Kendo
 		DropDownsModule,
 		GridModule,
@@ -47,7 +45,6 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		SortableModule,
 		PopupModule,
 		NumericTextBoxModule,
-		HttpClientModule,
 		UploadModule,
 		InputsModule,
 		LayoutModule,
