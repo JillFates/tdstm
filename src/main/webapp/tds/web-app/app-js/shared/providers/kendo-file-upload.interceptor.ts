@@ -30,6 +30,7 @@ export class KendoFileUploadInterceptor implements HttpInterceptor {
 	constructor(private kendoFileHandlerService: KendoFileHandlerService) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
 		if (req.url === FILE_UPLOAD_SAVE_URL) {
 			let events: Observable<HttpEvent<any>>[] = [100].map((x) => Observable.of(<HttpProgressEvent>{
 				type: HttpEventType.UploadProgress,
