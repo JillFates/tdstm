@@ -1,6 +1,7 @@
 /**
  * Angular Interceptor to compliance new Http Client
  */
+import {Injectable} from '@angular/core';
 import {
 	HttpErrorResponse,
 	HttpEvent,
@@ -10,7 +11,7 @@ import {
 	HttpResponse
 } from '@angular/common/http';
 // Model
-import {ERROR_STATUS} from '../model/constants';
+import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../model/constants';
 import {AlertType} from '../model/alert.model';
 // Service
 import {NotifierService} from '../services/notifier.service';
@@ -18,13 +19,28 @@ import {NotifierService} from '../services/notifier.service';
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
 
+@Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
 
 	constructor(private notifierService: NotifierService) {
 	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+		// Kendo
+		if (request.url === FILE_UPLOAD_SAVE_URL || request.url === FILE_UPLOAD_REMOVE_URL) {
+			// Continue its flows so it can be catch by another Interceptor
+			return next.handle(request);
+		}
+		// All request
+		return this.handleRequest(request, next);
+	}
 
+	/**
+	 * Listen to all Request to provide the Loader and Validation Handler
+	 * @param request
+	 * @param next
+	 */
+	private handleRequest(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		const authReq = request.clone({
 			setHeaders: { 'Content-Type': 'application/json' }
 		});
@@ -64,7 +80,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					name: 'httpRequestCompleted',
 				});
 			}));
-
 	}
 
 	/**
@@ -87,7 +102,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					});
 				}
 			} catch (error) {
-				// There is only one place doing it, the Asset Explorer.
 				console.warn('Error by processing the Response');
 			}
 		}
