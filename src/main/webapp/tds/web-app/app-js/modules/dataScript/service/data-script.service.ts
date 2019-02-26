@@ -680,6 +680,7 @@ export class DataScriptService {
 			})
 			.catch((error: any) => error);
 	}
+
 	private getUserPreference(preferenceName: string): Observable<any> {
 		return this.preferenceService.getPreference(preferenceName);
 	}

@@ -1,9 +1,15 @@
 import {Injectable} from '@angular/core';
-import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpProgressEvent, HttpRequest} from '@angular/common/http';
+import {
+	HttpEvent,
+	HttpEventType,
+	HttpHandler,
+	HttpInterceptor,
+	HttpProgressEvent,
+	HttpRequest,
+} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
-import {DataScriptService} from '../../modules/dataScript/service/data-script.service';
 import {FileRestrictions} from '@progress/kendo-angular-upload';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
@@ -11,6 +17,7 @@ import {
 	FILE_UPLOAD_TYPE_PARAM,
 	REMOVE_FILENAME_PARAM, SAVE_FILENAME_PARAM
 } from '../model/constants';
+import {KendoFileHandlerService} from '../services/kendo-file-handler.service';
 
 /**
  * Mainly used by Kendo Upload Component.
@@ -20,7 +27,7 @@ import {
 @Injectable()
 export class KendoFileUploadInterceptor implements HttpInterceptor {
 
-	constructor(private dataIngestionService: DataScriptService) {}
+	constructor(private kendoFileHandlerService: KendoFileHandlerService) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		if (req.url === FILE_UPLOAD_SAVE_URL) {
@@ -30,18 +37,20 @@ export class KendoFileUploadInterceptor implements HttpInterceptor {
 				total: 100
 			}).delay(1000));
 			if (req.body.get(FILE_UPLOAD_TYPE_PARAM) === ETL_SCRIPT_FILE_UPLOAD_TYPE) {
-				events.push(this.dataIngestionService.uploadETLScriptFile(req.body));
+				events.push(this.kendoFileHandlerService.uploadETLScriptFile(req.body));
 			} else if (req.body.get(FILE_UPLOAD_TYPE_PARAM) === ASSET_IMPORT_FILE_UPLOAD_TYPE) {
-				events.push(this.dataIngestionService.uploadAssetImportFile(req.body));
+				events.push(this.kendoFileHandlerService.uploadAssetImportFile(req.body));
 			} else {
-				events.push(this.dataIngestionService.uploadFile(req.body));
+				events.push(this.kendoFileHandlerService.uploadFile(req.body));
 			}
 			return Observable.concat(...events);
 		}
 		if (req.url === FILE_UPLOAD_REMOVE_URL) {
 			let filename = req.body.get(REMOVE_FILENAME_PARAM);
-			return this.dataIngestionService.deleteFile(filename);
+			return this.kendoFileHandlerService.deleteFile(filename);
 		}
+
+		return next.handle(req);
 	}
 }
 
@@ -65,4 +74,8 @@ export class KendoFileUploadBasicConfig {
 		this.removeField = REMOVE_FILENAME_PARAM;
 		this.multiple = false;
 	}
+}
+
+export function HTTPKendoFactory(kendoFileHandlerService: KendoFileHandlerService) {
+	return new KendoFileUploadInterceptor(kendoFileHandlerService);
 }
