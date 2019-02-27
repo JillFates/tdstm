@@ -279,6 +279,12 @@ export class APIActionParameterModel {
 	sourceFieldList?: Array<any>;
 }
 
+export const Languages = {
+	GROOVY_SCRIPT : 'Groovy',
+	POWER_SHELL : 'PowerShell',
+	UNIX_SHELL : 'Shell'
+};
+
 export enum EventReactionType {
 	STATUS = 'STATUS',
 	SUCCESS = 'SUCCESS',

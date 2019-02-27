@@ -216,6 +216,12 @@ export class APIActionService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Save either a web api or script action
+	 * @param {APIActionModel} model
+	 * @param {any} parameterList
+	 * @returns {Observable<APIActionParameterModel[]>}
+	 */
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,

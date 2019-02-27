@@ -111,20 +111,6 @@ export class APIActionListComponent implements OnInit {
 	protected onCreate(): void {
 		let apiActionModel = new APIActionModel();
 		this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
-
-		/*
-		if (this.hasEarlyAccessTMRPermission) {
-			this.openAPIActionTypeDialog()
-				.then((action: APIActionType) => {
-					// apiActionModel.tabActionType = action;
-					setTimeout(() => this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE), 500);
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
-		}
-		*/
-
 	}
 
 	/**
@@ -135,7 +121,6 @@ export class APIActionListComponent implements OnInit {
 	protected onEdit(dataItem: any): void {
 		let apiAction: APIActionModel = dataItem as APIActionModel;
 		this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
-			// response.tabActionType = this.getTabActionType(response.actionType.id);
 			this.openAPIActionDialogViewEdit(response, ActionType.EDIT, apiAction);
 		}, error => console.log(error));
 	}
@@ -166,7 +151,6 @@ export class APIActionListComponent implements OnInit {
 			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
 			this.selectRow(apiAction.id);
 			this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
-				// response.tabActionType = this.getTabActionType(response.actionType.id);
 				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
 			}, error => console.log(error));
 		}
@@ -256,13 +240,5 @@ export class APIActionListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
-	}
-
-	private getTabActionType(actionTypeId: any): any {
-		if (!this.hasEarlyAccessTMRPermission) {
-			return null;
-		}
-
-		return (actionTypeId === 'WEB_API' ? APIActionType.HTTP_API : APIActionType.SCRIPT);
 	}
 }

@@ -7,7 +7,8 @@ import {
 	APIActionType,
 	EventReaction,
 	EventReactionType,
-	EVENT_BEFORE_CALL_TEXT
+	EVENT_BEFORE_CALL_TEXT,
+	Languages
 } from '../../model/api-action.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -135,12 +136,6 @@ export class APIActionViewEditComponent implements OnInit {
 		mode: 'Groovy',
 		rows: 10,
 		cols: 4
-	};
-
-	protected languages = {
-		GROOVY_SCRIPT : 'Groovy',
-		POWER_SHELL : 'PowerShell',
-		UNIX_SHELL : 'Shell'
 	};
 
 	public validInfoForm = false;
@@ -465,14 +460,19 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Determine if the tab sent as parameter is the current one selected
+	 * @param num
+	 */
 	protected isCurrentTab(num: number): boolean {
 		return this.currentTab === num;
 	}
 
+	/**
+	 * Set the flag that grabs the reference to the current tab
+	 * @param tab
+	 */
 	protected setCurrentTab(tab: NavigationTab): void {
-		console.log('Set current tab');
-		console.log('-----');
-
 		// set validators for current tab
 		// ------------------
 		if (tab === NavigationTab.HttpAPI) {
@@ -515,6 +515,10 @@ export class APIActionViewEditComponent implements OnInit {
 		this.currentTab = tab;
 	}
 
+	/**
+	 * Determine if the tab is enabled
+	 * @param num
+	 */
 	protected isTabEnabled(actionType: APIActionType): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
 
@@ -1023,7 +1027,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	onChangeType(type: any): void {
-		const language = this.languages[type.id];
+		const language = Languages[type.id];
 
 		if (language) {
 			this.codeMirror.mode = language

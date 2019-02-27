@@ -1,3 +1,8 @@
+/**
+ * Provides angular form validations for checking custom empty fields
+ * It requires the constant text that represents the empty value, for example 'Select...'
+ */
+
 import {Directive, Input} from '@angular/core';
 import {NG_VALIDATORS, Validator, AbstractControl} from '@angular/forms';
 
