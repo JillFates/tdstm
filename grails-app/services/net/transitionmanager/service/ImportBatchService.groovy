@@ -6,9 +6,7 @@ import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
-import groovy.util.logging.Slf4j
-import java.text.DateFormat
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
@@ -19,7 +17,7 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
-@Slf4j
+@Transactional
 class ImportBatchService implements ServiceMethods {
 
 	DataImportService dataImportService
