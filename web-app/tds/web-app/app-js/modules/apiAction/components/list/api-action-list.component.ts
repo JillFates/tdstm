@@ -21,7 +21,6 @@ import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {APIActionTypeSelectorComponent} from '../action-type-selector/api-action-type-selector.component';
 import {APIActionType} from '../../model/api-action.model';
 
 @Component({
@@ -257,15 +256,6 @@ export class APIActionListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
-	}
-
-	/**
-	 * Open The Dialog to select the API action type
-	 * @param {APIActionModel} apiActionModel
-	 * @param {number} actionType
-	 */
-	private openAPIActionTypeDialog(): any {
-		return this.dialogService.open(APIActionTypeSelectorComponent, [], DIALOG_SIZE.SM, false);
 	}
 
 	private getTabActionType(actionTypeId: any): any {
