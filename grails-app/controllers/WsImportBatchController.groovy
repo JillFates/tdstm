@@ -176,7 +176,10 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 	 * Delete a given list of batches.
 	 */
 	@HasPermission(Permission.DataTransferBatchDelete)
-	def bulkDeleteImportBatches(IdsCommand idsCmd) {
+	def bulkDeleteImportBatches() {
+		//Delete with a body doesn't get bound to command objects in Grails 3. In general from a REST perspective
+		// Delete methods shouldn't have a body, because they are usually deleting a resource by id.
+		IdsCommand idsCmd = populateCommandObject(IdsCommand)
 		validateCommandObject(idsCmd)
 		Project project = getProjectForWs()
 		importBatchService.deleteImportBatch(project, idsCmd.ids)
