@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e0cdbcda-a9d1-46a4-93c3-c5ccbda30719",
+		"_postman_id": "8647f487-3f9e-42b9-a14f-8872e17df25f",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,7 +12,6 @@
 					"listen": "test",
 					"script": {
 						"id": "e7c1e1df-9ff3-43ee-ac8d-9eeebe5dc11e",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -23,9 +22,10 @@
 							"});",
 							"",
 							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");",
+							"    pm.expect(pm.response.text()).to.include(\"Project:\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -413,8 +413,7 @@
 			"id": "24abf044-ac3e-43a7-a1d1-bad880fc0e05",
 			"key": "uniqueDatascriptName",
 			"value": "UniqueName",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		}
 	]
 }
