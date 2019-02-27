@@ -228,10 +228,9 @@ export class APIActionService {
 			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },
-			script: model.script,
+			script: model.script || '',
 			commandLine: model.commandLine,
 			apiCatalog: { id: model.dictionary.id },
-			actionType: model.actionType.id,
 			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
@@ -242,6 +241,11 @@ export class APIActionService {
 			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
 			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
 		};
+
+		const actionType = (model.actionType && model.actionType.id) || '';
+		if (actionType) {
+			postRequest.actionType = actionType;
+		}
 
 		let reaction = {
 			'STATUS': model.eventReactions[0].value,
