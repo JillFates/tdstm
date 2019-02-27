@@ -132,9 +132,7 @@ export class APIActionViewEditComponent implements OnInit {
 	private currentTab: NavigationTab = NavigationTab.Info;
 	private initFormLoad = true;
 	private codeMirror = {
-		mode: {
-			name: 'Groovy' // Looks like we lack of JS support for coloring
-		},
+		mode: 'Groovy',
 		rows: 10,
 		cols: 4
 	};
@@ -161,9 +159,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
-		simpleInfoForm: { isValid: false, isConfiguredValidators: false},
-		httpAPIForm: {isValid: false, isConfiguredValidators: false},
-		scriptForm: { isValid: false, isConfiguredValidators: false},
+		simpleInfoForm: { isConfiguredValidators: false },
+		httpAPIForm: { isConfiguredValidators: false },
+		scriptForm: { isConfiguredValidators: false },
 	};
 	protected hasEarlyAccessTMRPermission = false;
 
@@ -217,8 +215,6 @@ export class APIActionViewEditComponent implements OnInit {
 		setTimeout(() => {
 			if (this.simpleInfoForm) {
 				this.formValidStates.simpleInfoForm.isConfiguredValidators = true;
-				this.simpleInfoForm.valueChanges
-					.subscribe(() => this.setValidStateSimpleInfoForm());
 			}
 
 			if (this.apiActionForm) {
@@ -293,7 +289,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.remoteCredentials = [];
 					const keys = Object.keys(result.data.remoteCredentialMethods);
 					keys.forEach((key: string) => {
-						this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+						this.remoteCredentials.push({id: key, name: result.data.remoteCredentialMethods[key]});
 					});
 				}
 
@@ -373,20 +369,22 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
-			(result: any) => {
-				if (result) {
-					this.savedApiAction = true;
-					this.modalType = this.actionTypes.VIEW;
-					this.getModalTitle();
-					this.apiActionModel.id = result.id;
-					this.apiActionModel.version = result.version;
-					this.apiActionModel.actionType = result.actionType;
-					this.dataSignature = JSON.stringify(this.apiActionModel);
-					this.dataParameterListSignature = JSON.stringify(this.parameterList);
-				}
-			},
-			(err) => console.log(err));
+		if (this.canSave()) {
+			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
+				(result: any) => {
+					if (result) {
+						this.savedApiAction = true;
+						this.modalType = this.actionTypes.VIEW;
+						this.getModalTitle();
+						this.apiActionModel.id = result.id;
+						this.apiActionModel.version = result.version;
+						this.apiActionModel.actionType = result.actionType;
+						this.dataSignature = JSON.stringify(this.apiActionModel);
+						this.dataParameterListSignature = JSON.stringify(this.parameterList);
+					}
+				},
+				(err) => console.log(err));
+		}
 	}
 
 	/**
@@ -481,13 +479,9 @@ export class APIActionViewEditComponent implements OnInit {
 			if (!this.formValidStates.httpAPIForm.isConfiguredValidators) {
 				setTimeout(() => {
 					if (this.httpAPIForm) {
-						this.httpAPIForm.valueChanges
-							.subscribe(() => this.setValidStateHttpAPIForm());
 						this.formValidStates.httpAPIForm.isConfiguredValidators = true;
 					}
 				}, 1000);
-			} else {
-				this.setValidStateHttpAPIForm();
 			}
 		}
 
@@ -495,30 +489,11 @@ export class APIActionViewEditComponent implements OnInit {
 			if (!this.formValidStates.scriptForm.isConfiguredValidators) {
 				setTimeout(() => {
 					if (this.scriptForm) {
-						this.scriptForm.valueChanges
-							.subscribe(() => this.setValidStateScriptForm());
 						this.formValidStates.scriptForm.isConfiguredValidators = true;
 					}
 				}, 1000);
-			} else {
-				this.setValidStateScriptForm();
 			}
 		}
-
-		// on leave previous tab, validate it
-		// ------------------
-		if (this.currentTab === NavigationTab.Info) {
-			this.setValidStateSimpleInfoForm();
-		}
-		if (this.currentTab === NavigationTab.HttpAPI) {
-			this.setValidStateHttpAPIForm();
-		}
-
-		if (this.currentTab === NavigationTab.Script) {
-			this.setValidStateScriptForm();
-		}
-
-		// ------------------
 
 		this.editModeFromView = false;
 		if (this.currentTab === 0) {
@@ -1025,41 +1000,23 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
-	setValidStateSimpleInfoForm(): void {
-		if (this.simpleInfoForm) {
-			this.formValidStates.simpleInfoForm.isValid =  this.simpleInfoForm.valid;
-		}
-	}
-
-	setValidStateHttpAPIForm(): void {
-		if (this.httpAPIForm) {
-			this.formValidStates.httpAPIForm.isValid =  this.httpAPIForm.valid;
-		}
-	}
-
-	setValidStateScriptForm(): void {
-		if (this.scriptForm) {
-			this.formValidStates.scriptForm.isValid =  this.scriptForm.valid;
-		}
-	}
-
 	canSave(): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
 
 		if (this.hasEarlyAccessTMRPermission &&  actionTypeId === this.WEB_API) {
 			return (
-				this.formValidStates.simpleInfoForm.isValid &&
-				this.formValidStates.httpAPIForm.isValid &&
+				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
+				(this.httpAPIForm && this.httpAPIForm.valid) &&
 				this.validParametersForm
-			)
+			);
 		}
 
 		if (this.hasEarlyAccessTMRPermission && actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
-				this.formValidStates.simpleInfoForm.isValid &&
-				this.formValidStates.scriptForm.isValid &&
+				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
+				(this.scriptForm && this.scriptForm.valid)	 &&
 				this.validParametersForm
-			)
+			);
 		}
 
 		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm);
@@ -1069,7 +1026,13 @@ export class APIActionViewEditComponent implements OnInit {
 		const language = this.languages[type.id];
 
 		if (language) {
-			this.codeMirror.mode.name = language
+			this.codeMirror.mode = language
 		}
+	}
+
+	getClonedCodeMirrorSettings(properties: any): any {
+		const cloned =  Object.assign({}, this.codeMirror, properties);
+
+		return cloned;
 	}
 }

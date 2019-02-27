@@ -219,11 +219,13 @@ export class APIActionService {
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,
+			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },
 			script: model.script,
+			commandLine: model.commandLine,
 			apiCatalog: { id: model.dictionary.id },
-			actionType: model.actionType,
+			actionType: model.actionType.id,
 			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,

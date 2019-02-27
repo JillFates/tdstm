@@ -7,43 +7,38 @@
 	</div>
 	<div class="modal-body"
 	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
-		<!--
-		<div class="row">
-			<div>@@ SIMPLE INFO VALID: {{formValidStates.simpleInfoForm.isValid}}</div>
-			<div>@@ WEB API VALID: {{formValidStates.httpAPIForm.isValid}}</div>
-			<div>@@ SCRIPT VALID: {{formValidStates.scriptForm.isValid}}</div>
-			<div>@@ INFO: {{validInfoForm}}</div>
-			<div>@@ PARAMETERS: {{validParametersForm}}</div>
-		</div>
-		-->
 		<div class="nav-tabs-custom">
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
-					<li *ngIf="!hasEarlyAccessTMRPermission" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
-                        <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span></a>
+					<li *ngIf="!hasEarlyAccessTMRPermission" role="presentation"
+					    [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
+                        <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
+	                        <span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span>
+                        </a>
 					</li>
-
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
+					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
+					    [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
 						<a href="#tab_simpleInfo" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!formValidStates.simpleInfoForm.isValid && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
+							<span [ngClass]="{ 'invalid-form': (!simpleInfoForm?.valid && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
 								Info
 							</span>
 						</a>
 					</li>
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
+					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
+					    [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
 						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
 						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!formValidStates.httpAPIForm.isValid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
+							<span [ngClass]="{ 'invalid-form': (!httpAPIForm?.valid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
 							<a class="tab-disabled"><span>WebAPI</span></a>
 						</ng-template>
 					</li>
-
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"  [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
+					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
+					    [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
 						<a href="#tab_script" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
 						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!formValidStates.scriptForm.isValid && formValidStates.scriptForm.isConfiguredValidators && !isCurrentTab(tabsEnum.Script)) && modalType !== actionTypes.VIEW}">
+							<span [ngClass]="{ 'invalid-form': (!scriptForm?.valid && formValidStates.scriptForm.isConfiguredValidators && !isCurrentTab(tabsEnum.Script)) && modalType !== actionTypes.VIEW}">
 								Script
 							</span>
 						</a>
@@ -52,6 +47,7 @@
 							<a class="tab-disabled"><span>Script</span></a>
 						</ng-template>
 					</li>
+
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
 						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">
 							<span [ngClass]="{ 'invalid-form': (!validParametersForm && !isCurrentTab(tabsEnum.Parameters)) && modalType !== actionTypes.VIEW}">
@@ -64,7 +60,10 @@
 					</li>
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
-					<div *ngIf="!hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info)" class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" id="tab_info">
+					<div [ngClass]="!hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed': 'is-hidden'"
+					     class="tab-pane" style="padding-left:15px"
+					     [ngClass]="{'active': isCurrentTab(tabsEnum.Info)}"
+					     id="tab_info">
 						<form name="apiActionForm" role="form" data-toggle="validator" #apiActionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -364,7 +363,7 @@
 							</div>
 						</form>
 					</div>
-					<div *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info)"
+					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed' : 'is-hidden'"
 					     class="tab-pane"
 					     style="padding-left:15px"
 					     [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}"
@@ -475,7 +474,8 @@
 							</div>
 						</form>
 					</div>
-					<div *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.HttpAPI)"  class="tab-pane" style="padding-left:15px"
+					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.HttpAPI) ? 'is-displayed' : 'is-hidden'"
+					     class="tab-pane" style="padding-left:15px"
 					     [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
 						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
@@ -729,7 +729,10 @@
 							</div>
 						</form>
 					</div>
-					<div *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"  class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}" id="tab_script">
+					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)  ? 'is-displayed' : 'is-hidden'"
+					     class="tab-pane"
+					     style="padding-left:15px"
+					     [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}" id="tab_script">
 						<form name="scriptForm" role="form" data-toggle="validator" #scriptForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
@@ -758,13 +761,15 @@
 											                    [data]="remoteCredentials"
 											                    required
 											                    requiredComplexValue propertyName="id"
-											                    [textField]="'value'"
+											                    [textField]="'name'"
 											                    [valueField]="'id'"
 											                    [(ngModel)]="apiActionModel.remoteCredentialMethod">
 											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
+											<label class="control-label label-detail">
+												{{apiActionModel.remoteCredentialMethod && apiActionModel.remoteCredentialMethod.name}}
+											</label>
 										</div>
 									</div>
 								</div>
@@ -772,21 +777,32 @@
 									<div class="form-group">
 										<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<code-mirror #codeMirror
+											<code-mirror *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
 											             id="scriptCode"
 											             [mode]="codeMirror.mode"
 											             [(model)]="apiActionModel.script">
 											</code-mirror>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
+											<code-mirror *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
+											             id="scriptCodeReadOnly"
+											             [mode]="getClonedCodeMirrorSettings({readOnly: true})"
+											             [(model)]="apiActionModel.script">
+											</code-mirror>
+
+											<!--<label class="control-label label-detail">-->
+												<!--{{apiActionModel.script}}-->
+												<!--((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')-->
+											<!--</label>-->
 										</div>
 									</div>
 								</div>
 							</div>
 						</form>
 					</div>
-					<div *ngIf="isCurrentTab(tabsEnum.Parameters)" class="tab-pane no-padding api-action-parameters-form" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
+					<div [ngClass]="isCurrentTab(tabsEnum.Parameters) ? 'is-displayed' : 'is-hidden'"
+					     class="tab-pane no-padding api-action-parameters-form"
+					     [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
 						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body no-padding ">
 								<kendo-grid
@@ -882,7 +898,8 @@
 							</div>
 						</form>
 					</div>
-					<div *ngIf="isCurrentTab(tabsEnum.Reactions)" class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
+					<div *ngIf="isCurrentTab(tabsEnum.Reactions)"
+					     class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
 						<form name="apiActionReactionForm" role="form" data-toggle="validator" #apiActionReactionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
