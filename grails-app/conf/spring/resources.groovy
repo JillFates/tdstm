@@ -42,7 +42,7 @@ beans = {
 	permissionEvaluator(TdsPermissionEvaluator)
 
 	userDetailsService(TdsUserDetailsService)
-	tdsSaltSource(TdsSaltSource)
+	saltSource(TdsSaltSource)
 
 	preAuthenticationChecks(TdsPreAuthenticationChecks) {
 		auditService = ref('auditService')
