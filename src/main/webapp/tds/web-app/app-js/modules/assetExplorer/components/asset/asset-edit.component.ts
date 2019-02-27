@@ -42,7 +42,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
-				this.http.get(`../ws/asset/editTemplate/${this.modelId}`),
+				this.http.get(`../ws/asset/editTemplate/${this.modelId}`, {responseType: 'text'}),
 				this.http.get(`../ws/asset/editModel/${this.modelId}`))
 				.subscribe((response: any) => {
 					let template = response[0];
@@ -64,6 +64,9 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 
 					}
 				});
+		}, (error) => {
+			console.error('Error: ');
+			console.error(error);
 		});
 	}
 
