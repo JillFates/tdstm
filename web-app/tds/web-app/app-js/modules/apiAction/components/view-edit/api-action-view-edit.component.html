@@ -31,7 +31,7 @@
 							<span [ngClass]="{ 'invalid-form': (!httpAPIForm?.valid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
 						</a>
 						<ng-template #labelTemplateHttpAPI>
-							<a class="tab-disabled"><span>WebAPI</span></a>
+							<a class="tab-disabled" tabindex="6"><span>WebAPI</span></a>
 						</ng-template>
 					</li>
 					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
@@ -430,7 +430,7 @@
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #simpleApiActionType
-												                    tabindex="2"
+												                    tabindex="4"
 												                    id="simpleApiActionType"
 												                    name="simpleApiActionType"
 												                    [data]="actionTypesList"
@@ -457,6 +457,7 @@
 												<input type="checkbox"
 												       id="simpleApiActionRemote"
 												       name="simpleApiActionRemote"
+												       tabindex="5"
 												       [(ngModel)]="apiActionModel.remoteInvocation"
 												       [disabled]="true"
 												       class="form-check-input aligned-checkbox" />
@@ -1173,18 +1174,28 @@
 			</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
+		<button type="button"
+		        tabindex="20"
+		        *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
 		 class="btn btn-primary pull-left"
 		        [disabled]="!canSave()">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
+		<button type="button"
+		        tabindex="21"
+		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
-		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
+		<button type="button"
+		        tabindex="22"
+		        *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
+		<button type="button"
+		        tabindex="23"
+		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
 			<span class="fa fa-fw fa-trash"></span> Delete</button>
 
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+		<button (click)="cancelCloseDialog()"
+		        tabindex="24"
+		        type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span>
 			<span *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">
 				{{'GLOBAL.CLOSE' | translate }}
