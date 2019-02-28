@@ -58,6 +58,7 @@ class Notice {
 			htmlText sqlType: 'text'
 			id column: 'notice_id'
 			rawText sqlType: 'text'
+			typeId enumType: 'ordinal'
 		}
 	}
 

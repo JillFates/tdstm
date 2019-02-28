@@ -139,8 +139,8 @@ class PersonController implements ControllerMethods {
 			pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
 			IFNULL(p.model_score, 0) AS modelScore
 			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='ROLE_STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='ROLE_COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
 			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id

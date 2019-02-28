@@ -106,13 +106,8 @@ export class NoticeViewEditComponent {
 	}
 
 	public formValid(): boolean {
-		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
-	}
-
-	public isCreateEditAvailable(): boolean {
-		return this.modalType === 0 ?
-			this.permissionService.hasPermission(Permission.NoticeEdit) :
-			this.permissionService.hasPermission(Permission.NoticeEdit);
+		return (this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId
+			&& this.permissionService.hasPermission(Permission.NoticeEdit));
 	}
 
 	protected isDeleteAvailable(): boolean {

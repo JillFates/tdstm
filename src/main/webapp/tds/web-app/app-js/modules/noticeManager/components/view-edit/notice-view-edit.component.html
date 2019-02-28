@@ -46,7 +46,7 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
+        <button (click)="saveNotice()" [disabled]="!formValid()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
         <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
         <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="modalType===1" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
