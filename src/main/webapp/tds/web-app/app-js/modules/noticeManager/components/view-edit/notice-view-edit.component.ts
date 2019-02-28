@@ -37,7 +37,7 @@ export class NoticeViewEditComponent {
 
 	constructor(
 		model: NoticeModel,
-		@Inject('modalType') public modalType: ModalType,
+		public modalType: ModalType,
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,

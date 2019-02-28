@@ -78,7 +78,7 @@ export class CredentialViewEditComponent {
 	};
 	constructor(
 		public originalModel: CredentialModel,
-		@Inject('modalType') public modalType: ActionType,
+		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,

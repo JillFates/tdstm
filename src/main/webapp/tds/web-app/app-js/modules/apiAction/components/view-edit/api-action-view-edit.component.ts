@@ -136,7 +136,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	constructor(
 		public originalModel: APIActionModel,
-		@Inject('modalType') public modalType: ActionType,
+		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,

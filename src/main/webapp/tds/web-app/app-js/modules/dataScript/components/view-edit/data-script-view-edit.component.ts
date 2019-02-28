@@ -43,7 +43,7 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	constructor(
 		public originalModel: DataScriptModel,
-		@Inject('modalType') public modalType: ActionType,
+		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
