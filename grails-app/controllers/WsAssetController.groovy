@@ -13,6 +13,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
@@ -534,6 +535,21 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson()
 
 	}
+
+	/**
+	 * Create or Update an AssetComment
+	 * @param id
+	 * @param command
+	 */
+	private void saveOrUpdateComment() {
+		// Retrieve the project for the user.
+		Project project = getProjectForWs()
+		// Populate the command object with the data coming from the request
+		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
+		// Save or update the comment
+		commentService.saveOrUpdateAssetComment(project, command)
+	}
+
 
 	/**
 	 * Get all the comments associated with the current project
