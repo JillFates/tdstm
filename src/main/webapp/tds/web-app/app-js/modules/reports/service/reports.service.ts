@@ -39,9 +39,9 @@ export class ReportsService {
 	 */
 	getPreventsCheckList(eventId: string): Observable<any> {
 		const payload = { moveEvent: eventId };
-		return this.http.post(`${this.baseURL}/ws/reports/generateCheckList`, JSON.stringify(payload))
+		return this.http.post(`${this.baseURL}/ws/reports/generateCheckList`, JSON.stringify(payload), {responseType: 'text'})
 			.map((response: any) => {
-				return response && response.text()  || '';
+				return response && response || '';
 
 			})
 			.catch((error: any) => error);
