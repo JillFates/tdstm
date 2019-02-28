@@ -68,7 +68,7 @@ export class LicenseColumnModel {
 
 export class RequestLicenseModel {
 	email: string;
-	environment?: LicenseEnvironment;
+	environment?: any;
 	project?: any;
 	clientName?: string;
 	specialInstruction?: string;
@@ -78,9 +78,19 @@ export class LicenseModel {
 	id?: number;
 	key?: string;
 	name: string;
+	status?: string;
 	description?: string;
+	expirationDate?: string;
+	activationDate?: string;
 	comment?: string;
+	email?: string;
+	client?: any;
 	dateCreated?: Date;
+	method?: any;
+	requestNote?: string;
+	environment?: string;
+	replaced?: string;
+	project?: any;
 }
 
 export enum LicenseType {

@@ -87,9 +87,9 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	public modalOptions: DecoratorOptions;
 	public ASSET_NAME_POPUP_MESSAGE = `Cloned asset will have Environment = 'Select...' and the next available Asset Tag number for device class`;
 	protected asset: any;
-	protected assetName: string;
-	protected uniqueAssetName: boolean;
-	protected existAsset: any;
+	public assetName: string;
+	public uniqueAssetName: boolean;
+	public existAsset: any;
 	@ViewChild('includeDependencies') includeDependencies: ElementRef;
 
 	constructor(
@@ -116,21 +116,21 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	/**
 	 * Close Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 
 	/**
 	 * Validates if user has Permission to clone assets
 	 */
-	protected canCloneAssets() {
+	public canCloneAssets() {
 		return this.permissionService.hasPermission(Permission.AssetCreate);
 	}
 
 	/**
 	 * Validate the name uniqueness of assets
 	 */
-	protected isAssetUnique() {
+	public isAssetUnique() {
 		const assetToValid = {
 			id: this.cloneModalModel.assetId,
 			name: this.assetName

@@ -15,7 +15,7 @@ import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'data-script-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/list/data-script-list.component.html',
+	templateUrl: 'data-script-list.component.html',
 	styles: [`
 		#btnCreateDataScript { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }

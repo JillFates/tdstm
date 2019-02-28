@@ -15,7 +15,7 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: 'import-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/detail/import-batch-detail-dialog.component.html',
+	templateUrl: 'import-batch-detail-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
 	}
@@ -25,7 +25,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	private BatchStatus = BatchStatus;
 	private columnsModel: ImportBatchRecordDetailColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
-	private dataGridOperationsHelper: DataGridOperationsHelper;
+	public dataGridOperationsHelper: DataGridOperationsHelper;
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
 	};
@@ -53,7 +53,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	private importBatchPreferences = {};
 
 	constructor(
-		private importBatchModel: ImportBatchModel,
+		public importBatchModel: ImportBatchModel,
 		private importBatchService: ImportBatchService,
 		private activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
@@ -172,7 +172,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	private cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.close(this.batchRecordsUpdatedFlag);
 	}
 

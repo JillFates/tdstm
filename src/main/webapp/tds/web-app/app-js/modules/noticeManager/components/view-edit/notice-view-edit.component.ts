@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild} from '@angular/core';
+import {Component, Inject, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -14,10 +14,11 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 import {NoticeModel} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {ModalType} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'tds-notice-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
+	templateUrl: 'notice-view-edit.component.html'
 })
 export class NoticeViewEditComponent {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
@@ -25,18 +26,18 @@ export class NoticeViewEditComponent {
 	@ViewChild('noticeForm') noticeForm: FormControl;
 
 	private dataSignature: string;
-	protected model: NoticeModel;
-	protected defaultItem: any = {
+	public defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-	protected typeDataSource: Array<any> = [
+	public typeDataSource: Array<any> = [
 		{typeId: 1, name: 'Prelogin'},
 		{typeId: 2, name: 'Postlogin'}
 	];
+	public model: NoticeModel;
 
 	constructor(
 		model: NoticeModel,
-		public action: Number,
+		public modalType: ModalType,
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
@@ -48,7 +49,7 @@ export class NoticeViewEditComponent {
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -75,7 +76,7 @@ export class NoticeViewEditComponent {
 	/**
 	 * Save the current status fo the Notice
 	 */
-	protected saveNotice(): void {
+	public saveNotice(): void {
 		if (this.model.id) {
 			this.noticeService.editNotice(this.model)
 				.subscribe(
@@ -94,7 +95,7 @@ export class NoticeViewEditComponent {
 	/**
 	 * Opens the view to pre-render the HTML
 	 */
-	protected viewHTML(): void {
+	public viewHTML(): void {
 		this.dialogService.extra(ViewHtmlComponent,
 			[{provide: NoticeModel, useValue: this.model}],
 			false, false)
@@ -104,9 +105,9 @@ export class NoticeViewEditComponent {
 			.catch(error => console.log('View HTML Closed'));
 	}
 
-	protected formValid(): boolean {
+	public formValid(): boolean {
 		return (this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId
-		&& this.permissionService.hasPermission(Permission.NoticeEdit));
+			&& this.permissionService.hasPermission(Permission.NoticeEdit));
 	}
 
 	protected isDeleteAvailable(): boolean {

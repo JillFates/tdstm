@@ -22,7 +22,7 @@
                         <span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
                     </button>
 
-                    <button id="btnCloseDialog" (click)="cancelCloseDialog()" type="button" class="close-screen" aria-label="Close" title="Close">
+                    <button id="btnCloseDialog" (click)="cancelCloseDialog($event)" type="button" class="close-screen" aria-label="Close" title="Close">
                         <span class="glyphicon glyphicon-remove" title="Close"></span>
                     </button>
                 </div>
@@ -81,7 +81,7 @@
                                 {{'GLOBAL.SAVE' | translate }}
                                 <i *ngIf="operationStatus.save === 'fail'" class="glyphicon glyphicon-remove" style="margin-left: 3px;"></i>
                             </button>
-                            <button (click)="cancelCloseDialog()"
+                            <button (click)="cancelCloseDialog($event)"
                                     type="button" class="btn btn-default btn-resize pull-right">
                                 <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
                         </div>

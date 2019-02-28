@@ -10,7 +10,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 @Component({
 	selector: 'asset-dependency',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/asset-dependency/asset-dependency.component.html',
+	templateUrl: 'asset-dependency.component.html',
 	styles: [`
         table {
             margin-top: 10px;
@@ -84,18 +84,18 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
         }`]
 })
 export class AssetDependencyComponent extends UIExtraDialog {
-	protected dependencyA: any;
-	protected dependencyB: any;
-	protected isEditing: boolean;
 	protected frequencyList: string[];
 	protected typeList: string[];
 	protected statusList: string[];
 	protected directionList: string[];
 	protected editedDependencies = this.getInitialEditDependencies();
 	protected DependencyType = DependencyType;
+	public dependencyA: any;
+	public dependencyB: any;
+	public isEditing: boolean;
 
 	constructor(
-		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
+		@Inject('ASSET_DEP_MODEL') public assetDependency: any,
 		private assetService: DependecyService,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe) {
@@ -136,7 +136,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 * Close the window
 	 * @return {void)
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 

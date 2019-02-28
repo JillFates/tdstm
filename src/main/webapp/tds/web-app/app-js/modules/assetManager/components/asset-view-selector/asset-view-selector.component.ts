@@ -121,11 +121,11 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		}
 	}
 
-	protected onAction(e): void {
+	public onAction(e): void {
 		e.prevented = true;
 	}
 
-	protected onToggle() {
+	public onToggle() {
 		setTimeout(() => {
 			this.dropdown.toggle(!this.dropdown.isOpen)
 			setTimeout( () => {

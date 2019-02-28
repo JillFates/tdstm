@@ -10,8 +10,6 @@ import {NotifierService} from '../services/notifier.service';
 import {UILoaderService} from '../services/ui-loader.service';
 import {LOADER_IDLE_PERIOD} from '../model/constants';
 
-declare var jQuery: any;
-
 @Component({
 	selector: 'tds-ui-loader',
 	template: '<div id="main-loader" *ngIf="loaderConfig.show"><div id="loader-icon"><div class="loader"></div></div></div>'
@@ -19,7 +17,7 @@ declare var jQuery: any;
 
 export class UILoaderDirective {
 
-	private loaderConfig: any;
+	public loaderConfig: any;
 
 	constructor(private notifierService: NotifierService, private loaderService: UILoaderService) {
 		this.httpRequestHandlerInitial();

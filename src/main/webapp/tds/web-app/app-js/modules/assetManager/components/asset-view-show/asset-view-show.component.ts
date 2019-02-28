@@ -23,21 +23,21 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 declare var jQuery: any;
 @Component({
 	selector: 'tds-asset-view-show',
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-show/asset-view-show.component.html'
+	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	private currentId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
-	protected model: ViewModel = new ViewModel();
+	public model: ViewModel = new ViewModel();
 	protected domains: DomainModel[] = [];
-	protected metadata: any = {};
+	public metadata: any = {};
 	private lastSnapshot;
 	protected navigationSubscription;
 	protected justPlanning: boolean;
-	protected data: any;
-	protected gridState: State = {
+	public data: any;
+	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
@@ -121,7 +121,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			]});
 	}
 
-	protected onQuery(): void {
+	public onQuery(): void {
 		let params = {
 			offset: this.gridState.skip,
 			limit: this.gridState.take,
@@ -176,7 +176,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return result;
 	}
 
-	protected onExport(): void {
+	public onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParamsForExport(),
 			domains: this.domains,
@@ -193,7 +193,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	protected onFavorite(): void {
+	public onFavorite(): void {
 		if (this.model.isFavorite) {
 			this.assetExplorerService.deleteFavorite(this.model.id)
 				.subscribe(d => {
@@ -258,7 +258,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Determines if show we can show Save/Save All buttons at all.
 	 * @returns {boolean}
 	 */
-	protected canShowSaveButton(): boolean {
+	public canShowSaveButton(): boolean {
 		return this.model.id && (this.canSave() || this.canSaveAs());
 		// long & old validation will leave it for the moment.
 		// return this.model.id && (this.model.isOwner || (this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))));
@@ -299,7 +299,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	protected isEditAvailable(): boolean {
+	public isEditAvailable(): boolean {
 		return this.model.isSystem ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
 			this.permissionService.hasPermission(Permission.AssetExplorerEdit);
@@ -309,7 +309,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Whenever the just planning change, grab the new value
 	 * @param justPlanning
 	 */
-	protected onJustPlanningChange(justPlanning: boolean): void {
+	public onJustPlanningChange(justPlanning: boolean): void {
 		this.justPlanning = justPlanning;
 	}
 
@@ -318,7 +318,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Whenever the grid state change, grab the new value
 	 * @param state New state
 	 */
-	protected onGridStateChange(state: State): void {
+	public onGridStateChange(state: State): void {
 		this.gridState = state;
 	}
 

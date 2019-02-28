@@ -7,7 +7,7 @@ import {PermissionService} from '../../../../../../../shared/services/permission
 
 @Component({
 	selector: 'model-device-show',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/device/model-device/components/model-device-show/model-device-show.component.html'
+	templateUrl: 'model-device-show.component.html'
 })
 export class ModelDeviceShowComponent extends UIExtraDialog {
 	constructor(
@@ -21,7 +21,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	/***
 	 * Close the Active Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.dismiss();
 	}
 

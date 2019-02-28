@@ -39,25 +39,25 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected modalType = ModalType;
 	protected dateFormat: string;
 	protected dateFormatTime: string;
-	protected dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
-	protected dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
 	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
-	protected collapsedTaskDetail = false;
+	public collapsedTaskDetail = false;
 	protected hasCookbookPermission = false;
-	protected modalOptions: DecoratorOptions;
-	protected model: any = {};
+	public modalOptions: DecoratorOptions;
+	public model: any = {};
 	protected getAssetList: Function;
 	protected yesNoList =  [...YesNoList];
 	protected predecessorSuccessorColumns: any[];
 	protected userTimeZone: string;
 	protected hasModelChanges = false;
-	protected hasDeleteTaskPermission = false;
-	protected hasEditTaskPermission = false;
-	protected modelHelper: TaskEditCreateModelHelper;
+	public hasDeleteTaskPermission = false;
+	public hasEditTaskPermission = false;
+	public modelHelper: TaskEditCreateModelHelper;
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
-	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
+	public dataGridTaskNotesHelper: DataGridOperationsHelper;
 	protected isEventLocked: boolean;
-	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
+	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 	private destroySubject: Subject<any> = new Subject<any>();
 	constructor(
@@ -335,7 +335,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	/**
 	 * Save the changes on the task
 	 */
-	protected onSave(): void {
+	public onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((result) => this.close(result));
 	}
@@ -343,7 +343,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	/**
 	 * Create the task
 	*/
-	protected onCreate(): void {
+	public onCreate(): void {
 		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
 			.subscribe((result) => this.close(result));
 	}
@@ -358,7 +358,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	/**
 	 * Close Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isFormDirty()) {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
@@ -379,7 +379,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * Prompt confirm delete a task
 	 * delegate operation to host component
 	 */
-	protected deleteTask(): void {
+	public deleteTask(): void {
 		this.promptService.open(
 			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
@@ -437,7 +437,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * Determine whether the form should be disabled because of invalid fields
 	 * @returns {boolean}
 	 */
-	protected isFormInvalid(): boolean {
+	public isFormInvalid(): boolean {
 		return !this.taskEditCreateForm.form.valid ||
 			this.hasInvalidFields() ||
 			!(this.taskEditCreateForm.form.dirty || this.hasModelChanges)
@@ -510,7 +510,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	/**
 	 * Create a note and update the datagrid task notes component
 	 */
-	protected createNote() {
+	public createNote() {
 		this.modelHelper.onCreateNote()
 			.subscribe((result) => {
 				if (result) {

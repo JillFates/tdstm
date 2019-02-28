@@ -22,7 +22,7 @@
 							[data]="environmentList"
 							[(ngModel)]="requestLicense.environment"
 							required
-							[ngClass]="{'has-error':  (licenseRequestForm.touched) && requestLicense.environment == 0}">
+							[ngClass]="{'has-error':  licenseRequestForm.touched && requestLicense.environment == 0}">
 						</kendo-dropdownlist>
 					</div>
 				</div>

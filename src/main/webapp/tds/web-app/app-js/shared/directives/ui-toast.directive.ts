@@ -38,10 +38,11 @@ import {KEYSTROKE} from '../model/constants';
 
 export class UIToastDirective {
 
-	private showsPopUp = false;
+	@ViewChild('closePopUpDialog') closePopUpDialog: ElementRef;
 	private alertModel = AlertModel;
 	private alertType = AlertType;
-	@ViewChild('closePopUpDialog') closePopUpDialog: ElementRef;
+
+	public showsPopUp = false;
 
 	constructor(private notifierService: NotifierService) {
 		this.eventListeners();

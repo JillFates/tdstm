@@ -10,19 +10,19 @@ import 'rxjs/add/operator/finally';
 
 @Component({
 	selector: 'tds-notice-view-html',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-html/view-html.component.html'
+	templateUrl: 'view-html.component.html'
 })
 export class ViewHtmlComponent extends UIExtraDialog {
 
-	protected modalOptions: DecoratorOptions;
+	public modalOptions: DecoratorOptions;
 
 	constructor(
-		private noticeModel: NoticeModel) {
+		public noticeModel: NoticeModel) {
 		super('#noticeViewHtml');
 		this.modalOptions = {isFullScreen: false, isResizable: false};
 	}
 
-	protected cancelCloseDialog($event): void {
+	public cancelCloseDialog($event): void {
 		this.close();
 	}
 

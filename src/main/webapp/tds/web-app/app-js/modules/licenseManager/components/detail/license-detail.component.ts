@@ -16,27 +16,27 @@ import {SortUtils} from '../../../../shared/utils/sort.utils';
 
 @Component({
 	selector: 'tds-license-manager-detail',
-	templateUrl: '../tds/web-app/app-js/modules/licenseManager/components/detail/license-detail.component.html'
+	templateUrl: 'license-detail.component.html'
 })
 export class LicenseDetailComponent implements OnInit {
 
 	private dataSignature: string;
-	protected environmentList: any = [];
 	protected projectList: any = [];
-	protected dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
-	protected methodOptions = MethodOptions;
 	protected licenseStatus = LicenseStatus;
-	protected editMode = false;
-	protected pendingLicense = false;
 	protected expiredOrTerminated = false;
-	protected activeShowMode = false;
 	protected range = { start: null, end: null };
-	protected licenseKey = 'Licenses has not been issued';
 	protected reloadRequired = false;
 	protected activityLog = [];
-	protected licenseActivityColumnModel = new LicenseActivityColumnModel();
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected userTimeZone: string;
+	public licenseActivityColumnModel = new LicenseActivityColumnModel();
+	public methodOptions = MethodOptions;
+	public activeShowMode = false;
+	public dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
+	public editMode = false;
+	public pendingLicense = false;
+	public environmentList: any = [];
+	public licenseKey = 'Licenses has not been issued';
 
 	constructor(
 		public licenseModel: LicenseModel,
@@ -185,7 +185,7 @@ export class LicenseDetailComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.editMode) {
 			this.editMode = false;
 			this.licenseModel = JSON.parse(this.dataSignature);
@@ -200,7 +200,7 @@ export class LicenseDetailComponent implements OnInit {
 	/**
 	 * Delete the current License
 	 */
-	protected onDelete(): void {
+	public onDelete(): void {
 		this.prompt.open('Confirmation Required', 'You are about to delete the selected license. Are you sure? Click Confirm to delete otherwise press Cancel.', 'Yes', 'No')
 			.then((res) => {
 				if (res) {

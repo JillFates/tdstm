@@ -6,7 +6,7 @@
 			 [style.width.px]="517"
 			 [style.height.px]="380">
 			<div class="modal-header">
-				<button type="button" (click)="cancelCloseDialog()" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<button type="button" (click)="cancelCloseDialog($event)" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 				<h4 class="modal-title">Apply License Key</h4>
 			</div>
 			<div class="modal-body">
@@ -23,7 +23,7 @@
 			</div>
 			<div class="modal-footer form-group">
 				<button (click)="applyKey()" [disabled]="!applyLicenseForm.form.valid" type="button" class="btn btn-primary pull-left"><i class="fa fa-fw fa-key"></i> Apply</button>
-				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+				<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>{{'GLOBAL.CANCEL' | translate }}</span>
 				</button>

@@ -9,12 +9,12 @@ import {PermissionService} from '../../../../services/permission.service';
 
 @Component({
 	selector: 'tds-tranman-menu',
-	templateUrl: '../tds/web-app/app-js/shared/modules/header/components/tranman-menu/tranman-menu.component.html',
+	templateUrl: 'tranman-menu.component.html',
 })
 
 export class TranmanMenuComponent {
-	protected userContext: UserContextModel;
 	protected permission: Permission = Permission;
+	public userContext: UserContextModel;
 
 	constructor(
 		private appSettingsService: UserContextService,

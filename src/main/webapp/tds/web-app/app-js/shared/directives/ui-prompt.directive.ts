@@ -90,17 +90,17 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 		});
 	};
 
-	protected cancel(): void {
+	public cancel(): void {
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
 
-	protected dismiss(): void {
+	public dismiss(): void {
 		this.reject();
 		this.tdsUiPrompt.modal('hide');
 	}
 
-	protected confirm(): void {
+	public confirm(): void {
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
 	}

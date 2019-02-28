@@ -7,7 +7,7 @@ import {ManufacturerService} from '../../../../../service/manufacturer.service';
 
 @Component({
 	selector: 'device-manufacturer-edit',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component.html'
+	templateUrl: 'manufacturer-edit.component.html'
 })
 export class ManufacturerEditComponent extends UIExtraDialog {
 	isEditing: boolean;
@@ -24,7 +24,7 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	/***
 	 * Close the Active Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.close(null);
 	}
 

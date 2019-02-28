@@ -23,7 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'api-action-list',
-	templateUrl: '../tds/web-app/app-js/modules/apiAction/components/list/api-action-list.component.html',
+	templateUrl: 'api-action-list.component.html',
 	styles: [`
 		#btnCreate { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }

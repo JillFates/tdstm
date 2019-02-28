@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
@@ -29,7 +29,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'api-action-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/apiAction/components/view-edit/api-action-view-edit.component.html',
+	templateUrl: 'api-action-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -324,7 +324,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
-	protected isDirty(): boolean {
+	public isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.apiActionModel);
 	}
 
@@ -332,7 +332,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
-	protected isParameterListDirty(): boolean {
+	public isParameterListDirty(): boolean {
 		if (this.dataParameterListSignature !== '' && this.parameterList.length > 0) {
 			return this.dataParameterListSignature !== JSON.stringify(this.parameterList);
 		}
@@ -341,7 +341,7 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty() || this.isParameterListDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -398,11 +398,11 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 	}
 
-	protected isCurrentTab(num: number): boolean {
+	public isCurrentTab(num: number): boolean {
 		return this.currentTab === num;
 	}
 
-	protected setCurrentTab(num: number): void {
+	public setCurrentTab(num: number): void {
 		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();

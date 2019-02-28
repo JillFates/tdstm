@@ -11,7 +11,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 
 @Component({
 	selector: 'import-batch-record-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-dialog.component.html',
+	templateUrl: 'import-batch-record-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
 	}
@@ -20,12 +20,12 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 
 	@ViewChild('detailFieldsComponent') detailFieldsComponent: ImportBatchRecordFieldsComponent;
 	private batchRecordUpdatedFlag = false;
-	protected modalOptions: DecoratorOptions;
-	protected isWindowMaximized;
+	public modalOptions: DecoratorOptions;
+	public isWindowMaximized;
 
 	constructor(
-		private importBatch: ImportBatchModel,
-		private batchRecord: ImportBatchRecordModel,
+		public importBatch: ImportBatchModel,
+		public batchRecord: ImportBatchRecordModel,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe) {
 			super('#import-batch-record-dialog');
@@ -36,7 +36,7 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 	/**
 	 * On close dialog.
 	 */
-	private onCancelCloseDialog(): void {
+	public onCancelCloseDialog(): void {
 		if (this.detailFieldsComponent.areOverrideValuesDirty()) {
 			this.promptService.open(
 				this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),

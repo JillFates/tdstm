@@ -16,7 +16,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: `asset-comment-list`,
-	templateUrl: '../tds/web-app/app-js/modules/assetComment/components/list/asset-comment-list.component.html',
+	templateUrl: 'asset-comment-list.component.html',
 })
 export class AssetCommentListComponent implements OnInit {
 

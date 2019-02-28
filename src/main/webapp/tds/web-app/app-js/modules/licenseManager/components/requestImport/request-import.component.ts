@@ -12,13 +12,13 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 
 @Component({
 	selector: 'tds-request-import-license',
-	templateUrl: '../tds/web-app/app-js/modules/licenseManager/components/requestImport/request-import.component.html'
+	templateUrl: 'request-import.component.html'
 })
 export class RequestImportComponent {
 
 	protected modalOptions: DecoratorOptions;
-	protected licenseKey = '';
 	private dataSignature = {};
+	public licenseKey = '';
 
 	constructor(
 		private notifierService: NotifierService,
@@ -29,7 +29,7 @@ export class RequestImportComponent {
 		this.dataSignature = JSON.stringify(this.licenseKey);
 	}
 
-	protected cancelCloseDialog($event): void {
+	public cancelCloseDialog($event): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -49,7 +49,7 @@ export class RequestImportComponent {
 	/**
 	 * Import the key and close the dialog, also send an info msg
 	 */
-	protected requestImportLicense(): void {
+	public requestImportLicense(): void {
 		this.licenseManagerService.requestImportLicense(this.licenseKey).subscribe((res: any) => {
 			let message = '';
 			let alertType: AlertType = null;

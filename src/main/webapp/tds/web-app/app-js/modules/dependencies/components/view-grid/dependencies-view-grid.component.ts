@@ -68,20 +68,20 @@ interface ComponentState {
 
 @Component({
 	selector: 'tds-dependencies-view-grid',
-	templateUrl: '../tds/web-app/app-js/modules/dependencies/components/view-grid/dependencies-view-grid.component.html',
+	templateUrl: 'dependencies-view-grid.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid') grid: GridComponent;
-	protected dependenciesColumnModel: DependenciesColumnModel;
+	public dependenciesColumnModel: DependenciesColumnModel;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
-	protected readonly GRID_PAGE_SIZES = GRID_DEFAULT_PAGINATION_OPTIONS;
+	public readonly GRID_PAGE_SIZES = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly defaultSorting: any = { dir: 'asc', field: 'assetName' };
 	protected tagsFieldNames = [];
 	private destroySubject: Subject<any>;
 	private tagsStateSubject: Subject<TagState>;
-	protected state: ComponentState;
+	public state: ComponentState;
 	private componentState: BehaviorSubject<ComponentState>;
 	protected readonly actionableAssets = ['assetName', 'dependentName', 'type'];
 	private openAssetsHandler = null;
@@ -254,7 +254,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Handle all the grid events (pageChange, filterChange, sortChange, ...)
 	 * @param {DataStateChangeEvent} state
 	 */
-	protected dataStateChange(state: DataStateChangeEvent): void {
+	public dataStateChange(state: DataStateChangeEvent): void {
 		this.changeState({gridState: state});
 	}
 
@@ -388,7 +388,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * gridCell field must be an actionable item
 	 * @param gridCell Reference to the current grid cell clicked
 	 */
-	protected  onClickActionableColumn(gridCell: any): void {
+	public  onClickActionableColumn(gridCell: any): void {
 		const fieldName = gridCell.column.field;
 		if (!this.actionableAssets.includes(fieldName)) {
 			return;

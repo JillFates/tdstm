@@ -14,12 +14,12 @@ import 'rxjs/add/operator/finally';
 
 @Component({
 	selector: 'tds-license-apply-key',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/apply-key/apply-key.component.html'
+	templateUrl: 'apply-key.component.html'
 })
 export class ApplyKeyComponent extends UIExtraDialog {
 
-	protected modalOptions: DecoratorOptions;
-	protected licenseKey = '';
+	public modalOptions: DecoratorOptions;
+	public licenseKey = '';
 	private dataSignature = {};
 
 	constructor(
@@ -32,7 +32,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 		this.dataSignature = JSON.stringify(this.licenseKey);
 	}
 
-	protected cancelCloseDialog($event): void {
+	public cancelCloseDialog($event): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -52,7 +52,7 @@ export class ApplyKeyComponent extends UIExtraDialog {
 	/**
 	 * Apply the key and close the dialog, also send an info msg
 	 */
-	protected applyKey(): void {
+	public applyKey(): void {
 		this.licenseAdminService.applyKey(this.licenseModel.id, this.licenseKey).subscribe((res: any) => {
 			let message = '';
 			let alertType: AlertType = null;

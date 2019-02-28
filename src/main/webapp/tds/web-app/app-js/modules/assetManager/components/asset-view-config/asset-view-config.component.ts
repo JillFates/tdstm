@@ -25,15 +25,15 @@ import {clone} from 'ramda';
 declare var jQuery: any;
 @Component({
 	selector: 'tds-asset-view-config',
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-config/asset-view-config.component.html'
+	templateUrl: 'asset-view-config.component.html'
 })
 export class AssetViewConfigComponent implements OnInit {
 	@ViewChild('select') select: AssetViewSelectorComponent;
 
-	protected data: any;
+	public data: any;
 	private dataSignature: string;
 	protected justPlanning: boolean;
-	protected gridState: State = {
+	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
@@ -66,7 +66,7 @@ export class AssetViewConfigComponent implements OnInit {
 	position: any[] = [];
 	currentTab = 0;
 	previewButtonClicked = false;
-	protected metadata: any = {};
+	public metadata: any = {};
 
 	constructor(
 		private route: ActivatedRoute,
@@ -246,7 +246,7 @@ export class AssetViewConfigComponent implements OnInit {
 		return this.model.schema.columns.length > 0;
 	}
 
-	protected isValid(): boolean {
+	public isValid(): boolean {
 		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
@@ -259,7 +259,7 @@ export class AssetViewConfigComponent implements OnInit {
 		return result;
 	}
 
-	protected isSaveAvailable(): boolean {
+	public isSaveAvailable(): boolean {
 		return this.assetExplorerService.isSaveAvailable(this.model);
 	}
 
@@ -271,7 +271,7 @@ export class AssetViewConfigComponent implements OnInit {
 			this.isSaveAvailable();
 	}
 
-	protected isSystemSaveAvailable(edit): boolean {
+	public isSystemSaveAvailable(edit): boolean {
 		return edit ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
@@ -306,7 +306,7 @@ export class AssetViewConfigComponent implements OnInit {
 		}
 	}
 
-	protected onCancel() {
+	public onCancel() {
 		if (this.model && this.model.id) {
 			this.router.navigate(['asset', 'views', this.model.id, 'show']);
 		} else {
@@ -328,7 +328,7 @@ export class AssetViewConfigComponent implements OnInit {
 		}
 	}
 
-	protected onExport(): void {
+	public onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
 			domains: this.domains,
@@ -403,7 +403,7 @@ export class AssetViewConfigComponent implements OnInit {
 		this.dataSignature = JSON.stringify(signature);
 	}
 
-	protected onFavorite() {
+	public onFavorite() {
 		if (this.model.isFavorite) {
 			if (this.model.id) {
 				this.assetExplorerService.deleteFavorite(this.model.id)
@@ -437,7 +437,7 @@ export class AssetViewConfigComponent implements OnInit {
 		}
 	}
 
-	protected onPreview(): void {
+	public onPreview(): void {
 		if (this.isValid() && this.previewButtonClicked) {
 			let params = this.getQueryParams();
 			this.assetExplorerService.previewQuery(params)
@@ -495,7 +495,7 @@ export class AssetViewConfigComponent implements OnInit {
 	 * Switch between View and Edit
 	 * if is on the Edit and then move in to the View disables the confirm dialog
 	 */
-	protected onToggleConfig(): void {
+	public onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
 		setTimeout(() => {
 			this.notifier.broadcast({
@@ -522,7 +522,7 @@ export class AssetViewConfigComponent implements OnInit {
 	 * Whenever the just planning change, grab the new value
 	 * @param justPlanning New value
 	 */
-	protected onJustPlanningChange(justPlanning: boolean): void {
+	public onJustPlanningChange(justPlanning: boolean): void {
 		this.justPlanning = justPlanning;
 	}
 
@@ -531,7 +531,7 @@ export class AssetViewConfigComponent implements OnInit {
 	 * Whenever the grid state change, grab the new value
 	 * @param state New state
 	 */
-	protected onGridStateChange(state: State): void {
+	public onGridStateChange(state: State): void {
 		this.gridState = state;
 	}
 

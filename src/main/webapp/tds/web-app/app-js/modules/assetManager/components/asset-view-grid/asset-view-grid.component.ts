@@ -56,7 +56,7 @@ declare var jQuery: any;
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-grid/asset-view-grid.component.html'
+	templateUrl: 'asset-view-grid.component.html'
 })
 export class AssetViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
@@ -94,7 +94,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
-	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	public maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
 	gridData: GridDataResult;
@@ -307,7 +307,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		});
 	}
 
-	protected dataStateChange(state: DataStateChangeEvent): void {
+	public dataStateChange(state: DataStateChangeEvent): void {
 		if (state.sort[0]) {
 			// Invert the Order to remove the Natural/Default from the UI (no arrow)
 			if (!state.sort[0].dir) {
@@ -608,7 +608,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	protected  cellClick(e): void {
+	public  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
 			this.onShow(e.dataItem);
 		}

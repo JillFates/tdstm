@@ -18,14 +18,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
 	selector: 'tds-asset-view-manager',
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-manager/asset-view-manager.component.html',
+	templateUrl: 'asset-view-manager.component.html',
 })
 export class AssetViewManagerComponent implements OnInit {
-	private reportGroupModels = Array<ViewGroupModel>();
-	private searchText: String;
+	public reportGroupModels = Array<ViewGroupModel>();
+	public searchText: String;
 	private viewType = ViewType;
-	private selectedFolder: ViewGroupModel;
-	private gridColumns: GridColumnModel[];
+	public selectedFolder: ViewGroupModel;
+	public gridColumns: GridColumnModel[];
 	private report;
 	constructor(
 		private route: ActivatedRoute,
@@ -67,7 +67,7 @@ export class AssetViewManagerComponent implements OnInit {
 		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 	}
 
-	protected onClearTextFilter(): void {
+	public onClearTextFilter(): void {
 		this.searchText = '';
 	}
 
@@ -131,7 +131,7 @@ export class AssetViewManagerComponent implements OnInit {
 	 * Disable the Create Report if the user does not have the proper permission
 	 * @returns {boolean}
 	 */
-	protected isCreateAvailable(): boolean {
+	public isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 

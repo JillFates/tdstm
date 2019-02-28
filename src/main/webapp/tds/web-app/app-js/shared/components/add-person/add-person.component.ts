@@ -109,7 +109,7 @@ import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
                                         <div class="col-md-3 label-description">Team:</div>
                                         <div class="col-md-9">
                                             <div><button (click)="addTeam()" class="component-action-add-team">Add Team</button></div>
-                                            <div *ngFor="let team of teams;let index=index;trackBy:trackByIndex" class="teams">
+                                            <div *ngFor="let team of teams;let index=index;" class="teams">
                                                 <kendo-dropdownlist
                                                         name="active"
                                                         [value]="teams[index].team"
@@ -198,7 +198,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	 * Verify if user filled all required fiedls
 	 * @returns {boolean}
 	 */
-	protected canSave(): boolean {
+	public canSave(): boolean {
 		const errors = this.errors || {};
 		return Boolean(this.personModel.firstName.trim() && this.personModel.active && Object.keys(errors).length === 0);
 	}
@@ -206,7 +206,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 
 			this.promptService.open(

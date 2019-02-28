@@ -31,31 +31,31 @@ export class ConstraintModel {
 }
 
 export class FieldImportance {
-	public static Y = {
+	public Y = {
 		name: 'yellow',
 		color: '#FAFF9B'
 	};
-	public static G = {
+	public G = {
 		name: 'green',
 		color: '#D4F8D4'
 	};
-	public static B = {
+	public B = {
 		name: 'blue',
 		color: '#A9D6F2'
 	};
-	public static P = {
+	public P = {
 		name: 'pink',
 		color: '#FFA5B4'
 	};
-	public static O = {
+	public O = {
 		name: 'orange',
 		color: '#FFC65E'
 	};
-	public static N = {
+	public N = {
 		name: 'normal',
 		color: '#DDDDDD'
 	};
-	public static U = {
+	public U = {
 		name: 'unimportant',
 		color: '#F4F4F4'
 	};

@@ -41,11 +41,12 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	`]
 })
 export class AssetViewExportComponent {
-	private columns: any[];
-	protected fileName = 'asset_explorer';
-	protected exportFileName = '';
-	protected dataToExport: any[] = [];
+	public columns: any[];
+	public fileName = 'asset_explorer';
+	public exportFileName = '';
+	public dataToExport: any[] = [];
 	private allProperties = false;
+	private fieldImportance = new FieldImportance();
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
@@ -77,13 +78,13 @@ export class AssetViewExportComponent {
 	private getImportanceColor(model: any): string {
 		let domain = this.assetExportModel.domains.find(r => r.domain.toLocaleLowerCase() === model.domain.toLocaleLowerCase());
 		let field = domain.fields.find(r => r.label.toLocaleLowerCase() === model.label.toLocaleLowerCase());
-		return FieldImportance[field.imp].color;
+		return this.fieldImportance[field.imp].color;
 	}
 
 	/**
 	 * Transform the Data information
 	 */
-	private getExportData(): void {
+	public getExportData(): void {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {

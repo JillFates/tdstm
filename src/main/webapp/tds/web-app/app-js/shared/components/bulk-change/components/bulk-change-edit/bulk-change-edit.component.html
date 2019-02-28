@@ -2,7 +2,7 @@
 	<div class="modal-dialog modal-md" role="document">
 		<div tds-autocenter class="modal-content">
 			<div class="modal-header">
-				<button (click)="cancelCloseDialog()"  type="button" class="close" aria-label="Close">
+				<button (click)="cancelCloseDialog($event)"  type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
 				<h4 class="modal-title">Bulk Change > Edit {{entityName}}</h4>
@@ -170,7 +170,7 @@
 					<span class="glyphicon glyphicon-step-forward"></span> Next
 				</button>
 
-				<button type="button" (click)="cancelCloseDialog()" class="btn btn-default pull-right">
+				<button type="button" (click)="cancelCloseDialog($event)" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>Cancel</span>
 				</button>

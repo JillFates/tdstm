@@ -17,12 +17,12 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-header',
-	templateUrl: '../tds/web-app/app-js/shared/modules/header/components/header/header.component.html',
+	templateUrl: 'header.component.html',
 })
 
 export class HeaderComponent implements OnInit {
 
-	protected userContext: UserContextModel;
+	public userContext: UserContextModel;
 
 	constructor(
 		private userContextService: UserContextService,
@@ -46,13 +46,13 @@ export class HeaderComponent implements OnInit {
 		});
 	}
 
-	protected openPrefModal(): void {
+	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			//
 		});
 	}
 
-	protected openEditPersonModal(): void {
+	public openEditPersonModal(): void {
 		this.dialogService.open(UserEditPersonComponent, [
 			{provide: PersonModel, useValue: {}},
 			{provide: PasswordChangeModel, useValue: {}}
@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit {
 		});
 	}
 
-	protected openDateTimezoneModal(): void {
+	public openDateTimezoneModal(): void {
 		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
 			//
 		});

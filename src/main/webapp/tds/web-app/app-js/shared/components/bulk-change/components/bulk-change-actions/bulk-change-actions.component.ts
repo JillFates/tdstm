@@ -13,19 +13,19 @@ import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.comp
 
 @Component({
 	selector: 'tds-bulk-change-actions',
-	templateUrl: '../tds/web-app/app-js/shared/components/bulk-change/components/bulk-change-actions/bulk-change-actions.component.html',
+	templateUrl: 'bulk-change-actions.component.html',
 	providers: [TranslatePipe]
 })
 export class BulkChangeActionsComponent extends UIExtraDialog {
 	protected bulkChangeType: BulkChangeType;
-	protected showEdit: boolean;
-	protected showDelete: boolean;
 	protected selectedItems: number[] = [];
 	protected selectedAction: BulkActions;
 	protected affected: number;
 	protected ACTION = BulkActions; // Make enum visible to the view
 	protected ACTION_TYPE = BulkChangeType;
 	protected itemType: string;
+	public showEdit: boolean;
+	public showDelete: boolean;
 
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
@@ -45,11 +45,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 				this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
 	}
 
-	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
+	public cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
 		this.dismiss(bulkOperationResult || {action: null, success: false});
 	}
 
-	closeDialog(bulkOperationResult: BulkActionResult): void {
+	public closeDialog(bulkOperationResult: BulkActionResult): void {
 		this.close(bulkOperationResult);
 	}
 

@@ -42,6 +42,3 @@
 
 </body>
 </html>
-<%
-    flash.remove('message');
-%>

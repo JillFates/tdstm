@@ -261,8 +261,6 @@ export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
-	private dataGridSupportsOnHelper: DataGridOperationsHelper;
-	private dataGridDependsOnHelper: DataGridOperationsHelper;
 	private supportOnColumnModel: SupportOnColumnsModel;
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
@@ -270,6 +268,8 @@ export class SupportsDependsComponent implements OnInit {
 	private statusList = [];
 	private moveBundleList = [];
 	public dependencyType = DEPENDENCY_TYPE;
+	public dataGridDependsOnHelper: DataGridOperationsHelper;
+	public dataGridSupportsOnHelper: DataGridOperationsHelper;
 
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
