@@ -1118,8 +1118,8 @@ digraph runbook {
 
 	/**
 	 * Endpoint that returns a list of tasks matching the filters provided. Some of available parameters are:
-	 * - project (id)
-	 * - event (id)
+	 * - projectId - project (id)
+	 * - eventId - event (id)
 	 * - justMyTasks (1, Y)
 	 * - justRemaining (1, Y)
 	 * - justActionable (1, Y)
@@ -1130,21 +1130,7 @@ digraph runbook {
 	def list() {
 		// This will contain a reference to, either the user's project, or the project specified as
 		// a parameter (given that they have access to it)
-		Project project
-
-		// Check if the user passed a project id
-		Long projectId = params.long('projectId')
-		if (projectId) {
-			// Determine if the user has access to the specified project.
-			if (projectService.hasAccessToProject(null, projectId)) {
-				project = Project.get(projectId)
-			} else {
-				throw new EmptyResultException('Project not found')
-			}
-		} else {
-			// If no project was specified, use the user's current project.
-			project = getProjectForWs()
-		}
+		Project project = getProjectForWs()
 
 		// If the params map has an event, validate that it exists and belongs to the project.
 		String eventIdParam = 'eventId'

@@ -161,8 +161,8 @@ class WsTaskController implements ControllerMethods {
 		Map<String,?> actionRequestMap = actionRequest.toMap()
 
 		// check if api action has credentials so to include credentials password unencrypted
-		if (actionRequest.options.hasProperty('credentials')) {
-			// need to create new map because credentials map originally is immutable
+		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
+			// Need to create new map because credentials map originally is immutable
 			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
 			credentials.password = credentialService.decryptPassword(assetComment.apiAction.credential)
 			actionRequestMap.options.credentials = credentials
