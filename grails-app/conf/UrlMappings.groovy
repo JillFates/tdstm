@@ -409,9 +409,14 @@ class UrlMappings {
 			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
 
-		"/ws/task/$id/invokeAction" {
+		"/ws/task/$id/invokeLocalAction" {
 			controller = "wsTask"
-			action = [POST:"invokeAction"]
+			action = [POST:"invokeLocalAction"]
+		}
+
+		"/ws/task/$id/invokeRemoteAction" {
+			controller = "wsTask"
+			action = [POST:"invokeRemoteAction"]
 		}
 
 		"/ws/task/$id/resetAction" {
