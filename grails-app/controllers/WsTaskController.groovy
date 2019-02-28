@@ -14,6 +14,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.CredentialService
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 
@@ -158,6 +159,10 @@ class WsTaskController implements ControllerMethods {
 		Project project = getProjectForWs()
 		AssetComment assetComment = fetchDomain(AssetComment, params)
 		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
+
+		if (! actionRequest.options.apiAction.isRemote) {
+			throw new InvalidRequestException('Local actions was incorrectly invoke as Remote')
+		}
 		Map<String,?> actionRequestMap = actionRequest.toMap()
 
 		// check if api action has credentials so to include credentials password unencrypted
