@@ -202,7 +202,7 @@
 					$(this).toggleClass("disableButton")
 					var id = $("[name=id]").val()
 					$.ajax({
-						url: "/sendPasswordReset?id="+id,
+						url: "/tdstm/userLogin/sendPasswordReset?id="+id,
 						type:'post',
 						success: function(data){
 							if(data && data.success){
