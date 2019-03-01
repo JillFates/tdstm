@@ -33,7 +33,7 @@
 					<tbody>
 						<tr class="prop">
 							<td class="name"><label>Client:</label></td>
-							<td class="valueNW">${projectInstance?.client}</td>
+							<td class="valueNW">${client}</td>
 							<td class="name"><label>Project Code:</label></td>
 							<td class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
 						</tr>
@@ -83,15 +83,15 @@
 								</tds:hasPermission>
 							</td>
 							<td class="name"><label>Default Bundle:</label></td>
-							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
+							<td class="valueNW">${defaultBundle}</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label>Workflow:</label></td>
 							<td class="valueNW" nowrap="nowrap">
-								${fieldValue(bean:projectInstance, field:'workflowCode')}
+								${projectInstance.workflowCode}
 							</td>
 							<td class="name"><label >Time Zone:</label></td>
-							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>
+							<td class="valueNW">${timezone}</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label >Date Created:</label></label></td>

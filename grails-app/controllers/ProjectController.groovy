@@ -123,9 +123,17 @@ class ProjectController implements ControllerMethods {
 			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
-		[projectInstance: project, projectPartners: partyRelationshipService.getProjectPartners(project),
-		 projectManagers: projectService.getProjectManagers(project), projectLogoForProject: projectLogo,
-		 isDeleteable: isDeleteable, planMethodology:planMethodology]
+		[
+			projectInstance      : project,
+			timezone             : project.timezone ?: '',
+			client               : project.client,
+			defaultBundle        : project.defaultBundle,
+			projectPartners      : partyRelationshipService.getProjectPartners(project),
+			projectManagers      : projectService.getProjectManagers(project),
+			projectLogoForProject: projectLogo,
+			isDeleteable         : isDeleteable,
+			planMethodology      : planMethodology
+		]
 	}
 
 	/**
