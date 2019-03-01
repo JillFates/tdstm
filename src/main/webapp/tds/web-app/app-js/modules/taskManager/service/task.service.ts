@@ -253,7 +253,7 @@ export class TaskService {
 	changeTimeEst(id: string, days: string) {
 		const url = `${this.baseURL}/ws/task/${id}/changeTime`;
 		return this.http.post(url, JSON.stringify({days}))
-			.map(res =>  res && res.json())
+			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
 
@@ -323,8 +323,8 @@ export class TaskService {
 
 	updateStatus(id: string, status: string): Observable<any> {
 		return this.http.post(`${this.baseURL}/ws/task/${id}/updateStatus`, JSON.stringify({status}))
-			.map(res =>  res && res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**

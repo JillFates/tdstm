@@ -41,7 +41,7 @@ export class UserService {
 
 	fetchModelForUserDashboard(projId = '') {
 		return this.http.get(`${this.userPreferenceUrl}/modelForUserDashboard/${projId}`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;
@@ -51,7 +51,7 @@ export class UserService {
 
 	getAssignedEvents() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedEvents`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;
@@ -61,7 +61,7 @@ export class UserService {
 
 	getAssignedEventNews() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedEventNews`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;
@@ -71,7 +71,7 @@ export class UserService {
 
 	getAssignedTasks() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedTasks`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;
@@ -81,7 +81,7 @@ export class UserService {
 
 	getAssignedApplications() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedApplications`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;
@@ -91,7 +91,7 @@ export class UserService {
 
 	getAssignedPeople() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedPeople`)
-			.map((res: Response) => {
+			.map((res: any) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;
 				return data;

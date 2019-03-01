@@ -16,7 +16,7 @@ import {TaskDetailComponent} from '../../../taskManager/components/detail/task-d
 
 @Component({
 	selector: 'user-dashboard',
-	templateUrl: '../tds/web-app/app-js/modules/user/components/dashboard/user-dashboard.component.html'
+	templateUrl: 'user-dashboard.component.html'
 })
 
 export class UserDashboardComponent implements OnInit {
