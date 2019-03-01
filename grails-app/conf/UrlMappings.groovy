@@ -196,6 +196,11 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event" {
+			controller = "event"
+			action = [GET: "index"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
@@ -337,6 +342,14 @@ class UrlMappings {
 			action = [GET:'qzCertificate']
 		}
 
+
+		"/ws/task" {
+			controller = 'task'
+			action = [
+			    GET: 'list'
+			]
+		}
+
 		/**
 		 * AssetComment CRUD endpoints
 		 */
@@ -396,9 +409,14 @@ class UrlMappings {
 			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
 
-		"/ws/task/$id/invokeAction" {
+		"/ws/task/$id/invokeLocalAction" {
 			controller = "wsTask"
-			action = [POST:"invokeAction"]
+			action = [POST:"invokeLocalAction"]
+		}
+
+		"/ws/task/$id/invokeRemoteAction" {
+			controller = "wsTask"
+			action = [POST:"invokeRemoteAction"]
 		}
 
 		"/ws/task/$id/resetAction" {
@@ -585,6 +603,7 @@ class UrlMappings {
 		}
 
 		///// LICENSES Admin API (Client Side) /////////
+
 		"/ws/license" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -598,6 +617,17 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
+			constraints {
+				id(matches:/[0-9]{1,}/)
+			}
+		}
+
+		// Licensing Information
+		"/ws/license/info" {
+			controller = "license"
+			action = [
+			        GET: "info"
+			]
 		}
 
 		//Gets que request Hash  --- OLB 161207 Change Hash to request...
@@ -608,7 +638,7 @@ class UrlMappings {
 			]
 		}
 
-		//Requests
+		// Requests
 		"/ws/license/request" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -616,7 +646,7 @@ class UrlMappings {
 			]
 		}
 
-		//Resubmit License Request
+		// Resubmit License Request
 		"/ws/license/$id/email/request" {
 			controller = "wsLicenseAdmin"
 			action = [

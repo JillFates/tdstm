@@ -1,11 +1,11 @@
 package com.tds.asset
 
+
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
-import grails.util.Environment
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -16,9 +16,6 @@ import org.apache.commons.lang3.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.TimeScale.M
 
 class AssetComment {
@@ -89,6 +86,12 @@ class AssetComment {
 
 	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
 	String apiActionSettings
+
+	// The percentage of the action duration that has been completed (set by API call)
+	Integer apiActionPercentDone = 0
+
+	// The percentage of the task that has been completed (manually set by users)
+	Integer taskPercentDone = 0
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
@@ -162,6 +165,8 @@ class AssetComment {
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
 		score nullable: true
+		apiActionPercentDone nullable: true, range: 0..100
+		taskPercentDone nullable: false, range: 0..100
 	}
 
 	static mapping = {
@@ -293,7 +298,7 @@ class AssetComment {
 	}
 
 	/*
-	 * Used to determine if the task action can be invoked either manually or by the automatic mechanism
+	 * Used to determine if the task action can be invoked locally
 	 *
 	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
 	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
@@ -302,8 +307,22 @@ class AssetComment {
 	 *
 	 * @return true if action can be invoked
 	 */
-	boolean isActionInvocable() {
-		apiAction && !apiActionInvokedAt && status in [READY, STARTED]
+	Boolean isActionInvocableLocally() {
+		return hasAction() && !apiActionInvokedAt && !apiAction.isRemote && status in [READY, STARTED]
+	}
+
+	/*
+	 * Used to determine if the task action can be invoked remotely
+	 *
+	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
+	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
+	 * will turn to STARTED otherwise marked DONE if successful.
+	 * With both manual/user or automatic tasks, if the invocation fails the status should change to HOLD
+	 *
+	 * @return true if action can be invoked
+	 */
+	Boolean isActionInvocableRemotely() {
+		return hasAction() && !apiActionInvokedAt && apiAction.isRemote && status in [READY, STARTED]
 	}
 
 	/*
@@ -346,6 +365,70 @@ class AssetComment {
     */
 	boolean isActionable() {
 		!(status in [ COMPLETED, TERMINATED ])
+	}
+
+	/**
+	 * This method generates a Map representation of the AssetComment including the most
+	 * useful fields for a Task. commentType is not included.
+	 * @return Map of the task attributes of the domain object
+	 */
+	Map taskToMap() {
+		Map actionMap = null
+		if (apiAction) {
+			actionMap = [
+			    id: apiAction.id,
+				name: apiAction.name,
+				isRemote: false,
+				type: 'Api',
+				invokedAt: apiActionInvokedAt,
+				completedAt: apiActionCompletedAt
+			]
+		}
+
+		Map assetMap = null
+		if (assetEntity) {
+			assetMap = [
+			    id: assetEntity.id,
+				name: assetEntity.assetName,
+				class: assetEntity.assetClass.toString() ?: '',
+				type: assetEntity.assetType ?: ''
+			]
+		}
+
+		Map assignedMap = null
+		if (assignedTo) {
+			assignedMap = [
+			    id: assignedTo.id,
+				name: assignedTo.toString()
+			]
+		}
+		return [
+				id: id,
+				taskNumber: taskNumber,
+				title: comment,
+				status: status,
+				statusUpdated: statusUpdated,
+			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
+			lastUpdated: lastUpdated,
+			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),
+			action: actionMap,
+			asset: assetMap,
+			assignedTo: assignedMap,
+			category: category ?: '',
+			dateCreated: dateCreated,
+			hardAssigned: hardAssigned == 1,
+			estDurationMinutes: durationInMinutes(),
+			estStart: estStart,
+			estFinish: estFinish,
+			actStart: actStart,
+			actFinish: actFinish,
+			team: role ?: '',
+			isPublished: isPublished,
+			isActionInvocableLocally: isActionInvocableLocally(),
+			isActionInvocableRemotey: isActionInvocableRemotely(),
+			isAutomatic: isAutomatic(),
+		]
+
 	}
 
 	// task Manager column header names and its labels

@@ -1,5 +1,4 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.CommentNote
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdssrc.grails.TimeUtil
@@ -10,8 +9,12 @@ import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
+import net.transitionmanager.service.CredentialService
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 
@@ -24,9 +27,11 @@ import net.transitionmanager.service.TaskService
 @Slf4j
 class WsTaskController implements ControllerMethods {
 
-	TaskService taskService
 	CommentService commentService
 	QzSignService qzSignService
+	TaskService taskService
+	ApiActionService apiActionService
+	CredentialService credentialService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -132,16 +137,43 @@ class WsTaskController implements ControllerMethods {
 	}
 
 	/**
-	 * Executes an action tied to a task and returns new task status if applies.
-	 * @param id - task id
+	 * Executes a local api action tied to a task and returns new task status if applies.
+	 * @param id - task id where api action is linked to
 	 * @return
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	def invokeAction() {
+	def invokeLocalAction() {
 		AssetComment assetComment = fetchDomain(AssetComment, params)
 		Person whom = securityService.loadCurrentPerson()
-		String status = taskService.invokeAction(assetComment, whom)
+		String status = taskService.invokeAction(assetComment, whom, false)
 		renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
+	}
+
+	/**
+	 * Fetch an api action execution context and return it for remote invocation
+	 * @param id - task id where api action is linked to
+	 * @return
+	 */
+	@HasPermission(Permission.ActionInvoke)
+	def invokeRemoteAction() {
+		Project project = getProjectForWs()
+		AssetComment assetComment = fetchDomain(AssetComment, params)
+		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
+
+		if (! actionRequest.options.apiAction.isRemote) {
+			throw new InvalidRequestException('Local actions was incorrectly invoke as Remote')
+		}
+		Map<String,?> actionRequestMap = actionRequest.toMap()
+
+		// check if api action has credentials so to include credentials password unencrypted
+		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
+			// Need to create new map because credentials map originally is immutable
+			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
+			credentials.password = credentialService.decryptPassword(assetComment.apiAction.credential)
+			actionRequestMap.options.credentials = credentials
+		}
+
+		renderAsJson([actionRequest: actionRequest.toMap()])
 	}
 
 	/**
