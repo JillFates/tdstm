@@ -40,7 +40,7 @@
 					</td>
 				</g:if>
 				<g:else>
-					<g:if test="${projectStaff.role != 'STAFF'}">
+					<g:if test="${projectStaff.role != 'ROLE_STAFF'}">
 
 						<td id="projectColumnId"
 							onClick="clkCB(event, $(this),${projectStaff.personId},${project.id}, null, '${projectStaff.role}', 'addRemoveProjectTeam');"

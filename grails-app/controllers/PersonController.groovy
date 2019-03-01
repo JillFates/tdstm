@@ -630,7 +630,7 @@ class PersonController implements ControllerMethods {
 						LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
 							AND pr2.role_type_code_to_id = pr.role_type_code_to_id
 							AND pr2.party_id_from_id IN ($projects)
-							AND pr2.role_type_code_from_id = 'PROJECT'
+							AND pr2.role_type_code_from_id = 'ROLE_PROJECT'
 						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
 							AND mes.role_id = pr.role_type_code_to_id
 					WHERE pr.role_type_code_from_id in ('ROLE_COMPANY')
@@ -657,16 +657,25 @@ class PersonController implements ControllerMethods {
 			staffList = jdbcTemplate.queryForList(query.toString())
 
 			// The template uses this value for the checkboxes
-			staffList.each { it -> it.inProjectValue = it.project ? '1' : '0' }
+			staffList.each {
+				it -> it.inProjectValue = it.project ? '1' : '0'
+			}
 		}
 
 		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
 		render(template: "projectStaffTable",
-		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
-		               firstProp: params.firstProp, editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
-		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy])
+			   model: [
+				   staffList     : staffList,
+				   moveEventList : retrieveBundleHeader(moveEvents),
+				   projectId     : projectId,
+				   firstProp     : params.firstProp,
+				   editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
+				   project       : project,
+				   sortOn        : params.sortOn,
+				   orderBy       : paramsMap.orderBy
+			   ])
 	}
 
 	/*
