@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -102,20 +103,16 @@ class ApiActionService implements ServiceMethods {
 	void invoke(ApiAction action, Object context) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
+
 		if (context.hasErrors()) {
-			log.warn 'Invoke() encountered data errors in context: {}', com.tdssrc.grails.GormUtil.allErrorsString(context)
+			log.warn 'Invoke() encountered data errors in context: {}', GormUtil.allErrorsString(context)
 		}
+
 		if (! context) {
 			throw new InvalidRequestException('invoke() required context was null')
 		}
 
 		if (context instanceof AssetComment) {
-			// Validate that the method is still invocable
-			// sl : this is already verified in TaskService
-			//if (! context.isActionInvocable() ) {
-			//	throw new InvalidRequestException('Task state does not permit action to be invoked')
-			//}
-
 			// Get the method definition of the Action configured Api Catalog
 			DictionaryItem methodDef = methodDefinition(action)
 
@@ -149,53 +146,15 @@ class ApiActionService implements ServiceMethods {
 				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', connector.name, action.connectorMethod, action.asyncQueue, remoteMethodParams
 				connector."${action.connectorMethod}"(action.asyncQueue, remoteMethodParams)
 			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
-				// add additional data to the api action execution to have it available when needed
-				Map optionalRequestParams = [
-						actionId: action.id,
-						taskId: context.id,
-						projectId: action.project.id,
-						producesData: action.producesData,
-						credentials: action.credential?.toMap(),
-						apiAction: apiActionToMap(action)
-				]
-
 				// get api action connector instance
 				def connector = connectorInstanceForAction(action)
 
-				// construct action request object and pass options params
-				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
-				actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
-
-				// check pre script
-				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
-				String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
-
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
-
+				ActionRequest actionRequest
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
 
-				// setup asset facade if task has an asset associated
-				AssetFacade assetFacade
-				if (context.assetEntity) {
-					AssetEntity assetEntity = context.assetEntity
-					Map<String, ?> fieldSettings = customDomainService.allFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
-					assetFacade = new AssetFacade(context.assetEntity, fieldSettings, true)
-				} else {
-					assetFacade = new AssetFacade(null, null, true)
-				}
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
-
-				// execute PRE script if present
-				if (preScript) {
+				// try to construct action request object and execute preScript if there is any
 					try {
-						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
-							new ApiActionResponse(),
-							taskFacade,
-							new AssetFacade(null, null, true),
-							new ApiActionJob()
-						)
+					actionRequest = createActionRequest(action)
 					} catch (ApiActionException preScriptException) {
 						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
@@ -233,7 +192,20 @@ class ApiActionService implements ServiceMethods {
 						ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 						return
 					}
+
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
+
+				// setup asset facade if task has an asset associated
+				AssetFacade assetFacade
+				if (context.assetEntity) {
+					AssetEntity assetEntity = context.assetEntity
+					Map<String, ?> fieldSettings = customDomainService.allFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
+					assetFacade = new AssetFacade(context.assetEntity, fieldSettings, true)
+				} else {
+					assetFacade = new AssetFacade(null, null, true)
 				}
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest
@@ -260,11 +232,62 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to invoke an connector method within action parameters solely.
+	 * Create action request object containing all necessary data for the api connector to invoke an api action.
+	 * It executes the action pre-scripts if there is any.
+	 * @param action
+	 * @return
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	ActionRequest createActionRequest(ApiAction action) {
+		if (!action) {
+			throw new InvalidRequestException('No action was provided to the invoke command')
+		}
+
+		// methodParams will hold the parameters to pass to the remote method
+		Map remoteMethodParams = buildMethodParamsWithContext(action, null)
+
+		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+		Map optionalRequestParams = [
+				actionId: action.id,
+				projectId: action.project.id,
+				producesData: action.producesData,
+				credentials: action.credential?.toMap(),
+				apiAction: apiActionToMap(action)
+		]
+		actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
+
+		// check pre script : set required request configurations
+		JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
+		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
+		String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
+
+		// execute PRE script if present
+		if (preScript) {
+			try {
+				invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
+						new ApiActionResponse(),
+						new TaskFacade(),
+						new AssetFacade(null, null, true),
+						new ApiActionJob()
+				)
+			} catch (ApiActionException preScriptException) {
+				log.error('Error invoking PRE script from DataScript: {}', ExceptionUtil.stackTraceToString(preScriptException))
+				throw preScriptException
+			} finally {
+				// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
+				ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+			}
+		}
+
+		return actionRequest
+	}
+
+	/**
+	 * Used to invoke a connector method within action parameters solely.
 	 * @param action - the ApiAction to be invoked
 	 * @return
 	 */
-	ApiActionResponse invoke (ApiAction action) {
+	ApiActionResponse invoke(ApiAction action) {
 		if (!action) {
 			throw InvalidRequestException('No action was provided to the invoke command')
 		}
@@ -381,7 +404,7 @@ class ApiActionService implements ServiceMethods {
 			// Retrieve the corresponding API Action instance
 			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
 
-			// Make sure nobody changed it while the user was editting the data
+			// Make sure nobody changed it while the user was editing the data
 			GormUtil.optimisticLockCheck(apiAction, version, 'API Action')
 		} else {
 			apiAction = new ApiAction(project: project)
@@ -631,14 +654,26 @@ class ApiActionService implements ServiceMethods {
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
 		// Load just the minimal or all by setting properties to null
-		List<String> properties = minimalInfo ? ["id", "name"] : null
+		List<String> properties = minimalInfo ? ['id', 'name', 'actionType', 'isRemote'] : []
+
+		if (ActionType.WEB_API == apiAction.actionType) {
+			properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
+		} else {
+			properties << ['commandLine', 'script', 'remoteCredentialMethod']
+		}
+
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
-		// If all the properties are required, the entry for the ConnectorClass has to be overriden with the following map.
+		// If all the properties are required, the entry for the ConnectorClass has to be overwritten with the following map.
 		if (!minimalInfo) {
 			AbstractConnector connector = connectorInstanceForAction(apiAction)
 			apiActionMap.connectorClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
 			apiActionMap.version = apiAction.version
+			apiActionMap.actionType = [id: apiAction.actionType.name(), name: apiAction.actionType.getType()]
+			apiActionMap.remoteCredentialMethod = null
+			if (apiAction.remoteCredentialMethod) {
+				apiActionMap.remoteCredentialMethod = [id: apiAction.remoteCredentialMethod.name(), name: apiAction.remoteCredentialMethod.getCredentialMethod()]
+			}
 		}
 
 		return apiActionMap

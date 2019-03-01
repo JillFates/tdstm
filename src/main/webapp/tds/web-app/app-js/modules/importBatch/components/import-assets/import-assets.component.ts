@@ -202,8 +202,22 @@ export class ImportAssetsComponent implements OnInit {
 		this.importResult = null;
 		this.importAssetsService.postImport(this.transformResult.data.filename).subscribe( (result) => {
 			this.importResult = result;
+			this.postImportResult();
 			this.importInProcess = false;
 		});
+	}
+
+	/**
+	 * Add a batchId = null if no batchId property comes from import batch domain result.
+	 */
+	private postImportResult(): void {
+		if (this.importResult.data.domains && this.importResult.data.domains.length > 0) {
+			this.importResult.data.domains.forEach( (item: any) => {
+				if (!item.batchId) {
+					item.batchId = null;
+				}
+			});
+		}
 	}
 
 	/**

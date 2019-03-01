@@ -80,9 +80,9 @@ class SecurityServiceTests extends Specification {
 			unPrivPerson = personHelper.createPerson(null, project.client, project)
 			unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
 		} else {
-		unPrivPerson = personHelper.createPerson()
-		unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
-	}
+			unPrivPerson = personHelper.createPerson()
+			unPrivUser = personHelper.createUserLoginWithRoles(unPrivPerson, [])
+		}
 	}
 
 	private void createUserAccount(Project project=null) {
@@ -90,7 +90,7 @@ class SecurityServiceTests extends Specification {
 		if (project) {
 			userRolePerson = personHelper.createPerson(null, project.client, project)
 		} else {
-		userRolePerson = personHelper.createPerson()
+			userRolePerson = personHelper.createPerson()
 		}
 		userRoleUser = personHelper.createUserLoginWithRoles(userRolePerson, userRole)
 	}

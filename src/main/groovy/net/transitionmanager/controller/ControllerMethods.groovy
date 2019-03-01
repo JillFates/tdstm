@@ -525,6 +525,7 @@ trait ControllerMethods {
 				project = Project.get(projectId)
 			}
 		} else {
+
 			// Load the user's currently selected project
 			project = securityService.userCurrentProject
 			if (! project) {
@@ -543,7 +544,7 @@ trait ControllerMethods {
 	 * Used to retrieve an domain record using the
 	 *
 	 */
-	def <T> T fetchDomain(Class<T> clazz, Map params) {
+	def <T> T fetchDomain(Class<T> clazz, Map params, Project project = null) {
 		if (! params.id) {
 			throw new InvalidParamException('Id was missing')
 		}
@@ -554,12 +555,18 @@ trait ControllerMethods {
 		}
 
 		if (GormUtil.isDomainProperty(t, 'project')) {
-			Project project = securityService.userCurrentProject
-			if (! project) {
+			Project currentProject = project
+
+			// fetch user current project only if no project was provided
+			if (!project) {
+				currentProject = securityService.userCurrentProject
+			}
+
+			if (! currentProject) {
 				// TODO : JPM 2/2018 : Change fetchDomain to throw new Exception for no project selected
 				throw new EmptyResultException()
 			} else {
-				if (project.id != t.project.id) {
+				if (currentProject.id != t.project.id) {
 					securityService.reportViolation("attempted to access asset from unrelated project (asset ${t.id})")
 					throw new EmptyResultException()
 				}

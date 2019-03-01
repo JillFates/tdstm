@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveEvent
@@ -40,7 +41,7 @@ class WsEventController implements ControllerMethods {
 		Project project = getProjectForWs()
 		List<MoveEvent> events = moveEventService.listMoveEvents(project)
 		List<Map> eventsMap = events.collect { event ->
-			[id: event.id, name: event.name]
+			GormUtil.domainObjectToMap(event, MoveEvent.BASIC_EVENT_FIELDS, null, false)
 		}
 		renderSuccessJson(eventsMap)
 	}

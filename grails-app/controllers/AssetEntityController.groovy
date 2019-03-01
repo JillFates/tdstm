@@ -77,6 +77,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -587,30 +588,30 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				]
 			}
 			commentList << [
-				assetComment:assetComment,
-				apiActionList:apiActionList,
-				priorityList: assetEntityService.getAssetPriorityOptions(),
-				durationScale:assetComment.durationScale.value(),
-				durationLocked: assetComment.durationLocked,
-				personCreateObj:personCreateObj,
-				personResolvedObj:personResolvedObj,
-				dtCreated:dtCreated ?: "",
-				dtResolved:dtResolved ?: "",
-				assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
-				assetName:assetComment.assetEntity?.assetName ?: "",
-				eventName:assetComment.moveEvent?.name ?: "",
-				dueDate:dueDate,
-				etStart:etStart,
-				etFinish:etFinish,
-				atStart:atStart,
-				notes:notes,
-				workflow:workflow,
-				roles:roles?:'Unassigned',
-				predecessorTable:predecessorTable ?: '',
-				successorTable:successorTable ?: '',
-				cssForCommentStatus: cssForCommentStatus,
-				statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
-				successorsCount: successorsCount,
+					assetComment:assetComment,
+					apiActionList:apiActionList,
+					priorityList: assetEntityService.getAssetPriorityOptions(),
+					durationScale:assetComment.durationScale.value(),
+					durationLocked: assetComment.durationLocked,
+					personCreateObj:personCreateObj,
+					personResolvedObj:personResolvedObj,
+					dtCreated:dtCreated ?: "",
+					dtResolved:dtResolved ?: "",
+					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
+					assetName:assetComment.assetEntity?.assetName ?: "",
+					eventName:assetComment.moveEvent?.name ?: "",
+					dueDate:dueDate,
+					etStart:etStart,
+					etFinish:etFinish,
+					atStart:atStart,
+					notes:notes,
+					workflow:workflow,
+					roles:roles?:'Unassigned',
+					predecessorTable:predecessorTable ?: '',
+					successorTable:successorTable ?: '',
+					cssForCommentStatus: cssForCommentStatus,
+					statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
+					successorsCount: successorsCount,
 				predecessorsCount: predecessorsCount,
 				taskSpecId: assetComment.taskSpec,
 				assetId: assetComment.assetEntity?.id ?: "",
@@ -623,7 +624,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				canEdit: canEdit,
 				apiAction:apiActionMap,
 				actionMode: actionMode,
-				actionInvocable: assetComment.isActionInvocable(),
+				actionInvocable: assetComment.isActionInvocableLocally(),
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
@@ -634,7 +635,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				eventList: eventList,
 				categories: AssetCommentCategory.list,
 				assetClasses: assetEntityService.getAssetClasses()
-				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
+					//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
@@ -1105,8 +1106,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		// Determine if only unpublished tasks need to be fetched.
 		boolean viewUnpublished = securityService.viewUnpublished()
 
+		params['viewUnpublished'] = viewUnpublished
+
 		// Fetch the tasks and the total count.
-		Map filterResults = commentService.filterTasks(project, params, viewUnpublished, sortIndex, sortOrder, maxRows, rowOffset)
+		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder, maxRows, rowOffset)
 
 		List<AssetComment> tasks = filterResults.tasks
 		Date today = new Date().clearTime()
@@ -2612,15 +2615,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 				query.append(qm.domain.name + ' AS a ')
 
-				def doJoin = qm.containsKey('assetType')
 				def notIn = qm.containsKey('notIn') && qm.notIn
-				if (doJoin) {
 					if (notIn) {
 						query.append('LEFT OUTER JOIN a.model AS m ')
-					} else {
-						query.append('JOIN a.model AS m ')
 					}
-				}
 
 				if (assetClass)
 					query.append('WHERE a.project=:project AND a.assetClass=:assetClass ')
@@ -2632,12 +2630,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					qparams.q = "%$params.q%"
 				}
 
-				if (doJoin) {
-					if (notIn) {
-						query.append("AND COALESCE(m.assetType,'') NOT ")
-					} else {
-						query.append("AND m.assetType ")
-					}
+				if (notIn) {
+					query.append("AND COALESCE(m.assetType,'') NOT ")
 					query.append('IN (:assetType)')
 					qparams.assetType = qm.assetType
 				}

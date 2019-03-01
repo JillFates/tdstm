@@ -66,7 +66,7 @@ function invokeAction(commentId) {
     updateStatus(commentId);
 
     jQuery.ajax({
-        url:contextPath+'/ws/task/'+commentId+'/invokeAction',
+        url:contextPath+'/ws/task/'+commentId+'/invokeLocalAction',
         data: {},
         type:'POST',
         success: function(data) {

@@ -55,15 +55,16 @@
 					colNames="'Actions', 'Username', 'Person', 'Roles', 'Company', 'Local User', 'Last Login', 'Date Created', 'Expiry Date'"
 					colModel="
 						{name:'act', index: 'act' , sortable: false, ${true ? 'formatter:actionFormatter,' :''} search:false, width:'50', fixed:true},
-						{name:'uzername', index: 'uzername', width:'80'},
+						{name:'username', index: 'username', width:'80'},
 						{name:'fullname', width:'100'},
 						{name:'roles',width:'100'},
-						{name:'zompany', width:'100'},
+						{name:'company', width:'100'},
 						{name:'isLocal', width:'80', fixed:true},
-						{name:'last1ogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'lastLogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
-					sortname="'uzername'"
+					sortname="'username'"
+					postData="{activeUsers: function() { return jQuery('#showActiveId').val(); }}"
 					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"
@@ -105,11 +106,12 @@
 			</g:if>
 			<div>
 				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}, activeUsers:${activeUsers}]']">
-					<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}" optionKey="id" optionValue="name" noSelection="['All':'All']" />
 					<input id="showActiveId" name="activeUsers" hidden="hidden" value="${(session.getAttribute('InActive'))}" />
+					<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}" optionKey="id" optionValue="name" noSelection="['All':'All']" />
+
+					<jqgrid:wrapper id="userLoginId" />
 				</g:form>
 			</div>
-			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
 

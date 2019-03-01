@@ -236,6 +236,15 @@ class TimeUtil {
 	}
 
 	/**
+	 * Overloaded variation of the ago(TimeDuration) method that accepts a start time and assumes now for the ending time
+	 * @param start -a starting datetime
+	 * @return The elapsed time in shorthand
+	 */
+	static String ago(Date start, String format = SHORT) {
+		ago(start, new Date(), format)
+	}
+
+	/**
 	 * @return the current datetime in GMT
 	 */
 	static Date nowGMT() {
