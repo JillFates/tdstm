@@ -553,7 +553,7 @@ class PersonController implements ControllerMethods {
 
 			if (eventsOption in ["A", "C"])
 			moveEvents = moveEvents.findAll {
-				def eventTimes = it.eventTimes
+				def eventTimes = moveEventService.getEventTimes(it.id)
 				if (eventTimes) {
 					if (eventsOption == "A") {
 						(eventTimes.completion && eventTimes.completion > now - 30) ||
