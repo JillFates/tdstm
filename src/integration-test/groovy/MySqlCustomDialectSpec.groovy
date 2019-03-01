@@ -46,7 +46,7 @@ class MySqlCustomDialectSpec extends Specification {
 					""", [], [max: 1])
 		then: 'results from a joined table are returned as a string with a comma separated list'
 			results.size() == 1
-			results[0].name == 'Cisco'
+			results[0].name.toLowerCase() == 'cisco'
 			results[0].id == 58
 			results[0].models == 'IronPort S170,NAS'
 	}
@@ -75,7 +75,7 @@ class MySqlCustomDialectSpec extends Specification {
 				""", [], [max: 1])
 		then: 'results from a joined table are returned as a JSON string in one column'
 			results.size() == 1
-			results[0].name == 'Cisco'
+			results[0].name.toLowerCase() == 'cisco'
 			results[0].id == 58
 			results[0].json == '[{"name": "IronPort S170", "type": "NAS"}]'
 	}

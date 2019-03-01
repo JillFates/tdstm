@@ -134,7 +134,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * Verify if user filled all required fiedls
 	 * @returns {boolean}
 	 */
-	protected canSave(): boolean {
+	public canSave(): boolean {
 		return this.isDirty();
 	}
 
@@ -158,7 +158,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 
 			this.promptService.open(

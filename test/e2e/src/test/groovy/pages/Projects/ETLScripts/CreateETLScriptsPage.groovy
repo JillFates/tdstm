@@ -28,6 +28,8 @@ class CreateETLScriptsPage extends Page{
         datascriptNameField   { $('input#dataScriptName')}
         datascriptDescField   { $('textarea#dataScriptDescription')}
         commonsModule { module CommonsModule }
+
     }
+
 
 }

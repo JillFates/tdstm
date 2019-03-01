@@ -14,12 +14,12 @@ import 'rxjs/add/operator/finally';
 
 @Component({
 	selector: 'tds-license-manual-request',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/manual-request/manual-request.component.html'
+	templateUrl: 'manual-request.component.html'
 })
 export class ManualRequestComponent extends UIExtraDialog implements OnInit {
 
-	protected modalOptions: DecoratorOptions;
-	protected licenseEmail = {};
+	public modalOptions: DecoratorOptions;
+	public licenseEmail: any = {};
 
 	constructor(
 		private licenseModel: LicenseModel,
@@ -36,7 +36,7 @@ export class ManualRequestComponent extends UIExtraDialog implements OnInit {
 		});
 	}
 
-	protected cancelCloseDialog($event): void {
+	public cancelCloseDialog($event): void {
 		this.dismiss();
 	}
 

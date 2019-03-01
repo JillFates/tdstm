@@ -1,5 +1,4 @@
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.service.TaskService
 import org.quartz.JobDataMap
@@ -11,7 +10,7 @@ import org.quartz.spi.MutableTrigger
  */
 class GenerateTasksJob {
 
-	def group = 'tdstm-generate-tasks'
+	static group = 'tdstm-generate-tasks'
 	static triggers = {}
 
 	TaskService taskService
@@ -58,8 +57,6 @@ class GenerateTasksJob {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			// TODO : JPM 5/2016 : execute() should update the progress to 100% if an exception occurs
 			// progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage())
-		}finally {
-			GormUtil.releaseLocalThreadMemory()
 		}
 	}
 }

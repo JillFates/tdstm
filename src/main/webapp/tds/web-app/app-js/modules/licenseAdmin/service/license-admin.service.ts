@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
@@ -12,7 +11,7 @@ export class LicenseAdminService {
 
 	private readonly licenseUrl = '../ws/license';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -20,16 +19,15 @@ export class LicenseAdminService {
 	 */
 	getLicenses(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let licenseModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let licenseModels = response && response.status === 'success' && response.data;
 				licenseModels.forEach((model) => {
 					model.activationDate = ((model.activationDate) ? new Date(model.activationDate) : '');
 					model.expirationDate = ((model.expirationDate) ? new Date(model.expirationDate) : '');
 				});
 				return licenseModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -37,11 +35,10 @@ export class LicenseAdminService {
 	 */
 	getLicense(id: number): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -49,11 +46,10 @@ export class LicenseAdminService {
 	 */
 	applyKey(id: number, hash: string): Observable<any> {
 		return this.http.post(`${this.licenseUrl}/${id}/load`, JSON.stringify({hash: hash}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -61,11 +57,10 @@ export class LicenseAdminService {
 	 */
 	resubmitLicenseRequest(id: number): Observable<any> {
 		return this.http.post(`${this.licenseUrl}/${id}/email/request`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -73,11 +68,10 @@ export class LicenseAdminService {
 	 */
 	getEmailContent(id: number): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/${id}/email/request`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -85,11 +79,10 @@ export class LicenseAdminService {
 	 */
 	getEnvironments(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}/environment`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -97,11 +90,10 @@ export class LicenseAdminService {
 	 */
 	getProjects(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}/project`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -110,11 +102,10 @@ export class LicenseAdminService {
 	 */
 	deleteLicense(id: number): Observable<string> {
 		return this.http.delete(`${this.licenseUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -130,11 +121,10 @@ export class LicenseAdminService {
 		};
 
 		return this.http.post(`${this.licenseUrl}/request`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**

@@ -62,31 +62,37 @@ class UserLoginController implements ControllerMethods {
 
 	@HasPermission(Permission.UserView)
 	def listJson() {
-		String sortIndex = params.sidx ?: 'username'
-		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
 		int currentPage = params.int('page', 1)
 		int rowOffset = (currentPage - 1) * maxRows
 
-		def companyId
-		List<UserLogin> userLogins
-		def filterParams = [username: params.username, fullname: params.fullname, roles: params.roles, company: params.company,
-		                    lastLogin: params.lastLogin, dateCreated: params.dateCreated, expiryDate: params.expiryDate]
+		Long companyId
+		List<UserLogin> userLogins = []
+		def filterParams = [
+			username: params.username,
+			fullname: params.fullname,
+			roles: params.roles,
+			company: params.company,
+			lastLogin: params.lastLogin,
+			dateCreated: params.dateCreated,
+			expiryDate: params.expiryDate
+		]
 
-		// Validate that the user is sorting by a valid column
-		if (!sortIndex in filterParams) {
-			sortIndex = 'username'
+		// Deal with sorting
+		String sortIndex = 'username'
+		if (filterParams.containsKey(params.sidx)) {
+			sortIndex = params.sidx
 		}
 
-		def presentDate = TimeUtil.nowGMTSQLFormat()
+		// Deal with order
+		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
 
-		def active = params.activeUsers ?: session.getAttribute("InActive")
-		if (!active) {
-			active = 'Y'
-		}
+		String presentDate = TimeUtil.nowGMTSQLFormat()
 
+		String active = ['Y', 'N'].contains(params.activeUsers) ?  params.activeUsers : 'Y'
+		//?: session.getAttribute("InActive")
 
-		def query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
+		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
 			FROM person p
@@ -103,7 +109,7 @@ class UserLoginController implements ControllerMethods {
 		if (securityService.hasPermission(Permission.UserListAll)) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
-				companyId = params.id
+				companyId = params.long('id')
 			}
 			if (!companyId && params.id != "All") {
 				// Still if no companyId found trying to get companyId from the session
@@ -120,31 +126,32 @@ class UserLoginController implements ControllerMethods {
 			query.append(" GROUP BY p.person_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 
 			// Handle the filtering by each column's text field
-			def firstWhere = true
-			for (it in filterParams) {
+			Boolean firstWhere = true
+			List<String> queryParams = []
+			filterParams.each {
 				if (it.value) {
 					if (firstWhere) {
-						query.append(" WHERE users.$it.key LIKE '%$it.value%'")
+						query.append(" WHERE ")
 						firstWhere = false
+					} else {
+						query.append(" AND ")
 					}
-					else {
-						query.append(" AND users.$it.key LIKE '%$it.value%'")
-					}
+					query.append("users.${it.key} LIKE ?")
+					queryParams << "%${it.value.trim()}%"
 				}
 			}
-			log.debug "listJson() Query for User Login List: $query"
-			userLogins = jdbcTemplate.queryForList(query.toString())
-		} else {
-			userLogins = []
+
+			userLogins = jdbcTemplate.queryForList(query.toString(), queryParams as Object[])
 		}
 
 		// Limit the returned results to the user's page size and number
 		def totalRows = userLogins.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if (totalRows > 0)
+		if (totalRows > 0) {
 			userLogins = userLogins[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
-		else
+		} else {
 			userLogins = []
+		}
 
 		String acceptImgTag = '<img src="' + "$grailsLinkGenerator.serverBaseURL/assets/icons/accept.png" + '"></img>'
 		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.

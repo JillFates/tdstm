@@ -3,6 +3,7 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import grails.web.context.ServletContextHolder
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
@@ -10,6 +11,8 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -71,6 +74,13 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 
 	@Unroll
 	def 'Test PaginationMethods.paginationMaxRowValue without user preferences'() {
+		setup:
+			def webRequest = RequestContextHolder.getRequestAttributes()
+			if(!webRequest) {
+			    def servletContext  = ServletContextHolder.getServletContext()
+			    def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+			    webRequest =  grails.util.GrailsWebMockUtil.bindMockWebRequest(applicationContext)
+			}
 		when: 'setting the max param to a value'
 			controller.params.max = maxValue
 		then: 'the PaginationMethod.paginationMaxRowValue method should return the expect result'

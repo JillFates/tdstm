@@ -1,7 +1,7 @@
 import {AssetCommonEdit} from '../../asset/asset-common-edit';
 import {ComboBoxSearchModel} from '../../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../../../shared/components/combo-box/model/combobox-search-result.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 export class DeviceCommonComponent extends AssetCommonEdit {
 

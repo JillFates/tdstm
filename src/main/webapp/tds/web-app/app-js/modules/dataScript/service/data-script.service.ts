@@ -1,8 +1,7 @@
 import {CredentialModel} from '../../credential/model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Headers, Http, RequestOptions, Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
@@ -38,14 +37,13 @@ export class DataScriptService {
 	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}&rootNode={3}');
 	private readonly GET_ETL_SCRIPT_BY_ID_URL = this.dataIngestionUrl.concat('/datascript/{0}');
 
-	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/datascript/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let dataScriptModels = response && response.status === 'success' && response.data;
 				dataScriptModels.forEach((r) => {
 					r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT);
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
@@ -53,45 +51,42 @@ export class DataScriptService {
 				});
 				return dataScriptModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/provider/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let providerModels = response && response.status === 'success' && response.data;
 				providerModels.forEach((r) => {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAPIActions(): Observable<APIActionModel[]> {
 		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let dataScriptModels = response && response.status === 'success' && response.data;
 				dataScriptModels.forEach((model) => {
 					this.transformApiActionModel(model);
 				});
 				return dataScriptModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAPIAction(id: number): Observable<APIActionModel> {
 		return this.http.get(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let model = response && response.status === 'success' && response.data;
 				this.transformApiActionModel(model);
 				return model;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private transformApiActionModel(model: any): void {
@@ -123,17 +118,14 @@ export class DataScriptService {
 
 	getAPIActionEnums(): Observable<any> {
 		return this.http.get(`${this.dataApiActionUrl}/enums`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	getCredentials(): Observable<CredentialModel[]> {
 		return this.http.get(`${this.credentialUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let credentialModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let credentialModels = response && response.status === 'success' && response.data;
 
 				credentialModels.forEach((model) => {
 					// r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
@@ -144,7 +136,7 @@ export class DataScriptService {
 				});
 				return credentialModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -153,13 +145,12 @@ export class DataScriptService {
 	 */
 	getCredential(id: number): Observable<CredentialModel> {
 		return this.http.get(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let model = response && response.status === 'success' && response.data;
 				this.processCredentialModel(model);
 				return model;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private processCredentialModel(model): void {
@@ -175,11 +166,10 @@ export class DataScriptService {
 	 */
 	getCredentialEnumsConfig(): Observable<any> {
 		return this.http.get(`${this.credentialUrl}/enums`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -221,14 +211,13 @@ export class DataScriptService {
 			.replace('{1}', fileName)
 			.replace('{2}', originalFileName)
 			.replace('{3}', rootNode))
-			.map((res: Response) => {
-				let result = res.json();
-				let data: any = (result && result.status === 'success' && result.data);
+			.map((response: any) => {
+				let data: any = (response && response.status === 'success' && response.data);
 				let columns: any = [];
 				let sampleDataModel: SampleDataModel;
-				if (result.status === ApiResponseModel.API_ERROR && result.errors) {
+				if (response.status === ApiResponseModel.API_ERROR && response.errors) {
 					sampleDataModel = {
-						errors: result.errors
+						errors: response.errors
 					};
 					return sampleDataModel;
 				}
@@ -250,53 +239,52 @@ export class DataScriptService {
 				}
 				return sampleDataModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
 		return this.http.get(`${this.dataApiActionUrl}/connector/${agentId}`)
-			.map((res: Response) => {
-				let result = res.json();
+			.map((response: any) => {
 				let agentMethodModel = new Array<AgentMethodModel>();
-				for (let property in result) {
-					if (result.hasOwnProperty(property)) {
+				for (let property in response) {
+					if (response.hasOwnProperty(property)) {
 						agentMethodModel.push({
-							id: result[property].apiMethod,
-							name: result[property].name,
-							description: result[property].description,
-							endpointUrl: result[property].endpointUrl,
-							docUrl: result[property].docUrl,
-							producesData: (result[property].producesData === 1),
+							id: response[property].apiMethod,
+							name: response[property].name,
+							description: response[property].description,
+							endpointUrl: response[property].endpointUrl,
+							docUrl: response[property].docUrl,
+							producesData: (response[property].producesData === 1),
 							polling: {
 								frequency: {
-									value: ((result[property].pollingInterval) ? result[property].pollingInterval : 0),
+									value: ((response[property].pollingInterval) ? response[property].pollingInterval : 0),
 									interval: INTERVAL.SECONDS
 								},
 								lapsedAfter: {
 									value: DateUtils.convertInterval({
-										value: ((result[property].pollingLapsedAfter) ? result[property].pollingLapsedAfter : 0),
+										value: ((response[property].pollingLapsedAfter) ? response[property].pollingLapsedAfter : 0),
 										interval: INTERVAL.SECONDS
 									}, INTERVAL.MINUTES),
 									interval: INTERVAL.MINUTES
 								},
 								stalledAfter: {
 									value: DateUtils.convertInterval({
-										value: ((result[property].pollingStalledAfter) ? result[property].pollingStalledAfter : 0),
+										value: ((response[property].pollingStalledAfter) ? response[property].pollingStalledAfter : 0),
 										interval: INTERVAL.SECONDS
 									}, INTERVAL.MINUTES),
 									interval: INTERVAL.MINUTES
 								}
 							},
-							methodParams: result[property].params,
-							script: result[property].script,
-							httpMethod: result[property].httpMethod
+							methodParams: response[property].params,
+							script: response[property].script,
+							httpMethod: response[property].httpMethod
 						});
 					}
 				}
-				result = agentMethodModel;
-				return result;
+				response = agentMethodModel;
+				return response;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
@@ -309,20 +297,18 @@ export class DataScriptService {
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
+				.map((response: any) => {
+					let dataItem = (response && response.status === 'success' && response.data);
 					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
 					return dataItem;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -334,18 +320,16 @@ export class DataScriptService {
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			return this.http.put(`${this.dataIngestionUrl}/provider/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -406,20 +390,18 @@ export class DataScriptService {
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
+				.map((response: any) => {
+					let dataItem = (response && response.status === 'success' && response.data);
 					return dataItem;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			postRequest.version = model.version;
 			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -455,20 +437,18 @@ export class DataScriptService {
 
 		if (!model.id) {
 			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
+				.map((response: any) => {
+					let dataItem = (response && response.status === 'success' && response.data);
 					return dataItem;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			postRequest.version = model.version;
 			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
@@ -481,11 +461,10 @@ export class DataScriptService {
 			postRequest['dataScriptId'] = model.id;
 		}
 		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.isUnique;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data && response.data.isUnique;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
@@ -494,20 +473,18 @@ export class DataScriptService {
 			postRequest['providerId'] = model.id;
 		}
 		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -517,11 +494,10 @@ export class DataScriptService {
 	 */
 	validateAuthentication(credentialId: number): Observable<any> {
 		return this.http.post(`${this.credentialUrl}/test/${credentialId}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -534,9 +510,8 @@ export class DataScriptService {
 			expression: validateExpression
 		};
 		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				let errorResult = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let errorResult = response && response.status === 'success' && response.data;
 				let errors = '';
 				if (errorResult['errors']) {
 					errorResult['errors'].forEach((error: string) => {
@@ -548,7 +523,7 @@ export class DataScriptService {
 					error: errors
 				};
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -558,47 +533,42 @@ export class DataScriptService {
 	 */
 	validateDeleteScript(id: number): Observable<string> {
 		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteDataScript(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteProvider(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteAPIAction(id: number): Observable<string> {
 		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteCredential(id: number): Observable<string> {
 		return this.http.delete(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveScript(id: number, script: string): Observable<any> {
@@ -607,19 +577,16 @@ export class DataScriptService {
 			script: script
 		};
 		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success';
+			.map((response: any) => {
+				return response && response.status === 'success';
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getETLScript(id: number): Observable<ApiResponseModel> {
 		return this.http.get(this.GET_ETL_SCRIPT_BY_ID_URL.replace('{0}', id.toString()) )
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -634,11 +601,8 @@ export class DataScriptService {
 			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/initiateTestScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let response = res.json();
-				return response;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	checkSyntax(script: string, filename: string): Observable<any> {
@@ -647,10 +611,8 @@ export class DataScriptService {
 			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	uploadText(content: string, extension: string): Observable<any> {
@@ -659,10 +621,8 @@ export class DataScriptService {
 			extension: extension
 		};
 		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	uploadETLScriptFileText(content: string, extension: string): Observable<any> {
@@ -671,60 +631,56 @@ export class DataScriptService {
 			extension: extension
 		};
 		return this.http.post(this.ETLScriptUploadTextURL, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'})
+		};
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, httpOptions)
+			.map((response: any) => {
+				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	uploadETLScriptFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.ETLScriptUploadURL, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'})
+		};
+		return this.http.post(this.ETLScriptUploadURL, formdata, httpOptions)
+			.map((response: any) => {
+				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	uploadAssetImportFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.assetImportUploadURL, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'})
+		};
+		return this.http.post(this.assetImportUploadURL, formdata, httpOptions)
+			.map((response: any) => {
+				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
-		let body = JSON.stringify({filename: filename} );
-		let headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({
-			headers: headers,
-			body : body
-		});
-		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
-			.map((res: Response) => {
-				let response = res.json();
+		const httpOptions = {
+			headers: new HttpHeaders({'Content-Type': 'application/json'}), body: JSON.stringify({filename: filename} )
+		};
+
+		return this.http.delete(`${this.fileSystemUrl}/delete`, httpOptions)
+			.map((response: any) => {
 				response.operation = 'delete';
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
+
 	private getUserPreference(preferenceName: string): Observable<any> {
 		return this.preferenceService.getPreference(preferenceName);
 	}
@@ -821,8 +777,7 @@ export class DataScriptService {
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
 		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

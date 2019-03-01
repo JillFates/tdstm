@@ -69,9 +69,9 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('viewFilterModel') viewFilterModel: string;
 
 	// Use to control if the Switch becomes visible
-	private switchVisible = false;
+	public switchVisible = false;
 
-	private assetSelectorModel = {
+	public assetSelectorModel = {
 		switch: false,
 		tags: []
 	};

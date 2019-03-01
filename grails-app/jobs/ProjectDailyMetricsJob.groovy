@@ -1,4 +1,3 @@
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.ProjectService
 import org.quartz.JobExecutionContext
 
@@ -13,17 +12,12 @@ class ProjectDailyMetricsJob {
 	}
 
 	// Quartz Properties
-	def group = 'tdstm-project-daily-metrics'
+	static group = 'tdstm-project-daily-metrics'
 
 	// IOC services
 	ProjectService projectService
 
 	void execute(JobExecutionContext context) {
-		try {
-			projectService.activitySnapshot()
-		}
-		finally {
-			GormUtil.releaseLocalThreadMemory()
-		}
+		projectService.activitySnapshot()
 	}
 }

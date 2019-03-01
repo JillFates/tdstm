@@ -196,6 +196,11 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event" {
+			controller = "event"
+			action = [GET: "index"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
@@ -337,6 +342,14 @@ class UrlMappings {
 			action = [GET:'qzCertificate']
 		}
 
+
+		"/ws/task" {
+			controller = 'task'
+			action = [
+			    GET: 'list'
+			]
+		}
+
 		/**
 		 * AssetComment CRUD endpoints
 		 */
@@ -397,9 +410,14 @@ class UrlMappings {
 			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
 
-		"/ws/task/$id/invokeAction" {
+		"/ws/task/$id/invokeLocalAction" {
 			controller = "wsTask"
-			action = [POST:"invokeAction"]
+			action = [POST:"invokeLocalAction"]
+		}
+
+		"/ws/task/$id/invokeRemoteAction" {
+			controller = "wsTask"
+			action = [POST:"invokeRemoteAction"]
 		}
 
 		"/ws/task/$id/resetAction" {
@@ -626,6 +644,7 @@ class UrlMappings {
 		}
 
 		///// LICENSES Admin API (Client Side) /////////
+
 		"/ws/license" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -639,9 +658,19 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
+			constraints {
+				id(matches:/[0-9]{1,}/)
+			}
 		}
 
-		//Gets que request Hash  --- OLB 161207 Change Hash to request...
+		// Licensing Information
+		"/ws/license/info" {
+			controller = "license"
+			action = [
+			        GET: "info"
+			]
+		}
+
 		"/ws/license/$id/hash" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -649,7 +678,7 @@ class UrlMappings {
 			]
 		}
 
-		//Requests
+		// Requests
 		"/ws/license/request" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -657,7 +686,7 @@ class UrlMappings {
 			]
 		}
 
-		//Resubmit License Request
+		// Resubmit License Request
 		"/ws/license/$id/email/request" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -726,6 +755,14 @@ class UrlMappings {
 		///// LICENSES Manager API (BackOffice) /////////
 
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
+
+		//load a request HASH from a client, returns JSON object
+		"/ws/manager/license/enabled" {
+			controller = "wsLicenseManager"
+			action = [
+					GET: "getLicenseManagerEnabled"
+			]
+		}
 
 		//load a request HASH from a client, returns JSON object
 		"/ws/manager/license/request" {
@@ -1203,6 +1240,13 @@ class UrlMappings {
 			controller = "wsTagEvent"
 			action = [
 				GET: "list"
+			]
+		}
+
+		"/ws/reports/generateCheckList" {
+			controller = "wsReports"
+			action = [
+					POST: "generateCheckList"
 			]
 		}
 

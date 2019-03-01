@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import { Response } from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
@@ -9,7 +8,7 @@ export class ImportAssetsService {
 
 	private importEndpointURL = '../ws/assetImport/';
 
-	constructor(private http: HttpInterceptor) {}
+	constructor(private http: HttpClient) {}
 
 	/**
 	 * Returns a collection of data lists including the actions and datascripts used to populate the form
@@ -18,9 +17,8 @@ export class ImportAssetsService {
 	public getManualOptions(): Observable<any> {
 		let url = this.importEndpointURL + 'manualFormOptions';
 		return this.http.get(url)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -31,9 +29,8 @@ export class ImportAssetsService {
 	public postFetch(action: any): Observable<any> {
 		let url = this.importEndpointURL + 'invokeFetchAction/' + action.id;
 		return this.http.post(url, null)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -44,15 +41,15 @@ export class ImportAssetsService {
 	 */
 	public getFileContent(filename: string): Observable<any> {
 		let url = this.importEndpointURL + 'viewData?filename=' + filename;
-		return this.http.get(url)
-			.map((res: Response) => {
+		return this.http.get(url, {responseType: 'text'})
+			.map((response: any) => {
 				let fileExtension = filename.split('.').pop();
 				if (fileExtension === 'json') {
-					return res.json();
+					return response;
 				} else {
-					return res['_body'];
+					return response;
 				}
-			}).catch((error: any) => error.json());
+			}).catch((error: any) => error);
 	}
 
 	/**
@@ -63,9 +60,8 @@ export class ImportAssetsService {
 	public postTransform(datascript: any, filename: string): Observable<ApiResponseModel> {
 		let url = this.importEndpointURL + 'initiateTransformData?dataScriptId=' + datascript.id + '&filename=' + filename;
 		return this.http.post(url, null)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -75,8 +71,7 @@ export class ImportAssetsService {
 	public postImport(filename: string): Observable<any> {
 		let url = this.importEndpointURL + 'loadData?filename=' + filename;
 		return this.http.post(url, null)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

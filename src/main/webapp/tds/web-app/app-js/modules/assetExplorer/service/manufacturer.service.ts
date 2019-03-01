@@ -1,8 +1,6 @@
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response, RequestOptions, Headers} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PermissionService} from '../../../shared/services/permission.service';
 import {DeviceManufacturer} from '../components/device/manufacturer/model/device-manufacturer.model';
 
 import 'rxjs/add/operator/map';
@@ -11,21 +9,21 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class ManufacturerService {
 	private manufacturerUrl = '/tdstm/manufacturer';
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
+	constructor(private http: HttpClient) {}
 
 	isValidAlias(alias: string, id: number, parentName: string): Observable<string> {
 		const url = `${this.manufacturerUrl}/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
 
-		return this.http.get(url, '')
+		return this.http.get(url)
 			.map((res: any) => res.text())
 	}
 
 	getDeviceManufacturer(id: string): Observable<DeviceManufacturer> {
 		const url = `${this.manufacturerUrl}/retrieveManufacturerAsJSON?id=${id}`;
 		return this.http.post(url, '')
-			.map((res: Response) => res.json())
+			.map((response: any) => response)
 			.map((res: any) => res && Object.assign({aka: res.aliases || '', akaCollection: res.akaCollection}, res.manufacturer) || {})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getManufacturerPayload(manufacturer: DeviceManufacturer, isDelete: boolean): string {
@@ -67,13 +65,11 @@ export class ManufacturerService {
 	updateManufacturer(manufacturer: DeviceManufacturer, isDelete: boolean): Observable<any> {
 		const body = this.getManufacturerPayload(manufacturer, isDelete);
 
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/x-www-form-urlencoded');
-		const requestOptions = new RequestOptions({headers: headers});
+		const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
 
-		const url = `${this.manufacturerUrl}/update` ;
-		return this.http.post(url, body, requestOptions)
-			.map(res => res.ok)
+		const url = `${this.manufacturerUrl}/update`;
+		return this.http.post(url, body, {headers: headers})
+			.map((res: any) => res.ok)
 			.catch((error: any) => error);
 	}
 }

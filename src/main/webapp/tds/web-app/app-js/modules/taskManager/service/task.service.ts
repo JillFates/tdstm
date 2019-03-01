@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Response, RequestOptions, Headers} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
 
@@ -8,7 +7,6 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
-import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name TaskService
@@ -20,7 +18,7 @@ export class TaskService {
 	private baseURL = '/tdstm';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -29,8 +27,8 @@ export class TaskService {
 	 */
 	retrieveUserToDoCount(): Observable<any> {
 		return this.http.get(`${this.baseURL}/task/retrieveUserToDoCount`)
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -39,11 +37,10 @@ export class TaskService {
 	 */
 	getCommentCategories(): Observable<any> {
 		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -52,11 +49,10 @@ export class TaskService {
 	 */
 	getTaskDetails(taskId: string): Observable<any> {
 		return this.http.get(`${this.baseURL}/assetEntity/showComment?id=${taskId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result[0];
+			.map((response: any) => {
+				return response && response[0];
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -65,11 +61,10 @@ export class TaskService {
 	 */
 	deleteTaskComment(commentId: any): Observable<any> {
 		return this.http.delete(`${this.baseURL}/ws/asset/comment/${commentId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -78,11 +73,10 @@ export class TaskService {
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
 		return this.http.post(`${this.baseURL}/assetEntity/updateAssignedToSelect?format=json&forView=&id=${commentId}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -91,11 +85,10 @@ export class TaskService {
 	 */
 	getStaffRoles(): Observable<any> {
 		return this.http.get(`${this.baseURL}/task/retrieveStaffRoles`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -104,11 +97,10 @@ export class TaskService {
 	 */
 	getStatusList(commentId: any): Observable<any> {
 		return this.http.post(`${this.baseURL}/assetEntity/updateStatusSelect?format=json&id=${commentId}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -116,11 +108,10 @@ export class TaskService {
 	 */
 	getLastCreatedTaskSessionParams(): Observable<any> {
 		return this.http.get(`${this.baseURL}/ws/task/taskCreateDefaults`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -139,19 +130,17 @@ export class TaskService {
 
 		if (!model.id) {
 			return this.http.post(`${this.baseURL}/ws/asset/comment`, JSON.stringify(request))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data && result.data.dataView;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data && response.data.dataView;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			request['id'] = model.id;
 			return this.http.put(`${this.baseURL}/ws/asset/comment/${model.id}`, JSON.stringify(request))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data && result.data.dataView;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data && response.data.dataView;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 	/**
@@ -162,8 +151,7 @@ export class TaskService {
 	 */
 	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.http.get(`${this.baseURL}/assetEntity/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value || ''}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.results,
 					total: response.total,
@@ -171,7 +159,7 @@ export class TaskService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -180,11 +168,10 @@ export class TaskService {
 	 */
 	getAssetClasses(): Observable<any> {
 		return this.http.get(`${this.baseURL}/assetEntity/assetClasses`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.data;
+			.map((response: any) => {
+				return response && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -195,8 +182,8 @@ export class TaskService {
 	 */
 	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.searchTasks(searchParams)
-			.map(res => {
-				const result = res.result.filter((item) => item.id);
+			.map(response => {
+				const result = response.result.filter((item) => item.id);
 
 				return {
 					result: result.map((item) =>
@@ -209,8 +196,8 @@ export class TaskService {
 								taskNumber: item.taskNumber
 							}
 						})),
-					total: res.total,
-					page: res.page
+					total: response.total,
+					page: response.page
 				}
 			});
 	}
@@ -240,8 +227,7 @@ export class TaskService {
 			.join('&');
 
 		return this.http.get(`${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: (response.data && response.data.list || []),
 					total: response.data && response.data.total,
@@ -249,7 +235,7 @@ export class TaskService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -260,7 +246,7 @@ export class TaskService {
 	updateTask(payload: any): Observable<any> {
 		const url = `${this.baseURL}/assetEntity/updateComment`;
 		return this.http.post(url, JSON.stringify(payload))
-			.map(res =>  res && res.json())
+			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
 
@@ -280,7 +266,7 @@ export class TaskService {
 	addNote(id: string, note: string): Observable<any> {
 		const url = `${this.baseURL}/ws/task/${id}/addNote`;
 		return this.http.post(url, JSON.stringify({note}))
-			.map(res =>  res && res.json())
+			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
 
@@ -292,7 +278,7 @@ export class TaskService {
 	createTask(payload: any): Observable<any> {
 		const url = `${this.baseURL}/assetEntity/saveComment`;
 		return this.http.post(url, JSON.stringify(payload))
-			.map(res =>  res && res.json())
+			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
 
@@ -303,12 +289,11 @@ export class TaskService {
 	 */
 	getCategories(): Observable<any[]> {
 		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				return response && response.data || [];
 
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -318,12 +303,11 @@ export class TaskService {
 	 */
 	getEvents(): Observable<any[]> {
 		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				return response && response.data || [];
 
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -333,11 +317,8 @@ export class TaskService {
 	 */
 	updateTaskStatus(payload: any): Observable<any> {
 		return this.http.post(`${this.baseURL}/task/update`, JSON.stringify(payload))
-			.map((res: Response) => {
-				let result = res.json();
-				return result;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	updateStatus(id: string, status: string): Observable<any> {
@@ -353,11 +334,8 @@ export class TaskService {
 	 */
 	assignToMe(payload: any): Observable<any> {
 		return this.http.post(`${this.baseURL}/task/assignToMe`, JSON.stringify(payload))
-			.map((res: Response) => {
-				let result = res.json();
-				return result;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -366,7 +344,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	invokeAction(taskId: string): Observable<any> {
-		return this.http.post(`${this.baseURL}/ws/task/${taskId}/invokeAction`, '')
+		return this.http.post(`${this.baseURL}/ws/task/${taskId}/invokeLocalAction`, '')
 			.map((res: Response) => {
 				let result = res.json();
 				return result;
@@ -380,11 +358,8 @@ export class TaskService {
 	 */
 	getActionList(): Observable<any> {
 		return this.http.get(`${this.baseURL}/ws/apiAction`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result.data || [];
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response.data || [])
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -395,11 +370,8 @@ export class TaskService {
 	getClassForAsset(assetId: string): Observable<any> {
 		if (assetId) {
 			return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
-				.map((res: Response) => {
-					let result = res.json();
-					return result.data || null;
-				})
-				.catch((error: any) => error.json());
+				.map((response: any) =>  response.data || null)
+				.catch((error: any) => error);
 		}
 		return Observable.empty();
 	}

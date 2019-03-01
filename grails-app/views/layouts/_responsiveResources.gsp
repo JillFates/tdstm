@@ -39,7 +39,7 @@ def moveEvent = tds.currentMoveEvent() ?: null
 <asset:javascript src="resources" />
 
 <!-- Migration Scripts -->
-<script src="${resource(dir: 'dist/js/migrateScript', file: 'jqueryDeprecated.js')}"></script>
+<script src="${resource(dir: 'js/migrateScript', file: 'jqueryDeprecated.js')}"></script>
 
 <!-- -->
 
@@ -64,10 +64,7 @@ def moveEvent = tds.currentMoveEvent() ?: null
 </script>
 
 <!-- LEGACY CODE END -->
-<!-- Vendors -->
-<script src="${resource(dir:'dist',file:'Vendors.js')}"></script>
-<!-- Single Page Logic -->
-<script src="${resource(dir:'dist',file:'App.js')}"></script>
+
 <!-- Kendo Directives -->
 <script src="${resource(dir: 'dist/js/vendors/kendo', file: 'kendo.all.min.js')}"></script>
 <!-- Boosttrap -->

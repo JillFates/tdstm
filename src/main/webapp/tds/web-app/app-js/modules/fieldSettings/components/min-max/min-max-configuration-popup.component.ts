@@ -4,7 +4,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 
 @Component({
 	selector: 'min-max-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/min-max/min-max-configuration-popup.component.html',
+	templateUrl: 'min-max-configuration-popup.component.html',
 	exportAs: 'minmaxConfig'
 })
 
@@ -49,7 +49,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 }

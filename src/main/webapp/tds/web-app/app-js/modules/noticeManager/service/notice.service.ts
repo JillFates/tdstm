@@ -1,14 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Response, Headers, RequestOptions} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {NotifierService} from '../../../shared/services/notifier.service';
+import {HttpClient} from '@angular/common/http';
 import {NoticeModel} from '../model/notice.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
-import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name NoticeService
@@ -20,7 +17,7 @@ export class NoticeService {
 	private noticeListUrl = '../ws/notices';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -29,33 +26,32 @@ export class NoticeService {
 	 */
 	getNoticesList(): Observable<NoticeModel[]> {
 		return this.http.get(this.noticeListUrl)
-			.map((res: Response) => {
-				let result = res.json();
-				result.notices.forEach( (notice: any) => {
+			.map((response: any) => {
+				response.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
 					notice.active = notice.active ? 'Yes' : 'No';
 				});
-				return result && result.notices;
+				return response && response.notices;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
-			.map((res: Response) => res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((response: any) => response)
+			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
 	editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
-			.map((res: Response) => res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((response: any) => response)
+			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
 	deleteNotice(noticeId: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
-			.map((res: Response) => res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((response: any) => response)
+			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
 	/**

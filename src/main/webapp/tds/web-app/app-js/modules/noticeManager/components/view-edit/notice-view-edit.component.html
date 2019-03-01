@@ -1,7 +1,7 @@
 <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">{{ (action === 0 ? 'NOTICE.CREATE_NOTICE':'NOTICE.EDIT_NOTICE') | translate }}</h4>
+        <h4 class="modal-title">{{ (modalType === 0 ? 'NOTICE.CREATE_NOTICE':'NOTICE.EDIT_NOTICE') | translate }}</h4>
     </div>
     <div class="modal-body">
         <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
@@ -46,9 +46,9 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
+        <button (click)="saveNotice()" [disabled]="!formValid()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
         <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
-        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
+        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="modalType===1" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
     </div>
 </div>

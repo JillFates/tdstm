@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Response, RequestOptions, Headers} from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -12,7 +11,7 @@ export class PersonService {
 
 	private personUrl = '/tdstm/person';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	savePerson(person: PersonModel): Observable<any> {
@@ -27,10 +26,8 @@ export class PersonService {
 
 		const payload = { ...person, ...params};
 		return this.http.post(`${this.personUrl}/save`, JSON.stringify(payload))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 }

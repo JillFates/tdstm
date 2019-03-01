@@ -343,30 +343,30 @@ class CustomTagLib implements InitializingBean {
 			Boolean justPlanning  = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
 			out << " <span style=\"margin-left: 15px; font-size: 15px;\"><input type=\"checkbox\" id=\"justPlanning\" onclick=\"toggleJustPlanning(\$(this))\" "
 			if (justPlanning) {
-				out << "checked=\"checked\""
+				out << 'checked="checked"'
 			}
-			out << "/><label style=\"font-weight: 600 !important;\" for=\"justPlanning\">&nbsp;Just Planning</label></span>"
+			out << '/><label style="font-weight: 600 !important;" for="justPlanning">&nbsp;Just Planning</label></span>'
 		}
-		out << " </h1>"
+		out << '</h1>'
 
-		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
-		if(isLicenseAdminEnabled) {
-			def bannerMessage = licenseAdminService.getLicenseBannerMessage()
-			if(bannerMessage) {
-				out << "<div class=\"breadcrumb licensing-banner-message breadcrumb-" << crumbs.size << " \">"
-				out << "<div class=\"callout\"> " +
-						"                    <p> <strong>" << bannerMessage << "</strong></p> " +
-						"                  </div>"
-				out << "</div>"
+		Map licenseInfo = licenseAdminService.licenseInfo(securityService.getUserCurrentProject())
+
+		if(licenseInfo.banner) {
+			out << """
+				<div class="breadcrumb licensing-banner-message breadcrumb-${crumbs.size}">
+					<div class="callout">
+						<p><strong>${licenseInfo.banner}</strong></p>
+					</div>
+				</div>"""
+		}
+
+		out << '<ol class="breadcrumb">'
+			crumbs.each {
+				out << '<li><a href="#">' << it << '</a></li>'
 			}
-		}
-			out << "<ol class=\"breadcrumb\">"
-				crumbs.each {
-					out << "<li><a href=\"#\">" << it << "</a></li>"
-				}
-			out << "</ol>"
+		out << '</ol>'
 
-		out << "</section>"
+		out << '</section>'
 	}
 
 	/**
@@ -380,7 +380,7 @@ class CustomTagLib implements InitializingBean {
 			String stateMessage = licenseAdminService.getLicenseStateMessage()
 			if(stateMessage) {
 				// Bootstrap converts the html entities into real elements
-				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/app/license/admin/list&apos;&quot;"
+				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/module/license/admin/list&apos;&quot;"
 				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message' style='word-wrap: break-word;'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
 			}
 		}

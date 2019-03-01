@@ -44,7 +44,7 @@
 
 
 <!-- Migration Scripts -->
-<script src="${resource(dir: 'dist/js/migrateScript', file: 'jqueryDeprecated.js')}"></script>
+<script src="${resource(dir: 'js/migrateScript', file: 'jqueryDeprecated.js')}"></script>
 
 <!-- -->
 

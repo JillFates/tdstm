@@ -42,4 +42,37 @@ class ActionRequest {
 		this.options.setReadonly(this.readonly)
 	}
 
+	/**
+	 * Return a ActionRequest as map representation
+	 * @return
+	 */
+	Map toMap() {
+		Map params
+		if (this.params) {
+			params = this.params.getAllProperties()
+		}
+
+		Map options
+		if (this.options) {
+			options = this.options.getAllProperties()
+		}
+
+		Map headers
+		if (this.headers) {
+			headers = this.headers.getHeadersAsMap()
+		}
+
+		Map config
+		if (this.config) {
+			config = this.config.asImmutable()
+		}
+
+		return [
+		        params: params,
+				options: options,
+				headers: headers,
+				config: config
+		]
+	}
+
 }

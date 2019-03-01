@@ -119,6 +119,16 @@ export class LicenseModel {
 	expirationDate?: Date;
 	activationDate?: Date;
 	status?: string;
+	bannerMessage?: string;
+	requestNote?: string;
+	environment?: string;
+	gracePeriodDays?: string;
+	email?: string;
+	requestDate?: string;
+	method?: any;
+	owner?: any;
+	client?: any;
+	project?: any;
 }
 
 export enum LicenseType {

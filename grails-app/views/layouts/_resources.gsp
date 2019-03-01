@@ -30,24 +30,8 @@
 <asset:stylesheet src="angular-support.css" />
 <asset:javascript src="angular-support" />
 
-<%
-    def moveEvent = tds.currentMoveEvent() ?: null
-%>
-<g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
-    <g:javascript src="crawler.js" />
-</g:if>
-
-<script src="${resource(dir: 'dist/js/vendors/jquery.browser/dist', file: 'jquery.browser.min.js')}"></script>
-
-<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'tinymce.min.js')}"></script>
-<script rel="prefetch" src="${resource(dir: 'dist/js/vendors/tinymce', file: 'theme.min.js')}"></script>
-
-<script type="text/javascript">
-    var contextPath = "${request.contextPath}";
-    var currentMenuId = '';
-</script>
-
-<!-- LEGACY CODE END -->
+<script rel="prefetch" src="${resource(dir: 'js/tinymce', file: 'tinymce.min.js')}"></script>
+<script rel="prefetch" src="${resource(dir: 'js/tinymce', file: 'theme.min.js')}"></script>
 
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>

@@ -24,7 +24,7 @@ import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'import-batch-list',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/list/import-batch-list.component.html',
+	templateUrl: 'import-batch-list.component.html',
 	providers: [TranslatePipe]
 })
 export class ImportBatchListComponent implements OnDestroy {
@@ -35,7 +35,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	protected columnsModel: ImportBatchColumnsModel;
 	protected importBatchPreferences = {};
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
-	private dataGridOperationsHelper: DataGridOperationsHelper;
+	public dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
 		dir: 'desc',
 		field: 'dateCreated'

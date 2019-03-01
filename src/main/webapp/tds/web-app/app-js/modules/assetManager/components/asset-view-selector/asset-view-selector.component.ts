@@ -1,6 +1,5 @@
 import {
 	Component,
-	Inject,
 	ViewChild,
 	AfterViewInit,
 	Input,
@@ -9,7 +8,6 @@ import {
 	EventEmitter,
 	ElementRef
 } from '@angular/core';
-import {Observable} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 
 import {ViewGroupModel} from '../../../assetExplorer/model/view.model';
@@ -23,7 +21,65 @@ import {Router} from '@angular/router';
 @Component({
 	selector: 'tds-asset-view-selector',
 	exportAs: 'tdsAssetViewSelector',
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-selector/asset-view-selector.component.html',
+	template: `
+        <kendo-dropdownlist #kendoDropDown="kendoDropDownList"
+                            [defaultItem]="defaultItem"
+                            [data]="data"
+                            [disabled]="isDisabled"
+                            (close)="onAction($event)"
+                            (open)="onAction($event)"
+                            [valueField]="'name'"
+                            (click)="onToggle()"
+                            [textField]="'name'"
+                            class="asset-explorer-view-selector-component"
+                            style="width: 266px;">
+            <ng-template kendoDropDownListValueTemplate let-dataItem>
+		<span style="cursor:pointer;width:100%;">
+			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
+				{{selectedItem}}
+			</div>
+			<ng-template #noneSelectedItem>
+				{{dataItem.name}}
+			</ng-template>
+		</span>
+            </ng-template>
+            <ng-template kendoDropDownListHeaderTemplate>
+                <div class="has-feedback" style="margin-top:-20px;">
+                    <input #viewSelectorFilter
+                           (focusout)="onFocusOut()"
+                           type="text"
+                           class="form-control"
+                           (keyup)="onSearch()"
+                           name="searchFilterSelector"
+                           [(ngModel)]='searchFilterSelector'
+                           placeholder="Search"
+                           aria-describedby="search">
+                    <i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
+                </div>
+            </ng-template>
+            <ng-template kendoDropDownListItemTemplate let-dataItem>
+                <div class="container" *ngIf="!dataItem.default; else default">
+                    <div class="row" (click)="onFolderClick(dataItem)">
+                        <i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
+                        <span class="label label-primary pull-right">{{dataItem.items.length}}</span>
+                    </div>
+                    <div class="row" style="margin-top:5px;" *ngIf="dataItem.open">
+                        <li *ngIf="isCreateVisible(dataItem)">
+                            <a (click)="onCreateNew(dataItem)" class="btn"><i class="fa fa-plus-square"></i> Create New</a>
+                        </li>
+                        <li>
+                            <ul style="padding-left:10px;margin-top:5px;word-wrap:break-word" *ngFor="let value of dataItem.items">
+                                <a [routerLink]="['/asset','views',value.id,'show']" (click)="onFocusOut()">
+                                    <i class="fa fa-file-text-o"></i> {{value.name}}</a>
+                            </ul>
+                        </li>
+                    </div>
+                </div>
+                <ng-template #default>
+                </ng-template>
+            </ng-template>
+        </kendo-dropdownlist>
+	`,
 	encapsulation: ViewEncapsulation.None,
 	styles: [
 			`ul.k-list .k-item.k-state-selected, ul.k-list .k-item.k-state-selected:hover {
@@ -65,11 +121,11 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		}
 	}
 
-	protected onAction(e): void {
+	public onAction(e): void {
 		e.prevented = true;
 	}
 
-	protected onToggle() {
+	public onToggle() {
 		setTimeout(() => {
 			this.dropdown.toggle(!this.dropdown.isOpen)
 			setTimeout( () => {

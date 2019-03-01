@@ -1,0 +1,448 @@
+{
+	"info": {
+		"_postman_id": "af936dcf-c4d6-4627-b1e8-5f5e6e0d1523",
+		"name": "Actions Endpoints Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Actions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "List Actions Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"var response = JSON.parse(responseBody);",
+							"var httpMethod = response.data.httpMethod;",
+							"",
+							"",
+							"pm.test(\"Http Method parameter is not null\", function () {",
+							"    pm.expect(httpMethod).not.equal(null);",
+							"});",
+							"",
+							"//We get a dictionary name, which is under the \"agentNames\" attribute",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var dictionaryName = jsonObject.data.agentNames[0].name; ",
+							"var dictionaryID = jsonObject.data.agentNames[0].id; ",
+							"",
+							"pm.environment.set(\"dictionaryName\", dictionaryName);",
+							"pm.environment.set(\"dictionaryID\", dictionaryID);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction/enums",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction",
+						"enums"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Dictionary methods",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa8e308f-24ca-46fb-9260-b7562e1a0b9c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//We get the info from the methods of the Dictionary we use",
+							"var responseObject = JSON.parse(responseBody);",
+							"var firstMethod = Object.keys(responseObject)[0];",
+							"var endpointUrl = Object.values(responseObject)[0].endpointUrl;",
+							"var docUrl = Object.values(responseObject)[0].docUrl;",
+							"",
+							"",
+							"pm.environment.set(\"dictionaryMethod\", firstMethod);",
+							"pm.environment.set(\"dictionaryEndpointUrld\", endpointUrl);",
+							"pm.environment.set(\"dictionaryDocUrl\", docUrl);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction/connector/{{dictionaryID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction",
+						"connector",
+						"{{dictionaryID}}"
+					]
+				},
+				"description": "Find all the providers for the user's current project."
+			},
+			"response": []
+		},
+		{
+			"name": "List API Actions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Providers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa8e308f-24ca-46fb-9260-b7562e1a0b9c",
+						"exec": [
+							"//We need a provider value for the Api Action",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var providerId = jsonObject.data[0].id; ",
+							"",
+							"pm.environment.set(\"providerId\", providerId);",
+							"",
+							"var apiActionName = \"API Script New Action\" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"",
+							"pm.environment.set(\"apiActionName\", apiActionName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"list"
+					]
+				},
+				"description": "Find all the providers for the user's current project."
+			},
+			"response": []
+		},
+		{
+			"name": "Create API Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var responseObject = JSON.parse(responseBody);",
+							"var apiID = responseObject.data.id;",
+							"pm.environment.set(\"apiID\", apiID);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\":\"{{apiActionName}}\",\r\n\"description\":\"\",\r\n\"provider\":{\"id\":\"{{providerId}}\"},\r\n\"apiCatalog\":{\"id\":\"{{dictionaryID}}\"},\r\n\"connectorMethod\":\"{{dictionaryMethod}}\",\r\n\"httpMethod\":\"GET\",\r\n\"endpointUrl\":\"{{dictionaryEndpointUrld}}\",\r\n\"docUrl\":\"{{dictionaryDocUrl}}\",\r\n\"producesData\":1,\"isPolling\":0,\r\n\"pollingInterval\":0,\"pollingLapsedAfter\":0,\r\n\"pollingStalledAfter\":0,\r\n\"reactionScripts\":\"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.done()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.error )\\\",\\\"ERROR\\\":\\\"\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\"defaultDataScript\":{\"id\":null},\"methodParams\":\"[{\\\"context\\\":\\\"USER_DEF\\\",\\\"description\\\":\\\"Destination hostname\\\",\\\"encoded\\\":0,\\\"fieldName\\\":null,\\\"paramName\\\":\\\"HOSTNAME\\\",\\\"readonly\\\":0,\\\"required\\\":1,\\\"type\\\":\\\"String\\\",\\\"value\\\":\\\"Enter your FQDN to Cloudscape\\\"}]\"}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit API Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9a894b9e-f7e0-43fc-bd3c-61da311b7ea7",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var checkname = response.data.name;",
+							"tests[\"Name was updated\"] = /Updated/.test(checkname);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\":\"{{apiActionName}} Updated\",\r\n\"description\":\"\",\r\n\"provider\":{\"id\":\"{{providerId}}\"},\r\n\"apiCatalog\":{\"id\":\"{{dictionaryID}}\"},\r\n\"connectorMethod\":\"{{dictionaryMethod}}\",\r\n\"httpMethod\":\"GET\",\r\n\"endpointUrl\":\"{{dictionaryEndpointUrld}}\",\r\n\"docUrl\":\"{{dictionaryDocUrl}}\",\r\n\"producesData\":1,\"isPolling\":0,\r\n\"pollingInterval\":0,\"pollingLapsedAfter\":0,\r\n\"pollingStalledAfter\":0,\r\n\"reactionScripts\":\"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.done()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.error )\\\",\\\"ERROR\\\":\\\"\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\"defaultDataScript\":{\"id\":null},\"methodParams\":\"[{\\\"context\\\":\\\"USER_DEF\\\",\\\"description\\\":\\\"Destination hostname\\\",\\\"encoded\\\":0,\\\"fieldName\\\":null,\\\"paramName\\\":\\\"HOSTNAME\\\",\\\"readonly\\\":0,\\\"required\\\":1,\\\"type\\\":\\\"String\\\",\\\"value\\\":\\\"Enter your FQDN to Cloudscape\\\"}]\",\"version\":0}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction/{{apiID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction",
+						"{{apiID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Api Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b881db0-83ee-4a16-bbbe-93966c77c052",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var deleted = response.data.deleted;",
+							"",
+							"pm.test(\"Api action was deleted\", function () {",
+							"    pm.expect(deleted).eql(true);",
+							"});",
+							"",
+							"",
+							"pm.environment.unset(\"dictionaryName\");",
+							"pm.environment.unset(\"dictionaryID\");",
+							"pm.environment.unset(\"dictionaryMethod\");",
+							"pm.environment.unset(\"dictionaryEndpointUrld\");",
+							"pm.environment.unset(\"dictionaryDocUrl\");",
+							"pm.environment.unset(\"apiActionName\");",
+							"pm.environment.unset(\"providerId\");",
+							"pm.environment.unset(\"apiID\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction/{{apiID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction",
+						"{{apiID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

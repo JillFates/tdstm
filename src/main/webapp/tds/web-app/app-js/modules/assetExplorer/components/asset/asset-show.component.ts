@@ -9,7 +9,7 @@ import {
 	Inject
 } from '@angular/core';
 
-import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
 import {DatabaseShowComponent} from '../database/database-show.component';
@@ -31,7 +31,7 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 		inj: Injector,
 		comp: Compiler,
 		mod: NgModuleRef<any>,
-		private http: HttpInterceptor,
+		private http: HttpClient,
 		private tagService: TagService,
 		@Inject('ID') private modelId: number,
 		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
@@ -41,8 +41,8 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get(`../ws/asset/showTemplate/${this.modelId}`).subscribe(res => {
-				let template = res.text();
+			this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}).subscribe((response: any) => {
+				let template = response;
 				const additionalImports = [AssetExplorerModule];
 				switch (this.asset) {
 					case 'APPLICATION':

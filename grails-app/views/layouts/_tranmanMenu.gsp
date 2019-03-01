@@ -42,14 +42,14 @@
                             <li class="divider"></li>
                             <li class="menu-parent-item">Manage Clients</li>
                             <li class="menu-child-item menu-list-companies">
-                                <g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link>
+                                <g:link controller="partyGroup" action="list">List Companies</g:link>
                             </li>
                             <li class="menu-child-item menu-list-staff">
-                                <g:link controller="person" id="${partyGroup}">List Staff</g:link>
+                                <g:link controller="person">List Staff</g:link>
                             </li>
                             <li class="menu-child-item menu-list-users">
                                 <tds:hasPermission permission="${Permission.UserView}">
-                                    <g:link controller="userLogin" id="${partyGroup}">List Users</g:link>
+                                    <g:link controller="userLogin">List Users</g:link>
                                 </tds:hasPermission>
                             </li>
                             <li class="menu-child-item menu-client-import-accounts">
@@ -80,10 +80,10 @@
                             <li class="divider"></li>
                             <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
-                                <g:link controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link>
+                                <g:link controller="manufacturer">List Manufacturers</g:link>
                             </li>
                             <li class="menu-child-item menu-list-models">
-                                <g:link controller="model" id="${partyGroup}">List Models</g:link>
+                                <g:link controller="model" >List Models</g:link>
                             </li>
                             <li class="menu-child-item menu-sync-libraries">
                                 <g:link controller="model" action="importExport">Export Mfg & Models</g:link>
@@ -167,11 +167,6 @@
                         <li class="menu-child-item menu-parent-data-centers-list-rooms">
                             <g:link params="[viewType:'list']" controller="room">List Locations</g:link>
                         </li>
-                        <g:if test="${room}">
-                            <li class="menu-child-item menu-parent-data-centers-selected-center">
-                                <g:link params="[roomId:room.id]" controller="room">Room ${room.location}/${room.roomName}</g:link>
-                            </li>
-                        </g:if>
                         <tds:hasPermission permission="${Permission.RackView}">
                             <li class="menu-child-item menu-parent-data-centers-rack-elevation">
                                 <g:link controller="rackLayouts" action="create">Rack Elevations</g:link>
@@ -324,7 +319,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
                                 <li class="menu-child-item menu-planning-pre-checklist">
-                                    <g:link controller="reports" action="preMoveCheckList">Pre-event Checklist</g:link>
+                                    <g:link controller="module" action="reports" id="preEventCheckList" elementId="preEventCheckList">Pre-event Checklist</g:link>
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-planning-export-runbook">

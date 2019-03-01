@@ -22,6 +22,7 @@ declare var jQuery: any;
                         [valueField]="'id'"
                         [placeholder]="placeholder"
                         [filterable]="true"
+                        [title]="model?.text || ''"
                         (valueChange)="onValueChange($event)"
                         (selectionChange)="onSelectionChange($event)"
                         (filterChange)="onFilterChange($event)"
@@ -73,7 +74,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('updateOnChanges') updateOnChanges = false;
 	@Input('innerTemplateFormat') innerTemplateFormat: Function;
 	// Inner Params
-	private datasource: any[] = [{id: '', text: ''}];
+	public datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;

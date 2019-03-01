@@ -63,8 +63,8 @@ class CommentServiceIntTests extends Specification {
             AssetComment task3 = assetCommentTestHelper.createAssetComment(project, event1)
             AssetComment task4 = assetCommentTestHelper.createAssetComment(project, event2)
         when: 'requesting published and unpublished tasks for the first event sorted by their comment.'
-            Map params = ['event': event1.name]
-            Map result = commentService.filterTasks(project, params, true, 'comment', 'desc', 10, 0)
+            Map params = ['event': event1.name, 'viewUnpublished': true]
+            Map result = commentService.filterTasks(project, params, 'comment', 'desc', 10, 0)
         then: 'the total number of tasks is three'
             result['totalCount'] == 3
         and: 'the list of filtered tasks has three elements'
@@ -73,14 +73,15 @@ class CommentServiceIntTests extends Specification {
             result['tasks'][0].comment.toUpperCase() > result['tasks'][1].comment.toUpperCase()
             result['tasks'][1].comment.toUpperCase() > result['tasks'][2].comment.toUpperCase()
         when: 'requesting multiple tasks (published only)'
-            result = commentService.filterTasks(project, params, false, 'comment', 'desc', 10, 0)
+            params['viewUnpublished'] = false
+            result = commentService.filterTasks(project, params, 'comment', 'desc', 10, 0)
         then: 'two tasks were found'
             result['tasks'].size() == 2
         and: 'results are properly sorted'
             result['tasks'][0].comment.toUpperCase() > result['tasks'][1].comment.toUpperCase()
         when: 'requesting tasks for an event with no tasks'
             params = ['moveEvent': event3.id]
-            result = commentService.filterTasks(project, params, false, 'comment', 'desc', 10, 0)
+            result = commentService.filterTasks(project, params, 'comment', 'desc', 10, 0)
         then: 'no results were found'
             result['tasks'].size() == 0
 

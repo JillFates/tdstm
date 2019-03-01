@@ -7,7 +7,7 @@ import {PasswordChangeModel} from '../../../../shared/components/password-change
 
 @Component({
 	selector: 'user-edit-person',
-	templateUrl: '../tds/web-app/app-js/modules/user/components/edit-person/user-edit-person.component.html'
+	templateUrl: 'user-edit-person.component.html'
 })
 
 export class UserEditPersonComponent {
@@ -32,7 +32,7 @@ export class UserEditPersonComponent {
 	/**
 	 * Close the Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 			this.promptService.open(
 				'Confirmation Required',

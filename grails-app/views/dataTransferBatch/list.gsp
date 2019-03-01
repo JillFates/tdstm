@@ -291,7 +291,8 @@
                     },
                     {
                         field: "status",
-                        title: "Status"
+                        title: "Status",
+
                     },
                     {
                         field: "action",
@@ -328,5 +329,6 @@
         loadManageAssetImportBatchesList();
 
     </script>
+
     </body>
 </html>

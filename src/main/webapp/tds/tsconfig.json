@@ -5,9 +5,11 @@
     "module": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "removeComments": true,
     "lib": [
       "es2016",
       "dom"
@@ -19,5 +21,9 @@
         "node_modules/@types/ramda/index"
       ]
     }
+  },
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": false,
+    "annotationsAs": "decorators"
   }
 }

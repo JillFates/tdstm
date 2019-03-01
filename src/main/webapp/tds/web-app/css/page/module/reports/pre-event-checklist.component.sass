@@ -1,0 +1,41 @@
+.pre-event-checklist
+  $report-primary-background-color: #fff
+  $report-primary-foreground-color: #000
+  $report-alternate-background-color: #e0e0e0
+  $report-secondary-background-color: #CCCCCC
+
+  background-color: $report-primary-background-color
+  .report-controls
+    margin-left: 15px
+    padding-top: 10px
+    margin-top: 5px
+    .event-selector
+      width: 20%
+    .k-dropdown
+      span
+        background-color: $report-primary-background-color
+    .actions
+      display: flex
+      flex-direction: row
+      width: 100%
+      justify-content: space-between
+      margin-top: 10px
+  table
+    background-color: transparent;
+    border-spacing: 2px;
+    border-collapse: initial;
+  th
+    background: $report-secondary-background-color
+    color: $report-primary-foreground-color
+    font-size: 12px
+    font-weight: bold
+    line-height: 16px
+    padding: 2px 6px
+  td
+    padding: 2px 6px
+
+  .odd
+    background: $report-alternate-background-color
+
+  .generated-check-list
+    padding: 0 15px

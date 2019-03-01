@@ -8,7 +8,7 @@ import {RequestLicenseModel} from '../../model/license.model';
 
 @Component({
 	selector: 'tds-license-created',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/created-license/created-license.component.html'
+	templateUrl: 'created-license.component.html'
 })
 export class CreatedLicenseComponent {
 
@@ -21,7 +21,7 @@ export class CreatedLicenseComponent {
 	/**
 	 * Close the Dialog
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 }

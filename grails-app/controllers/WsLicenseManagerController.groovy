@@ -27,6 +27,10 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 	}
 
+	def getLicenseManagerEnabled() {
+		renderSuccessJson(licenseManagerService.isManagerEnabled())
+	}
+
 	/* list the licenses */
 	def getLicenses(){
 		renderSuccessJson(licenseManagerService.list()*.toMap())

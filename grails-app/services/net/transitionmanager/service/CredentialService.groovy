@@ -5,6 +5,7 @@ import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialEnvironment
+import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
@@ -175,8 +176,8 @@ class CredentialService implements ServiceMethods {
      */
     private Map<String, ?> doBasicAuthentication(Credential credential) {
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
-        def resp = rest.get(credential.getAuthenticationUrl()) {
-            // TODO TM-9609 Change the Cookie Authentication to support POST/PUT
+
+        def resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
             auth credential.username, decryptPassword(credential)
             header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
         }
@@ -191,12 +192,20 @@ class CredentialService implements ServiceMethods {
     private Map<String, ?> doJWTTokenAuthentication(Credential credential) {
         String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: decryptPassword(credential)])
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
-        def resp = rest.post(credential.getAuthenticationUrl()) {
-            // TODO determine the httpMethod is GET, POST or PUT
-            // verify if we need to parse parameters out of the URL
+
+        def resp = null
+        switch (credential.httpMethod) {
+            case [CredentialHttpMethod.POST, CredentialHttpMethod.PUT]:
+                resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
+                    // TODO : SL 02/2019 : verify if we need to parse parameters out of the URL
             header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             json jsonString
+        }
+                break
+            default: // GET
+                // method not supported
+                throw new RuntimeException('JWT authentication and ' + credential.httpMethod.name() + ' HTTP method not supported')
         }
         return getAuthenticationResponse(credential, resp)
     }
@@ -208,9 +217,12 @@ class CredentialService implements ServiceMethods {
      */
     private Map<String, ?> doCookieAuthentication(Credential credential) {
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
-        def resp = rest.post(credential.getAuthenticationUrl()) {
-            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
-            // verify if we need to parse parameters out of the URL
+
+        def resp = null
+        switch (credential.httpMethod) {
+            case [CredentialHttpMethod.POST, CredentialHttpMethod.PUT]:
+                resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
+                    // TODO : SL 02/2019 : verify if we need to parse parameters out of the URL
             switch (credential.requestMode) {
                 case AuthenticationRequestMode.BASIC_AUTH:
                     auth credential.username, decryptPassword(credential)
@@ -225,7 +237,22 @@ class CredentialService implements ServiceMethods {
             }
             header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
         }
-
+                break
+            default: // GET
+                resp = rest.get(credential.getAuthenticationUrl()) {
+                    // TODO : SL 02/2019 : verify if we need to parse parameters out of the URL
+                    switch (credential.requestMode) {
+                        case AuthenticationRequestMode.BASIC_AUTH:
+                            auth credential.username, decryptPassword(credential)
+                            break
+                        case AuthenticationRequestMode.FORM_VARS:
+                            // method not supported
+                            throw new RuntimeException('Cookie authentication with form variables and ' + credential.httpMethod.name() + ' HTTP method is not supported')
+                            break
+                    }
+                    header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+                }
+        }
         return getAuthenticationResponse(credential, resp)
     }
 
@@ -236,9 +263,12 @@ class CredentialService implements ServiceMethods {
      */
     private Map<String, ?> doHeaderAuthentication(Credential credential) {
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
-        def resp = rest.post(credential.getAuthenticationUrl()) {
-            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
-            // verify if we need to parse parameters out of the URL
+
+        def resp = null
+        switch (credential.httpMethod) {
+            case [CredentialHttpMethod.POST, CredentialHttpMethod.PUT]:
+                resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
+                    // TODO : SL 02/2019 : verify if we need to parse parameters out of the URL
             switch (credential.requestMode) {
                 case AuthenticationRequestMode.BASIC_AUTH:
                     auth credential.username, decryptPassword(credential)
@@ -253,7 +283,22 @@ class CredentialService implements ServiceMethods {
             }
             header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
         }
-
+                break
+            default: // GET
+                resp = rest.get(credential.getAuthenticationUrl()) {
+                    // TODO : SL 02/2019 : verify if we need to parse parameters out of the URL
+                    switch (credential.requestMode) {
+                        case AuthenticationRequestMode.BASIC_AUTH:
+                            auth credential.username, decryptPassword(credential)
+                            break
+                        case AuthenticationRequestMode.FORM_VARS:
+                            // method not supported
+                            throw new RuntimeException('Header authentication with form variables and ' + credential.httpMethod.name() + ' HTTP method is not supported')
+                            break
+                    }
+                    header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+                }
+        }
         return getAuthenticationResponse(credential, resp)
     }
 

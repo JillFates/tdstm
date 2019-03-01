@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../../assetExplorer/model/view.model';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {Permission} from '../../../shared/model/permission.model';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
@@ -21,14 +20,13 @@ export class AssetExplorerService {
 	private ALL_ASSETS = 'All Assets';
 	private assetEntitySearch = 'assetEntity';
 
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
+	constructor(private http: HttpClient, private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
-			.map((res: Response) => {
-				let response = res.json().data;
-				let reportGroupModel: ViewGroupModel[] = Object.keys(response).map(key => {
-					return response[key];
+			.map((response: any) => {
+				let reportGroupModel: ViewGroupModel[] = Object.keys(response.data).map(key => {
+					return response.data[key];
 				});
 				let folders = [
 					{
@@ -63,83 +61,75 @@ export class AssetExplorerService {
 				}
 				return folders as any;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getReport(id: number): Observable<ViewModel> {
 		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				if (result && result.status === 'success' && result.data) {
-					return result.data.dataView;
+			.map((response: any) => {
+				if (response && response.status === 'success' && response.data) {
+					return response.data.dataView;
 				} else {
-					throw new Error(result.errors.join(';'));
+					throw new Error(response.errors.join(';'));
 				}
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
 		if (!model.id) {
 			return this.http.post(`${this.assetExplorerUrl}/view`, JSON.stringify(model))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data && result.data.dataView;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data && response.data.dataView;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			return this.http.put(`${this.assetExplorerUrl}/view/${model.id}`, JSON.stringify(model))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data && result.data.dataView;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data && response.data.dataView;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
 	deleteReport(id: number): Observable<string> {
 		return this.http.delete(`${this.assetExplorerUrl}/view/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.status;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data && response.data.status;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	query(id: number, schema: any): Observable<any[]> {
 		return this.http.post(`${this.assetExplorerUrl}/query/${id}`, JSON.stringify(schema))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	previewQuery(schema: any): Observable<any[]> {
 		return this.http.post(`${this.assetExplorerUrl}/previewQuery`, JSON.stringify(schema))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveFavorite(id: number): Observable<any> {
 		return this.http.post(`${this.assetExplorerUrl}/favoriteDataview/${id}`, '')
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.status;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data && response.data.status;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteFavorite(id: number): Observable<any> {
 		return this.http.delete(`${this.assetExplorerUrl}/favoriteDataview/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.status;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data && response.data.status;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	hasMaximumFavorites(length: number): boolean {
@@ -149,11 +139,10 @@ export class AssetExplorerService {
 
 	deleteAssets(ids: string[]): Observable<any> {
 		return this.http.post(`${this.assetUrl}/deleteAssets`, JSON.stringify({ids: ids}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -163,20 +152,18 @@ export class AssetExplorerService {
 	 */
 	deleteAssetComment(ids: number|string[]): Observable<any> {
 		return this.http.post(`${this.assetEntitySearch}/deleteComment`, JSON.stringify({ids: ids}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getFileName(viewName: string): Observable<any> {
 		return this.http.post(`${this.defaultUrl}/filename`, JSON.stringify({viewName: viewName}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	isAllAssets(model: ViewModel): boolean {
@@ -213,11 +200,10 @@ export class AssetExplorerService {
 
 		const url = `${this.assetExplorerUrl}/validateUnique`;
 		return this.http.post(url, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.isUnique;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data && response.data.isUnique;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -227,8 +213,7 @@ export class AssetExplorerService {
 	 */
 	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.http.get(`../${this.assetEntitySearch}/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.results,
 					total: response.total,
@@ -236,7 +221,7 @@ export class AssetExplorerService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -245,11 +230,10 @@ export class AssetExplorerService {
 	 */
 	getAssetClassOptions(): Observable<any> {
 		return this.http.get(`${this.assetUrl}/classOptions`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -259,16 +243,13 @@ export class AssetExplorerService {
 	 */
 	retrieveChangedBundle(changeParams: any): Observable<any> {
 		return this.http.post(`${this.assetUrl}/retrieveBundleChange`, JSON.stringify(changeParams))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	getAssetTypesForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.http.get(`../${this.assetEntitySearch}/assetTypesOf?${searchModel.query}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.data.assetTypes,
 					total: response.data.assetTypes.length,
@@ -276,13 +257,12 @@ export class AssetExplorerService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getManufacturersForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.http.get(`../${this.assetEntitySearch}/manufacturer?${searchModel.query}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.data.manufacturers,
 					total: response.data.manufacturers.length,
@@ -290,13 +270,12 @@ export class AssetExplorerService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getModelsForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.http.get(`../${this.assetEntitySearch}/modelsOf?${searchModel.query}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.data.models,
 					total: response.data.models.length,
@@ -304,7 +283,7 @@ export class AssetExplorerService {
 				};
 				return comboBoxSearchResultModel;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getRacksForRoom(roomId: number, sourceTarget: 'S'|'T'): Observable<any> {
@@ -327,18 +306,14 @@ export class AssetExplorerService {
 			{id: 13161, text: 'B6'},
 		];
 		return this.http.get(`${this.assetUrl}/retrieveRackSelectOptions/${roomId}`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: Response) => response)
+			.catch((error: any) => error);
 	}
 
 	getChassisForRoom(roomId: number): Observable<any> {
 		return this.http.get(`${this.assetUrl}/retrieveChassisSelectOptions/${roomId}`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -357,11 +332,10 @@ export class AssetExplorerService {
 		};
 
 		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -380,11 +354,10 @@ export class AssetExplorerService {
 		};
 
 		return this.http.post(`${this.defaultUrl}/asset`, request)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -394,8 +367,8 @@ export class AssetExplorerService {
 	 */
 	getAsset(assetId: number): Observable<any> {
 		return this.http.get(`${this.assetUrl}/${assetId}`)
-			.map((res: Response) => res.json().data.result)
-			.catch((error: any) => error.json());
+			.map((response: any) => response.data.result)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -406,8 +379,8 @@ export class AssetExplorerService {
 	checkAssetForUniqueName(assetToValid: any): Observable<any> {
 
 		return this.http.post(`${this.assetUrl}/checkForUniqueName`, assetToValid)
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -418,8 +391,8 @@ export class AssetExplorerService {
 	cloneAsset(assetToClone): Observable<any> {
 
 		return this.http.post(`${this.assetUrl}/clone`, assetToClone)
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	/**

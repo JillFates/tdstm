@@ -129,7 +129,7 @@
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.criticality}">
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
-										from="${applicationInstance.constrainedProperties.criticality.inList}" value="${applicationInstance.criticality}"
+										from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(applicationInstance.class).criticality.inList}" value="${applicationInstance.criticality}"
 										noSelection="${['':'Please select']}"
 										tabindex="34">
 									</g:select>
@@ -199,7 +199,7 @@
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
 									<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
-										from="${applicationInstance.constrainedProperties.validation.inList }"
+										from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(applicationInstance.class).validation.inList }"
 										value="${applicationInstance.validation}" tabindex="37" />
 								</tds:tooltipSpan>
 								</td>

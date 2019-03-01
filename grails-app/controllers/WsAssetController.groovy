@@ -5,17 +5,15 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.AssetCommentType
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
@@ -32,7 +30,6 @@ import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.UserPreferenceService
 
-import java.text.DateFormat
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -540,26 +537,28 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
+	 * Create or Update an AssetComment
+	 * @param id
+	 * @param command
+	 */
+	private void saveOrUpdateComment() {
+		// Retrieve the project for the user.
+		Project project = getProjectForWs()
+		// Populate the command object with the data coming from the request
+		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
+		// Save or update the comment
+		commentService.saveOrUpdateAssetComment(project, command)
+	}
+
+
+	/**
 	 * Get all the comments associated with the current project
 	 */
 	@HasPermission(Permission.CommentView)
 	def listComments() {
-		def project = securityService.userCurrentProject
+		Project project = securityService.userCurrentProject
 		boolean viewUnpublished = securityService.viewUnpublished()
-		def assetComments = commentService.listAssetComments(project, viewUnpublished)
-		List<Map> assetCommentsList = []
-		def today = new Date()
-		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
-
-		assetComments.each {
-			if ((viewUnpublished || it.isPublished) && it.assetEntity)
-				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
-									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
-									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
-									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
-									 canEditComments: canEditComments]
-		}
-
-		renderAsJson assetCommentsList
+		List<AssetComment> assetComments = commentService.listAssetComments(project, viewUnpublished)
+		renderAsJson (assetComments*.toMap() )
 	}
 }

@@ -51,6 +51,7 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -442,7 +443,7 @@ class TaskService implements ServiceMethods {
 	 * @return The status that the task should be set to
 	 */
 	@NotTransactional
-	String invokeAction(AssetComment task, Person whom) {
+	String invokeAction(AssetComment task, Person whom, Boolean remoteInvocation = false) {
 		def status = task.status
 		//return status
 		// For tasks that are actionable and has an assigned action, this logic will attempt to invoke and
@@ -450,7 +451,7 @@ class TaskService implements ServiceMethods {
 		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
 		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
 		if (task.hasAction() && ACTIONABLE_STATUSES.contains(status)) {
-			if (task.isActionInvocable()) {
+			if (task.isActionInvocableLocally()) {
 				String errMsg
 
 				if (task.apiAction.isSync()) {
@@ -458,7 +459,7 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						markTaskStarted(task.id)
+						markActionStarted(task.id, whom, remoteInvocation)
 
 						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
@@ -477,6 +478,8 @@ class TaskService implements ServiceMethods {
 					} catch (InvalidConfigurationException e) {
 						errMsg = e.getMessage()
 					} catch (CannotAcquireLockException e) {
+						errMsg = e.getMessage()
+					} catch (ApiActionException e) {
 						errMsg = e.getMessage()
 					} catch (e) {
 						errMsg = 'A runtime error occurred while attempting to process the action'
@@ -498,18 +501,46 @@ class TaskService implements ServiceMethods {
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
 	 * @param id - the id of the task to mark as started
+	 * @param whom - the id whos invoking the action
+	 * @param remoteInvocation - whether is a remote or local api action invokation
 	 */
 	@NotTransactional
-	void markTaskStarted(Long id) {
-		try {
+	void markActionStarted(Long id, Person whom, Boolean remoteInvocation = false) {
+		log.debug "Attempting to action as started for task.id={}", id
 			AssetComment.withTransaction { TransactionStatus ts ->
-				log.debug "Attempting to mark asset comment as started for task.id={}", id
-
 				def taskWithLock = AssetComment.lock(id)
 				log.debug 'Locked out AssetComment: {}', taskWithLock
 
-				if (taskWithLock.status in [ACS.STARTED, ACS.HOLD, ACS.COMPLETED]) {
-					throw new Exception('Another user invoked the action before')
+			if (!taskWithLock.hasAction()) {
+				throwException(InvalidRequestException, 'apiAction.task.message.noAction')
+			}
+
+			if (taskWithLock.apiActionInvokedAt != null) {
+				throwException(ApiActionException, 'apiAction.task.message.alreadyInvoked')
+			}
+
+			if (!taskWithLock.isActionable()) {
+				throwException(ApiActionException, 'apiAction.task.message.notActionable')
+			}
+
+			if (taskWithLock.apiAction.isSync()) {
+				throwException(ApiActionException, 'apiAction.task.message.syncActionNotSupported')
+			}
+
+			if (!remoteInvocation && taskWithLock.isActionInvocableRemotely()) {
+				throwException(ApiActionException, 'apiAction.task.message.notLocalAction')
+			}
+
+			if (remoteInvocation && !taskWithLock.isActionInvocableLocally()) {
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction')
+			}
+
+			if ((remoteInvocation && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) || (!remoteInvocation && !securityService.hasPermission(who, Permission.ActionInvoke))) {
+				throwException(ApiActionException, 'apiAction.task.message.noPermission')
+			}
+
+			if (!taskWithLock.apiAction.reactionScriptsValid == 1) {
+				throwException(ApiActionException, 'apiAction.task.message.invalidReactionScript')
 				}
 
 				// Update the task so that the we track that the action was invoked
@@ -521,10 +552,8 @@ class TaskService implements ServiceMethods {
 				// Make sure that the status is STARTED instead
 				taskWithLock.status = AssetCommentStatus.STARTED
 				taskWithLock.save(flush: true, failOnError: true)
-			}
-		} catch (Exception e) {
-			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
-			throw new CannotAcquireLockException('Another user invoked the action before')
+
+			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${remoteInvocation ? 'Remotely' : 'Locally'})")
 		}
 	}
 
@@ -1702,34 +1731,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Used to find assets associated with a given context object. When the context contains one or more tags
-	 * then the query will be based solely on Tags and it will find assets associated with ANY of the tags. The event will
-	 * not affect the query with Tags. If only an event is specified then the search will be for any asset associated to planning
-	 * bundles assigned to the event.
+	 * Used to find assets associated with a given context object based on selected event and tags.
 	 * @param context - the context object to find associated assets for
 	 * @return list of assets
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
-		List<AssetEntity> assets = []
 
-		if (contextObj.tag) {
-			// Query the TagAsset to get list of Assets with ANY of the tags
-			assets = TagAsset.where {
-					tag.id in contextObj.getTagIds()
-					asset.moveBundle.useForPlanning == true }.projections {
-				}.projections {
-					property 'asset'
-				}.list()
-		} else {
-			// Legacy get assets by event
+		// Fetch the tags selected by the user running the Task Generation.
+		List<Long> tagIds = contextObj.getTagIds()
+		// Retrieve the bundles associated with the selected event (if any).
 			List<Long> bundleIds = getBundleIds(contextObj)
 
+		return AssetEntity.createCriteria().list {
+			createAlias('moveBundle', 'mb')
+			if (tagIds) {
+				createAlias('tagAssets', 'ta')
+				createAlias('ta.tag', 't')
+			}
+			eq ('mb.useForPlanning', true)
+			or {
+				if (tagIds) {
+					'in' ('t.id', tagIds)
+					// Assets must belong to a planning bundle.
+
+				}
 			if (bundleIds) {
-				assets = AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
+					'in' ('mb.id', bundleIds)
+				}
 			}
 		}
-
-		return assets
 	}
 
 	/**
@@ -4185,21 +4215,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
 
-			map.bIds = getBundleIds(contextObject, project, filter)
+
+			List bundleIds = getBundleIds(contextObject, project, filter)
+
+			if(bundleIds) {
+				map.bIds = bundleIds
+			}
+
 			String join = ''
 
+			List<String> tagsOrEvent = []
 			if (contextObject.tag) {
-				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
+				tagsOrEvent.add('t.id in (:tags)')
 				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
-
-				// When using tags, bundles are going to be ignored
-				map.remove('bIds')
-			} else if (map.bIds) {
-				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
-			} else {
-				throw new IllegalArgumentException('The selected event has no assigned bundles')
 			}
+
+			if (map.bIds) {
+				tagsOrEvent.add('a.moveBundle.id IN (:bIds)')
+			}
+
+			String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
+
+			where = SqlUtil.appendToWhere(where, tagsOrEventStr)
 
 			// Assemble the SQL and attempt to execute it
 			try {

@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
 
 /**
  * @name UserService
@@ -17,29 +16,27 @@ export class UserService {
 	private userPreferenceUrl = this.baseURL + '/ws/user';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getStartPageOptions() {
 		return this.http.get(`${this.userPreferenceUrl}/startPageOptions`)
-			.map((res: Response) => {
-				let result = res.json();
-				let options = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let options = response && response.status === 'success' && response.data;
 				return options;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 	/**
 	 * Used to retrieve all of the model data that will be used by the user preferences component
 	 */
 	fetchComponentModel() {
 		return this.http.get(`${this.userPreferenceUrl}/modelForPreferenceManager`)
-			.map((res: Response) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	fetchModelForUserDashboard(projId = '') {
@@ -107,40 +104,36 @@ export class UserService {
 	 */
 	fetchModelForStaffViewEdit(id) {
 		return this.http.get(`${this.userPreferenceUrl}/modelForStaffViewEdit/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getUser() {
 		return this.http.get(`${this.userPreferenceUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	removePreference(prefCode) {
 		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	resetPreferences() {
 		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -148,11 +141,10 @@ export class UserService {
 	 */
 	updateAccount(params) {
 		return this.http.post(`${this.userPreferenceUrl}/updateAccount`, params)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -160,35 +152,31 @@ export class UserService {
 	 */
 	updateAccountAdmin(params) {
 		return this.http.post(`${this.userPreferenceUrl}/updateAccountAdmin`, params)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getMapAreas() {
 		return this.http.get(`${this.userPreferenceUrl}/mapAreas`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getTimezones() {
 		return this.http.get(`${this.userPreferenceUrl}/timezones`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveDateAndTimePreferences(params: any): Observable<any> {
 		return this.http.post(`${this.userPreferenceUrl}/saveDateAndTimePreferences`, params)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 }

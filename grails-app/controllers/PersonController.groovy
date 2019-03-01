@@ -89,12 +89,10 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.PersonStaffList)
 	def listJson() {
 
-		String sortIndex = params.sidx ?: 'lastname'
-		String sortOrder  = params.sord ?: 'asc'
 		int maxRows = params.int('rows', 25)
 		int currentPage = params.int('page', 1)
 		int rowOffset = (currentPage - 1) * maxRows
-		def companyId
+		Long companyId
 		def personInstanceList
 		def filterParams = [
 			firstname  : params.firstname,
@@ -108,18 +106,22 @@ class PersonController implements ControllerMethods {
 			modelScore : params.modelScore
 		]
 
-		// Validate that the user is sorting by a valid column
-		if (!(sortIndex in filterParams)) {
-			sortIndex = 'lastname'
+		// Deal with determining the Sort Column
+		String sortIndex = 'lastname'
+		if (filterParams.containsKey(params.sidx)) {
+			sortIndex = params.sidx
 		}
 
-		def query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
+		// Deal with Sort Order
+		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
+
+		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
 			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, p.email as email,
 			pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
 			IFNULL(p.model_score, 0) AS modelScore
 			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='ROLE_STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='ROLE_COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
 			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
@@ -127,7 +129,7 @@ class PersonController implements ControllerMethods {
 
 		if (params.id && params.id != "All") {
 			// If companyId is requested
-			companyId = params.id
+			companyId = params.long('id')
 		}
 		if (!companyId && params.id != "All") {
 			// Still if no companyId found trying to get companyId from the session
@@ -145,20 +147,22 @@ class PersonController implements ControllerMethods {
 				", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
 
 		// Handle the filtering by each column's text field
-		def firstWhere = true
+		List queryParams = []
+		Boolean firstWhere = true
 		filterParams.each {
 			if (it.value) {
 				if (firstWhere) {
-					query.append(" WHERE people.$it.key LIKE '%$it.value%'")
+					query.append(" WHERE ")
 					firstWhere = false
+				} else {
+					query.append(" AND ")
 				}
-				else {
-					query.append(" AND people.$it.key LIKE '%$it.value%'")
-				}
+				query.append("people.${it.key} LIKE ?")
+				queryParams << "%${it.value.trim()}%"
 			}
 		}
 
-		personInstanceList = jdbcTemplate.queryForList(query.toString())
+		personInstanceList = jdbcTemplate.queryForList(query.toString(), queryParams as Object[])
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = personInstanceList.size()
@@ -340,7 +344,7 @@ class PersonController implements ControllerMethods {
 			params.teams = params.list("function")
 			Person person = personService.updatePerson(params, true)
 			if (params.tab) {
-				forward(action: 'loadGeneral', params :[tab: params.tab, personId:person.id])
+				forward(action: 'loadGeneral', params :[personId:person.id])
 			} else {
 				renderAsJson(name: person.firstName, tz: tzId)
 			}
@@ -549,7 +553,7 @@ class PersonController implements ControllerMethods {
 
 			if (eventsOption in ["A", "C"])
 			moveEvents = moveEvents.findAll {
-				def eventTimes = it.eventTimes
+				def eventTimes = moveEventService.getEventTimes(it.id)
 				if (eventTimes) {
 					if (eventsOption == "A") {
 						(eventTimes.completion && eventTimes.completion > now - 30) ||
@@ -626,7 +630,7 @@ class PersonController implements ControllerMethods {
 						LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
 							AND pr2.role_type_code_to_id = pr.role_type_code_to_id
 							AND pr2.party_id_from_id IN ($projects)
-							AND pr2.role_type_code_from_id = 'PROJECT'
+							AND pr2.role_type_code_from_id = 'ROLE_PROJECT'
 						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
 							AND mes.role_id = pr.role_type_code_to_id
 					WHERE pr.role_type_code_from_id in ('ROLE_COMPANY')
@@ -653,16 +657,25 @@ class PersonController implements ControllerMethods {
 			staffList = jdbcTemplate.queryForList(query.toString())
 
 			// The template uses this value for the checkboxes
-			staffList.each { it -> it.inProjectValue = it.project ? '1' : '0' }
+			staffList.each {
+				it -> it.inProjectValue = it.project ? '1' : '0'
+			}
 		}
 
 		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
 		render(template: "projectStaffTable",
-		       model: [staffList: staffList, moveEventList: retrieveBundleHeader(moveEvents), projectId: projectId,
-		               firstProp: params.firstProp, editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
-		               project: project, sortOn: params.sortOn, orderBy: paramsMap.orderBy])
+			   model: [
+				   staffList     : staffList,
+				   moveEventList : retrieveBundleHeader(moveEvents),
+				   projectId     : projectId,
+				   firstProp     : params.firstProp,
+				   editPermission: securityService.hasPermission(Permission.ProjectStaffEdit),
+				   project       : project,
+				   sortOn        : params.sortOn,
+				   orderBy       : paramsMap.orderBy
+			   ])
 	}
 
 	/*

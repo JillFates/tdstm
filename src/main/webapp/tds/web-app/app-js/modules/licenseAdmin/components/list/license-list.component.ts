@@ -28,7 +28,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-license-list',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/list/license-list.component.html'
+	templateUrl: 'license-list.component.html'
 })
 export class LicenseListComponent implements OnInit {
 

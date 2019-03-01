@@ -15,7 +15,7 @@ import {FieldInfoType} from '../../../modules/importBatch/components/record/impo
 		            <label class="fields-info-popup-label">
 		                {{getPopupTitle()}}
 		            </label>
-		            <i class="glyphicon glyphicon-remove" (click)="onClose()"></i>
+		            <i class="glyphicon glyphicon-remove" (click)="onClose($event)"></i>
 		        </div>
 		        <div class="popup-body">
 		            <!-- Find Type-->
@@ -56,10 +56,11 @@ import {FieldInfoType} from '../../../modules/importBatch/components/record/impo
 	`
 })
 export class FieldReferencePopupComponent implements OnInit {
+	public static POPUP_ESC_TRIGGER_CLASS = 'field-reference-esc-trigger';
 
 	@Input ('mouseEvent') private mouseEvent;
-	@Input ('offset') private offset;
-	@Input ('type') private type;
+	@Input ('offset') public offset;
+	@Input ('type') public type;
 	@Input ('domain') private domain;
 	@Input ('results') private results;
 	@Input ('gridData') private gridData;
@@ -67,11 +68,11 @@ export class FieldReferencePopupComponent implements OnInit {
 	@Output ('onClose') onCloseEvent: EventEmitter<any> = new EventEmitter();
 	@ViewChild('focusElement') popupEscFocusElement: ElementRef;
 
-	protected margin = {horizontal: 2, vertical: 2};
-	protected position = 'fixed';
-	protected FieldInfoType = FieldInfoType;
-	public static POPUP_ESC_TRIGGER_CLASS = 'field-reference-esc-trigger';
-	protected BTN_POPUP_ESC_TRIGGER_CLASS = FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS;
+	public margin = {horizontal: 2, vertical: 2};
+	public position = 'fixed';
+	public FieldInfoType = FieldInfoType;
+
+	public BTN_POPUP_ESC_TRIGGER_CLASS = FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS;
 
 	ngOnInit(): void {
 		this.offset = { left: this.mouseEvent.pageX, top: this.mouseEvent.pageY};
@@ -86,7 +87,7 @@ export class FieldReferencePopupComponent implements OnInit {
 	/**
 	 * On Close.
 	 */
-	protected onClose($event): void {
+	public onClose($event): void {
 		this.onCloseEvent.emit($event);
 		$event.stopPropagation();
 	}
@@ -96,7 +97,7 @@ export class FieldReferencePopupComponent implements OnInit {
 	 * @param {FieldInfoType} type
 	 * @returns {string}
 	 */
-	protected getPopupTitle(): string {
+	public getPopupTitle(): string {
 		switch (this.type) {
 			case FieldInfoType.CREATE: return 'Create Reference';
 			case FieldInfoType.UPDATE: return 'Update Reference';

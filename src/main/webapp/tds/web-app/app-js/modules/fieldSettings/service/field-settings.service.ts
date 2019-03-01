@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import { DomainModel } from '../model/domain.model';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
-import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {equals} from 'ramda';
 
 import 'rxjs/add/operator/map';
@@ -14,13 +13,12 @@ export class FieldSettingsService {
 
 	private fieldSettingsUrl = '../ws/customDomain/fieldSpec';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getFieldSettingsByDomain(domain = 'ASSETS'): Observable<DomainModel[]> {
 		return this.http.get(`${this.fieldSettingsUrl}/${domain}`)
-			.map((res: Response) => {
-				let response = res.json();
+			.map((response: any) => {
 				let domains: DomainModel[] = Object.keys(response).map(key => {
 					response[key].domain = response[key].domain.toUpperCase();
 					return response[key];
@@ -45,7 +43,7 @@ export class FieldSettingsService {
 				}
 				return domains as any;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveFieldSettings(domains: DomainModel[]): Observable<DomainModel[]> {
@@ -62,8 +60,8 @@ export class FieldSettingsService {
 			payload[domainModel.domain.toUpperCase()] = domainModel;
 		});
 		return this.http.post(`${this.fieldSettingsUrl}/ASSETS`, JSON.stringify(payload))
-			.map((res: Response) => res['_body'] ? res.json() : { status: 'Ok' })
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((response: any) => response['_body'] ? response : { status: 'Ok' })
+			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
 	/**

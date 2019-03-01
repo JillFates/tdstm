@@ -46,8 +46,8 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class TDSDateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
-	protected displayFormat: string;
-	protected dateValue: Date;
+	public displayFormat: string;
+	public dateValue: Date;
 
 	constructor(
 		private userPreferenceService: PreferenceService,

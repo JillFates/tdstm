@@ -22,7 +22,7 @@ import {PreferenceService} from '../../../../services/preference.service';
 
 @Component({
 	selector: 'tds-bulk-change-edit',
-	templateUrl: '../tds/web-app/app-js/shared/components/bulk-change/components/bulk-change-edit/bulk-change-edit.component.html'
+	templateUrl: 'bulk-change-edit.component.html'
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	private readonly CLEAR_ACTION = 'clear';
@@ -37,17 +37,17 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	protected tagList: Array<TagModel>;
 	protected yesNoList: IdTextItem[] = [{ id: 'Yes', text: 'Yes'}, { id: 'No', text: 'No'}];
 	protected domains: IdTextItem[];
-	protected gridSettings: DataGridOperationsHelper;
 	protected editRows: {selectedValues: Array<{domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}> };
 	protected listOptions: any;
 	protected availableFields: Array<any>;
 	protected userDateFormat: string;
 	protected userTimeZone: string;
 	protected fieldActionsMap: any = {};
-	protected entityName = '';
+	public gridSettings: DataGridOperationsHelper;
+	public entityName = '';
 
 	constructor(
-		protected bulkChangeModel: BulkChangeModel,
+		public bulkChangeModel: BulkChangeModel,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService,
 		private customDomainService: CustomDomainService,
@@ -151,7 +151,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.catch((err) => console.log(err));
 	}
 
-	protected cancelCloseDialog(bulkActionResult: BulkActionResult): void {
+	public cancelCloseDialog(bulkActionResult: BulkActionResult): void {
 		if (!bulkActionResult) {
 			bulkActionResult = {action: null, success: false};
 		}
@@ -182,7 +182,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	 * Used to disable the form if returns false.
 	 * @returns {boolean} True | False
 	 */
-	protected isAllInputEntered(): boolean {
+	public isAllInputEntered(): boolean {
 		return this.editRows.selectedValues.every(row => row.field && row.action && (row.value || row.action.id === this.CLEAR_ACTION ))
 	}
 

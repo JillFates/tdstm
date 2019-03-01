@@ -13,7 +13,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
  */
 @Component({
 	selector: 'selectlist-configuration-popup',
-	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
+	templateUrl: 'selectlist-configuration-popup.component.html',
 	encapsulation: ViewEncapsulation.None,
 	exportAs: 'selectlistConfig',
 	styles: [
@@ -28,9 +28,9 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	public newItem = '';
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
-	protected sortType: string;
-	private ASCENDING_ORDER = 'asc';
-	private DESCENDING_ORDER = 'desc';
+	public sortType: string;
+	public ASCENDING_ORDER = 'asc';
+	public DESCENDING_ORDER = 'desc';
 
 	/**
 	 * Class constructor.
@@ -201,7 +201,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		if (this.isDirty() || this.newItem.length > 0) {
 			this.promptService.open(
 				'Confirmation Required',

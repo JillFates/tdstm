@@ -58,7 +58,7 @@
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" size="10" value="${fileInstance?.size}" tabindex="13"/>
 								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select from="${fileInstance.constrainedProperties.scale.inList}" optionValue="value" name="scale" id="scale" value="GB" tabindex="13"/>
+									<g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).scale.inList}" optionValue="value" name="scale" id="scale" value="GB" tabindex="13"/>
 								</tds:tooltipSpan>
 							</td>
 
@@ -89,7 +89,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${fileInstance.constrainedProperties.validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}" tabindex="44"/>
+									<g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}" tabindex="44"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>

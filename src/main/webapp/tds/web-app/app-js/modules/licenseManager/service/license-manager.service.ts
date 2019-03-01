@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
@@ -13,7 +12,7 @@ export class LicenseManagerService {
 
 	private readonly licenseUrl = '../ws/manager/license';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -21,16 +20,15 @@ export class LicenseManagerService {
 	 */
 	getLicenses(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let licenseModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let licenseModels = response && response.status === 'success' && response.data;
 				licenseModels.forEach((model) => {
 					model.activationDate = ((model.activationDate) ? new Date(model.activationDate) : '');
 					model.expirationDate = ((model.expirationDate) ? new Date(model.expirationDate) : '');
 				});
 				return licenseModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -38,11 +36,10 @@ export class LicenseManagerService {
 	 */
 	getLicense(id: number): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -50,11 +47,10 @@ export class LicenseManagerService {
 	 */
 	requestImportLicense(licenseKey: string): Observable<any> {
 		return this.http.post(`${this.licenseUrl}/request`, JSON.stringify({ data: licenseKey}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -63,11 +59,8 @@ export class LicenseManagerService {
 	 */
 	activateLicense(id: number): Observable<any> {
 		return this.http.post(`${this.licenseUrl}/${id}/activate`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result.data;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response.data)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -76,11 +69,8 @@ export class LicenseManagerService {
 	 */
 	revokeLicense(id: number): Observable<any> {
 		return this.http.delete(`${this.licenseUrl}/${id}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result.data;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response.data)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -88,11 +78,8 @@ export class LicenseManagerService {
 	 */
 	manuallyRequest(id: number): Observable<any> {
 		return this.http.post(`${this.licenseUrl}/${id}/email/send`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result.data;
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response.data)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -122,11 +109,10 @@ export class LicenseManagerService {
 		}
 
 		return this.http.put(`${this.licenseUrl}/${licenseModel.id}`, JSON.stringify(licenseModified))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -135,11 +121,10 @@ export class LicenseManagerService {
 	 */
 	getActivityLog(id: number): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}/${id}/activitylog`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -147,11 +132,10 @@ export class LicenseManagerService {
 	 */
 	getEnvironments(): Observable<any[]> {
 		return this.http.get(`../ws/license/environment`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -159,11 +143,10 @@ export class LicenseManagerService {
 	 */
 	getKeyCode(id: number): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}/${id}/key`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -171,11 +154,10 @@ export class LicenseManagerService {
 	 */
 	getProjects(): Observable<any[]> {
 		return this.http.get(`${this.licenseUrl}/project`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -184,11 +166,10 @@ export class LicenseManagerService {
 	 */
 	deleteLicense(id: number): Observable<string> {
 		return this.http.delete(`${this.licenseUrl}/${id}/delete`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**

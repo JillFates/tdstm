@@ -1,8 +1,8 @@
+// Angular
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {CredentialModel} from '../../credential/model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Headers, RequestOptions, Response} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../../dataScript/model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
@@ -10,7 +10,6 @@ import {AgentMethodModel} from '../model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS} from '../../credential/model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
-import {HttpResponse} from '@angular/common/http';
 import {DOMAIN} from '../../../shared/model/constants';
 import * as R from 'ramda';
 import 'rxjs/add/operator/map';
@@ -27,14 +26,13 @@ export class APIActionService {
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/datascript/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let dataScriptModels = response && response.status === 'success' && response.data;
 				dataScriptModels.forEach((r) => {
 					r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT);
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
@@ -42,45 +40,42 @@ export class APIActionService {
 				});
 				return dataScriptModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
 		return this.http.get(`${this.dataIngestionUrl}/provider/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let providerModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let providerModels = response && response.status === 'success' && response.data;
 				providerModels.forEach((r) => {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAPIActions(): Observable<APIActionModel[]> {
 		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let dataScriptModels = response && response.status === 'success' && response.data;
 				dataScriptModels.forEach((model) => {
 					this.transformApiActionModel(model);
 				});
 				return dataScriptModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAPIAction(id: number): Observable<APIActionModel> {
 		return this.http.get(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let model = response && response.status === 'success' && response.data;
 				this.transformApiActionModel(model);
 				return model;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private transformApiActionModel(model: any): void {
@@ -113,17 +108,14 @@ export class APIActionService {
 
 	getAPIActionEnums(): Observable<any> {
 		return this.http.get(`${this.dataApiActionUrl}/enums`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	getCredentials(): Observable<CredentialModel[]> {
 		return this.http.get(`${this.credentialUrl}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let credentialModels = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let credentialModels = response && response.status === 'success' && response.data;
 
 				credentialModels.forEach((model) => {
 					// r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
@@ -134,7 +126,7 @@ export class APIActionService {
 				});
 				return credentialModels;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	private processCredentialModel(model): void {
@@ -172,48 +164,47 @@ export class APIActionService {
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
 		return this.http.get(`${this.dataApiActionUrl}/connector/${agentId}`)
-			.map((res: Response) => {
-				let result = res.json();
+			.map((response: any) => {
 				let agentMethodModel = new Array<AgentMethodModel>();
-				for (let property in result) {
-					if (result.hasOwnProperty(property)) {
+				for (let property in response) {
+					if (response.hasOwnProperty(property)) {
 						agentMethodModel.push({
-							id: result[property].apiMethod,
-							name: result[property].name,
-							description: result[property].description,
-							endpointUrl: result[property].endpointUrl,
-							docUrl: result[property].docUrl,
-							producesData: (result[property].producesData === 1),
+							id: response[property].apiMethod,
+							name: response[property].name,
+							description: response[property].description,
+							endpointUrl: response[property].endpointUrl,
+							docUrl: response[property].docUrl,
+							producesData: (response[property].producesData === 1),
 							polling: {
 								frequency: {
-									value: ((result[property].pollingInterval) ? result[property].pollingInterval : 0),
+									value: ((response[property].pollingInterval) ? response[property].pollingInterval : 0),
 									interval: INTERVAL.SECONDS
 								},
 								lapsedAfter: {
 									value: DateUtils.convertInterval({
-										value: ((result[property].pollingLapsedAfter) ? result[property].pollingLapsedAfter : 0),
+										value: ((response[property].pollingLapsedAfter) ? response[property].pollingLapsedAfter : 0),
 										interval: INTERVAL.SECONDS
 									}, INTERVAL.MINUTES),
 									interval: INTERVAL.MINUTES
 								},
 								stalledAfter: {
 									value: DateUtils.convertInterval({
-										value: ((result[property].pollingStalledAfter) ? result[property].pollingStalledAfter : 0),
+										value: ((response[property].pollingStalledAfter) ? response[property].pollingStalledAfter : 0),
 										interval: INTERVAL.SECONDS
 									}, INTERVAL.MINUTES),
 									interval: INTERVAL.MINUTES
 								}
 							},
-							methodParams: result[property].params,
-							script: result[property].script,
-							httpMethod: result[property].httpMethod
+							methodParams: response[property].params,
+							script: response[property].script,
+							httpMethod: response[property].httpMethod
 						});
 					}
 				}
-				result = agentMethodModel;
-				return result;
+				response = agentMethodModel;
+				return response;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
@@ -273,30 +264,27 @@ export class APIActionService {
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
+				.map((response: any) => {
+					let dataItem = (response && response.status === 'success' && response.data);
 					return dataItem;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		} else {
 			postRequest.version = model.version;
 			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
+				.map((response: any) => {
+					return response && response.status === 'success' && response.data;
 				})
-				.catch((error: any) => error.json());
+				.catch((error: any) => error);
 		}
 	}
 
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -306,11 +294,10 @@ export class APIActionService {
 	 */
 	validateAuthentication(credentialId: number): Observable<any> {
 		return this.http.post(`${this.credentialUrl}/test/${credentialId}`, null)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -323,9 +310,8 @@ export class APIActionService {
 			expression: validateExpression
 		};
 		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				let errorResult = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let errorResult = response && response.status === 'success' && response.data;
 				let errors = '';
 				if (errorResult['errors']) {
 					errorResult['errors'].forEach((error: string) => {
@@ -337,16 +323,15 @@ export class APIActionService {
 					error: errors
 				};
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteAPIAction(id: number): Observable<string> {
 		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	checkSyntax(script: string, filename: string): Observable<any> {
@@ -355,21 +340,17 @@ export class APIActionService {
 			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
+			.map((response: any) => response)
+			.catch((error: any) => error);
 	}
 
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
+		const headers = new HttpHeaders({});
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, { headers: headers })
+			.map((response: any) => {
+				return new HttpResponse({status: 200, body: { data : response.data } });
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**

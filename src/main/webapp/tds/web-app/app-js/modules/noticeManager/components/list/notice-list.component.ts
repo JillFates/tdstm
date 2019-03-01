@@ -20,7 +20,7 @@ import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-qu
 
 @Component({
 	selector: 'tds-notice-list',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
+	templateUrl: 'notice-list.component.html'
 })
 
 export class NoticeListComponent {
@@ -38,12 +38,12 @@ export class NoticeListComponent {
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected noticeTypes = NoticeTypes;
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];
+	public noticeColumnModel = null;
 
 	/**
 	 * @constructor

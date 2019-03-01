@@ -831,22 +831,27 @@ class CommentService implements ServiceMethods {
 	 * @param rowOffset - used for paginating results.
 	 * @return A map with the tasks found plus the total number of tasks.
 	 */
-	Map filterTasks(Project project, Map params, boolean viewUnpublished, String sortIndex, String sortOrder, Integer maxRows, Integer rowOffset) {
-
-		List<AssetComment> results = []
-		Integer totalCount = 0
-		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder, viewUnpublished)
+	Map filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
+		List<AssetComment> tasksList = []
+		Map resultMap = [:]
+		if (!params.containsKey('viewUnpublished')) {
+			params['viewUnpublished'] = false
+		}
+		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder)
 		Map queryInfo = queryBuilder.buildQueries()
 		if (!queryInfo.invalidCriterion) {
-			Map metaParams = [max: maxRows, offset: rowOffset, readOnly: true]
-			results = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
-			totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
+			Map metaParams = [readOnly: true]
+			if (maxRows >= 0 && rowOffset >= 0) {
+				metaParams['max'] = maxRows
+				metaParams['offset'] = rowOffset
+				Integer totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
+				resultMap['totalCount'] = totalCount
+			}
+			tasksList = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
+			resultMap['tasks'] = tasksList
 		}
 
-		return [
-			tasks: results,
-			totalCount: totalCount
-		]
+		return resultMap
 
 	}
 

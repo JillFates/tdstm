@@ -21,7 +21,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `task-comment`,
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/task-comment.component.html',
+	templateUrl: 'task-comment.component.html',
 	styles: []
 })
 export class TaskCommentComponent implements OnInit {

@@ -37,7 +37,7 @@ export enum FieldInfoType {
 
 @Component({
 	selector: 'import-batch-record-fields',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-fields.component.html'
+	templateUrl: 'import-batch-record-fields.component.html'
 })
 export class ImportBatchRecordFieldsComponent implements OnInit {
 
@@ -47,7 +47,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	@Output('onUpdateSuccess') updateSuccessEvent = new EventEmitter<any>();
 	@Output('onBatchRecordUpdated') onBatchRecordUpdated = new EventEmitter<any>();
 
-	private fieldsInfo: Array<{
+	public fieldsInfo: Array<{
 		// Name of the field
 		name: string,
 		// Contains the value to post or was posted that the user can modify before posting

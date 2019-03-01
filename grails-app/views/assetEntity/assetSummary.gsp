@@ -27,7 +27,7 @@
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	          <td>
 				<tds:hasPermission permission="${Permission.BundleView}">
-					<a href=/moveBundle/show/${assetSummary.id}>${assetSummary.name}</a>
+					<a href="${createLink(controller:"moveBundle" , action: 'show', id: assetSummary.id)}">${assetSummary.name}</a>
 				</tds:hasPermission>
 			  </td>
 	          <g:if test="${assetSummary.applicationCount>0}">

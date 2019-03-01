@@ -8,7 +8,32 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'asset-explorer-view-export',
-	templateUrl: '../tds/web-app/app-js/modules/assetManager/components/asset-view-export/asset-view-export.component.html',
+	template: `
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Export to Excel</h4>
+            </div>
+            <div class="modal-body">
+                <form name="exportForm" role="form" data-toggle="validator" #exportForm='ngForm'>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="fileName" class="control-label">File Name </label>
+                            <input type="text" class="form-control" id="fileName" [(ngModel)]="fileName" name="fileName" required [ngClass]="{'has-error': !exportForm.form.valid}"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer form-group-center">
+                <tds-button-export class="btn-primary pull-left" (click)="getExportData()" [disabled]="!exportForm.form.valid">
+                </tds-button-export>
+                <kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
+                    <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title" [locked]="column.locked" [cellOptions]="column.cell"></kendo-excelexport-column>
+                </kendo-excelexport>
+                <tds-button-cancel class="pull-right"  (click)="cancelCloseDialog()"></tds-button-cancel>
+            </div>
+        </div>
+	`,
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -16,11 +41,12 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	`]
 })
 export class AssetViewExportComponent {
-	private columns: any[];
-	protected fileName = 'asset_explorer';
-	protected exportFileName = '';
-	protected dataToExport: any[] = [];
+	public columns: any[];
+	public fileName = 'asset_explorer';
+	public exportFileName = '';
+	public dataToExport: any[] = [];
 	private allProperties = false;
+	private fieldImportance = new FieldImportance();
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
@@ -52,13 +78,13 @@ export class AssetViewExportComponent {
 	private getImportanceColor(model: any): string {
 		let domain = this.assetExportModel.domains.find(r => r.domain.toLocaleLowerCase() === model.domain.toLocaleLowerCase());
 		let field = domain.fields.find(r => r.label.toLocaleLowerCase() === model.label.toLocaleLowerCase());
-		return FieldImportance[field.imp].color;
+		return this.fieldImportance[field.imp].color;
 	}
 
 	/**
 	 * Transform the Data information
 	 */
-	private getExportData(): void {
+	public getExportData(): void {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {

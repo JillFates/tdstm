@@ -13,5 +13,9 @@ if (NODE_ENV === 'production') {
 	enableProdMode();
 }
 
-// Compile and launch the module
-platformBrowserDynamic().bootstrapModule(TDSAppModule);
+platformBrowserDynamic().bootstrapModule(TDSAppModule).then(ref => {
+	if (window['ngRef']) {
+		window['ngRef'].destroy();
+	}
+	window['ngRef'] = ref;
+}).catch(err => console.error(err));

@@ -10,7 +10,7 @@ import {
 } from '../../service/data-script.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -27,34 +27,34 @@ import {FieldReferencePopupComponent} from '../../../../shared/components/field-
 
 @Component({
 	selector: 'data-script-etl-builder',
-	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/etl-builder/data-script-etl-builder.component.html'
+	templateUrl: 'data-script-etl-builder.component.html'
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	@ViewChild('resizableForm') resizableForm: ElementRef;
-	private collapsed = {
+	public collapsed = {
 		code: true,
 		sample: false,
 		transform: false,
 	};
-	private script: string;
+	public script: string;
 	private filename: string;
-	private isWindowMaximized = false;
+	public isWindowMaximized = false;
 	private initialWindowStyle = null;
-	private modalOptions: DecoratorOptions;
-	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
+	public modalOptions: DecoratorOptions;
+	public sampleDataModel: SampleDataModel = new SampleDataModel([], []);
 	protected sampleDataGridHelper: DataGridOperationsHelper;
-	private operationStatus = {
+	public operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
 		syntax: new OperationStatusModel(),
 	};
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
-	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
+	public scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
 	protected transformedDataGrids: Array<DataGridOperationsHelper>;
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
-	private closeErrorsSection = false;
-	protected CHECK_ACTION = CHECK_ACTION;
+	public closeErrorsSection = false;
+	public CHECK_ACTION = CHECK_ACTION;
 	protected testScriptProgress = {
 		progressKey: null,
 		currentProgress: 0,
@@ -67,7 +67,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	constructor(
 		private translatePipe: TranslatePipe,
 		private dialogService: UIDialogService,
-		private dataScriptModel: DataScriptModel,
+		public dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private importAssetsService: ImportAssetsService,
 		private preferenceService: PreferenceService,
@@ -122,7 +122,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On Test Script button.
 	 */
-	private onTestScript(): void {
+	public onTestScript(): void {
 		this.clearLogVariables('test');
 		this.clearSyntaxErrors();
 		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
@@ -195,7 +195,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On Check Script Syntax button.
 	 */
-	private onCheckScriptSyntax(): void {
+	public onCheckScriptSyntax(): void {
 		this.clearSyntaxErrors();
 		this.clearLogVariables('syntax');
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
@@ -213,7 +213,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		});
 	}
 
-	protected cancelCloseDialog($event): void {
+	public cancelCloseDialog($event): void {
 		if ($event && $event.target && $event.target.classList.contains(FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS)) {
 			return;
 		}
@@ -236,7 +236,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}
 	}
 
-	private onSave(): void {
+	public onSave(): void {
 		this.operationStatus.save = 'progress';
 		this.clearLogVariables();
 		this.dataIngestionService.saveScript(this.dataScriptModel.id, this.script).subscribe(
@@ -253,7 +253,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			});
 	}
 
-	protected isScriptDirty(): boolean {
+	public isScriptDirty(): boolean {
 		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
 	}
 
@@ -263,11 +263,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.operationStatus.test.value = event.newValue;
 	}
 
-	protected toggleSection(section: string) {
+	public toggleSection(section: string) {
 		this.collapsed[section] = !this.collapsed[section];
 	}
 
-	protected onLoadSampleData(): void {
+	public onLoadSampleData(): void {
 		this.dialogService.extra(DataScriptSampleDataComponent, [
 			{provide: 'etlScript', useValue: this.dataScriptModel}
 		])
@@ -327,25 +327,25 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On View Console button open the console dialog.
 	 */
-	protected onViewConsole(): void {
+	public onViewConsole(): void {
 		this.dialogService.extra(DataScriptConsoleComponent, [{provide: ScriptConsoleSettingsModel, useValue: this.consoleSettings}], false, true)
 			.then((result) => {/* on ok */} )
 			.catch((result) => {/* on close/cancel */});
 	}
 
-	private testHasErrors(): boolean {
+	public testHasErrors(): boolean {
 		return !this.scriptTestResult.isValid && this.scriptTestResult.error && this.scriptTestResult.error.length > 0;
 	}
 
-	protected sampleDataHasErrors(): boolean {
+	public sampleDataHasErrors(): boolean {
 		return this.sampleDataModel && this.sampleDataModel.errors && this.sampleDataModel.errors.length > 0;
 	}
 
-	private syntaxHasErrors(): boolean {
+	public syntaxHasErrors(): boolean {
 		return !this.scriptValidSyntaxResult.validSyntax && this.scriptValidSyntaxResult.errors && this.scriptValidSyntaxResult.errors.length > 0;
 	}
 
-	private closeErrors(): void {
+	public closeErrors(): void {
 		this.closeErrorsSection = true;
 	}
 
@@ -379,11 +379,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}
 	}
 
-	protected isCheckSyntaxDisabled(): boolean {
+	public isCheckSyntaxDisabled(): boolean {
 		return !this.script || !this.filename;
 	}
 
-	protected isTestDisabled(): boolean {
+	public isTestDisabled(): boolean {
 		return !this.script || !this.filename || this.operationStatus.test.state === CHECK_ACTION.IN_PROGRESS;
 	}
 

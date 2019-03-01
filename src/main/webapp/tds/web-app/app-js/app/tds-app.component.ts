@@ -4,17 +4,23 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
 	selector: 'tds-app',
 	template: `
-        <tds-ui-loader></tds-ui-loader>
-        <tds-ui-toast></tds-ui-toast>
-
-        <tds-header></tds-header>
-        <router-outlet></router-outlet>
+		<tds-header></tds-header>
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container">
+                <tds-ui-loader></tds-ui-loader>
+                <tds-ui-toast></tds-ui-toast>
+                <tds-breadcrumb-navigation></tds-breadcrumb-navigation>
+                <router-outlet></router-outlet>
+            </div>
+            <!-- /.container -->
+        </div>
 	`,
 })
 
@@ -34,6 +40,21 @@ export class TDSAppComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.handleTransitions();
+	}
+
+	/**
+	 * Listen to the Transitions
+	 */
+	private handleTransitions(): void {
+		// As soon as a transition start
+		this.router.events.subscribe((event) => {
+				this.notifierService.broadcast({
+					name: 'notificationRouteChange'
+				});
+			});
+
+		// Specific filter to get the information from the current Page of the latest request event
 		this.router.events
 			.filter((event) => event instanceof NavigationEnd)
 			.map(() => this.activatedRoute)
@@ -47,6 +68,9 @@ export class TDSAppComponent implements OnInit {
 				this.notifierService.broadcast({
 					name: 'notificationRouteNavigationEnd',
 					route: event
+				});
+				this.notifierService.broadcast( {
+					name: 'httpRequestCompleted'
 				});
 			});
 	}

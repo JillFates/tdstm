@@ -1411,6 +1411,9 @@ class AdminController implements ControllerMethods {
 			return
 		}
 
+		InetAddress addr = InetAddress.getLocalHost();
+		String fqdn = addr.getCanonicalHostName()
+
 		int MegaBytes = 1024
 
 		Runtime rt = Runtime.getRuntime()
@@ -1442,7 +1445,9 @@ class AdminController implements ControllerMethods {
 
 		Map sysProps = rtMXBean.getSystemProperties()
 
-			[freeMemory      : freeMemory,
+			[
+			fqdn      		 : fqdn,
+			freeMemory       : freeMemory,
 			 totalMemory     : totalMemory,
 			 maxMemory       : maxMemory,
 			 usedMemory      : usedMemory,

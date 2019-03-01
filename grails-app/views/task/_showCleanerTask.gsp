@@ -26,12 +26,12 @@
 		<input type="hidden" name="FormName" id="FormName" />
 		<input type="hidden" name="PrinterName" id="PrinterName" />
 		<input type="hidden" name="RepPath" id="RepPath" />
-		<input type="hidden" name="model" id="model" value="${assetEntity?.model}" />
-		<input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
-		<input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
-		<input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" />
-		<input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" />
-		<input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" />
+		<g:if test="${assetEntity.hasProperty('model')}"><input type="hidden" name="model" id="model" value="${assetEntity?.model}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('cart')}"><input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('shelf')}"><input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('targetRoomName')}"><input type="hidden" name="room" id="room" value="${assetEntity?.targetRoomName}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('targetRackName')}"><input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRackName}" /></g:if>
+		<g:if test="${assetEntity.hasProperty('targetRackPosition')}"><input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" /></g:if>
 		<input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
 			<tr>
@@ -82,7 +82,7 @@
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constrainedProperties.category.inList}" value="${assetComment.category}"></g:select>
+				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" value="${assetComment.category}"></g:select>
 				<g:if test="${assetComment.moveEvent}">
 		   		  <span style="margin-left:60px;">Move Event:</span>
 		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
@@ -107,11 +107,11 @@
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
 					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
 					</g:if>
 					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constrainedProperties.status.inList}" value="${assetComment.status}"
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
 					</g:else>
 				</td>	
@@ -224,10 +224,10 @@
 						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
 						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-						<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-					  	<dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-						<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-						<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+		                <g:if test="${assetComment?.assetEntity.hasProperty('sourceRackName')}"><dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd></g:if>
+					  	<g:if test="${assetComment?.assetEntity.hasProperty('targetRackName')}"><dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRackName}/${assetComment?.assetEntity.targetRackPosition}</dd></g:if>
+						<g:if test="${assetComment?.assetEntity.hasProperty('sourceRoomName')}"><dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoomName}</dd></g:if>
+						<g:if test="${assetComment?.assetEntity.hasProperty('targetRoomName')}"><dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoomName}</dd></g:if>
 						<g:if test="${location == 'source'}">			   	
 					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	

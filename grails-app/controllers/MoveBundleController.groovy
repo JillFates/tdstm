@@ -443,18 +443,18 @@ class MoveBundleController implements ControllerMethods {
 		def selectCount = 'SELECT count(ae)'
 		def countArgs = [project:project, moveBundles:moveBundleList]
 
-		def countQuery = "$selectCount FROM AssetEntity ae $baseWhere"
-		def appQuery = "FROM Application ae $baseWhere"
-		def appCountQuery = "$selectCount $appQuery"
-		def dbQuery = "FROM Database ae $baseWhere"
-		def dbCountQuery = "$selectCount $dbQuery"
-		def filesQuery = "FROM Files ae $baseWhere"
-		def filesCountQuery = "$selectCount $filesQuery"
-		def phyStorageQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
-		def phyStorageCountQuery = "$selectCount $phyStorageQuery"
-		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
-		def deviceCountQuery = "$selectCount $deviceQuery"
-		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
+		String countQuery = "$selectCount FROM AssetEntity ae $baseWhere"
+		String appQuery = "FROM Application ae $baseWhere"
+		String appCountQuery = "$selectCount $appQuery"
+		String dbQuery = "FROM Database ae $baseWhere"
+		String dbCountQuery = "$selectCount $dbQuery"
+		String filesQuery = "FROM Files ae $baseWhere"
+		String filesCountQuery = "$selectCount $filesQuery"
+		String phyStorageQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		String phyStorageCountQuery = "$selectCount $phyStorageQuery"
+		String deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		String deviceCountQuery = "$selectCount $deviceQuery"
+		String otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
 
 		def databaseCount = Database.executeQuery(dbCountQuery, countArgs)[0]
 		def fileCount = Files.executeQuery(filesCountQuery, countArgs)[0]
@@ -643,7 +643,7 @@ class MoveBundleController implements ControllerMethods {
 		// Application Plan Methodology
 		def customField = project.planMethodology ?: "''"
 
-		def groupingSumQuery = "SELECT new map(${customField} as key, COUNT(ae) as count) FROM Application ae WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)"
+		String groupingSumQuery = "SELECT new map(${customField} as key, COUNT(ae) as count) FROM Application ae WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)"
 
 		if (customField) {
 			groupingSumQuery += " group by ${customField}"
@@ -694,7 +694,7 @@ class MoveBundleController implements ControllerMethods {
 			(total > 0 ? ((count/total*100)as double).trunc(2).intValue() : 0)
 		}
 
-		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
+		String planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
 		int percVirtualServerCount = moveBundleList ?
 			AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.virtualServerTypes])[0]
 			: 0
@@ -738,11 +738,11 @@ class MoveBundleController implements ControllerMethods {
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')
 
-		def validationQuery = ' AND ae.validation=:validation'
-		def validateCountQuery = countQuery + validationQuery + ' AND ae.assetType IN (:type) AND ae.assetClass=:assetClass'
-		def appValidateCountQuery = appCountQuery + validationQuery
-		def dbValidateCountQuery = dbCountQuery + validationQuery
-		def filesValidateCountQuery = filesCountQuery + validationQuery
+		String validationQuery = ' AND ae.validation=:validation'
+		String validateCountQuery = countQuery + validationQuery + ' AND ae.assetType IN (:type) AND ae.assetClass=:assetClass'
+		String appValidateCountQuery = appCountQuery + validationQuery
+		String dbValidateCountQuery = dbCountQuery + validationQuery
+		String filesValidateCountQuery = filesCountQuery + validationQuery
 
 		// This section could be consolidated to a simple query instead of a bunch
 		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.UNKNOWN])[0]

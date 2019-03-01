@@ -17,15 +17,15 @@ import {ManualRequestComponent} from '../manual-request/manual-request.component
 
 @Component({
 	selector: 'tds-license-detail',
-	templateUrl: '../tds/web-app/app-js/modules/licenseAdmin/components/detail/license-detail.component.html'
+	templateUrl: 'license-detail.component.html'
 })
 export class LicenseDetailComponent implements OnInit {
 
-	protected environmentList: any = [];
+	public environmentList: any = [];
 	protected projectList: any = [];
-	protected dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
-	protected methodOptions = MethodOptions;
-	protected licenseStatus = LicenseStatus;
+	public dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
+	public methodOptions = MethodOptions;
+	public licenseStatus = LicenseStatus;
 
 	constructor(
 		public licenseModel: LicenseModel,
@@ -52,7 +52,7 @@ export class LicenseDetailComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	protected cancelCloseDialog(): void {
+	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 	}
 
@@ -108,7 +108,7 @@ export class LicenseDetailComponent implements OnInit {
 	/**
 	 * Delete the current License
 	 */
-	protected onDelete(): void {
+	public onDelete(): void {
 		this.prompt.open('Confirmation Required', 'You are about to delete the license. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {

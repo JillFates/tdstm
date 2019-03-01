@@ -761,8 +761,8 @@ class PersonService implements ServiceMethods {
 		def messages = []
 
 		if (ids) {
-			try {
-				for (id in ids) {
+			for (id in ids) {
+				try {
 					Person person = validatePersonAccess(id, byWhom)
 					if (person) {
 						// Deletes the person and other related entities.
@@ -780,18 +780,17 @@ class PersonService implements ServiceMethods {
 					} else {
 						messages << 'Invalid ID(s) were submitted in the request'
 					}
+				} catch (UnauthorizedException ue) {
+					securityService.reportViolation("attempted to delete person ($id) without neccessary access", byWhom.userLogin.username)
+					messages << "You do not have the required access to delete the specified person"
+				} catch (InvalidParamException ipe) {
+					log.error "bulkDelete() was invoked with invalid id ($id) value by $byWhom"
+					messages << "One of the parameters specified was invalid and an error was logged."
+				} catch (EmptyResultException ere) {
+					securityService.reportViolation("attempted to delete a non-existent person ($id)", byWhom.userLogin.username)
+					messages << "Specified person was not found"
 				}
-			} catch (UnauthorizedException ue) {
-				securityService.reportViolation("attempted to delete person ($id) without neccessary access", byWhom.userLogin.username)
-				messages << "You do not have the required access to delete the specified person"
-			} catch (InvalidParamException ipe) {
-				log.error "bulkDelete() was invoked with invalid id ($id) value by $byWhom"
-				messages << "One of the parameters specified was invalid and an error was logged."
-			} catch (EmptyResultException ere) {
-				securityService.reportViolation("attempted to delete a non-existent person ($id)", byWhom.userLogin.username)
-				messages << "Specified person was not found"
 			}
-
 		}
 
 		return [deleted: deleted, skipped: skipped, cleared: cleared, messages: messages]

@@ -20,6 +20,7 @@ export class ImportBatchModel {
 	project: ProjectModel;
 	provider: ProviderModel;
 	datascript: DataScriptModel;
+	dataScript: any;
 	createdBy: string;
 	archived: boolean;
 	timezone: string;
