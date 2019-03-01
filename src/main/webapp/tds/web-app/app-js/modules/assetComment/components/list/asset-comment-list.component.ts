@@ -129,14 +129,14 @@ export class AssetCommentListComponent implements OnInit {
 	 */
 	private openAssetCommentDialogViewEdit(comment: any, type: ModalType): void {
 		let commentModel: AssetCommentModel = {
-			id: comment.commentInstance.id,
+			id: comment.id,
 			modal: {
 				title: 'Comment Detail',
 				type: type
 			},
-			archive: comment.commentInstance.dateResolved !== null,
-			comment: comment.commentInstance.comment,
-			category: comment.commentInstance.category,
+			archive: comment.dateResolved !== null,
+			comment: comment.comment,
+			category: comment.category,
 			assetClass: {
 				text: comment.assetType,
 			},
@@ -144,8 +144,8 @@ export class AssetCommentListComponent implements OnInit {
 				id: comment.assetEntityId,
 				text: comment.assetName
 			},
-			lastUpdated: comment.commentInstance.lastUpdated,
-			dateCreated: comment.commentInstance.dateCreated
+			lastUpdated: comment.lastUpdated,
+			dateCreated: comment.dateCreated
 		};
 
 		this.dialogService.extra(AssetCommentViewEditComponent, [
