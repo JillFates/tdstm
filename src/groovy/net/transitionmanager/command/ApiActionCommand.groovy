@@ -1,6 +1,8 @@
 package net.transitionmanager.command
 
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import grails.validation.Validateable
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.domain.ApiCatalog
@@ -36,4 +38,9 @@ class ApiActionCommand implements CommandObject {
     Integer timeout = 0
     Integer useWithAsset = 0
     Integer useWithTask = 0
+    ActionType actionType = ActionType.WEB_API
+    Boolean isRemote = false
+    String script
+    String commandLine
+    RemoteCredentialMethod remoteCredentialMethod
 }

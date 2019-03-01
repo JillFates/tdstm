@@ -11,7 +11,6 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.common.exceptions.ServiceException
-import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
@@ -52,6 +51,7 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -442,7 +442,7 @@ class TaskService implements ServiceMethods {
 	 * @return The status that the task should be set to
 	 */
 	@NotTransactional
-	String invokeAction(AssetComment task, Person whom) {
+	String invokeAction(AssetComment task, Person whom, Boolean remoteInvocation = false) {
 		def status = task.status
 		//return status
 		// For tasks that are actionable and has an assigned action, this logic will attempt to invoke and
@@ -450,7 +450,7 @@ class TaskService implements ServiceMethods {
 		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
 		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
 		if (task.hasAction() && ACTIONABLE_STATUSES.contains(status)) {
-			if (task.isActionInvocable()) {
+			if (task.isActionInvocableLocally()) {
 				String errMsg
 
 				if (task.apiAction.isSync()) {
@@ -458,7 +458,7 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						markTaskStarted(task.id)
+						markActionStarted(task.id, whom, remoteInvocation)
 
 						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
@@ -477,6 +477,8 @@ class TaskService implements ServiceMethods {
 					} catch (InvalidConfigurationException e) {
 						errMsg = e.getMessage()
 					} catch (CannotAcquireLockException e) {
+						errMsg = e.getMessage()
+					} catch (ApiActionException e) {
 						errMsg = e.getMessage()
 					} catch (e) {
 						errMsg = 'A runtime error occurred while attempting to process the action'
@@ -498,33 +500,59 @@ class TaskService implements ServiceMethods {
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
 	 * @param id - the id of the task to mark as started
+	 * @param whom - the id whos invoking the action
+	 * @param remoteInvocation - whether is a remote or local api action invokation
 	 */
 	@NotTransactional
-	void markTaskStarted(Long id) {
-		try {
-			AssetComment.withTransaction { TransactionStatus ts ->
-				log.debug "Attempting to mark asset comment as started for task.id={}", id
+	void markActionStarted(Long id, Person whom, Boolean remoteInvocation = false) {
+		log.debug "Attempting to action as started for task.id={}", id
+		AssetComment.withTransaction { TransactionStatus ts ->
+			def taskWithLock = AssetComment.lock(id)
+			log.debug 'Locked out AssetComment: {}', taskWithLock
 
-				def taskWithLock = AssetComment.lock(id)
-				log.debug 'Locked out AssetComment: {}', taskWithLock
-
-				if (taskWithLock.status in [ACS.STARTED, ACS.HOLD, ACS.COMPLETED]) {
-					throw new Exception('Another user invoked the action before')
-				}
-
-				// Update the task so that the we track that the action was invoked
-				taskWithLock.apiActionInvokedAt = new Date()
-
-				// Update the task so that we track the task started at
-				taskWithLock.actStart = taskWithLock.apiActionInvokedAt
-
-				// Make sure that the status is STARTED instead
-				taskWithLock.status = AssetCommentStatus.STARTED
-				taskWithLock.save(flush: true, failOnError: true)
+			if (!taskWithLock.hasAction()) {
+				throwException(InvalidRequestException, 'apiAction.task.message.noAction')
 			}
-		} catch (Exception e) {
-			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
-			throw new CannotAcquireLockException('Another user invoked the action before')
+
+			if (taskWithLock.apiActionInvokedAt != null) {
+				throwException(ApiActionException, 'apiAction.task.message.alreadyInvoked')
+			}
+
+			if (!taskWithLock.isActionable()) {
+				throwException(ApiActionException, 'apiAction.task.message.notActionable')
+			}
+
+			if (taskWithLock.apiAction.isSync()) {
+				throwException(ApiActionException, 'apiAction.task.message.syncActionNotSupported')
+			}
+
+			if (!remoteInvocation && taskWithLock.isActionInvocableRemotely()) {
+				throwException(ApiActionException, 'apiAction.task.message.notLocalAction')
+			}
+
+			if (remoteInvocation && !taskWithLock.isActionInvocableLocally()) {
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction')
+			}
+
+			if ((remoteInvocation && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) || (!remoteInvocation && !securityService.hasPermission(who, Permission.ActionInvoke))) {
+				throwException(ApiActionException, 'apiAction.task.message.noPermission')
+			}
+
+			if (!taskWithLock.apiAction.reactionScriptsValid == 1) {
+				throwException(ApiActionException, 'apiAction.task.message.invalidReactionScript')
+			}
+
+			// Update the task so that the we track that the action was invoked
+			taskWithLock.apiActionInvokedAt = new Date()
+
+			// Update the task so that we track the task started at
+			taskWithLock.actStart = taskWithLock.apiActionInvokedAt
+
+			// Make sure that the status is STARTED instead
+			taskWithLock.status = AssetCommentStatus.STARTED
+			taskWithLock.save(flush: true, failOnError: true)
+
+			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${remoteInvocation ? 'Remotely' : 'Locally'})")
 		}
 	}
 

@@ -1,6 +1,8 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
+import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiActionCommand
@@ -119,7 +121,9 @@ class WsApiActionController implements ControllerMethods {
     def enums() {
         renderSuccessJson([
                 'httpMethod': ApiActionHttpMethod.names(),
-                'agentNames': apiCatalogService.listCatalogNames()
+                'agentNames': apiCatalogService.listCatalogNames(),
+                'actionTypes': ActionType.toMap(),
+                'remoteCredentialMethods': RemoteCredentialMethod.toMap()
         ])
     }
 }

@@ -1458,7 +1458,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
 	var invokeAction = function (commentId) {
 		var deferred = q.defer();
-		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeAction')).
+		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeLocalAction')).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).

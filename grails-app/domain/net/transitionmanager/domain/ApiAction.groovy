@@ -1,6 +1,8 @@
 package net.transitionmanager.domain
 
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -112,6 +114,21 @@ class ApiAction {
 
 	Date lastUpdated
 
+	// An enum of the types of actions
+	ActionType actionType = ActionType.WEB_API
+
+	// 	The script to be executed
+	String script
+
+	// The commandline to used to invoke the script if necessary
+	String commandLine
+
+	// Flag that the action should be invoked remotely
+	Boolean isRemote = false
+
+	// How the authentication for remote scripts will be performed
+	RemoteCredentialMethod remoteCredentialMethod
+
 	static belongsTo = [
 		project: Project,
 		provider: Provider,
@@ -126,8 +143,8 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointUrl nullable: true, blank: true, validator: ApiAction.&endpointUrlValidator
-		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
+		endpointUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&endpointUrlValidator
+		docUrl nullable: true, blank: true, size: 0..1024, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
@@ -141,19 +158,26 @@ class ApiAction {
 		timeout min:0
 		useWithAsset range: 0..1
 		useWithTask range: 0..1
+		actionType nullable: false
+		script nullable: true, size: 0..65535
+		commandLine nullable: true, size: 0..1024
+		isRemote nullable: false
+		remoteCredentialMethod nullable: true
 	}
 
 	static mapping = {
 		columns {
-			connectorMethod 	sqlType: 'varchar(64)'
-			callbackMode 	sqlType: 'varchar(64)'
-			callbackMethod	sqlType: 'varchar(64)'
-			asyncQueue 		sqlType: 'varchar(64)'
-			name 			sqlType: 'varchar(64)'
-			methodParams	sqlType: 'text'
-			endpointUrl		sqlType: 'varchar(255)'
-			docUrl			sqlType: 'varchar(255)'
-			httpMethod		sqlType: 'varchar(10)'
+			connectorMethod 		sqlType: 'varchar(64)'
+			callbackMode 			sqlType: 'varchar(64)'
+			callbackMethod			sqlType: 'varchar(64)'
+			asyncQueue 				sqlType: 'varchar(64)'
+			name 					sqlType: 'varchar(64)'
+			methodParams			sqlType: 'text'
+			endpointUrl				sqlType: 'varchar(1024)'
+			docUrl					sqlType: 'varchar(1024)'
+			httpMethod				sqlType: 'varchar(10)'
+			actionType				sqlType: 'varchar(15)'
+			remoteCredentialMethod	sqlType: 'varchar(15)'
 		}
 	}
 

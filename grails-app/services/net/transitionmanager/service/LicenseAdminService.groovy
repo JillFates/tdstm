@@ -308,7 +308,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					! StringUtils.equalsIgnoreCase(currentHost, hostName)
 				){
 					licState.message = """
-						|Error loading license:<br/> 
+						|Error loading license:<br/>
 						|current host:<br/><strong>${currentHost}</strong><br/>
 						|licensed host:<br/><strong>${hostName}</strong>
 					""".stripMargin()
@@ -322,7 +322,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					! StringUtils.equalsIgnoreCase(fqdn, websitename)
 				){
 					licState.message = """
-						|Error loading license:<br/> 
+						|Error loading license:<br/>
 						|current website:<br/><strong>${fqdn}</strong><br/>
 						|licensed website:<br/><strong>${websitename}</strong>
 					""".stripMargin()
@@ -754,4 +754,39 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 		}
 	}
 
+	/**
+	 * Used to retrieve Licensing information that can be used by the frontend
+	 * @param project - the project to get the current licensing information
+	 * @return Map of data
+	 */
+	Map licenseInfo(Project project) {
+		Boolean isManager = isManagerEnabled()
+		Boolean isTMLicenseEnabled = ! isManager && isAdminEnabled()
+
+		Map info = [:]
+
+		info.isManager = isManager
+
+		if (isManager) {
+			// Instance is LicenseManager
+			info.put('isValid', true)
+			info.put('state', State.VALID.toString())
+			info.put('banner', '')
+			info.put('message', '')
+		} else {
+			// Instance is TransitionManager
+			if (isTMLicenseEnabled) {
+				info.put('isValid', isValid(project))
+				info.put('state', getLicenseState(project).toString())
+				info.put('banner', getLicenseBannerMessage(project))
+				info.put('message', getLicenseStateMessage(project))
+			} else {
+				info.put('isValid', true)
+				info.put('state', State.VALID.toString())
+				info.put('banner', 'Licensing is disabled for Development/QA purpose ONLY')
+				info.put('message', '')
+			}
+		}
+		return info
+	}
 }

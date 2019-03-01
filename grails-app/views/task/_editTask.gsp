@@ -74,7 +74,13 @@
 							<label for="category">Category:</label>
 						</td>
 						<td>
-							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" noSelection="['':'please select']" />
+							<tds:select
+								id="category" name="category"
+								required="true"
+								ng-model="ac.category" datasource="ds.categories"
+								from="${com.tdsops.tm.enums.domain.AssetCommentCategory.list}"
+								noSelection="['':'Please select']"
+							/>
 						</td>
 					</tr>
 					<tr class="prop" id="workFlowTransitionEditTrId" ng-show="ds.workflows.length > 0">
@@ -94,7 +100,7 @@
 						<td valign="top">
 							<select ng-model="commentInfo.currentAssetClass" ng-change="assetClassChanged()" ng-options="assetClass.key as assetClass.label for assetClass in commentInfo.assetClasses"></select>
 							<div style="width:200px;display: inline-block;">
-								<input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"  
+								<input type="hidden" id="currentAsset" name="commentInfo.currentAsset" ng-model="commentInfo.currentAsset" value="{{commentInfo.currentAsset}}" class="scrollSelect"
 									data-asset-type="{{commentInfo.currentAssetClass}}" data-asset-id="{{commentInfo.currentAsset}}" data-asset-name="{{commentInfo.currentAssetName}}"/>
 							</div>
 						</td>
@@ -165,13 +171,13 @@
 							<table style="border: none;">
 								<tr class="prop" id="predecessorHeadTrId">
 									<td valign="top" class="name" style="width: 50%">
-										<label>Predecessors:</label> 
+										<label>Predecessors:</label>
 										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
 										 ng-click="$broadcast('addDependency','predecessor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Predecessor task">
 											<i class="fa fa-plus-circle"></i> Add </a>
 									</td>
 									<td valign="top" class="name" style="width: 50%">
-										<label>Successors:</label> 
+										<label>Successors:</label>
 										<a class="button btn" href="javascript:" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
 										 ng-click="$broadcast('addDependency','successor')" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Add link to a Successor task">
 										 	<i class="fa fa-plus-circle"></i> Add </a>
@@ -226,9 +232,9 @@
 			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Save</button>
 			<button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 		</div>
-		<script> 
+		<script>
 		$(document).ready(function(){
-			$('[data-toggle="popover"]').popover(); 
+			$('[data-toggle="popover"]').popover();
 			setTimeout(function(){
 				 $('#commentEditId').trigger('focus');
 			},1000);

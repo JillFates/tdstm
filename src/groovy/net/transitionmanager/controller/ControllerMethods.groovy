@@ -21,6 +21,7 @@ import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.InvalidSyntaxException
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LogicException
+import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import org.grails.databinding.bindingsource.InvalidRequestBodyException
@@ -501,11 +502,42 @@ trait ControllerMethods {
 		parts.findAll().join(separator)
 	}
 
-	Project getProjectForWs() {
-		Project project = securityService.userCurrentProject
-		if (! project) {
-			throw new InvalidRequestException('No current project selected for session')
+	/**
+	 * Used by web services to retrieve the project object based on three conditions listed in the logical order:
+	 *    1. If projectId argument is passed into the method that will be used
+	 *    2. Else If the HTTP Request params contains projectId then that will be used
+	 *    3. Else the user's saved current project prefererence is used
+	 * @param projectid - the id of a project (if supplied) which will be validated that the user has access to
+	 * @return a Project object if found and the user has permission to access
+	 * @throws EmptyResultException - if projectId is provided and does not exist or user does not have access to the project
+	 * @throws ProjectRequiredException - projectId not provided and user has not selected current project
+	 */
+	Project getProjectForWs(Long projectId = null) {
+		Project project = null
+
+		// Load param projectId if an id wasn't specified directly
+		if (! projectId && params.containsKey('projectId') ) {
+			projectId = params.long('projectId')
 		}
+
+		if (projectId) {
+			// Determine if the user has access to the specified project
+			if (projectService.hasAccessToProject(null, projectId)) {
+				project = Project.get(projectId)
+			}
+		} else {
+
+			// Load the user's currently selected project
+			project = securityService.userCurrentProject
+			if (! project) {
+				throw new ProjectRequiredException('No current project selected for session')
+			}
+		}
+
+		if (! project) {
+			throw new EmptyResultException('Project not found')
+		}
+
 		return project
 	}
 
@@ -513,7 +545,7 @@ trait ControllerMethods {
 	 * Used to retrieve an domain record using the
 	 *
 	 */
-	def <T> T fetchDomain(Class<T> clazz, Map params) {
+	def <T> T fetchDomain(Class<T> clazz, Map params, Project project = null) {
 		if (! params.id) {
 			throw new InvalidParamException('Id was missing')
 		}
@@ -524,12 +556,18 @@ trait ControllerMethods {
 		}
 
 		if (GormUtil.isDomainProperty(t, 'project')) {
-			Project project = securityService.userCurrentProject
-			if (! project) {
+			Project currentProject = project
+
+			// fetch user current project only if no project was provided
+			if (!project) {
+				currentProject = securityService.userCurrentProject
+			}
+
+			if (! currentProject) {
 				// TODO : JPM 2/2018 : Change fetchDomain to throw new Exception for no project selected
 				throw new EmptyResultException()
 			} else {
-				if (project.id != t.project.id) {
+				if (currentProject.id != t.project.id) {
 					securityService.reportViolation("attempted to access asset from unrelated project (asset ${t.id})")
 					throw new EmptyResultException()
 				}
