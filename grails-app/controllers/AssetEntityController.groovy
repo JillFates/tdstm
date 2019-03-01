@@ -424,6 +424,39 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson data
 	}
 
+	@HasPermission([Permission.CommentView, Permission.TaskView])
+	def listComments() {
+		def assetEntityInstance = AssetEntity.get(params.id)
+		def commentType = params.commentType
+
+		def assetCommentsInstance = []
+
+		if(securityService.hasPermission(Permission.TaskView) && (!commentType || commentType == AssetCommentType.TASK)) {
+			assetCommentsInstance = taskService.findAllByAssetEntity(assetEntityInstance)
+		}
+
+		if(securityService.hasPermission(Permission.CommentView) && (!commentType || commentType == AssetCommentType.COMMENT)) {
+			assetCommentsInstance.addAll(commentService.findAllByAssetEntity(assetEntityInstance))
+		}
+		def assetCommentsList = []
+		def today = new Date()
+		boolean viewUnpublished = securityService.viewUnpublished()
+		boolean canEditComments = securityService.hasPermission(Permission.CommentEdit)
+		boolean canEditTasks = securityService.hasPermission(Permission.TaskEdit)
+
+		assetCommentsInstance.each {
+			if (viewUnpublished || it.isPublished)
+				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
+									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
+									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
+									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
+									 canEditComments: canEditComments,
+									 canEditTasks: canEditTasks]
+		}
+
+		renderAsJson assetCommentsList
+	}
+
 	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
 	def showComment() {
 		def commentList = []
