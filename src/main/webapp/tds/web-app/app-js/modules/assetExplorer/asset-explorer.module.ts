@@ -93,7 +93,9 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
 		TaskCommentComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		TaskEditComponent,
+		TaskCreateComponent
 	],
 	entryComponents: [
 		AssetShowComponent,

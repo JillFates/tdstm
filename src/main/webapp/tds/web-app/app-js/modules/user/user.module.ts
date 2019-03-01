@@ -35,11 +35,11 @@ import {GridModule} from '@progress/kendo-angular-grid';
 		SharedModule,
 		FormsModule,
 		AssetExplorerModule,
-		// Route
-		UserRouteModule,
 		// Kendo
 		DropDownsModule,
-		GridModule
+		GridModule,
+		// Route
+		UserRouteModule
 	],
 	providers: [
 		// Resolve

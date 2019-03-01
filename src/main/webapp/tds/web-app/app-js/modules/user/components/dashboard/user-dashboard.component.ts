@@ -75,9 +75,9 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	getMarkupUrlData(url) {
-		if(url) {
-			let data = url.split("|");
-			if(data.length == 1) {
+		if (url) {
+			let data = url.split('|');
+			if (data.length === 1) {
 				data[1] = data[0];
 				data[0] = 'Instructions...';
 			}
@@ -86,10 +86,10 @@ export class UserDashboardComponent implements OnInit {
 		return null;
 	}
 
-	changeTimeEst(id,days) {
-		this.taskService.changeTimeEst(id,days)
+	changeTimeEst(id, days) {
+		this.taskService.changeTimeEst(id, days)
 			.subscribe((result) => {
-				if(result) {
+				if (result) {
 					this.fetchTasksForGrid();
 				}
 			});
@@ -114,10 +114,10 @@ export class UserDashboardComponent implements OnInit {
 		});
 	}
 
-	updateTaskStatus(id,status) {
-		this.taskService.updateStatus(id,status)
+	updateTaskStatus(id, status) {
+		this.taskService.updateStatus(id, status)
 			.subscribe((result) => {
-				if(result) {
+				if (result) {
 					this.fetchTasksForGrid();
 				}
 			});
@@ -149,7 +149,7 @@ export class UserDashboardComponent implements OnInit {
 			.subscribe((result) => {
 				this.taskList = result.tasks;
 				this.summaryDetail = result.summaryDetail
-				for(let i=0; i < this.taskList.length; i++) {
+				for (let i = 0; i < this.taskList.length; i++) {
 					this.taskList[i].parsedInstructions = this.getMarkupUrlData(this.taskList[i].instructionsLink);
 				}
 			});
