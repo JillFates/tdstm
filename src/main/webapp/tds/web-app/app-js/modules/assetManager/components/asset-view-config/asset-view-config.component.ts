@@ -30,7 +30,7 @@ declare var jQuery: any;
 export class AssetViewConfigComponent implements OnInit {
 	@ViewChild('select') select: AssetViewSelectorComponent;
 
-	public data: any;
+	public data: any = null;
 	private dataSignature: string;
 	protected justPlanning: boolean;
 	public gridState: State = {

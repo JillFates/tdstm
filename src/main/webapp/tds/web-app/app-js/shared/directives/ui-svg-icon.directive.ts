@@ -10,7 +10,7 @@ declare var jQuery: any;
 	selector: 'tds-ui-svg-icon',
 	template: `
         <svg [ngStyle]="{'height':svgHeight + 'px', 'width': svgWidth + 'px'}" class='tds-svg-icons' viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
-            <image x='0' y='8' height='110px' width='110px' fill='#1f77b4' xmlns:xlink='http://www.w3.org/1999/xlink' [attr.xlink:href]="'/tdstm/static/icons/svg/' + svgName + '.svg'"></image>
+            <image x='0' y='8' height='110px' width='110px' fill='#1f77b4' xmlns:xlink='http://www.w3.org/1999/xlink' [attr.xlink:href]="'/tdstm/icons/svg/' + svgName + '.svg'"></image>
         </svg>
 	`
 })
