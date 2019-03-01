@@ -12,6 +12,8 @@ import {SharedModule} from '../../shared/shared.module';
 import {UserRouteModule} from './user-routing.states';
 // Kendo Module
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
+// Asset Module
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserPreferencesComponent} from './components/preferences/user-preferences.component';
@@ -32,6 +34,7 @@ import {GridModule} from '@progress/kendo-angular-grid';
 		CommonModule,
 		SharedModule,
 		FormsModule,
+		AssetExplorerModule,
 		// Route
 		UserRouteModule,
 		// Kendo

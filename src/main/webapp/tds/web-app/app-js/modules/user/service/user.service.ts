@@ -42,8 +42,58 @@ export class UserService {
 			.catch((error: any) => error.json());
 	}
 
-	fetchModelForUserDashboard() {
-		return this.http.get(`${this.userPreferenceUrl}/modelForUserDashboard`)
+	fetchModelForUserDashboard(projId = '') {
+		return this.http.get(`${this.userPreferenceUrl}/modelForUserDashboard/${projId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssignedEvents() {
+		return this.http.get(`${this.userPreferenceUrl}/assignedEvents`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssignedEventNews() {
+		return this.http.get(`${this.userPreferenceUrl}/assignedEventNews`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssignedTasks() {
+		return this.http.get(`${this.userPreferenceUrl}/assignedTasks`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssignedApplications() {
+		return this.http.get(`${this.userPreferenceUrl}/assignedApplications`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data = result && result.status === 'success' && result.data;
+				return data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssignedPeople() {
+		return this.http.get(`${this.userPreferenceUrl}/assignedPeople`)
 			.map((res: Response) => {
 				let result = res.json();
 				let data = result && result.status === 'success' && result.data;

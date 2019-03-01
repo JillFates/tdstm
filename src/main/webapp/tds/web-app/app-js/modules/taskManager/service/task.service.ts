@@ -264,6 +264,13 @@ export class TaskService {
 			.catch((error: any) => error);
 	}
 
+	changeTimeEst(id: string, days: string) {
+		const url = `${this.baseURL}/ws/task/${id}/changeTime`;
+		return this.http.post(url, JSON.stringify({days}))
+			.map(res =>  res && res.json())
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * Add note
 	 * @param {string} id task
@@ -330,6 +337,12 @@ export class TaskService {
 				let result = res.json();
 				return result;
 			})
+			.catch((error: any) => error.json());
+	}
+
+	updateStatus(id: string, status: string): Observable<any> {
+		return this.http.post(`${this.baseURL}/ws/task/${id}/updateStatus`, JSON.stringify({status}))
+			.map(res =>  res && res.json())
 			.catch((error: any) => error.json());
 	}
 

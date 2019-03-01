@@ -107,3 +107,33 @@ export class EventColumnModel {
 		];
 	}
 }
+
+export class TaskColumnModel {
+	columns: any[];
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Task',
+				property: 'task',
+				type: 'text',
+				width: 100
+			}, {
+				label: 'Related',
+				property: 'related',
+				type: 'text',
+				width: 100
+			}, {
+				label: 'Due/Est Finish',
+				property: 'dueEstFinish',
+				type: 'text',
+				width: 100
+			}, {
+				label: 'Status',
+				property: 'status',
+				type: 'text',
+				width: 100
+			}
+		];
+	}
+}

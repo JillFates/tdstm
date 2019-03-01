@@ -1,6 +1,7 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -32,6 +33,7 @@ class WsUserController implements ControllerMethods {
 	PersonService personService
 	PartyRelationshipService partyRelationshipService
 	UserService userService
+	ProjectService projectService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -83,11 +85,55 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
 	}
 
-	def modelForUserDashboard() {
-		Project project = getProjectForWs()
+	def modelForUserDashboard(String id) {
+		Project project
 		Person person = currentPerson()
 
-		// Task Stuff
+		if(id && id != "undefined") {
+			project = Project.findById(id.toLong())
+			userPreferenceService.setCurrentProjectId(project.id)
+		} else {
+			project = getProjectForWs()
+		}
+
+		def projects = [project]
+		def userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+		if (userProjects) {
+			projects = (userProjects + project).unique()
+		}
+
+		renderSuccessJson(
+				person: person,
+				projects: projects,
+				projectInstance: project,
+				movedayCategories: AssetComment.moveDayCategories
+		)
+	}
+
+	def getAssignedEvents() {
+		def project = getProjectForWs()
+		def events = userService.getEventDetails(project).values().collect { value -> [
+				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
+				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
+				days: value.daysToGo + ' days', teams: value.teams]
+		}
+		renderSuccessJson(events: events)
+	}
+
+	def getAssignedEventNews() {
+		def project = getProjectForWs()
+		List eventNews = []
+		if (project) {
+			userService.getEventNews(project).each { news ->
+				eventNews << [eventId: news.moveEvent.id, projectName: news.moveEvent.project.name,
+							  date: news.dateCreated, event: news.moveEvent.name, news: news.message]
+			}
+		}
+		renderSuccessJson(eventNews: eventNews)
+	}
+
+	def getAssignedTasks() {
+		def project = getProjectForWs()
 		def taskList = []
 		def taskSummary = userService.getTaskSummary(project)
 		DateFormat formatter = TimeUtil.createFormatter("MM/dd kk:mm")
@@ -105,7 +151,11 @@ class WsUserController implements ControllerMethods {
 					related: task.item.assetName,
 					dueEstFinish: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone,
 							(task.item.estFinish != null? task.item.estFinish : new Date()), formatter),
-					status: task.item.status
+					status: task.item.status,
+					successors: task.item.successors,
+					predacessors: task.item.predecessors,
+					instructionsLink: task.item.instructionsLink,
+                    category: task.item.category
 			])
 		}
 
@@ -115,39 +165,23 @@ class WsUserController implements ControllerMethods {
 		if (taskSummary.taskList.size() > 0) {
 			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${dueTaskCount} ${(dueTaskCount == 1) ? ('is') : ('are')} overdue)"
 		}
+		renderSuccessJson(tasks: taskList, summaryDetail: summaryDetail)
+	}
 
-		// Active People
+	def getAssignedApplications() {
+		def project = getProjectForWs()
+		def appSummary = userService.getApplications(project)
+		renderSuccessJson(applications: appSummary.appList)
+	}
+
+	def getAssignedPeople() {
+		def project = getProjectForWs()
 
 		def activePeople = userService.getActivePeople(project).collect { login ->
 			[personId: login.personId, projectName: login.projectName,
 			 personName: login.personName, lastActivity: login.lastActivity]
 		}
-
-		// Event News
-
-		List eventNews = []
-		if (project) {
-			userService.getEventNews(project).each { news ->
-				eventNews << [eventId: news.moveEvent.id, projectName: news.moveEvent.project.name,
-						   date: news.dateCreated, event: news.moveEvent.name, news: news.message]
-			}
-		}
-
-		// Events
-
-		def events = userService.getEventDetails(project).values().collect { value -> [
-				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
-				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
-				days: value.daysToGo + ' days', teams: value.teams]
-		}
-		renderSuccessJson(
-				applications: Application.findAllByAppOwnerOrSmeOrSme2(person, person, person),
-				tasks: taskList,
-				summaryDetail: summaryDetail,
-				activePeople: activePeople,
-				eventNews: eventNews,
-				events: events
-		)
+		renderSuccessJson(activePeople: activePeople)
 	}
 
     /**

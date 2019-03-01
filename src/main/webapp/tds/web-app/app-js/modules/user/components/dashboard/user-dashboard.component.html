@@ -2,7 +2,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <span>Project:</span>
-            <kendo-dropdownlist></kendo-dropdownlist>
+            <kendo-dropdownlist [data]="projectList" [(ngModel)]="selectedProject" (ngModelChange)="onChangeProject()" textField="name" valueField="id"></kendo-dropdownlist>
         </div>
         <div class="panel-body">
             <div class="col-md-6 cell-container">
@@ -11,7 +11,7 @@
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
                         <span>Events - Your assigned events and your team</span>
-                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
@@ -31,24 +31,39 @@
                     </kendo-grid-column>
                 </kendo-grid>
                 <kendo-grid
-                        [selectable]="true">
+                        [data]="taskList"
+                        [selectable]="true"
+                        style="max-height: 400px">
                     <ng-template kendoGridToolbarTemplate>
                         <span>Task Summary - Active tasks assigned to you</span>
-                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchTasksForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
-                    <kendo-grid-column field="Test"
-                                       format="string"
-                                       [width]="100">
+                    <kendo-grid-column *ngFor="let column of taskColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
                         <ng-template kendoGridHeaderTemplate>
                             <div>
-                                <label> Test</label>
+                                <label>{{column.label}}</label>
                             </div>
                         </ng-template>
-
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            test
+                        <ng-template kendoGridDetailTemplate let-dataItem let-rowIndex="rowIndex">
+                            <div>
+                                <div>
+                                    <button *ngIf="dataItem.status!='Started' && dataItem.status!='Completed'" (click)="updateTaskStatus(dataItem.taskId,'Started')">Start</button>
+                                    <button *ngIf="dataItem.status!='Completed'" (click)="updateTaskStatus(dataItem.taskId,'Completed')">Done</button>
+                                    <button (click)="openTaskDetailView(dataItem)">Details...</button>
+                                </div>
+                                <div *ngIf="dataItem.status=='Ready' && !movedayCategories.includes(dataItem.category)">
+                                    <span>Delay For: </span>
+                                    <button (click)="changeTimeEst(dataItem.taskId,1)">1 day</button>
+                                    <button (click)="changeTimeEst(dataItem.taskId,2)">2 day</button>
+                                    <button (click)="changeTimeEst(dataItem.taskId,7)">7 day</button></div>
+                                <div *ngIf="dataItem.successors > 0 || dataItem.predecessors > 0" (click)="openLinkInNewTab('../task/taskGraph?neighborhoodTaskId=' + dataItem.taskId)"><button>Neighborhood</button></div>
+                                <button *ngIf="dataItem.parsedInstructions" (click)="openLinkInNewTab(dataItem.parsedInstructions[1])">{{dataItem.parsedInstructions[0]}}</button>
+                            </div>
                         </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
@@ -60,7 +75,7 @@
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
                         <span>Event News - Active news for your events</span>
-                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventNewsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
@@ -73,10 +88,6 @@
                                 <label>{{column.label}}</label>
                             </div>
                         </ng-template>
-
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            test
-                        </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
                 <kendo-grid
@@ -84,7 +95,7 @@
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
                         <span>Applications - Your applications as an SME or Owner</span>
-                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchApplicationsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
@@ -97,10 +108,6 @@
                                 <label>{{column.label}}</label>
                             </div>
                         </ng-template>
-
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            test
-                        </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
 
@@ -109,7 +116,7 @@
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
                         <span>Active People - Currently active people on this project</span>
-                        <div class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchPeopleForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
@@ -121,10 +128,6 @@
                             <div>
                                 <label>{{column.label}}</label>
                             </div>
-                        </ng-template>
-
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            test
                         </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>

@@ -412,6 +412,16 @@ class UrlMappings {
 			action = [POST:"addNote"]
 		}
 
+		"/ws/task/$id/changeTime" {
+			controller = "wsTask"
+			action = [POST:"changeEstTime"]
+		}
+
+		"/ws/task/$id/updateStatus" {
+			controller = "wsTask"
+			action = [POST:"updateStatus"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [
@@ -452,9 +462,34 @@ class UrlMappings {
 			action = [ GET: "modelForStaffViewEdit" ]
 		}
 
-		"/ws/user/modelForUserDashboard" {
+		"/ws/user/modelForUserDashboard/$id?" {
 			controller = "wsUser"
 			action = [ GET: "modelForUserDashboard" ]
+		}
+
+		"/ws/user/assignedEvents" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedEvents" ]
+		}
+
+		"/ws/user/assignedEventNews" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedEventNews" ]
+		}
+
+		"/ws/user/assignedTasks" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedTasks" ]
+		}
+
+		"/ws/user/assignedApplications" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedApplications" ]
+		}
+
+		"/ws/user/assignedPeople" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedPeople" ]
 		}
 
         "/ws/user/mapAreas" {
