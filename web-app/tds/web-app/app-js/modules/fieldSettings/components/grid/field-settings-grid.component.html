@@ -49,18 +49,14 @@
 	             [position]="'top'"
 	             *ngIf="isEditing; else defaultToolbar">
 		<div class="col-xs-4 col-md-3 col-lg-2">
-			<button type="button" class="btn"
+			<button type="button" class="btn btn-default"
 			        [ngClass]="{
-			            'btn-default': !gridState.dirty && !formHasError,
-			            'btn-success': gridState.valid && gridState.dirty && formHasError !== null && formHasError === false,
-			            'btn-danger': (!gridState.valid && gridState.dirty) || formHasError
+			            'btn-default': !isDirty,
+			            'btn-success':  isDirty && !formHasError,
+			            'btn-danger': isDirty && formHasError
 			        }"
 			        id="btnSaveAll"
-			        [disabled]="
-			            !gridState.editable ||
-			            !gridState.dirty ||
-			            !gridState.valid ||
-			            formHasError"
+			        [disabled]="!gridState.editable || !isDirty || formHasError"
 			        (click)="onSaveAll()">
 					<i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}
 			</button>
@@ -128,6 +124,7 @@
 			       disabled
 			       class="form-control"
 			       [(ngModel)]="dataItem.field"
+			       (keyup)="setIsDirty(true)"
 			       name="field"
 			       [ngClass]="{
 			        'to-be-deleted': dataItem.toBeDeleted
@@ -151,6 +148,7 @@
 			<kendo-numerictextbox *ngIf="dataItem.udf && !dataItem.toBeDeleted"
 			                      [format]="'n'"
 			                      [(value)]="dataItem.order"
+			                      (valueChange)="setIsDirty(true)"
 			                      [min]="0"
 			                      [autoCorrect]="true"
 			                      style="width: 70px;">
@@ -163,6 +161,7 @@
 			       style="width: 70px;"
 			       disabled
 			       class="form-control to-be-deleted"
+			       (keyup)="setIsDirty(true)"
 			       [(value)]="dataItem.order"
 			       *ngIf="dataItem.udf && dataItem.toBeDeleted">
 		</ng-template>
@@ -179,7 +178,7 @@
 		             let-dataItem>
 			<!--'has-error': hasError(dataItem),-->
 			<input (blur)="onBlur(dataItem, $event)"
-			       (keyup)="onKeyPressed($event, dataItem)"
+			       (keyup)="onKeyPressed($event)"
 			       type="text"
 			       [ngClass]="{
 			        'has-error': dataItem.errorMessage,
@@ -211,7 +210,7 @@
 			<div class="checkbox text-center">
 				<label>
 					<input type="checkbox"
-					       (change)="onShare(dataItem)"
+					       (change)="onShare(dataItem);setIsDirty(true);"
 				           [disabled]="!dataItem.udf || dataItem.toBeDeleted"
 				           [(ngModel)]="dataItem.shared"
 				           name="shared">
@@ -236,6 +235,7 @@
 		             let-dataItem>
 			<field-settings-imp *ngIf="!dataItem.toBeDeleted"
 			                    [edit]="isEditing"
+			                    (modelChange)="setIsDirty(true)"
 			                    [(model)]="dataItem.imp">
 			</field-settings-imp>
 			<div *ngIf="dataItem.toBeDeleted"
@@ -257,7 +257,7 @@
 			<div class="checkbox text-center">
 				<label>
 					<input type="checkbox"
-					       (change)="onRequired(dataItem)"
+					       (change)="onRequired(dataItem);setIsDirty(true)"
 				           [disabled]="!dataItem.udf || dataItem.toBeDeleted"
 				           [(ngModel)]="dataItem.constraints.required" name="required">
 				</label>
@@ -279,6 +279,7 @@
 			<div class="checkbox text-center">
 				<label>
 					<input type="checkbox"
+					       (change)="setIsDirty(true)"
 					       [disabled]="!dataItem.udf || dataItem.toBeDeleted"
 				           [(ngModel)]="dataItem.show" name="required">
 				</label>
@@ -301,6 +302,7 @@
 				       type="text"
 				       class="form-control"
 				       [(ngModel)]="dataItem.default"
+				       (keypress)="setIsDirty(true)"
 				       name="default"
 				       [disabled]="dataItem.toBeDeleted"
 				       [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}">
@@ -308,6 +310,7 @@
 				<select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'"
 				        class="form-control"
 				        name="default"
+				        (change)="setIsDirty(true)"
 				        [(ngModel)]="dataItem.default"
 				        [disabled]="dataItem.toBeDeleted"
 				        [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}">
@@ -358,6 +361,7 @@
             <textarea style="resize: vertical;"
                       class="form-control"
                       [(ngModel)]="dataItem.tip"
+                      (keyup)="setIsDirty(true)"
                       name="tip"
                       rows="2"
                       [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}"

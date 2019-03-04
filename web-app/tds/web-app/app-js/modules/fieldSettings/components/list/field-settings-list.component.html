@@ -9,9 +9,18 @@
 						</li>
 					</ul>
 					<div class="tab-content">
-						<div *ngFor="let value of domains" [ngClass]="{'active':isTabSelected(value.domain)}" class="tab-pane">
-							<field-settings-grid #grid="fieldSettingsGrid" (save)="onSaveAll($event)" (cancel)="onCancel($event)" (add)="onAdd($event)"
-							 (share)="onShare($event)" (delete)="onDelete($event)" (filter)="onFilter()" [data]="value" [state]="getCurrentState(value)"></field-settings-grid>
+						<div *ngFor="let value of domains"
+						     [ngClass]="{'active':isTabSelected(value.domain)}" class="tab-pane">
+							<field-settings-grid #grid="fieldSettingsGrid"
+							                     (save)="onSaveAll($event)"
+							                     (cancel)="onCancel($event)"
+							                     (add)="onAdd($event)"
+							                     (share)="onShare($event)"
+							                     (delete)="onDelete($event)"
+							                     (filter)="onFilter()"
+							                     [data]="value"
+							                     [state]="getCurrentState(value)">
+							</field-settings-grid>
 						</div>
 						<!-- /.tab-pane -->
 					</div>

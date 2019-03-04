@@ -186,8 +186,8 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected getCurrentState(domain: DomainModel) {
 		return {
 			editable: this.isEditAvailable(),
-			dirty: this.isDirty(),
-			valid: this.isValid(domain),
+			dirty: false,  // this.isDirty(),
+			valid: false, // this.isValid(domain),
 			filter: this.filter
 		};
 	}
@@ -205,6 +205,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	protected isValid(domain: DomainModel): boolean {
+		console.log('@@isValid');
 		const deletedFields  = this.fieldsToDelete && this.fieldsToDelete[domain.domain] || [];
 
 		const fields =  domain.fields

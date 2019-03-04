@@ -48,6 +48,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	public colors = FIELD_COLORS;
 	protected hasAtLeastOneInvalidField = false;
 	protected formHasError: boolean = null;
+	protected isDirty = false;
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -134,7 +135,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
-			this.formHasError = null;
+			this.resetValidationFlags();
 			this.sortable = { mode: 'single' };
 			this.isFilterDisabled = false;
 			this.onFilter();
@@ -154,6 +155,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {any} event containing the current event control which has the latest error
 	 */
 	protected onCancel(event: any): void {
+		this.resetValidationFlags();
 		this.resettingChanges = true;
 		event = event || this.lastEditedControl || null;
 
@@ -344,6 +346,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
+		this.setIsDirty(true);
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.prompt.open(
@@ -401,7 +404,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		console.log('@@atLeastOneInvalidField');
 		const fields = this.getFieldsExcludingDeleted() || [];
 
-		return fields.some((field) => field.errorMessage);
+		return fields.some((field) => field.errorMessage || !field.label);
 	}
 
 	/**
@@ -537,10 +540,28 @@ export class FieldSettingsGridComponent implements OnInit {
 	/**
 	 * On esc key pressed open confirmation dialog
 	 */
-	protected onKeyPressed(event: KeyboardEvent, dataItem: any): void {
+	protected onKeyPressed(event: KeyboardEvent): void {
 		console.log('@on key pressed');
+		this.setIsDirty(true);
 		if (event.code === 'Escape') {
 			this.onCancel(event);
 		}
 	}
+
+	/**
+	 * Set the flag to indicate the form is dirty
+	 */
+	protected setIsDirty(value: boolean): void {
+		console.log('Setting is dirty:', value);
+		this.isDirty = value;
+	}
+
+	/**
+	 * Reset the flags to keep track the validation state
+	 */
+	private resetValidationFlags(): void {
+		this.formHasError = null;
+		this.setIsDirty(false);
+	}
+
 }
