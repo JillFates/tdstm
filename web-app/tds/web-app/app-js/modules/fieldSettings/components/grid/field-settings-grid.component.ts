@@ -46,6 +46,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	public colors = FIELD_COLORS;
+	protected hasAtLeastOneInvalidField = false;
+	protected formHasError: boolean = null;
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -132,6 +134,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
+			this.formHasError = null;
 			this.sortable = { mode: 'single' };
 			this.isFilterDisabled = false;
 			this.onFilter();
@@ -177,6 +180,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			targetField.errorMessage = '';
 		}
 
+		dataItem.toBeDeleted = true;
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
 			domain: this.data.domain,
@@ -189,6 +193,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
+		dataItem.toBeDeleted = false;
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
 		this.deleteEmitter.emit({
@@ -203,8 +208,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected toBeDeleted(dataItem: FieldSettingsModel): boolean {
-		let found = this.fieldsToDelete.filter(item => item === dataItem.field);
-		return found.length > 0;
+		console.log('@@toBeDeleted');
+		return this.fieldsToDelete.some(item => item === dataItem.field);
 	}
 
 	protected onAddCustom(): void {
@@ -379,9 +384,11 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected hasError(dataItem: FieldSettingsModel) {
+		console.log('@@hasError');
 		const fields = this.getFieldsExcludingDeleted();
 
 		return dataItem.label.trim() === '' ||
+			fields.some((field) => field.errorMessage) ||
 			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
@@ -390,10 +397,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	/**
 	 * Returns a boolean indicating if the fields contain atleast one field with error
 	 */
-	protected atLeastOneInvalidField(): boolean {
+	private atLeastOneInvalidField(): boolean {
+		console.log('@@atLeastOneInvalidField');
 		const fields = this.getFieldsExcludingDeleted() || [];
 
 		return fields.some((field) => field.errorMessage);
+	}
+
+	/**
+	 * Set the state for the at least invalid field
+	 */
+	protected setAtLeastOneInvalidField(): void {
+		this.hasAtLeastOneInvalidField = this.atLeastOneInvalidField();
 	}
 
 	/**
@@ -402,6 +417,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {any} event Context event from the input that launched the change
 	 */
 	protected onBlur(dataItem: FieldSettingsModel, event: any) {
+		// this.setAtLeastOneInvalidField();
+		console.log('@on blur');
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
 		const message = 'The label must be different from all other field names and labels';
@@ -417,6 +434,9 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 			}
 		}
+
+		this.formHasError =  this.atLeastOneInvalidField();
+
 		if (dataItem.errorMessage)  {
 			if (!this.resettingChanges) {
 				this.lastEditedControl = this.lastEditedControl || event;
@@ -517,7 +537,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	/**
 	 * On esc key pressed open confirmation dialog
 	 */
-	protected onKeyPressed(event: KeyboardEvent): void {
+	protected onKeyPressed(event: KeyboardEvent, dataItem: any): void {
+		console.log('@on key pressed');
 		if (event.code === 'Escape') {
 			this.onCancel(event);
 		}
