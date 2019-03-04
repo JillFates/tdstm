@@ -5,13 +5,21 @@ import org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverte
 
 import java.nio.charset.Charset
 
+// relevant notes
+// The set of possible levels (TRACE, DEBUG, INFO, WARN and ERROR)
+// see: ch.qos.logback.classic.Level class
+
 conversionRule 'clr', ColorConverter
 conversionRule 'wex', WhitespaceThrowableProxyConverter
 
 def targetDir = BuildSettings.TARGET_DIR
 def appenderList = ['STDOUT']
 String logAppName = 'tdstm'
-String commonPattern = '[%t] %-5p %c{2} %ex - %m%n'
+String commonPattern = '%d{ISO8601_STRICT} [%t] %-5p %c{2} %ex - %m%n'
+
+if (System.properties.getProperty('catalina.base')) {
+    targetDir = "${System.properties.getProperty('catalina.base')}/logs"
+}
 
 // See http://logback.qos.ch/manual/groovy.html for details on configuration
 appender('STDOUT', ConsoleAppender) {
@@ -61,6 +69,7 @@ logger 'grails.plugin.springsecurity', INFO, appenderList, false
 
 // TDS LOG Section
 logger 'com.tdssrc.grails.GormUtil', INFO, appenderList, false
+logger 'net.transitionmanager', INFO, appenderList, false
 
 // GRAILS FRAMEWORK
 logger 'grails.app.controllers', WARN, appenderList, false
