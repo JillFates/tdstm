@@ -50,7 +50,7 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name
-				ACMEVMPROD01
+				acmevmprod01
 		""")
 
 		and:
@@ -67,12 +67,21 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 				domain Application
 				iterate {
 					extract 'name' set nameVar
+					transform nameVar uppercase() set upperNameVar 
+					load 'Name' with upperNameVar
 				}
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['assetName'], 'ACMEVMPROD01', 'ACMEVMPROD01')
+					}
+				}
 			}
 
 		cleanup:

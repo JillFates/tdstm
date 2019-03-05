@@ -687,8 +687,39 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @throws ETLProcessorException
 	 * @See ETLProcessorException.missingPropertyException
 	 */
-	Element load(LocalVariableDefinition localVariableDefinition){
+	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+
+	/**
+	 * Traps EQL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	transform aBogusVariableNameVar
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 */
+	void transform(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
+	/**
+	 * <pre>
+	 * iterate {
+	 * 	extract 'name' set nameVar
+	 * 	transform nameVar toUpper() set upperNameVar
+	 * }
+	 * </pre>
+	 * @param variableContent
+	 * @return
+	 */
+	Element transform(Object variableContent) {
+		Element element = new Element(
+			value: variableContent,
+			originalValue: variableContent,
+			processor: this
+		)
+		element.loadedElement = true
+		return element
 	}
 
 	/**
