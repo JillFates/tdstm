@@ -99,6 +99,11 @@ grails {
 
 	controllers {
 		defaultScope = 'singleton'
+
+		upload {
+			maxFileSize = 500 * 1024 * 1024
+			maxRequestSize = 500 * 1024 * 1024
+		}
 	}
 
 	converters {

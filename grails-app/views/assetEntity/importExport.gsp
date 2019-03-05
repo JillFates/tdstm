@@ -232,6 +232,13 @@
                 $("#file").on('change', function() {
                     var fileName  = $(this).val().split(/(\\|\/)/g).pop();
                     var fileExt = fileName.split('.').pop()
+
+                    if(this.files[0].size > 500 * 1024 * 1024){
+                        this.form.reset();
+                        alert("The file upload size is limited to 500 MB");
+                        return;
+                    }
+
                     if(["xls", "xlsx"].indexOf(fileExt) >= 0){
                         $("#uploadFile").val(fileName);
                         $("#importTaskSubmitButton").attr('disabled', false)
