@@ -6,7 +6,7 @@ import modules.ProjectsModule
 class ActionsPage extends Page {
 
     static at = {
-        modaltitle.text() == "API Actions"
+        modaltitle.text() == "Actions"
     }
 
     static content = {
