@@ -39,7 +39,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('filter') filterEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
-	@Input('state') gridState: any;
+	@Input('isEditable') isEditable: boolean;
+	@Input('gridFilter') gridFilter: any;
 	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
@@ -109,18 +110,18 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.state.filter.filters = [];
 
 		this.fieldsSettings = this.data.fields;
-		if (this.gridState.filter.search !== '') {
-			let search = new RegExp(this.gridState.filter.search, 'i');
+		if (this.gridFilter.search !== '') {
+			let search = new RegExp(this.gridFilter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
 				item => search.test(item.field) ||
 					search.test(item.label) ||
 					item['isNew']);
 		}
-		if (this.gridState.filter.fieldType !== 'All') {
+		if (this.gridFilter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.gridState.filter.fieldType === 'Custom Fields' ? 1 : 0
+				value: this.gridFilter.fieldType === 'Custom Fields' ? 1 : 0
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
@@ -269,7 +270,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onClearTextFilter(): void {
-		this.gridState.filter.search = '';
+		this.gridFilter.search = '';
 		this.onFilter();
 	}
 
@@ -412,8 +413,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
 	 * @param {any} event Context event from the input that launched the change
 	 */
-	protected onBlur(dataItem: FieldSettingsModel, event: any) {
-		console.log('@on blur');
+	protected onLabelBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
 		const message = 'The label must be different from all other field names and labels';
@@ -428,6 +428,10 @@ export class FieldSettingsGridComponent implements OnInit {
 					dataItem.errorMessage = message;
 				}
 			}
+		}
+
+		if (!dataItem.errorMessage && !dataItem.label.trim()) {
+			dataItem.errorMessage = 'Label is required';
 		}
 
 		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());

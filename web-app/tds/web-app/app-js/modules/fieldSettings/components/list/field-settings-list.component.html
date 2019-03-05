@@ -18,8 +18,9 @@
 							                     (share)="onShare($event)"
 							                     (delete)="onDelete($event)"
 							                     (filter)="onFilter()"
-							                     [data]="value"
-							                     [state]="getCurrentState(value)">
+							                     [isEditable]="isEditable"
+							                     [gridFilter]="filter"
+							                     [data]="value">
 							</field-settings-grid>
 						</div>
 						<!-- /.tab-pane -->
