@@ -356,10 +356,11 @@ class CredentialService implements ServiceMethods {
             case 'cookie':
                 // pull out cookies data
                 for (String header : resp.getHeaders().get(HttpHeaders.SET_COOKIE)) {
-                    if (header.contains(propertyName)) {
+                    if (header.startsWith("${propertyName}=")) {
                         String sessionHeader = header.split(';')[0]
                         String[] sessionName = sessionHeader.split('=')
                         sessionId = ['sessionName': sessionName[0], 'sessionValue': sessionName[1]]
+                        break
                     }
                 }
                 break
