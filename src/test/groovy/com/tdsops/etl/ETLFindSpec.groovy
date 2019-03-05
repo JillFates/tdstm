@@ -46,7 +46,6 @@ class ETLFindSpec extends ETLBaseSpec {
 		}
 		fileSystemService(FileSystemService) {
 			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
 		}
 	}
 
