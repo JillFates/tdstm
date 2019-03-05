@@ -537,7 +537,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * On esc key pressed open confirmation dialog
 	 */
 	protected onKeyPressed(event: KeyboardEvent): void {
-		console.log('@on key pressed');
 		this.setIsDirty(true);
 		if (event.code === 'Escape') {
 			this.onCancel(event);
@@ -548,7 +547,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * Set the flag to indicate the form is dirty
 	 */
 	protected setIsDirty(value: boolean): void {
-		console.log('Setting is dirty:', value);
 		this.isDirty = value;
 	}
 
