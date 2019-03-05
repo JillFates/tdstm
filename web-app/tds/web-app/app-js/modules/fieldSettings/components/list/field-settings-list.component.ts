@@ -205,7 +205,6 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	protected isValid(domain: DomainModel): boolean {
-		console.log('@@isValid');
 		const deletedFields  = this.fieldsToDelete && this.fieldsToDelete[domain.domain] || [];
 
 		const fields =  domain.fields

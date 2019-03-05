@@ -155,7 +155,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {any} event containing the current event control which has the latest error
 	 */
 	protected onCancel(event: any): void {
-		this.resetValidationFlags();
 		this.resettingChanges = true;
 		event = event || this.lastEditedControl || null;
 
@@ -183,6 +182,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 
 		dataItem.toBeDeleted = true;
+		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
 			domain: this.data.domain,
@@ -210,11 +210,12 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected toBeDeleted(dataItem: FieldSettingsModel): boolean {
-		console.log('@@toBeDeleted');
 		return this.fieldsToDelete.some(item => item === dataItem.field);
 	}
 
 	protected onAddCustom(): void {
+		this.setIsDirty(true);
+
 		this.addEmitter.emit((custom) => {
 			this.state.sort = [
 				{
@@ -280,6 +281,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			dir: 'asc',
 			field: 'order'
 		}];
+		this.resetValidationFlags();
 		this.applyFilter();
 	}
 
@@ -387,7 +389,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected hasError(dataItem: FieldSettingsModel) {
-		console.log('@@hasError');
 		const fields = this.getFieldsExcludingDeleted();
 
 		return dataItem.label.trim() === '' ||
@@ -401,17 +402,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * Returns a boolean indicating if the fields contain atleast one field with error
 	 */
 	private atLeastOneInvalidField(): boolean {
-		console.log('@@atLeastOneInvalidField');
 		const fields = this.getFieldsExcludingDeleted() || [];
 
 		return fields.some((field) => field.errorMessage || !field.label);
-	}
-
-	/**
-	 * Set the state for the at least invalid field
-	 */
-	protected setAtLeastOneInvalidField(): void {
-		this.hasAtLeastOneInvalidField = this.atLeastOneInvalidField();
 	}
 
 	/**
@@ -420,7 +413,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {any} event Context event from the input that launched the change
 	 */
 	protected onBlur(dataItem: FieldSettingsModel, event: any) {
-		// this.setAtLeastOneInvalidField();
 		console.log('@on blur');
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
@@ -438,7 +430,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			}
 		}
 
-		this.formHasError =  this.atLeastOneInvalidField();
+		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 
 		if (dataItem.errorMessage)  {
 			if (!this.resettingChanges) {
