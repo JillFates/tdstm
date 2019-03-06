@@ -80,7 +80,7 @@ class MoveEventController implements ControllerMethods {
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = events.collect {
-			[cell: [it.name, it.estStartTime, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
+			[cell: [it.name, it.estStartTime, it.description,
 			        it.runbookStatus, it.moveBundlesString], id: it.id]
 		}
 
