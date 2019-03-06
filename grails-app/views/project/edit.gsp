@@ -187,7 +187,7 @@
 
 							<td class="name"><label>Time Zone:</label></td>
 							<td class="valueNW">
-								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
+								<input type="text" id="timezone" name="timezone" value="${timezone ? timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
 								<input type="button" value="Change" indextab="240" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
 
