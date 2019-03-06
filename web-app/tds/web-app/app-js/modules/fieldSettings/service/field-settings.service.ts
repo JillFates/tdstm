@@ -96,8 +96,9 @@ export class FieldSettingsService {
 	 * @param The list of fields.
 	 */
 	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
+		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
 		return fields.filter(
-				item => item.field.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 0;
+				item => item.field.toLowerCase().trim() === cleanLabel).length > 0;
 	}
 
 	/**
@@ -113,21 +114,29 @@ export class FieldSettingsService {
 	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any): boolean {
 		let conflicts = [];
 		// We are going to find conflicts in the other domains,
-		// so first remove the origin domain from the list of domains
+		// so first remove the origin domain (the domain to which 'field' belongs) from the list of domains
 		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain);
+		// The whole logic should only be computed if the field is shared
 		if (field.shared === true) {
+			// Get the label from 'field' (convert to lower case and trim spaces )
+			let fieldLabel = field.label.replace(/\s/g, '').toLowerCase().trim();
 			for (let domain of filteredDomains) {
+				// get all fields from this domain
 				let fields = domain.fields;
+				// As 'field' is also in the list of domains of every other domain,
+				// first remove it from the list of fields to be checked against
 				const filteredFields = fields.filter((field) => {
 					return !(field instanceof FieldSettingsModel);
 				});
-				let x = 0;
-					conflicts = filteredFields.filter(item =>
-					item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim() ||
-							this.conflictsWithAnotherFieldName(field.label, fields));
-					if (conflicts.length > 0) { // The field is also added automatically in the other domains field lists, so > 1 is used
-						return true;
-					}
+				// Finally check if 'field' has any conflicts
+				conflicts = filteredFields.filter(item => {
+					let itemLabel = item.label.replace(/\s/g, '').toLowerCase().trim();
+					// validate conflicts between field, and labels and field names in the domain
+					return itemLabel === fieldLabel || this.conflictsWithAnotherFieldName(field.label, fields);
+				});
+				if (conflicts.length > 0) {
+					return true;
+				}
 			}
 		};
 		return false;
