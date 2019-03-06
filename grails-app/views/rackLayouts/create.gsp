@@ -30,16 +30,16 @@
 
     <div class="dialog">
         <g:form action="generateElevations" name="rackLayoutCreate" method="post" target="_blank"
-                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%">
+                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%; display:inline-block; position:relative">
             <input type="hidden" id="redirectTo" value="rack"/>
             <input type="hidden" id="fromRoomOrRack" value="rack"/>
-            <table style="width:auto; border: none">
+            <table style="width:auto; border: none; float: left">
                 <tbody>
                 <tr>
                     <td>
                         <label><b>Bundle</b></label><br/>
                         <select id="bundleId" name="moveBundle" multiple="multiple" size="3"
-                                onchange="getRackDetails(this.id)" style="width:150px">
+                                onchange="getRackDetails(this.id)" style="width:150px; height:96px">
                             <option value="all" selected="selected">All</option>
                             <g:each in="${moveBundleList}" var="moveBundle">
                                 <option value="${moveBundle?.id}">${moveBundle?.name}</option>
@@ -49,7 +49,7 @@
 
                     <td>
                         <label><b>Source</b></label><br/>
-                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px"
+                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px; height:96px"
                                 size="4">
                             <option value="null" selected="selected">All</option>
                         </select>
@@ -58,7 +58,7 @@
                     <td>
                         <div style="width:250px">
                             <label><b>Target</b></label><br/>
-                            <select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px"
+                            <select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px; height:96px"
                                     size="4">
                                 <option value="null" selected="selected">All</option>
                             </select>
