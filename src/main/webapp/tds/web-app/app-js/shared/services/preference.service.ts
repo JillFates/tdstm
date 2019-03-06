@@ -75,9 +75,10 @@ export class PreferenceService {
 	 */
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
 		const httpOptions = {
-			headers: new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'})
+			headers: new HttpHeaders({'Content-Type': 'application/json'})
 		};
-		const body = `code=${preferenceCode}&value=${value}`;
+		const body = JSON.stringify({code: preferenceCode, value});
+
 		return this.http.post(this.preferenceUrlPost, body, httpOptions);
 	}
 
