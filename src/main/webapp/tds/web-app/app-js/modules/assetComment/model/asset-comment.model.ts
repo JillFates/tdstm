@@ -64,13 +64,6 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'Updated',
-				property: 'lastUpdated',
-				type: 'date',
-				format: dateFormat,
-				width: 170
-			},
-			{
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
@@ -81,6 +74,13 @@ export class AssetCommentColumnModel {
 				label: 'CreatedBy',
 				property: 'createdBy.name',
 				type: 'text',
+				width: 170
+			},
+			{
+				label: 'Updated',
+				property: 'lastUpdated',
+				type: 'date',
+				format: dateFormat,
 				width: 170
 			}
 		];
