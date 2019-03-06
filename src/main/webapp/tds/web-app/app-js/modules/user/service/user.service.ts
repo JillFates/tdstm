@@ -41,62 +41,56 @@ export class UserService {
 
 	fetchModelForUserDashboard(projId = '') {
 		return this.http.get(`${this.userPreferenceUrl}/modelForUserDashboard/${projId}`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAssignedEvents() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedEvents`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAssignedEventNews() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedEventNews`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAssignedTasks() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedTasks`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAssignedApplications() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedApplications`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	getAssignedPeople() {
 		return this.http.get(`${this.userPreferenceUrl}/assignedPeople`)
-			.map((res: any) => {
-				let result = res.json();
-				let data = result && result.status === 'success' && result.data;
+			.map((response: any) => {
+				let data = response && response.status === 'success' && response.data;
 				return data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**

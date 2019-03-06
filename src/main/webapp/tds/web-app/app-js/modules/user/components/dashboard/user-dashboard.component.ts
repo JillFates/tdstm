@@ -13,6 +13,8 @@ import {AssetCommentViewEditComponent} from '../../../assetComment/components/vi
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {UserManageStaffComponent} from '../manage-staff/user-manage-staff.component';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 
 @Component({
 	selector: 'user-dashboard',
@@ -37,6 +39,7 @@ export class UserDashboardComponent implements OnInit {
 	public taskColumnModel;
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	private itemForDoubleClick;
 	constructor(private userService: UserService, private taskService: TaskService, private dialogService: UIDialogService) {
 
 	}
@@ -88,10 +91,8 @@ export class UserDashboardComponent implements OnInit {
 
 	changeTimeEst(id, days) {
 		this.taskService.changeTimeEst(id, days)
-			.subscribe((result) => {
-				if (result) {
-					this.fetchTasksForGrid();
-				}
+			.subscribe(() => {
+				this.fetchTasksForGrid();
 			});
 	}
 
@@ -107,19 +108,19 @@ export class UserDashboardComponent implements OnInit {
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		]).then(result => {
+		]).then(() => {
 			this.fetchTasksForGrid();
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			if (!result) {
+				this.fetchTasksForGrid();
+			}
 		});
 	}
 
 	updateTaskStatus(id, status) {
 		this.taskService.updateStatus(id, status)
-			.subscribe((result) => {
-				if (result) {
-					this.fetchTasksForGrid();
-				}
+			.subscribe(() => {
+				this.fetchTasksForGrid();
 			});
 	}
 
@@ -160,5 +161,46 @@ export class UserDashboardComponent implements OnInit {
 			.subscribe((result) => {
 				this.activePersonList = result.activePeople;
 			});
+	}
+
+	launchManageStaff(id): void {
+		if (id) {
+			this.dialogService.extra(UserManageStaffComponent, [
+				{provide: 'id', useValue: id},
+				{provide: PersonModel, useValue: {}}
+			], false, false).then( (result: any)  => {
+				console.log(result);
+			}).catch(result => {
+				if (result) {
+					console.error(result);
+				}
+			});
+		}
+	}
+
+	handleApplicationClicked(event) {
+		if (event.dataItem === this.itemForDoubleClick) {
+			console.log('open dislog');
+		} else {
+			this.itemForDoubleClick = event.dataItem;
+			setTimeout((dataItem) => {
+				if (this.itemForDoubleClick === dataItem) {
+					this.itemForDoubleClick = null;
+				}
+			}, 500, event.dataItem);
+		}
+	}
+
+	handlePersonClicked(event) {
+		if (event.dataItem === this.itemForDoubleClick) {
+			this.launchManageStaff(event.dataItem.personId);
+		} else {
+			this.itemForDoubleClick = event.dataItem;
+			setTimeout((dataItem) => {
+				if (this.itemForDoubleClick === dataItem) {
+					this.itemForDoubleClick = null;
+				}
+			}, 500, event.dataItem);
+		}
 	}
 }

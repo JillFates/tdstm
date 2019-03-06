@@ -259,7 +259,7 @@ class WsTaskController implements ControllerMethods {
 
 	@HasPermission(Permission.TaskEdit)
 	def updateStatus() {
-		def commentId = params.id.toLong()
+		Long commentId = params.id.toLong()
 		Map requestParams = request.JSON
 		def status = requestParams.status
 		AssetComment comment = taskService.findById(commentId)

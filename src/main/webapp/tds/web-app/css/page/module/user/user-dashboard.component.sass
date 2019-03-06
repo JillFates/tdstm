@@ -1,9 +1,32 @@
 .user-dashboard-component
   width: 97%
   margin: 24px auto 24px auto
+  .panel-heading span
+    font-size: 14px
+    font-weight: 700
+  .kendo-grid-toolbar__refresh-btn
+    margin: 0
   .k-grid
     margin-top: 24px
+    a
+      color: #666
+      font-weight: bold
+      text-decoration: none
+    .k-grid-content
+      font-family: helvetica, arial, sans-serif
+      font-size: 12px
+    .btn
+      margin-right: 16px
   tr.k-detail-row > .k-hierarchy-cell
     border-right: 0
   tr.k-detail-row div
     display: inline
+  .ready-task
+    background-color: green
+    border: 0
+  .k-header
+    padding: 6px !important
+    font-size: 14px
+  .k-grid.clickable-grid
+    td
+      cursor: pointer

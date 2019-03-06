@@ -123,10 +123,14 @@ class WsUserController implements ControllerMethods {
 	def getAssignedEventNews() {
 		def project = getProjectForWs()
 		List eventNews = []
+		DateFormat formatter = TimeUtil.createFormatter("MM/dd/yyyy hh:mm a")
 		if (project) {
 			userService.getEventNews(project).each { news ->
-				eventNews << [eventId: news.moveEvent.id, projectName: news.moveEvent.project.name,
-							  date: news.dateCreated, event: news.moveEvent.name, news: news.message]
+				eventNews << [eventId: news.moveEvent.id,
+							  projectName: news.moveEvent.project.name,
+							  date: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, (news.dateCreated != null? news.dateCreated : new Date()), formatter),
+							  event: news.moveEvent.name,
+							  news: news.message]
 			}
 		}
 		renderSuccessJson(eventNews: eventNews)
@@ -170,8 +174,18 @@ class WsUserController implements ControllerMethods {
 
 	def getAssignedApplications() {
 		def project = getProjectForWs()
-		def appSummary = userService.getApplications(project)
-		renderSuccessJson(applications: appSummary.appList)
+		Map<String, Object> appSummary = userService.getApplications(project)
+
+		def appList = appSummary.appList.collect { Application app -> [
+				projectName: app.project.name,
+				name: app.assetName,
+				appId: app.id,
+				assetClass: app.assetClass.toString(),
+				planStatus: app.planStatus,
+				moveBundle: app.moveBundle.name,
+				relation: appSummary.relationList[app.id]
+		] }
+		renderSuccessJson(applications: appList)
 	}
 
 	def getAssignedPeople() {

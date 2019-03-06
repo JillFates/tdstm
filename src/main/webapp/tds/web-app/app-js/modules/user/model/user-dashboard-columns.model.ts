@@ -5,7 +5,7 @@ export class ApplicationColumnModel {
 		this.columns = [
 			{
 				label: 'Name',
-				property: 'assetName',
+				property: 'name',
 				type: 'text',
 				width: 100
 			}, {
@@ -15,7 +15,7 @@ export class ApplicationColumnModel {
 				width: 100
 			}, {
 				label: 'Bundle',
-				property: 'moveBundle.id',
+				property: 'moveBundle',
 				type: 'text',
 				width: 100
 			}, {
@@ -65,12 +65,12 @@ export class EventNewsColumnModel {
 				width: 100
 			}, {
 				label: 'Event',
-				property: 'eventName',
+				property: 'event',
 				type: 'text',
 				width: 100
 			}, {
 				label: 'News',
-				property: 'eventNews',
+				property: 'news',
 				type: 'text',
 				width: 100
 			}
@@ -117,22 +117,22 @@ export class TaskColumnModel {
 				label: 'Task',
 				property: 'task',
 				type: 'text',
-				width: 100
+				width: 450
 			}, {
 				label: 'Related',
 				property: 'related',
 				type: 'text',
-				width: 100
+				width: 450
 			}, {
 				label: 'Due/Est Finish',
 				property: 'dueEstFinish',
 				type: 'text',
-				width: 100
+				width: 140
 			}, {
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 100
+				width: 80
 			}
 		];
 	}

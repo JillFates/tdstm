@@ -14,6 +14,7 @@ import {UserRouteModule} from './user-routing.states';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 // Asset Module
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
+import {AssetManagerModule} from '../assetManager/asset-manager.module';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserPreferencesComponent} from './components/preferences/user-preferences.component';
@@ -35,6 +36,7 @@ import {GridModule} from '@progress/kendo-angular-grid';
 		SharedModule,
 		FormsModule,
 		AssetExplorerModule,
+		AssetManagerModule,
 		// Kendo
 		DropDownsModule,
 		GridModule,
