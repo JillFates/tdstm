@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
@@ -11,7 +11,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
-class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecValidateableTest, ETLAssertTest, DataTest, AutowiredTest {
+class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTest, ETLAssertTest, DataTest, AutowiredTest {
 
 	Closure doWithSpring() {
 		{ ->
@@ -31,10 +31,6 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 
 	void setupSpec() {
 		mockDomain Project
-		mockDomain AssetEntity
-
-		// for multiple domains, call mockDomains...
-		// mockDomains Person, Address, Company
 	}
 
 	void setup() {
@@ -90,6 +86,49 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 			deleteTemporaryFile(fileName)
 	}
 
+	void 'test can transform a local variable using a chain of methods'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name
+				acmevmprod01
+		""")
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Application
+				iterate {
+					extract 'name' set nameVar
+					transform nameVar middle(3, 2) uppercase() set upperNameVar 
+					load 'Name' with upperNameVar
+				}
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['assetName'], 'ME', 'ME')
+					}
+				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName)
+	}
+
 	void 'test can throw an exception applying a transformation using non valid local variable'() {
 
 		given:
@@ -118,7 +157,7 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'No such property: unknownVar at line 7'
 				startLine == 7
 				endLine == 7
