@@ -216,11 +216,20 @@ export class APIActionService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Save either a web api or script action
+	 * @param {APIActionModel} model
+	 * @param {any} parameterList
+	 * @returns {Observable<APIActionParameterModel[]>}
+	 */
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,
+			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },
+			script: model.script || '',
+			commandLine: model.commandLine,
 			apiCatalog: { id: model.dictionary.id },
 			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
@@ -232,6 +241,11 @@ export class APIActionService {
 			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
 			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
 		};
+
+		const actionType = (model.actionType && model.actionType.id) || '';
+		if (actionType) {
+			postRequest.actionType = actionType;
+		}
 
 		let reaction = {
 			'STATUS': model.eventReactions[0].value,

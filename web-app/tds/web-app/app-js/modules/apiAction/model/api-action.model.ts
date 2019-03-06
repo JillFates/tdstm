@@ -126,10 +126,20 @@ export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'applic
 
 // Setting content type Accepted, default 'application/json'
 // request.config.setProperty('Accept', 'application/xml;q=0.9')`;
+export enum APIActionType {
+	HTTP_API = 1,
+	SCRIPT
+}
 
 export class APIActionModel {
 	id?: number;
 	name: string;
+	tabActionType?: APIActionType;
+	actionType?: any;
+	commandLine?: string;
+	isRemote?: boolean;
+	script?: any;
+	remoteInvocation?: boolean;
 	description: string;
 	agentMethod?: AgentMethodModel;
 	httpMethod: string;
@@ -176,6 +186,7 @@ export class APIActionModel {
 	docUrl?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
+	remoteCredentialMethod?: any;
 
 	constructor() {
 		this.name = '';
@@ -267,6 +278,12 @@ export class APIActionParameterModel {
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;
 }
+
+export const Languages = {
+	GROOVY_SCRIPT : 'Groovy',
+	POWER_SHELL : 'PowerShell',
+	UNIX_SHELL : 'Shell'
+};
 
 export enum EventReactionType {
 	STATUS = 'STATUS',
