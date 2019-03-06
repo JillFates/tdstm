@@ -4,14 +4,24 @@ import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.service.CustomDomainService
 
 /**
- * Implements {@code ETLFieldsValidator} construction for Test purposes.
+ * <p>Implements {@code ETLFieldsValidator} construction for Test purposes.</p>
+ * Use it:
  * <pre>
+ * class ETLSpec extends Specification implements FieldSpecValidateableTest {
  *
+ *	....
+ *	validator = createDomainClassFieldsValidator()
+ * }
  *
  * </pre>
  */
 trait FieldSpecValidateableTest {
 
+	/**
+	 * <p>Creates an instance of {@code ETLFieldsValidator} for testing purposes. </p>
+	 * <p>It is configured with all the domain Asset fields definitions</p>
+	 * @return an instance of {@code ETLFieldsValidator}
+	 */
 	ETLFieldsValidator createDomainClassFieldsValidator() {
 		ETLFieldsValidator validator = new ETLFieldsValidator()
 		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
@@ -25,7 +35,13 @@ trait FieldSpecValidateableTest {
 		return validator
 	}
 
-	List<Map<String, ?>> buildFieldSpecsFor(def asset) {
+	/**
+	 * <p>It builds all the fields Spec definitions copied from database configuration </p>
+	 * <p>It returns a {@code List} of FieldSpec represented by a {@code Map} instance</p>
+	 * @param asset an instance of an asset class name
+	 * @return a {@code List} of Field Spec represented by a {@code Map}
+	 */
+	List<Map<String, ?>> buildFieldSpecsFor(Object asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
 		switch (asset) {

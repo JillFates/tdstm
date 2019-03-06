@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tds.asset.AssetEntity
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
@@ -30,6 +31,7 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 
 	void setupSpec() {
 		mockDomain Project
+		mockDomain AssetEntity
 
 		// for multiple domains, call mockDomains...
 		// mockDomains Person, Address, Company
@@ -45,7 +47,7 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 		validator = createDomainClassFieldsValidator()
 	}
 
-	void 'test can transform local variables'() {
+	void 'test can transform a local variable using uppercase method'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -82,6 +84,47 @@ class ETLTransformPrimaryVerbSpec extends Specification implements FieldSpecVali
 						assertFieldResult(fields['assetName'], 'ACMEVMPROD01', 'ACMEVMPROD01')
 					}
 				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName)
+	}
+
+	void 'test can throw an exception applying a transformation using non valid local variable'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name
+				acmevmprod01
+		""")
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Application
+				iterate {
+					extract 'name' set nameVar
+					transform unknownVar uppercase() set upperNameVar 
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'No such property: unknownVar at line 7'
+				startLine == 7
+				endLine == 7
+				startColumn == null
+				endColumn == null
+				fatal == true
 			}
 
 		cleanup:
