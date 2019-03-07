@@ -48,7 +48,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.integration.ApiActionException
@@ -4235,9 +4234,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				tagsOrEvent.add('a.moveBundle.id IN (:bIds)')
 			}
 
-			String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
+			if(tagsOrEvent) {
+				String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
 
-			where = SqlUtil.appendToWhere(where, tagsOrEventStr)
+				where = SqlUtil.appendToWhere(where, tagsOrEventStr)
+			}
 
 			// Assemble the SQL and attempt to execute it
 			try {
