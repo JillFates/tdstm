@@ -42,10 +42,6 @@ class LocalVariableFacade {
 		return wrappedValue[name]
 	}
 
-	def propertyMissing(String name, def arg) {
-
-	}
-
 	Boolean asBoolean() {
 		return wrappedValue.asBoolean()
 	}

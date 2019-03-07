@@ -62,7 +62,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domain Application
 				iterate {
 					extract 'name' set nameVar
-					nameVar.transform with uppercase() set upperNameVar 
+					nameVar transform with uppercase() set upperNameVar 
 					load 'Name' with upperNameVar
 				}
 			""".stripIndent())
@@ -105,7 +105,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domain Application
 				iterate {
 					extract 'name' set nameVar
-					nameVar.transform with middle(3, 2) uppercase() set upperNameVar 
+					nameVar transform with middle(3, 2) uppercase() set upperNameVar 
 					load 'Name' with upperNameVar
 				}
 			""".stripIndent())
