@@ -290,6 +290,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	}
 
 	/**
+	 * <p>Selects a domain based on an instance of {@code LocalVariableFacade}</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * @param element an instance of {@code LocalVariableFacade} class
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
+	 */
+	DomainBuilder domain(LocalVariableFacade localVariableFacade) {
+		return domain(localVariableFacade.wrappedValue)
+	}
+
+	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
@@ -973,12 +983,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLFindElement}
 	 */
-	ETLFindElement find(String domainName) {
-		ETLDomain domain = ETLDomain.lookup(domainName)
+	ETLFindElement find(LocalVariableFacade localVariableFacade) {
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedValue.toString())
 		if (domain) {
 			return find(domain)
 		}
-		throw ETLProcessorException.invalidDomain(domainName)
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedValue.toString())
 	}
 
 	/**
@@ -1036,12 +1046,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLProcessor}
 	 */
-	ETLProcessor elseFind(String domainName) {
-		ETLDomain domain = ETLDomain.lookup(domainName)
+	ETLProcessor elseFind(LocalVariableFacade localVariableFacade) {
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedValue)
 		if (domain) {
 			return elseFind(domain)
 		}
-		throw ETLProcessorException.invalidDomain(domainName)
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedValue)
 	}
 
 	/**

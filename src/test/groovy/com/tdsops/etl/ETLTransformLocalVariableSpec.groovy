@@ -1,9 +1,6 @@
 package com.tdsops.etl
 
 
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
-import getl.utils.FileUtils
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import net.transitionmanager.domain.Project
@@ -11,7 +8,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
-class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTest, ETLAssertTest, DataTest, AutowiredTest {
+class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTrait, ETLFileSystemTest, ETLAssertTest, DataTest, AutowiredTest {
 
 	Closure doWithSpring() {
 		{ ->
@@ -49,7 +46,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
-		""")
+			""", fileSystemService)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -65,7 +62,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domain Application
 				iterate {
 					extract 'name' set nameVar
-					transform nameVar uppercase() set upperNameVar 
+					nameVar.transform with uppercase() set upperNameVar 
 					load 'Name' with upperNameVar
 				}
 			""".stripIndent())
@@ -83,7 +80,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			}
 
 		cleanup:
-			deleteTemporaryFile(fileName)
+			deleteTemporaryFile(fileName, fileSystemService)
 	}
 
 	void 'test can transform a local variable using a chain of methods'() {
@@ -92,7 +89,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
-		""")
+			""", fileSystemService)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -108,7 +105,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domain Application
 				iterate {
 					extract 'name' set nameVar
-					transform nameVar middle(3, 2) uppercase() set upperNameVar 
+					nameVar.transform with middle(3, 2) uppercase() set upperNameVar 
 					load 'Name' with upperNameVar
 				}
 			""".stripIndent())
@@ -126,7 +123,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			}
 
 		cleanup:
-			deleteTemporaryFile(fileName)
+			deleteTemporaryFile(fileName, fileSystemService)
 	}
 
 	void 'test can throw an exception applying a transformation using non valid local variable'() {
@@ -135,7 +132,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
-		""")
+			""", fileSystemService)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -151,12 +148,12 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domain Application
 				iterate {
 					extract 'name' set nameVar
-					transform unknownVar uppercase() set upperNameVar 
+					unknownVar transform with uppercase() set upperNameVar 
 				}
 			""".stripIndent())
 
 		then: 'It throws an Exception'
-			ETLProcessorException e = thrown ETLProcessorException
+			Exception e = thrown Exception
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'No such property: unknownVar at line 7'
 				startLine == 7
@@ -167,34 +164,6 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			}
 
 		cleanup:
-			deleteTemporaryFile(fileName)
-	}
-
-	/**
-	 *
-	 * @param fileName
-	 */
-	void deleteTemporaryFile(String fileName) {
-		if (fileName) {
-			fileSystemService.deleteTemporaryFile(fileName)
-		}
-	}
-
-	/**
-	 * Builds a CSV dataSet from a csv content
-	 * @param csvContent
-	 * @return
-	 */
-	protected List buildCSVDataSet(String csvContent) {
-		def (String fileName, OutputStream dataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
-		dataSetOS << csvContent
-		dataSetOS.close()
-
-		String fullName = fileSystemService.getTemporaryFullFilename(fileName)
-
-		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
-		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
-
-		return [fileName, new DataSetFacade(dataSet)]
+			deleteTemporaryFile(fileName, fileSystemService)
 	}
 }

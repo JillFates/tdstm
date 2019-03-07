@@ -7,7 +7,7 @@ import net.transitionmanager.service.CustomDomainService
  * <p>Implements {@code ETLFieldsValidator} construction for Test purposes.</p>
  * Use it:
  * <pre>
- * class ETLSpec extends Specification implements FieldSpecValidateableTest {
+ * class ETLSpec extends Specification implements FieldSpecValidateableTrait {
  *
  *	....
  *	validator = createDomainClassFieldsValidator()
@@ -15,7 +15,7 @@ import net.transitionmanager.service.CustomDomainService
  *
  * </pre>
  */
-trait FieldSpecValidateableTest {
+trait FieldSpecValidateableTrait {
 
 	/**
 	 * <p>Creates an instance of {@code ETLFieldsValidator} for testing purposes. </p>
