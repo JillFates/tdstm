@@ -25,9 +25,6 @@
                 <li *ngIf="!userContext.licenseInfo.license.isManager" class="menu-child-item menu-admin-asset-options">
                     <a href="/tdstm/assetEntity/assetOptions">Asset Options</a>
                 </li>
-                <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');">help</a>
-                </li>
                 <li class="divider"></li>
                 <li class="menu-parent-item">Manage Clients</li>
                 <li class="menu-child-item menu-list-companies">
@@ -45,17 +42,11 @@
                 <li *ngIf="hasPermission(permission.PersonExport)" class="menu-child-item menu-client-export-accounts">
                     <a href="/tdstm/admin/exportAccounts">Export Accounts</a>
                 </li>
-                <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');">help</a>
-                </li>
                 <ng-container *ngIf="!userContext.licenseInfo.license.isManager">
                     <li class="divider"></li>
                     <li class="menu-parent-item">Manage Workflows</li>
                     <li class="menu-child-item menu-list-workflows">
                         <a href="/tdstm/workflow/home">List Workflows </a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-parent-item">Manage Model Library</li>
@@ -67,9 +58,6 @@
                     </li>
                     <li class="menu-child-item menu-sync-libraries">
                         <a href="/tdstm/model/importExport">Export Mfg &amp; Models</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a>
                     </li>
                 </ng-container>
             </ul>
@@ -100,9 +88,6 @@
                     <li class="menu-child-item menu-projects-tags">
                         <a [routerLink]="['/tag','list']">Tags</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a>
-                    </li>
                     <li class="divider"></li>
                     <li class="menu-parent-item">Integrations</li>
                     <li class="menu-child-item ">
@@ -129,9 +114,6 @@
                     </li>
                     <li *ngIf="hasPermission(permission.RackView)" class="menu-child-item menu-parent-data-centers-rack-elevation">
                         <a href="/tdstm/rackLayouts/create">Rack Elevations</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a>
                     </li>
                 </ul>
             </li>
@@ -207,9 +189,6 @@
                             <img src="/tdstm/assets/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph"> Architecture Graph
                         </a>
                     </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a>
-                    </li>
                     <li class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
                         <a href="/tdstm/assetEntity/exportAssets">Export Assets</a>
@@ -227,9 +206,6 @@
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-manage-batches">
                         <a href="/tdstm/dataTransferBatch/list">Manage Import Batches (Excel)</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a>
                     </li>
                 </ul>
             </li>
@@ -254,9 +230,6 @@
                     <li class="menu-child-item menu-parent-planning-export-runbook">
                         <a href="/tdstm/moveEvent/exportRunbook">Export Runbook</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');">help</a>
-                    </li>
                     <li class="divider"></li>
                     <li class="menu-parent-item">Bundles</li>
                     <li class="menu-child-item menu-parent-planning-list-bundles">
@@ -264,9 +237,6 @@
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
                         <a href="/tdstm/moveBundle/show/{{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a>
                     </li>
                 </ul>
             </li>
@@ -297,9 +267,6 @@
                     <li *ngIf="hasPermission(permission.RecipeGenerateTasks)" class="menu-child-item menu-parent-tasks-import-tasks">
                         <a href="/tdstm/assetEntity/importTask" class="mmlink">Import Tasks</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a>
-                    </li>
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.DashboardMenuView)" class="dropdown menu-parent-dashboard">
@@ -316,9 +283,6 @@
                     </li>
                     <li class="menu-child-item menu-parent-dashboard-event-dashboard">
                         <a href="/tdstm/dashboard/index">Event Dashboard</a>
-                    </li>
-                    <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');">help</a>
                     </li>
                 </ul>
             </li>
@@ -351,9 +315,6 @@
                         <li class="menu-parent-item">Event Day</li>
                         <li class="menu-child-item menu-reports-application-migration">
                             <a href="/tdstm/reports/applicationMigrationReport">Application Event Results</a>
-                        </li>
-                        <li *ngIf="hasPermission(permission.HelpMenuView)" class="menu-child-item">
-                            <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
                         </li>
                     </ng-template>
                 </ul>
