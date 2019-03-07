@@ -17,7 +17,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
@@ -35,6 +35,8 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.support.DefaultTransactionStatus
+
 /**
  * DataImportService - contains the methods for dealing with data importing from the ETL process;
  * interacting with the Import Batch management; and posting of data into various domains.
@@ -508,25 +510,23 @@ class DataImportService implements ServiceMethods {
 	 */
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
-		ImportBatch.withNewTransaction { session ->
-			ImportBatch batch = ImportBatch.get(batchId)
-			if (!batch) {
-				log.error "ImportBatch($batchId) disappeared during batch processing process"
-				throw new DomainUpdateException('The import batch was deleted while being processed')
-			}
-
-			// Calculate the % completed and update the batch appropriately
-			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
-			batch.processProgress = percComplete
-			batch.processLastUpdated = new Date()
-
-			if (status) {
-				batch.status = status
-			}
-			batch.save(failOnError:true)
-
-			return (0 == batch.processStopFlag)
+		ImportBatch batch = ImportBatch.get(batchId)
+		if (!batch) {
+			log.error "ImportBatch($batchId) disappeared during batch processing process"
+			throw new DomainUpdateException('The import batch was deleted while being processed')
 		}
+
+		// Calculate the % completed and update the batch appropriately
+		Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
+		batch.processProgress = percComplete
+		batch.processLastUpdated = new Date()
+
+		if (status) {
+			batch.status = status
+		}
+		batch.save(failOnError:true)
+
+		return (0 == batch.processStopFlag)
 	}
 
 	/**
@@ -636,17 +636,25 @@ class DataImportService implements ServiceMethods {
 					id in recordSetIds
 				}.list(sortBy: 'id')
 
-				ImportBatchRecord.withNewTransaction { status ->
+				ImportBatchRecord.withNewTransaction { DefaultTransactionStatus status ->
 					for (record in records) {
 						context.record = record
 						rowsProcessed++
-						processBatchRecord(batch, record, context, rowsProcessed)
+						try {
+							processBatchRecord(batch, record, context, rowsProcessed)
+						} catch (e) {
+							record.addError(e.getMessage())
+							record.save(failOnError: true)
+							log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${rowsProcessed}", e, 80)
+						}
 					}
+
 					log.debug 'processBatch({}) clearing Hibernate Session', batchId
-					GormUtil.flushAndClearSession()
+						GormUtil.flushAndClearSession()
 				}
 
 				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
+
 				if (aborted) {
 					log.info 'processBatch({}) received abort process signal and stopped', batchId
 				}
@@ -780,13 +788,17 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the batch processing context that contains objects used throughout the process
 	 * @throws DomainUpdateException when unable to save the record with updates to it
 	 */
+	@Transactional(noRollbackFor=[Throwable])
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
+		Object entity
+		Map fieldsInfo
+
 		try {
-			Map fieldsInfo = record.fieldsInfoAsMap()
+			fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
-			Object entity = findOrCreateEntity(fieldsInfo, context)
+			entity = findOrCreateEntity(fieldsInfo, context)
 
 			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
@@ -818,7 +830,7 @@ class DataImportService implements ServiceMethods {
 
 					if (shouldBeSaved) {
 
-						if (entity.save(failOnError:false)) {
+						if (entity.save(failOnError:false, flush:true)) {
 
 							if (record.hasComments()) {
 								List<String> comments = record.commentsAsList()
@@ -838,24 +850,33 @@ class DataImportService implements ServiceMethods {
 							entity = null
 						}
 					} else {
-						// Discard the entity just incase something unexpected
 						entity.discard()
 						record.status = ImportBatchStatusEnum.COMPLETED
 					}
 				}
 			}
 
-			// Update the fieldsInfo back into the Import Batch Record
-			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
-			// Register error count accordingly
-			record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
+
 		} catch (e) {
 			record.addError(e.getMessage())
 			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e, 80)
+
+			try {
+				entity.discard()
+			}catch(Exception en){
+				//discard throws an exception java.lang.IllegalStateException: cannot generate an EntityKey when id is null.
+				//We need to to the discard to get the errors to be populated correctly, but we don't care about this error.
+				log.debug('Discarding entity had an error.',en)
+			}
 		}
 
+		// Update the fieldsInfo back into the Import Batch Record
+		record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+		// Register error count accordingly
+		record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
+
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
-		if (! record.save(failOnError:false, flush:true) ) {
+		if (!record.save(failOnError: false, flush: true)) {
 			// Catch the error here but need to throw it outside the try/catch so that it gets recorded at the batch level
 			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
 			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg

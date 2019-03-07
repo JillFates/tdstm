@@ -532,6 +532,7 @@ export class ImportBatchListComponent implements OnDestroy {
 					if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
 						batch.status.code = (response.data as ImportBatchModel).status.code;
 						batch.status.label = (response.data as ImportBatchModel).status.label;
+						batch.recordsSummary = response.data.recordsSummary;
 						this.removeBatchFromQueuedLoop(batch);
 						if (batch.status.code === BatchStatus.RUNNING.toString()) {
 							this.addToRunningBatchesLoop(batch);
