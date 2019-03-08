@@ -13,7 +13,7 @@
 		<asset:stylesheet href="css/ui.datepicker.css" />
 		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
 		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
-		<asset:stylesheet href="components/comment/comment.css" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 
 		<jqgrid:resources />
 		<g:javascript src="projectStaff.js" />

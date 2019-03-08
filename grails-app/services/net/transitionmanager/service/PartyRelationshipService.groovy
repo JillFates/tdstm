@@ -128,7 +128,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<PartyRelationship> getCompanyPartners(Party company, String sortOn = 'name') {
 		List<PartyRelationship> partners = PartyRelationship.findAllWhere(
-				partyRelationshipType: PartyRelationshipType.load('ROLE_PARTNERS'),
+				partyRelationshipType: PartyRelationshipType.load('PARTNERS'),
 				partyIdFrom: company,
 				roleTypeCodeFrom: RoleType.load('ROLE_COMPANY'),
 				roleTypeCodeTo: RoleType.load('ROLE_PARTNER'))

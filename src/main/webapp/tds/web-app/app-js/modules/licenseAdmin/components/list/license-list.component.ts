@@ -168,6 +168,7 @@ export class LicenseListComponent implements OnInit {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
+				jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 			},
 			(err) => console.log(err));
 	}

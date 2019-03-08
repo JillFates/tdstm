@@ -333,7 +333,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List Event News</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
+							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preEventCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
 							</tds:hasPermission>
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="exportRunbook" onclick="hideMegaMenu('bundleMegaMenu')">Export Runbook</g:link></li>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
@@ -445,7 +445,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<td style="vertical-align:top"><span class="megamenuSection">Event Prep</span><br />
 						<ul >
 							<tds:hasPermission permission="${Permission.ReportViewEventPrep}">
-							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
+							<li><a href="/tdstm/module/reports/preEventCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>

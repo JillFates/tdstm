@@ -19,8 +19,8 @@
                        <!-- Menu toggle button -->
                         <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
                             <span *ngIf="userContext.project">{{userContext.project.name}}</span>
-                            <span *ngIf="userContext.event">{{userContext.event.name}}</span>
-                            <span *ngIf="userContext.bundle">{{userContext.bundle.name}}</span>
+                            <span *ngIf="userContext.event"> : {{userContext.event.name}}</span>
+                            <span *ngIf="userContext.bundle"> : {{userContext.bundle.name}}</span>
                         </a>
                     </li>
                     <li *ngIf="!userContext.licenseInfo.license.isManager && !userContext.licenseInfo.license.isValid">
