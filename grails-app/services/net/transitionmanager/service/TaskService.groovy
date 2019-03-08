@@ -4843,8 +4843,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	private List createRollcallTasks(whom, recipeId, taskSpec, settings) {
 
 		def taskList = []
-		def staffList = MoveEventStaff.findAllByMoveEvent(settings.moveEvent, [sort:'person'])
-		log.info("createRollcallTasks: Found ${staffList.size()} MoveEventStaff records")
+		def staffList = MoveEventStaff.findAllByMoveEvent(settings.event, [sort:'person'])
+		log.info("createRollcallTasks: Found ${staffList.size()} MoveEventStaff records for event ${settings.event}")
 
 		def lastPerson = (staffList && staffList[0]) ? staffList[0].person : null
 		def teams = []
@@ -4864,8 +4864,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				isPublished: settings.publishTasks,
 				sendNotification: taskSpec.sendNotification ?: false,
 				comment: title,
-				project: settings.moveEvent.project,
-				moveEvent: settings.moveEvent,
+				project: settings.event.project,
+				moveEvent: settings.event,
 				commentType: AssetCommentType.TASK,
 				status: ACS.READY,
 				createdBy: whom,
@@ -4882,7 +4882,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (taskSpec.containsKey('category')) task.category = taskSpec.category
 
 			if (! (task.save(flush:true))) {
-				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $settings.moveEvent"
+				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $settings.event"
 				throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
 			}
 
