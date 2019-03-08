@@ -4,7 +4,6 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
-import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -176,7 +175,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doBasicAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
 
         def resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
             auth credential.username, decryptPassword(credential)
@@ -192,7 +191,7 @@ class CredentialService implements ServiceMethods {
      */
     private Map<String, ?> doJWTTokenAuthentication(Credential credential) {
         String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: decryptPassword(credential)])
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
 
         def resp = null
         switch (credential.httpMethod) {
@@ -217,7 +216,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doCookieAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
 
         def resp = null
         switch (credential.httpMethod) {
@@ -263,7 +262,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doHeaderAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
 
         def resp = null
         switch (credential.httpMethod) {
