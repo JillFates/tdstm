@@ -21,6 +21,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.http.HostnameVerifier
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
@@ -303,16 +304,13 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Gets the RestTemplate for the RestBuilder according to the environment
-     * For PRODUCTION we should trust SSL certificates as they come but for
-     * other environments some certificates are self-signed so HTTPClient needs
-     * some help to trust them, so the custom trust store is doing that.
+     * Gets the RestTemplate with a truststore when authentication URL is secure. Otherwise
+     * HTTPClient will hit the endpoint as is.
      *
-     * @param environment - the credential environment
      * @return
      */
-    private RestBuilder getRestBuilderForCredentialEnvironment(String url, CredentialEnvironment environment) {
-        if (UrlUtil.isSecure(url) && environment != CredentialEnvironment.PRODUCTION) {
+    private RestBuilder getRestBuilderForCredentialEnvironment(String url) {
+        if (UrlUtil.isSecure(url)) {
             return new RestBuilder(getRestTemplateWithTrustStore())
         } else {
             return new RestBuilder()
@@ -336,7 +334,7 @@ class CredentialService implements ServiceMethods {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, HostnameVerifier.STRICT)
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(connectionSocketFactory)
                 .build()

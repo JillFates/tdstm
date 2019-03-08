@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AuthenticationMethod
-import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.JsonUtil
@@ -14,6 +13,7 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Credential
+import net.transitionmanager.http.HostnameVerifier
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade
 import org.apache.commons.io.IOUtils
@@ -536,11 +536,9 @@ class HttpProducerService {
         URIBuilder builder = new URIBuilder(httpElements.uri(httpMethod))
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setDefaultRequestConfig(requestBuilder.build())
 
-        // only provides a trust store if endpoint url is secure and credentials are nor for production
+        // only provides a trust store if endpoint url is secure
         if (UrlUtil.isSecure(actionRequest.options.apiAction.endpointUrl)) {
-            if (actionRequest.options.credentials && actionRequest.options.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
-                configureTrustStore(httpClientBuilder)
-            }
+            configureTrustStore(httpClientBuilder)
         }
 
         CloseableHttpClient httpClient = httpClientBuilder.build()
@@ -670,7 +668,7 @@ class HttpProducerService {
     }
 
     /**
-     * Configures a trust store for non-production environments.
+     * Configures a trust store for the given HTTPClient.
      * Useful when calling endpoints using SSL with self-signed certificates, so we trust them
      * to avoid hand shaking errors.
      *
@@ -689,7 +687,7 @@ class HttpProducerService {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, HostnameVerifier.STRICT)
 
         final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory> create()
                 .register('http', PlainConnectionSocketFactory.getSocketFactory())
