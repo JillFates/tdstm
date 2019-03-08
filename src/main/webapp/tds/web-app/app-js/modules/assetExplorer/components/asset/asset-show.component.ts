@@ -19,6 +19,7 @@ import {StorageShowComponent} from '../storage/storage-show.component';
 
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {AssetExplorerModule} from '../../asset-explorer.module';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -42,18 +43,19 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 		this.prepareMetadata().then( (metadata: any) => {
 			this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}).subscribe((response: any) => {
 				let template = response;
+				const additionalImports = [AssetExplorerModule];
 				switch (this.asset) {
 					case 'APPLICATION':
-						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view);
+						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'DATABASE':
-						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view);
+						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'DEVICE':
-						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view);
+						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'STORAGE':
-						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view);
+						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 				}
 			});

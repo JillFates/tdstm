@@ -1,20 +1,21 @@
+// Angular
 import {Component, OnInit} from '@angular/core';
+// Services
+import {TaskService} from '../../../taskManager/service/task.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserService} from '../../service/user.service';
+// Components
+// import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
+// Model
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {
 	ActivePersonColumnModel,
 	ApplicationColumnModel,
 	EventColumnModel, EventNewsColumnModel, TaskColumnModel
 } from '../../model/user-dashboard-columns.model';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {TaskService} from '../../../taskManager/service/task.service';
-import {ModalType} from '../../../../shared/model/constants';
-import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
-import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
-import {UserManageStaffComponent} from '../manage-staff/user-manage-staff.component';
-import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 
 @Component({
 	selector: 'user-dashboard',
@@ -106,15 +107,15 @@ export class UserDashboardComponent implements OnInit {
 				currentUserId: 5662
 			}
 		};
-		this.dialogService.extra(TaskDetailComponent, [
-			{provide: TaskDetailModel, useValue: taskDetailModel}
-		]).then(() => {
-			this.fetchTasksForGrid();
-		}).catch(result => {
-			if (!result) {
-				this.fetchTasksForGrid();
-			}
-		});
+		// this.dialogService.extra(TaskDetailComponent, [
+		// 	{provide: TaskDetailModel, useValue: taskDetailModel}
+		// ]).then(() => {
+		// 	this.fetchTasksForGrid();
+		// }).catch(result => {
+		// 	if (!result) {
+		// 		this.fetchTasksForGrid();
+		// 	}
+		// });
 	}
 
 	updateTaskStatus(id, status) {

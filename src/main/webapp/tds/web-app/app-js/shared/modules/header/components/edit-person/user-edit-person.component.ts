@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
-import {UserService} from '../../service/user.service';
-import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PasswordChangeModel} from '../../../../shared/components/password-change/model/password-change.model';
+import {HeaderService} from '../../services/header.service';
+import {PersonModel} from '../../../../components/add-person/model/person.model';
+import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
+import {UIPromptService} from '../../../../directives/ui-prompt.directive';
+import {PasswordChangeModel} from '../../model/password-change.model';
 
 @Component({
 	selector: 'user-edit-person',
@@ -19,7 +19,7 @@ export class UserEditPersonComponent {
 	constructor(
 		public personModel: PersonModel,
 		public passwordChangeModel: PasswordChangeModel,
-		private userService: UserService,
+		private headerService: HeaderService,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService) {
 		this.startPageOptions = [];
@@ -50,7 +50,7 @@ export class UserEditPersonComponent {
 	}
 
 	private loadComponentModel() {
-		this.userService.fetchComponentModel().subscribe(
+		this.headerService.fetchComponentModel().subscribe(
 			(result: any) => {
 				const defaultPerson = { firstName: '',
 					middleName: '',
@@ -97,7 +97,7 @@ export class UserEditPersonComponent {
 	}
 
 	private retrieveStartPageOptions() {
-		this.userService.getStartPageOptions().subscribe(
+		this.headerService.getStartPageOptions().subscribe(
 			(result: any) => {
 				this.startPageOptions = result.pages;
 			},
@@ -137,7 +137,7 @@ export class UserEditPersonComponent {
 		}
 		if (returnVal) {
 			preferences.id = this.currentPersonId;
-			this.userService.updateAccount(preferences).subscribe(
+			this.headerService.updateAccount(preferences).subscribe(
 				(result: any) => {
 					this.savedPersonModel = this.personModel;
 					this.cancelCloseDialog();

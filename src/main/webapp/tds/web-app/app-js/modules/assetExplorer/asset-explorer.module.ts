@@ -92,6 +92,7 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
+		TaskCommentDialogComponent,
 		TaskCommentComponent,
 		TaskDetailComponent,
 		TaskEditComponent,
@@ -109,6 +110,7 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		ModelDeviceShowComponent,
 		AssetCloneComponent,
 		TaskCommentDialogComponent,
+		TaskCommentComponent,
 		TaskCreateComponent,
 		TaskEditComponent,
 		TaskDetailComponent

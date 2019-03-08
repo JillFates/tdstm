@@ -24,7 +24,7 @@ export class DynamicComponent {
 
 	constructor(private inj: Injector, private comp: Compiler, private mod: NgModuleRef<any>) { }
 
-	registerAndCreate(compClass: any, view: ViewContainerRef) {
+	registerAndCreate(compClass: any, view: ViewContainerRef, imports = []) {
 
 		const tmpModule = NgModule({
 			imports: [
@@ -36,8 +36,8 @@ export class DynamicComponent {
 				IntlModule,
 				DateInputsModule,
 				GridModule,
-				InputsModule
-			],
+				InputsModule,
+			].concat(imports),
 			declarations: [
 				compClass
 			]
