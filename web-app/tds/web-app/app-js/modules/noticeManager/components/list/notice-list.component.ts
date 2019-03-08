@@ -1,5 +1,5 @@
 // Angular
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Components
 import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
@@ -17,13 +17,15 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
 import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
+import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'tds-notice-list',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
 })
 
-export class NoticeListComponent {
+export class NoticeListComponent implements OnInit {
 
 	private state: State = {
 		sort: [{
@@ -40,10 +42,11 @@ export class NoticeListComponent {
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	protected noticeTypes = NoticeTypes;
+	protected noticeTypes = [{typeId: '', name: ''}].concat(NoticeTypes);
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];
+	protected dateFormat: string;
 
 	/**
 	 * @constructor
@@ -52,12 +55,20 @@ export class NoticeListComponent {
 	constructor(
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
+		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
 		private prompt: UIPromptService,
 		private route: ActivatedRoute) {
-		this.noticeColumnModel = new NoticeColumnModel();
 		this.resultSet = this.route.snapshot.data['notices'];
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	ngOnInit() {
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.noticeColumnModel = new NoticeColumnModel(dateFormat);
+			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {

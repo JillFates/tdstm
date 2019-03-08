@@ -1,7 +1,7 @@
 export class NoticeColumnModel {
 	columns: any[];
 
-	constructor() {
+	constructor(dateFormat: string) {
 		this.columns = [
 			{
 				label: 'Action',
@@ -22,8 +22,34 @@ export class NoticeColumnModel {
 			}, {
 				label: 'Active',
 				property: 'active',
-				type: 'text',
+				type: 'boolean',
 				width: 160,
+			},
+			{
+				label: 'Activation Date',
+				property: 'activationDate',
+				format: dateFormat,
+				type: 'date',
+				width: 160
+			},
+			{
+				label: 'Expiration Date',
+				property: 'expirationDate',
+				format: dateFormat,
+				type: 'date',
+				width: 160
+			},
+			{
+				label: 'Sequence',
+				property: 'sequence',
+				type: 'text',
+				width: 160
+			},
+			{
+				label: 'Locked',
+				property: 'locked',
+				type: 'boolean',
+				width: 160
 			}
 		];
 	}

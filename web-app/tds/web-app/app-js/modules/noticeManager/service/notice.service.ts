@@ -73,7 +73,7 @@ export class NoticeService {
 			column.filter = '';
 		}
 
-		if (column.type === 'text') {
+		if (column.type === 'text' || column.type === 'boolean') {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,

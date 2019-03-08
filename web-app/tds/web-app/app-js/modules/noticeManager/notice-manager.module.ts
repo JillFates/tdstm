@@ -10,6 +10,7 @@ import {NoticeRouteModule} from './notice-routing.states';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
 import {InputsModule} from '@progress/kendo-angular-inputs' ;
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {NoticeListComponent} from './components/list/notice-list.component';
 import {NoticeViewEditComponent} from './components/view-edit/notice-view-edit.component';
@@ -30,6 +31,7 @@ import {NoticeService} from './service/notice.service';
 		DropDownListModule,
 		GridModule,
 		InputsModule,
+		DateInputsModule,
 		// Route
 		NoticeRouteModule
 	],
