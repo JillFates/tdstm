@@ -7,15 +7,15 @@
         <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
             <div class="box-body">
                 <div class="form-group">
-                    <label for="inputTitle" class="col-sm-2 control-label">Title: <span class="required_field">*</span></label>
-                    <div class="col-sm-10">
+                    <label for="inputTitle" class="col-sm-3 control-label">Title: <span class="required_field">*</span></label>
+                    <div class="col-sm-9">
                         <input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title" [(ngModel)]="model.title"
                             required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="selectType" class="col-sm-2 control-label">Type: <span class="required_field">*</span></label>
-                    <div class="col-sm-10">
+                    <label for="selectType" class="col-sm-3 control-label">Type: <span class="required_field">*</span></label>
+                    <div class="col-sm-9">
                         <kendo-dropdownlist #typeIdField="kendoDropDownList" [defaultItem]="defaultItem" [data]="typeDataSource" [textField]="'name'"
                             [valueField]="'typeId'" [valuePrimitive]="true" id="selectType" class="form-control" [(value)]="model.typeId"
                             required>
@@ -23,13 +23,48 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="checkActive" class="col-sm-2 control-label">Active:</label>
-                    <div class="col-sm-10 checkbox">
+                    <label for="checkActive" class="col-sm-3 control-label">Active:</label>
+                    <div class="col-sm-9 checkbox">
                         <label>
                             <input id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
                         </label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="activationDate" class="col-sm-3 control-label">Activation Date:</label>
+                    <div class="col-sm-9">
+                        <tds-datetime-control
+                               name="activationDate"
+                               [(ngModel)]="model.activationDate">
+                        </tds-datetime-control>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="expirationDate" class="col-sm-3 control-label">Expiration Date:</label>
+                    <div class="col-sm-9">
+                        <tds-datetime-control
+                               name="expirationDate"
+                               [(ngModel)]="model.expirationDate">
+                        </tds-datetime-control>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sequence" class="col-sm-3 control-label">Sequence:</label>
+                    <div class="col-sm-9">
+                        <kendo-numerictextbox
+                                name="sequence" [value]="model.sequence" [format]="'n0'" [min]="0" [autoCorrect]="true">
+                        </kendo-numerictextbox>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="locked" class="col-sm-3 control-label">Locked:</label>
+                    <div class="col-sm-9">
+                        <input id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <div class="col-sm-12">
                         <rich-text-editor

@@ -45,6 +45,10 @@ export class NoticeModel {
 	rawText: string;
 	title: string;
 	typeId: any;
+	activationDate: any;
+	expirationDate: any;
+	sequence: number;
+	locked: boolean;
 }
 
 export const NoticeTypes = [
