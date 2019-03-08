@@ -6,7 +6,8 @@
 <%@page import="com.tdsops.tm.enums.domain.StartPageEnum"%>
 <div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog old-legacy-content">
 	<div class="dialog">
-		<table>
+        <form autocomplete="off">
+		    <table>
 		  <tbody>
 			<tr>
 				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
@@ -100,6 +101,7 @@
 			<g:render template="../userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength, fromDialog:true]}" />
 		  </tbody>
 		</table>
+        </form>
 	  </div>
 	  <div class="buttons">
 		<span class="button"><input type="button" class="edit" value="Update" onclick="changePersonDetails()"/></span>

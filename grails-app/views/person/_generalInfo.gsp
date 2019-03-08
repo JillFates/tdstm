@@ -15,7 +15,7 @@
 		</tds:hasPermission>
 	</ul>
 </div>
-<g:form name="personDialogForm" action="updatePerson">
+<g:form name="personDialogForm" action="updatePerson" autocomplete="off">
 	<div id="generalInfoEditId" class="person">
 		<input type="hidden" name="id" value="${person.id}" />
 		<div class="dialog">
