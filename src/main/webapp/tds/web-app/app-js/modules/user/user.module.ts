@@ -9,11 +9,16 @@ import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Route Module
-import {UserRouteModule} from './user-routing.states';
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
+import {UserRouteModule} from './user-routing.states';
 // Kendo Module
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
+import {SortableModule} from '@progress/kendo-angular-sortable';
+import {IntlModule} from '@progress/kendo-angular-intl';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+import {PopupModule} from '@progress/kendo-angular-popup';
+import {InputsModule} from '@progress/kendo-angular-inputs';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
@@ -28,13 +33,22 @@ import {UserService} from './service/user.service';
 		// Angular
 		CommonModule,
 		SharedModule,
-		FormsModule,
 		AssetExplorerModule,
+		FormsModule,
 		// Kendo
 		DropDownsModule,
 		GridModule,
+		PopupModule,
+		SortableModule,
+		IntlModule,
+		InputsModule,
+		DateInputsModule,
 		// Route
 		UserRouteModule
+	],
+	declarations: [
+		UserListComponent,
+		UserDashboardComponent
 	],
 	providers: [
 		// Resolve
@@ -42,10 +56,6 @@ import {UserService} from './service/user.service';
 		UserResolveService,
 		// Service
 		UserService
-	],
-	declarations: [
-		UserListComponent,
-		UserDashboardComponent
 	],
 	exports: [
 		UserListComponent

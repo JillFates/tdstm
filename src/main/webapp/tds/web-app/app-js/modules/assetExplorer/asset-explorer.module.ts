@@ -93,27 +93,26 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
 		TaskCommentDialogComponent,
-		TaskCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
-		TaskCreateComponent
+		TaskCommentComponent
 	],
 	entryComponents: [
 		AssetShowComponent,
 		AssetCreateComponent,
 		AssetEditComponent,
 		AssetDependencyComponent,
+		AssetDependencyShowComponent,
+		AssetDependencyEditComponent,
+		TaskCommentDialogComponent,
+		TaskCommentComponent,
+		TaskDetailComponent,
+		TaskEditComponent,
+		TaskCreateComponent,
 		SingleCommentComponent,
 		SingleNoteComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent,
-		TaskCommentDialogComponent,
-		TaskCommentComponent,
-		TaskCreateComponent,
-		TaskEditComponent,
-		TaskDetailComponent
+		AssetCloneComponent
 	],
 })
 

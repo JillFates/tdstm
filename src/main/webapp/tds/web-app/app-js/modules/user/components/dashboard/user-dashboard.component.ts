@@ -5,7 +5,7 @@ import {TaskService} from '../../../taskManager/service/task.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserService} from '../../service/user.service';
 // Components
-// import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 // Model
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
@@ -107,15 +107,15 @@ export class UserDashboardComponent implements OnInit {
 				currentUserId: 5662
 			}
 		};
-		// this.dialogService.extra(TaskDetailComponent, [
-		// 	{provide: TaskDetailModel, useValue: taskDetailModel}
-		// ]).then(() => {
-		// 	this.fetchTasksForGrid();
-		// }).catch(result => {
-		// 	if (!result) {
-		// 		this.fetchTasksForGrid();
-		// 	}
-		// });
+		this.dialogService.extra(TaskDetailComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		]).then(() => {
+			this.fetchTasksForGrid();
+		}).catch(result => {
+			if (!result) {
+				this.fetchTasksForGrid();
+			}
+		});
 	}
 
 	updateTaskStatus(id, status) {
