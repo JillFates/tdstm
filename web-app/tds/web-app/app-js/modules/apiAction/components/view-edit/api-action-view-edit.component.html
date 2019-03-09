@@ -871,7 +871,7 @@
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc"/>
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.description"/>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -891,7 +891,7 @@
 												<span *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<span>{{dataItem.desc}}</span>
+												<span>{{dataItem.description}}</span>
 											</div>
 										</ng-template>
 									</kendo-grid-column>
