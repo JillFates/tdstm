@@ -7,6 +7,7 @@ import {UserService} from '../../service/user.service';
 // Components
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 // Model
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
@@ -16,6 +17,7 @@ import {
 	EventColumnModel, EventNewsColumnModel, TaskColumnModel
 } from '../../model/user-dashboard-columns.model';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'user-dashboard',
@@ -41,6 +43,7 @@ export class UserDashboardComponent implements OnInit {
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	private itemForDoubleClick;
+
 	constructor(private userService: UserService, private taskService: TaskService, private dialogService: UIDialogService) {
 
 	}
@@ -180,8 +183,20 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	handleApplicationClicked(event) {
+
+		// ------------------------------------------------
+
+		this.dialogService.open(AssetShowComponent, [
+				{provide: 'ID', useValue: event.dataItem.appId},
+				{provide: 'ASSET', useValue: event.dataItem.assetClass}
+			], DIALOG_SIZE.LG).then(x => {
+			// ---
+		});
+
+		// ------------------------------------------------
+
 		if (event.dataItem === this.itemForDoubleClick) {
-			console.log('open dislog');
+			// ---
 		} else {
 			this.itemForDoubleClick = event.dataItem;
 			setTimeout((dataItem) => {
