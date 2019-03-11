@@ -783,6 +783,7 @@ class CommentService implements ServiceMethods {
 	 * @param project
 	 * @param command
 	 */
+	@Transactional
 	void saveOrUpdateAssetComment(Project project, AssetCommentSaveUpdateCommand command) {
 
 		// Fetch the corresponding asset.
