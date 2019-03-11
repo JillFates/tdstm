@@ -48,7 +48,7 @@
                             <td class="name">Bundles:</td>
                             <td style="text-align:left;" class="valueNW">
                                 <ul>
-                                <g:each var="m" in="${moveEventInstance.moveBundles}">
+                                <g:each var="m" in="${moveBundles}">
                                     <li><g:link controller="moveBundle" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></li>
                                 </g:each>
                                 </ul>
