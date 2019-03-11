@@ -117,7 +117,11 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		[moveEventInstance: moveEvent, moveBundles: moveEvent.moveBundles]
+		List moveBundles = moveEvent.moveBundles.collect { MoveBundle moveBundle ->
+			[id: moveBundle.id, name: moveBundle.name]
+		}
+
+		[moveEventInstance: moveEvent, moveBundles: moveBundles]
 	}
 
 	/**
