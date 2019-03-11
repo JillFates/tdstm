@@ -77,6 +77,18 @@ export class NoticeModel {
 	locked: boolean;
 }
 
+export class PostNoticeResponse {
+	redirectUri: string;
+	notices: PostNoticeModel[];
+}
+
+export class PostNoticeModel {
+	htmlText: string;
+	id: number;
+	name: string;
+	needAcknowledgement: number;
+}
+
 export const NoticeTypes = [
 	{typeId: '1', name: 'Prelogin'},
 	{typeId: '2', name: 'Postlogin'}

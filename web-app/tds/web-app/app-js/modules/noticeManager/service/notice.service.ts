@@ -2,10 +2,12 @@ import {Injectable} from '@angular/core';
 import {Response, Headers, RequestOptions} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {NotifierService} from '../../../shared/services/notifier.service';
-import {NoticeModel} from '../model/notice.model';
 import {Observable} from 'rxjs/Observable';
 
+import {NoticeModel, PostNoticeResponse} from '../model/notice.model';
+
 import 'rxjs/add/operator/map';
+
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
@@ -113,4 +115,37 @@ export class NoticeService {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
 	}
+
+	/**
+	 * Get the post Notices to process
+	 * @returns any
+	 */
+	getchPostNotices(): Observable<PostNoticeResponse> {
+		const mockResponse = {
+			redirectUri: '/tdstm/notices',
+			notices: [
+				{
+					id: 5,
+					name: 'ELUA Aggreement 2018-19 version 1.0',
+					htmlText: 'All of the text for the notice',
+					needAcknowledgement: 1
+				},
+				{
+					id: 7,
+					name: 'Pizza to night in lobby',
+					htmlText: 'Come one come all for some greasy pizza',
+					needAcknowledgement: 0
+				},
+				{
+					id: 12,
+					name: 'Maintenance Outage',
+					htmlText: 'We will be updating the system at 11:00pm EST this evening - you have been warned!',
+					needAcknowledgement: 0
+				}
+			]
+		};
+
+		return Observable.of(mockResponse);
+	}
+
 }
