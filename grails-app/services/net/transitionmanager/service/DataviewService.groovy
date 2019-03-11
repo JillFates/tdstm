@@ -524,6 +524,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewId
 	 * @return
 	 */
+	@Transactional
 	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
 		Dataview dataview = fetch(dataviewId)
 
