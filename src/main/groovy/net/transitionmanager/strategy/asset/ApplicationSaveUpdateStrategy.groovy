@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.domain.Person
 
 class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 
@@ -42,6 +43,9 @@ class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 	protected void populateAsset(AssetEntity assetEntity) {
 		super.populateAsset(assetEntity)
 		Application application = (Application) assetEntity
+		application.sme = Person.get((Long)command.asset.sme.id)
+		application.appOwner = Person.get((Long)command.asset.appOwner.id)
+		application.sme2 = Person.get((Long)command.asset.sme2.id)
 		application.shutdownFixed = command.asset.shutdownFixed ?  1 : 0
 		application.startupFixed = command.asset.startupFixed ?  1 : 0
 		application.testingFixed = command.asset.testingFixed ?  1 : 0

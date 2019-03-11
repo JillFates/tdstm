@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.domain.MoveBundle
@@ -47,6 +48,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * when creating the instance.
 	 * @return
 	 */
+	@Transactional
 	AssetEntity saveOrUpdateAsset() {
 		// Some setting up required before proceeding with the save/update operation.
 		prepareForSaving()
@@ -221,6 +223,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param depMap
 	 * @param isDependent
 	 */
+	@Transactional
 	private void createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
 		AssetDependency dependency = null
 		if (depMap.id) {

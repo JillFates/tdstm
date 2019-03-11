@@ -91,7 +91,7 @@ class ApplicationService implements ServiceMethods {
 		def partyGroupList = partyRelationshipService.getCompaniesList()
 		Map commonModel = this.getCommonModel(false, project, app, params)
 
-		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
+		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist, smeId: app?.sme?.id, sme2Id: app?.sme2?.id,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
 				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
