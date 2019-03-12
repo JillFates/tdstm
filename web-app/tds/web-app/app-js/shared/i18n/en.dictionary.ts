@@ -269,6 +269,7 @@ export const en_DICTIONARY: Object = {
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
 		'VIEW_HTML': 'View HTML',
+		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.'
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

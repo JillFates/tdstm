@@ -22,6 +22,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 export class EULAComponent {
 	private dataSignature: string;
 	protected model: PostNoticeModel;
+	protected acceptAgreement = false;
 
 	constructor(
 		model: PostNoticeModel,
@@ -59,4 +60,13 @@ export class EULAComponent {
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
 	}
+
+	protected onBack() {
+		this.activeDialog.dismiss();
+	}
+
+	protected onNext() {
+		this.activeDialog.close(true);
+	}
+
 }

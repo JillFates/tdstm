@@ -181,6 +181,8 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	onShowEULA(): void {
+		this.iterateMandatory();
+		/*
 		if (this.postNotices.length) {
 			const notice = this.postNotices[0];
 			this.dialogService.open(EULAComponent, [
@@ -193,6 +195,28 @@ export class NoticeListComponent implements OnInit {
 				console.log(error);
 			});
 			console.log('Clicked on create notice');
+		}
+		*/
+
+	}
+
+	async iterateMandatory() {
+		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
+		let keepGoing = true;
+
+		while (keepGoing && notices.length) {
+			try {
+				const notice = notices.shift();
+				const result = await this.dialogService.open(EULAComponent, [ {provide: PostNoticeModel, useValue: notice}]);
+				console.log('The result is');
+				console.log(result);
+				console.log('---------');
+			} catch(error) {
+				console.log('Error:');
+				console.log(error.message || error);
+				keepGoing = false;
+			}
+			console.log('Here Im ');
 		}
 
 	}
