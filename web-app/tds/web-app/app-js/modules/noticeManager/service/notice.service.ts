@@ -120,14 +120,60 @@ export class NoticeService {
 	 * Get the post Notices to process
 	 * @returns any
 	 */
-	getchPostNotices(): Observable<PostNoticeResponse> {
+	getPostNotices(): Observable<PostNoticeResponse> {
 		const mockResponse = {
 			redirectUri: '/tdstm/notices',
 			notices: [
 				{
 					id: 5,
-					name: 'ELUA Aggreement 2018-19 version 1.0',
-					htmlText: 'All of the text for the notice',
+					name: 'EULA Aggreement 2018-19 version 1.0',
+					htmlText: `
+					<p>Last updated: (add date)</p>
+					<p>
+					Please read this End­User License Agreement ("Agreement") carefully before clicking the "I Agree"
+					button, downloading or using My Application (change this) ("Application").
+					By clicking the "I Agree" button, downloading or using the Application, you are agreeing to be bound
+					by the terms and conditions of this Agreement.
+					If you do not agree to the terms of this Agreement, do not click on the "I Agree" button and do not
+					download or use the Application.
+					</p>
+					<h5>License</h5>
+					<p>
+					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
+					to download, install and use the Application solely for your personal, non­commercial purposes
+					strictly in accordance with the terms of this Agreement.
+					</p>
+					<h5>Restrictions</h5>
+					<p>
+					You agree not to, and you will not permit others to:
+					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
+					commercially exploit the Application or make the Application available to any third party.
+					</p>
+					<h5>License</h5>
+					<p>
+					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
+					to download, install and use the Application solely for your personal, non­commercial purposes
+					strictly in accordance with the terms of this Agreement.
+					</p>
+					<h5>Restrictions</h5>
+					<p>
+					You agree not to, and you will not permit others to:
+					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
+					commercially exploit the Application or make the Application available to any third party.
+					</p>
+					<h5>License</h5>
+					<p>
+					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
+					to download, install and use the Application solely for your personal, non­commercial purposes
+					strictly in accordance with the terms of this Agreement.
+					</p>
+					<h5>Restrictions</h5>
+					<p>
+					You agree not to, and you will not permit others to:
+					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
+					commercially exploit the Application or make the Application available to any third party.
+					</p>
+					`,
 					needAcknowledgement: 1
 				},
 				{

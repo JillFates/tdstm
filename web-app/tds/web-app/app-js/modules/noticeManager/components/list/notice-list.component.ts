@@ -10,7 +10,10 @@ import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
-import {NoticeColumnModel, NoticeModel, NoticeTypes} from '../../model/notice.model';
+import {
+	NoticeColumnModel, NoticeModel, NoticeTypes, PostNoticeModel,
+	PostNoticeResponse
+} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
@@ -19,6 +22,7 @@ import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {EULAComponent} from '../eula/eula.component';
 
 @Component({
 	selector: 'tds-notice-list',
@@ -47,6 +51,7 @@ export class NoticeListComponent implements OnInit {
 	private gridData: GridDataResult;
 	protected resultSet: any[];
 	protected dateFormat: string;
+	protected postNotices: PostNoticeModel[] = [];
 
 	/**
 	 * @constructor
@@ -68,6 +73,13 @@ export class NoticeListComponent implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.noticeColumnModel = new NoticeColumnModel(dateFormat);
+			});
+
+		this.noticeService.getPostNotices()
+			.subscribe((response: PostNoticeResponse) => {
+				console.log('The post notice are:');
+				console.log(response);
+				this.postNotices = response.notices;
 			});
 	}
 
@@ -166,6 +178,23 @@ export class NoticeListComponent implements OnInit {
 			console.log(error);
 		});
 		console.log('Clicked on create notice');
+	}
+
+	onShowEULA(): void {
+		if (this.postNotices.length) {
+			const notice = this.postNotices[0];
+			this.dialogService.open(EULAComponent, [
+				{provide: PostNoticeModel, useValue: notice}
+			]).then(result => {
+				alert('closing fine');
+				this.reloadData();
+			}, error => {
+				alert('closing with error');
+				console.log(error);
+			});
+			console.log('Clicked on create notice');
+		}
+
 	}
 
 	/**
