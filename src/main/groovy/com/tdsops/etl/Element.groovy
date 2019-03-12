@@ -741,13 +741,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * @see LocalVariableFacade
 	 */
 	private Element doSet(String variableName) {
-//		ETLTransformable bindingValue = this.value.withTraits(ETLTransformable)
-//		bindingValue.etlProcessor = this.processor
-//		processor.addLocalVariableInBinding(variableName, bindingValue)
 		LocalVariableFacade localVariableFacade = new LocalVariableFacade(this.value, this.processor)
 		processor.addLocalVariableInBinding(variableName, localVariableFacade)
-//		processor.addLocalVariableInBinding('transform', localVariableFacade.&transform)
-//		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
 

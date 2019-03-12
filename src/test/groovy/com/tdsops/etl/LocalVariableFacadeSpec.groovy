@@ -66,10 +66,33 @@ class LocalVariableFacadeSpec extends Specification {
 			LocalVariableFacade localVariableFacade = new LocalVariableFacade(wrappedObject, Mock(ETLProcessor))
 
 		expect:
-			localVariableFacade."${method} == result
+			localVariableFacade."${property}" == result
 
 		where:
 			wrappedObject | property || result
 			'FOOBAR'      | 'number' || false
+	}
+
+	@Unroll
+	void 'test can forward equals method for wrappedObject #wrappedObject'() {
+
+		setup:
+			LocalVariableFacade localVariableFacade = new LocalVariableFacade(wrappedObject, Mock(ETLProcessor))
+
+		expect:
+			(localVariableFacade.equals(otherObject)) == result
+
+		where:
+			wrappedObject      | otherObject || result
+			true               | true        || true
+			new Boolean(false) | true        || false
+			'FOOBAR'           | 'FOOBAR'    || true
+			'FOOBAR'           | ''          || false
+			'FOOBAR'           | null        || false
+			1000               | 1000        || true
+			1000               | 10          || false
+			null               | 10          || false
+			1000               | null        || false
+			null               | null        || true
 	}
 }

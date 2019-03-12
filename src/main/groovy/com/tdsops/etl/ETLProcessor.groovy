@@ -296,7 +296,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 */
 	DomainBuilder domain(LocalVariableFacade localVariableFacade) {
-		return domain(localVariableFacade.wrappedValue)
+		return domain(localVariableFacade.wrappedObject)
 	}
 
 	/**
@@ -984,11 +984,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return an instance of {@code ETLFindElement}
 	 */
 	ETLFindElement find(LocalVariableFacade localVariableFacade) {
-		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedValue.toString())
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject.toString())
 		if (domain) {
 			return find(domain)
 		}
-		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedValue.toString())
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject.toString())
 	}
 
 	/**
@@ -1047,11 +1047,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return an instance of {@code ETLProcessor}
 	 */
 	ETLProcessor elseFind(LocalVariableFacade localVariableFacade) {
-		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedValue)
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject)
 		if (domain) {
 			return elseFind(domain)
 		}
-		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedValue)
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject)
 	}
 
 	/**

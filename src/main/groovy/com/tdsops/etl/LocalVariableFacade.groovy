@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tdsops.etl.ETLProcessor.ReservedWord
+
 /**
  * <p>Defines a wrapper over a local variable.</p>
  * <p>User can define local variables: </p>
@@ -8,25 +11,23 @@ package com.tdsops.etl
  * 	...
  * </pre>
  * <p>Then set command adds a local variable in an ETL Binding content</p>
- * @see ETLBinding* @see Element#set(com.tdsops.etl.LocalVariableDefinition)
+ * @see ETLBinding
+ * @see Element#set(com.tdsops.etl.LocalVariableDefinition)
  */
 class LocalVariableFacade {
-
 	/**
 	 * Wrapped instance. It contains original value.
 	 */
-	Object wrappedValue
-
+	Object wrappedObject
 	/**
 	 * Instance of {@code ETLProcessor} used to continue in the chain of methods
 	 */
 	ETLProcessor etlProcessor
 
-	LocalVariableFacade(Object wrappedValue, ETLProcessor etlProcessor) {
-		this.wrappedValue = wrappedValue
+	LocalVariableFacade(Object wrappedObject, ETLProcessor etlProcessor) {
+		this.wrappedObject = wrappedObject
 		this.etlProcessor = etlProcessor
 	}
-
 	/**
 	 * <p>It creates an instance of {@code Element} class
 	 * in order to continue with the chain of transformation
@@ -34,67 +35,73 @@ class LocalVariableFacade {
 	 * @param withParameter
 	 * @return an instance of {@code Element}
 	 */
-	def transform(Object withParameter) {
+	Element transform(ReservedWord withParameter) {
 		Element element = new Element(
-			value: wrappedValue,
-			originalValue: wrappedValue,
+			value: wrappedObject,
+			originalValue: wrappedObject,
 			processor: etlProcessor
 		)
 		element.loadedElement = true
 		return element
 	}
-
 	/**
 	 * <p>Override method missing to manage called method for the wrapped value.</p>
-	 *
+	 * <pre>
+	 *	LocalVariableFacade localVariableFacade = new LocalVariableFacade('FOOBAR', etlProcessor)
+	 *  ...
+	 *  localVariableFacade.toLowerCase()
+	 * </pre>
+	 * <p>This method is forwarding method {@code toLowerCase()} to the String 'FOOBAR'</p>
 	 * @param name a method name
 	 * @param args method arguments
-	 * @return result of method invokation on wrappedValue
+	 * @return result of method invokation on wrappedObject
 	 */
 	def methodMissing(String name, def args) {
-		return wrappedValue?.invokeMethod(name, args)
+		return wrappedObject?.invokeMethod(name, args)
 	}
 	/**
-	 *
+	 * Fowards a property invokation to the wrappedObject
 	 * @param name
 	 * @return
 	 */
 	def propertyMissing(String name) {
-		return wrappedValue[name]
+		return wrappedObject[name]
 	}
 
 	/**
 	 * <p>Overrides Groovy Truth</p>
-	 * <p></p>
-	 * http://gr8labs.org/getting-groovy/
-	 * @return
-	 *
+	 * <pre>
+	 *     LocalVariableFacade localVariableFacade = new LocalVariableFacade(true, etlProcessor)
+	 *     if(localVariableFacade){
+	 *         ....
+	 *     }
+	 * </pre>
+	 * @return boolean groovy truth for {@code wrappedObject}
 	 */
 	Boolean asBoolean() {
-		return !!wrappedValue
+		return !!wrappedObject
 	}
 
 	/**
-	 *
-	 * @param object
-	 * @return
+	 * <p>Overrides equals method forwarding invokation to the {@code wrappedObject}</p>
+	 * @param   obj   the reference object with which to compare.
+	 * @return  {@code true} if this {@code wrappedObject} is the same as the obj
+	 *          argument; {@code false} otherwise.
 	 */
 	boolean equals(Object object) {
-		if (!wrappedValue && object) return false
-		if (!wrappedValue && !object) return true
-
-		return wrappedValue.equals(object)
+		return wrappedObject.equals(object)
 	}
+
 	/**
 	 *
 	 * @return
 	 */
 	int hashCode() {
-		return (wrappedValue != null ? wrappedValue.hashCode() : 0)
+		return (wrappedObject != null ? wrappedObject.hashCode() : 0)
 	}
 
 	@Override
 	String toString() {
-		return wrappedValue?.toString()
+		return wrappedObject?.toString()
 	}
 }
