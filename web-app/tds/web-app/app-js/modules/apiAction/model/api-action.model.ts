@@ -30,7 +30,14 @@ export class APIActionColumnModel {
 				property: 'description',
 				type: 'text',
 				width: 300
-			}, {
+			},
+			{
+				label: 'Type',
+				property: 'actionType.name',
+				type: 'text',
+				width: 125
+			},
+			{
 				label: 'Method',
 				property: 'agentMethod.name',
 				type: 'text',

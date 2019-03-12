@@ -458,14 +458,14 @@
 												       id="simpleApiActionRemote"
 												       name="simpleApiActionRemote"
 												       tabindex="5"
-												       [(ngModel)]="apiActionModel.remoteInvocation"
+												       [checked]="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'"
 												       [disabled]="true"
 												       class="form-check-input aligned-checkbox" />
 
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">
-													{{apiActionModel.remoteInvocation ? 'Yes' : 'No'}}
+													{{apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API' ? 'Yes' : 'No'}}
 												</label>
 											</div>
 										</div>
@@ -742,6 +742,7 @@
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 											<input type="text"
 											       id="scriptCommandLine"
+											       placeholder="Enter optional command to invoke script using {scriptName}placeholder for the name of the script"
 											       name="scriptCommandLine"
 											       class="form-control"
 											       [(ngModel)]="apiActionModel.commandLine" maxlength="1024" />
@@ -762,14 +763,14 @@
 											                    [data]="remoteCredentials"
 											                    required
 											                    requiredComplexValue propertyName="id"
-											                    [textField]="'name'"
+											                    [textField]="'value'"
 											                    [valueField]="'id'"
 											                    [(ngModel)]="apiActionModel.remoteCredentialMethod">
 											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 											<label class="control-label label-detail">
-												{{apiActionModel.remoteCredentialMethod && apiActionModel.remoteCredentialMethod.name}}
+												{{apiActionModel.remoteCredentialMethod && (apiActionModel.remoteCredentialMethod.name || apiActionModel.remoteCredentialMethod.value)}}
 											</label>
 										</div>
 									</div>
