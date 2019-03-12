@@ -85,6 +85,11 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
 	}
 
+	/**
+	 * Used by the User Dashboard
+	 * @param id - ID of the user requested
+	 * @return Success structure with person, projects, project instance, and moveday categories
+	 */
 	def modelForUserDashboard(String id) {
 		Project project
 		Person person = currentPerson()
@@ -110,6 +115,10 @@ class WsUserController implements ControllerMethods {
 		)
 	}
 
+	/**
+	 * Get events assigned to current user in the current project
+	 * @return list of events
+	 */
 	def getAssignedEvents() {
 		def project = getProjectForWs()
 		def events = userService.getEventDetails(project).values().collect { value -> [
@@ -120,6 +129,10 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(events: events)
 	}
 
+	/**
+	 * Get the event news assigned to the current user in the current project
+	 * @return list of event news
+	 */
 	def getAssignedEventNews() {
 		def project = getProjectForWs()
 		List eventNews = []
@@ -136,6 +149,10 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(eventNews: eventNews)
 	}
 
+	/**
+	 * Get the tasks assigned to the current user in the current project and a summary string for the user dashboard
+	 * @return list of tasks and summary string
+	 */
 	def getAssignedTasks() {
 		def project = getProjectForWs()
 		def taskList = []
@@ -172,6 +189,10 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(tasks: taskList, summaryDetail: summaryDetail)
 	}
 
+	/**
+	 * Get the applications assigned to the current user in the current project
+	 * @return list of applications
+	 */
 	def getAssignedApplications() {
 		def project = getProjectForWs()
 		Map<String, Object> appSummary = userService.getApplications(project)
@@ -188,6 +209,10 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(applications: appList)
 	}
 
+	/**
+	 * Get the active people assigned to the current project
+	 * @return list of people
+	 */
 	def getAssignedPeople() {
 		def project = getProjectForWs()
 

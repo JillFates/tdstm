@@ -407,7 +407,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Live Dashboards</li>
                             <li class="menu-child-item menu-parent-dashboard-user-dashboard">
-                                <g:link controller="dashboard" action="userPortal">User Dashboard</g:link>
+                                <g:link class="mmlink" controller="module" action="user" id="dashboard">User Dashboard</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-parent-dashboard-planning-dashboard">

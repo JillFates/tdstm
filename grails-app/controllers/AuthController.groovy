@@ -98,14 +98,14 @@ class AuthController implements ControllerMethods {
 				uri = '/admin/home'
 			}
 			else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-				uri = '/dashboard/userPortal'
+				uri = '/module/user/dashboard'
 			}
 			else {
 				uri = '/projectUtil'
 			}
 		}
 		else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-			uri = '/dashboard/userPortal'
+			uri = '/module/user/dashboard'
 		}
 		else {
 			uri = '/projectUtil'
