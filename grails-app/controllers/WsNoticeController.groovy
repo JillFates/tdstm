@@ -56,7 +56,7 @@ class WsNoticeController implements ControllerMethods {
 	 *{* 		"title":"titulo",
 	 * 		"rawText":"este es el Mensaje",
 	 * 		"htmlText":"<strong>este es el Mensaje</strong>",
-	 * 		"type":"Prelogin"
+	 * 		"type":"PRE_LOGIN"
 	 */
 	@HasPermission(Permission.NoticeCreate)
 	def create() {
