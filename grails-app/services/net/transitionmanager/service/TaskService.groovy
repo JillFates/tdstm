@@ -48,7 +48,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.integration.ApiActionException
@@ -5477,6 +5476,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		[
 			id            : taskBatch.id,
+			eventName     : taskBatch.eventName(),
 			taskCount     : taskBatch.taskCount,
 			exceptionCount: taskBatch.exceptionCount,
 			createdBy     : taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
