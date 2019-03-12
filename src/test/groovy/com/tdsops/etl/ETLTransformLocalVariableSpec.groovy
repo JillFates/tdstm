@@ -61,9 +61,12 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					extract 'name' set nameVar
-					nameVar transform with uppercase() set upperNameVar 
-					load 'Name' with upperNameVar
+					set columnVar with 'Name'
+					extract columnVar transform with lowercase() set nameVar
+					if (nameVar){
+						nameVar transform with uppercase() set upperNameVar
+						load 'Name' with upperNameVar
+					}
 				}
 			""".stripIndent())
 
@@ -155,7 +158,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 		then: 'It throws an Exception'
 			Exception e = thrown Exception
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == 'No such property: unknownVar at line 7'
+				message == 'No signature of method: com.tdsops.etl.LocalVariableDefinition.transform() is applicable for argument types: (com.tdsops.etl.ETLProcessor$ReservedWord) values: [with] at line 7'
 				startLine == 7
 				endLine == 7
 				startColumn == null

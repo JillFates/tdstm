@@ -709,9 +709,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param localVariableDefinition
 	 * @throws ETLProcessorException
 	 */
-	void transform(LocalVariableDefinition localVariableDefinition) {
-		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
-	}
+//	void transform(LocalVariableDefinition localVariableDefinition) {
+//		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+//	}
 	/**
 	 * <pre>
 	 * iterate {
@@ -722,15 +722,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param variableContent
 	 * @return
 	 */
-	Element transform(Object variableContent) {
-		Element element = new Element(
-			value: variableContent,
-			originalValue: variableContent,
-			processor: this
-		)
-		element.loadedElement = true
-		return element
-	}
+//	Element transform(Object variableContent) {
+//		Element element = new Element(
+//			value: variableContent,
+//			originalValue: variableContent,
+//			processor: this
+//		)
+//		element.loadedElement = true
+//		return element
+//	}
 
 	/**
 	 * Creates an instance of {@code Element} to manage next step in chain method
@@ -1633,6 +1633,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this.result
 	}
 
+	/**
+	 * It creates an instance of {@code Element} class
+	 * in order to continue with the chain of transformation
+	 * after a local variable in an ETL script.
+	 * @param withParameter
+	 * @return
+	 */
+//	def transform(ETLProcessor.ReservedWord withParameter) {
+//		Element element = new Element(
+//			value: 'qweqwe',
+//			originalValue: 'qweqweq',
+//			processor: this
+//		)
+//		element.loadedElement = true
+////		return element
+//
+//		return [
+//		    uppercase: {
+//				element.uppercase()
+//				return element
+//			}
+//		]
+//	}
+
 	List<String> getAvailableMethods() {
 		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
 				'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
@@ -1797,6 +1821,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
 		setUpProgressIndicator(script, progressCallback)
 
+		script = applyLocalVariableTransformation(script)
+
 		String tag = this.dataSetFacade.fileName()
 		this.stopWatch.begin(tag)
 
@@ -1809,6 +1835,23 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 		logMeasurements(this.stopWatch.lap(tag))
 		return result
+	}
+
+	/**
+	 * <p>This transformation converts local variables
+	 * adding a dot ('.') character</p>
+	 * <pre>
+	 * 	nameVar transform with uppercase() set upperNameVar
+	 * </pre>
+	 * It is going to be transformed:
+	 * <pre>
+	 * 	nameVar.transform with uppercase() set upperNameVar
+	 * </pre>
+	 * @param etlScript an ETL String content
+	 * @return same ETL script received by parameter modified
+	 */
+	String applyLocalVariableTransformation(String etlScript) {
+		return etlScript.replaceAll(/(^[^<>]+)(\w*Var\b)\s(transform\swith\s.*)/, '$1$2.$3')
 	}
 
 	/**
