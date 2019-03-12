@@ -8,7 +8,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
-class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTrait, ETLFileSystemTest, ETLAssertTest, DataTest, AutowiredTest {
+class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTrait, ETLFileSystemTrait, ETLAssertTrait, DataTest, AutowiredTest {
 
 	Closure doWithSpring() {
 		{ ->

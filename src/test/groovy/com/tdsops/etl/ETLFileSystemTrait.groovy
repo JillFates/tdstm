@@ -10,7 +10,7 @@ import net.transitionmanager.service.FileSystemService
  * like create a CSV dataset or delete a file after a test case execution.
  * <p><b>Note:</> It needs always an instance of {@code FileSystemService} to complete any task on It<p>
  */
-trait ETLFileSystemTest {
+trait ETLFileSystemTrait {
 
 	/**
 	 * It deletes a a temporary file in test cases using an instance of filesystem service

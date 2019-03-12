@@ -3,9 +3,9 @@ package com.tdsops.etl
 import org.spockframework.runtime.SpockAssertionError
 
 /**
- * Custom assertions for ETL test
+ * <p>Custom assertions for ETL test cases.</p>
  */
-trait ETLAssertTest {
+trait ETLAssertTrait {
 
 	/**
 	 * Assertions for a {@code FieldResult} instance
@@ -32,7 +32,6 @@ trait ETLAssertTest {
 
 	/**
 	 * Assertions for a {@code QueryResult} instance
-	 * //TODO dcorrea add an example
 	 * @param queryResult
 	 * @param domain
 	 * @param values
