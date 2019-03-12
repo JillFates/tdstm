@@ -1633,30 +1633,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this.result
 	}
 
-	/**
-	 * It creates an instance of {@code Element} class
-	 * in order to continue with the chain of transformation
-	 * after a local variable in an ETL script.
-	 * @param withParameter
-	 * @return
-	 */
-//	def transform(ETLProcessor.ReservedWord withParameter) {
-//		Element element = new Element(
-//			value: 'qweqwe',
-//			originalValue: 'qweqweq',
-//			processor: this
-//		)
-//		element.loadedElement = true
-////		return element
-//
-//		return [
-//		    uppercase: {
-//				element.uppercase()
-//				return element
-//			}
-//		]
-//	}
-
 	List<String> getAvailableMethods() {
 		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
 				'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
