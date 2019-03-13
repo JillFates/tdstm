@@ -221,7 +221,7 @@ export class NoticeListComponent implements OnInit {
 					await this.dialogService.open(EULAComponent, [ {provide: PostNoticeModel, useValue: notice}]);
 					return resolve(true);
 				} catch (error) {
-					return reject(error);
+					return reject(error || 'User cancelled');
 				}
 			}, 500);
 		});
