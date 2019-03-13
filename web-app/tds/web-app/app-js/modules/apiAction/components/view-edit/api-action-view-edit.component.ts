@@ -274,9 +274,6 @@ export class APIActionViewEditComponent implements OnInit {
 					});
 					if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
 						this.apiActionModel.actionType = { id: this.WEB_API};
-						this.apiActionModel.remoteInvocation = false;
-					} else {
-						this.apiActionModel.remoteInvocation = true;
 					}
 				}
 
@@ -284,7 +281,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.remoteCredentials = [];
 					const keys = Object.keys(result.data.remoteCredentialMethods);
 					keys.forEach((key: string) => {
-						this.remoteCredentials.push({id: key, name: result.data.remoteCredentialMethods[key]});
+						this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
 					});
 				}
 
