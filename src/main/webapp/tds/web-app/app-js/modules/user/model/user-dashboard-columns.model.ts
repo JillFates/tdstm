@@ -117,12 +117,12 @@ export class TaskColumnModel {
 				label: 'Task',
 				property: 'task',
 				type: 'text',
-				width: 450
+				width: 295
 			}, {
 				label: 'Related',
 				property: 'related',
 				type: 'text',
-				width: 450
+				width: 295
 			}, {
 				label: 'Due/Est Finish',
 				property: 'dueEstFinish',
