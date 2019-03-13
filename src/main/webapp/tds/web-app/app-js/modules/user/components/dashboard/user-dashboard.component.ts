@@ -52,11 +52,11 @@ export class UserDashboardComponent implements OnInit {
 		this.populateData();
 	}
 
-	onChangeProject() {
+	public onChangeProject(): void {
 		this.populateData(this.selectedProject.id);
 	}
 
-	populateData(projId = '') {
+	private populateData(projId = ''): void {
 		this.userService.fetchModelForUserDashboard(projId)
 			.subscribe((result) => {
 				this.fetchApplicationsForGrid();
@@ -77,11 +77,11 @@ export class UserDashboardComponent implements OnInit {
 		this.taskColumnModel = new TaskColumnModel();
 	}
 
-	openLinkInNewTab(url) {
+	public openLinkInNewTab(url): void {
 		window.open(url, '_blank');
 	}
 
-	getMarkupUrlData(url) {
+	public getMarkupUrlData(url): any {
 		if (url) {
 			let data = url.split('|');
 			if (data.length === 1) {
@@ -121,35 +121,35 @@ export class UserDashboardComponent implements OnInit {
 		});
 	}
 
-	updateTaskStatus(id, status) {
+	public updateTaskStatus(id, status): void {
 		this.taskService.updateStatus(id, status)
 			.subscribe(() => {
 				this.fetchTasksForGrid();
 			});
 	}
 
-	fetchApplicationsForGrid() {
+	public fetchApplicationsForGrid(): void {
 		this.userService.getAssignedApplications()
 			.subscribe((result) => {
 				this.applicationList = result.applications;
 			});
 	}
 
-	fetchEventsForGrid() {
+	public fetchEventsForGrid(): void {
 		this.userService.getAssignedEvents()
 			.subscribe((result) => {
 				this.eventList = result.events;
 			});
 	}
 
-	fetchEventNewsForGrid() {
+	public fetchEventNewsForGrid(): void {
 		this.userService.getAssignedEventNews()
 			.subscribe((result) => {
 				this.eventNewsList = result.eventNews;
 			});
 	}
 
-	fetchTasksForGrid() {
+	public fetchTasksForGrid(): void {
 		this.userService.getAssignedTasks()
 			.subscribe((result) => {
 				this.taskList = result.tasks;
@@ -160,14 +160,14 @@ export class UserDashboardComponent implements OnInit {
 			});
 	}
 
-	fetchPeopleForGrid() {
+	public fetchPeopleForGrid(): void {
 		this.userService.getAssignedPeople()
 			.subscribe((result) => {
 				this.activePersonList = result.activePeople;
 			});
 	}
 
-	launchManageStaff(id): void {
+	private launchManageStaff(id): void {
 		if (id) {
 			this.dialogService.extra(UserManageStaffComponent, [
 				{provide: 'id', useValue: id},
@@ -182,7 +182,7 @@ export class UserDashboardComponent implements OnInit {
 		}
 	}
 
-	handleApplicationClicked(event) {
+	public handleApplicationClicked(event): void {
 		if (event.dataItem === this.itemForDoubleClick) {
 			this.dialogService.open(AssetShowComponent, [
 				{provide: 'ID', useValue: event.dataItem.appId},
@@ -198,7 +198,7 @@ export class UserDashboardComponent implements OnInit {
 		}
 	}
 
-	handlePersonClicked(event) {
+	public handlePersonClicked(event): void {
 		if (event.dataItem === this.itemForDoubleClick) {
 			this.launchManageStaff(event.dataItem.personId);
 		} else {
