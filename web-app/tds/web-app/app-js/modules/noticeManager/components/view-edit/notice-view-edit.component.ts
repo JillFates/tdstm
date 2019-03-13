@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -19,7 +19,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 	selector: 'tds-notice-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
 })
-export class NoticeViewEditComponent {
+export class NoticeViewEditComponent implements OnInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 	@ViewChild('noticeForm') noticeForm: FormControl;
@@ -31,6 +31,7 @@ export class NoticeViewEditComponent {
 	};
 	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
 	protected EnumNoticeType = NoticeType;
+	protected noticeType: any;
 
 	constructor(
 		model: NoticeModel,
@@ -40,10 +41,13 @@ export class NoticeViewEditComponent {
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
-
 		this.model = {...model};
 		this.model.typeId = this.model.typeId ?  parseInt(this.model.typeId, 10) : null;
+		this.noticeType = {typeId: this.model.typeId};
 		this.dataSignature = JSON.stringify(this.model);
+	}
+
+	ngOnInit() {
 	}
 
 	protected cancelCloseDialog(): void {
@@ -74,6 +78,8 @@ export class NoticeViewEditComponent {
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
+		this.model.typeId = (this.noticeType && this.noticeType.typeId);
+
 		if (this.model.id) {
 			this.noticeService.editNotice(this.model)
 				.subscribe(
@@ -103,7 +109,16 @@ export class NoticeViewEditComponent {
 	}
 
 	protected formValid(): boolean {
-		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
+		const noticeType = this.noticeType && this.noticeType.typeId;
+		const isValid =  this.model.title &&
+				(this.htmlText.value && this.htmlText.value.trim())  &&
+				this.htmlText.valid() && noticeType;
+
+		const returnValue =  (noticeType === NoticeType.Mandatory) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
+
+		console.log('IsValid:', returnValue);
+
+		return returnValue;
 	}
 
 	protected isCreateEditAvailable(): boolean {

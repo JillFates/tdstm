@@ -64,7 +64,12 @@
                                         (valueChange)="onFilter(column)"
                                         class="form-control">
                                     </kendo-dropdownlist>
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <span *ngIf="column.filter"
+                                          (click)="resetTypeFilter(column);"
+                                          style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;"
+                                          class="fa fa-times form-control-feedback"
+                                          aria-hidden="true">
+                                    </span>
                                 </div>
 
                                 <div *ngIf="column.type === 'date'">
@@ -82,7 +87,7 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'typeId'" let-dataItem>
-                            {{((dataItem.typeId == 1 )? 'Prelogin' : 'Postlogin')}}
+                            {{notices[dataItem.typeId]}}
                         </ng-template>
 
                     </kendo-grid-column>

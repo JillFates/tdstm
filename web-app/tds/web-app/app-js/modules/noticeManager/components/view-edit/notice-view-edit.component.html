@@ -9,7 +9,8 @@
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-3 control-label">Title: <span class="required_field">*</span></label>
                     <div class="col-sm-9">
-                        <input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title" [(ngModel)]="model.title"
+                        <input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title"
+                               [(ngModel)]="model.title"
                             required>
                     </div>
                 </div>
@@ -26,7 +27,7 @@
                                 [valueField]="'typeId'"
                                 id="selectType"
                                 class="form-control"
-                                [(ngModel)]="model.noticeType"
+                                [(ngModel)]="noticeType"
                                 requiredComplexValue propertyName="typeId" required>
                         </kendo-dropdownlist>
                     </div>
@@ -89,20 +90,20 @@
                     </div>
                 </div>
                 <div class="form-group"
-                     *ngIf="model.noticeType && model.noticeType.typeId == EnumNoticeType.Mandatory">
+                     *ngIf="noticeType && noticeType.typeId == EnumNoticeType.Mandatory">
                     <label for="postMessageText" class="col-sm-12 control-label">Post Message Text: <span class="required_field">*</span></label>
 	                <div class="col-sm-12">
-                        <input type="text" class="form-control"
-                               required
+                        <input type="text"
+                               class="form-control"
                                name="postMessageText" id="postMessageText"
-                               [(ngModel)]="model.title">
+                               [(ngModel)]="model.postMessageText">
                     </div>
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
+        <button (click)="saveNotice()" [disabled]="!formValid() || !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
         <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
         <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>

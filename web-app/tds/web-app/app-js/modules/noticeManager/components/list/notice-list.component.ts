@@ -52,6 +52,7 @@ export class NoticeListComponent implements OnInit {
 	protected resultSet: any[];
 	protected dateFormat: string;
 	protected postNotices: PostNoticeModel[] = [];
+	protected notices = [];
 
 	/**
 	 * @constructor
@@ -69,6 +70,11 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.notices = this.noticeTypes
+			.map((notice) => notice.name);
+		console.log('The notices are:');
+		console.log(this.notices);
+
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
@@ -101,6 +107,11 @@ export class NoticeListComponent implements OnInit {
 	protected clearValue(column: any): void {
 		this.noticeService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
+	}
+
+	protected resetTypeFilter(column: any): void {
+		this.clearValue(column);
+		column.filter = null;
 	}
 
 	/**
@@ -182,26 +193,10 @@ export class NoticeListComponent implements OnInit {
 
 	onShowEULA(): void {
 		this.iterateMandatory();
-		/*
-		if (this.postNotices.length) {
-			const notice = this.postNotices[0];
-			this.dialogService.open(EULAComponent, [
-				{provide: PostNoticeModel, useValue: notice}
-			]).then(result => {
-				alert('closing fine');
-				this.reloadData();
-			}, error => {
-				alert('closing with error');
-				console.log(error);
-			});
-			console.log('Clicked on create notice');
-		}
-		*/
-
 	}
 
 	async iterateMandatory() {
-		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement)
+		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
 		let keepGoing = true;
 
 		while (keepGoing && notices.length) {

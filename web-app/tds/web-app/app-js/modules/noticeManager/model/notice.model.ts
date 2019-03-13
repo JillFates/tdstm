@@ -18,7 +18,7 @@ export class NoticeColumnModel {
 				label: 'Type',
 				property: 'typeId',
 				type: 'text',
-				width: 160,
+				width: 220,
 			}, {
 				label: 'Active',
 				property: 'active',
@@ -56,7 +56,7 @@ export class NoticeColumnModel {
 }
 
 export enum NoticeType {
-	PreLogin,
+	PreLogin = 1,
 	PostLogin,
 	Mandatory
 }
@@ -76,6 +76,7 @@ export class NoticeModel {
 	expirationDate: any;
 	sequence: number;
 	locked: boolean;
+	postMessageText: string;
 }
 
 export class PostNoticeResponse {
