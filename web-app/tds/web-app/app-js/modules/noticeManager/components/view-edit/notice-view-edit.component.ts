@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -29,11 +29,8 @@ export class NoticeViewEditComponent {
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-	protected typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Pre Login'},
-		{typeId: 2, name: 'Post Login'},
-		{typeId: 3, name: 'Mandatory Acknowledgement'}
-	];
+	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
+	protected EnumNoticeType = NoticeType;
 
 	constructor(
 		model: NoticeModel,

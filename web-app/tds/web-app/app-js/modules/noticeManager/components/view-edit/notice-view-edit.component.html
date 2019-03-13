@@ -62,18 +62,17 @@
 
                 <div class="form-group">
                     <label for="sequence" class="col-sm-3 control-label">Sequence:</label>
-                    <div class="col-sm-9">
+                    <div class="col-sm-1">
                         <kendo-numerictextbox
                                 name="sequence" [value]="model.sequence" [format]="'n0'" [min]="0" [autoCorrect]="true">
                         </kendo-numerictextbox>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="locked" class="col-sm-3 control-label">Locked:</label>
-                    <div class="col-sm-9">
-                        <input id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
-                    </div>
+	                <div class="col-sm-2">
+	                </div>
+	                <div class="col-sm-6 locked-container">
+		                <label for="locked" class="control-label">Locked:</label>
+		                <input id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
+	                </div>
                 </div>
 
                 <div class="form-group">
@@ -89,10 +88,12 @@
                         </rich-text-editor>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="postMessageText" class="col-sm-12 control-label">Post Message Text:</label>
+                <div class="form-group"
+                     *ngIf="model.noticeType && model.noticeType.typeId == EnumNoticeType.Mandatory">
+                    <label for="postMessageText" class="col-sm-12 control-label">Post Message Text: <span class="required_field">*</span></label>
 	                <div class="col-sm-12">
                         <input type="text" class="form-control"
+                               required
                                name="postMessageText" id="postMessageText"
                                [(ngModel)]="model.title">
                     </div>

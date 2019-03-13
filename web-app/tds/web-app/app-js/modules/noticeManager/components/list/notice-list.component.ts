@@ -46,7 +46,7 @@ export class NoticeListComponent implements OnInit {
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	protected noticeTypes = [{typeId: '', name: ''}].concat(NoticeTypes);
+	protected noticeTypes = [{typeId: null, name: ''}].concat(NoticeTypes);
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];

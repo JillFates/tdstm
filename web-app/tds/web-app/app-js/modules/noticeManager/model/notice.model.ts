@@ -57,7 +57,8 @@ export class NoticeColumnModel {
 
 export enum NoticeType {
 	PreLogin,
-	PostLogin
+	PostLogin,
+	Mandatory
 }
 
 export class NoticeModel {
@@ -90,6 +91,7 @@ export class PostNoticeModel {
 }
 
 export const NoticeTypes = [
-	{typeId: '1', name: 'Prelogin'},
-	{typeId: '2', name: 'Postlogin'}
+	{typeId: NoticeType.PreLogin, name: 'Pre Login'},
+	{typeId: NoticeType.PostLogin, name: 'Post Login'},
+	{typeId: NoticeType.Mandatory, name: 'Mandatory Acknowledgement'}
 ];
