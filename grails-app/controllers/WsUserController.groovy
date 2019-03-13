@@ -12,7 +12,6 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.Timezone
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService

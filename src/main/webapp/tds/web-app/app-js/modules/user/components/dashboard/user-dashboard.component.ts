@@ -183,20 +183,11 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	handleApplicationClicked(event) {
-
-		// ------------------------------------------------
-
-		this.dialogService.open(AssetShowComponent, [
+		if (event.dataItem === this.itemForDoubleClick) {
+			this.dialogService.open(AssetShowComponent, [
 				{provide: 'ID', useValue: event.dataItem.appId},
 				{provide: 'ASSET', useValue: event.dataItem.assetClass}
-			], DIALOG_SIZE.LG).then(x => {
-			// ---
-		});
-
-		// ------------------------------------------------
-
-		if (event.dataItem === this.itemForDoubleClick) {
-			// ---
+			], DIALOG_SIZE.LG);
 		} else {
 			this.itemForDoubleClick = event.dataItem;
 			setTimeout((dataItem) => {
