@@ -201,7 +201,7 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	async iterateMandatory() {
-		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
+		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement)
 		let keepGoing = true;
 
 		while (keepGoing && notices.length) {

@@ -30,8 +30,9 @@ export class NoticeViewEditComponent {
 		typeId: null, name: 'Select a Type'
 	};
 	protected typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Prelogin'},
-		{typeId: 2, name: 'Postlogin'}
+		{typeId: 1, name: 'Pre Login'},
+		{typeId: 2, name: 'Post Login'},
+		{typeId: 3, name: 'Mandatory Acknowledgement'}
 	];
 
 	constructor(
@@ -44,7 +45,7 @@ export class NoticeViewEditComponent {
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
-		this.model.typeId = parseInt(this.model.typeId, 10);
+		this.model.typeId = this.model.typeId ?  parseInt(this.model.typeId, 10) : null;
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
