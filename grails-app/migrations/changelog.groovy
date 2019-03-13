@@ -157,7 +157,7 @@ databaseChangeLog = {
 	include file: '20160909-add-duration-locked-to-tasks.groovy'
 	include file: '20161006-update-user-preference-code-legendTwistieState.groovy'
 	// include file: '20161010-notice-support.groovy'
-	include file: '20161010-notice-support-change-noticetype-column.groovy'
+	// include file: '20161010-notice-support-change-noticetype-column.groovy'
 	include file: '20161111-delete-asset-dependency-orphans.groovy'
 	include file: '20161129-fix-license-columns.groovy'
 	include file: '20161207-add-owner-to-license-table.groovy'
