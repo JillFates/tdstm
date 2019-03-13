@@ -186,7 +186,7 @@ export class NoticeService {
 					id: 12,
 					name: 'Maintenance Outage',
 					htmlText: 'We will be updating the system at 11:00pm EST this evening - you have been warned!',
-					needAcknowledgement: 0
+					needAcknowledgement: 1
 				}
 			]
 		};

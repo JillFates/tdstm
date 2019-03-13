@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
@@ -206,19 +206,25 @@ export class NoticeListComponent implements OnInit {
 
 		while (keepGoing && notices.length) {
 			try {
-				const notice = notices.shift();
-				const result = await this.dialogService.open(EULAComponent, [ {provide: PostNoticeModel, useValue: notice}]);
-				console.log('The result is');
-				console.log(result);
-				console.log('---------');
-			} catch(error) {
-				console.log('Error:');
-				console.log(error.message || error);
+				await this.openDialogWithDelay(notices.shift());
+			} catch (error) {
+				console.log('Error:', error.message || error);
 				keepGoing = false;
 			}
-			console.log('Here Im ');
 		}
+	}
 
+	openDialogWithDelay(notice: PostNoticeModel) {
+		return new Promise((resolve, reject) => {
+			setTimeout(async() => {
+				try {
+					await this.dialogService.open(EULAComponent, [ {provide: PostNoticeModel, useValue: notice}]);
+					return resolve(true);
+				} catch (error) {
+					return reject(error);
+				}
+			}, 500);
+		});
 	}
 
 	/**
