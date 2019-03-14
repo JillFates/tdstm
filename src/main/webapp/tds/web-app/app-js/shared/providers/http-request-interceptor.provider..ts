@@ -20,6 +20,9 @@ import {FILE_SYSTEM_URL, ETL_SCRIPT_UPLOAD_URL, ASSET_IMPORT_UPLOAD_URL} from '.
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
 
+export const MULTIPART_FORM_DATA = 'multipart/form-data';
+export const APPLICATION_JSON = 'application/json';
+
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
 
@@ -48,9 +51,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	 */
 	private handleRequest(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-		const authReq = request.clone({
-			setHeaders: { 'Content-Type': 'application/json' }
-		});
+		let contentType = APPLICATION_JSON;
+		// Verify this request is as JSON, if not, do not overwrite the original request
+		let originalRequestType = request.headers.get('Content-Type');
+		if (originalRequestType !== null && originalRequestType !== APPLICATION_JSON) {
+			contentType = originalRequestType;
+		}
+
+		let authReq = request.clone({
+			setHeaders: {'Content-Type': contentType}
+		})
 
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'

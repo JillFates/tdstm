@@ -4234,9 +4234,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				tagsOrEvent.add('a.moveBundle.id IN (:bIds)')
 			}
 
-			String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
+			if(tagsOrEvent) {
+				String tagsOrEventStr = "(${tagsOrEvent.join(' OR ')})"
 
-			where = SqlUtil.appendToWhere(where, tagsOrEventStr)
+				where = SqlUtil.appendToWhere(where, tagsOrEventStr)
+			}
 
 			// Assemble the SQL and attempt to execute it
 			try {
