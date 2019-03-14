@@ -21,8 +21,8 @@
 	<asset:stylesheet href="css/spinner.css" />
 
 	<!-- jQuery -->
-	<asset:stylesheet href="css/ui.dialog.css" />
-	<asset:stylesheet href="css/jquery-ui-smoothness.css" />
+	<asset:stylesheet href="css/resources/ui.dialog.css" />
+	<asset:stylesheet href="css/resources/jquery-ui-smoothness.css" />
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 	<g:javascript src="jquery-1.9.1.js"/>

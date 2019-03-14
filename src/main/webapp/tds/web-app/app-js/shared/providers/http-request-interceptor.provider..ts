@@ -83,6 +83,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
 				if (error && error.status === 404) {
 					errorMessage = 'The requested resource was not found';
+				} else if (error.headers && error.headers.get('x-login-url')) {
+					errorMessage = 'Your Session expired';
+					window.location.href = error.headers.get('x-login-url');
 				} else {
 					errorMessage = 'Bad Request';
 				}
