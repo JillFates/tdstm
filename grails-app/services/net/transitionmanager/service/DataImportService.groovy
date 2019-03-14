@@ -971,7 +971,7 @@ class DataImportService implements ServiceMethods {
 	 * @return the newly minted entity instance
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	Object createEntity(Class domainClass, Map fieldsMap, Map context) {
+	Object createEntity(def domainClass, Map fieldsMap, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
 		}
