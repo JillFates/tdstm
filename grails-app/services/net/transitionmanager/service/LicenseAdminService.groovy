@@ -578,15 +578,13 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 			lic.type = DomainLicense.Type.MULTI_PROJECT
 		}
 
-        if (lic.save(flush:true)) {
+        if (lic.save(flush:true, failOnError: false)) {
         	return lic
         } else {
-        	if (lic.hasErrors()) {
-            	String errors = GormUtil.allErrorsString(lic)
-                log.error("lic error: {}",  errors)
-            }
-            throw new DomainUpdateException("Error while creating License Request")
-        }
+			String errors = GormUtil.allErrorsString(lic)
+			log.error("lic error: {}", errors)
+			throw new DomainUpdateException("Error while creating License Request")
+		}
     }
 
 	/**

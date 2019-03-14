@@ -1,18 +1,17 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.annotation.Secured
+import grails.web.mapping.LinkGenerator
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelConnector
@@ -26,8 +25,6 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang3.math.NumberUtils
-import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

@@ -83,6 +83,7 @@ class CustomDomainServiceTests extends Specification {
             loadFieldSpecJson()
             def fieldSpec = loadFieldSpecJson()
             def customFieldSpecsMap
+
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
             customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)

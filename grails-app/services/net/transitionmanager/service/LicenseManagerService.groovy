@@ -247,7 +247,7 @@ class LicenseManagerService extends LicenseCommonService {
 		}
 
 		if(lic) {
-			if(! lic.save() ){
+			if(! lic.save(failOnError:false) ){
 				if( log.isDebugEnabled() ) {
 					String errors = ""
 					lic.errors.each { err ->

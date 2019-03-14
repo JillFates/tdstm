@@ -160,7 +160,7 @@ class PartyGroupService implements ServiceMethods {
 		if (partyGroup) {
 			partyGroup.properties = params
 
-			if (!partyGroup.hasErrors() && partyGroup.save()) {
+			if (!partyGroup.hasErrors() && partyGroup.save(failOnError:false)) {
 
 				def company = securityService.loadCurrentPerson().company
 
@@ -195,7 +195,7 @@ class PartyGroupService implements ServiceMethods {
 		partyGroup.comment = comment
 		partyGroup.partyType = partyType
 
-		if (!partyGroup.hasErrors() && partyGroup.save()) {
+		if (!partyGroup.hasErrors() && partyGroup.save(failOnError:false)) {
 
 			//	Statements to create CLIENT PartyRelationship with the user's Company
 			if (partyType.id == "COMPANY") {

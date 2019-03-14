@@ -401,7 +401,7 @@ trait ControllerMethods {
 	def <T> T saveWithWarnings(T instance, boolean flush = false) {
 		if (instance == null) return null
 
-		instance.save(flush: flush)
+		instance.save(flush: flush, failOnError:false)
 
 		if (instance.hasErrors()) {
 			LoggerFactory.getLogger('grails.app.controllers.' + getClass().name).error(

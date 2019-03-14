@@ -559,7 +559,7 @@ class ImportService implements ServiceMethods {
 
 					// Update the batch status to POSTING
 					dtb.statusCode = DataTransferBatch.POSTING
-					if (!dtb.save(flush:true, failOnError:true)) {
+					if (!dtb.save(flush:true, failOnError:false)) {
 						errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
 					}
 
@@ -581,7 +581,7 @@ class ImportService implements ServiceMethods {
 							dtb.importResults = combineDataTransferBatchImportResults(dtb, results.info)
 							results.batchStatusCode = DataTransferBatch.COMPLETED
 						}
-						if (!dtb.validate() || !dtb.save(flush:true)) {
+						if (!dtb.save(flush:false, failOnError: false)) {
 							errorMsg = "Unable to import assets: ${GormUtil.allErrorsString(dtb)}"
 							log.error(errorMsg)
 						}
@@ -2427,7 +2427,7 @@ class ImportService implements ServiceMethods {
 						}
 
 						// Attempt to save the record
-						if (!assetDep.save(flush:true)) {
+						if (!assetDep.save(flush:true, failOnError: false)) {
 							dependencyError "Dependency save failed for row $rowNum : ${GormUtil.allErrorsString(assetDep)}"
 							continue
 						}
@@ -2602,7 +2602,7 @@ class ImportService implements ServiceMethods {
 							continue
 						}
 
-						if (!assetComment.save()) {
+						if (!assetComment.save(failOnError: false)) {
 							importResults.errors << "Save failed (row $rowNum) : ${GormUtil.allErrorsString(assetComment)}"
 						} else {
 							if (recordForAddition) {
@@ -2817,7 +2817,7 @@ class ImportService implements ServiceMethods {
 				assetClass:assetClass
 			)
 
-		if (!dtb.save()) {
+		if (!dtb.save(failOnError: false)) {
 			log.error "createTransferBatch() failed save - ${GormUtil.allErrorsString(dtb)}"
 			return null
 		}

@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetCableMap
-import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -11,7 +10,6 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import net.transitionmanager.security.Permission
 
 class RackService implements ServiceMethods {
 
@@ -55,7 +53,7 @@ class RackService implements ServiceMethods {
 			// TODO : JPM 9/2014 : Adjust the roomX/Y coord so that racks don't land on top of one another when creating new ones
 
 			rack = new Rack(params)
-			if (!rack.save()) {
+			if (!rack.save(failOnError: false)) {
 				log.error "Unable to create room project:$project, room:$room, rackName:$rackName, $model:$model ${GormUtil.allErrorsString(rack)}"
 				room = null
 			}
@@ -85,7 +83,7 @@ class RackService implements ServiceMethods {
 			Manufacturer manu = Manufacturer.findByName(names.manuName)
 			if (! manu) {
 				manu = new Manufacturer([ name: names.manuName])
-				if (! manu.validate() || ! manu.save(flush:true)) {
+				if (! manu.save(flush:true, failOnError: false)) {
 					log.error "getDefaultRackModel() failed to create Manufacturer $manuName : ${GormUtil.allErrorsString(manu)}"
 					return null
 				}
@@ -104,7 +102,7 @@ class RackService implements ServiceMethods {
 				depth: 34
 			]
 			model = new Model(modelProps)
-			if (! model.validate() || ! model.save(flush:true)) {
+			if (! model.save(flush:true, failOnError: false)) {
 				log.error "getDefaultRackModel() failed to create model $names.manuName/$names.modelName : ${GormUtil.allErrorsString(model)}"
 				return null
 			}

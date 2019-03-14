@@ -182,7 +182,7 @@ class MoveEventService implements ServiceMethods {
 			mes.person = person
 			mes.moveEvent = moveEvent
 			mes.role = teamRoleType
-			if (! mes.save(flush:true)) {
+			if (! mes.save(flush:true, failOnError: false)) {
 				log.error "addTeamMember() failed to create MoveEventStaff($person.id, $moveEvent.id, $teamCode) : ${GormUtil.allErrorsString(moveEventStaff)}"
 				throw new DomainUpdateException('An error occurred while assigning person to the event')
 			}
@@ -340,12 +340,9 @@ class MoveEventService implements ServiceMethods {
 	MoveEvent update(Long id, CreateEventCommand command) {
 		MoveEvent moveEvent = findById(id, true)
 		moveEvent.properties = command
-		if (!moveEvent.hasErrors() && moveEvent.save()) {
-			return moveEvent
-		} else {
-			log.info("Error updating MoveEvent. {}", GormUtil.allErrorsString(moveEvent))
-			throw new DomainUpdateException("Error updating move event.")
-		}
+		moveEvent.save()
+
+		return moveEvent
 	}
 
 	/**

@@ -83,7 +83,7 @@ class ProviderService implements ServiceMethods {
         }
 
         // Try to save or fail.
-        if (!provider.save()) {
+        if (!provider.save(failOnError: false)) {
             throw new DomainUpdateException("Error creating or updating Provider ${GormUtil.allErrorsString(provider)}")
         }
 

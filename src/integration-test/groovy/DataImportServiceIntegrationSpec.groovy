@@ -949,7 +949,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			GormUtil.hasUnsavedChanges(server)
 
 		when: 'the server is saved'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'there should be no unsaved changes'
 			! GormUtil.hasUnsavedChanges(server)
@@ -993,7 +993,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			server.modifiedBy == clientStaff2
 
 		when: 'saving the changes after the latest changes'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'the server move bundle should now reference the new bundle'
 			server.moveBundle.id == mb2.id
@@ -1157,7 +1157,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			manufacturer = Manufacturer.findOrSaveWhere( name: manufacturerName )
 			new ManufacturerAlias(
 					  name: manufacturerAliasName, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return manufacturer
@@ -1180,7 +1180,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			model = Model.findOrSaveWhere( modelName:modelName , manufacturer: manufacturer )
 			new ModelAlias(
 					  name: modelAliasName, model: model, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return model

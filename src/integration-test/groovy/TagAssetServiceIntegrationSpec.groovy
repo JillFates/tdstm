@@ -132,22 +132,22 @@ class TagAssetServiceIntegrationSpec extends Specification{
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
-		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
-		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
-		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
 
 		event = moveEventTestHelper.createMoveEvent(project)
 		event2 = moveEventTestHelper.createMoveEvent(project)
 
-		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true, failOnError: true)
-		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
-		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
+		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true)
+		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true)
+		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true)
 
 		tagService.securityService = [
 			getUserCurrentProject  : { -> project },

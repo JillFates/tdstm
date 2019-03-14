@@ -54,14 +54,14 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				client: new PartyGroup(name: 'client'),
 				workflowCode: '12345',
 				guid: StringUtil.generateGuid()
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			AssetComment task = new AssetComment(
 				comment: 'a comment',
 				commentType: 'comment',
 				project: project,
 				status: 'Planned'
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
 
@@ -475,10 +475,10 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 		setup:
 			service.sequenceService = Mock(SequenceService)
 			Workflow workflow = new Workflow(process: 'process')
-			workflow.save(failOnError: true, flush: true)
+			workflow.save(flush: true)
 
 			RoleType role = new RoleType(id: 'ROLE_SECURITY', type: 'ROLE_SECURITY', level: 0)
-			role.save(failOnError: true, flush: true)
+			role.save(flush: true)
 
 			WorkflowTransition workflowTransition = new WorkflowTransition(
 				category: 'Category',
@@ -493,7 +493,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				duration_scale: TimeScale.D,
 				code: 'code')
 
-			workflowTransition.save(failOnError: true, flush: true)
+			workflowTransition.save(flush: true)
 
 
 		when:
@@ -508,7 +508,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				client: new PartyGroup(name: 'client'),
 				workflowCode: workflowTransition.code,
 				guid: StringUtil.generateGuid()
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			def taskList = [:]
 			def taskSpec = [:]

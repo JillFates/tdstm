@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.MoveEvent
@@ -60,7 +59,7 @@ class NewsEditorService {
 			moveEventNews.isArchived = 0
 		}
 
-		moveEventNews.save(failOnError: true)
+		moveEventNews.save()
 
 
 	}
@@ -81,6 +80,6 @@ class NewsEditorService {
 			moveEventNews = GormUtil.findInProject(project, MoveEventNews, id, true)
 		}
 
-			moveEventNews.delete(failOnError: true)
+			moveEventNews.delete()
 	}
 }

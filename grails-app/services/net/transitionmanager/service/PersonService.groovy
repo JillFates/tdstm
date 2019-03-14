@@ -566,7 +566,7 @@ class PersonService implements ServiceMethods {
 
 		// toPerson.properties = cmdObj
 		cmdObj.populateDomain(toPerson, true, ['constraintsMap'])
-		if (!toPerson.save(flush:true)) {
+		if (!toPerson.save(flush:true, failOnError: false)) {
 			throw new DomainUpdateException('Unable to update person ' + GormUtil.allErrorsString(toPerson))
 			toPerson.errors.allErrors.each{ println it }
 		}

@@ -553,7 +553,7 @@ class ProjectService implements ServiceMethods {
 				type: spec.type,
 				key: spec.key,
 				json: spec.json)
-			if (!s.save(flush:true)) {
+			if (!s.save(flush:true, failOnError: false)) {
 				log.error 'cloneDefaultSettings failed : ' + GormUtil.allErrorsString(s)
 				throw new DomainUpdateException('An error occurred while creating the Asset Field Settings')
 			}
@@ -741,7 +741,7 @@ class ProjectService implements ServiceMethods {
 					completionTime: project.completionDate
 				)
 
-				if (!moveBundle.save(flush: true)) {
+				if (!moveBundle.save(flush: true, failOnError: false)) {
 					log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
 					throw new RuntimeException('Unable to create default bundle')
 				}
@@ -899,7 +899,7 @@ class ProjectService implements ServiceMethods {
 			return [message: " Image size is too large. Please select proper Image", success: false]
 		}
 
-		if (!projectInstance.hasErrors() && projectInstance.save()) {
+		if (projectInstance.save(failOnError: false)) {
 			if(file && file.getContentType() == "application/octet-stream"){
 				//Nonthing to perform.
 			} else {
@@ -1005,10 +1005,7 @@ class ProjectService implements ServiceMethods {
 			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
 
 			metrics.each { metric ->
-				//TODO: Remove duplicated
-				if (!metric.save(flush:true)) {
-					log.error "generateDailyMetrics: failed to create ProjectDailyMetric: ${GormUtil.allErrorsString(metric)}"
-				}
+				metric.save(flush:true)
 			}
 
 			log.info "Project Daily Metrics. End date: $sqlSearchDate"
@@ -1839,5 +1836,31 @@ class ProjectService implements ServiceMethods {
 			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}
 		return logoUrl
+	}
+
+	/**
+	 * A factory method to create/update a ProjectLogo object from an File which will be associated to a project. This will
+	 * attempt to lookup an existing ProjectLogo by project first and only create one if it doesn't already exist. It will then
+	 * update the object with the content from the file object.
+	 *
+	 * @param project - the project to save logo to
+	 * @param file - the File resource to reference
+	 * @return the ProjectLogo object
+	 */
+	ProjectLogo createOrUpdate(Project project, file) {
+		assert file
+		assert project
+
+		String origFileName = file.originalFilename
+		int slashIndex = Math.max(origFileName.lastIndexOf('/'), origFileName.lastIndexOf('\\'))
+
+		if (slashIndex > -1) {
+			origFileName = origFileName.substring(slashIndex + 1)
+		}
+
+		ProjectLogo pl = findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
+		pl.setData file.inputStream
+
+		return pl.save(flush: true)
 	}
 }

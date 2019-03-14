@@ -3097,7 +3097,7 @@ class AccountImportExportService implements ServiceMethods {
 
 			if (changed) {
 				recordChangeHistory(account.changeHistory, person)
-				if (! person.save()) {
+				if (! person.save(failOnError: false)) {
 					account.changeHistory = null
 					log.error "applyPersonChanges() save person $person failed : ${GormUtil.allErrorsString(person)}"
 					error = gormValidationErrors(person)
@@ -3142,7 +3142,7 @@ class AccountImportExportService implements ServiceMethods {
 
 		// Try saving the user but if it errors we'll discard it and just report an error
 		recordChangeHistory(account.changeHistory, userLogin)
-		if (! userLogin.save()) {
+		if (! userLogin.save(failOnError: false)) {
 			error = gormValidationErrors(userLogin)
 			userLogin.discard()
 			userLogin = null

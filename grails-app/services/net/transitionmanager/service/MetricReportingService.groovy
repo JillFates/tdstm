@@ -7,7 +7,6 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StopWatch
-import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
@@ -16,12 +15,9 @@ import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserLoginProjectAccess
 import org.apache.commons.lang3.RandomUtils
 import org.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 /**
  * A service for dealing with reporting metrics.
  */
@@ -534,7 +530,7 @@ class MetricReportingService {
 		)
 
 		result.value = data.value
-		result.save(failOnError: true)
+		result.save()
 	}
 
 	/**

@@ -1,8 +1,8 @@
 
 
+
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -60,10 +60,8 @@ class ProjectUtilController implements ControllerMethods {
 					planStartTime: new Date(step.planStartTime?.time + timeDelta),
 					planCompletionTime: new Date(step.planCompletionTime?.time + timeDelta),
 					calcMethod: step.calcMethod)
-			if (!moveBundleStep.save()) {
-				def etext = "Unable to create asset $moveBundleStep: ${GormUtil.allErrorsString(moveBundleStep)}"
-				println etext
-			}
+
+			moveBundleStep.save()
 		}
 	}
 
@@ -82,10 +80,8 @@ class ProjectUtilController implements ControllerMethods {
 					resolution : news.resolution,
 					archivedBy : news.archivedBy,
 					createdBy : news.createdBy)
-			if (! moveNews.validate() || ! moveNews.save(flush:true)) {
-				def etext = "Unable to create asset $moveNews: ${GormUtil.allErrorsString(moveNews)}"
-				println etext
-			}
+
+			moveNews.save(flush:true)
 		}
 	}
 	/*

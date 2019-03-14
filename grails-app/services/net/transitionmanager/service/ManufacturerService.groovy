@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.CollectionUtils
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Manufacturer
@@ -144,7 +143,7 @@ class ManufacturerService implements ServiceMethods {
 	}
 
 	boolean save(Manufacturer manufacturer, List<String> akaNames) {
-		if (isValidName(manufacturer.name, manufacturer.id) && !manufacturer.hasErrors() && manufacturer.save()) {
+		if (isValidName(manufacturer.name, manufacturer.id)  && manufacturer.save(failOnError: false)) {
 			if (CollectionUtils.isNotEmpty(akaNames) && !(akaNames.size() == 1 && StringUtil.isBlank(akaNames[0]))) {
 				akaNames.each { aka ->
 					findOrCreateAliasByName(manufacturer, aka, true)
@@ -169,7 +168,7 @@ class ManufacturerService implements ServiceMethods {
 		akaToSave.each { aka ->
 			findOrCreateAliasByName(manufacturer, aka, true)
 		}
-		return isValidName(manufacturer.name, manufacturer.id) && !manufacturer.hasErrors() && manufacturer.save()
+		return isValidName(manufacturer.name, manufacturer.id) && manufacturer.save(failOnError: false)
 	}
 
 	/**
@@ -211,7 +210,7 @@ class ManufacturerService implements ServiceMethods {
 		if (!alias && createIfNotFound) {
 			def isValid = isValidAlias(name, manufacturer, false)
 			alias = new ManufacturerAlias(name: name.trim(), manufacturer: manufacturer)
-			if (!isValid || !alias.save(flush: true)) {
+			if (!isValid || !alias.save(flush: true, failOnError: false)) {
 //				log.error GormUtil.allErrorsString(alias)
 //				return null
 				throw new ServiceException("AKA or Manufacturer with same name already exists: ${name}")

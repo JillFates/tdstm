@@ -843,7 +843,7 @@ class GormUtil{
 	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false, boolean flush = true) {
 		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
-		newDomain.save(flush: flush)
+		newDomain.save(flush: flush, failOnError: false)
 
 		if (deleteOriginal) {
 			originalDomain.delete(flush: flush)

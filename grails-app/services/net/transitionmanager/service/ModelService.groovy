@@ -8,25 +8,17 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
+import grails.web.servlet.mvc.GrailsParameterMap
 import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerSync
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.ModelSync
-import net.transitionmanager.domain.ModelSyncBatch
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.web.multipart.MultipartFile
 
 class ModelService implements ServiceMethods {
 
@@ -51,7 +43,7 @@ class ModelService implements ServiceMethods {
 		for (AssetEntity assetEntity in AssetEntity.findAllByModel(fromModel)) {
 			assetEntity.model = toModel
 			assetEntity.assetType = toModel.assetType
-			if (assetEntity.save()) {
+			if (assetEntity.save(failOnError: false)) {
 				assetUpdated++
 			}
 			assetEntityAttributeLoaderService.updateModelConnectors(assetEntity)
@@ -314,7 +306,7 @@ class ModelService implements ServiceMethods {
 
 	@Transactional
 	boolean save(Model model, GrailsParameterMap params) {
-		if (isValidName(model.modelName, model.id, model.manufacturerId) && model.save(flush: true)) {
+		if (isValidName(model.modelName, model.id, model.manufacturerId) && model.save(flush: true, failOnError: false)) {
 			int connectorCount = params.int("connectorCount", 0)
 			if (connectorCount > 0) {
 				for (int i = 1; i <= connectorCount; i++) {
@@ -327,8 +319,9 @@ class ModelService implements ServiceMethods {
 							connectorPosY: params.int("connectorPosY${i}", 0),
 							status: params['status' + i])
 
-					if (!modelConnector.hasErrors())
+					if (!modelConnector.hasErrors()) {
 						modelConnector.save(flush: true)
+					}
 				}
 			} else {
 				def powerConnector = new ModelConnector(model: model,
@@ -341,11 +334,7 @@ class ModelService implements ServiceMethods {
 						status: "missing"
 				)
 
-				if (!powerConnector.save(flush: true)) {
-					def errText = "Unable to create Power Connectors for ${model} " +
-							GormUtil.allErrorsString(powerConnector)
-					log.warn(errText)
-				}
+				powerConnector.save(flush: true)
 			}
 
 			model.sourceTDSVersion = 1
@@ -374,9 +363,7 @@ class ModelService implements ServiceMethods {
 			def modelAliasList = ModelAlias.findAllByModel(model)
 			modelAliasList.each { modelAlias ->
 				modelAlias.name = params["aka_${modelAlias.id}"]
-				if (!modelAlias.save()) {
-					modelAlias.errors.allErrors.each { log.error it }
-				}
+				modelAlias.save()
 			}
 
 			List<String> akaToSave = params.list('aka')
@@ -438,11 +425,8 @@ class ModelService implements ServiceMethods {
 						assetCableMap.cableStatus= connector.status
 						assetCableMap.cableComment= "Cable"
 					}
-					if (!assetCableMap.validate() || !assetCableMap.save()) {
-						def errText = "Unable to create assetCableMap for assetEntity $assetEntity" +
-								GormUtil.allErrorsString(assetCableMap)
-						log.error(errText)
-					}
+
+					assetCableMap.save()
 				}
 
 				def assetCableMaps = AssetCableMap.findAllByAssetFrom(assetEntity)
@@ -489,9 +473,7 @@ class ModelService implements ServiceMethods {
 				ModelAlias.executeUpdate('delete ModelAlias where model.id = :modelId', [modelId: model.id])
 				model.delete(flush: true)
 
-				if (!person.save(flush:true)) {
-					person.errors.allErrors.each { log.error it }
-				}
+				person.save(flush:true)
 
 				return true
 			} else {
@@ -513,7 +495,7 @@ class ModelService implements ServiceMethods {
 		if (!alias && createIfNotFound) {
 			def isValid = isValidAlias(name, model)
 			alias = new ModelAlias(name: name, model: model, manufacturer: model.manufacturer)
-			if (!isValid || !alias.save()) {
+			if (!isValid || !alias.save(failOnError: false)) {
 				throw new ServiceException("AKA or Model with same name already exists: ${name}")
 			}
 		}
@@ -547,15 +529,14 @@ class ModelService implements ServiceMethods {
         int assetsUpdated = 0
         //Saving toModel before merge
         toModel.properties = toModelProperties
-        if (!toModel.save(flush:true)) {
-            toModel.errors.allErrors.each {println it }
-        } else {
-			fromIds.each {
-				def fromModel = Model.get(it)
-				assetsUpdated += merge(fromModel, toModel)
-				mergedModels << fromModel
-			}
+		toModel.save(flush: true)
+
+		fromIds.each {
+			def fromModel = Model.get(it)
+			assetsUpdated += merge(fromModel, toModel)
+			mergedModels << fromModel
 		}
-        return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
+
+		return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
     }
 }

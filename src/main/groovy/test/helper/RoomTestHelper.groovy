@@ -25,7 +25,7 @@ class RoomTestHelper {
 		room.city = city
 		room.stateProv = stateProv
 		room.postalCode = postalCode
-		room.save(failOnError: true)
+		room.save()
 		return room
 	}
 }

@@ -18,7 +18,7 @@ class ApplicationTestHelper {
 			assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10)
 		)
 
-		application.save(flush: true, failOnError: true)
+		application.save(flush: true)
 
 		return application
 	}
