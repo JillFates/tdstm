@@ -7,7 +7,7 @@ div.content-wrapper
   min-height: 200px
 
   .discovery-phase, .analysis-phase
-    flex-basis: 25%
+    max-width: 285px
 
   .execution-phase
     flex-basis: 50%
@@ -17,7 +17,9 @@ div.content-wrapper
   .planning-dashboard
     flex-wrap: wrap
 
-    .discovery-phase, .analysis-phase, .execution-phase
+    .discovery-phase, .analysis-phase
+      max-width: 285px
+    .execution-phase
       flex-basis: 100%
 
 // medium viewports
@@ -26,7 +28,7 @@ div.content-wrapper
     flex-wrap: wrap
 
     .discovery-phase, .analysis-phase
-      flex-basis: 49%
+      max-width: 285px
 
     .execution-phase
       flex-basis: 100%
@@ -38,7 +40,7 @@ div.content-wrapper
     display: flex
 
     .discovery-phase, .analysis-phase
-      flex-basis: 25%
+      max-width: 285px
 
     .execution-phase
       flex-basis: 49%

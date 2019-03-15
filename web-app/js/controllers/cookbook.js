@@ -81,11 +81,11 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	rowToShow = null;
 
 	// Method to Get the list of Recipes.
-	listRecipes = function(){
+	listRecipes = function() {
 		scope.recipes = cookbookService.getListOfRecipes({archived: scope.archived, context: scope.context, rand: tdsCommon.randomString(16) },
 			function(data){
 			log.info('Success on getting Recipes');
-			if(data.data){
+			if (data.data) {
 				scope.totalItems = data.data.list.length;
 				scope.gridData = (scope.totalItems) ? data.data.list :
 					[{'message': 'No results found', 'context': 'none'}];
@@ -93,7 +93,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 				timeout(function(){
 					checkForSelectedRow();
 				}, 100);
-			}else{
+			} else {
 				log.warn('Moved Temporarily');
 				location.reload();
 			}
@@ -113,6 +113,12 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	scope.$on("refreshRecipes", function(evt) {
 		listRecipes();
+	});
+
+	// Capture the sorted data when a user sorts the datagrid because the original data never gets sorted
+	scope.$on("ngGridEventSorted", function(evt) {
+		debugger;
+		scope.sortedRows = evt.targetScope.renderedRows
 	});
 
 	// Pagination Stuff
@@ -202,9 +208,9 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 				return (!scope.preventSelection);
 			}
 		},
-		afterSelectionChange: function(rowItem){
-			if(rowItem.rowIndex != scope.currentSelectedRow.rowIndex && scope.enabledGridSelection){
-
+		// Function called after a datagrid row is selected
+		afterSelectionChange: function(rowItem) {
+			if ( (scope.currentSelectedRow.entity == undefined || rowItem.entity.recipeId != scope.currentSelectedRow.entity.recipeId) && scope.enabledGridSelection) {
 				scope.currentSelectedRow = rowItem;
 				// This hack is to avoid changeRecipe() to be executed many times.
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
@@ -255,18 +261,27 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		return next;
 	}
 
+	/**
+	 * This method is responsible for highlighting the selected row when clicked and when reloading the list
+	 * after various update functions (e.g. Save WIP).
+	 */
 	var checkForSelectedRow = function() {
 		var row = -1;
 		if (state.params.recipeId) {
+			// The scope.sortedRows is a separate dataset from the scope.gridData that gets populated when the user sorts the
+			// list. The original scope.gridData does not get remains in the order when retrieved from the server. So if sortedRows
+			// exists then this logic will figure out the selected row index from that dataset otherwise use the gridData list.
+			// Note that the location of the recipeId is in different places within the List<Object>.
+			var datagridSet = scope.sortedRows ? scope.sortedRows : scope.gridData;
 			var recipeId = state.params.recipeId;
-			row = (scope.gridData.length > 0)?0:-1;
-			for (var i = 0; i < scope.gridData.length; i++) {
-				if (scope.gridData[i].recipeId == recipeId) {
+			row = (datagridSet.length > 0) ? 0 : -1;
+			for (var i = 0; i < datagridSet.length; i++) {
+				if (datagridSet[i].recipeId == recipeId || (datagridSet[i].entity && datagridSet[i].entity.recipeId == recipeId)) {
 					row = i;
 					break;
 				}
 			}
-		} else if (!state.includes('**.create.**') && (scope.gridData.length > 0)) {
+		} else if (!state.includes('**.create.**') && (datagridSet.length > 0)) {
 			row = 0;
 		}
 		if (row >= 0) {

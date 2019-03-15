@@ -100,7 +100,7 @@
 						</table>
 						<g:each in="${rackInstanceList}" var="rack">
 							<g:if test="${rack.rackType == 'Rack'}">
-								<g:if test="${rack.model?.layoutStyle == null}">
+								<g:if test="${ ! rack.model?.layoutStyle }">
 									<div align="center" id="rack_${rack.id}"
 										style="top:${rack.roomY}px; left:${rack.roomX}px;"
 										onmouseout="updateXYPositions(this.id)"
