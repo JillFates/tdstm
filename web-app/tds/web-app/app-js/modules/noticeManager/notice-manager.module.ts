@@ -16,6 +16,7 @@ import {NoticeListComponent} from './components/list/notice-list.component';
 import {NoticeViewEditComponent} from './components/view-edit/notice-view-edit.component';
 import {ViewHtmlComponent} from './components/view-html/view-html.component';
 import {EULAComponent} from './components/eula/eula.component';
+import {StandardNoticesComponent} from './components/standard-notices/standard-notices.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {NoticeResolveService} from './resolve/notice-resolve.service';
@@ -40,7 +41,8 @@ import {NoticeService} from './service/notice.service';
 		NoticeListComponent,
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
-		EULAComponent
+		EULAComponent,
+		StandardNoticesComponent
 	],
 	providers: [
 		// Resolve
@@ -52,12 +54,15 @@ import {NoticeService} from './service/notice.service';
 	exports: [
 		NoticeListComponent,
 		NoticeViewEditComponent,
-		ViewHtmlComponent
+		ViewHtmlComponent,
+		EULAComponent,
+		StandardNoticesComponent
 	],
 	entryComponents: [
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
-		EULAComponent
+		EULAComponent,
+		StandardNoticesComponent
 	]
 })
 

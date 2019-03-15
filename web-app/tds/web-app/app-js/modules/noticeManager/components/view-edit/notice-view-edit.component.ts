@@ -48,6 +48,7 @@ export class NoticeViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		console.log('On init');
 	}
 
 	protected cancelCloseDialog(): void {

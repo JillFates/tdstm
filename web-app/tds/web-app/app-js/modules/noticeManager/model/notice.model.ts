@@ -89,6 +89,11 @@ export class PostNoticeModel {
 	id: number;
 	name: string;
 	needAcknowledgement: number;
+	dontShowAgain?: boolean;
+}
+
+export class StandardNotices {
+	notices: PostNoticeModel[];
 }
 
 export const NoticeTypes = [

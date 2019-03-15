@@ -1,0 +1,45 @@
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()"
+     class="modal-content notice-eula-html-content">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">{{'NOTICE.NOTICE' | translate }}</h4>
+    </div>
+
+    <div class="modal-body">
+        <form name="form"
+              role="form"
+              data-toggle="validator"
+              class="form-horizontal"
+              #form='ngForm'>
+	        <div *ngIf="modelNotices && modelNotices[currentNoticeIndex]; let notice">
+		        <h4>{{notice.name}}</h4>
+		        <div class="form-group">
+			        <div class="col-sm-12 html-container">
+				        <div [innerHTML]="modelNotices[currentNoticeIndex].htmlText"></div>
+			        </div>
+		        </div>
+		        <div class="form-group" class="agreement-container">
+			        <input type="checkbox" name="agreement" id="agreement" [(ngModel)]="dontShowAgain">
+			        <label for="agreement"> {{'NOTICE.DO_NOT_SHOW_AGAIN' | translate}}</label>
+		        </div>
+	        </div>
+        </form>
+    </div>
+
+    <div class="modal-footer form-group-center">
+	    <tds-button-custom
+			    (click)="onBack()"
+			    icon="chevron-left"
+			    title="Back"
+			    class="pull-left">
+	    </tds-button-custom>
+
+	    <tds-button-custom
+			    (click)="onNext()"
+			    icon="chevron-right"
+			    title="Next"
+			    class="btn-primary pull-right">
+	    </tds-button-custom>
+    </div>
+
+</div>

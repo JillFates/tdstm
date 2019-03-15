@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {Permission} from '../../../../shared/model/permission.model';
 import {
 	NoticeColumnModel, NoticeModel, NoticeTypes, PostNoticeModel,
-	PostNoticeResponse
+	PostNoticeResponse, StandardNotices
 } from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
@@ -23,6 +23,7 @@ import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-qu
 import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {EULAComponent} from '../eula/eula.component';
+import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
 
 @Component({
 	selector: 'tds-notice-list',
@@ -192,21 +193,42 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	onShowEULA(): void {
-		this.iterateMandatory();
+		this.showMandatoryMessages()
+			.then((result) => {
+				if (result) {
+					setTimeout(() => this.showDefaultMessages(), 500);
+				}
+			});
 	}
 
-	async iterateMandatory() {
-		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
+	async showMandatoryMessages(): Promise<boolean> {
+		const noticesMandatory = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
 		let keepGoing = true;
 
-		while (keepGoing && notices.length) {
+		while (keepGoing && noticesMandatory.length) {
 			try {
-				await this.openDialogWithDelay(notices.shift());
+				await this.openDialogWithDelay(noticesMandatory.shift());
 			} catch (error) {
 				console.log('Error:', error.message || error);
 				keepGoing = false;
 			}
 		}
+
+		return Promise.resolve(keepGoing);
+	}
+
+	showDefaultMessages() {
+		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  !notice.needAcknowledgement);
+
+		this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
+			.then((response: any) => {
+				console.log('The response is:');
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log('The error calling the standard notice is:');
+				console.log(error);
+			});
 	}
 
 	openDialogWithDelay(notice: PostNoticeModel) {

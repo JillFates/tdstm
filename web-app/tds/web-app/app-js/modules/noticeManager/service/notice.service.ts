@@ -183,6 +183,12 @@ export class NoticeService {
 					needAcknowledgement: 0
 				},
 				{
+					id: 8,
+					name: 'Another message',
+					htmlText: 'Come one come all for some greasy pizza',
+					needAcknowledgement: 0
+				},
+				{
 					id: 12,
 					name: 'Maintenance Outage',
 					htmlText: 'We will be updating the system at 11:00pm EST this evening - you have been warned!',
