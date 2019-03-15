@@ -75,7 +75,7 @@
                     <!-- Save / Cancel buttons -->
                     <div class="row">
                         <div class="col-md-12">
-                            <button [disabled]="script && script.length === 0 || !isScriptDirty() || (operationStatus.save && operationStatus.save !== 'success')" (click)="onSave()"
+                            <button [disabled]="(script && script.length === 0) || !isScriptDirty() || (operationStatus.save && operationStatus.save !== 'success')" (click)="onSave()"
                                     type="button" class="btn btn-primary btn-resize pull-left">
                                 <span class="fa fa-fw fa-floppy-o"></span>
                                 {{'GLOBAL.SAVE' | translate }}
