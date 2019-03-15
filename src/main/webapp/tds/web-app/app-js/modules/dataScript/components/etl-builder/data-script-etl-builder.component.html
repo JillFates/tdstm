@@ -75,7 +75,7 @@
                     <!-- Save / Cancel buttons -->
                     <div class="row">
                         <div class="col-md-12">
-                            <button [disabled]="script.length === 0 || !isScriptDirty() || (operationStatus.save && operationStatus.save !== 'success')" (click)="onSave()"
+                            <button [disabled]="script && script.length === 0 || !isScriptDirty() || (operationStatus.save && operationStatus.save !== 'success')" (click)="onSave()"
                                     type="button" class="btn btn-primary btn-resize pull-left">
                                 <span class="fa fa-fw fa-floppy-o"></span>
                                 {{'GLOBAL.SAVE' | translate }}
@@ -151,7 +151,7 @@
                         </div>
                         <hr>
                         <!-- Transformed Test Data -->
-                        <div class="row" *ngIf="scriptTestResult.domains.length > 0">
+                        <div class="row" *ngIf="scriptTestResult.domains && scriptTestResult.domains.length > 0">
                             <label class="col-md-12">
                                 <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
                                 <button data-toggle="collapse" data-target=".collapsible"
