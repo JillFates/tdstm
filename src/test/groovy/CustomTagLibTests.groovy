@@ -49,9 +49,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/20/2012'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/20/2012'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/20/2012'
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '08/19/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '08/19/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '08/19/2012'
 	}
 
 	void 'Test tds:convertDate tag with LITTLE_ENDIAN'() {
@@ -66,9 +66,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE  | '20/08/2012'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '20/08/2012'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '20/08/2012'
+		'GMT'                               | TimeUtil.FORMAT_DATE  | '19/08/2012'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE  | '19/08/2012'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE  | '19/08/2012'
 	}
 
 	void 'Test tds:convertDateTime tag with MIDDLE_ENDIAN'() {
