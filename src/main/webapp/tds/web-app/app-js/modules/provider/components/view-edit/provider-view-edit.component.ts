@@ -127,12 +127,12 @@ export class ProviderViewEditComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDeleteProvider(): void {
-		this.providerService.deleteContext(this.providerModel.id).subscribe( (result: any) => {
+		this.providerService.deleteContext(this.providerModel.id).subscribe((result: any) => {
 			this.dialogService.extra(ProviderAssociatedComponent,
 				[{provide: ProviderAssociatedModel, useValue: result}],
 				false, false)
 				.then((toDelete: any) => {
-					if(toDelete) {
+					if (toDelete) {
 						this.providerService.deleteProvider(this.providerModel.id).subscribe(
 							(result) => {
 								this.activeDialog.close(result);

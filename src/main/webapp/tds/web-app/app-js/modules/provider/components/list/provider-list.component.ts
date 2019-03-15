@@ -115,12 +115,12 @@ export class ProviderListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.providerService.deleteContext(dataItem.id).subscribe( (result: any) => {
+		this.providerService.deleteContext(dataItem.id).subscribe((result: any) => {
 			this.dialogService.extra(ProviderAssociatedComponent,
 				[{provide: ProviderAssociatedModel, useValue: result}],
 				false, false)
 				.then((toDelete: any) => {
-					if(toDelete) {
+					if (toDelete) {
 						this.providerService.deleteProvider(dataItem.id).subscribe(
 							(result) => {
 								this.reloadData();
