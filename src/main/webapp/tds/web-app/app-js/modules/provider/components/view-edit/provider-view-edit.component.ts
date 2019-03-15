@@ -1,11 +1,13 @@
 import {ElementRef, Component, OnInit, ViewChild, HostListener, Inject} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {ProviderService} from '../../service/provider.service';
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+import {ProviderAssociatedModel} from '../../model/provider-associated.model';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -32,6 +34,7 @@ export class ProviderViewEditComponent implements OnInit {
 		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
+		private dialogService: UIDialogService,
 		private prompt: UIPromptService,
 		private providerService: ProviderService) {
 
@@ -124,16 +127,21 @@ export class ProviderViewEditComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDeleteProvider(): void {
-		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.providerService.deleteProvider(this.providerModel.id).subscribe(
-						(result) => {
-							this.activeDialog.close(result);
-						},
-						(err) => console.log(err));
-				}
-			});
+		this.providerService.deleteContext(this.providerModel.id).subscribe( (result: any) => {
+			this.dialogService.extra(ProviderAssociatedComponent,
+				[{provide: ProviderAssociatedModel, useValue: result}],
+				false, false)
+				.then((toDelete: any) => {
+					if(toDelete) {
+						this.providerService.deleteProvider(this.providerModel.id).subscribe(
+							(result) => {
+								this.activeDialog.close(result);
+							},
+							(err) => console.log(err));
+					}
+				})
+				.catch(error => console.log('Closed'));
+		});
 	}
 
 	/**

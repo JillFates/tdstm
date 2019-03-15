@@ -13,6 +13,8 @@ import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.compone
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute} from '@angular/router';
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+import {ProviderAssociatedModel} from '../../model/provider-associated.model';
 declare var jQuery: any;
 
 @Component({
@@ -113,16 +115,21 @@ export class ProviderListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.providerService.deleteProvider(dataItem.id).subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
-				}
-			});
+		this.providerService.deleteContext(dataItem.id).subscribe( (result: any) => {
+			this.dialogService.extra(ProviderAssociatedComponent,
+				[{provide: ProviderAssociatedModel, useValue: result}],
+				false, false)
+				.then((toDelete: any) => {
+					if(toDelete) {
+						this.providerService.deleteProvider(dataItem.id).subscribe(
+							(result) => {
+								this.reloadData();
+							},
+							(err) => console.log(err));
+					}
+				})
+				.catch(error => console.log('Closed'));
+		});
 	}
 
 	/**
