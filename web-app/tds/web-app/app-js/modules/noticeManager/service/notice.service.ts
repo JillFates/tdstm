@@ -121,24 +121,6 @@ export class NoticeService {
 	 * @returns any
 	 */
 	getPostNotices(): Observable<PostNoticeResponse> {
-		/*
-		acknowledgeable: boolean;
-		active: boolean;
-		createdBy: any;
-		dateCreated: string;
-		htmlText: string;
-		id: number;
-		lastModified: string;
-		rawText: string;
-		title: string;
-		typeId: any;
-		activationDate: any;
-		expirationDate: any;
-		sequence: number;
-		locked: boolean;
-		postMessageText: string;
-		notShowAgain?: boolean;
-		*/
 		const mockResponse = {
 			redirectUri: '/tdstm/notices',
 			notices: [
@@ -197,10 +179,10 @@ export class NoticeService {
 					createdBy: null,
 					lastModified: null,
 					rawText: null,
-					typeId: 0,
+					typeId: 2,
 					activationDate: null,
 					expirationDate: null,
-					sequence: 1,
+					sequence: 2,
 					locked: false,
 					postMessageText: '',
 					dateCreated: ''
@@ -214,10 +196,10 @@ export class NoticeService {
 					createdBy: null,
 					lastModified: null,
 					rawText: null,
-					typeId: 0,
+					typeId: 1,
 					activationDate: null,
 					expirationDate: null,
-					sequence: 1,
+					sequence: 2,
 					locked: false,
 					postMessageText: '',
 					dateCreated: ''
@@ -231,10 +213,10 @@ export class NoticeService {
 					createdBy: null,
 					lastModified: null,
 					rawText: null,
-					typeId: 0,
+					typeId: 1,
 					activationDate: null,
 					expirationDate: null,
-					sequence: 1,
+					sequence: 4,
 					locked: false,
 					postMessageText: '',
 					dateCreated: ''
@@ -248,10 +230,10 @@ export class NoticeService {
 					createdBy: null,
 					lastModified: null,
 					rawText: null,
-					typeId: 0,
+					typeId: 1,
 					activationDate: null,
 					expirationDate: null,
-					sequence: 1,
+					sequence: 3,
 					locked: false,
 					postMessageText: '',
 					dateCreated: ''

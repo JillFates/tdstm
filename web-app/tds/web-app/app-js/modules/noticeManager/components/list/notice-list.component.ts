@@ -8,11 +8,12 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
 import {
 	NoticeColumnModel, NoticeModel, NoticeTypes,
-	PostNoticeResponse, StandardNotices
+	PostNoticeResponse, StandardNotices, NoticeType
 } from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
@@ -84,9 +85,13 @@ export class NoticeListComponent implements OnInit {
 
 		this.noticeService.getPostNotices()
 			.subscribe((response: PostNoticeResponse) => {
-				console.log('The post notice are:');
-				console.log(response);
-				this.postNotices = response.notices;
+				this.postNotices = response.notices.map((notice: NoticeModel) => {
+					if (!notice.sequence) {
+						notice.sequence = 0;
+					}
+
+					return notice;
+				});
 			});
 	}
 
@@ -202,7 +207,10 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	async showMandatoryMessages(): Promise<boolean> {
-		const noticesMandatory = this.postNotices.filter((notice: NoticeModel) =>  notice.acknowledgeable);
+		// this.availableFields = this.availableFields.sort( (a, b) => SortUtils.compareByProperty(a, b, 'text'));
+		const noticesMandatory = this.postNotices
+			.filter((notice: NoticeModel) =>  notice.typeId === NoticeType.Mandatory)
+			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 		let keepGoing = true;
 
 		while (keepGoing && noticesMandatory.length) {
@@ -218,7 +226,9 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	showDefaultMessages() {
-		const notices = this.postNotices.filter((notice: NoticeModel) =>  !notice.acknowledgeable);
+		const notices = this.postNotices
+			.filter((notice: NoticeModel) =>  notice.typeId === NoticeType.PostLogin)
+			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
 		this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
 			.then((response: any) => {

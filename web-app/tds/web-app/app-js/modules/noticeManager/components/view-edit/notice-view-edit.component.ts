@@ -113,7 +113,7 @@ export class NoticeViewEditComponent implements OnInit {
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =  this.model.title &&
 				(this.htmlText.value && this.htmlText.value.trim())  &&
-				this.htmlText.valid() && noticeType;
+				this.htmlText.valid() && (noticeType || noticeType === 0);
 
 		const returnValue =  (noticeType === NoticeType.Mandatory) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
 
