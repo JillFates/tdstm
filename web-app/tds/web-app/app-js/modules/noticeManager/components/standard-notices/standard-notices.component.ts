@@ -34,7 +34,11 @@ export class StandardNoticesComponent implements OnInit {
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
 
-		this.modelNotices = model.notices.concat([]) ;
+		this.modelNotices = model.notices.concat([])
+			.map((notice: PostNoticeModel) => {
+				return {...notice, notShowAgain: false};
+			});
+
 		this.dataSignature = JSON.stringify(this.modelNotices);
 	}
 
@@ -69,12 +73,15 @@ export class StandardNoticesComponent implements OnInit {
 	}
 
 	protected onBack() {
-		this.activeDialog.dismiss();
+		if (this.currentNoticeIndex > 0) {
+			this.currentNoticeIndex -= 1;
+		}
+		// this.activeDialog.dismiss();
 	}
 
 	protected onNext() {
 		// handle save don't show again
-		if ((this.currentNoticeIndex + 1) > this.modelNotices.length) {
+		if ((this.currentNoticeIndex + 1) >= this.modelNotices.length) {
 			this.activeDialog.close(true);
 		}
 

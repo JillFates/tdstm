@@ -89,7 +89,7 @@ export class PostNoticeModel {
 	id: number;
 	name: string;
 	needAcknowledgement: number;
-	dontShowAgain?: boolean;
+	notShowAgain?: boolean;
 }
 
 export class StandardNotices {

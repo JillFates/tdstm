@@ -4,7 +4,6 @@
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">{{'NOTICE.NOTICE' | translate }}</h4>
     </div>
-
     <div class="modal-body">
         <form name="form"
               role="form"
@@ -15,11 +14,12 @@
 		        <h4>{{notice.name}}</h4>
 		        <div class="form-group">
 			        <div class="col-sm-12 html-container">
-				        <div [innerHTML]="modelNotices[currentNoticeIndex].htmlText"></div>
+				        <div [innerHTML]="notice.htmlText"></div>
 			        </div>
 		        </div>
 		        <div class="form-group" class="agreement-container">
-			        <input type="checkbox" name="agreement" id="agreement" [(ngModel)]="dontShowAgain">
+			        <input type="checkbox" name="agreement" id="agreement"
+			               [(ngModel)]="notice.notShowAgain">
 			        <label for="agreement"> {{'NOTICE.DO_NOT_SHOW_AGAIN' | translate}}</label>
 		        </div>
 	        </div>
@@ -31,6 +31,7 @@
 			    (click)="onBack()"
 			    icon="chevron-left"
 			    title="Back"
+			    [disabled]="currentNoticeIndex <= 0"
 			    class="pull-left">
 	    </tds-button-custom>
 

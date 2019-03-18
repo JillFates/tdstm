@@ -179,13 +179,13 @@ export class NoticeService {
 				{
 					id: 7,
 					name: 'Pizza to night in lobby',
-					htmlText: 'Come one come all for some greasy pizza',
+					htmlText: 'Come one come all for some greasy pizza 1',
 					needAcknowledgement: 0
 				},
 				{
 					id: 8,
 					name: 'Another message',
-					htmlText: 'Come one come all for some greasy pizza',
+					htmlText: 'Come one come all for some greasy pizza 2',
 					needAcknowledgement: 0
 				},
 				{
