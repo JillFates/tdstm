@@ -199,9 +199,9 @@ export const en_DICTIONARY: Object = {
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
 	},
 	'PLANNING': {
-    	'PLANNING': 'Planning',
-    	'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
-    },
+		'PLANNING': 'Planning',
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
