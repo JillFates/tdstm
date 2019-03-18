@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -85,6 +86,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can create a domain when not found a instance with find command using local variables'() {
 
 		given:
@@ -119,9 +121,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -174,7 +176,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 						find.query.size() == 4
 						assertQueryResult(find.query[0], ETLDomain.Device, [
-							['id', FindOperator.eq.name(), "151954"]
+							['id', FindOperator.eq.name(), 151954l]
 						])
 						assertQueryResult(find.query[1], ETLDomain.Device, [
 							['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],
@@ -201,6 +203,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenNotFound command defines an update action using local variables'() {
 
 		given:
@@ -235,9 +238,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -281,6 +284,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenFound command defines a create action using local variables'() {
 
 		given:
@@ -315,9 +319,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -360,6 +364,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can update a domain when found a instance with find command using local variables'() {
 
 		given:
@@ -394,10 +399,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -473,6 +477,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenFound is used without using previously a find command'() {
 
 		given:
@@ -507,8 +512,8 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
@@ -548,14 +553,15 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	}
 
     @See('TM-11182')
-    void 'test can create throw an Exception when script tries to use a non existing variable'() {
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can create throw an Exception when script tries to use a non existing variable'() {
 
 	    given:
 		    def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 	    and:
-		    GroovySpy(AssetEntity, global: true)
-		    AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 			    []
 		    }
 

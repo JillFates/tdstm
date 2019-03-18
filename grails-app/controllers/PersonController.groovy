@@ -814,7 +814,7 @@ class PersonController implements ControllerMethods {
 	def editTimezone () {
 		def currDateTimeFormat = userPreferenceService.dateFormat ?: TimeUtil.getDefaultFormatType()
 
-		render(template: "../project/showTimeZoneSelect",
+		render(template: "/project/showTimeZoneSelect",
 		       model: [areas: userPreferenceService.timezonePickerAreas(), timezones: Timezone.findAll(), userPref: true,
 		               currTimeZone: userPreferenceService.timeZone, currDateTimeFormat: currDateTimeFormat])
 	}

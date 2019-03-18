@@ -99,6 +99,11 @@ grails {
 
 	controllers {
 		defaultScope = 'singleton'
+
+		upload {
+			maxFileSize = 500 * 1024 * 1024
+			maxRequestSize = 500 * 1024 * 1024
+		}
 	}
 
 	converters {
@@ -209,7 +214,6 @@ hibernate {
 		region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
 	}
 
-	flush.mode = 'manual' // OSIV session flush mode outside of transactional context
 	// format_sql = true
 	singleSession = true
 	// use_sql_comments = true

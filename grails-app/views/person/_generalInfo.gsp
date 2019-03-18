@@ -141,7 +141,7 @@
 							<label for="staffType">Staff Type:</label>
 						</td>
 						<td valign="top" class="value" colspan="2">
-							<g:select id="staffTypeId" name="staffType" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(Person).staffType.inList}" value="Salary" />
+							<g:select id="staffTypeId" name="staffType" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(Person).staffType.inList}" value="${person.staffType}" />
 						</td>
 					</tr>
 

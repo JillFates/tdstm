@@ -1,7 +1,7 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import grails.events.EventPublisher
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataImportService

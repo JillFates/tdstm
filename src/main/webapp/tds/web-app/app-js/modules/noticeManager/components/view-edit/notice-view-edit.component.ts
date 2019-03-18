@@ -45,7 +45,7 @@ export class NoticeViewEditComponent {
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
-		this.model.typeId = parseInt(this.model.typeId, 10);
+		this.model.typeId = (this.model.typeId) ? parseInt(this.model.typeId, 10) : null;
 		this.dataSignature = JSON.stringify(this.model);
 	}
 

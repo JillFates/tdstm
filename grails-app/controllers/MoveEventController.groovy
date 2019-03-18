@@ -10,7 +10,6 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -118,7 +117,11 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		[moveEventInstance: moveEvent]
+		List moveBundles = moveEvent.moveBundles.collect { MoveBundle moveBundle ->
+			[id: moveBundle.id, name: moveBundle.name]
+		}
+
+		[moveEventInstance: moveEvent, moveBundles: moveBundles]
 	}
 
 	/**
