@@ -77,23 +77,27 @@ export class NoticeModel {
 	sequence: number;
 	locked: boolean;
 	postMessageText: string;
+	notShowAgain?: boolean;
 }
 
 export class PostNoticeResponse {
 	redirectUri: string;
-	notices: PostNoticeModel[];
+	notices: NoticeModel[];
 }
 
+/*
 export class PostNoticeModel {
 	htmlText: string;
 	id: number;
 	name: string;
-	needAcknowledgement: number;
+	acknowledgeable: number;
 	notShowAgain?: boolean;
+	sequence?: number;
 }
+*/
 
 export class StandardNotices {
-	notices: PostNoticeModel[];
+	notices: NoticeModel[];
 }
 
 export const NoticeTypes = [

@@ -65,7 +65,12 @@
                     <label for="sequence" class="col-sm-3 control-label">Sequence:</label>
                     <div class="col-sm-1">
                         <kendo-numerictextbox
-                                name="sequence" [value]="model.sequence" [format]="'n0'" [min]="0" [autoCorrect]="true">
+                                [spinners]="false"
+                                name="sequence"
+                                [value]="model.sequence"
+                                [format]="'n0'"
+                                [min]="0"
+                                [autoCorrect]="true">
                         </kendo-numerictextbox>
                     </div>
 	                <div class="col-sm-2">

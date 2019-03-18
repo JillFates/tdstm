@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel, PostNoticeModel, StandardNotices} from '../../model/notice.model';
+import {NoticeModel, StandardNotices} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -21,7 +21,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class StandardNoticesComponent implements OnInit {
 	private dataSignature: string;
-	protected modelNotices: PostNoticeModel[];
+	protected modelNotices: NoticeModel[];
 	protected acceptAgreement = false;
 	protected dontShowAgain: boolean;
 	protected currentNoticeIndex: number;
@@ -35,7 +35,7 @@ export class StandardNoticesComponent implements OnInit {
 		private permissionService: PermissionService) {
 
 		this.modelNotices = model.notices.concat([])
-			.map((notice: PostNoticeModel) => {
+			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};
 			});
 

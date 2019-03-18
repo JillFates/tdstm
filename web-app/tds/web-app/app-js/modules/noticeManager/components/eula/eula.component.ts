@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel, PostNoticeModel} from '../../model/notice.model';
+import {NoticeModel} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -21,11 +21,11 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class EULAComponent {
 	private dataSignature: string;
-	protected model: PostNoticeModel;
+	protected model: NoticeModel;
 	protected acceptAgreement = false;
 
 	constructor(
-		model: PostNoticeModel,
+		model: NoticeModel,
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,

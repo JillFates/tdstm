@@ -121,12 +121,30 @@ export class NoticeService {
 	 * @returns any
 	 */
 	getPostNotices(): Observable<PostNoticeResponse> {
+		/*
+		acknowledgeable: boolean;
+		active: boolean;
+		createdBy: any;
+		dateCreated: string;
+		htmlText: string;
+		id: number;
+		lastModified: string;
+		rawText: string;
+		title: string;
+		typeId: any;
+		activationDate: any;
+		expirationDate: any;
+		sequence: number;
+		locked: boolean;
+		postMessageText: string;
+		notShowAgain?: boolean;
+		*/
 		const mockResponse = {
 			redirectUri: '/tdstm/notices',
 			notices: [
 				{
 					id: 5,
-					name: 'EULA Aggreement 2018-19 version 1.0',
+					title: 'EULA Aggreement 2018-19 version 1.0',
 					htmlText: `
 					<p>Last updated: (add date)</p>
 					<p>
@@ -174,25 +192,69 @@ export class NoticeService {
 					commercially exploit the Application or make the Application available to any third party.
 					</p>
 					`,
-					needAcknowledgement: 1
+					acknowledgeable: true,
+					active: true,
+					createdBy: null,
+					lastModified: null,
+					rawText: null,
+					typeId: 0,
+					activationDate: null,
+					expirationDate: null,
+					sequence: 1,
+					locked: false,
+					postMessageText: '',
+					dateCreated: ''
 				},
 				{
 					id: 7,
-					name: 'Pizza to night in lobby',
+					title: 'Pizza to night in lobby',
 					htmlText: 'Come one come all for some greasy pizza 1',
-					needAcknowledgement: 0
+					acknowledgeable: false,
+					active: true,
+					createdBy: null,
+					lastModified: null,
+					rawText: null,
+					typeId: 0,
+					activationDate: null,
+					expirationDate: null,
+					sequence: 1,
+					locked: false,
+					postMessageText: '',
+					dateCreated: ''
 				},
 				{
 					id: 8,
-					name: 'Another message',
+					title: 'Another message',
 					htmlText: 'Come one come all for some greasy pizza 2',
-					needAcknowledgement: 0
+					acknowledgeable: false,
+					active: true,
+					createdBy: null,
+					lastModified: null,
+					rawText: null,
+					typeId: 0,
+					activationDate: null,
+					expirationDate: null,
+					sequence: 1,
+					locked: false,
+					postMessageText: '',
+					dateCreated: ''
 				},
 				{
 					id: 12,
-					name: 'Maintenance Outage',
+					title: 'Maintenance Outage',
 					htmlText: 'We will be updating the system at 11:00pm EST this evening - you have been warned!',
-					needAcknowledgement: 1
+					acknowledgeable: false,
+					active: true,
+					createdBy: null,
+					lastModified: null,
+					rawText: null,
+					typeId: 0,
+					activationDate: null,
+					expirationDate: null,
+					sequence: 1,
+					locked: false,
+					postMessageText: '',
+					dateCreated: ''
 				}
 			]
 		};

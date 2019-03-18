@@ -11,7 +11,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
 import {
-	NoticeColumnModel, NoticeModel, NoticeTypes, PostNoticeModel,
+	NoticeColumnModel, NoticeModel, NoticeTypes,
 	PostNoticeResponse, StandardNotices
 } from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
@@ -52,7 +52,7 @@ export class NoticeListComponent implements OnInit {
 	private gridData: GridDataResult;
 	protected resultSet: any[];
 	protected dateFormat: string;
-	protected postNotices: PostNoticeModel[] = [];
+	protected postNotices: NoticeModel[] = [];
 	protected notices = [];
 
 	/**
@@ -202,7 +202,7 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	async showMandatoryMessages(): Promise<boolean> {
-		const noticesMandatory = this.postNotices.filter((notice: PostNoticeModel) =>  notice.needAcknowledgement);
+		const noticesMandatory = this.postNotices.filter((notice: NoticeModel) =>  notice.acknowledgeable);
 		let keepGoing = true;
 
 		while (keepGoing && noticesMandatory.length) {
@@ -218,7 +218,7 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	showDefaultMessages() {
-		const notices = this.postNotices.filter((notice: PostNoticeModel) =>  !notice.needAcknowledgement);
+		const notices = this.postNotices.filter((notice: NoticeModel) =>  !notice.acknowledgeable);
 
 		this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
 			.then((response: any) => {
@@ -231,11 +231,11 @@ export class NoticeListComponent implements OnInit {
 			});
 	}
 
-	openDialogWithDelay(notice: PostNoticeModel) {
+	openDialogWithDelay(notice: NoticeModel) {
 		return new Promise((resolve, reject) => {
 			setTimeout(async() => {
 				try {
-					await this.dialogService.open(EULAComponent, [ {provide: PostNoticeModel, useValue: notice}]);
+					await this.dialogService.open(EULAComponent, [ {provide: NoticeModel, useValue: notice}]);
 					return resolve(true);
 				} catch (error) {
 					return reject(error || 'User cancelled');
