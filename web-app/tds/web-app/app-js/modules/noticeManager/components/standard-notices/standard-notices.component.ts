@@ -1,5 +1,6 @@
 // Angular
 import {Component, ViewChild, OnInit} from '@angular/core';
+import { DomSanitizer} from '@angular/platform-browser';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -32,6 +33,7 @@ export class StandardNoticesComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
+		protected sanitizer: DomSanitizer,
 		private permissionService: PermissionService) {
 
 		this.modelNotices = model.notices.concat([])

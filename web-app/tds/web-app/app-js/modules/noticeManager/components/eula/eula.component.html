@@ -15,7 +15,7 @@
 		        <h4>{{model.name}}</h4>
 		        <div class="form-group">
 			        <div class="col-sm-12 html-container">
-				        <div [innerHTML]="model.htmlText"></div>
+				        <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(model.htmlText)"></div>
 			        </div>
 		        </div>
 		        <div class="form-group" class="agreement-container">

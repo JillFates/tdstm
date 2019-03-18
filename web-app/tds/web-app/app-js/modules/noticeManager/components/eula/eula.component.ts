@@ -1,5 +1,6 @@
 // Angular
 import {Component, ViewChild} from '@angular/core';
+import { DomSanitizer} from '@angular/platform-browser';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -30,6 +31,7 @@ export class EULAComponent {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
+		protected sanitizer: DomSanitizer,
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
