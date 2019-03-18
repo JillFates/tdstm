@@ -87,6 +87,9 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 				const [events, defaults] = results;
 				this.model.events = events.map((item) => ({id: item.id.toString(), text: item.name}));
 				this.model.defaultEvent.id = pathOr(null, ['preferences', 'TASK_CREATE_EVENT'], defaults);
+				if (this.model.defaultEvent.id === "null" || this.model.defaultEvent.id === null) {
+				    this.model.defaultEvent.id = this.model.events[0].id;
+				}
 			})
 	}
 
