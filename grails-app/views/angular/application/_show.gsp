@@ -30,7 +30,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}"/>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
-				<span class="clickableText" (click)="launchManageStaff(${asset.sme?.id})">
+				<span class="clickableText" (click)="launchManageStaff(${asset.sme2?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.sme2}" />
 				</span>
 			</td>
@@ -41,7 +41,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}"/>
 			<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 			<td class="valueNW ${standardFieldSpecs.appOwner.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${asset.appOwner?.id},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${asset.appOwner?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.appOwner}" />
 				</span>
 			</td>
@@ -94,7 +94,7 @@
 				${shutdownBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="Person.showPersonDialog(${shutdownById},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${shutdownById})">
 					${shutdownBy}
 				</span>
 			</g:else>
@@ -112,7 +112,7 @@
 				${startupBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="Person.showPersonDialog(${startupById},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${startupById})">
 					${startupBy}
 				</span>
 			</g:else>
@@ -128,7 +128,7 @@
 				${testingBy}
 			</g:if>
 			<g:else>
-				<span class="clickableText" onClick="Person.showPersonDialog(${testingById},'generalInfoShow')">
+				<span class="clickableText" (click)="launchManageStaff(${testingById})">
 					${testingBy}
 				</span>
 			</g:else>
