@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -124,8 +125,9 @@ class RackLayoutsController implements ControllerMethods {
 		boolean generateView = params.viewMode == 'Generate'
 
 		if (bundleIds && !bundleIds.contains("all")) {
-			def bundlesString = bundleIds.toString().replace("[", "(").replace("]", ")")
-			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${bundlesString} ")
+			String bundlesString = bundleIds.toString().replace("[", "").replace("]", "")
+			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundlesString.split(',').toList())
+			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${moveBundleIds} ")
 		}
 		def rackLayoutsHasPermission = securityService.hasPermission(Permission.RackLayoutModify)
 
@@ -353,7 +355,9 @@ class RackLayoutsController implements ControllerMethods {
 			moveBundles = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
 		}
 		else if (bundleIds) {
-			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($bundleIds)")
+			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundleIds.split(',').toList())
+
+			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($moveBundleIds)")
 		}
 
 		def sourceRacks = []
@@ -425,7 +429,8 @@ class RackLayoutsController implements ControllerMethods {
 					queryParams.roomName = assetEntity.getTargetRoomName()
 					queryParams.rackName = assetEntity.getTargetRackName()
 				}
-				def query = "FROM AssetEntity AS a \
+
+				String query = "FROM AssetEntity AS a \
 					JOIN a.room$srcTrg AS room \
 					JOIN a.rack$srcTrg as rack \
 					WHERE a.project=:project AND a.assetClass=:assetClass AND (a.assetType IS NULL OR a.assetType<>'Blade') \

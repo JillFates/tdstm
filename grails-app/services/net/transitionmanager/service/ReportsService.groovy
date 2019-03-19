@@ -46,7 +46,14 @@ class ReportsService implements ServiceMethods {
 
   //---------------------------------------for Assets and Bundles --------------------------------------//
 
-		List<AssetEntity> assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles, project, [sort: 'assetName'])
+		List<AssetEntity> assetEntityList
+		if (moveBundles) {
+			assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles, project, [sort: 'assetName'])
+		} else {
+			assetEntityList = AssetEntity.findAllByProject(project, [sort: 'assetName'])
+		}
+
+
 
 		def assetsInfo = getAssetInfo(assetEntityList, moveBundles, project, projectId, moveEvent, eventErrorList, viewUnpublished)
 
