@@ -124,7 +124,7 @@ export class NoticeListComponent implements OnInit {
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
 			this.openNoticeViewEdit(event['dataItem']);
 		}
 	}
