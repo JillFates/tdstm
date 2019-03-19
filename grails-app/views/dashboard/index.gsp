@@ -711,7 +711,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"/ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
+				url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 				dataType: 'json',
 				success:updateMoveEventNews,
 				error:function (xhr, ajaxOptions, thrownError){
@@ -822,7 +822,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"/ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+				url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 				dataType: 'json',
 				success:updateMoveBundleSteps,
 				error:function (xhr, ajaxOptions, thrownError){
