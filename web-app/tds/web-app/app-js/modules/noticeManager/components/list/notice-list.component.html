@@ -19,7 +19,7 @@
                         (cellClick)="cellClick($event)"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button class="btn btn-default button-create-license" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
+                        <button [disabled]="!isCreateAvailable()" class="btn btn-default button-create-license" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
                         <button class="btn btn-default button-create-license" type="button" (click)="onShowEULA()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> EULAS </button>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
@@ -81,7 +81,7 @@
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                             <div class="text-center">
-                                <button class="btn btn-default" (click)="openNoticeViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                                <button [disabled]="!isEditAvailable()" class="btn btn-default" (click)="openNoticeViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
                                 <button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
                             </div>
                         </ng-template>

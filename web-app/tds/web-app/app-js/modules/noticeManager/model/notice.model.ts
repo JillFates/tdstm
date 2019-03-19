@@ -56,7 +56,7 @@ export class NoticeColumnModel {
 }
 
 export enum NoticeType {
-	PreLogin,
+	PreLogin = 1,
 	PostLogin,
 	Mandatory
 }

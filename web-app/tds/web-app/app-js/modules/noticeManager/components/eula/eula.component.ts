@@ -1,20 +1,13 @@
 // Angular
-import {Component, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
-import {FormControl} from '@angular/forms';
-// Component
-import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
-import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Kendo
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 import {NoticeModel} from '../../model/notice.model';
-import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tds-eula',
@@ -31,8 +24,7 @@ export class EULAComponent {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
-		protected sanitizer: DomSanitizer,
-		private permissionService: PermissionService) {
+		protected sanitizer: DomSanitizer) {
 
 		this.model = {...model};
 		this.dataSignature = JSON.stringify(this.model);

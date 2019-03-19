@@ -1,20 +1,12 @@
 // Angular
-import {Component, ViewChild, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
-import {FormControl} from '@angular/forms';
-// Component
-import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
-import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-// Kendo
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 import {NoticeModel, StandardNotices} from '../../model/notice.model';
-import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tds-standard-notices',
@@ -23,8 +15,6 @@ import {Permission} from '../../../../shared/model/permission.model';
 export class StandardNoticesComponent implements OnInit {
 	private dataSignature: string;
 	protected modelNotices: NoticeModel[];
-	protected acceptAgreement = false;
-	protected dontShowAgain: boolean;
 	protected currentNoticeIndex: number;
 
 	constructor(
@@ -33,8 +23,7 @@ export class StandardNoticesComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
-		protected sanitizer: DomSanitizer,
-		private permissionService: PermissionService) {
+		protected sanitizer: DomSanitizer) {
 
 		this.modelNotices = model.notices.concat([])
 			.map((notice: NoticeModel) => {
@@ -45,7 +34,6 @@ export class StandardNoticesComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.dontShowAgain = false;
 		this.currentNoticeIndex = 0;
 	}
 
@@ -87,7 +75,6 @@ export class StandardNoticesComponent implements OnInit {
 			this.activeDialog.close(true);
 		}
 
-		this.dontShowAgain = false;
 		this.currentNoticeIndex += 1;
 	}
 }

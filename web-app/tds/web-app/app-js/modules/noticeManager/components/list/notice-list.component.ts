@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
@@ -21,7 +21,6 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
 import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {APIActionColumnModel} from '../../../apiAction/model/api-action.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {EULAComponent} from '../eula/eula.component';
 import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
