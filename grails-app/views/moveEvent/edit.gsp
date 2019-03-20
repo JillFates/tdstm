@@ -184,7 +184,7 @@
                             </tr>
 							<tr class="prop">
 								<td class="name">
-									<label for="apiActionBypass">By-Pass API Actions:</label>
+									<label for="apiActionBypass">By-Pass Actions:</label>
 								</td>
 								<td class="valueNW ${hasErrors(bean:moveEventInstance,field:'apiActionBypass','errors')}">
 									<g:select id="apiActionBypass" optionKey="key" optionValue="value" from="${['true': 'Yes', 'false': 'No']}" name="apiActionBypass" value="${moveEventInstance.apiActionBypass}" >

@@ -1,5 +1,6 @@
 <%@ page import="net.transitionmanager.domain.MoveBundleStep" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -562,7 +563,7 @@
 
 	function toggleUnpublished (e) {
 		var checkedValue = $(e.srcElement).is(':checked');
-		setUserPreference('viewUnpublished', checkedValue, function () {
+		setUserPreference('${UserPreferenceEnum.VIEW_UNPUBLISHED.name()}', checkedValue, function () {
 			refreshDashboard();
 		});
 	}
@@ -711,7 +712,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"/ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
+				url:"../ws/moveEventNews/"+moveEvent+"?type="+$("#typeId").val()+"&state="+$("#stateId").val()+"&maxLen="+$("#maxLenId").val()+"&sort="+$("#sortId").val(),
 				dataType: 'json',
 				success:updateMoveEventNews,
 				error:function (xhr, ajaxOptions, thrownError){
@@ -822,7 +823,7 @@
 				type:"GET",
 				async : true,
 				cache: false,
-				url:"/ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
+				url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
 				dataType: 'json',
 				success:updateMoveBundleSteps,
 				error:function (xhr, ajaxOptions, thrownError){

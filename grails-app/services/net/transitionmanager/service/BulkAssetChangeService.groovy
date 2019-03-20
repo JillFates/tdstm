@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -17,6 +17,7 @@ import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 /**
  * This handles taking in a bulk change json and delegating the bulk change to the appropriate service.
@@ -179,9 +180,9 @@ class BulkAssetChangeService implements ServiceMethods {
 
 			actions << [service: service, field: field, action: edit.action, value: value]
 
-			// Adding so that collections won't be included in the validation, as they can't be validated this way, and their ids are
-			// validated in the coerceBulkValue.
-			if (value instanceof Collection) {
+			// Adding so that collections and move bundles won't be included in the validation, as they can't be validated this way,
+			// and their ids are validated in the coerceBulkValue.
+			if (value instanceof Collection || GormUtil.getDomainPropertyType(typeInstance, field).name == MoveBundle.class.name) {
 				return null
 			}
 

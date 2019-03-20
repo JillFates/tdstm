@@ -84,6 +84,9 @@
                                                         [name]="'controlNumber' + rowIndex"
                                                         [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                                         [format]="editRows.selectedValues[rowIndex].field.constraints?.format"
+                                                        [allowNegative]="editRows.selectedValues[rowIndex].field.constraints?.allowNegative"
+                                                        [precision]="editRows.selectedValues[rowIndex].field.constraints?.precision"
+                                                        [separator]="editRows.selectedValues[rowIndex].field.constraints?.separator"
                                                         [min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
                                                         [max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
                                     </tds-number-control>

@@ -667,7 +667,7 @@ class ApiActionService implements ServiceMethods {
 		// If all the properties are required, the entry for the ConnectorClass has to be overwritten with the following map.
 		if (!minimalInfo) {
 			AbstractConnector connector = connectorInstanceForAction(apiAction)
-			apiActionMap.connectorClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
+			apiActionMap.connectorClass = [id: apiAction.apiCatalog?.id, name: apiAction.apiCatalog?.name]
 			apiActionMap.version = apiAction.version
 			apiActionMap.actionType = [id: apiAction.actionType.name(), name: apiAction.actionType.getType()]
 			apiActionMap.remoteCredentialMethod = null
@@ -707,6 +707,12 @@ class ApiActionService implements ServiceMethods {
 
 		if (count > 0) {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
+		}
+
+		// Blank out the apiCatalog if not selected for scripts
+		if (cmdObj.actionType != ActionType.WEB_API.name()) {
+			cmdObj.apiCatalog?.discard()
+			cmdObj.apiCatalog = null
 		}
 	}
 

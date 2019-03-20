@@ -24,6 +24,7 @@ import net.transitionmanager.command.bulk.EditCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import org.grails.web.json.JSONObject
@@ -40,6 +41,9 @@ import test.helper.PersonTestHelper
 class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
+
+	@Autowired
+	CustomDomainService customDomainService
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper
@@ -194,7 +198,9 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 
 			JSONObject fieldSpec = loadFieldSpecJson()
-			bulkAssetChangeService.dataviewService.projectService.customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+
+			Setting.findByProject(project).delete(flush:true)
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true
 		}
