@@ -1,9 +1,36 @@
 <div class="planning-dashboard-component">
     <div class="phase-wrapper">
         <div class="dashboard-div discovery-phase">
-            <span class="dashboard_head">Discovery Phase</span>
+            <span class="dashboard-head">Discovery Phase</span>
             <div>
-                Progress bars here
+                <table style="margin-bottom: 10px; border-spacing: 0px;">
+                    <!-- Applications Validated Progressbar -->
+                    <tbody><tr>
+                        <td class="dashboard-bar-base" style="background-color:lightyellow">
+
+                            <div class="dashboard-bar-graph" id="discoverybar" style="width: 11%;"></div>
+                            <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+                                <b> 11%</b>
+                                <a href="/tdstm/application/list?filter=application&amp;toValidate=Validated">
+                                    Applications Validated
+                                </a>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <!-- Applications Ready Progressbar --->
+                    <tr>
+                        <td class="dashboard-bar-base">
+
+                            <div class="dashboard-bar-graph" id="analysisbar" style="width: 3%;"></div>
+                            <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+                                <b> 3%</b>
+                                <a href="/tdstm/application/list?filter=application&amp;toValidate=PlanReady">Applications Plan Ready</a>
+                            </div>
+
+                        </td>
+                    </tr>
+                    </tbody></table>
             </div>
             <h4>Total Discovered</h4>
             <div>Table Here</div>
@@ -11,10 +38,72 @@
             <div>Details here</div>
         </div>
         <div class="dashboard-div analysis-phase">
-            TEST
+            <span class="dashboard-head">Analysis & Planning Phase</span>
+            <div><table style="margin-bottom: 10px; border-spacing: 0px;">
+
+                <tbody><tr>
+                    <td class="dashboard-bar-base">
+
+                        <div class="dashboard-bar-graph" id="assignmentbar" style="width: 55%;"></div>
+                        <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+                            <b> 55% </b>
+                            <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Assigned">Applications Assigned</a>
+                        </div>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="dashboard-bar-base">
+
+                        <div class="dashboard-bar-graph" id="confirmedbar" style="width: 2%;"></div>
+                        <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+                            <b> 2%</b>
+                            <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Confirmed">Applications Confirmed</a>
+                        </div>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+            <h4>Application Review Status</h4>
+            <div>Details here</div>
+            <h4>Dependencies</h4>
+            <div>Table here</div>
+            <h4>Application Plans</h4>
+            <div>Details here</div>
         </div>
         <div class="dashboard-div execution-phase">
-            TEST
+            <span class="dashboard-head">Discovery Phase</span>
+            <div>
+                <table style="margin-bottom: 10px; border-spacing: 0px;">
+                    <tbody><tr>
+                        <td class="dashboard-bar-base">
+
+                            <div class="dashboard-bar-graph" id="appmovedbar" style="width: 1%;"></div>
+                            <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+                                <b> 1% </b>
+                                <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Moved">Applications Completed</a>
+                            </div>
+
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="dashboard-bar-base">
+
+                            <div class="dashboard-bar-graph0">
+                                <b>0% Servers Completed</b>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    </tbody></table>
+            </div>
+            <div>Big Table Here</div>
         </div>
     </div>
 </div>

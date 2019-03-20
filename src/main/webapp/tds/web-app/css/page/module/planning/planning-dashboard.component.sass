@@ -1,8 +1,18 @@
 .planning-dashboard-component
+  table
+    width: 100%
+  h4
+    font-weight: 700
   .phase-wrapper
     min-height: 200px
     display: flex
     margin-left: 20px
+    .dashboard-head
+      color: green
+      font-size: 18px
+      font-weight: bold
+      line-height: 31px
+      margin-bottom: -15px
     .dashboard-div
       margin-top: 10px
       margin-left: 5px
@@ -15,3 +25,15 @@
       max-width: 285px
     .execution-phase
       width: 63%
+  .dashboard-bar-base
+    padding: 0px
+    height: 24px
+    background-color: lightyellow
+    box-shadow: 2px 3px 3px lightgrey inset
+    .dashboard-bar-graph
+      background-color: #BFF3A5
+      z-index: -1
+      height: 24px
+      border-right-width: 3px
+      border-color: lightgray
+      border-right-style: inset
