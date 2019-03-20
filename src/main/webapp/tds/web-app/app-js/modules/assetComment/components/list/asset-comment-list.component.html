@@ -30,7 +30,7 @@
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                             <div class="tds-action-button-set">
-                                <tds-button-edit tooltip="Edit Comment" ng-reflect-tooltip="Edit Comment" class="tds-generic-button" (click)="onEdit(dataItem)">
+                                <tds-button-edit tooltip="Edit Comment" class="tds-generic-button" (click)="onEdit(dataItem)">
                                 </tds-button-edit>
                             </div>
                         </ng-template>
