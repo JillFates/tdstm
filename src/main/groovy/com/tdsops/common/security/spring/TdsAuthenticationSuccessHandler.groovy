@@ -98,7 +98,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		}
 
 		if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-			'/dashboard/userPortal'
+			'/module/user/dashboard'
 		}
 		else {
 			'/projectUtil'

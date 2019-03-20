@@ -250,6 +250,13 @@ export class TaskService {
 			.catch((error: any) => error);
 	}
 
+	changeTimeEst(id: string, days: string) {
+		const url = `${this.baseURL}/ws/task/${id}/changeTime`;
+		return this.http.post(url, JSON.stringify({days}))
+			.map((response: any) => response)
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * Add note
 	 * @param {string} id task
@@ -310,6 +317,12 @@ export class TaskService {
 	 */
 	updateTaskStatus(payload: any): Observable<any> {
 		return this.http.post(`${this.baseURL}/task/update`, JSON.stringify(payload))
+			.map((response: any) => response)
+			.catch((error: any) => error);
+	}
+
+	updateStatus(id: string, status: string): Observable<any> {
+		return this.http.post(`${this.baseURL}/ws/task/${id}/updateStatus`, JSON.stringify({status}))
 			.map((response: any) => response)
 			.catch((error: any) => error);
 	}

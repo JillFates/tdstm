@@ -13,7 +13,7 @@ import {AssetCommonShow} from '../asset/asset-common-show';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from '../asset/asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
-import {UserManageStaffComponent} from '../../../user/components/manage-staff/user-manage-staff.component';
+import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 
 declare var jQuery: any;

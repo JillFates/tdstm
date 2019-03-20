@@ -1,0 +1,143 @@
+<div class="user-dashboard-component">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span>Project:</span>
+            <kendo-dropdownlist [data]="projectList" [(ngModel)]="selectedProject" (ngModelChange)="onChangeProject()" textField="name" valueField="id"></kendo-dropdownlist>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6 cell-container">
+                <kendo-grid
+                        [data]="eventList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <img src="/tdstm/assets/icons/calendar.png"/>
+                        <strong>Events</strong> <span> - Your assigned events and your team</span>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of eventColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <kendo-grid
+                        [data]="taskList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <img src="/tdstm/assets/icons/table.png"/>
+                        <strong>Task Summary</strong> <span> - Active tasks assigned to you</span>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchTasksForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <div *kendoGridDetailTemplate="let dataItem, let rowIndex = rowIndex">
+                            <div>
+                                <button class="btn btn-primary" *ngIf="dataItem.status!='Started' && dataItem.status!='Completed'" (click)="updateTaskStatus(dataItem.taskId,'Started')">Start</button>
+                                <button class="btn btn-primary" *ngIf="dataItem.status!='Completed'" (click)="updateTaskStatus(dataItem.taskId,'Completed')">Done</button>
+                                <button class="btn btn-primary" (click)="openTaskDetailView(dataItem)">Details...</button>
+                            </div>
+                            <div *ngIf="dataItem.status=='Ready' && !movedayCategories.includes(dataItem.category)">
+                                <span style="margin-right:16px">Delay for:</span>
+                                <button class="btn btn-primary" (click)="changeTimeEst(dataItem.taskId,1)">1 day</button>
+                                <button class="btn btn-primary" (click)="changeTimeEst(dataItem.taskId,2)">2 day</button>
+                                <button class="btn btn-primary" (click)="changeTimeEst(dataItem.taskId,7)">7 day</button></div>
+                            <button *ngIf="dataItem.successors > 0 || dataItem.predecessors > 0" (click)="openLinkInNewTab('../task/taskGraph?neighborhoodTaskId=' + dataItem.taskId)" class="btn btn-primary">Neighborhood</button>
+                            <button *ngIf="dataItem.parsedInstructions" class="btn btn-primary" (click)="openLinkInNewTab(dataItem.parsedInstructions[1])">{{dataItem.parsedInstructions[0]}}</button>
+                    </div>
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of taskColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <span>{{summaryDetail}}</span>
+            </div>
+            <div class="col-md-6 cell-container">
+                <kendo-grid
+                        [data]="eventNewsList"
+                        [selectable]="true">
+                    <ng-template kendoGridToolbarTemplate>
+                        <img src="/tdstm/assets/icons/newspaper.png"/>
+                        <strong>Event News</strong> <span> - Active news for your events</span>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventNewsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of eventNewsColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+                        <ng-template kendoGridCellTemplate let-dataItem let-column="column">
+                            <span *ngIf="column.field == 'event'"><a [href]="'/tdstm/dashboard/index?moveEvent=' + dataItem['eventId']">{{dataItem[column.field]}}</a></span>
+                            <span *ngIf="column.field != 'event'">{{ dataItem[column.field] }}</span>
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+                <kendo-grid
+                        [data]="applicationList"
+                        [selectable]="true"
+                        (cellClick)="handleApplicationClicked($event)"
+                        class="clickable-grid">
+                    <ng-template kendoGridToolbarTemplate>
+                        <img src="/tdstm/assets/icons/svg/application_menu.svg" width="16" height="16"/>
+                        <strong>Applications</strong> <span> - Your applications as an SME or Owner</span>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchApplicationsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of applicationColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+
+                <kendo-grid
+                        [data] = "activePersonList"
+                        [selectable]="true"
+                        (cellClick)="handlePersonClicked($event)"
+                        class="clickable-grid">
+                    <ng-template kendoGridToolbarTemplate>
+                        <img src="/tdstm/assets/icons/group.png"/>
+                        <strong>Active People</strong><span> - Currently active people on this project</span>
+                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchPeopleForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                    </ng-template>
+
+                    <!-- Configured View Columns (*ngFor) -->
+                    <kendo-grid-column *ngFor="let column of activePersonColumnModel.columns"
+                                       field="{{column.property}}"
+                                       format="{{column.format}}"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div>
+                                <label>{{column.label}}</label>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+                </kendo-grid>
+            </div>
+        </div>
+    </div>
+</div>

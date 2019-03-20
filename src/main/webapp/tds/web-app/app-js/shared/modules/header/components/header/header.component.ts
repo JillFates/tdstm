@@ -1,16 +1,16 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
 // Component
-import {UserPreferencesComponent} from '../../../../../modules/user/components/preferences/user-preferences.component';
-import {UserEditPersonComponent} from '../../../../../modules/user/components/edit-person/user-edit-person.component';
-import {UserDateTimezoneComponent} from '../../../../../modules/user/components/date-timezone/user-date-timezone.component';
+import {UserPreferencesComponent} from '../preferences/user-preferences.component';
+import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
+import {UserDateTimezoneComponent} from '../date-timezone/user-date-timezone.component';
 // Service
 import {UserContextService} from '../../../../../modules/security/services/user-context.service';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
 // Model
 import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
 import {PersonModel} from '../../../../components/add-person/model/person.model';
-import {PasswordChangeModel} from '../../../../components/password-change/model/password-change.model';
+import {PasswordChangeModel} from '../../model/password-change.model';
 import {DIALOG_SIZE} from '../../../../model/constants';
 
 declare var jQuery: any;
