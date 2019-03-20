@@ -100,8 +100,8 @@ class WsUserController implements ControllerMethods {
 			project = getProjectForWs()
 		}
 
-		def projects = [project]
-		def userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+		List projects = [project]
+		List userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		if (userProjects) {
 			projects = (userProjects + project).unique()
 		}
@@ -119,8 +119,8 @@ class WsUserController implements ControllerMethods {
 	 * @return list of events
 	 */
 	def getAssignedEvents() {
-		def project = getProjectForWs()
-		def events = userService.getEventDetails(project).values().collect { value -> [
+		Project project = getProjectForWs()
+		List events = userService.getEventDetails(project).values().collect { value -> [
 				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
 				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
 				days: value.daysToGo + ' days', teams: value.teams]
@@ -133,7 +133,7 @@ class WsUserController implements ControllerMethods {
 	 * @return list of event news
 	 */
 	def getAssignedEventNews() {
-		def project = getProjectForWs()
+		Project project = getProjectForWs()
 		List eventNews = []
 		DateFormat formatter = TimeUtil.createFormatter("MM/dd/yyyy hh:mm a")
 		if (project) {
@@ -153,9 +153,9 @@ class WsUserController implements ControllerMethods {
 	 * @return list of tasks and summary string
 	 */
 	def getAssignedTasks() {
-		def project = getProjectForWs()
-		def taskList = []
-		def taskSummary = userService.getTaskSummary(project)
+		Project project = getProjectForWs()
+		List taskList = []
+		Map taskSummary = userService.getTaskSummary(project)
 		DateFormat formatter = TimeUtil.createFormatter("MM/dd kk:mm")
 
 		taskSummary.taskList.each { task ->
@@ -193,7 +193,7 @@ class WsUserController implements ControllerMethods {
 	 * @return list of applications
 	 */
 	def getAssignedApplications() {
-		def project = getProjectForWs()
+		Project project = getProjectForWs()
 		Map<String, Object> appSummary = userService.getApplications(project)
 
 		def appList = appSummary.appList.collect { Application app -> [
@@ -213,9 +213,9 @@ class WsUserController implements ControllerMethods {
 	 * @return list of people
 	 */
 	def getAssignedPeople() {
-		def project = getProjectForWs()
+		Project project = getProjectForWs()
 
-		def activePeople = userService.getActivePeople(project).collect { login ->
+		Map activePeople = userService.getActivePeople(project).collect { login ->
 			[personId: login.personId, projectName: login.projectName,
 			 personName: login.personName, lastActivity: login.lastActivity]
 		}
