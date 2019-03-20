@@ -215,7 +215,7 @@ class WsUserController implements ControllerMethods {
 	def getAssignedPeople() {
 		Project project = getProjectForWs()
 
-		Map activePeople = userService.getActivePeople(project).collect { login ->
+		ArrayList activePeople = userService.getActivePeople(project).collect { login ->
 			[personId: login.personId, projectName: login.projectName,
 			 personName: login.personName, lastActivity: login.lastActivity]
 		}
