@@ -73,8 +73,8 @@ export class APIActionListComponent implements OnInit {
 		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
 		private userContext: UserContextService,
-		private translate: TranslatePipe)) {
-	this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
+		private translate: TranslatePipe) {
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['apiActions'];
