@@ -41,7 +41,7 @@ export const ImportBatchRoute: Routes = [
 			requiresPermission: Permission.DataTransferBatchView
 		},
 		component: ImportBatchListComponent,
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	},
 	{
 		path: ImportBatchStates.IMPORT_ASSETS.url,
@@ -56,7 +56,7 @@ export const ImportBatchRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: ImportAssetsComponent,
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	},
 	{
 		path: ImportBatchStates.IMPORT_BATCH_VIEW.url,
@@ -71,7 +71,7 @@ export const ImportBatchRoute: Routes = [
 			requiresPermission: Permission.DataTransferBatchView
 		},
 		component: ImportBatchListComponent,
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

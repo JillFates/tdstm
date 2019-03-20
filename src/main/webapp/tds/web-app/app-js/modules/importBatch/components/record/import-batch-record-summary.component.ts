@@ -1,8 +1,9 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ImportBatchModel} from '../../model/import-batch.model';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {PreferenceService, PREFERENCES_LIST, IMPORT_BATCH_PREFERENCES} from '../../../../shared/services/preference.service';
-import { DateUtils } from '../../../../shared/utils/date.utils';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 @Component({
 	selector: 'import-batch-record-summary',
@@ -17,8 +18,13 @@ export class ImportBatchRecordSummaryComponent {
 	public importBatchPrefEnum = IMPORT_BATCH_PREFERENCES;
 	public userTimeZone: string;
 
-	constructor(private userPreferenceService: PreferenceService) {
-		this.onLoad();
+	constructor(private userPreferenceService: PreferenceService, private userContextService: UserContextService) {
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.userTimeZone = userContext.timezone;
+				this.onLoad();
+			});
+
 	}
 
 	/**
