@@ -112,22 +112,18 @@ export class FieldSettingsService {
 	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any): boolean {
 		let conflicts = [];
 		// We are going to find conflicts in other domains, so first remove the origin domain from the list of domains
-		try {
-			let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain)
-			for (let domain of filteredDomains) {
-				let fields = domain.fields;
-				let x = 0;
-				if (field.shared === 1) {
-					conflicts = fields.filter(
-						item => item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim().length > 0 ||
-							this.conflictsWithAnotherFieldName(field.label, fields));
-					if (conflicts.length > 0) {
-						return true;
-					}
+		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain)
+		for (let domain of filteredDomains) {
+			let fields = domain.fields;
+			let x = 0;
+			if (field.shared === 1) {
+				conflicts = fields.filter(
+					item => item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim().length > 0 ||
+						this.conflictsWithAnotherFieldName(field.label, fields));
+				if (conflicts.length > 0) {
+					return true;
 				}
 			}
-		} catch(e) {
-			console.log(e);
 		}
 		return false;
 	}
