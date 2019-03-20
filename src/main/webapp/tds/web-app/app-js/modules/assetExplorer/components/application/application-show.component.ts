@@ -11,7 +11,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
-import {UserManageStaffComponent} from '../../../user/components/manage-staff/user-manage-staff.component';
+import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {UserContextService} from '../../../security/services/user-context.service';
 

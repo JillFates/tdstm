@@ -299,7 +299,7 @@ class Person extends Party {
 				active: active,
 				company: company.toString(),
 				country: country,
-				stateProv: stateProv,
+				stateProv: stateProv ?: '',
 				keyWords: keyWords,
 				tdsNote: tdsNote,
 				tdsLink: tdsLink,

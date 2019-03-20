@@ -325,6 +325,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				}
 			);
 
+		} else {
+			GraphUtil.applyHighlights(null);
 		}
 	};
 

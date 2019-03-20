@@ -1,10 +1,10 @@
 import {Component, Inject} from '@angular/core';
 
-import {UserService} from '../../service/user.service';
-import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {HeaderService} from '../../services/header.service';
+import {PersonModel} from '../../../../components/add-person/model/person.model';
+import {UIPromptService} from '../../../../directives/ui-prompt.directive';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../services/ui-dialog.service';
+import {DecoratorOptions} from '../../../../model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'user-manage-staff',
@@ -24,7 +24,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 
 	constructor(
 		public personModel: PersonModel,
-		private userService: UserService,
+		private headerService: HeaderService,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
@@ -81,7 +81,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 
 	// Populate the data for the model
 	private loadComponentModel() {
-		this.userService.fetchModelForStaffViewEdit(this.id).subscribe(
+		this.headerService.fetchModelForStaffViewEdit(this.id).subscribe(
 			(result: any) => {
 				const defaultPerson = {
 					firstName: '',
@@ -167,7 +167,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 			// Isolate just team codes
 			data['teams'] = this.personModel.teams.map(a => a.id);
 
-			this.userService.updateAccountAdmin(data).subscribe(
+			this.headerService.updateAccountAdmin(data).subscribe(
 				(result) => {
 					if (result) {
 						this.savedPersonModel = Object.assign({}, this.personModel);

@@ -518,8 +518,12 @@ table.rack_elevation .rack_future {
 table.rack_elevation .rack_error {
 	background: #D80B01 !important;
 	color: white !important;
-	font-size: 1.0em;
+	font-size: 0.9em;
 	border: 1px dashed black !important;
+}
+table.rack_elevation td img {
+	height: 11px;
+	width: 11px;
 }
 table.rack_elevation .rack_error a{
 	color: white !important;
@@ -553,6 +557,7 @@ table.rack_elevation.back {
 }
 
 table.rack_elevation td {
+	height: 14px;
 	text-align: left;
 	font: 8px helvetica, arial, sans-serif;
 	border: 1px solid #999999;

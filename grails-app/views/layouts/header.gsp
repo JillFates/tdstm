@@ -19,6 +19,16 @@
 
     <g:layoutHead />
 
+    <script type="text/javascript">
+        <%
+            // Only used for the Person Dialog... remove as soon as the Person Dialog from Asset is done
+        %>
+		$(document).ready(function() {
+			$('.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			$('.ui-dialog').addClass('old-legacy-content');
+		});
+    </script>
+
 </head>
 
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->

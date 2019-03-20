@@ -11,6 +11,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
 // Shared Services
+import {HeaderService} from './modules/header/services/header.service';
 import {PreferenceService} from '../shared/services/preference.service';
 import {NotifierService} from '../shared/services/notifier.service';
 import {ComponentCreatorService} from '../shared/services/component-creator.service';
@@ -40,6 +41,8 @@ import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-
 import {UIAutoCenterDirective} from './directives/autocenter-directive';
 import {InputPasteDirective} from './directives/input-paste.directive';
 import {CopyClipboardDirective} from './directives/copy-clipboard.directive';
+import {UIRequiredComplexValueDirective} from './directives/required-complex-value';
+import {UIRequiredCustomEmptyDirective} from './directives/required-custom-empty';
 // Shared Pipes
 import {DateTimePipe} from './pipes/datetime.pipe';
 import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
@@ -55,6 +58,11 @@ import {BreadcrumbNavigationComponent} from './modules/header/components/breadcr
 import {HeaderComponent} from './modules/header/components/header/header.component';
 import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
 import {LicenseWarningComponent} from './modules/header/components/license-warning/license-warning.component';
+import {UserManageStaffComponent} from './modules/header/components/manage-staff/user-manage-staff.component';
+import {UserPreferencesComponent} from './modules/header/components/preferences/user-preferences.component';
+import {UserEditPersonComponent} from './modules/header/components/edit-person/user-edit-person.component';
+import {PasswordChangeComponent} from './modules/header/components/password-change/password-change.component';
+import {UserDateTimezoneComponent} from './modules/header/components/date-timezone/user-date-timezone.component';
 import {CodeMirrorComponent} from './modules/code-mirror/code-mirror.component';
 import {DynamicComponent} from './components/dynamic.component';
 import {CheckActionComponent} from './components/check-action/check-action.component';
@@ -67,7 +75,6 @@ import {AddPersonComponent} from './components/add-person/add-person.component';
 import {DateRangeSelectorComponent} from './components/date-range-selector/date-range-selector.component';
 import {AssetTagSelectorComponent} from './components/asset-tag-selector/asset-tag-selector.component';
 import {AkaComponent} from './components/aka/aka.component';
-import {PasswordChangeComponent} from './components/password-change/password-change.component';
 import {ConnectorComponent} from './components/connector/connector.component';
 import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
 import {TDSDateControlComponent} from './components/custom-control/date-time/date-control.component';
@@ -114,6 +121,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UIDialogDirective,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		UserPreferencesComponent,
+		UserEditPersonComponent,
+		UserDateTimezoneComponent,
+		UserManageStaffComponent,
 		TranmanMenuComponent,
 		LicenseWarningComponent,
 		PopupLegendsComponent,
@@ -133,6 +144,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
+		UIRequiredComplexValueDirective,
+		UIRequiredCustomEmptyDirective,
 		InputPasteDirective,
 		CopyClipboardDirective,
 		AkaComponent,
@@ -170,6 +183,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		EscapeUrlEncodingPipe,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		UserPreferencesComponent,
+		UserEditPersonComponent,
+		UserDateTimezoneComponent,
+		UserManageStaffComponent,
 		TranmanMenuComponent,
 		LicenseWarningComponent,
 		PopupLegendsComponent,
@@ -186,6 +203,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
+		UIRequiredComplexValueDirective,
+		UIRequiredCustomEmptyDirective,
 		AkaComponent,
 		ConnectorComponent,
 		PopupModule,
@@ -210,7 +229,12 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
-		BulkChangeEditComponent
+		BulkChangeEditComponent,
+		UserPreferencesComponent,
+		UserEditPersonComponent,
+		UserDateTimezoneComponent,
+		UserManageStaffComponent,
+		PasswordChangeComponent
 	]
 })
 export class SharedModule {
@@ -229,6 +253,7 @@ export class SharedModule {
 				UIDialogService,
 				UIActiveDialogService,
 				// Services
+				HeaderService,
 				PersonService,
 				NotifierService,
 				KendoFileHandlerService,

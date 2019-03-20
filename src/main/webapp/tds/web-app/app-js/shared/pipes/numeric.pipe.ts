@@ -18,10 +18,12 @@ export class NumericPipe implements PipeTransform {
 	 * @returns {any}
 	 */
 	transform(value: string, args?: any): any {
+		const format = (args || '').replace(/'/g, '');
+
 		if (!value) {
 			return '';
 		}
 		let number = +value;
-		return formatNumber(number, args);
+		return formatNumber(number, format);
 	}
 }

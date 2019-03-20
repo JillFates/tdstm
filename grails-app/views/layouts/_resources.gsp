@@ -22,6 +22,10 @@
 
 <!-- jQuery -->
 <!-- LEGACY AND SUPPORT LEGACY CODE START -->
+<%-- What is this for?  --%>
+<script type="text/javascript">
+	var contextPath = "${request.contextPath}";
+</script>
 
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds-main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>

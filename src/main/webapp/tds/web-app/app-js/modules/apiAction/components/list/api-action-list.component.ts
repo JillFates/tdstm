@@ -7,6 +7,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UserContextService} from '../../../security/services/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -22,6 +23,7 @@ import {
 } from '../../../../shared/model/data-list-grid.model';
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 import {UserContextModel} from '../../../security/model/user-context.model';
+import {APIActionType} from '../../model/api-action.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
@@ -61,6 +63,8 @@ export class APIActionListComponent implements OnInit {
 	private interval = INTERVAL;
 	private openLastItemId = 0;
 	public dateFormat = '';
+	protected createActionText = '';
+	protected hasEarlyAccessTMRPermission: boolean;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -68,11 +72,14 @@ export class APIActionListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
-		private userContext: UserContextService) {
+		private userContext: UserContextService,
+		private translate: TranslatePipe)) {
+	this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['apiActions'];
 		this.gridData = process(this.resultSet, this.state);
+		this.createActionText = this.translate.transform('API_ACTION.CREATE_ACTION');
 	}
 
 	ngOnInit() {
@@ -184,7 +191,10 @@ export class APIActionListComponent implements OnInit {
 	 * @param {APIActionModel} apiActionModel
 	 * @param {number} actionType
 	 */
-	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number, originalModel?: APIActionModel): void {
+	private openAPIActionDialogViewEdit(
+		apiActionModel: APIActionModel,
+		actionType: number,
+		originalModel?: APIActionModel): void {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }

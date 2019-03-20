@@ -15,7 +15,7 @@ export class CredentialModel {
 }
 
 export class AgentMethodModel {
-	id?: string;
+	id?: string | number;
 	name?: string;
 	description?: string;
 	method?: string;
