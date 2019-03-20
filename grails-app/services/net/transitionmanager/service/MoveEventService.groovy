@@ -253,4 +253,28 @@ class MoveEventService implements ServiceMethods {
 				MoveEvent.executeUpdate(query, params)
 			}
 		}
+
+	/**
+	 * Used to get the list of events that a person is assigned to.
+	 * @param person - the person to find assigned event for
+	 * @param currentProject - the individual project to find events for, if null then the
+	 *  events of all projects that the user is assigned will be returned
+	 * @param completionCutoff - the date cut off the list based on the estCompletionDate.
+	 *  If the field is set then only events where the estCompletionDate >= to
+	 *  completionCutoff or completionCutoff is null will appear.
+	 */
+	List<MoveEvent> getAssignedEvents(Person person, Project currentProject =null, Date completionCutoff=null) {
+
+		return MoveEvent.where {
+			if (currentProject) {
+				project == currentProject
+			} else {
+				project.id in securityService.getUserProjectIds(null, person.userLogin)
+			}
+			if (completionCutoff) {
+				estCompletionTime > completionCutoff || estCompletionTime == null
+			}
+		}.list()
+
+	}
 }
