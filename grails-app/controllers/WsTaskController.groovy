@@ -243,9 +243,9 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def changeEstTime() {
-		def commentId = params.id.toLong()
+		Long commentId = params.id.toLong()
 		Map requestParams = request.JSON
-		def days = requestParams.days.toInteger()
+		Integer days = requestParams.days.toInteger()
 		Map<String, String> retMap = [etext: '', estStart: '', estFinish: '']
 		try {
 			AssetComment comment = taskService.changeEstTime(commentId, days)
