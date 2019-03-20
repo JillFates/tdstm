@@ -16,6 +16,7 @@ export class FieldSettingsModel {
 	constraints: ConstraintModel;
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	errorMessage?: string;
+	toBeDeleted?: boolean;
 
 	constructor() {
 		this.udf = true;

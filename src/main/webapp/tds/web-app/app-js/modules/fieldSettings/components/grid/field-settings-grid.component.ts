@@ -39,13 +39,17 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('filter') filterEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
-	@Input('state') gridState: any;
+	@Input('isEditable') isEditable: boolean;
+	@Input('gridFilter') gridFilter: any;
 	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
 	public gridData: GridDataResult;
 	public colors = FIELD_COLORS;
+	public hasAtLeastOneInvalidField = false;
+	public formHasError: boolean = null;
+	public isDirty = false;
 	public state: State = {
 		sort: [{
 			dir: 'asc',
@@ -106,18 +110,18 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.state.filter.filters = [];
 
 		this.fieldsSettings = this.data.fields;
-		if (this.gridState.filter.search !== '') {
-			let search = new RegExp(this.gridState.filter.search, 'i');
+		if (this.gridFilter.search !== '') {
+			let search = new RegExp(this.gridFilter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
 				item => search.test(item.field) ||
 					search.test(item.label) ||
 					item['isNew']);
 		}
-		if (this.gridState.filter.fieldType !== 'All') {
+		if (this.gridFilter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.gridState.filter.fieldType === 'Custom Fields' ? 1 : 0
+				value: this.gridFilter.fieldType === 'Custom Fields' ? 1 : 0
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
@@ -132,6 +136,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.loaderService.show();
 		setTimeout(() => {
 			this.isEditing = true;
+			this.resetValidationFlags();
 			this.sortable = { mode: 'single' };
 			this.isFilterDisabled = false;
 			this.onFilter();
@@ -177,6 +182,8 @@ export class FieldSettingsGridComponent implements OnInit {
 			targetField.errorMessage = '';
 		}
 
+		dataItem.toBeDeleted = true;
+		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
 		this.deleteEmitter.emit({
 			domain: this.data.domain,
@@ -189,6 +196,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
+		dataItem.toBeDeleted = false;
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
 		this.deleteEmitter.emit({
@@ -203,11 +211,12 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected toBeDeleted(dataItem: FieldSettingsModel): boolean {
-		let found = this.fieldsToDelete.filter(item => item === dataItem.field);
-		return found.length > 0;
+		return this.fieldsToDelete.some(item => item === dataItem.field);
 	}
 
 	protected onAddCustom(): void {
+		this.setIsDirty(true);
+
 		this.addEmitter.emit((custom) => {
 			this.state.sort = [
 				{
@@ -261,7 +270,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onClearTextFilter(): void {
-		this.gridState.filter.search = '';
+		this.gridFilter.search = '';
 		this.onFilter();
 	}
 
@@ -273,6 +282,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			dir: 'asc',
 			field: 'order'
 		}];
+		this.resetValidationFlags();
 		this.applyFilter();
 	}
 
@@ -339,6 +349,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
+		this.setIsDirty(true);
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.prompt.open(
@@ -382,6 +393,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		const fields = this.getFieldsExcludingDeleted();
 
 		return dataItem.label.trim() === '' ||
+			fields.some((field) => field.errorMessage) ||
 			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
@@ -390,10 +402,10 @@ export class FieldSettingsGridComponent implements OnInit {
 	/**
 	 * Returns a boolean indicating if the fields contain atleast one field with error
 	 */
-	protected atLeastOneInvalidField(): boolean {
+	private atLeastOneInvalidField(): boolean {
 		const fields = this.getFieldsExcludingDeleted() || [];
 
-		return fields.some((field) => field.errorMessage);
+		return fields.some((field) => field.errorMessage || !field.label);
 	}
 
 	/**
@@ -401,7 +413,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
 	 * @param {any} event Context event from the input that launched the change
 	 */
-	protected onBlur(dataItem: FieldSettingsModel, event: any) {
+	protected onLabelBlur(dataItem: FieldSettingsModel, event: any) {
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
 		const message = 'The label must be different from all other field names and labels';
@@ -417,6 +429,13 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 			}
 		}
+
+		if (!dataItem.errorMessage && !dataItem.label.trim()) {
+			dataItem.errorMessage = 'Label is required';
+		}
+
+		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
+
 		if (dataItem.errorMessage)  {
 			if (!this.resettingChanges) {
 				this.lastEditedControl = this.lastEditedControl || event;
@@ -518,8 +537,25 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * On esc key pressed open confirmation dialog
 	 */
 	protected onKeyPressed(event: KeyboardEvent): void {
+		this.setIsDirty(true);
 		if (event.code === 'Escape') {
 			this.onCancel(event);
 		}
 	}
+
+	/**
+	 * Set the flag to indicate the form is dirty
+	 */
+	protected setIsDirty(value: boolean): void {
+		this.isDirty = value;
+	}
+
+	/**
+	 * Reset the flags to keep track the validation state
+	 */
+	private resetValidationFlags(): void {
+		this.formHasError = null;
+		this.setIsDirty(false);
+	}
+
 }

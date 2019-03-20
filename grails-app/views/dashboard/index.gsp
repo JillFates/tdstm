@@ -1,5 +1,6 @@
 <%@ page import="net.transitionmanager.domain.MoveBundleStep" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -562,7 +563,7 @@
 
 	function toggleUnpublished (e) {
 		var checkedValue = $(e.srcElement).is(':checked');
-		setUserPreference('viewUnpublished', checkedValue, function () {
+		setUserPreference('${UserPreferenceEnum.VIEW_UNPUBLISHED.name()}', checkedValue, function () {
 			refreshDashboard();
 		});
 	}

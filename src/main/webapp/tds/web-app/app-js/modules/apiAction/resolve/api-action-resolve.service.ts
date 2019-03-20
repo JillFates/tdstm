@@ -12,7 +12,7 @@ export class APIActionResolveService implements Resolve<any> {
 	}
 
 	/**
-	 * Get the List of API Actions
+	 * Get the List of Actions
 	 * @param route
 	 */
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {
