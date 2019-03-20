@@ -155,7 +155,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			partyGroupService.save('TestCompany$Delta', 'a comment', 'N', company)
 			partyGroupService.save('TestCompany$Zed', 'a comment', 'N', company)
 		when: 'getting a listing, by the company name, and given a max rows of 2 in ascending order'
-			def results = partyGroupService.list([companyName: 'TestCompany$'], 'companyName', 'asc', 2, 0, 0)
+			def results = partyGroupService.list(['name': 'TestCompany$'], 'companyName', 'asc', 2, 0, 0)
 		then: 'the results had the first two companies is ascending order.'
 			results.page == 0
 			results.records == 4
@@ -172,7 +172,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			partyGroupService.save('TestCompany$Delta', 'a comment', 'N', company)
 			partyGroupService.save('TestCompany$Zed', 'a comment', 'N', company)
 		when: 'getting a listing, offsetting by 2 by the company name, and given a max rows of 2 in descending order'
-			def results = partyGroupService.list([companyName: 'TestCompany$'], 'companyName', 'desc', 2, 1, 2)
+			def results = partyGroupService.list(['name': 'TestCompany$'], 'companyName', 'desc', 2, 1, 2)
 		then: 'the results have the last two companies in descending order.'
 			results.page == 1
 			results.records == 4
@@ -189,7 +189,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			partyGroupService.save('TestCompany$Delta', 'a comment', 'Y', company)
 			partyGroupService.save('TestCompany$Zed', 'a comment', 'N', company)
 		when: 'getting a listing, filtering by partner'
-			def results = partyGroupService.list([companyName: 'TestCompany$', partner: 'Y'], 'companyName', 'asc', 2, 0, 0)
+			def results = partyGroupService.list(['name': 'TestCompany$', partner: 'Y'], 'companyName', 'asc', 2, 0, 0)
 		then: 'only the company that is a partner is returned.'
 			results.page == 0
 			results.records == 1
