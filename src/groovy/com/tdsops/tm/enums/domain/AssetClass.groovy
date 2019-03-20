@@ -157,7 +157,7 @@ enum AssetClass {
 	 * @param clazz a Class in the AssetEntity Hierarchy
 	 * @return an AssetClass instance or null if there is not a class mapped
 	 */
-	static lookup(Class<? extends AssetEntity> clazz){
+	static AssetClass lookup(Class<? extends AssetEntity> clazz){
 		return assetClassByDomainClassMap[clazz]
 	}
 
