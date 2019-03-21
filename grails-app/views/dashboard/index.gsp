@@ -195,9 +195,11 @@
 				<div id="bdlsection">
 					<div id="bdltabs" style="width: ${moveBundleList.size * 130}px;">
 						<g:each in="${moveBundleList}" status="i" var="moveBundle">
-							<span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' } tab-item" onClick="updateDash(${moveBundle.id})">
-								${moveBundle.name}
-							</span>
+                            <g:if test="${moveBundle && moveBundle.id}">
+                                <span id="spnBundle${moveBundle.id}" class="${ i == 0 ? 'mbhactive' : 'mbhinactive' } tab-item" onClick="updateDash(${moveBundle.id})">
+                                    ${moveBundle.name}
+                                </span>
+                            </g:if>
 						</g:each>
 					</div>
 					<div id="leftcol">
@@ -463,9 +465,11 @@
 				clearTimeout(hasTimedOut);
 			}
 			hasTimedOut = setTimeout(function() {
-				AditionalFrames = 1
-				stepCount = 1
-				updateDash( $("#defaultBundleId").val() );
+				AditionalFrames = 1;
+				stepCount = 1;
+				if ($("#defaultBundleId").val() && $("#defaultBundleId").val() > 0) {
+					updateDash( $("#defaultBundleId").val() );
+                }
 			}, 100);
 		});
 		// used to call the function once page loaded
@@ -756,13 +760,15 @@
 			type:"POST",
 			async : true,
 			data: $('#teamTaskPercentageFormId').serialize(),
-			url:"/dashboard/taskSummary/"+moveEvent,
+			url:"../ws/dashboard/taskSummary/"+moveEvent,
 			success:function (data){
 				$("#taskSummary").html(data);
 			},
 			error:function (xhr, ajaxOptions, thrownError){
 				if (errorCode ==  xhr.status) {
-					clearInterval(handler);
+					if (handler) {
+						clearInterval(handler);
+                    }
 					$("#update").css("color","red");
 					if( xhr.status == "403"){
 						alert("403 Forbidden occurred, user don't have permission to load the current project data.");
@@ -817,7 +823,7 @@
 
 	function updateDash (bundleId) {
 		var moveEvent = $("#moveEvent").val()
-		if (moveEvent) {
+		if (bundleId && moveEvent) {
 			displayBundleTab( bundleId )
 			jQuery.ajax({
 				type:"GET",
