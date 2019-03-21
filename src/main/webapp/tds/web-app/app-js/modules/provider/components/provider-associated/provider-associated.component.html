@@ -13,10 +13,10 @@
 					<div class="form-group">
 
 						<div class="col-sm-12" *ngIf="providerAssociated.credentialCount > 0 || providerAssociated.actionCount > 0 || providerAssociated.etlScriptCount > 0; else defaultMessage">
-							Deleting the Provider will also delete the following: <br /><br />
-							<span class="associated-total" *ngIf="providerAssociated.credentialCount > 0"><span class="associated-count">{{providerAssociated.credentialCount}}</span> Credentials</span>
-							<span class="associated-total" *ngIf="providerAssociated.actionCount > 0"><span class="associated-count">{{providerAssociated.actionCount}}</span> Actions</span>
-							<span class="associated-total" *ngIf="providerAssociated.etlScriptCount > 0"><span class="associated-count">{{providerAssociated.etlScriptCount}}</span> ETL Scripts</span>
+							Deleting the Provider will also delete the following: <br />
+							<span class="associated-total" *ngIf="providerAssociated.credentialCount > 0"><br /><span class="associated-count">{{providerAssociated.credentialCount}}</span> Credentials</span>
+							<span class="associated-total" *ngIf="providerAssociated.actionCount > 0"><br /><span class="associated-count">{{providerAssociated.actionCount}}</span> Actions</span>
+							<span class="associated-total" *ngIf="providerAssociated.etlScriptCount > 0"><br /><span class="associated-count">{{providerAssociated.etlScriptCount}}</span> ETL Scripts</span>
 						</div>
 
 						<ng-template #defaultMessage >
