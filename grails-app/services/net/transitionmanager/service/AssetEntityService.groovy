@@ -3138,10 +3138,10 @@ class AssetEntityService implements ServiceMethods {
 				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
 				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
 			],
-			dataFlowFreq: AssetDependency.constraints.dataFlowFreq.inList,
+			dataFlowFreq: GormUtil.getConstrainedProperties(AssetDependency).dataFlowFreq.inList,
 			dependencyType: entityInfo(project).dependencyType,
 			dependencyStatus: entityInfo(project).dependencyStatus,
-			directionList: AssetDependency.constraints.dataFlowDirection.inList,
+			directionList: GormUtil.getConstrainedProperties(AssetDependency).dataFlowDirection.inList,
 			editPermission: securityService.hasPermission(Permission.AssetEdit)
 		]
 	}

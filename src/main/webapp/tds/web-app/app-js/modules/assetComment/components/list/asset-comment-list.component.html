@@ -29,8 +29,9 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-                            <div class="text-center">
-                                <button class="btn btn-default" (click)="onEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                            <div class="tds-action-button-set">
+                                <tds-button-edit tooltip="Edit Comment" class="tds-generic-button" (click)="onEdit(dataItem)">
+                                </tds-button-edit>
                             </div>
                         </ng-template>
                         <ng-template kendoGridFilterCellTemplate let-filter>

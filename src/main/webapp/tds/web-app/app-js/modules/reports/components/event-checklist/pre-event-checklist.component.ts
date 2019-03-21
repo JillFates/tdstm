@@ -4,6 +4,8 @@ import {
 	OnInit
 } from '@angular/core';
 
+import {AlertType} from '../../../../shared/model/alert.model';
+
 import {
 	DomSanitizer,
 	SafeHtml
@@ -20,6 +22,7 @@ import {
 import {ActivatedRoute} from '@angular/router';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
@@ -75,6 +78,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
+		private notifierService: NotifierService,
 		private reportsService: ReportsService) {
 	}
 
@@ -87,6 +91,9 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 				const [events, defaults] = results;
 				this.model.events = events.map((item) => ({id: item.id.toString(), text: item.name}));
 				this.model.defaultEvent.id = pathOr(null, ['preferences', 'TASK_CREATE_EVENT'], defaults);
+				if (this.model.defaultEvent.id === 'null' || this.model.defaultEvent.id === null) {
+						this.model.defaultEvent.id = this.model.events[0].id;
+				}
 			})
 	}
 
@@ -97,7 +104,31 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 	onGenerateReport(eventId: string): void {
 		this.reportsService.getPreventsCheckList(eventId)
 			.subscribe((content) => {
-				this.html =  this.sanitizer.bypassSecurityTrustHtml(content);
+				let errorMessage = 'Unknown error';
+				try {
+					const errorResponse = JSON.parse(content);
+					if (errorResponse && errorResponse.errors && errorResponse.errors.length) {
+						errorMessage = errorResponse.errors.shift();
+					}
+
+					this.notifierService.broadcast({
+						name: AlertType.DANGER,
+						message: errorMessage
+					});
+				} catch (error) {
+					console.log(error.message || error);
+					errorMessage = '';
+				}
+
+				this.html = (errorMessage) ? this.getSafeHtml('') : this.getSafeHtml(content);
 			});
+	}
+
+	/**
+	 * Based on the text passed it generates the corresponding safe html string
+	 * @param {string} content: html to be proccessed
+	 */
+	getSafeHtml(content: string): SafeHtml {
+		return this.sanitizer.bypassSecurityTrustHtml(content);
 	}
 }

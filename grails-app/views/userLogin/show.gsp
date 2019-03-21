@@ -18,7 +18,7 @@
 		<jqgrid:resources />
 		<g:javascript src="admin.js" />
 		<g:javascript src="projectStaff.js" />
-		<g:javascript src="person.js" />
+		<asset:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
 		<g:javascript src="asset.comment.js" />
 	</head>

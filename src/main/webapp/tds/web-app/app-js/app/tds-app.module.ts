@@ -26,7 +26,6 @@ import {UserModule} from '../modules/user/user.module';
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
 		TaskManagerModule,
-		UserModule,
 		SharedModule.forRoot()
 	],
 	declarations: [

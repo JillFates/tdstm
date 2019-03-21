@@ -11,6 +11,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 // Model
 import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE} from '../../../../shared/model/constants';
@@ -24,6 +25,8 @@ import {
 // Kendo
 import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 declare var jQuery: any;
 
 @Component({
@@ -61,15 +64,16 @@ export class LicenseListComponent implements OnInit {
 		private licenseAdminService: LicenseAdminService,
 		private preferenceService: PreferenceService,
 		private prompt: UIPromptService,
-		private route: ActivatedRoute) {
+		private route: ActivatedRoute,
+		private userContextService: UserContextService) {
 		this.resultSet = this.route.snapshot.data['licenses'];
 		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.licenseColumnModel = new LicenseColumnModel(`{0:${this.dateFormat}}`);
 			});
 	}

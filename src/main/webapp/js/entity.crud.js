@@ -1851,6 +1851,9 @@ function reloadDependencyGroupsSection() {
 			processTab.attr("style", "display:none");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
+            setTimeout( function () {
+                $('#dependencyDivId').css('overflow-x', 'scroll');
+            }, 200);
 		}
 	});
 }
@@ -2446,7 +2449,9 @@ function toggleJustPlanning($me) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({
 		url: tdsCommon.createAppURL('/ws/user/preference'),
-		data: { 'value': isChecked, 'code': 'ASSET_JUST_PLANNING' },
+		contentType: "application/json",
+		dataType: 'json',
+		data: JSON.stringify({ 'value': isChecked, 'code': 'ASSET_JUST_PLANNING' }),
 		type: 'POST',
 		success: function (data) {
 			window.location.reload()

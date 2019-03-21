@@ -38,8 +38,7 @@ export const DependenciesRoute: Routes = [
 		component: DependenciesViewGridComponent,
 		canActivate: [
 			AuthGuardService,
-			ModuleResolveService,
-			PreferencesResolveService],
+			ModuleResolveService],
 		resolve: {
 			tagList: TagsResolveService
 		},

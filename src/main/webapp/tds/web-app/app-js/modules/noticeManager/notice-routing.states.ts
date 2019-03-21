@@ -35,7 +35,7 @@ export const NoticeManagerRoute: Routes = [
 		resolve: {
 			notices: NoticeResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

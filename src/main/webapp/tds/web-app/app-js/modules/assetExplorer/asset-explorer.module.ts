@@ -92,6 +92,7 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
+		TaskCommentDialogComponent,
 		TaskCommentComponent
 	],
 	entryComponents: [
@@ -99,16 +100,19 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		AssetCreateComponent,
 		AssetEditComponent,
 		AssetDependencyComponent,
+		AssetDependencyShowComponent,
+		AssetDependencyEditComponent,
+		TaskCommentDialogComponent,
+		TaskCommentComponent,
+		TaskDetailComponent,
+		TaskEditComponent,
+		TaskCreateComponent,
 		SingleCommentComponent,
 		SingleNoteComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent,
-		TaskCommentDialogComponent,
-		TaskCreateComponent,
-		TaskEditComponent,
-		TaskDetailComponent
+		AssetCloneComponent
 	],
 })
 

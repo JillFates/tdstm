@@ -862,7 +862,7 @@ class ProjectService implements ServiceMethods {
 					log.info "updateProjectPartners() Unassigned staff from $c task(s) for project $projectInstance"
 				}
 
-				partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "ROLE_PROJECT", partnerParty, "PARTNER")
+				partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "ROLE_PROJECT", partnerParty, "ROLE_PARTNER")
 			}
 		}
 	}

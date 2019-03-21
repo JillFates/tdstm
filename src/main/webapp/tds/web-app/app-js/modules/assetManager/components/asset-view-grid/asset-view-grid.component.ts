@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
-
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
@@ -45,6 +44,8 @@ import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-chan
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -116,9 +117,14 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private userService: UserService) {
-			this.fieldPipeMap = {pipe: {}, metadata: {}};
-			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
+		private userService: UserService,
+		private userContextService: UserContextService) {
+		this.fieldPipeMap = {pipe: {}, metadata: {}};
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.userDateFormat = userContext.dateFormat;
+				this.userTimeZone = userContext.timezone;
+			});
 	}
 
 	ngOnInit(): void {
@@ -127,7 +133,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 			total: 0
 		};
 
-		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
 			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});

@@ -125,7 +125,6 @@ export class FieldSettingsService {
 				}
 			}
 		}
-		;
 		return false;
 	}
 
