@@ -480,5 +480,7 @@ setFocus();
 </g:if>
 	<g:render template="/assetEntity/initAssetEntityData"/>
 	<g:render template="/layouts/error"/>
+
+	<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 </body>
 </html>
