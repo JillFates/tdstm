@@ -21,6 +21,8 @@ import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
+import test.helper.ApiCatalogTestHelper
+import test.helper.mock.ProjectMock
 
 class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<HttpProducerService>, DataTest, GrailsWebUnitTest {
 
@@ -127,9 +129,9 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 	}
 
 	def setup() {
-		project = new Project()
-		provider = new Provider(project: project)
-		apiCatalog = new ApiCatalog(project: project, provider: provider)
+		project = new ProjectMock().create()
+		provider = new Provider(name: 'provider-name', project: project)
+		apiCatalog = new ApiCatalog(name: 'api-cat', dictionary: ApiCatalogTestHelper.DICTIONARY, dictionaryTransformed: '{"key": "value"}', project: project, provider: provider)
 
 		action = new ApiAction(
 				name: 'testAction',
@@ -141,21 +143,25 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 				callbackMode: CallbackMode.DIRECT,
 				httpMethod: ApiActionHttpMethod.GET,
 				endpointUrl: 'http://zzz.about.yyy',
-				reactionScripts: '',
+				reactionScripts: '{"STATUS": "// do nothing", "SUCCESS": "// do nothing", "DEFAULT": "// do nothing"}',
+				isRemote: false,
 				provider: provider,
 				project: project
 		)
 
-		//TODO if this save is commented in it will fail with fail on error true, which leads  me to thing there might
-		//TODO be something wrong with this test, and it might not be testing what it intends. 3/14/2019
-		//action.save(flush: true)
+		if (action.hasErrors()) {
+			println "action has errors: ${GormUtil.allErrorsString(action)}"
+		}
+
+		project.save(failOnError: true, flush: true)
+		action.save(failOnError: true, flush: true)
 	}
 
 	def cleanup() {
 		action.delete()
 		apiCatalog.delete()
 		provider.delete()
-		project.delete()
+		// project.delete()
 	}
 
 	def cleanupSpec() {
