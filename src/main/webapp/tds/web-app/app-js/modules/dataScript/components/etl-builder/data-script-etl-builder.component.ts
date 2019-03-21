@@ -170,7 +170,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 						this.scriptTestResult.isValid = true;
 						this.importAssetsService.getFileContent(scripTestFilename)
 							.subscribe(result => {
-								this.scriptTestResult.domains = result.domains;
+								this.scriptTestResult.domains = result.domains || [];
 								this.transformedDataGrids = [];
 								this.scriptTestResult.domains.forEach( (domain,  index) => {
 									this.transformedDataGrids[index] = new DataGridOperationsHelper(domain.data);

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {PasswordChangeModel} from './model/password-change.model';
-import {UserService} from '../../../modules/user/service/user.service';
+import {PasswordChangeModel} from '../../model/password-change.model';
+import {HeaderService} from '../../services/header.service';
 
 @Component({
 	selector: 'tds-password-change',
@@ -101,12 +101,12 @@ export class PasswordChangeComponent implements OnInit {
 	public hidePasswordFields;
 	private currentUsername;
 
-	constructor(private userService: UserService) {
+	constructor(private headerService: HeaderService) {
 	}
 
 	ngOnInit() {
 		this.hidePasswordFields = true;
-		this.userService.getUser().subscribe(
+		this.headerService.getUser().subscribe(
 			(result: any) => {
 				this.currentUsername = result.username;
 			},
