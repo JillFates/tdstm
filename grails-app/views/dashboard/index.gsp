@@ -760,7 +760,7 @@
 			type:"POST",
 			async : true,
 			data: $('#teamTaskPercentageFormId').serialize(),
-			url:"../ws/dashboard/taskSummary/"+moveEvent,
+			url:"../dashboard/taskSummary/"+moveEvent,
 			success:function (data){
 				$("#taskSummary").html(data);
 			},
