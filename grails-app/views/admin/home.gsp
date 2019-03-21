@@ -138,7 +138,7 @@ a:hover {
 									<g:link controller="apiCatalog" action="manager" style="color:black">API Dictionaries</g:link>
 								</tds:hasPermission>
 							</td>
-							<td>Manage dictionaries used by API Actions</td>
+							<td>Manage dictionaries used by Actions</td>
 						</tr>
 						<tr class="odd">
 							<td>

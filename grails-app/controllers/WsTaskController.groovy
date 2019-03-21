@@ -1,7 +1,8 @@
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.task.TaskGenerationCommand
@@ -12,6 +13,8 @@ import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.QzSignService
@@ -229,6 +232,39 @@ class WsTaskController implements ControllerMethods {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "addNote: $errorMsg"
 			renderErrorJson([errorMsg])
+		}
+	}
+
+	/**
+	 * Used in Task Manager action bar to change estTime.
+	 * @param : day : 1, 2 or 7 days.
+	 * @param : commentId.
+	 * @return : retMap.
+	 */
+	@HasPermission(Permission.TaskManagerView)
+	def changeEstTime() {
+		Long commentId = params.id.toLong()
+		Map requestParams = request.JSON
+		Integer days = requestParams.days.toInteger()
+		Map<String, String> retMap = [etext: '', estStart: '', estFinish: '']
+		try {
+			AssetComment comment = taskService.changeEstTime(commentId, days)
+			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
+			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
+		} catch (EmptyResultException | InvalidParamException e) {
+			retMap['etext'] = e.message
+		}
+		render retMap as JSON
+	}
+
+	@HasPermission(Permission.TaskEdit)
+	def updateStatus() {
+		Long commentId = params.id.toLong()
+		Map requestParams = request.JSON
+		def status = requestParams.status
+		AssetComment comment = taskService.findById(commentId)
+		if(AssetCommentStatus.list.contains(status)) {
+			taskService.setTaskStatus(comment,status)
 		}
 	}
 }

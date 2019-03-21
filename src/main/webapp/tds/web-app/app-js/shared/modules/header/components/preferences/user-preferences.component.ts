@@ -1,6 +1,6 @@
 import {Component, OnInit, HostListener} from '@angular/core';
-import {UserService} from '../../service/user.service';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {HeaderService} from '../../services/header.service';
+import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
 
 @Component({
 	selector: 'user-preferences',
@@ -12,7 +12,7 @@ export class UserPreferencesComponent implements OnInit {
 	public fixedPreferenceCodes;
 
 	constructor(
-		private userService: UserService,
+		private headerService: HeaderService,
 		public activeDialog: UIActiveDialogService) {
 		this.loadComponentModel();
 	}
@@ -45,7 +45,7 @@ export class UserPreferencesComponent implements OnInit {
 	 * Used to fetch all of the model data that will be used by this componet for the User Preferences Manager
 	 */
 	private loadComponentModel() {
-		this.userService.fetchComponentModel().subscribe(
+		this.headerService.fetchComponentModel().subscribe(
 			(result: any) => {
 				this.preferenceList = result.preferences;
 				this.fixedPreferenceCodes = result.fixedPreferenceCodes;
@@ -59,7 +59,7 @@ export class UserPreferencesComponent implements OnInit {
 	 * @param preferenceCode
 	 */
 	public removePreference(preferenceCode: String) {
-		this.userService.removePreference(preferenceCode).subscribe(
+		this.headerService.removePreference(preferenceCode).subscribe(
 			(result: any) => {
 				// Remove the delete preference from the list
 				let idx = this.preferenceList.findIndex(x => x.code === preferenceCode);
@@ -74,7 +74,7 @@ export class UserPreferencesComponent implements OnInit {
 	 * Used to remove all preferences for a user other than those that are fixed (e.g. CURR_PROJ)
 	 */
 	public resetPreferences() {
-		this.userService.resetPreferences().subscribe(
+		this.headerService.resetPreferences().subscribe(
 			(result: any) => {
 				this.cancelCloseDialog();
 				location.reload();

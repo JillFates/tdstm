@@ -5,7 +5,7 @@
 			<div class="col-sm-8 col-md-8 col-lg-8">
 				<div class="form-group">
 					<label class="col-title" for="eventSelect">Event:</label>
-					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
+					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected(true)" ng-options="item as item.name for item in contexts.eventsArray">
 						<option value="">Please select</option>
 					</select>
 				</div>
@@ -40,7 +40,7 @@
 	</div>
 
 	<a class="selectorsHideShow" data-toggle="collapse" data-target=".selectors">Show/Hide Selectors</a>
-	
+
 	<div class="gridStyleGroups" style="margin-top:15px;" ng-grid="groups.groupsGrid"></div>
 
 	<div class="gridStyleGroups" ng-show="groups.showAssetsGrid" style="margin-top:15px;" ng-grid="assets.assetsGrid"></div>

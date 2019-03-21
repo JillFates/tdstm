@@ -265,7 +265,7 @@ class ControllerService implements ServiceMethods {
 		}
 
 		if (securityService.loggedIn) {
-			controller.redirect(controller: 'dashboard', action: 'userPortal')
+			controller.redirect(controller: 'module', action: 'user', link: 'dashboard')
 		}
 		else {
 			controller.redirect(controller: 'auth', action: 'login')

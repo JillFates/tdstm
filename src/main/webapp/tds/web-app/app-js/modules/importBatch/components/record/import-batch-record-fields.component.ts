@@ -189,6 +189,13 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 
 			// Determine what action should be shown for the Current Value column
 			let currentValueAction: CurrentValueAction;
+			// Fix issues with bad data when expected properties of the field are undefined.
+			fields[fieldName].init = fields[fieldName].init ? fields[fieldName].init : {};
+			fields[fieldName].update = fields[fieldName].update ? fields[fieldName].update : {};
+			fields[fieldName].create = fields[fieldName].create ? fields[fieldName].create : {};
+			fields[fieldName].errors = fields[fieldName].errors ? fields[fieldName].errors : {};
+			fields[fieldName].value = fields[fieldName].value ? fields[fieldName].value : {};
+			fields[fieldName].find = fields[fieldName].find ? fields[fieldName].find : {};
 			if (this.batchRecord.status.code === BatchStatus.PENDING) {
 				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.EditValue : CurrentValueAction.EditInit
 			} else {
@@ -271,9 +278,10 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
 		for (let field of this.fieldsInfo) {
+			if (field.importValue) {
 			const newFieldValue = {fieldName: field.name, value: field.importValue};
 			newFieldsValues.push(newFieldValue);
-
+			}
 		}
 		this.importBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
