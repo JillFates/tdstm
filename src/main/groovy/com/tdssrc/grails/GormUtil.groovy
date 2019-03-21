@@ -132,38 +132,6 @@ class GormUtil{
 		return propertyNames
 	}
 
-	/*
-// TODO : JPM 1/2017 : Validate getDomainPropertiesWithConstraint method that Burt replaced
-	public static List<String> getDomainPropertiesWithConstraint(def domain, def constraintName, def value=null ) {
-		def fields = []
-		domain.constraints.each() { propName, props ->
-			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
-			switch (constraintName) {
-				case 'blank':
-					// By default property blank is false except String prop so if false is requested as value
-					// and property is not string so considering as 'blank : false'
-					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
-					if (type == 'java.lang.String' && constraint in [null , true])
-						constraint = true
-					else
-						constraint = false
-					break
-
-				case ['nullable', 'range']:
-					// println "propName=$propName, constraintName=$constraintName, constraint=$constraint, value=$value"
-					break
-
-				default:
-					logger.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
-			}
-
-			if ( (value == null && constraint != null) || (value != null && constraint == value) )
-				fields <<  propName
-		}
-		return fields
-	}
-	*/
-
 	/**
 	 * Used to access all constraints for a single property of a domain object
 	 * @param domainClass - the domain class to get the constraint from
