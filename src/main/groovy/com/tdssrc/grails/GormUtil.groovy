@@ -120,10 +120,13 @@ class GormUtil{
 	 */
 	static List<String> getDomainPropertiesWithConstraint(Class clazz, String constraintName, value = null) {
 		List<String> propertyNames = []
-		Map<String, ConstrainedProperty> constraints = clazz.constraints
+		Map constraints = getConstrainedProperties(clazz)
+
 		for (propertyName in constraints.keySet()) {
-			def constraintValue = getConstraintValue(clazz, propertyName, constraintName) != null
-			if (constraintValue) {
+			def constraintValue = getConstraintValue(clazz, propertyName, constraintName)
+
+			if (constraintValue != null) {
+
 				if ((value == null && constraintValue != null) || (value != null && constraintValue == value)) {
 					propertyNames << propertyName
 				}
@@ -321,7 +324,7 @@ class GormUtil{
 	 */
 	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
-		Map<String, ConstrainedProperty> constraints = clazz.constrainedProperties
+		Map<String, ConstrainedProperty> constraints = getConstrainedProperties(clazz)
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
 		// 'blank' is only supported for String properties and defaults to true, but there won't
