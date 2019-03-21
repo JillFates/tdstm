@@ -1,17 +1,15 @@
 import {
 	Component,
-	ElementRef,
 	EventEmitter,
 	Input,
 	OnInit,
 	Output,
-	ViewChild
 } from '@angular/core';
 import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {DataResult, GroupDescriptor, process, State} from '@progress/kendo-data-query';
+import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';

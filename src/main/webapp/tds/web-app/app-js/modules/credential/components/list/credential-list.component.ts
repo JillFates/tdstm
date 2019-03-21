@@ -1,25 +1,30 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
-import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-
+// Angular
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+// Services
 import {CredentialService} from '../../service/credential.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {Permission} from '../../../../shared/model/permission.model';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+// Components
+import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+// Models
+import {Permission} from '../../../../shared/model/permission.model';
 import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {
 	COLUMN_MIN_WIDTH,
 	ActionType,
 	BooleanFilterData,
 	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
-import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute} from '@angular/router';
+// Kendo
+import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'credential-list',
@@ -62,7 +67,7 @@ export class CredentialListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private credentialService: CredentialService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private userContext: UserContextService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['credentials'];
@@ -70,10 +75,10 @@ export class CredentialListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.credentialColumnModel = new CredentialColumnModel(`{0:${dateFormat}}`);
+		this.userContext.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+				this.credentialColumnModel = new CredentialColumnModel(`{0:${this.dateFormat}}`);
 				this.gridColumns = this.credentialColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}

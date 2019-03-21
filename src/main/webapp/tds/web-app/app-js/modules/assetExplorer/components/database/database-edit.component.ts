@@ -6,17 +6,14 @@
  */
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-
-declare var jQuery: any;
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function DatabaseEditComponent(template, editModel, metadata: any) {
 
@@ -30,14 +27,14 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
-			preference: PreferenceService,
+			userContextService: UserContextService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
 
-			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {

@@ -39,6 +39,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Output('filter') filterEmitter = new EventEmitter<any>();
 
 	@Input('data') data: DomainModel;
+	@Input('domains') domainsList: DomainModel[];
 	@Input('isEditable') isEditable: boolean;
 	@Input('gridFilter') gridFilter: any;
 	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
@@ -92,9 +93,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
 		this.refresh();
-		this.fieldSettingsService.getFieldSettingsByDomain().subscribe(domains => {
-			this.domains = domains;
-		});
+		this.domains = [].concat.apply([], this.domainsList);
 	}
 
 	public dataStateChange(state: DataStateChangeEvent): void {
