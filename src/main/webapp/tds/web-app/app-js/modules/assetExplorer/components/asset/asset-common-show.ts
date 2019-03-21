@@ -4,14 +4,14 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
 import {HostListener, OnInit} from '@angular/core';
-import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
-import {AssetEditComponent} from './asset-edit.component';
 import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommonHelper} from './asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 declare var jQuery: any;
 
@@ -30,11 +30,14 @@ export class AssetCommonShow implements OnInit {
 		protected prompt: UIPromptService,
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
-		protected preferenceService: PreferenceService,
+		protected userContextService: UserContextService,
 		protected windowService: WindowService) {
 			jQuery('[data-toggle="popover"]').popover();
-			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
-			this.userTimeZone = this.preferenceService.getUserTimeZone();
+			this.userContextService.getUserContext()
+				.subscribe((userContext: UserContextModel) => {
+					this.userDateFormat = userContext.dateFormat;
+					this.userTimeZone = userContext.timezone;
+				});
 	}
 
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
