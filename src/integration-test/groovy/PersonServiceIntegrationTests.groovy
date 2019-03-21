@@ -496,8 +496,10 @@ class PersonServiceIntegrationTests extends Specification {
 			result['deleted'] == true
 		and: 'the person and user references should be deleted'
 			// Shouldn't be able to lookup the person
-			! Person.get(newPID)
-			! UserLogin.get(userId)
+			Person.withNewSession {
+				! Person.get(newPID)
+				! UserLogin.get(userId)
+			}
 		and: 'there should be no PartyRelationship references'
 			! PartyRelationship.findAllWhere(partyIdTo: newPerson)
 		and: 'is associated as a SME on an application has been cleared'
@@ -687,11 +689,6 @@ class PersonServiceIntegrationTests extends Specification {
 			result['deleted'] == 1
 	}
 
-
-
-
-
-
 	def "17. Test for TM-6141 - Add an admin new person to a project as client staff, log in with that user, remove and re-attach itself to the project"() {
 
 		setup: 'create a person and user as staff with ADMIN role for the project client so that'
@@ -716,12 +713,14 @@ class PersonServiceIntegrationTests extends Specification {
 		and: 'the person is assigned to the project'
 		personService.isAssignedToProject(project, newPerson)
 
-		when: 'removing the newUser from the project'
+		when: 'removing the newPerson from the project'
 			personService.removeFromProject(project.id.toString(), newPerson.id.toString())
 		then: 'the person should be able to access the project'
 			personService.hasAccessToProject(newPerson, project)
 		and: 'the person is NOT assigned to the project'
-			!personService.isAssignedToProject(project, newPerson)
+			Person.withNewSession {
+				!personService.isAssignedToProject(project, newPerson)
+			}
 
 		when: 'the person re-attach himself to the project'
 			personService.addToProject(adminUser, project.id.toString(), newPerson.id.toString())

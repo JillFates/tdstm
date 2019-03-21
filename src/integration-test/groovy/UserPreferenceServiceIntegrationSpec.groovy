@@ -17,13 +17,11 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 	// IOC
 	@Autowired
 	SecurityService securityService
-
 	@Autowired
 	UserPreferenceService userPreferenceService
 
 	// Shared variables
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
+	private PersonTestHelper personHelper
 	private UserLogin userLogin
 	private Person person
 	private UserPreferenceEnum pref = UserPreferenceEnum.CURR_TZ
@@ -33,6 +31,7 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 	String result
 
 	void setup() {
+		personHelper  = new PersonTestHelper()
 		person = personHelper.createPerson()
 		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"])
 		securityService.assumeUserIdentity(userLogin.username, false)
