@@ -4,6 +4,7 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
+import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -22,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.http.HostnameVerifier
 import org.apache.commons.lang3.RandomStringUtils
+import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -175,7 +177,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doBasicAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
 
         def resp = rest."${credential.httpMethod.name().toLowerCase()}"(credential.getAuthenticationUrl()) {
             auth credential.username, decryptPassword(credential)
@@ -191,7 +193,7 @@ class CredentialService implements ServiceMethods {
      */
     private Map<String, ?> doJWTTokenAuthentication(Credential credential) {
         String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: decryptPassword(credential)])
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
 
         def resp = null
         switch (credential.httpMethod) {
@@ -216,7 +218,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doCookieAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
 
         def resp = null
         switch (credential.httpMethod) {
@@ -262,7 +264,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doHeaderAuthentication(Credential credential) {
-        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl)
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
 
         def resp = null
         switch (credential.httpMethod) {
@@ -308,9 +310,15 @@ class CredentialService implements ServiceMethods {
      *
      * @return
      */
-    private RestBuilder getRestBuilderForCredentialEnvironment(String url) {
+    private RestBuilder getRestBuilderForCredentialEnvironment(String url, CredentialEnvironment environment) {
         if (UrlUtil.isSecure(url)) {
-            return new RestBuilder(getRestTemplateWithTrustStore())
+            if (environment == CredentialEnvironment.PRODUCTION) {
+                // use trust store with wildcard hostname validator
+                return new RestBuilder(getRestTemplateWithTrustStore(HostnameVerifier.STRICT))
+            } else {
+                // use trust store that accepts all hostnames
+                return new RestBuilder(getRestTemplateWithTrustStore(NoopHostnameVerifier.INSTANCE))
+            }
         } else {
             return new RestBuilder()
         }
@@ -322,7 +330,7 @@ class CredentialService implements ServiceMethods {
      *
      * @return a RestTemplate configured with a Allow All Trust Store
      */
-    private RestTemplate getRestTemplateWithTrustStore() {
+    private RestTemplate getRestTemplateWithTrustStore(javax.net.ssl.HostnameVerifier verifier) {
         TrustManager[] trustAllCerts = [
                 new X509TrustManager() {
                     X509Certificate[] getAcceptedIssuers() { return [] }
@@ -333,7 +341,7 @@ class CredentialService implements ServiceMethods {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, HostnameVerifier.STRICT)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, verifier)
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(connectionSocketFactory)
                 .build()

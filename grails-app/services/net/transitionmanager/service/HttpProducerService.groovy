@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.JsonUtil
@@ -538,7 +539,13 @@ class HttpProducerService {
 
         // only provides a trust store if endpoint url is secure
         if (UrlUtil.isSecure(actionRequest.options.apiAction.endpointUrl)) {
-            configureTrustStore(httpClientBuilder)
+            if (actionRequest.options.credentials && actionRequest.options.credentials.environment == CredentialEnvironment.PRODUCTION.name()) {
+                // use trust store with wildcard hostname validator
+                configureTrustStore(httpClientBuilder, HostnameVerifier.STRICT)
+            } else {
+                // use trust store that accepts all hostnames
+                configureTrustStore(httpClientBuilder, NoopHostnameVerifier.INSTANCE)
+            }
         }
 
         CloseableHttpClient httpClient = httpClientBuilder.build()
@@ -674,7 +681,7 @@ class HttpProducerService {
      *
      * @param httpClientBuilder
      */
-    private void configureTrustStore(HttpClientBuilder httpClientBuilder) {
+    private void configureTrustStore(HttpClientBuilder httpClientBuilder, javax.net.ssl.HostnameVerifier verifier) {
         TrustManager[] trustAllCerts = [
                 new X509TrustManager() {
                     X509Certificate[] getAcceptedIssuers() { return [] }
@@ -687,7 +694,7 @@ class HttpProducerService {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, HostnameVerifier.STRICT)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, verifier)
 
         final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory> create()
                 .register('http', PlainConnectionSocketFactory.getSocketFactory())
