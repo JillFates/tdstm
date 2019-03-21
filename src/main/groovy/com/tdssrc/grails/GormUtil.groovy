@@ -1063,10 +1063,14 @@ class GormUtil{
 		}
 
 		if (deleteObject) {
-			domainObject.delete(flush:true)
+			Class clazz = domainObject.class
+			String domainName = getDomainNameForClass(clazz)
+			Map params = [domainId:domainObject.id]
+			String hql = "delete from $domainName where id=:domainId"
+			clazz.executeUpdate(hql, params)
 		}
 
-		return [deletedCount, nulledCount]
+ 		return [deletedCount, nulledCount]
 	}
 
 	/**
