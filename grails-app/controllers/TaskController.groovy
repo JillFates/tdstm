@@ -99,12 +99,16 @@ class TaskController implements ControllerMethods {
 		String userDTFormat = userPreferenceService.dateFormat
 		// Deal with legacy view parameters.
 		Map requestParams = null
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			params.taskDependency = params.list('taskDependency[]')
-			params.taskSuccessor = params.list('taskSuccessor[]')
-			requestParams = params
+
+		withFormat {
+			js {
+				requestParams = request.JSON
+			}
+			html {
+				params.taskDependency = params.list('taskDependency[]')
+				params.taskSuccessor = params.list('taskSuccessor[]')
+				requestParams = params
+			}
 		}
 
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
@@ -145,10 +149,15 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
 		Map requestParams
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			requestParams = params
+
+		withFormat {
+			js {
+				requestParams = request.JSON
+			}
+
+			html {
+				requestParams = params
+			}
 		}
 
 		String errorMsg = ''
@@ -873,16 +882,18 @@ digraph runbook {
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
 		Map preferencesMap
+		withFormat {
+			js {
+				preferencesMap = request.JSON
 
-		if (request.format == "json") {
-			preferencesMap = request.JSON
-
-		} else {
-			preferencesMap = [:]
-			def key = params.preference
-			def value = params.value
-			if (value) {
-				preferencesMap[key] = value
+			}
+			html {
+				preferencesMap = [:]
+				def key = params.preference
+				def value = params.value
+				if (value) {
+					preferencesMap[key] = value
+				}
 			}
 		}
 
