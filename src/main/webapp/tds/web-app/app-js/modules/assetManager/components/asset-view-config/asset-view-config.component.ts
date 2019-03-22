@@ -57,9 +57,6 @@ export class AssetViewConfigComponent implements OnInit {
 	columnIndex = 0;
 	rowIndex = 0;
 
-	public items: string[] = [
-		'Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6', 'Item 7', 'Item 8'
-	];
 	draggableColumns: QueryColumn[];
 	model: ViewModel;
 	domains: DomainModel[] = [];
