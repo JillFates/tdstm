@@ -353,7 +353,7 @@ class GormUtil{
 	 */
 	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
-		Map<String, ConstrainedProperty> constraints = clazz.constrainedProperties
+		Map<String, ConstrainedProperty> constraints = getConstrainedProperties(clazz)
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
 		// 'blank' is only supported for String properties and defaults to true, but there won't
@@ -1063,10 +1063,14 @@ class GormUtil{
 		}
 
 		if (deleteObject) {
-			domainObject.delete(flush:true)
+			Class clazz = domainObject.class
+			String domainName = getDomainNameForClass(clazz)
+			Map params = [domainId:domainObject.id]
+			String hql = "delete from $domainName where id=:domainId"
+			clazz.executeUpdate(hql, params)
 		}
 
-		return [deletedCount, nulledCount]
+ 		return [deletedCount, nulledCount]
 	}
 
 	/**

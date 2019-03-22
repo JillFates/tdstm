@@ -1,17 +1,24 @@
+// Angular
 import {Component} from '@angular/core';
+// Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../security/services/user-context.service';
+// Components
+import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TagService} from '../../service/tag.service';
+// Models
 import {TagModel} from '../../model/tag.model';
 import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 import {Permission} from '../../../../shared/model/permission.model';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
+// Others
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TagService} from '../../service/tag.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'tag-list',
@@ -36,10 +43,11 @@ export class TagListComponent {
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
-		userPreferenceService: PreferenceService) {
-			userPreferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.gridColumns = new TagListColumnsModel(`{0:${dateFormat}}`);
+		private userContext: UserContextService) {
+		this.userContext.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+				this.gridColumns = new TagListColumnsModel(`{0:${this.dateFormat}}`);
 				this.onLoad();
 			});
 	}

@@ -39,7 +39,7 @@ import test.helper.AssetEntityTestHelper
 @Rollback
 class DataImportServiceIntegrationSpec extends Specification {
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
     DataImportService dataImportService
@@ -48,22 +48,22 @@ class DataImportServiceIntegrationSpec extends Specification {
     SecurityService securityService
 
 	@Shared
-	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+	DataScriptTestHelper dataScriptTestHelper
 
 	@Shared
 	FileSystemService fileSystemService
 
 	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
+	PersonTestHelper personTestHelper
 
 	@Shared
-    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+    ProjectTestHelper projectTestHelper
 
 	@Shared
-	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+	ProviderTestHelper providerTestHelper
 
 	@Shared
 	Project project
@@ -91,6 +91,12 @@ class DataImportServiceIntegrationSpec extends Specification {
 	}
 
 	void setup() {
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		dataScriptTestHelper = new DataScriptTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
+		personTestHelper = new PersonTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		providerTestHelper = new ProviderTestHelper()
 		whom = personTestHelper.createPerson()
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()

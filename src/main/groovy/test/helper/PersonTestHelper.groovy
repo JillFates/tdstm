@@ -110,7 +110,8 @@ class PersonTestHelper {
 		if (email == null) email = "$firstName.$lastName@" + RSU.randomAlphabetic(10) + '.com'
 
 		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email] )
-		person.save(failOnError:true)
+		personService.save(person, true)
+	//	person.save(failOnError:true)
 
 		return person
 	}

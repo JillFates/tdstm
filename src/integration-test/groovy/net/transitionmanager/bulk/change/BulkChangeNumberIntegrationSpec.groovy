@@ -102,7 +102,7 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 		Project project = projectTestHelper.createProjectWithDefaultBundle()
 		JSONObject fieldSpec = loadFieldSpecJson()
-		Setting.findByProject(project).delete(flush:true)
+		Setting.findAllByProject(project)*.delete(flush:true)
 		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 	}
 

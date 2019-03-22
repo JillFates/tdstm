@@ -23,16 +23,16 @@ import test.helper.ProjectTestHelper
 class BulkChangePersonIntegrationSpec extends Specification{
 
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+	ProjectTestHelper projectTestHelper
 
 	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
+	PersonTestHelper personTestHelper
 
 	@Shared
 	Project project
@@ -71,6 +71,10 @@ class BulkChangePersonIntegrationSpec extends Specification{
 	AssetEntity device3
 
 	void setup() {
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		personTestHelper = new PersonTestHelper()
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
 
