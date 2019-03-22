@@ -353,7 +353,7 @@ class GormUtil{
 	 */
 	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
-		Map<String, ConstrainedProperty> constraints = clazz.constrainedProperties
+		Map<String, ConstrainedProperty> constraints = getConstrainedProperties(clazz)
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
 		// 'blank' is only supported for String properties and defaults to true, but there won't
