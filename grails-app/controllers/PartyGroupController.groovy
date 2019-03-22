@@ -41,10 +41,10 @@ class PartyGroupController implements ControllerMethods {
 		int rowOffset = (list.page - 1) * list.rows
 
 		Map filterParams = [
-			companyName: list.companyName,
-			dateCreated: list.dateCreated,
-			lastUpdated: list.lastUpdated,
-			partner    : list.partner
+			'name': list.companyName,
+			'dateCreated': list.dateCreated,
+			'lastUpdated': list.lastUpdated,
+			'partner'    : list.partner
 		]
 
 		// Validate that the user is sorting by a valid column

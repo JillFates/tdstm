@@ -1995,22 +1995,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def firstOption = [value:'', display:'Please Select']
 		def selectId = taskId ? "statusEditId" : "statusCreateId"
 		def optionSelected = taskId ? (status != '*EMPTY*' ? status : 'na'): AssetCommentStatus.READY
+		def format = params.format
 
-		withFormat {
-			js {
-				renderSuccessJson(optionList)
-			}
-
-			html {
-				render HtmlUtil.generateSelect(
+		if (format == 'json') {
+			renderSuccessJson(optionList)
+		} else {
+			render HtmlUtil.generateSelect(
 					selectId: selectId,
 					selectName: 'statusEditId',
 					options: optionList,
 					selectClass: "task_${optionSelected.toLowerCase()}", optionSelected: optionSelected,
 					javascript: "onChange='this.className=this.options[this.selectedIndex].className'",
 					firstOption: firstOption, optionClass: ''
-				)
-			}
+			)
 		}
 	}
 

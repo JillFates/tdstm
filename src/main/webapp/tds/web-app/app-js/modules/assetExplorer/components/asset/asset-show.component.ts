@@ -17,9 +17,9 @@ import {ApplicationShowComponent} from '../application/application-show.componen
 import {DeviceShowComponent} from '../device/device-show.component';
 import {StorageShowComponent} from '../storage/storage-show.component';
 
-import {AssetExplorerModule} from '../../asset-explorer.module';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {AssetExplorerModule} from '../../asset-explorer.module';
 
 @Component({
 	selector: `tds-asset-all-show`,

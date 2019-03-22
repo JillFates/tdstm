@@ -1,15 +1,15 @@
 // Angular
 import {Component, HostListener, OnInit} from '@angular/core';
 // Services
-import {UserService} from '../../service/user.service';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {HeaderService} from '../../services/header.service';
+import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
+import {PreferenceService} from '../../../../services/preference.service';
+import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 // Models
-import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST} from '../../../../services/preference.service';
 // Utils
-import {DateUtils} from '../../../../shared/utils/date.utils';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {DateUtils} from '../../../../utils/date.utils';
+import {SortUtils} from '../../../../utils/sort.utils';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
 
@@ -35,7 +35,7 @@ export class UserDateTimezoneComponent implements OnInit {
 	private dateTimezoneData = '';
 
 	constructor(
-		private userService: UserService,
+		private headerService: HeaderService,
 		public activeDialog: UIActiveDialogService,
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService) {
@@ -129,7 +129,7 @@ export class UserDateTimezoneComponent implements OnInit {
 	 */
 	private retrieveMapAreas(): Observable<any> {
 		return new Observable((observer: any) => {
-			this.userService.getMapAreas().subscribe(
+			this.headerService.getMapAreas().subscribe(
 				(result: any) => {
 					let mapAreas = [];
 					for (let key in result) {
@@ -150,7 +150,7 @@ export class UserDateTimezoneComponent implements OnInit {
 	 */
 	private retrieveTimezones(): Observable<any> {
 		return new Observable((observer: any) => {
-			this.userService.getTimezones().subscribe(
+			this.headerService.getTimezones().subscribe(
 				(result: any) => {
 					let timezones = [];
 					result.forEach((timezone: any) => {
@@ -192,7 +192,7 @@ export class UserDateTimezoneComponent implements OnInit {
 			datetimeFormat: this.selectedTimeFormat
 		};
 
-		this.userService.saveDateAndTimePreferences(params).subscribe(
+		this.headerService.saveDateAndTimePreferences(params).subscribe(
 			(result: any) => {
 				this.cancelCloseDialog();
 				location.reload();

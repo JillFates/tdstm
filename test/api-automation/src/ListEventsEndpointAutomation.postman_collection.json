@@ -1,0 +1,579 @@
+{
+	"info": {
+		"_postman_id": "dd0943d5-63a3-4b96-a77d-6066ed9a6827",
+		"name": "ListEvents",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TranMan Login 01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "List user projects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b04a083-d728-426f-9e3a-f52b97374cfe",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var project01ID ; ",
+							"var jsonData = pm.response.json();",
+							"project01ID = jsonObject.data.projects[0].id;",
+							"project01Name = jsonObject.data.projects[0].name;",
+							"pm.environment.set(\"firstProjID\", project01ID);",
+							"pm.environment.set(\"firstProjName\", project01Name);",
+							"",
+							"",
+							"",
+							"pm.test(\"Project accessible to the user are listed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Jack Wolfskin\");",
+							"    pm.expect(pm.response.text()).to.include(\"TM-Demo\");",
+							"    pm.expect(pm.response.text()).to.include(\"TM DEFAULT PROJECT\");",
+							"});",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/project/userProjects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"project",
+						"userProjects"
+					]
+				},
+				"description": "This EP lists the projects available to a user"
+			},
+			"response": []
+		},
+		{
+			"name": "List events no project parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b04a083-d728-426f-9e3a-f52b97374cfe",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Default is always TM Demo and its events are listed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"M1-Physical\");",
+							"    pm.expect(pm.response.text()).to.include(\"M2-Hybrid\");",
+							"    pm.expect(pm.response.text()).to.include(\"Buildout\");",
+							"    pm.expect(pm.response.text()).to.include(\"DR-ERP\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/event",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change project to first listed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
+						"exec": [
+							"pm.test(\"Changed to first list project\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"Jack\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{firstProjID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{firstProjID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TranMan Logoff 01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signOut",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signOut"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "TranMan Login 02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "List events no project parameter Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b04a083-d728-426f-9e3a-f52b97374cfe",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Default is always TM Demo and its events are listed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"1st Event\");",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/event",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change back to default project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
+						"exec": [
+							"pm.test(\"Changed to TM Demo\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{tmDemoID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{tmDemoID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List events with project parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b04a083-d728-426f-9e3a-f52b97374cfe",
+						"exec": [
+							"pm.test(\"The expected data is retrieved\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    pm.expect(pm.response.text()).to.include(\"data\");",
+							"    pm.expect(pm.response.text()).to.include(\"id\");",
+							"    pm.expect(pm.response.text()).to.include(\"name\");",
+							"    pm.expect(pm.response.text()).to.include(\"description\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateCreated\");",
+							"    pm.expect(pm.response.text()).to.include(\"lastUpdated\");",
+							"    pm.expect(pm.response.text()).to.include(\"estStartTime\");",
+							"    pm.expect(pm.response.text()).to.include(\"estCompletionTime\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/event?projectId={{tmDemoID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"event"
+					],
+					"query": [
+						{
+							"key": "projectId",
+							"value": "{{tmDemoID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TranMan Logoff 02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signOut",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signOut"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "87d46a01-a8ae-4a07-864f-5028857bd1fc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "df158f68-3ab8-410f-982b-cc3ef70746ec",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c28a453d-99d2-4325-9558-fc8c0f2ea7d0",
+			"key": "tmDemoID",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

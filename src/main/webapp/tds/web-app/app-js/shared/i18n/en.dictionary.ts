@@ -77,8 +77,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
-		'API_ACTION': 'API Action',
-		'API_ACTIONS': 'API Actions',
+		'API_ACTION': 'Action',
+		'API_ACTIONS': 'Actions',
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'View Manager',

@@ -37,8 +37,8 @@ export const ReportsRoute: Routes = [
 		component: PreEventCheckListSelectorComponent,
 		canActivate: [
 			AuthGuardService,
-			ModuleResolveService,
-			PreferencesResolveService],
+			ModuleResolveService
+		],
 		resolve: {},
 		runGuardsAndResolvers: 'always'
 	}

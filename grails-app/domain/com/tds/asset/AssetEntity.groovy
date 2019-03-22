@@ -277,7 +277,7 @@ class AssetEntity {
 		rackSource nullable: true
 		roomTarget nullable: true
 		rackTarget nullable: true
-		appOwner nullable: true, size: 0..255
+		appOwner nullable: true
 		appSme nullable: true, size: 0..255
 
 		// MoveBundleAsset fields

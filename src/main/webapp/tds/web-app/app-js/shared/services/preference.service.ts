@@ -93,6 +93,7 @@ export class PreferenceService {
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
 
+	// TODO: I don't see this returning the Date with any "special MomentJS" format?
 	getUserDateFormatForMomentJS(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		if (currentUserDateFormat) {
@@ -166,6 +167,7 @@ export class PreferenceService {
 	/**
 	 * Used to retrieve the user preference current date format
 	 */
+	// TODO: this is doing the same as the method getUserDateFormat on this same class...
 	getUserCurrentDateFormatOrDefault(): string {
 		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 

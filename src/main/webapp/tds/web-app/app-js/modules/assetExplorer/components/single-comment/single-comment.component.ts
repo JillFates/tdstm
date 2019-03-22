@@ -1,14 +1,13 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SingleCommentModel} from './model/single-comment.model';
-import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
+import { ModalType} from '../../../../shared/model/constants';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TaskService} from '../../../taskManager/service/task.service';
-import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {Observable} from 'rxjs';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `single-comment`,
@@ -23,13 +22,21 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	public commentCategories: string[];
 	private dataSignature: string;
 
-	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
+	constructor(
+		public singleCommentModel: SingleCommentModel,
+		public userContextService: UserContextService,
+		public taskManagerService: TaskService,
+		public assetExplorerService: AssetExplorerService,
+		public promptService: UIPromptService) {
 		super('#single-comment-component');
 	}
 
 	ngOnInit(): void {
-		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-		this.loadCommentCategories();
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormatTime = userContext.dateFormat + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
+				this.loadCommentCategories();
+			});
 	}
 
 	/**

@@ -8,6 +8,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
@@ -101,6 +102,7 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 
 		Project project = projectTestHelper.createProjectWithDefaultBundle()
 		JSONObject fieldSpec = loadFieldSpecJson()
+		Setting.findAllByProject(project)*.delete(flush:true)
 		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 	}
 

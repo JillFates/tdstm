@@ -1068,7 +1068,12 @@ function getLabelWidths () {
 	GraphUtil.force.nodes().each(function (o, i) {
 		if (o.showLabel) {
 			var labelElement = o.labelElement.select('text:not(.labelBackground)')[0][0]
-			var extent = labelElement.getExtentOfChar(labelElement.getNumberOfChars() - 1)
+            var extent;
+			try {
+                extent = labelElement.getExtentOfChar(labelElement.getNumberOfChars() - 1)
+            } catch (e) {
+			    extent = {x: 0, width: 0};
+            }
 			var offset = labelElement.dx.baseVal.getItem(0).value
 			var labelWidth = extent.x + extent.width + offset
 			o.labelWidth = labelWidth

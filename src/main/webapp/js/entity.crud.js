@@ -1851,6 +1851,9 @@ function reloadDependencyGroupsSection() {
 			processTab.attr("style", "display:none");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
+            setTimeout( function () {
+                $('#dependencyDivId').css('overflow-x', 'scroll');
+            }, 200);
 		}
 	});
 }

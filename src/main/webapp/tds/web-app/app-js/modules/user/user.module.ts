@@ -9,31 +9,46 @@ import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Route Module
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 import {UserRouteModule} from './user-routing.states';
 // Kendo Module
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
+import {GridModule} from '@progress/kendo-angular-grid';
+import {SortableModule} from '@progress/kendo-angular-sortable';
+import {IntlModule} from '@progress/kendo-angular-intl';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+import {PopupModule} from '@progress/kendo-angular-popup';
+import {InputsModule} from '@progress/kendo-angular-inputs';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
-import {UserPreferencesComponent} from './components/preferences/user-preferences.component';
-import {UserEditPersonComponent} from './components/edit-person/user-edit-person.component';
-import {UserDateTimezoneComponent} from './components/date-timezone/user-date-timezone.component';
+import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {UserService} from './service/user.service';
-import {UserManageStaffComponent} from './components/manage-staff/user-manage-staff.component';
 
 @NgModule({
 	imports: [
 		// Angular
 		CommonModule,
 		SharedModule,
+		AssetExplorerModule,
 		FormsModule,
-		// Route
-		UserRouteModule,
 		// Kendo
-		DropDownsModule
+		DropDownsModule,
+		GridModule,
+		PopupModule,
+		SortableModule,
+		IntlModule,
+		InputsModule,
+		DateInputsModule,
+		// Route
+		UserRouteModule
+	],
+	declarations: [
+		UserListComponent,
+		UserDashboardComponent
 	],
 	providers: [
 		// Resolve
@@ -42,25 +57,10 @@ import {UserManageStaffComponent} from './components/manage-staff/user-manage-st
 		// Service
 		UserService
 	],
-	declarations: [
-		UserDateTimezoneComponent,
-		UserListComponent,
-		UserPreferencesComponent,
-		UserEditPersonComponent,
-		UserManageStaffComponent
-	],
 	exports: [
-		UserDateTimezoneComponent,
-		UserListComponent,
-		UserPreferencesComponent,
-		UserEditPersonComponent,
-		UserManageStaffComponent
+		UserListComponent
 	],
 	entryComponents: [
-		UserPreferencesComponent,
-		UserEditPersonComponent,
-		UserDateTimezoneComponent,
-		UserManageStaffComponent
 	]
 })
 
