@@ -517,6 +517,13 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
 			}
 			$('#estStartTime').val(dateTZ);
 
+			userDateInput = $('#kendoEstCompletionTime').data("kendoDateTimePicker").value();
+			if (userDateInput !== null) {
+				dateTZ = tdsCommon.getISOString(userDateInput)
+			}
+
+			$('#estCompletionTime').val(dateTZ);
+
 			$scope.validEditEventSubmit = true;
 			if (qPromises.length > 0) {
 				$q.all(qPromises).then(function(){
