@@ -364,9 +364,13 @@ function updateModel(forWhom, formName) {
 				position: { at: 'center top' },
 				modal: true
 			}).dialog('open');
-
 		},
-		error: function (request, errordata, errorObject) { alert(errorObject.toString()); },
+		error: function (error) {
+			if (error) {
+				const errorMessage = error.message || error.toString();
+				alert(errorMessage);
+			}
+		}
 	});
 }
 
