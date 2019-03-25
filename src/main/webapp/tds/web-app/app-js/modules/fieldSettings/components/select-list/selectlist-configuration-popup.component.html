@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="modal-list">
-                <kendo-sortable #kendoSortableInstance="kendoSortable" [navigatable]="false" [animation]="false" [data]="items" [emptyItemStyle]="{'cursor': 'default'}"
+                <kendo-sortable #kendoSortableInstance="kendoSortable" [navigatable]="false" [animation]="false" [kendoSortableBinding]="items" [emptyItemStyle]="{'cursor': 'default'}"
                                 [activeItemStyle]="{'opacity': '.7'}" [itemStyle]="{'cursor': 'move', 'margin-bottom': '5px'}" emptyText="">
                     <ng-template let-item="item" let-index="index">
                         <div [ngStyle]="getStyle(index)" class="row">
