@@ -245,11 +245,29 @@ class ModelController implements ControllerMethods {
 			} else {
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+
+				// WEAK, DIRTY AND UGLY FIX
+				// For some reason params.redirectTo is coming as an array of strings
+				// having the value ["modelDialog", "modelDialog"]
+				// with this fix I'm returning it back to a string  "modelDialog"
+				// this is because the line below (269) assume params.redirectTo is a string and based on the value
+				// of that string get the name of the view, which could be("show" or "_show")
+				// because params.redirectTo is coming sometimes as an array that condition is never met
+
+				// INIT DIRTY FIX
+				if (!(params.redirectTo instanceof String)) {
+					if (params.redirectTo[0] == "modelDialog") {
+						params.redirectTo = "modelDialog"
+					}
+				}
+				// END DIRTY FIX
+
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
 				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
 
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+
 				render(view: view, model: paramsMap)
 			}
 		} else {
