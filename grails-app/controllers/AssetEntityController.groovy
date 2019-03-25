@@ -653,13 +653,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Map requestParams = null
 
 		withFormat {
-			js {
-				requestParams = request.JSON
-			}
 			html {
 				params.taskDependency = params.list('taskDependency[]')
 				params.taskSuccessor = params.list('taskSuccessor[]')
 				requestParams = params
+			}
+			js {
+				requestParams = request.JSON
 			}
 		}
 
