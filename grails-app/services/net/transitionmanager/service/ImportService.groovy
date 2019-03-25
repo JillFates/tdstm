@@ -575,7 +575,7 @@ class ImportService implements ServiceMethods {
 
 						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat)
 						errorMsg = results.error
-						dtb = dtb.merge()
+						dtb = DataTransferBatch.get(batchId)
 
 						if (errorMsg) {
 							dtb.statusCode = DataTransferBatch.PENDING
