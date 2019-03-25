@@ -246,22 +246,6 @@ class ModelController implements ControllerMethods {
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 
-				// WEAK, DIRTY AND UGLY FIX
-				// For some reason params.redirectTo is coming as an array of strings
-				// having the value ["modelDialog", "modelDialog"]
-				// with this fix I'm returning it back to a string  "modelDialog"
-				// this is because the line below (269) assume params.redirectTo is a string and based on the value
-				// of that string get the name of the view, which could be("show" or "_show")
-				// because params.redirectTo is coming sometimes as an array that condition is never met
-
-				// INIT DIRTY FIX
-				if (!(params.redirectTo instanceof String)) {
-					if (params.redirectTo[0] == "modelDialog") {
-						params.redirectTo = "modelDialog"
-					}
-				}
-				// END DIRTY FIX
-
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
 				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
@@ -406,17 +390,17 @@ class ModelController implements ControllerMethods {
 						if (params.redirectTo == "assetAudit") {
 							render(template: "modelAuditView", model: [modelInstance: modelInstance])
 						} else {
-							forward(action: "show", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+							forward(action: "show", params: [id: modelInstance.id])
 						}
 					} else {
 						modelInstance.errors.allErrors.each { log.error it }
 						flash.message = "Unable to update model."
-						forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+						forward(action: "edit", params: [id: modelInstance.id])
 					}
 				} catch (ServiceException e) {
 					//log.error(e.message, e)
 					flash.message = e.message
-					forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+					forward(action: "edit", params: [id: modelInstance.id])
 				}
 			} else {
 				flash.message = "Model not found with Id ${params.id}"
