@@ -85,6 +85,11 @@
 						</tr>
 						<tr class="prop">
 							<td  class="name">By-Pass API Actions:</td>
+							<td  class="name">Estimated Completion Time:</td>
+							<td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" /></td>
+						</tr>
+						<tr class="prop">
+							<td  class="name">By-Pass Actions:</td>
 							<td class="valueNW">
 								<tds:yesNo value="${moveEventInstance.apiActionBypass}"/>
 							</td>

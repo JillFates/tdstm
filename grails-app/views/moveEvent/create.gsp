@@ -176,6 +176,20 @@
 				                  </g:hasErrors>
 				                </td>
                             </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="description">Estimated Completion Time:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estCompletionTime','errors')}">
+                                    <input type="text" class="dateRange" size="15" style="width: 210px;" id="kendoEstCompletionTime"/>
+                                    <input type="hidden" id="estCompletionTime" name="estCompletionTime" />
+                                    <g:hasErrors bean="${moveEventInstance}" field="estCompletionTime">
+                                        <div class="errors">
+                                            <g:renderErrors bean="${moveEventInstance}" as="list" field="estCompletionTime"/>
+                                        </div>
+                                    </g:hasErrors>
+                                </td>
+                            </tr>
 							<tr class="prop">
 								<td class="name">
 									<label for="apiActionBypass">By-Pass API Actions:</label>
@@ -207,6 +221,7 @@
 
     $(document).ready(function(){
 		$("#kendoEstStartTime").kendoDateTimePicker({ animation: false, change: onEstStartTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />'  });
+		$("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />'  });
     	function onEstStartTimeChange() {
         	if ($('#kendoEstStartTime').data("kendoDateTimePicker")) {
                 var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
