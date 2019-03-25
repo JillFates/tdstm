@@ -91,7 +91,7 @@ export class HeaderService {
 	}
 
 	removePreference(prefCode) {
-		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`, null)
+		return this.http.delete(`${this.userPreferenceUrl}/preferences/${prefCode}`)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
@@ -99,7 +99,7 @@ export class HeaderService {
 	}
 
 	resetPreferences() {
-		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`, null)
+		return this.http.delete(`${this.userPreferenceUrl}/resetPreferences`)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
