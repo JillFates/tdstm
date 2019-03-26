@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "TranMan Login 01",
+			"name": "Login - List Events",
 			"event": [
 				{
 					"listen": "test",
@@ -572,7 +572,7 @@
 	],
 	"variable": [
 		{
-			"id": "afecee41-7593-4b68-a07f-59641a811aa1",
+			"id": "1f4c8390-4bb5-4a86-90e6-b28655acbae1",
 			"key": "tmDemoID",
 			"value": "2445",
 			"type": "string"
