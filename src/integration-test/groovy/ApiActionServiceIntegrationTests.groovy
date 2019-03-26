@@ -106,12 +106,9 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiCatalogHelper = new ApiCatalogTestHelper()
 			projectHelper = new ProjectTestHelper()
 
-			project.save(flush: true)
-
 			action = new ApiAction(
 				name: 'testAction',
 				description: 'This is a bogus action for testing',
-				//connectorClass: ConnectorClass.HTTP,
 				apiCatalog: apiCatalog,
 				connectorMethod: 'callEndpoint',
 				methodParams: paramsJson,
@@ -119,12 +116,15 @@ class ApiActionServiceIntegrationTests extends Specification{
 				callbackMethod: 'updateTaskState',
 				callbackMode: CallbackMode.MESSAGE,
 				httpMethod: ApiActionHttpMethod.GET,
-				project: project
+				isRemote: false,
+				reactionScripts: '{"STATUS": "// do nothing", "SUCCESS": "// do nothing", "DEFAULT": "// do nothing"}',
+				project: project,
+				provider: provider
 			)
 			if (action.hasErrors()) {
 				println "action has errors: ${GormUtil.allErrorsString(action)}"
 			}
-			action.save(flush: true)
+			action.save(failsOnError: true)
 
 			asset = new AssetEntity(
 				assetName: 'fubarsvr01',
@@ -243,7 +243,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 		then: "This API Action should no longer exist"
 			apiActionService.find(apiAction.id, project) == null
 		and: "There's no ApiAction for this project"
-			apiActionService.list(project).size() == 0
+			apiActionService.list(project).size() == 1
 	}
 
 	def "7. tests deleting an API Action for a different project"() {
@@ -255,7 +255,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 			List<Map> actions1 = apiActionService.list(project)
 			List<Map> actions2 = apiActionService.list(project2)
 		then: "Both lists of actions have only one element"
-			actions1.size() == 1
+			actions1.size() == 2
 			actions2.size() == 1
 		and: "Each list contains the expected element"
 			actions1.get(0)["id"] == apiAction1.id || actions1.get(1)["id"] == apiAction1.id || actions1.get(2)["id"] == apiAction1.id
@@ -265,7 +265,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiActionService.delete(apiAction1.id, project, true)
 			actions2 = apiActionService.list(project2)
 		then: "The corresponding project doesn't have any API Action left"
-			apiActionService.list(project).size() == 0
+			apiActionService.list(project).size() == 1
 		and: "The other project still has its API Action"
 			actions2.size() == 1
 			actions2.get(0)["id"] == apiAction2.id || actions2.get(1)["id"] == apiAction2.id || actions2.get(2)["id"] == apiAction2.id
@@ -306,7 +306,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 		and: "User current project when no project is given."
 			apiActionService.validateApiActionName(null, apiAction1.name)
 		and: "False when no name is given."
-			!apiActionService.validateApiActionName(project1, null)
+			! apiActionService.validateApiActionName(project1, null)
 
 	}
 

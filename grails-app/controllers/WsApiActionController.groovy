@@ -37,7 +37,7 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def list(){
         Project project = securityService.getUserCurrentProjectOrException()
-        List<Map> apiActions = apiActionService.list(project, false, params)
+        List<Map> apiActions = apiActionService.list(project, true, params)
         renderSuccessJson(apiActions)
     }
 

@@ -199,7 +199,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 
 			JSONObject fieldSpec = loadFieldSpecJson()
 
-			Setting.findByProject(project).delete(flush:true)
+			Setting.findAllByProject(project)*.delete(flush:true)
 			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true

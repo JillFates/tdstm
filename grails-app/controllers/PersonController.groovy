@@ -264,7 +264,13 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
-		Map personParams = (request.format == 'json') ? request.JSON : params
+		Map personParams = [:]
+
+		withFormat {
+			js { request.JSON }
+			html { params }
+		}
+
 		def duplicatePersonId
 		try {
 			person = personService.savePerson(personParams, companyId, project, true)

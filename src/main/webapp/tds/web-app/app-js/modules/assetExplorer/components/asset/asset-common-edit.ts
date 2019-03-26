@@ -15,6 +15,8 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 declare var jQuery: any;
 
@@ -38,7 +40,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	constructor(
 		protected model: any,
 		protected activeDialog: UIActiveDialogService,
-		protected preference: PreferenceService,
+		protected userContextService: UserContextService,
 		protected assetExplorerService: AssetExplorerService,
 		protected dialogService: UIDialogService,
 		protected notifierService: NotifierService,
@@ -47,10 +49,14 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		private promptService: UIPromptService) {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
-			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			if (this.dateFormat && this.dateFormat !== null) {
-				this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
-			}
+
+			this.userContextService.getUserContext()
+				.subscribe((userContext: UserContextModel) => {
+					this.dateFormat = userContext.dateFormat;
+					if (this.dateFormat && this.dateFormat !== null) {
+						this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+					}
+				});
 	}
 	/**
 	 * Initiates The Injected Component

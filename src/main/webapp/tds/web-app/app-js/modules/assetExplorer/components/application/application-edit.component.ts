@@ -6,8 +6,6 @@
  */
 import { Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import { PreferenceService } from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
@@ -18,6 +16,7 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -41,15 +40,14 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
-			preference: PreferenceService,
+			userContextService: UserContextService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
-			private prompt: UIPromptService,
+			promptService: UIPromptService
 			) {
-				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+				super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {
