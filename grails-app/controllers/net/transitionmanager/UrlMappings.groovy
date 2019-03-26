@@ -216,6 +216,11 @@ class UrlMappings {
 			action = [GET:"bundleData"]
 		}
 
+		"/ws/user/getPlanningStats" {
+			controller = "wsUser"
+			action = [GET:"getDataForPlanningDashboard"]
+		}
+
 		"/ws/cookbook/recipe/list" {
 			controller = "wsCookbook"
 			action = [GET:"recipeList"]

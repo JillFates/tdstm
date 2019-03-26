@@ -8,9 +8,9 @@
                     <tbody><tr>
                         <td class="dashboard-bar-base" style="background-color:lightyellow">
 
-                            <div class="dashboard-bar-graph" id="discoverybar" style="width: 11%;"></div>
+                            <div class="dashboard-bar-graph" id="discoverybar"  [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                <b> 11%</b>
+                                <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}%</b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=Validated">
                                     Applications Validated
                                 </a>
@@ -22,9 +22,9 @@
                     <tr>
                         <td class="dashboard-bar-base">
 
-                            <div class="dashboard-bar-graph" id="analysisbar" style="width: 3%;"></div>
+                            <div class="dashboard-bar-graph" id="analysisbar" [style.width]="planningDashboardModel.discovery.appsPlanReadyPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                <b> 3%</b>
+                                <b> {{planningDashboardModel.discovery.appsPlanReadyPercentage}}%</b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=PlanReady">Applications Plan Ready</a>
                             </div>
 
