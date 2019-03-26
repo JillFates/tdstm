@@ -556,19 +556,33 @@ class DataviewService implements ServiceMethods {
      * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
      */
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
+	    // Find the position of the AssetClass field.
+	    int indexOfAssetClassField = dataviewSpec.columns.findIndexOf {it.property == 'assetClass'}
         [
 			pagination: [
 				offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
 			],
 			assets: assets.collect { columns ->
 				Map row = [:]
+				// Find the domain for this asset.
+				String assetDomain = indexOfAssetClassField > -1 ? columns[indexOfAssetClassField].toLowerCase() : ''
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
+					Map column = dataviewSpec.columns[index]
 					if(dataviewSpec.columns[index].property == 'tagAssets'){
 						cell = handleTags(cell)
 					}
 
-					if (dataviewSpec.columns[index]) {
+					/*
+			            TM-14497: Merging the fix provided for 4.6.x into 4.5.x is not simple, as it relies on functionality not
+			            available on this branch (several changes to DataviewSpec and the addition of the FieldSpecProject class).
+			            Instead of reimplementing all this -- which would mean executing additional queries just to run a simple
+			            check, we can use the field's name which, in 4.5.x, always start with 'custom'.
+			         */
+					Boolean isCustom = column.property.startsWith('custom')
+					// A field should be populated if it's a common field or if it's a custom field that belongs to the asset's domain.
+					Boolean shouldBePopulated = !isCustom || (isCustom && column.domain == assetDomain)
+					if (column && shouldBePopulated) {
 						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
 					}
 				}
