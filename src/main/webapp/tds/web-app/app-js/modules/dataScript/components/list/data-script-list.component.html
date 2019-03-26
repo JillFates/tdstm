@@ -29,7 +29,7 @@
 					</ng-template>
 
 					<!-- Action -->
-					<kendo-grid-command-column [width]="108" [locked]="true">
+					<kendo-grid-command-column [width]="70" [locked]="true">
 						<ng-template kendoGridHeaderTemplate>
 							<div class="text-center">
 								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -38,9 +38,11 @@
 						<ng-template kendoGridCellTemplate
 						             let-dataItem
 						             let-rowIndex="rowIndex">
-							<div class="text-center">
-								<button class="btn btn-default" (click)="onEditDataScript(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
-								<button class="btn btn-default" (click)="onDeleteDataScript(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+							<div class="tds-action-button-set">
+								<tds-button-edit  (click)="onEditDataScript(dataItem)">
+								</tds-button-edit>
+								<tds-button-delete  (click)="onDeleteDataScript(dataItem)">
+								</tds-button-delete>
 							</div>
 						</ng-template>
 					</kendo-grid-command-column>
