@@ -1,5 +1,7 @@
 package net.transitionmanager.search
 
+import com.tdsops.tm.enums.domain.AssetClass
+
 /**
  * Class that contain the information required for constructing a
  * SQL orHQL statement to filter a domain by a particular field.
@@ -124,6 +126,18 @@ class FieldSearchData {
         if (isMixed()) {
             expression = "($mixedSqlExpression) OR ${expression})"
         }
+        /* If the field is a custom field, in addition to the filter provided by the user,
+           the corresponding AssetClass needs to be included to keep the search consistent and avoid
+           matches for this custom field in other domains.
+        */
+        if (isCustomField()) {
+            /* Generate a name for the AssetClass parameter that will be unique for each domain.
+               This is so when the user mixes custom fields from different domains, nothing is returned. */
+            AssetClass assetClass = AssetClass.lookup(domain)
+            String parameterName = "${assetClass.toString()}_assetClass"
+            expression = "($expression AND assetClass = :$parameterName)"
+            parsedInfo.parameters[parameterName] = assetClass
+        }
         return expression
     }
 
@@ -166,4 +180,14 @@ class FieldSearchData {
     boolean isManyToMany() {
         return searchInfo.manyToManyQueries != null
     }
+
+	boolean isCustomField() {
+        /*
+            TM-14497: Merging the fix provided for 4.6.x into 4.5.x is not simple, as it relies on functionality not
+            available on this branch (several changes to DataviewSpec and the addition of the FieldSpecProject class).
+            Instead of reimplementing all this -- which would mean executing additional queries just to run a simple
+            check, we can use the field's name which, in 4.5.x, always start with 'custom'.
+         */
+		return searchInfo.columnAlias.startsWith('custom')
+	}
 }
