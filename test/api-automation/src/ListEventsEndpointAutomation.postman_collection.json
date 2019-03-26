@@ -98,7 +98,6 @@
 							"",
 							"",
 							"pm.test(\"Project accessible to the user are listed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Jack Wolfskin\");",
 							"    pm.expect(pm.response.text()).to.include(\"TM-Demo\");",
 							"    pm.expect(pm.response.text()).to.include(\"TM DEFAULT PROJECT\");",
 							"});",
@@ -209,7 +208,8 @@
 						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
 						"exec": [
 							"pm.test(\"Changed to first list project\", function () {",
-							"pm.expect(pm.response.text()).to.include(\"Jack\");",
+							"let pName = pm.variables.get(\"firstProjName\")",
+							"pm.expect(pm.response.text()).to.include(pName);",
 							"});",
 							""
 						],
@@ -362,11 +362,7 @@
 							"pm.test(\"Success\", function () {",
 							"pm.expect(pm.response.text()).to.include(\"success\");",
 							"});",
-							"",
-							"pm.test(\"Default is always TM Demo and its events are listed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"1st Event\");",
-							"",
-							"});"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -570,7 +566,7 @@
 	],
 	"variable": [
 		{
-			"id": "c28a453d-99d2-4325-9558-fc8c0f2ea7d0",
+			"id": "01e89300-66ab-431e-b1ec-bdd2e657fef6",
 			"key": "tmDemoID",
 			"value": "",
 			"type": "string"
