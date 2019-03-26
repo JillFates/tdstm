@@ -178,14 +178,18 @@ class WsAssetController implements ControllerMethods {
     */
    @HasPermission(Permission.AssetEdit)
    def bulkDeleteDependencies(){
-       Project project = projectForWs
+	   Project project = projectForWs
 
 	   Map requestParams = null
-	   if (request.format == 'json') {
-		   requestParams = request.JSON
-	   } else {
-		   params.dependencies = params.list('dependencyIds[]')
-		   requestParams = params
+
+	   withFormat {
+		   js {
+			   requestParams = request.JSON
+		   }
+		   html {
+			   params.dependencies = params.list('dependencyIds[]')
+			   requestParams = params
+		   }
 	   }
 
 	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, requestParams.dependencies))
