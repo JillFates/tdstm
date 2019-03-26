@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd0943d5-63a3-4b96-a77d-6066ed9a6827",
+		"_postman_id": "dd687729-b6a3-4951-be06-78f8d13d6277",
 		"name": "ListEvents",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -265,7 +265,10 @@
 						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signOut",
 					"host": [
@@ -525,7 +528,10 @@
 						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signOut",
 					"host": [
@@ -566,9 +572,9 @@
 	],
 	"variable": [
 		{
-			"id": "01e89300-66ab-431e-b1ec-bdd2e657fef6",
+			"id": "afecee41-7593-4b68-a07f-59641a811aa1",
 			"key": "tmDemoID",
-			"value": "",
+			"value": "2445",
 			"type": "string"
 		}
 	]
