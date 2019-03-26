@@ -37,7 +37,8 @@ export const UserRoute: Routes = [
 		data: {
 			page: {
 				title: 'User Dashboard',
-				instruction: ''
+				instruction: '',
+				menu: ['Dashboard', 'User']
 			},
 			requiresAuth: true,
 		},
