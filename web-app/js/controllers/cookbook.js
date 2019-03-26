@@ -531,12 +531,13 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	}
 
 	scope.contexts = {
+		assetSelector: {},
 		contextId: 0,
 		eventsArray : [],
 		boundlesArray : [],
 		selectedEvent : '',
 		validCurrentSelection : false,
-		enableClearDefaultContext: false
+		enableClearDefaultContext : false
 	}
 
 	// Returns true if the 'generate task' button should be enabled. Otherwise returns false
@@ -613,11 +614,41 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		}
 	};
 
-	/////////////////////////////
+	////////////////////////////////
+	// Events for select elements //
+	////////////////////////////////
 
-	// Events for select elements.
-	scope.contexts.eventSelected = function(){
+	/**
+	 * This is triggered when the Event Selector is loaded and when the user changes the select in either
+	 * the Generate tab or in the Editor > Groups tab. The latter two cases the resetSaveAsDefault is passed true. For the
+	 * initial load it should be set to false.
+	 * @param resetSaveAsDefault - set to true to show the Set Default Context otherwise the Clear Default Context is shown.
+	 */
+	scope.contexts.eventSelected = function(resetSaveAsDefault){
 		scope.contexts.checkValidSelection();
+		if (scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
+			$http.get(utils.url.applyRootPath('/ws/tag/event/' + scope.contexts.selectedEvent.id),
+				{ headers: {'Content-Type': 'application/json'} }
+			).then(function successCallback(response) {
+				var result = response.data;
+				if (result && result.data && result.data.length >= 1) {
+					result.data.forEach(function(eventTag) {
+						var eventId = eventTag.id;
+						var tagId = eventTag.tagId;
+						eventTag.id = tagId;
+						eventTag.eventId = eventId;
+						eventTag.label = eventTag.name;
+					});
+					scope.editor.selectedRVersion.context.tag = result.data;
+					scope.contexts.checkValidSelection();
+					if (!scope.$$phase) scope.$digest();
+				}
+				if (resetSaveAsDefault) {
+					// The Save Default Context should be enabled when the user changes the event
+					scope.contexts.enableClearDefaultContext = false;
+				}
+			});
+		}
 	};
 
 	// Reset selects
@@ -639,7 +670,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		if (scope.recipeId > 0) {
 			var dataToSend = {
 				'context': {
-					'tagMatch': (scope.contexts.assetSelector.operator === 'ALL')? true : false,
+					'tagMatch': (scope.contexts.assetSelector.operator === 'ALL') ? true : false,
 					'tag': getTagsIds(scope.contexts.assetSelector.tag)
 				}
 			};
@@ -648,17 +679,20 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			}
 
 			// Partially Remove Prototype
-			if(window.Prototype) {
+			if (window.Prototype) {
 				delete Array.prototype.toJSON;
 			}
 
-			$http.post(utils.url.applyRootPath('/ws/cookbook/recipe/context/' + stateParams.recipeId), JSON.stringify(dataToSend), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
-				alerts.addAlert({type: 'success', msg: 'Default context updated.', closeIn: 3000});
-				log.info('Success on set default context');
+			$http.post(utils.url.applyRootPath('/ws/cookbook/recipe/context/' + stateParams.recipeId),
+				JSON.stringify(dataToSend),
+				{headers: {'Content-Type': 'application/json'}}
+			).then(function successCallback(response) {
+				alerts.addAlert({type: 'success', msg: 'Default context updated', closeIn: 3000});
+				// log.info('Success on set default context');
 				scope.getRecipeData('wip');
 			}, function(){
-				alerts.addAlert({type: 'danger', msg: 'Error on set default context.'});
-				log.info('Error on set default context');
+				alerts.addAlert({type: 'danger', msg: 'An error occurred while attempting to set the default context'});
+				log.error('Error on set default context');
 			});
 		}
 	}
@@ -674,14 +708,18 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		});
 	}
 
+	/**
+	 * Used to populate the Event and Tag Selectors
+	 */
 	scope.contexts.getEventsAndBundles = function() {
 		cookbookService.getEventsAndBundles({rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting Events');
 			log.info(data.data.list);
 			scope.contexts.eventsArray = data.data.list;
+
 			if (scope.editor.selectedRVersion && scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.eventId) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.editor.selectedRVersion.context.eventId);
-				scope.contexts.eventSelected();
+				scope.contexts.eventSelected(false);
 			} else if (scope.contexts.selectedEvent != null) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.contexts.selectedEvent.id);
 			}
@@ -737,6 +775,9 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		scope.editor.selectedRecipe = (recipeTypeToShow == 'release') ? scope.editor.selectedRVersion : scope.editor.selectedRWip;
 	}
 
+	/**
+	 * Used to load the recipe information after a recipe is selected
+	 */
 	scope.getRecipeData = function(defaultView) {
 		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			scope.editor.selectedRVersion = (data.data) ? data.data : null;
@@ -751,6 +792,10 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 				scope.editor.selectedRWip = fillDefault(scope.editor.selectedRVersion);
 				updateVersionSelection(defaultView);
 			}
+
+			// Trigger loading the events and tags for the generation context
+			scope.contexts.getEventsAndBundles();
+
 			log.info('Success on getting selected released recipe');
 			log.info(data.data);
 		}, function(){
@@ -781,7 +826,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		recipeManager.setEditingRecipe(false);
 		scope.editor.editingRecipe = false;
 		scope.switchWipRelease((defaultView!=null)?defaultView:'wip');
-		scope.contexts.getEventsAndBundles();
+		// scope.contexts.getEventsAndBundles();
 		scope.$broadcast("recipeUpdated", scope.editor.selectedRVersion);
 	}
 
