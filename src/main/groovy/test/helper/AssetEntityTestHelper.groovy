@@ -19,7 +19,7 @@ class AssetEntityTestHelper {
 				retireDate: new Date()
         )
 
-		assetEntity.save(flush: true, failOnError: true)
+		assetEntity.save(flush: true)
 
         return assetEntity
     }

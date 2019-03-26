@@ -474,3 +474,6 @@ Specify jndi name of datasource to monitor in production environment
         javamelody.datasources = 'java:comp/env/myapp/mydatasource'
     }
 }*/
+
+// TM-11135 Change so that GORM save defaults to failOnError:true
+grails.gorm.failOnError = true

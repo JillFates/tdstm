@@ -19,7 +19,7 @@ class ImportBatchTestHelper {
 			project: project,
 			domainClassName: domainClass
 		)
-		importBatch.save(flush: true, failOnError: true)
+		importBatch.save(flush: true)
 		return importBatch
 	}
 
@@ -35,7 +35,7 @@ class ImportBatchTestHelper {
 			errorList: '[]',
 		   fieldsInfo: '{}'
 		)
-		record.save(flush: true, failOnError: true)
+		record.save(flush: true)
 		return record
 	}
 
@@ -51,7 +51,7 @@ class ImportBatchTestHelper {
 		}.join(',')
 
 		importBatch.fieldNameList = "[$arrayValues]"
-		importBatch.save(flush: true, failOnError: true)
+		importBatch.save(flush: true)
 
 
 		Map fieldsInfo = fields.collectEntries { k, v ->
@@ -63,6 +63,6 @@ class ImportBatchTestHelper {
 		}
 
 		importBatchRecord.fieldsInfo = JsonUtil.convertMapToJsonString(fieldsInfo)
-		importBatchRecord.save(flush: true, failOnError: true)
+		importBatchRecord.save(flush: true)
 	}
 }

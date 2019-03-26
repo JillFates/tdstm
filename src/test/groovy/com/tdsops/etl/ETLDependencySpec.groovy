@@ -389,7 +389,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			AssetOptions dependencyType = new AssetOptions(
 				value: 'Runs On',
 				type: AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -444,7 +444,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			AssetOptions dependencyType = new AssetOptions(
 				value: 'Runs On',
 				type: AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -626,7 +626,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			AssetOptions dependencyType = new AssetOptions(
 				value: 'Runs On',
 				type: AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(

@@ -8,21 +8,16 @@
  */
 
 
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.SettingService
-import org.apache.commons.lang3.RandomStringUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.util.Holders
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.ProjectService
@@ -190,7 +185,7 @@ class AssetTestHelper {
 		 }
 		AssetEntity asset = new AssetEntity(params)
 
-		return asset.save(flush: true, failOnError: true)
+		return asset.save(flush: true)
 	 }
 
 }

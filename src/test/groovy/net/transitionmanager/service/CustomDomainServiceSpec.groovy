@@ -47,7 +47,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			guid = StringUtil.generateGuid()
 		}
 
-		defaultProject.save(failOnError: true)
+		defaultProject.save()
 
 		[
 			'Application': createJSONFieldSpecFor(AssetClass.APPLICATION),
@@ -60,7 +60,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			setting.type = SettingType.CUSTOM_DOMAIN_FIELD_SPEC
 			setting.key = it.key.toUpperCase()
 			setting.json = it.value
-			setting.save(failOnError: true)
+			setting.save()
 		}
 
 		fieldSpecProject = service.createFieldSpecProject(defaultProject)

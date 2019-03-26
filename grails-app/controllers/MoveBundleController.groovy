@@ -21,6 +21,7 @@ import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.NotTransactional
+import grails.validation.ValidationException
 import net.transitionmanager.command.DependencyConsoleCommand
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
@@ -36,7 +37,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
@@ -256,7 +256,7 @@ class MoveBundleController implements ControllerMethods {
 			} catch (EmptyResultException e) {
 				flash.message = "MoveBundle not found with id $params.id"
 				redirect(action: 'edit', id: params.id)
-			} catch (DomainUpdateException e) {
+			} catch (ValidationException e) {
 				flash.message = "Error updating MoveBundle with id $params.id"
 			}
 		} else {

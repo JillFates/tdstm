@@ -365,13 +365,13 @@ class CommentService implements ServiceMethods {
 			// Note that shouldSendNotification has to be called before calling save on the object
 			boolean shouldSendNotification = shouldSendNotification(assetComment, currentPerson, isNew, addingNote)
 
-			if (!assetComment.hasErrors() && assetComment.save(flush: true)) {
+			if (assetComment.save(flush: true, failOnError: false)) {
 				// Deal with Notes if there are any
 				if (assetComment.commentType == AssetCommentType.TASK && params.note) {
 					// TODO The adding of commentNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.
 					def commentNote = new CommentNote(createdBy: currentPerson, dateCreated: date, note: params.note,
 					                                  isAudit: 0, assetComment: assetComment)
-					if (commentNote.hasErrors() || !commentNote.save(flush: true)) {
+					if (!commentNote.save(flush: true, failOnError: false)) {
 						// TODO error won't bubble up to the user
 						log.error "saveUpdateCommentAndNotes: Saving comment notes faild - ${GormUtil.allErrorsString(commentNote)}"
 						errorMsg = 'An unexpected error occurred while saving your comment'
@@ -644,7 +644,7 @@ class CommentService implements ServiceMethods {
         } else if( !taskDependency ) {
             taskDependency = new TaskDependency(predecessor: dependent, assetComment: task)
 		}
-		if (taskDependency.hasErrors() || !taskDependency.save(flush: true)) {
+		if (!taskDependency.save(flush: true, failOnError: false)) {
             log.error "saveUpdateCommentAndNotes: Saving comment successor failed - ${GormUtil.allErrorsString(taskDependency)}"
 			errorMsg = 'An unexpected error occurred while saving your change'
 		}
@@ -818,7 +818,7 @@ class CommentService implements ServiceMethods {
 			}
 		}
 
-		assetComment.save(failOnError: true)
+		assetComment.save()
 	}
 
 

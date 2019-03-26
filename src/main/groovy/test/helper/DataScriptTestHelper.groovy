@@ -31,7 +31,7 @@ class DataScriptTestHelper {
                 provider: provider,
                 mode: DataScriptMode.IMPORT,
                 createdBy: createdBy
-        ).save(flush: true, failOnError: true)
+        ).save(flush: true)
         return dataScript
     }
 
@@ -49,7 +49,7 @@ class DataScriptTestHelper {
             existingDs.etlSourceCode = ''
             existingDs.dateCreated = new Date()
             existingDs.lastUpdated = existingDs.dateCreated
-            existingDs.save(flush: true, failOnError: true)
+            existingDs.save(flush: true)
             return existingDs
         } else {
             DataScript dataScript = new DataScript(
@@ -61,7 +61,7 @@ class DataScriptTestHelper {
                     provider: provider,
                     mode: DataScriptMode.IMPORT,
                     createdBy: createdBy
-            ).save(flush: true, failOnError: true)
+            ).save(flush: true)
             return dataScript
         }
     }

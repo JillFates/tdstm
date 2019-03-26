@@ -132,7 +132,7 @@ class DataviewService implements ServiceMethods {
 			isShared = dataviewJson.isShared
 		}
 
-		if (!dataview.save()) {
+		if (!dataview.save(failOnError:false)) {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
@@ -176,7 +176,7 @@ class DataviewService implements ServiceMethods {
 			reportSchema = dataviewJson.schema
 		}
 
-		if (!dataview.save()) {
+		if (!dataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Error on create', dataview)
 		}
 
@@ -558,7 +558,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
-		if (!favoriteDataview.save()) {
+		if (!favoriteDataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
 		}
 	}

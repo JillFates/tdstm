@@ -33,7 +33,7 @@ class RackTestHelper {
 		rack.powerB = powerB
 		rack.powerC = powerC
 		rack.rackType = rackType
-		rack.save(failOnError: true)
+		rack.save()
 		return rack
 	}
 }

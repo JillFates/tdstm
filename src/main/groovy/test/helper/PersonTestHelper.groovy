@@ -75,7 +75,7 @@ class PersonTestHelper {
 
 		Party companyParty = Party.get(company.id)
 		Person person = new Person(personMap)
-		person.save(failOnError: true, flush:true)
+		person.save(flush:true)
 
 		if(project) {
 			personService.addToProjectSecured(project, person)

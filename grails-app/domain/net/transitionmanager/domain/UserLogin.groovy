@@ -1,13 +1,12 @@
 package net.transitionmanager.domain
 
 import com.tdsops.common.security.SecurityUtil
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.PasswordHistory
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.UserAudit
+import net.transitionmanager.service.DomainUpdateException
 
 class UserLogin {
 
@@ -182,10 +181,7 @@ class UserLogin {
 			log.debug "savePasswordHistory() for ${this}"
 			PasswordHistory ph = new PasswordHistory(userLogin: this, password: password)
 			//TM-5601: Don't use flush:true is not needed for the transaction and we can end in a Saving loop ConcurrentModificationException due to the afterUpdate Event
-			if (!ph.save()) {
-				log.error "savePasswordHistory() failed for $username : ${GormUtil.allErrorsString(ph)}"
-				throw new RuntimeException('Unable to save password history')
-			}
+			ph.save()
 		}
 	}
 

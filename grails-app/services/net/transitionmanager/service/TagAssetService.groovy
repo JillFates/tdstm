@@ -3,12 +3,10 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TagEvent
-
 /**
  * A service for managing the relationship of Tags to Assets.
  */
@@ -65,12 +63,12 @@ class TagAssetService implements ServiceMethods {
 			Tag tag = get(Tag, tagId, currentProject)
 
 			TagAsset tagAsset = new TagAsset(tag: tag, asset: asset)
-			return tagAsset.save(failOnError: true)
+			return tagAsset.save()
 		}
 
 		// Bump the last updated date for the given asset.
 		asset.lastUpdated = TimeUtil.nowGMT()
-		asset.save(failOnError: true)
+		asset.save()
 
 		return tagAssets
 	}
@@ -126,7 +124,7 @@ class TagAssetService implements ServiceMethods {
 		}
 
 		//removes the secondary tag, and by cascade any links, that would create a duplicate key.
-		secondary.delete(failOnError:true, flush: true)
+		secondary.delete(flush: true)
 
 		return updatedLinks
 	}

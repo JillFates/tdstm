@@ -708,9 +708,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			PasswordReset pr = (PasswordReset) it
 			if (pr.status == PasswordResetStatus.PENDING) {
 				pr.status = PasswordResetStatus.VOIDED
-				if (!pr.save()) {
-					log.error 'Unable to void pending password reset token for {} : {}', userLogin, GormUtil.allErrorsString(pr)
-				}
+
+				pr.save()
 			}
 		}
 
@@ -805,13 +804,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		String errMsg = 'An error occurred while attempting to save your new password'
 
-		if (!pr.userLogin.save()) {
+		if (!pr.userLogin.save(failOnError: false)) {
 			log.error 'applyNewPassword() failed to update UserLogin {} : {}', pr.userLogin, GormUtil.allErrorsString(pr.userLogin)
 			throw new ServiceException(errMsg)
 		}
 
 		pr.status = PasswordResetStatus.COMPLETED
-		if (!pr.save()) {
+		if (!pr.save(failOnError: false)) {
 			log.error 'applyNewPassword() failed to update PasswordReset.status for token {} : {}', token, GormUtil.allErrorsString(pr)
 			throw new ServiceException(errMsg)
 		}
@@ -1189,7 +1188,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		// Try to save the user changes
-		if (!userLogin.save(flush: true)) {
+		if (!userLogin.save(flush: true, failOnError: false)) {
 			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
 		}
 
@@ -1198,7 +1197,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		if (userLogin.active == 'Y') {
 			person.active = 'Y'
-			if (!person.save(flush: true)) {
+			if (!person.save(flush: true, failOnError: false)) {
 				throw new DomainUpdateException('Unable to update person : ' + GormUtil.allErrorsString(person))
 			}
 		}
@@ -1597,7 +1596,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 		else {
 			pr = new PartyRole(party: person, roleType: rt)
-			pr.save(flush: true, failOnError: true)
+			pr.save(flush: true)
 		}
 		return pr
 	}
@@ -1746,7 +1745,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 		if (user.forcePasswordChange != 'Y') {
 			user.forcePasswordChange = 'Y'
-			user.save(failOnError: true)
+			user.save()
 		}
 	}
 
@@ -1775,7 +1774,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			PartyRole partyRole = PartyRole.findByPartyAndRoleType(person, roleType)
 			if (!partyRole) {
 				partyRole = new PartyRole(party: person, roleType: roleType)
-				if (!partyRole.save()) {
+				if (!partyRole.save(failOnError: false)) {
 					log.error 'setUserRoles() failed to add partyRole {}: {}', partyRole, GormUtil.allErrorsString(partyRole)
 					return true
 				}
