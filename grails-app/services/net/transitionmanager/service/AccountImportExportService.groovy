@@ -997,7 +997,7 @@ class AccountImportExportService implements ServiceMethods {
 			} else if (accounts[i].flags.isNewAccount) {
 				icon = 'add.png'
 			}
-			accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
+			accounts[i].icon = HtmlUtil.resource([dir: 'assets/icons', file: icon, absolute: false])
 		}
 	}
 
