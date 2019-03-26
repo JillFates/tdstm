@@ -549,6 +549,7 @@ class ImportService implements ServiceMethods {
 				GormUtil.setSessionFlushMode FlushMode.COMMIT
 
 				errorMsg = validateImportBatchCanBeProcessed(projectId, userLoginId, batchId, progressKey)
+
 				if (errorMsg) {
 					break
 				}
@@ -572,7 +573,8 @@ class ImportService implements ServiceMethods {
 
 						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat)
 						errorMsg = results.error
-						dtb = dtb.merge()
+						dtb = DataTransferBatch.get(batchId)
+
 						if (errorMsg) {
 							dtb.statusCode = DataTransferBatch.PENDING
 							dtb.importResults = combineDataTransferBatchImportResults(dtb, errorMsg)

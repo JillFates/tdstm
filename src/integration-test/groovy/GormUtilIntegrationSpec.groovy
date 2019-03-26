@@ -1,6 +1,7 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.test.TestDomain
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.gorm.validation.ConstrainedProperty
@@ -401,38 +402,38 @@ class GormUtilIntegrationSpec extends Specification {
 
 	}
 
-	/*
+
 	void '19. testGetDomainPropertiesWithConstraint'() {
 
 		def list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable', true).sort()
-		assertEquals 'Test "nullable" for true', ['age', 'label'], list
+		['age', 'label'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable', false).sort()
-		assertEquals 'Test "nullable" for false', ['color', 'name', 'note', 'score'], list
+		['color', 'name', 'note', 'score'] == list
 
 		// nullable is always set regardless
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable').sort()
-		assertEquals 'Test "nullable" for null', ['age', 'color', 'label', 'name', 'note', 'score'], list
+		['age', 'color', 'label', 'name', 'note', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank', true).sort()
-		assertEquals 'Test "blank" for true', ['color', 'label', 'note'], list
+		['color', 'label', 'note'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank', false).sort()
-		assertEquals 'Test "blank" for false', ['age', 'name', 'score'], list
+		['age', 'name', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank').sort()
-		assertEquals 'Test "blank" for null', ['age', 'color', 'label', 'name', 'note', 'score'], list
+		['age', 'color', 'label', 'name', 'note', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (1..5) ).sort()
-		assertEquals 'Test "range" matching', ['score'], list
+		['score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (2..4) )
-		assertEquals 'Test "range" no matching', [], list
+		[] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range').sort()
-		assertEquals 'Test "range" for null', ['score'], list
+		['score'] == list
 
 		//
 		// inList functionality doesn't work presently
@@ -450,7 +451,7 @@ class GormUtilIntegrationSpec extends Specification {
 			// note
 			// score inList:[1,2,3,4,5]
 	}
-
+/*
 	// tests the GormUtil.flushAndClearSession and mergeWithSession functionality
 	void '20. testFlushAndClearSession()'' {
 		def session = sessionFactory.getCurrentSession()
