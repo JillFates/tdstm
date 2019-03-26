@@ -549,6 +549,7 @@ class ImportService implements ServiceMethods {
 				GormUtil.setSessionFlushMode FlushMode.COMMIT
 
 				errorMsg = validateImportBatchCanBeProcessed(projectId, userLoginId, batchId, progressKey)
+
 				if (errorMsg) {
 					break
 				}
@@ -559,6 +560,8 @@ class ImportService implements ServiceMethods {
 
 					// Update the batch status to POSTING
 					dtb.statusCode = DataTransferBatch.POSTING
+
+					//TODO This doesn't make sense if failOnError is true, then the error message would never be reached...
 					if (!dtb.save(flush:true, failOnError:true)) {
 						errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
 					}
@@ -572,7 +575,8 @@ class ImportService implements ServiceMethods {
 
 						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat)
 						errorMsg = results.error
-						dtb = dtb.merge()
+						dtb = DataTransferBatch.get(batchId)
+
 						if (errorMsg) {
 							dtb.statusCode = DataTransferBatch.PENDING
 							dtb.importResults = combineDataTransferBatchImportResults(dtb, errorMsg)
@@ -581,6 +585,7 @@ class ImportService implements ServiceMethods {
 							dtb.importResults = combineDataTransferBatchImportResults(dtb, results.info)
 							results.batchStatusCode = DataTransferBatch.COMPLETED
 						}
+
 						if (!dtb.validate() || !dtb.save(flush:true)) {
 							errorMsg = "Unable to import assets: ${GormUtil.allErrorsString(dtb)}"
 							log.error(errorMsg)
