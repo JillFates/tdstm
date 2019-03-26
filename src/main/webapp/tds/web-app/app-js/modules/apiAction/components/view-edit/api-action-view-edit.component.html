@@ -1175,35 +1175,35 @@
 			</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button"
-		        tabindex="20"
-		        *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left"
-		        [disabled]="!canSave()">
-			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button"
-		        tabindex="21"
-		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
-			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
-		<button type="button"
-		        tabindex="22"
-		        *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
-			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button type="button"
-		        tabindex="23"
-		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
-			<span class="fa fa-fw fa-trash"></span> Delete</button>
+		<tds-button-save *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE"
+		                 (click)="onSaveApiAction()" [disabled]="!canSave()"
+		                 tabindex="20" class="btn-primary pull-left">
+		</tds-button-save>
 
-		<button (click)="cancelCloseDialog()"
-		        tabindex="24"
-		        type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">
-				{{'GLOBAL.CLOSE' | translate }}
-			</span>
-			<span *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())">
-				<span>{{'GLOBAL.CANCEL' | translate }}</span>
-			</span>
-		</button>
+		<tds-button-custom
+		        tabindex="21"
+		        [icon]="'thumbs-o-up'"
+		        [title]="'Check Syntax'"
+		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)"
+		        (click)="onCheckAllSyntax()" class="btn-primary pull-left">
+		</tds-button-custom>
+
+		<tds-button-edit *ngIf="modalType === actionTypes.VIEW"
+		                 (click)="changeToEditApiAction()"
+		                 tabindex="22" class="btn-primary pull-left">
+		</tds-button-edit>
+
+		<tds-button-delete
+		        tabindex="23"
+		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn-danger">
+		</tds-button-delete>
+
+		<tds-button-close *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())"
+		                  (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
+		</tds-button-close>
+
+		<tds-button-cancel *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())"
+		                  (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
+		</tds-button-cancel>
 	</div>
 </div>
