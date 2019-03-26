@@ -102,6 +102,7 @@ class MoveEventService implements ServiceMethods {
 			videolink: event.videolink,
 			newsBarMode: event.newsBarMode,
 			estStartTime: event.estStartTime,
+			estCompletionTime: event.estCompletionTime,
 			apiActionBypass: event.apiActionBypass
 		)
 
