@@ -12,13 +12,13 @@ export class APIActionColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 106,
+				width: 70,
 				locked: true
 			}, {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
-				width: 150,
+				width: 186,
 				locked: true
 			}, {
 				label: 'Provider',
