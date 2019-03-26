@@ -245,11 +245,13 @@ class ModelController implements ControllerMethods {
 			} else {
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
 				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
 
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+
 				render(view: view, model: paramsMap)
 			}
 		} else {
@@ -388,17 +390,17 @@ class ModelController implements ControllerMethods {
 						if (params.redirectTo == "assetAudit") {
 							render(template: "modelAuditView", model: [modelInstance: modelInstance])
 						} else {
-							forward(action: "show", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+							forward(action: "show", params: [id: modelInstance.id])
 						}
 					} else {
 						modelInstance.errors.allErrors.each { log.error it }
 						flash.message = "Unable to update model."
-						forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+						forward(action: "edit", params: [id: modelInstance.id])
 					}
 				} catch (ServiceException e) {
 					//log.error(e.message, e)
 					flash.message = e.message
-					forward(action: "edit", params: [id: modelInstance.id, redirectTo: params.redirectTo])
+					forward(action: "edit", params: [id: modelInstance.id])
 				}
 			} else {
 				flash.message = "Model not found with Id ${params.id}"
