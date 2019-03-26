@@ -651,7 +651,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param minimalInfo - flag that indicates that only the id and the name are required.
 	 * @return
 	 */
-	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
+	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = true) {
 		Map<String, Object> apiActionMap = null
 		// Load just the minimal or all by setting properties to null
 		List<String> properties = minimalInfo ? ['id', 'name', 'actionType', 'isRemote'] : []
