@@ -544,7 +544,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.contexts.validateCurrentSelection = function(){
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
-			if(scope.contexts.selectedEvent || scope.contexts.assetSelector && scope.contexts.assetSelector.tag.length > 0){
+			if(scope.contexts.selectedEvent || scope.contexts.assetSelector && scope.contexts.assetSelector.tag && scope.contexts.assetSelector.tag.length > 0){
 				log.log('matches event or tag');
 				return true;
 			}else{

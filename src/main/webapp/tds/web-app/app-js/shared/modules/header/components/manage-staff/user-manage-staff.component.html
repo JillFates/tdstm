@@ -187,7 +187,7 @@
                         <span class="fa fa-fw fa-floppy-o"></span>
                         <span>Update</span>
                     </button>
-                    <button (click)="handleCancelButton()" class="btn btn-default" role="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                    <button (click)="handleCancelButton()" class="btn btn-default" role="button"><span class="glyphicon glyphicon-ban-circle"></span> {{editing ? 'Cancel' : 'Close'}}</button>
                 </div>
             </div>
         </div>

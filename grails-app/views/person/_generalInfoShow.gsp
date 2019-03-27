@@ -29,7 +29,7 @@
 									<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60" />
 								</g:if>
 								<g:else>
-									<img src="${person.personImageURL}" height="60" width="60" />
+									<img src="${person.personImageURL}" onError="this.onerror=null;this.src='../../images/blankPerson.jpg'" height="60" width="60" />
 								</g:else>
 							</td>
 						</tr>
