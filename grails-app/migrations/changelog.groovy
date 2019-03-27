@@ -1,5 +1,3 @@
-import version.*
-
 databaseChangeLog = {
 	include file: '20180508-add-asset-class-to-transferbatch.groovy'
 	include file: '20180508-migrate-and-remove-eav.groovy'
@@ -50,4 +48,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_1/20190107-add-and-modify-domain-constraints.groovy'
 	include file: 'version/v4_6_2/2018-tmr-task-api-action-changes.groovy'
 	include file: 'version/v4_7_0/20181219-Updating-role-prefix.groovy'
+	include file: 'version/v4_7_0/20190326-Updating-recipe-size.groovy'
 }
