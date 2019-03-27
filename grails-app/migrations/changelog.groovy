@@ -157,7 +157,7 @@ databaseChangeLog = {
 	include file: '20160909-add-duration-locked-to-tasks.groovy'
 	include file: '20161006-update-user-preference-code-legendTwistieState.groovy'
 	// include file: '20161010-notice-support.groovy'
-	include file: '20161010-notice-support-change-noticetype-column.groovy'
+	// include file: '20161010-notice-support-change-noticetype-column.groovy'
 	include file: '20161111-delete-asset-dependency-orphans.groovy'
 	include file: '20161129-fix-license-columns.groovy'
 	include file: '20161207-add-owner-to-license-table.groovy'
@@ -295,4 +295,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_1/20190107-add-and-modify-domain-constraints.groovy'
 
 	include file: 'version/v4_6_2/2018-tmr-task-api-action-changes.groovy'
+	include file: 'version/v4_6_2/20190311-eula-notifications-mandatory-acknowledgements-changes.groovy'
 }
