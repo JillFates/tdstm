@@ -20,9 +20,9 @@
 						(pageChange)="pageChange($event)"
 						[rowSelected]="isRowSelected">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<tds-button-add [id]="'btnCreateDataScript'" class="button-create-data-script" 
+						<tds-button-create [id]="'btnCreateDataScript'" class="button-create-data-script" 
 							[title]="'DATA_INGESTION.CREATE_ETL_SCRIPT' | translate" (click)="onCreateDataScript()">
-						</tds-button-add>
+						</tds-button-create>
 						<div (click)="reloadDataScripts()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
 
