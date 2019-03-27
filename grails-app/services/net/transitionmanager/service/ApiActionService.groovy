@@ -654,8 +654,6 @@ class ApiActionService implements ServiceMethods {
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap
 
-	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = true) {
-		Map<String, Object> apiActionMap = null
 		// Load just the minimal or all by setting properties to null
 		List<String> properties
 		if (minimalInfo) {
