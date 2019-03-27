@@ -37,8 +37,10 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[id]="id"
 			[title]="tooltip || button.tooltip || titleButton"
 			[ngClass]="buttonClasses">
-				<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
-				<span class="title">{{titleButton}}</span>
+				<div class="tds-action-button-container">
+					<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
+					<span class="title">{{titleButton}}</span>
+				</div>
 				<ng-content></ng-content>
 		</button>
 	`,

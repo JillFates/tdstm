@@ -15,11 +15,11 @@ export class ButtonsFactoryService {
 			.subscribe((permissions: any) => this.permissions = permissions);
 
 		this.registeredButtons = {
-			['tds-button-add']: { icon: 'plus-circle', title: translate('GLOBAL.ADD') },
+			['tds-button-add']: { icon: 'plus', title: translate('GLOBAL.ADD'), tooltip: translate('GLOBAL.ADD') },
 			['tds-button-cancel']: { icon: 'ban', title: translate('GLOBAL.CANCEL'), tooltip: translate('GLOBAL.CANCEL') },
 			['tds-button-clone']: { icon: 'clone', title: translate('GLOBAL.CLONE'), tooltip: translate('GLOBAL.CLONE') },
 			['tds-button-close']: { icon: 'ban', title: translate('GLOBAL.CLOSE'), tooltip: translate('GLOBAL.CLOSE') },
-			['tds-button-create']: { icon: 'plus-square', title: translate('GLOBAL.CREATE'), tooltip: translate('GLOBAL.CREATE') },
+			['tds-button-create']: { icon: 'plus', title: translate('GLOBAL.CREATE'), tooltip: translate('GLOBAL.CREATE') },
 			['tds-button-custom']: { icon: '', title: '', tooltip: '' },
 			['tds-button-delete']: { icon: 'trash', title: translate('GLOBAL.DELETE'), tooltip: translate('GLOBAL.DELETE') },
 			['tds-button-edit']: { icon: 'pencil', title: translate('GLOBAL.EDIT'), tooltip: translate('GLOBAL.EDIT') },
