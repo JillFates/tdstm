@@ -54,6 +54,8 @@ class Notice {
 	Date dateCreated
 	Date lastModified
 
+	static hasMany = [noticeAcknowledgements: NoticeAcknowledgement]
+
 	static constraints = {
 		activationDate nullable: true
 		expirationDate nullable: true
@@ -83,7 +85,7 @@ class Notice {
 	}
 
 	private static final Map<String, Class> MARSHALLER_TYPES = [
-		acknowledgeable: Object,
+		needAcknowledgement: Object,
 		active:          Object,
 		createdBy:       Person,
 		dateCreated:     Object,
