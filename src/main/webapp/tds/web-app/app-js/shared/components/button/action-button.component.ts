@@ -26,7 +26,9 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-delete,
 		tds-button-edit,
 		tds-button-export,
-		tds-button-save
+		tds-button-filter,
+		tds-button-save,
+		tds-button-undo
 	`,
 	template: `
 		<button *ngIf="button"

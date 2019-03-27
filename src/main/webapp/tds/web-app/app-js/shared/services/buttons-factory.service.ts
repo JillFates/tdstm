@@ -24,7 +24,9 @@ export class ButtonsFactoryService {
 			['tds-button-delete']: { icon: 'trash', title: translate('GLOBAL.DELETE'), tooltip: translate('GLOBAL.DELETE') },
 			['tds-button-edit']: { icon: 'pencil', title: translate('GLOBAL.EDIT'), tooltip: translate('GLOBAL.EDIT') },
 			['tds-button-export'] : { icon: 'download', title: translate('GLOBAL.EXPORT'), tooltip: translate('GLOBAL.EXPORT') },
-			['tds-button-save']: { icon: 'floppy-o', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE') }
+			['tds-button-filter'] : { icon: 'filter', title: translate('GLOBAL.FILTER'), tooltip: translate('GLOBAL.FILTER') },
+			['tds-button-save']: { icon: 'floppy-o', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE') },
+			['tds-button-undo']: { icon: 'undo', title: translate('GLOBAL.UNDO'), tooltip: translate('GLOBAL.UNDO') }
 		};
 	}
 
