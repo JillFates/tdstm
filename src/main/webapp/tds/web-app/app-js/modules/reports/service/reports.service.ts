@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {catchError, map} from 'rxjs/operators';
 
 /**
  * @name ReportsService
@@ -12,7 +13,8 @@ import 'rxjs/add/operator/catch';
 export class ReportsService {
 
 	// private instance variable to hold base url
-	private baseURL = '/tdstm';
+	private readonly baseURL = '/tdstm';
+	private readonly EVENT_LIST_URL = `${this.baseURL}/ws/event`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -21,6 +23,7 @@ export class ReportsService {
 	/**
 	 * Get events list
 	 * @returns {Observable<any>}
+	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
 	getEvents(): Observable<any[]> {
 		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
@@ -29,6 +32,15 @@ export class ReportsService {
 
 			})
 			.catch((error: any) => error);
+	}
+
+	getEventList(): Observable<any> {
+		return this.http.get(this.EVENT_LIST_URL).pipe(
+			catchError( error => {
+				console.error(error);
+				return error;
+			})
+		);
 	}
 
 	/**
