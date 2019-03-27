@@ -211,13 +211,12 @@
         </div>
         <span>|</span>
         # if(importResults){ #
-            <a href="\\#" data-link="#:contextPath#/dataTransferBatch/importResults/#:batchId#" title="View Log" class="lnkViewLog"><g:img uri="${resource(dir:'icons',file:'script_error.png')}" width="16" height="16" alt="View Log"/></a> |
+            <a href="\\#" data-link="#:contextPath#/dataTransferBatch/importResults/#:batchId#" title="View Log" class="lnkViewLog"><g:img uri="${resource(dir:'assets/icons',file:'script_error.png')}" width="16" height="16" alt="View Log"/></a> |
         # } else { #
             <div style="display:inline-block;width:16px;text-align: center;">-</div>
         # } #
         <a href="#:contextPath#/dataTransferBatch/delete?batchId=#:batchId#" title="Delete Batch">
-            %{--TODO what is this?--}%
-            <img src="#:contextPath#/static/icons/delete.png" width="16" height="16" alt="Delete Batch">
+            <g:img uri="${resource(dir:'assets/icons',file:'delete.png')}" width="16" height="16" alt="Delete Batch"/>
         </a>
     </script>
     <script type="text/javascript">
