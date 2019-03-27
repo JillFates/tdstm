@@ -1,3 +1,5 @@
+package test.helper
+
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
