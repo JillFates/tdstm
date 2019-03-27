@@ -1,3 +1,4 @@
+import com.tdsops.common.security.SecurityUtil
 import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
@@ -121,6 +122,19 @@ class WsNoticeController implements ControllerMethods {
 		catch (e) {
 			renderError500 e
 		}
+	}
+
+	/**
+	 * Fetch a list of person post notices that has not been acknowledged
+	 */
+	@HasPermission(Permission.NoticeView)
+	def fetchPostLoginNotices() {
+		def result = [
+				notices: noticeService.fetchPersonPostLoginNotices(currentPerson()),
+				redirectUri: session[SecurityUtil.REDIRECT_URI]
+		]
+
+		renderSuccessJson(result)
 	}
 
 	private void renderError500(Exception e) {

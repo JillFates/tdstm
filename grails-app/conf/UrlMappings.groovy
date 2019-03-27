@@ -602,6 +602,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/notice/fetchPostNotices" {
+			controller = "wsNotice"
+			action = [
+					GET: "fetchPostLoginNotices"
+			]
+		}
+
 		///// LICENSES Admin API (Client Side) /////////
 
 		"/ws/license" {
