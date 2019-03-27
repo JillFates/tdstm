@@ -19,6 +19,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
@@ -1128,6 +1129,14 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Scale Options.
+	 * @return the values
+	 */
+	List<String> getScaleOptions() {
+		return SizeScale.getLabels()
+	}
+
+	/**
 	 * Get dependent assets of an asset
 	 * @param AssetEntity - the asset that we're finding the dependent assets
 	 * @return List of Assets
@@ -1413,6 +1422,7 @@ class AssetEntityService implements ServiceMethods {
 			environmentOptions: getAssetEnvironmentOptions(),
 			moveBundleList: 	assetService.getMoveBundleOptions(project),
 			planStatusOptions: 	getAssetPlanStatusOptions(),
+			scaleOptions: 		getScaleOptions(),
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),
@@ -3081,6 +3091,7 @@ class AssetEntityService implements ServiceMethods {
 
 		// add the list values needed to render this controls as regular control from ControlAngularTab lib
 		commonModel.standardFieldSpecs.environment.constraints.put('values', getAssetEnvironmentOptions())
+	//	commonModel.standardFieldSpecs.scale.constraints.put('values', SizeScale.values())
 
 		return commonModel
 	}
