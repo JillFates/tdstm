@@ -4,7 +4,7 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.NoticeAcknowledgment
+import net.transitionmanager.domain.NoticeAcknowledgement
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.springframework.context.MessageSource
@@ -38,7 +38,7 @@ class NoticeService implements ServiceMethods {
 			return false
 		}
 
-		NoticeAcknowledgment notack = new NoticeAcknowledgment(notice: notice, person: person)
+		NoticeAcknowledgement notack = new NoticeAcknowledgement(notice: notice, person: person)
 		notack.save()
 
 		return !notack.hasErrors()

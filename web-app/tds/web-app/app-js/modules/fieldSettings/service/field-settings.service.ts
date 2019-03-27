@@ -75,12 +75,13 @@ export class FieldSettingsService {
 	 * 	  e.g. 	label: "Last Modified or last modified or LastModified".
 	 * 	  		other label: "Last Modified".
 	 * 	  		This comparisons will error.
-	 * NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
-	 * when the label compares to itself.
 	 *
 	 * @param The label string to be compared with the list of existing labels.
+	 * @param The list of fields.
 	 */
 	conflictsWithAnotherLabel(label: string, fields: any): boolean {
+		// NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
+		// when the label compares to itself.
 		return fields.filter(
 		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
 	}
@@ -92,13 +93,12 @@ export class FieldSettingsService {
 	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
 	 * 	  e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
 	 * @param  The label string to be compared with the list of existing field names.
+	 * @param The list of fields.
 	 */
-	conflictsWithAnotherFieldName(field: any, fields: any): boolean {
-		const label = field && field.label || '';
-		return fields.some(
-				item => !equals(field, item) && item.field.replace(/\s/g, '')
-					.toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
-		);
+	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
+		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
+		return fields.filter(
+				item => item.field.toLowerCase().trim() === cleanLabel).length > 0;
 	}
 
 	/**
@@ -113,21 +113,32 @@ export class FieldSettingsService {
 	 */
 	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any): boolean {
 		let conflicts = [];
-		// We are going to find conflicts in other domains, so first remove the origin domain from the list of domains
-		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain)
-		for (let domain of filteredDomains) {
-			let fields = domain.fields;
-			let x = 0;
-			if (field.shared === 1) {
-				conflicts = fields.filter(
-					item => item.label.replace(/\s/g, '').toLowerCase().trim() === field.label.replace(/\s/g, '').toLowerCase().trim().length > 0 ||
-						this.conflictsWithAnotherFieldName(field.label, fields));
+		// We are going to find conflicts in the other domains,
+		// so first remove the origin domain (the domain to which 'field' belongs) from the list of domains
+		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain);
+		// The whole logic should only be computed if the field is shared
+		if (field.shared === true) {
+			// Get the label from 'field' (convert to lower case and trim spaces )
+			let fieldLabel = field.label.replace(/\s/g, '').toLowerCase().trim();
+			for (let domain of filteredDomains) {
+				// get all fields from this domain
+				let fields = domain.fields;
+				// As 'field' is also in the list of domains of every other domain,
+				// first remove it from the list of fields to be checked against
+				const filteredFields = fields.filter((field) => {
+					return !(field instanceof FieldSettingsModel);
+				});
+				// Finally check if 'field' has any conflicts
+				conflicts = filteredFields.filter(item => {
+					let itemLabel = item.label.replace(/\s/g, '').toLowerCase().trim();
+					// validate conflicts between field, and labels and field names in the domain
+					return itemLabel === fieldLabel || this.conflictsWithAnotherFieldName(field.label, fields);
+				});
 				if (conflicts.length > 0) {
 					return true;
 				}
 			}
-		}
-		;
+		};
 		return false;
 	}
 

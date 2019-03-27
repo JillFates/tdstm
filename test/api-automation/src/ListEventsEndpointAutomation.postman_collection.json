@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "dd0943d5-63a3-4b96-a77d-6066ed9a6827",
+		"_postman_id": "dd687729-b6a3-4951-be06-78f8d13d6277",
 		"name": "ListEvents",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "TranMan Login 01",
+			"name": "Login - List Events",
 			"event": [
 				{
 					"listen": "test",
@@ -98,7 +98,6 @@
 							"",
 							"",
 							"pm.test(\"Project accessible to the user are listed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Jack Wolfskin\");",
 							"    pm.expect(pm.response.text()).to.include(\"TM-Demo\");",
 							"    pm.expect(pm.response.text()).to.include(\"TM DEFAULT PROJECT\");",
 							"});",
@@ -209,7 +208,8 @@
 						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
 						"exec": [
 							"pm.test(\"Changed to first list project\", function () {",
-							"pm.expect(pm.response.text()).to.include(\"Jack\");",
+							"let pName = pm.variables.get(\"firstProjName\")",
+							"pm.expect(pm.response.text()).to.include(pName);",
 							"});",
 							""
 						],
@@ -265,7 +265,10 @@
 						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signOut",
 					"host": [
@@ -362,11 +365,7 @@
 							"pm.test(\"Success\", function () {",
 							"pm.expect(pm.response.text()).to.include(\"success\");",
 							"});",
-							"",
-							"pm.test(\"Default is always TM Demo and its events are listed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"1st Event\");",
-							"",
-							"});"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -529,7 +528,10 @@
 						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signOut",
 					"host": [
@@ -570,9 +572,9 @@
 	],
 	"variable": [
 		{
-			"id": "c28a453d-99d2-4325-9558-fc8c0f2ea7d0",
+			"id": "1f4c8390-4bb5-4a86-90e6-b28655acbae1",
 			"key": "tmDemoID",
-			"value": "",
+			"value": "2445",
 			"type": "string"
 		}
 	]
