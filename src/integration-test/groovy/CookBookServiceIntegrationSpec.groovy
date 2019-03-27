@@ -42,9 +42,9 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void setup() {
 		projectTestHelper = new test.helper.ProjectTestHelper()
 		project = projectTestHelper.createProject()
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true)
 
 
 		cookbookService.securityService = [
@@ -64,7 +64,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test recipe full context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
+			existingRecipe.save()
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1, tag: [tag1.id, tag2.id])
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
@@ -81,7 +81,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test recipe ANY context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
+			existingRecipe.save()
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1, tag: [tag1.id, tag2.id], tagMatch: "ANY")
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
@@ -98,7 +98,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test recipe event context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
+			existingRecipe.save(flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1)
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
@@ -111,7 +111,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test recipe tag context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
+			existingRecipe.save(flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(tag: [tag1.id, tag2.id])
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
@@ -129,7 +129,7 @@ class CookBookServiceIntegrationSpec extends Specification{
 	void 'Test delete recipe context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"tagMatch":"ANY","tag":[]}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
+			existingRecipe.save(flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			cookbookService.deleteRecipeContext(existingRecipe.id)
 			Recipe recipe = Recipe.get(existingRecipe.id)
@@ -144,8 +144,8 @@ class CookBookServiceIntegrationSpec extends Specification{
 			Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			//Person adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"tagMatch":"ANY","tag":[]}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
-			new RecipeVersion(recipe: existingRecipe, createdBy: adminPerson).save(failOnError: true, flush: true)
+			existingRecipe.save(flush: true)
+			new RecipeVersion(recipe: existingRecipe, createdBy: adminPerson).save(flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			Map recipe = cookbookService.getRecipe(existingRecipe.id, 0)
 

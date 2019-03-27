@@ -180,10 +180,10 @@ class CookbookService implements ServiceMethods {
 			context: context,
 			project: project,
 			archived: false
-		).save(flush:true, failOnError: true)
+		).save(flush:true)
 
 		new RecipeVersion(sourceCode: sourceCode, changelog: changelog, clonedFrom: recipeVersion,
-				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save(failOnError: true)
+				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save()
 	}
 
 	/**
@@ -210,12 +210,12 @@ class CookbookService implements ServiceMethods {
 		}
 
 		recipe.releasedVersion=null
-		recipe.save(flush:true, failOnError:true)
+		recipe.save(flush:true)
 
 		// Remove all versions of the recipes
 		RecipeVersion.executeUpdate('delete RecipeVersion rv where rv.recipe=:recipe', [recipe:recipe])
 
-		recipe.delete(failOnError: true)
+		recipe.delete()
 
 		return recipe
 	}
@@ -329,7 +329,7 @@ class CookbookService implements ServiceMethods {
 		wip.sourceCode = sourceCode
 		wip.changelog = changelog
 
-		wip.save(failOnError: true)
+		wip.save()
 
 		return wip
 	}
@@ -362,7 +362,7 @@ class CookbookService implements ServiceMethods {
 		wip.versionNumber = max + 1
 		wip.recipe.releasedVersion = wip
 
-		wip.save(failOnError: true)
+		wip.save()
 	}
 
 	/**
@@ -390,7 +390,7 @@ class CookbookService implements ServiceMethods {
 
 		recipe.releasedVersion = recipeVersion
 
-		if (! recipe.save()) {
+		if (! recipe.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to save change', recipe)
 		}
 
@@ -1435,7 +1435,7 @@ class CookbookService implements ServiceMethods {
 
 		recipe.context = JsonUtil.convertMapToJsonString(context)
 
-		recipe.save(flush:true, failOnError: true)
+		recipe.save(flush:true)
 	}
 
 	void deleteRecipeContext(Long recipeId) {
@@ -1446,7 +1446,7 @@ class CookbookService implements ServiceMethods {
 		assertProject(recipe, project)
 		recipe.context = null
 
-		recipe.save(flush:true, failOnError: true)
+		recipe.save(flush:true)
 	}
 
 	private void assertProject(Recipe recipe, Project project) {

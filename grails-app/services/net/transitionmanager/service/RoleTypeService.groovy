@@ -74,7 +74,7 @@ class RoleTypeService implements ServiceMethods {
 		RoleType roleTypeInstance = getById(roleTypeCommand.id, true)
 		roleTypeCommand.populateDomain(roleTypeInstance, false, ['type', 'code'])
 
-		if (roleTypeInstance.hasErrors() || !roleTypeInstance.save()) {
+		if (!roleTypeInstance.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to update role type ' + GormUtil.allErrorsString(roleTypeInstance))
 		}
 		return roleTypeInstance
@@ -91,7 +91,7 @@ class RoleTypeService implements ServiceMethods {
 		RoleType roleTypeInstance = new RoleType()
 		roleTypeCommand.populateDomain(roleTypeInstance)
 
-		if (roleTypeInstance.hasErrors() || !roleTypeInstance.save()) {
+		if (!roleTypeInstance.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to update role type ' + GormUtil.allErrorsString(roleTypeInstance))
 		}
 		return roleTypeInstance

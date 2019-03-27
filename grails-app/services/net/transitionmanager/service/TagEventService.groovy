@@ -62,12 +62,12 @@ class TagEventService implements ServiceMethods {
 
 			TagEvent tagEvent = new TagEvent(tag: tag, event: event)
 			event.refresh()
-			return tagEvent.save(failOnError: true)
+			return tagEvent.save()
 		}
 
 		// Bump the last updated date for the given asset.
 		event.lastUpdated = TimeUtil.nowGMT()
-		event.save(failOnError: true)
+		event.save()
 
 		return tagEvents
 	}

@@ -80,7 +80,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			Integer progress = 50
 			batch.processLastUpdated = lastUpdated
 			batch.processProgress = progress
-			batch.save(failOnError: true)
+			batch.save()
 			progressInfo = importBatchService.getImportBatchInfo(project, batch.id, info)
 		then: 'the progress info was updated with the new values'
 			progressInfo[progressKey] == progress

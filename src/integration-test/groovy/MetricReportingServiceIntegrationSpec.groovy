@@ -141,24 +141,24 @@ class MetricReportingServiceIntegrationSpec extends Specification {
 
 		device.assetType = 'Server'
 		device.validation = ValidationType.PLAN_READY
-		device.save(flush: true, failOnError: true)
+		device.save(flush: true)
 
 		device2.assetType = 'Server'
 		device2.validation = ValidationType.UNKNOWN
-		device2.save(flush: true, failOnError: true)
+		device2.save(flush: true)
 
 		moveBundle2.useForPlanning = 0
-		moveBundle2.save(flush: true, failOnError: true)
+		moveBundle2.save(flush: true)
 
 		// Create a second project with a device with the same name and type as device above
 		otherProjectDevice.assetName = device.assetName
 		otherProjectDevice.assetType = device.assetType
 		otherProjectDevice.validation = ValidationType.UNKNOWN
-		otherProjectDevice.save(flush: true, failOnError: true)
+		otherProjectDevice.save(flush: true)
 
-		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true)
+		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true)
+		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true)
 	}
 
 	void "test gatherMetric for query mode"() {
@@ -422,15 +422,15 @@ class MetricReportingServiceIntegrationSpec extends Specification {
 
 			project1.collectMetrics = 1
 			project1.startDate = new Date() - 5
-			project1.save(flush: true, failOnError: true)
+			project1.save(flush: true)
 
 			project2.collectMetrics = 1
 			project2.startDate = project2.startDate + 5
-			project2.save(flush: true, failOnError: true)
+			project2.save(flush: true)
 
 			project3.collectMetrics = 1
 			project3.completionDate = new Date() - 1
-			project3.save(flush: true, failOnError: true)
+			project3.save(flush: true)
 
 		when: 'projectIdsForMetrics() is run'
 			List<Long> projectIds = metricReportingService.projectIdsForMetrics()

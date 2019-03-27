@@ -20,7 +20,7 @@ class DataviewTestHelper {
         dataview.isSystem = true
         dataview.isShared = true
         dataview.reportSchema = '{reportSchema}'
-        dataview.save(flush: true, failOnError: true)
+        dataview.save(flush: true)
         return dataview
     }
 

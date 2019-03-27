@@ -18,7 +18,6 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.UserLoginProjectAccess
@@ -26,7 +25,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.user.UserContext
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
-
 /**
  * Methods to manage UserLogin domain.
  * @author jmartin
@@ -146,7 +144,7 @@ class UserService implements ServiceMethods {
 				workPhone: userInfo.telephone,
 				mobilePhone: userInfo.mobile
 			)
-			if (!person.save(flush:true)) {
+			if (!person.save(flush:true, failOnError: false)) {
 				log.error "$mn Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
 				throw new RuntimeException('Data error while creating Person object')
 			}
@@ -171,7 +169,7 @@ class UserService implements ServiceMethods {
 
 				if (person.isDirty()) {
 					log.debug "$mn Updating existing person record : $person.dirtyPropertyNames"
-					if (!person.save(flush:true)) {
+					if (!person.save(flush:true, failOnError: false)) {
 						log.error "$mn Failed updating Person ($person) due to ${GormUtil.allErrorsString(person)}"
 						throw new DomainUpdateException("Unexpected error while updating Person object")
 					}
@@ -215,7 +213,7 @@ class UserService implements ServiceMethods {
 
 		if (createUser || userLogin.isDirty()) {
 			log.debug "findOrProvisionUser: Persisting UserLogin : $userLogin.dirtyPropertyNames"
-			if (!userLogin.save(flush:true)) {
+			if (!userLogin.save(flush:true, failOnError: false)) {
 				def action = createUser ? 'creating' : 'updating'
 				log.error "findOrProvisionUser: Failed $action UserLogin failed due to ${GormUtil.allErrorsString(userLogin)}"
 				throw new RuntimeException("Unexpected error while $action UserLogin object")
@@ -239,7 +237,7 @@ class UserService implements ServiceMethods {
 					throw new ConfigurationException("Configuration security property domains.${authority}.roleMap[$r] is an invalid code")
 				}
 				def pr = new PartyRole(party: person, roleType: rt)
-				if (!pr.save(flush:true)) {
+				if (!pr.save(flush:true, failOnError: false)) {
 					log.error "$mn Unable to add new role for person ${GormUtil.allErrorsString(userLogin)}"
 					throw new RuntimeException("Unexpected error while assigning security role")
 				}
@@ -272,7 +270,7 @@ class UserService implements ServiceMethods {
 						log.debug "$mn Assigning new security role $nr for $personIdentifier"
 
 						def pr = new PartyRole(party: person, roleType: RoleType.load(nr))
-						if (!pr.save(flush:true)) {
+						if (!pr.save(flush:true, failOnError: false)) {
 							log.error "$mn Unable to update new role for person ${GormUtil.allErrorsString(userLogin)}"
 							throw new RuntimeException("Unexpected error while assigning security role")
 						}
@@ -715,7 +713,7 @@ class UserService implements ServiceMethods {
 					project: project,
 					date: date
 			)
-			userLoginProjectAccess.save(failOnError: true)
+			userLoginProjectAccess.save()
 		}
 	}
 

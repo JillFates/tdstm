@@ -413,7 +413,7 @@ class ApiActionService implements ServiceMethods {
 		// Populate the apiAction with the properties from the command object
 		apiActionCommand.populateDomain(apiAction, false, ['constraintsMap'])
 
-		apiAction.save(failOnError: true)
+		apiAction.save()
 
 		return apiAction
 	}

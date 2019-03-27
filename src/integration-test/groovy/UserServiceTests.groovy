@@ -19,13 +19,13 @@ class UserServiceTests extends Specification {
 
     private UserLogin createUserAccount(String username = null, Date createdDate = null, Date lastLogin = null) {
         Date now = TimeUtil.nowGMT()
-        Person person = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save(failOnError: true)
+        Person person = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save()
         UserLogin userLogin = new UserLogin(username: username ?: 'bendover', password: 'guessit', person: person, active: 'Y',
                 createdDate: createdDate,
                 expiryDate: now + 1,
                 lastLogin: lastLogin,
                 lockedOutUntil: null
-        ).save(failOnError: true)
+        ).save()
         return userLogin
     }
 

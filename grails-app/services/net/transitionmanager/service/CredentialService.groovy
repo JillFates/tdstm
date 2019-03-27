@@ -68,7 +68,7 @@ class CredentialService implements ServiceMethods {
 
         credentialInstance.project = project
 
-        credentialInstance.save(failOnError: true)
+        credentialInstance.save()
 
         return credentialInstance
     }
@@ -94,7 +94,7 @@ class CredentialService implements ServiceMethods {
 
         setEncryptedPassword(domain, command.password)
 
-        domain.save(failOnError: true)
+        domain.save()
 
         return domain
     }

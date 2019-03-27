@@ -79,7 +79,7 @@ class ApiCatalogService implements ServiceMethods {
 		}
 
 		// save or update api catalog
-		apiCatalog.save(failOnError: true)
+		apiCatalog.save()
 
 		return apiCatalog
 	}

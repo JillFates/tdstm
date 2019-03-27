@@ -40,27 +40,27 @@ class DeviceUtilsIntegrationSpec extends Specification{
 			project = projectTestHelper.createProject()
 			moveBundle = bundleHelper.createBundle(project)
 
-			Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true, failOnError: true)
-			Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true, failOnError: true)
+			Room room1 = new Room(project: project, location: 'Location 1', roomName: 'Room 1', source: 1).save(flush: true)
+			Room room2 = new Room(project: project, location: 'Location 2', roomName: 'Room 2', source: 0).save(flush: true)
 
-			Manufacturer manufacturer1 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
-			Manufacturer manufacturer2 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true, failOnError: true)
+			Manufacturer manufacturer1 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true)
+			Manufacturer manufacturer2 = new Manufacturer(project: project, name: RandomStringUtils.randomAlphabetic(10)).save(flush: true)
 
-			Model model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true, failOnError: true)
-			Model model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true, failOnError: true)
-			Model model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true, failOnError: true)
-			Model model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true, failOnError: true)
+			Model model1 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Rack', modelName: 'Model 1').save(flush: true)
+			Model model2 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Rack', modelName: 'Model 2').save(flush: true)
+			Model model3 = new Model(project: project, manufacturer: manufacturer1, assetType: 'Chassis', modelName: 'Model 3').save(flush: true)
+			Model model4 = new Model(project: project, manufacturer: manufacturer2, assetType: 'Blade Chassis', modelName: 'Model 4').save(flush: true)
 
-			Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true, failOnError: true)
-			Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true, failOnError: true)
+			Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true)
+			Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true)
 
-			AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true, failOnError: true)
-			AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true, failOnError: true)
+			AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true)
+			AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true)
 
-			room1.addToRacks(rack1).save(flush: true, failOnError: true)
-			room2.addToRacks(rack2).save(flush: true, failOnError: true)
-			room1.addToSourceAssets(assetEntity1).save(flush: true, failOnError: true)
-			room2.addToTargetAssets(assetEntity2).save(flush: true, failOnError: true)
+			room1.addToRacks(rack1).save(flush: true)
+			room2.addToRacks(rack2).save(flush: true)
+			room1.addToSourceAssets(assetEntity1).save(flush: true)
+			room2.addToTargetAssets(assetEntity2).save(flush: true)
 
 			initialized = true
 		}

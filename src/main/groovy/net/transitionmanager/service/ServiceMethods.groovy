@@ -114,7 +114,7 @@ trait ServiceMethods {
 		if (instance == null) return null
 
 		try {
-			instance.save(flush: flush)
+			instance.save(flush: flush, failOnError: false)
 
 			if (instance.hasErrors()) {
 				log.error("save() Validation errors saving ${instance.getClass().simpleName} with id ${instance.id} ${GormUtil.allErrorsString(instance)}")

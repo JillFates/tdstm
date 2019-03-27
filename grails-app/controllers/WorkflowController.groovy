@@ -93,7 +93,7 @@ class WorkflowController implements ControllerMethods {
 		String message
 		Date dateNow = TimeUtil.nowGMT()
 		Workflow workflow = new Workflow(process: process)
-		if (!workflow.save()) {
+		if (!workflow.save(failOnError: false)) {
 			message = 'Workflow "' + workflow + '" must be unique'
 		}
 		else {
@@ -180,10 +180,7 @@ class WorkflowController implements ControllerMethods {
 				transition.dashboardLabel = params['dashboardLabel_' + transition.id]
 				transition.duration = params.int('duration_' + transition.id)
 				transition.role = RoleType.load(params['role_' + transition.id])
-				if (! transition.validate() || ! transition.save(flush:true)) {
-				} else {
-					log.debug('Workflow step "{}" updated', transition)
-				}
+				transition.save(flush:true)
 			}
 			// add new steps to the workflow
 			def additionalSteps = Integer.parseInt(params.additionalSteps)
@@ -203,7 +200,7 @@ class WorkflowController implements ControllerMethods {
 					//effort : params.int('effort_' + i),
 					duration : params.int('duration_' + i))
 
-				if (! workflowTransition.validate() || ! workflowTransition.save(flush:true)) {
+				if (! workflowTransition.validate() || ! workflowTransition.save(flush:true, failOnError:false)) {
 					flash.message += 'Workflow step with code [' + workflowTransition.code + '] must be unique.'
 				} else {
 					log.debug('Workflow step "{}" updated', workflowTransition)
@@ -290,9 +287,7 @@ class WorkflowController implements ControllerMethods {
 			role.maxTarget = maxTargetId ? stateEngineService.getState(workflow.process, maxTargetId) : null
 			role.maxSource = maxSourceId ? stateEngineService.getState(workflow.process, maxSourceId) : null
 
-			if (!role.save(flush:true)) {
-				role.errors.each {  println it}
-			}
+			role.save(flush:true)
 		}
 		//	load transitions details into application memory.
 		stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
@@ -387,10 +382,8 @@ class WorkflowController implements ControllerMethods {
 		def workFlow = Workflow.read(workFlowId)
 		def swimlane = Swimlane.findWhere(name: swimLaneName , workflow : workFlow)
 		swimlane?.actorId = actorId
-		if (!swimlane.save(flush:true)) {
-			println"Error while updating swimlane : "
-			swimlane.errors.each { println it }
-		}
+		swimlane.save(flush:true)
+
 		render actorId
 	}
 }

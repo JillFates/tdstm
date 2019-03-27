@@ -10,6 +10,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.validation.ValidationException
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -18,7 +19,6 @@ import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
@@ -182,7 +182,7 @@ class MoveEventController implements ControllerMethods {
 		} catch (EmptyResultException e) {
 			flash.message = "MoveEvent not found with id $params.id"
 			redirect(action: 'list')
-		} catch (DomainUpdateException e) {
+		} catch (ValidationException e) {
 			render(view: 'edit', model: [moveEventInstance: command])
 		}
 	}
