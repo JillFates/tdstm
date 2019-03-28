@@ -45,9 +45,6 @@ class ProviderServiceIntegrationSpec extends Specification {
 	@Shared
 	Person whom
 
-	@Shared
-	boolean initialized = false
-
 	def setup() {
 
 		projectTestHelper = new ProjectTestHelper()
