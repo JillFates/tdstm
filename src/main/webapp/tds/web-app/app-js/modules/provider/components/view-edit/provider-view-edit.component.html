@@ -42,17 +42,21 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveProvider()" class="btn btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique ||  isEmptyValue()"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditProvider()" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteProvider()" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> Delete</button>
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span *ngIf="modalType === actionTypes.VIEW">
-				{{'GLOBAL.CLOSE' | translate }}
-			</span>
-			<span *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE">
-				{{'GLOBAL.CANCEL' | translate }}
-			</span>
-		</button>
+		<tds-button-save *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" 
+			(click)="onSaveProvider()" class="btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique ||  isEmptyValue()">
+		</tds-button-save>
+
+		<tds-button-edit *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditProvider()" 
+			class="btn-primary pull-left">
+		</tds-button-edit>
+
+		<tds-button-delete *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteProvider()" class="btn-danger">
+		</tds-button-delete>
+
+		<tds-button-close *ngIf="modalType === actionTypes.VIEW" class="pull-right" (click)="cancelCloseDialog()">
+		</tds-button-close>
+
+		<tds-button-cancel *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" class="pull-right" (click)="cancelCloseDialog()">
+		</tds-button-cancel>
 	</div>
 </div>
