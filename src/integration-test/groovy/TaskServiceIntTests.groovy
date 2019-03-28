@@ -88,7 +88,7 @@ class TaskServiceIntTests extends Specification{
     private MoveEvent createMoveEvent(Project project) {
         MoveEvent moveEvent = new MoveEvent(
                 name: "Example 1", project: project,
-                inProgress: 'false').save(failOnError: true)
+                inProgress: 'false').save()
         return moveEvent
     }
 
@@ -105,7 +105,7 @@ class TaskServiceIntTests extends Specification{
                     moveBundle: moveBundle,
                     project: project
             )
-            if (!assetEntity.validate() || !assetEntity.save(failOnError: true)) {
+            if (!assetEntity.validate() || !assetEntity.save()) {
                 String etext = "Unable to create assetEntity" +
                         GormUtil.allErrorsString(assetEntity)
                 println etext
@@ -127,7 +127,7 @@ class TaskServiceIntTests extends Specification{
                     comment: "Sample for " + assetEntity.toString(),
                     commentType: AssetCommentType.TASK,
                     assetEntity: assetEntity
-            ).save(failOnError: true)
+            ).save()
 
         when:
             List<AssetComment> tasks = taskService.findAllByAssetEntity(assetEntity)
@@ -159,7 +159,7 @@ class TaskServiceIntTests extends Specification{
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
             description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
-            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
 
             AssetComment task = new AssetComment(
                     project: project,
@@ -167,7 +167,7 @@ class TaskServiceIntTests extends Specification{
                     commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
                     status: 'Ready'
-            ).save(failOnError: true)
+            ).save()
             sessionFactory.getCurrentSession().flush()
 
         when: 'invoking the api action'
@@ -188,7 +188,7 @@ class TaskServiceIntTests extends Specification{
 //            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
 //            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
 //            methodParams: '[]', reactionScripts: '{"SUCCESS": "task.done()","STATUS": "return SUCCESS","ERROR": "task.error( response.error )", "DEFAULT": "task.error( response.error )"}', reactionScriptsValid: 1,
-//            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+//            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
 //
 //            AssetComment task = new AssetComment(
 //                    project: project,
@@ -197,7 +197,7 @@ class TaskServiceIntTests extends Specification{
 //                    commentType: AssetCommentType.TASK,
 //                    apiAction: apiAction,
 //                    status: 'Ready'
-//            ).save(failOnError: true)
+//            ).save()
 //            sessionFactory.getCurrentSession().flush()
 //
 //        when: 'simulating invoking the api action at approximately the same time'
@@ -235,7 +235,7 @@ class TaskServiceIntTests extends Specification{
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId1 = task.id
 
         when: 'assign task to me is call, task gets assigned to current logged in user'
@@ -256,7 +256,7 @@ class TaskServiceIntTests extends Specification{
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING,
                     assignedTo: whom
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId2 = task.id
             taskService.assignToMe(assetCommentId2, AssetCommentStatus.READY)
         then: 'exception is thrown'
@@ -286,7 +286,7 @@ class TaskServiceIntTests extends Specification{
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId1 = task.id
 
         when: 'updating estimated start and finish time'
@@ -303,7 +303,7 @@ class TaskServiceIntTests extends Specification{
                     comment: RandomStringUtils.randomAlphanumeric(10),
                     commentType: AssetCommentType.TASK,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId2 = task.id
             assetComment = taskService.changeEstTime(assetCommentId2, 2)
 

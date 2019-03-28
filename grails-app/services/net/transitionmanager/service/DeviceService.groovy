@@ -316,7 +316,7 @@ class DeviceService implements ServiceMethods {
 
 		assetEntityService.assignDeviceToChassisOrRack(project, device, params)
 
-		if (!device.save()) {
+		if (!device.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to update device ' + GormUtil.allErrorsString(device))
 		}
 	}

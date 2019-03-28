@@ -30,7 +30,7 @@ class RecipeVersion {
 		clonedFrom nullable: true
 		dateCreated nullable: true
 		lastUpdated nullable: true
-		sourceCode nullable: true
+		sourceCode nullable: true, maxSize: 131072
 	}
 
 	static mapping = {

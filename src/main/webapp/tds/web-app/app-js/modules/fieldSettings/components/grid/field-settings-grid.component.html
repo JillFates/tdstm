@@ -25,14 +25,8 @@
 		</div>
 	</div>
 	<div class="col-xs-2 col-md-2 col-lg-1">
-		<button
-			type="button"
-			class="btn btn-default"
-			id="btnFilter"
-			(click)="onFilter()">
-			<i class="fa fa-fw fa-filter"></i>
-			{{'GLOBAL.FILTER' | translate}}
-		</button>
+		<tds-button-filter [id]="'btnFilter'" (click)="onFilter()">
+		</tds-button-filter>
 	</div>
 </ng-template>
 
@@ -49,34 +43,26 @@
 	             [position]="'top'"
 	             *ngIf="isEditing; else defaultToolbar">
 		<div class="col-xs-4 col-md-3 col-lg-2">
-			<button type="button" class="btn btn-default"
+			<tds-button-save 
 			        [ngClass]="{
 			            'btn-default': !isDirty,
 			            'btn-success':  isDirty && !formHasError,
 			            'btn-danger': isDirty && formHasError
 			        }"
-			        id="btnSaveAll"
+			        [id]="'btnSaveAll'"
 			        [disabled]="!isEditable || !isDirty || formHasError"
 			        (click)="onSaveAll()">
-					<i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}
-			</button>
-			<button type="button"
-			        class="btn btn-default"
-			        id="btnCancel"
-			        (click)="onCancel()">
-				<i class="fa fa-fw fa-times"></i>
-				{{'GLOBAL.CANCEL' | translate}}
-			</button>
+			</tds-button-save>
+			<tds-button-cancel [id]="'btnCancel'" (click)="onCancel()" [icon]="'times'" > 
+			</tds-button-cancel>
 		</div>
 		<div *ngIf="isFilterDisabled; else filterControl"></div>
 		<div class="col-xs-3 col-md-3 col-lg-5">
-			<button type="button"
-			        class="btn btn-default float-right"
-			        id="btnAddCustom"
+			<tds-button-add class="float-right"
+					[id]="'btnAddCustom'"
+					[title]="'FIELD_SETTINGS.CREATE_CUSTOM' | translate"
 			        (click)="onAddCustom()">
-					<i class="fa fa-fw fa-plus-circle"></i>
-				{{'FIELD_SETTINGS.CREATE_CUSTOM' | translate}}
-			</button>
+			</tds-button-add>
 		</div>
 	</ng-template>
 
@@ -85,13 +71,8 @@
 	             [position]="'top'"
 	             #defaultToolbar>
 		<div class="col-xs-4 col-md-3 col-lg-2">
-			<button type="button"
-			        class="btn btn-default"
-			        id="btnEdit"
-			        [disabled]="!isEditable"
-			        (click)="onEdit()">
-				<i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}
-			</button>
+			<tds-button-edit [id]="'btnEdit'" icon="list-ul" [disabled]="!isEditable" (click)="onEdit()">
+			</tds-button-edit>
 		</div>
 		<div *ngIf="isFilterDisabled; else filterControl"></div>
 	</ng-template>
@@ -100,17 +81,16 @@
 	                   *ngIf='isEditing'
 	                   [width]="70">
 		<ng-template kendoGridCellTemplate let-dataItem>
-			<button title="Deleting the custom field removes the definition but does not delete the data"
-			        class="btn btn-default"
-			        *ngIf="dataItem.udf && !dataItem.toBeDeleted"
-			        (click)="onDelete(dataItem)"
-			        [disabled]="isFieldUsedAsPlanMethodology(dataItem)">
-				<span class="fa fa-fw fa-trash"></span>
-			</button>
-			<button class="btn btn-default" *ngIf="dataItem.udf && dataItem.toBeDeleted"
-			        (click)="undoDelete(dataItem)">
-				<span class="fa fa-fw fa-undo"></span>
-			</button>
+			<div class="tds-action-button-set">
+				<tds-button-delete tooltip="Deleting the custom field removes the definition but does not delete the data"
+						*ngIf="dataItem.udf && !dataItem.toBeDeleted"
+						(click)="onDelete(dataItem)"
+						[disabled]="isFieldUsedAsPlanMethodology(dataItem)">
+				</tds-button-delete>
+				<tds-button-undo *ngIf="dataItem.udf && dataItem.toBeDeleted"
+						(click)="undoDelete(dataItem)">
+				</tds-button-undo>
+			</div>
 		</ng-template>
 	</kendo-grid-column>
 

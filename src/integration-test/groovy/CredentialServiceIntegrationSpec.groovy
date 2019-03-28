@@ -81,7 +81,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredential = credentialService.findById(credential.id)
         then:
@@ -94,7 +94,7 @@ class CredentialServiceIntegrationSpec extends Specification{
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredentials = credentialService.findAllByProject(project)
         then:
@@ -109,7 +109,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredentials = credentialService.findAllByProvider(provider)
         then:
@@ -124,7 +124,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
             final Long id = credential.id
         when: 'the credential is deleted'
             credentialService.delete(id)

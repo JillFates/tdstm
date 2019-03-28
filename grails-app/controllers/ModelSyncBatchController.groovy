@@ -1,5 +1,5 @@
-import com.tdssrc.grails.GormUtil
 import com.tdsops.common.security.spring.HasPermission
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerSync
@@ -12,7 +12,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ManufacturerService
 import net.transitionmanager.service.ModelService
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ModelSyncBatchController implements ControllerMethods {
 
@@ -48,53 +47,8 @@ class ModelSyncBatchController implements ControllerMethods {
 						if (!manufacturerInstance) {
 							manufacturerInstance = new Manufacturer(name: manufacturerSync.name,
 							                                        description: manufacturerSync.description)
-							if (!manufacturerInstance.save()) {
-								def etext = "Unable to create manufacturerInstance" + GormUtil.allErrorsString(manufacturerInstance)
-								println etext
-							} else {
-							    if (manufacturerSync.aka) {
-									def akas = manufacturerSync.aka?.split(",")
-									akas.each {
-										def manuExist = Manufacturer.findByName(it.trim())
-										if (!manuExist) {
-											//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
-											manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
-										}
-									}
-							    }
-								manuAdded ++
-							}
-						} else {
-							//manufacturerInstance.aka = manufacturerSync.aka
-							manufacturerInstance.description = manufacturerSync.description
-							manufacturerInstance.userLogin = securityService.loadCurrentUserLogin()
-							if (!manufacturerInstance.validate() || !manufacturerInstance.save()) {
-								def etext = "Unable to create manufacturerInstance" +
-								GormUtil.allErrorsString(manufacturerInstance)
-								println etext
-							} else {
-								if (manufacturerSync.aka) {
-									def akas = manufacturerSync.aka?.split(",")
-									akas.each {
-										def manuExist = Manufacturer.findByName(it.trim())
-										if (!manuExist) {
-											//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
-											manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
-										}
-									}
-							    }
-								manuUpdated ++
-							}
+							manufacturerInstance.save()
 
-						}
-					} else {
-						//manufacturerInstance.aka = manufacturerSync.aka
-						manufacturerInstance.description = manufacturerSync.description
-						if (!manufacturerInstance.validate() || !manufacturerInstance.save()) {
-							def etext = "Unable to create manufacturerInstance" +
-							GormUtil.allErrorsString(manufacturerInstance)
-							println etext
-						} else {
 							if (manufacturerSync.aka) {
 								def akas = manufacturerSync.aka?.split(",")
 								akas.each {
@@ -103,11 +57,50 @@ class ModelSyncBatchController implements ControllerMethods {
 										//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
 										manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
 									}
-
 								}
-						    }
+							}
+
+							manuAdded ++
+
+						} else {
+							//manufacturerInstance.aka = manufacturerSync.aka
+							manufacturerInstance.description = manufacturerSync.description
+							manufacturerInstance.userLogin = securityService.loadCurrentUserLogin()
+							manufacturerInstance.save()
+
+							if (manufacturerSync.aka) {
+								def akas = manufacturerSync.aka?.split(",")
+								akas.each {
+									def manuExist = Manufacturer.findByName(it.trim())
+									if (!manuExist) {
+										//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+										manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
+									}
+								}
+							}
+
 							manuUpdated ++
+
 						}
+					} else {
+						//manufacturerInstance.aka = manufacturerSync.aka
+						manufacturerInstance.description = manufacturerSync.description
+						manufacturerInstance.save()
+
+						if (manufacturerSync.aka) {
+							def akas = manufacturerSync.aka?.split(",")
+							akas.each {
+								def manuExist = Manufacturer.findByName(it.trim())
+								if (!manuExist) {
+									//manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
+									manufacturerService.findOrCreateAliasByName(manufacturerInstance, it.trim(), true)
+								}
+
+							}
+						}
+
+						manuUpdated ++
+
 					}
 				}
 				// Merge manufacturers
@@ -146,25 +139,22 @@ class ModelSyncBatchController implements ControllerMethods {
 							   modelStatus : modelSync.modelStatus,
 							   modelScope : modelSync.modelScope
 							)
-							if (!modelInstance.validate() || !modelInstance.save()) {
-								def etext = "Unable to create modelInstance" +
-								GormUtil.allErrorsString(modelInstance)
-								println etext
-								modelInstance.errors.allErrors.each { println it }
-							} else {
-							    if (modelSync.aka) {
-									def akas = modelSync.aka?.split(",")
-									akas.each { String aka ->
-										aka = aka.trim()
-										def akaExist = Model.findByModelName(aka)
-										if (!akaExist) {
-											//modelInstance.findOrCreateAliasByName(it.trim(), true)
-											modelService.findOrCreateAliasByName(modelInstance, aka, true)
-										}
+							modelInstance.save()
+
+							if (modelSync.aka) {
+								def akas = modelSync.aka?.split(",")
+								akas.each { String aka ->
+									aka = aka.trim()
+									def akaExist = Model.findByModelName(aka)
+									if (!akaExist) {
+										//modelInstance.findOrCreateAliasByName(it.trim(), true)
+										modelService.findOrCreateAliasByName(modelInstance, aka, true)
 									}
-							    }
-								modelAdded ++
+								}
 							}
+
+							modelAdded ++
+
 						} else {
 							if (modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion) {
 
@@ -193,24 +183,22 @@ class ModelSyncBatchController implements ControllerMethods {
 								modelInstance.modelStatus = modelSync.modelStatus
 								modelInstance.modelScope = modelSync.modelScope
 
-								if (!modelInstance.validate() || !modelInstance.save()) {
-									def etext = "Unable to create modelInstance" +
-									GormUtil.allErrorsString(modelInstance)
-									println etext
-								} else {
-									if (modelSync.aka) {
-										def akas = modelSync.aka?.split(",")
-										akas.each { String aka ->
-											aka = aka.trim()
-											def akaExist = Model.findByModelName(aka)
-											if (!akaExist) {
-												//modelInstance.findOrCreateAliasByName(it.trim(), true)
-												modelService.findOrCreateAliasByName(modelInstance, aka, true)
-											}
+								modelInstance.save()
+
+								if (modelSync.aka) {
+									def akas = modelSync.aka?.split(",")
+									akas.each { String aka ->
+										aka = aka.trim()
+										def akaExist = Model.findByModelName(aka)
+										if (!akaExist) {
+											//modelInstance.findOrCreateAliasByName(it.trim(), true)
+											modelService.findOrCreateAliasByName(modelInstance, aka, true)
 										}
 									}
-									modelUpdated ++
 								}
+
+								modelUpdated ++
+
 							}
 						}
 					} else {
@@ -242,25 +230,23 @@ class ModelSyncBatchController implements ControllerMethods {
 							modelInstance.modelStatus = modelSync.modelStatus
 							modelInstance.modelScope = modelSync.modelScope
 
-							if (!modelInstance.validate() || !modelInstance.save()) {
-								def etext = "Unable to create modelInstance" +
-								GormUtil.allErrorsString(modelInstance)
-								println etext
-							} else {
-								if (modelSync.aka) {
-									def akas = modelSync.aka?.split(",")
-									akas.each { String aka ->
-										aka = aka.trim()
-										// TODO - THIS should be checking if model exists by model name AND manufacturer. The model name is NOT unique
-										def modelExist = Model.findByModelName(aka)
-										if (!modelExist) {
-											//modelInstance.findOrCreateAliasByName(it.trim(), true)
-											modelService.findOrCreateAliasByName(modelInstance, aka, true)
-										}
+							modelInstance.save()
+
+							if (modelSync.aka) {
+								def akas = modelSync.aka?.split(",")
+								akas.each { String aka ->
+									aka = aka.trim()
+									// TODO - THIS should be checking if model exists by model name AND manufacturer. The model name is NOT unique
+									def modelExist = Model.findByModelName(aka)
+									if (!modelExist) {
+										//modelInstance.findOrCreateAliasByName(it.trim(), true)
+										modelService.findOrCreateAliasByName(modelInstance, aka, true)
 									}
 								}
-								modelUpdated ++
 							}
+
+							modelUpdated ++
+
 						}
 					}
 				}
@@ -284,13 +270,10 @@ class ModelSyncBatchController implements ControllerMethods {
 								option : connectorSync.option,
 								model : model
 							)
-							if (!connectorInstance.validate() || !connectorInstance.save()) {
-								def etext = "Unable to create connectorInstance" +
-								GormUtil.allErrorsString(connectorInstance)
-								//println etext
-							} else {
-								connectorsAdded ++
-							}
+
+							connectorInstance.save()
+							connectorsAdded ++
+
 						} else {
 							if (connectorInstance.model.sourceTDSVersion <= connectorSync.model.sourceTDSVersion) {
 								connectorInstance.label = connectorSync.label
@@ -301,13 +284,9 @@ class ModelSyncBatchController implements ControllerMethods {
 								connectorInstance.status = connectorSync.status
 								connectorInstance.option = connectorSync.option
 
-								if (!connectorInstance.validate() || !connectorInstance.save()) {
-									def etext = "Unable to create connectorInstance" +
-									GormUtil.allErrorsString(connectorInstance)
-									//println etext
-								} else {
-									connectorsUpdated ++
-								}
+								connectorInstance.save()
+								connectorsUpdated ++
+
 							}
 						}
 					}
@@ -330,6 +309,7 @@ class ModelSyncBatchController implements ControllerMethods {
 			}
 			modelSyncBatch.statusCode = "COMPLETED"
 			modelSyncBatch.save()
+
 		} catch (Exception e) {
 			flash.message = "Import Batch process failed"
 			log.error "Can't import: " + e.message

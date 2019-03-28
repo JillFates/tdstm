@@ -550,7 +550,7 @@ class TaskService implements ServiceMethods {
 
 				// Make sure that the status is STARTED instead
 				taskWithLock.status = AssetCommentStatus.STARTED
-				taskWithLock.save(flush: true, failOnError: true)
+				taskWithLock.save(flush: true)
 
 			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${remoteInvocation ? 'Remotely' : 'Locally'})")
 		}
@@ -1638,7 +1638,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def assets = getAssocAssets(contextObj)
 		if (!assets) {
-			throw new EmptyResultException("The selected event doesn't have associated bundles")
+			throw new EmptyResultException("The selected event does not have any assets with the associated Tags or Bundles.")
 		}
 
 		if(contextObj.eventId) {
@@ -1717,7 +1717,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			context: JsonUtil.convertMapToJsonString(taskBatchContext),
 			status: "Pending",
 			isPublished: isPublished
-		).save(failOnError: true)
+		).save()
 	}
 
 	/**
@@ -1854,7 +1854,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskBatch.infoLog = out.toString()
 			taskBatch.taskCount = taskList.size()
 			taskBatch.exceptionCount = ++exceptCnt
-			taskBatch.save(flush:true, failOnError:true)
+			taskBatch.save(flush:true)
 			*/
 
 			log.info(msg)
@@ -3164,7 +3164,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		taskBatch.exceptionLog = exceptions.toString()
 		taskBatch.infoLog = msg.toString() + "<br>" + out
 		taskBatch.status = failure ? 'Failed' : 'Completed'
-		taskBatch.save(flush:true, failOnError:true)
+		taskBatch.save(flush:true)
 
 		// TM-2843 - Fix issue with memory leak due to the usage of metaClass.addProperty
 		// TODO : JPM 5/2016 : generateTasks() review if the 'taskToWipe.metaClass = null' is still necessary for the memory leak
@@ -3665,7 +3665,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.info "createTaskDependency: dependency already exists"
 		} else {
 			dependency = new TaskDependency(predecessor:predecessor, assetComment:successor)
-			if (! (dependency.save(flush:true))) {
+			if (! (dependency.save(flush:true, failOnError: false))) {
 				throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error:${GormUtil.errorsAsUL(dependency)}, ")
 			}
 			out.append("Created dependency ($dependency.id) between $predecessor and $successor<br/>")
@@ -3683,7 +3683,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Mark the Successor task to the PENDING status since it has to wait for the predecessor task to complete before it can begin
 		successor.status = ACS.PENDING
-		if (! successor.save(flush:true)) {
+		if (! successor.save(flush:true, failOnError: false)) {
 			throw new RuntimeException("Failed to update successor ($successor) status to PENDING<br>Errors:${GormUtil.errorsAsUL(dependency)}")
 		}
 
@@ -4884,7 +4884,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Handle the various settings from the taskSpec
 			if (taskSpec.containsKey('category')) task.category = taskSpec.category
 
-			if (! (task.save(flush:true))) {
+			if (! (task.save(flush:true, failOnError: false))) {
 				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $settings.event"
 				throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
 			}
@@ -5325,7 +5325,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			[taskId: taskId, shouldPublish: shouldPublish])
 
 		task.isPublished = shouldPublish
-		task.save(failOnError: true)
+		task.save()
 
 		return affectedComments
 	}
@@ -5350,7 +5350,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		log.debug "User $currentUsername is deleting TaskBatch $taskBatch"
 
-		taskBatch.delete(failOnError: true)
+		taskBatch.delete()
 	}
 
 	/**
@@ -5598,7 +5598,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		String belongedTo = task.assignedTo ?: 'Unassigned'
 		Person person = securityService.userLoginPerson
 		task.assignedTo = person
-		if (task.save(flush: true)) {
+		if (task.save(flush: true, failOnError:false)) {
 			if (task.isRunbookTask()) {
 				addNote(task, person, 'Assigned task to self, previously assigned to ' + belongedTo)
 			}
@@ -5650,11 +5650,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			comment.estFinish = comment.estStart.plus(1)
 		}
 
-		if (!comment.hasErrors() && !comment.save(flush: true)) {
-			String errors = 'Unable to update estTime ' + GormUtil.allErrorsString(comment)
-			log.error errors
-			throw InvalidParamException(errors)
-		}
+		comment.save(flush: true)
 		return comment
 	}
 }

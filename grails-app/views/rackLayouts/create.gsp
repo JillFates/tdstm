@@ -21,7 +21,7 @@
 
 <body>
 <tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/>
-<div class="body" style="width:98%;" ng-app="tdsComments"
+<div class="body" style="width:98%; min-width:1110px" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 
     <g:if test="${flash.message}">
@@ -30,7 +30,7 @@
 
     <div class="dialog">
         <g:form action="generateElevations" name="rackLayoutCreate" method="post" target="_blank"
-                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%; display:inline-block; position:relative">
+                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%; display: flex; align-items: baseline;  position:relative">
             <input type="hidden" id="redirectTo" value="rack"/>
             <input type="hidden" id="fromRoomOrRack" value="rack"/>
             <table style="width:auto; border: none; float: left">

@@ -413,7 +413,7 @@ class ApiActionService implements ServiceMethods {
 		// Populate the apiAction with the properties from the command object
 		apiActionCommand.populateDomain(apiAction, false, ['constraintsMap'])
 
-		apiAction.save(failOnError: true)
+		apiAction.save()
 
 		return apiAction
 	}
@@ -652,21 +652,24 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
-		Map<String, Object> apiActionMap = null
-		// Load just the minimal or all by setting properties to null
-		List<String> properties = minimalInfo ? ['id', 'name', 'actionType', 'isRemote'] : []
+		Map<String, Object> apiActionMap
 
-		if (ActionType.WEB_API == apiAction.actionType) {
-			properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
-		} else {
-			properties << ['commandLine', 'script', 'remoteCredentialMethod']
+		// Load just the minimal or all by setting properties to null
+		List<String> properties
+		if (minimalInfo) {
+			properties = ['id', 'name', 'actionType', 'isRemote']
+			if (ActionType.WEB_API == apiAction.actionType) {
+				properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
+			} else {
+				properties << ['commandLine', 'script', 'remoteCredentialMethod']
+			}
 		}
 
+		// obtain a map representation of ApiAction with desired properties or all
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
 		// If all the properties are required, the entry for the ConnectorClass has to be overwritten with the following map.
 		if (!minimalInfo) {
-			AbstractConnector connector = connectorInstanceForAction(apiAction)
 			apiActionMap.connectorClass = [id: apiAction.apiCatalog?.id, name: apiAction.apiCatalog?.name]
 			apiActionMap.version = apiAction.version
 			apiActionMap.actionType = [id: apiAction.actionType.name(), name: apiAction.actionType.getType()]

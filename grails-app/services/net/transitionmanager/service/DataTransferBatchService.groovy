@@ -23,6 +23,6 @@ class DataTransferBatchService {
 	 * @return same instance of {@code DataTransferBatch} already saved in database
 	 */
 	DataTransferBatch save(DataTransferBatch dtb){
-		return dtb.save()
+		return dtb.save(failOnError: false)
 	}
 }

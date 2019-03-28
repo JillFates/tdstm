@@ -549,7 +549,7 @@ class AssetEntityService implements ServiceMethods {
 		String error
 		String errObject = 'dependencies'
 		try {
-			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+			if (!assetEntity.save(flush:true, failOnError: false)) {
 				errObject = 'asset'
 				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
 			}
@@ -617,7 +617,7 @@ class AssetEntityService implements ServiceMethods {
 	void deleteAssetEntityDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId) {
 		String error
 		try {
-			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+			if (!assetEntity.save(flush:true, failOnError: false)) {
 				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
 			}
 
@@ -686,7 +686,7 @@ class AssetEntityService implements ServiceMethods {
 		assetDependency.updatedBy = securityService.loadCurrentPerson()
 
 		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-		if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+		if (!assetDependency.save(failOnError: false, flush:true)) {
 			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 		}
 
@@ -770,7 +770,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			log.debug "addOrUpdateDependencies() Attempting to ${isNew ? 'CREATE' : 'UPDATE'} dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-			if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+			if (!assetDependency.save(flush:true, failOnError: false)) {
 				throw new DomainUpdateException("Unable to save $depType dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 			}
 		}

@@ -71,7 +71,7 @@ class RoomService implements ServiceMethods {
 				roomInstance.country = params.country
 				roomInstance.source = source
 
-				if (! roomInstance.validate() || ! roomInstance.save()) {
+				if (! roomInstance.save(failOnError: false)) {
 					log.info "Updating room information failed - ${GormUtil.allErrorsString(roomInstance)} - user $username"
 					msg = "Updating room failed due to ${GormUtil.allErrorsString(roomInstance)}"
 					break
@@ -99,7 +99,7 @@ class RoomService implements ServiceMethods {
 						rack.manufacturer = model?.manufacturer
 						rack.model = model
 
-						if (! rack.validate() || ! rack.save() ) {
+						if (! rack.save(failOnError: false) ) {
 							log.info "Updating rack information failed - ${GormUtil.allErrorsString(rack)} - user $username"
 							msg = "Updating rack ($rack.tag) failed due to ${GormUtil.allErrorsString(rack)}"
 							return
@@ -145,7 +145,7 @@ class RoomService implements ServiceMethods {
 								newRack.rackType = params["rackType_"+id]
 								newRack.front = params["front_"+id]
 
-								if (! newRack.validate() || ! newRack.save() ) {
+								if (! newRack.save(failOnError: false) ) {
 									log.info "Adding new rack failed - ${GormUtil.allErrorsString(newRack)} - user $username"
 									msg = "Adding new rack ($newRack.tag) failed due to ${GormUtil.allErrorsString(newRack)}"
 									return
@@ -196,7 +196,7 @@ class RoomService implements ServiceMethods {
 			// Attempt to create a new room if it doesn't exist
 			if( !room ) {
 				room = new Room( params )
-				if ( ! room.validate() || ! room.save(flush:true) ) {
+				if (! room.save(flush:true, failOnError: false) ) {
 					log.error "findOrCreateRoom() Unable to create room $project, $location, $roomName, $isSource : ${GormUtil.allErrorsString(room)}"
 					room = null
 				}
@@ -284,7 +284,7 @@ class RoomService implements ServiceMethods {
 		roomCommand.populateDomain(room, false)
 
 		String retMessage
-		if (room.save(flush: true)) {
+		if (room.save(flush: true, failOnError: false)) {
 			retMessage = "Room : $room.roomName is created"
 		}
 		else {

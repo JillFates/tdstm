@@ -187,7 +187,7 @@ class TagService implements ServiceMethods {
 	 */
 	Tag create(Project currentProject, String name, String description, Color color) {
 		Tag tag = new Tag(name: name, description: description, color: color, project: currentProject)
-		return tag.save(failOnError: true)
+		return tag.save()
 	}
 
 	/**
@@ -215,7 +215,7 @@ class TagService implements ServiceMethods {
 			tag.color = color
 		}
 
-		return tag.save(failOnError: true)
+		return tag.save()
 	}
 
 	/**
@@ -225,7 +225,7 @@ class TagService implements ServiceMethods {
 	 */
 	void delete(Long id, Project currentProject) {
 		Tag tag = get(Tag, id, currentProject)
-		tag.delete(failOnError: true)
+		tag.delete()
 	}
 
 	/**
@@ -249,7 +249,8 @@ class TagService implements ServiceMethods {
 						color: tag.color,
 						project: targetProject
 				)
-				newTag.save()
+
+				newTag.save(failOnError: false)
 				log.debug "Cloned tag ${tag.name} for project ${targetProject.toString()}"
 			}
 		}

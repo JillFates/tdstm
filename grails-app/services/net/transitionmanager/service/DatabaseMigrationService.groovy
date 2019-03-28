@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
-import grails.gorm.transactions.Transactional
 import net.transitionmanager.domain.Project
 import org.grails.web.json.JSONObject
 
@@ -144,7 +143,7 @@ class DatabaseMigrationService implements ServiceMethods {
 			// Assign the result of the script execution to the same field, which may be a different object.
 			domainObject[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
 			// Save the changes or throw an exception.
-			if (!domainObject.save(flush:true, failOnError: true)) {
+			if (!domainObject.save(flush:true)) {
 				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
 			}
 		}

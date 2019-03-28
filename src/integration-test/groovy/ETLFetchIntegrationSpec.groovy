@@ -43,7 +43,7 @@ class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 asset id,asset name
@@ -94,7 +94,7 @@ ${device.id},${device.assetName}""".stripIndent())
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 asset id,asset name,environment
@@ -147,7 +147,7 @@ ${device.id},${device.assetName},${device.environment}""".stripIndent())
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 asset id,asset name
@@ -248,7 +248,7 @@ ${person.toString()}""".stripIndent())
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 
-			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName      : "PowerEdge 1950",
@@ -259,11 +259,11 @@ ${person.toString()}""".stripIndent())
 				type           : "Power",
 				connectorPosX  : 250,
 				connectorPosY  : 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -321,7 +321,7 @@ ${manufacturer.name},${model.modelName}
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 
-			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName      : "PowerEdge 1950",
@@ -332,11 +332,11 @@ ${manufacturer.name},${model.modelName}
 				type           : "Power",
 				connectorPosX  : 250,
 				connectorPosY  : 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 model,manufacturer
@@ -392,7 +392,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName: "PowerEdge 1950",
@@ -403,10 +403,10 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -454,7 +454,7 @@ ${device.id},${device.assetName},${device.model.modelName},${device.model.manufa
 	void 'test can fetch Asset Entity results by Alternate Key'() {
 
 		given: 'a defined manufacturer assigned to an Device domain'
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.assetName = 'AGPM'
@@ -462,7 +462,7 @@ ${device.id},${device.assetName},${device.model.modelName},${device.model.manufa
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg
@@ -509,7 +509,7 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 	/*void 'test can fetch results by Alternate Key using a non AssetEntity'() {
 
 		given: 'a defined Model and Manufacturer assigned to an Device domain'
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.assetName = 'AGPM'
@@ -526,11 +526,11 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg

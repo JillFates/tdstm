@@ -83,6 +83,7 @@ class CustomDomainServiceTests extends Specification {
             loadFieldSpecJson()
             def fieldSpec = loadFieldSpecJson()
             def customFieldSpecsMap
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
             customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)
@@ -98,6 +99,7 @@ class CustomDomainServiceTests extends Specification {
             def domain = AssetClass.APPLICATION as String
             def fieldSpec = loadFieldSpecJson()
             def standardFieldSpecsMap
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
             standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(project, domain)
@@ -114,6 +116,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = "-invalid-"
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
         when: 'Save fields specs providing invalid AssetClass should throw an exception'
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'InvalidParamException should be thrown'
@@ -125,6 +128,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
         when: 'Save fields specs should save without errors'
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'Saved fields specs should exists'
@@ -136,6 +140,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
             def foundFieldSpec
         when: 'Retrieving fields specs from database should return them'

@@ -14,8 +14,8 @@ export class ManufacturerService {
 	isValidAlias(alias: string, id: number, parentName: string): Observable<string> {
 		const url = `${this.manufacturerUrl}/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
 
-		return this.http.get(url)
-			.map((res: any) => res.text())
+		return this.http.get(url, {responseType: 'text'})
+			.map((res: any) => res)
 	}
 
 	getDeviceManufacturer(id: string): Observable<DeviceManufacturer> {
@@ -68,7 +68,7 @@ export class ManufacturerService {
 		const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
 
 		const url = `${this.manufacturerUrl}/update`;
-		return this.http.post(url, body, {headers: headers})
+		return this.http.post(url, body, {headers: headers, responseType: 'text'})
 			.map((res: any) => res.ok)
 			.catch((error: any) => error);
 	}

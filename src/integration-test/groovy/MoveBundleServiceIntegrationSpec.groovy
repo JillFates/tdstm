@@ -3,13 +3,13 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import grails.test.mixin.integration.Integration
+import grails.validation.ValidationException
 import grails.web.servlet.mvc.GrailsHttpSession
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.domain.MoveBundle
@@ -19,7 +19,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import org.apache.commons.lang3.RandomStringUtils
@@ -243,35 +242,35 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
 
 			//'some dependency relationships are established between this assets (see graph in TM-10261)'
-			dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
+			dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(flush: true)
+			dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(flush: true)
+			dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(flush: true)
+			dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(flush: true)
+			dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(flush: true)
+			dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(flush: true)
+			dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(flush: true)
+			dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(flush: true)
 
 			Integer dependencyBundle = 1
-			adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(failOnError: true, flush: true)
-			adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(failOnError: true, flush: true)
-			adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
-			adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(failOnError: true, flush: true)
-			adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(failOnError: true, flush: true)
+			adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(flush: true)
+			adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(flush: true)
+			adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
+			adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: ++dependencyBundle).save(flush: true)
+			adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle).save(flush: true)
 
-			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
+			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true)
 
-			tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
-			tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
-			tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
-			tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
+			tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true)
+			tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true)
+			tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true)
+			tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true)
 
 			initialized = true
 		}
@@ -494,7 +493,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			)
 			moveBundleService.save(command)
 		then: 'exception is thrown'
-			thrown(ServiceException)
+			thrown(ValidationException)
 		when: 'fixing failing constraint'
 			command.workflowCode = 'STD'
 			MoveBundle moveBundle = moveBundleService.save(command)
@@ -505,7 +504,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 		when: 'saving a second move bundle with same name and project'
 			moveBundleService.save(command)
 		then: 'exception is thrown'
-			thrown(ServiceException)
+			thrown(ValidationException)
 
 	}
 
@@ -533,6 +532,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			command.workflowCode = null
 			moveBundleService.update(moveBundle.id, command)
 		then: 'exception is thrown'
-			thrown(DomainUpdateException)
+			thrown(ValidationException)
 	}
 }

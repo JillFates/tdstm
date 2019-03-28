@@ -120,10 +120,13 @@ class GormUtil{
 	 */
 	static List<String> getDomainPropertiesWithConstraint(Class clazz, String constraintName, value = null) {
 		List<String> propertyNames = []
-		Map<String, ConstrainedProperty> constraints = clazz.constraints
+		Map constraints = getConstrainedProperties(clazz)
+
 		for (propertyName in constraints.keySet()) {
-			def constraintValue = getConstraintValue(clazz, propertyName, constraintName) != null
-			if (constraintValue) {
+			def constraintValue = getConstraintValue(clazz, propertyName, constraintName)
+
+			if (constraintValue != null) {
+
 				if ((value == null && constraintValue != null) || (value != null && constraintValue == value)) {
 					propertyNames << propertyName
 				}
@@ -131,38 +134,6 @@ class GormUtil{
 		}
 		return propertyNames
 	}
-
-	/*
-// TODO : JPM 1/2017 : Validate getDomainPropertiesWithConstraint method that Burt replaced
-	public static List<String> getDomainPropertiesWithConstraint(def domain, def constraintName, def value=null ) {
-		def fields = []
-		domain.constraints.each() { propName, props ->
-			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
-			switch (constraintName) {
-				case 'blank':
-					// By default property blank is false except String prop so if false is requested as value
-					// and property is not string so considering as 'blank : false'
-					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
-					if (type == 'java.lang.String' && constraint in [null , true])
-						constraint = true
-					else
-						constraint = false
-					break
-
-				case ['nullable', 'range']:
-					// println "propName=$propName, constraintName=$constraintName, constraint=$constraint, value=$value"
-					break
-
-				default:
-					logger.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
-			}
-
-			if ( (value == null && constraint != null) || (value != null && constraint == value) )
-				fields <<  propName
-		}
-		return fields
-	}
-	*/
 
 	/**
 	 * Used to access all constraints for a single property of a domain object
@@ -353,7 +324,7 @@ class GormUtil{
 	 */
 	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
-		Map<String, ConstrainedProperty> constraints = clazz.constrainedProperties
+		Map<String, ConstrainedProperty> constraints = getConstrainedProperties(clazz)
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
 
 		// 'blank' is only supported for String properties and defaults to true, but there won't
@@ -843,7 +814,7 @@ class GormUtil{
 	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false, boolean flush = true) {
 		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
-		newDomain.save(flush: flush)
+		newDomain.save(flush: flush, failOnError: false)
 
 		if (deleteOriginal) {
 			originalDomain.delete(flush: flush)

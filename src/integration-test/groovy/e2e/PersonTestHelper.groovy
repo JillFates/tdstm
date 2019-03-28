@@ -31,7 +31,7 @@ class PersonTestHelper extends test.helper.PersonTestHelper {
                 email: personData.email,
                 username: personData.username
         ])
-        person.save(flush: true, failOnError:true)
+        person.save(flush: true)
         return person
     }
 

@@ -3,13 +3,13 @@ import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
+import grails.validation.ValidationException
 import spock.lang.Specification
 
 @Integration
@@ -95,7 +95,7 @@ class MoveEventServiceSpec extends Specification {
 			updateCommand.name = ''
 			moveEventService.update(moveEvent.id, updateCommand)
 		then: 'DomainUpdateException is thrown'
-			thrown(DomainUpdateException)
+			thrown(ValidationException)
 	}
 
 	void '04. Export runbook to Excel'() {

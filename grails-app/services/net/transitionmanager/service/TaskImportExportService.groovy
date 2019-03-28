@@ -1175,8 +1175,8 @@ class TaskImportExportService implements ServiceMethods {
 
 				if (changed) {
 					recordChangeHistory(task.changeHistory, assetComment, sheetInfoOpts)
-					assetComment.save()
-					if (assetComment.hasErrors()) {
+
+					if (!assetComment.save(failOnError: false)) {
 						task.changeHistory = null
 						error = GormUtil.allErrorsString(assetComment)
 						assetComment.discard()

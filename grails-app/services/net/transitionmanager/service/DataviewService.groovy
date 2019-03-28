@@ -132,7 +132,7 @@ class DataviewService implements ServiceMethods {
 			isShared = dataviewJson.isShared
 		}
 
-		if (!dataview.save()) {
+		if (!dataview.save(failOnError:false)) {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
@@ -176,7 +176,7 @@ class DataviewService implements ServiceMethods {
 			reportSchema = dataviewJson.schema
 		}
 
-		if (!dataview.save()) {
+		if (!dataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Error on create', dataview)
 		}
 
@@ -558,7 +558,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
-		if (!favoriteDataview.save()) {
+		if (!favoriteDataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
 		}
 	}
@@ -578,6 +578,8 @@ class DataviewService implements ServiceMethods {
      * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
      */
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
+	    // Find the position of the AssetClass field.
+	    int indexOfAssetClassField = dataviewSpec.columns.findIndexOf {it.property == 'assetClass'}
         [
 			pagination: [
 				offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
@@ -585,6 +587,8 @@ class DataviewService implements ServiceMethods {
 			assets: assets.collect { columns ->
 				Map row = [:]
 				columns = [columns].flatten()
+				// Find the domain for this asset.
+				String assetDomain = indexOfAssetClassField > -1 ? columns[indexOfAssetClassField].toLowerCase() : ''
 				columns.eachWithIndex { cell, index ->
 					Map column = dataviewSpec.columns[index]
 
@@ -596,8 +600,11 @@ class DataviewService implements ServiceMethods {
 							cell = cell.value
 						}
 					}
-
-					if (column) {
+					// Determine if the field is a custom field based on the field's spec.
+					Boolean isCustom = column.fieldSpec?.isUserDefinedField
+					// A field should be populated if it's a common field or if it's a custom field that belongs to the asset's domain.
+					Boolean shouldBePopulated = !isCustom || (isCustom && column.domain == assetDomain)
+					if (column && shouldBePopulated) {
 						row["${column.domain}${DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER}${column.property}"] = cell
 					}
 				}

@@ -38,7 +38,7 @@ class ApiActionTestHelper {
                 useWithAsset: 0,
                 useWithTask: 0
         )
-        apiAction.save(flush:true, failOnError: true)
+        apiAction.save(flush:true)
         return apiAction
     }
 }

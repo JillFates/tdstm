@@ -19,12 +19,13 @@
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<button class="btn btn-default" id="btnCreateProvider" type="button" (click)="onCreateProvider()"><span class="glyphicon glyphicon-plus button-create-provider" aria-hidden="true"></span> {{ 'PROVIDER.CREATE_PROVIDER' | translate }}</button>
+						<tds-button-create  [id]="'btnCreateProvider'" (click)="onCreateProvider()" [title]="'PROVIDER.CREATE_PROVIDER' | translate">
+						</tds-button-create>
 						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
 
 					<!-- Action -->
-					<kendo-grid-command-column [width]="108" [locked]="true">
+					<kendo-grid-command-column [width]="70" [locked]="true">
 						<ng-template kendoGridHeaderTemplate>
 							<div class="text-center">
 								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -33,9 +34,9 @@
 						<ng-template kendoGridCellTemplate
 						             let-dataItem
 						             let-rowIndex="rowIndex">
-							<div class="text-center">
-								<button class="btn btn-default" (click)="onEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
-								<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+							<div class="tds-action-button-set">
+								<tds-button-edit (click)="onEdit(dataItem)"></tds-button-edit>
+								<tds-button-delete (click)="onDelete(dataItem)"></tds-button-delete>
 							</div>
 						</ng-template>
 					</kendo-grid-command-column>
