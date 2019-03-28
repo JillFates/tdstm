@@ -42,7 +42,6 @@ export class UserDashboardComponent implements OnInit {
 	public taskColumnModel;
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	private itemForDoubleClick;
 
 	constructor(private userService: UserService, private taskService: TaskService, private dialogService: UIDialogService) {
 
@@ -183,31 +182,13 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public handleApplicationClicked(event): void {
-		if (event.dataItem === this.itemForDoubleClick) {
-			this.dialogService.open(AssetShowComponent, [
-				{provide: 'ID', useValue: event.dataItem.appId},
-				{provide: 'ASSET', useValue: event.dataItem.assetClass}
-			], DIALOG_SIZE.LG);
-		} else {
-			this.itemForDoubleClick = event.dataItem;
-			setTimeout((dataItem) => {
-				if (this.itemForDoubleClick === dataItem) {
-					this.itemForDoubleClick = null;
-				}
-			}, 500, event.dataItem);
-		}
+		this.dialogService.open(AssetShowComponent, [
+			{provide: 'ID', useValue: event.dataItem.appId},
+			{provide: 'ASSET', useValue: event.dataItem.assetClass}
+		], DIALOG_SIZE.LG);
 	}
 
 	public handlePersonClicked(event): void {
-		if (event.dataItem === this.itemForDoubleClick) {
-			this.launchManageStaff(event.dataItem.personId);
-		} else {
-			this.itemForDoubleClick = event.dataItem;
-			setTimeout((dataItem) => {
-				if (this.itemForDoubleClick === dataItem) {
-					this.itemForDoubleClick = null;
-				}
-			}, 500, event.dataItem);
-		}
+		this.launchManageStaff(event.dataItem.personId);
 	}
 }

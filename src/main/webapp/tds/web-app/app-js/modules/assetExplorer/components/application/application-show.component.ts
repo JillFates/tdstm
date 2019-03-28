@@ -50,7 +50,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 				this.dialogService.extra(UserManageStaffComponent, [
 					{provide: 'id', useValue: id},
 					{provide: PersonModel, useValue: {}}
-				], false, false).then( (result: any)  => {
+				], false, true).then( (result: any)  => {
 					console.log(result);
 				}).catch(result => {
 					if (result) {

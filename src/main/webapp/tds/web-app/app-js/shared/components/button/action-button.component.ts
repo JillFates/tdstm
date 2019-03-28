@@ -26,7 +26,9 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-delete,
 		tds-button-edit,
 		tds-button-export,
-		tds-button-save
+		tds-button-filter,
+		tds-button-save,
+		tds-button-undo
 	`,
 	template: `
 		<button *ngIf="button"
@@ -35,8 +37,10 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[id]="id"
 			[title]="tooltip || button.tooltip || titleButton"
 			[ngClass]="buttonClasses">
-				<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
-				<span class="title">{{titleButton}}</span>
+				<div class="tds-action-button-container">
+					<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
+					<span class="title">{{titleButton}}</span>
+				</div>
 				<ng-content></ng-content>
 		</button>
 	`,
@@ -57,22 +61,25 @@ export class TDSActionButton implements OnInit, OnChanges {
 	titleButton: string;
 	hostClasses: any = [];
 	hasAllPermissions: boolean;
+	private buttonSelectorName: string;
 
 	constructor(
 		private elementRef: ElementRef,
 		private buttonsFactoryService: ButtonsFactoryService) {
 		this.hasAllPermissions = false;
 	}
-
+	/**
+	* Based on the selector name, creates the corresponding button
+	*/
 	ngOnInit() {
-		this.hostClasses = this.elementRef.nativeElement.classList;
+		this.hostClasses = this.elementRef.nativeElement.classList || [];
 
-		const buttonSelector = this.elementRef.nativeElement.localName;
-		this.button = this.buttonsFactoryService.create(buttonSelector, this.permissions || []);
+		this.buttonSelectorName = this.elementRef.nativeElement.localName;
+		this.button = this.buttonsFactoryService.create(this.buttonSelectorName, this.permissions || []);
 		this.hasAllPermissions = this.button.hasAllPermissions;
 
 		if (!this.button) {
-			throw new Error(`Unable to create button ${buttonSelector}`);
+			throw new Error(`Unable to create button ${this.buttonSelectorName}`);
 		}
 		this.titleButton = this.title || this.button.title;
 	}
@@ -105,6 +112,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 			'tds-action-button': true,
 			'not-has-all-permissions': !this.hasAllPermissions
 		};
+		buttonClasses[this.buttonSelectorName] = true;
 
 		const hostClasses = this.getHostClasses();
 		const hasStyle = Array.from(this.hostClasses)
