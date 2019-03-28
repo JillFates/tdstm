@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 
@@ -121,6 +122,10 @@ class Notice {
 							Project project = value
 							value = [id  : project.id, code: project.projectCode, name: project.name]
 							break
+					}
+
+					if (name == 'htmlText') {
+						value = StringUtil.sanitizeJavaScript(value)
 					}
 
 					jsonData[name] = value

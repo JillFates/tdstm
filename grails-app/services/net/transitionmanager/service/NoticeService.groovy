@@ -6,6 +6,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Notice
+import net.transitionmanager.domain.Notice.NoticeType
 import net.transitionmanager.domain.NoticeAcknowledgement
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -172,6 +173,38 @@ class NoticeService implements ServiceMethods {
 		else {
 			Locale locale = LocaleContextHolder.locale
 			result.data.errors = notice.errors.allErrors.collect { messageSource.getMessage(it, locale) }
+		}
+
+		return result
+	}
+
+	/**
+	 * Return a list of person post login notices that has not been acknowledged
+	 * @param person - person requesting list notices
+	 * @return
+	 */
+	List<Notice> fetchPersonPostLoginNotices(Person person) {
+		Date now = TimeUtil.nowGMT()
+		log.info('List person: [{}] post login notices.', person.id)
+
+		def result = Notice.withCriteria {
+			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
+			eq('active', true)
+			eq('typeId', NoticeType.POST_LOGIN)
+			and {
+				or {
+					isNull('activationDate')
+					lt('activationDate', now)
+				}
+				or {
+					isNull('expirationDate')
+					gt('expirationDate', now)
+				}
+			}
+			isNull('ack.person')
+
+			order('needAcknowledgement', 'desc')
+			order('sequence', 'desc')
 		}
 
 		return result
