@@ -296,4 +296,5 @@ databaseChangeLog = {
 
 	include file: 'version/v4_6_2/2018-tmr-task-api-action-changes.groovy'
 	include file: 'version/v4_6_2/20190311-eula-notifications-mandatory-acknowledgements-changes.groovy'
+	include file: 'version/v4_6_2/20190319-rename-asset-system-views.groovy'
 }
