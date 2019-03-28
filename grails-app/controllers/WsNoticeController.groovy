@@ -25,7 +25,8 @@ class WsNoticeController implements ControllerMethods {
 				type = Notice.NoticeType.forId(typeId)
 			}
 
-			renderAsJson(notices: noticeService.fetch(type))
+			List<Notice> notices = noticeService.fetch(type)
+			renderAsJson(notices: notices)
 		}
 		catch (e) {
 			renderError500 e

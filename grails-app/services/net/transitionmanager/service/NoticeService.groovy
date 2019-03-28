@@ -2,11 +2,15 @@ package net.transitionmanager.service
 
 import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.NoticeAcknowledgement
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.hibernate.criterion.Restrictions
+import org.hibernate.sql.JoinType
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -15,6 +19,7 @@ import javax.xml.bind.DatatypeConverter
 /**
  * @author octavio
  */
+@Slf4j
 class NoticeService implements ServiceMethods {
 
 	MessageSource messageSource
@@ -87,6 +92,42 @@ class NoticeService implements ServiceMethods {
 		title:           String,
 		typeId:          Notice.NoticeType
 	]
+
+	/**
+	 * Check for any unacknowledged notices
+	 * @param person
+	 * @return
+	 */
+	Boolean hasUnacknowledgedNotices(Person person) {
+		Date now = TimeUtil.nowGMT()
+		log.info('Check if person: [{}] has unacknowledged notices.', person.id)
+
+		def result = Notice.withCriteria {
+			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ack.person", person))
+			eq('active', true)
+			and {
+				or {
+					isNull('activationDate')
+					lt('activationDate', now)
+				}
+				or {
+					isNull('expirationDate')
+					gt('expirationDate', now)
+				}
+			}
+			isNull('ack.person')
+
+			projections {
+				count()
+			}
+		}
+
+		if (!result) {
+			return false
+		}
+
+		return result[0] > 0
+	}
 
 	// HELPER METHODS /////////////////////////////////////////
 	private Map<String, ?> saveUpdate(json, Notice notice) {
