@@ -36,8 +36,8 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields.size() == 4
 
 		and:
-			fields[0].name == 'application id'
-			fields[1].name == 'location'
+			fields[0].name == 'Application Id'
+			fields[1].name == 'Location'
 			fields[2].name == 'technology'
 			fields[3].name == 'vendor name'
 
@@ -60,8 +60,8 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields.size() == 4
 
 		and:
-			fields[0].name == 'application id'
-			fields[1].name == 'location'
+			fields[0].name == 'Application Id'
+			fields[1].name == 'Location'
 			fields[2].name == 'technology'
 			fields[3].name == 'vendor name'
 
@@ -75,14 +75,14 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 	static final String RootApplicationDataSet = """
 		[
 			{
-				"application id":152254,
+				"Application Id":152254,
 				"vendor name":"Microsoft",
-				"location":"ACME Data Center"
+				"Location":"ACME Data Center"
 			},
 			{
-				"application id":152255,
+				"Application Id":152255,
 				"technology":"NGM",
-				"location":"ACME Data Center"
+				"Location":"ACME Data Center"
 			}
 		]	
 	""".stripIndent().trim()
@@ -91,14 +91,14 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 		{
 			"Applications" : [
 				{
-					"application id":152254,
+					"Application Id":152254,
 					"vendor name":"Microsoft",
-					"location":"ACME Data Center"
+					"Location":"ACME Data Center"
 				},
 				{
-					"application id":152255,
+					"Application Id":152255,
 					"technology":"NGM",
-					"location":"ACME Data Center"
+					"Location":"ACME Data Center"
 				}
 			],
 			"Device" : []
