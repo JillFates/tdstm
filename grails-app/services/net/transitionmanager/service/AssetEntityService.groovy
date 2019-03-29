@@ -3091,7 +3091,6 @@ class AssetEntityService implements ServiceMethods {
 
 		// add the list values needed to render this controls as regular control from ControlAngularTab lib
 		commonModel.standardFieldSpecs.environment.constraints.put('values', getAssetEnvironmentOptions())
-	//	commonModel.standardFieldSpecs.scale.constraints.put('values', SizeScale.values())
 
 		return commonModel
 	}

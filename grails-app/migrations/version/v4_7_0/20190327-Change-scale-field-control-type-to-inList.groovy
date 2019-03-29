@@ -25,7 +25,7 @@ databaseChangeLog = {
 
                         // For the scale fields, change control type to 'inList'
                         mapForScaleField.each { Map map ->
-                            map.control = "inList"
+                            map.control = "InList"
                         }
                     }
                     return settingsJson
