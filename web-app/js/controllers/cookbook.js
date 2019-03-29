@@ -583,13 +583,11 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return;
 		}
 
-		var sameEvent = validEventStatus();
-		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null && scope.contexts.selectedEvent != '' && scope.contexts.selectedEvent != null) || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
+		if(!validEventStatus()) {
 			return; // dirty
 		}
 
-		var sameTag = validTagStatus();
-		if(!sameTag) {
+		if(!validTagStatus()) {
 			if (!scope.$$phase) scope.$digest();
 			return; // dirty
 		}
@@ -600,7 +598,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	};
 
 	var validEventStatus = function () {
-		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:0;
+		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:null;
 		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
 	};
 
