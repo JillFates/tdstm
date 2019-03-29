@@ -324,6 +324,7 @@
                                 projectName: { type: "string"},
                                 name: { type: "string" },
                                 startDate: { type: "date" },
+								estCompletionTime: { type: "date" },
                                 days: { type: "string" },
                                 teams: { type: "string" }
                             }
@@ -347,8 +348,14 @@
                     {
                         field: "startDate",
                         title: "Start Date",
-                        template:"#= moment(startDate).format(tdsCommon.defaultDateFormat())#"
-                    }, {
+                        template:"#= (startDate && startDate !== null)? moment(startDate).format(tdsCommon.defaultDateFormat()): ''#"
+                    },
+					{
+						field: "endDate",
+						title: "Completion Time",
+						template:"#= (endDate && endDate !== null)? moment(endDate).format(tdsCommon.defaultDateFormat()): ''#"
+					},
+                    {
                         field: "days",
                         title: "Days"
                     }, {

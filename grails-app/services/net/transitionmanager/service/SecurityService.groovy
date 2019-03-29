@@ -26,6 +26,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Permissions
 import net.transitionmanager.domain.Person
@@ -1863,4 +1864,42 @@ logger.debug "mergePersonsUserLogin() entered"
             [(it): 1]
         }
     }
+
+	/**
+	 * Returns a list of project ids that the user has access to
+	 * @param projectId - used to only look for a particular projectId (optional)
+	 * @param userLogin - the user to lookup projects for or null to use the authenticated user
+	 * @return List of project IDs that the user has access to
+	 */
+	List<Long> getUserProjectIds(Long projectId = null, UserLogin userLogin = null) {
+		Person person = userLogin ? userLogin.person : getUserLoginPerson()
+		List<Long> projectIds = []
+		Boolean showAllProjPerm = hasPermission(Permission.ProjectShowAll)
+		Boolean hasAccessToDefaultProject = securityService.hasPermission(person, Permission.ProjectManageDefaults)
+
+		if (showAllProjPerm) {
+			// Find all the projects that are available for the user's company as client or as partner or owner
+			projectIds = partyRelationshipService.companyProjects(person.getCompany()).id
+		} else {
+			// Find the projects that the user has been assigned to
+			projectIds = PartyRelationship.where {
+				partyRelationshipType.id == 'PROJ_STAFF'
+				roleTypeCodeFrom.id == 'PROJECT'
+				roleTypeCodeTo.id == 'STAFF'
+				partyIdTo.id == person.id
+				if (projectId) {
+					partyIdFrom.id == projectId
+				}
+			}.projections {
+				distinct('partyIdFrom.id')
+			}.list()
+		}
+
+		// If the user has access to the default project, it should be included in the list.
+		if  (hasAccessToDefaultProject && (projectId == Project.DEFAULT_PROJECT_ID || ! projectId) ) {
+			projectIds << Project.DEFAULT_PROJECT_ID
+		}
+
+		return projectIds
+	}
 }
