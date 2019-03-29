@@ -8,6 +8,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UserContextService} from '../../../security/services/user-context.service';
 import {UserContextModel} from '../../../security/model/user-context.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: `single-comment`,
@@ -27,14 +28,15 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		public userContextService: UserContextService,
 		public taskManagerService: TaskService,
 		public assetExplorerService: AssetExplorerService,
-		public promptService: UIPromptService) {
+		public promptService: UIPromptService,
+		private userPreferenceService: PreferenceService) {
 		super('#single-comment-component');
 	}
 
 	ngOnInit(): void {
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
-				this.dateFormatTime = userContext.dateFormat + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
+				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.loadCommentCategories();
 			});
 	}
