@@ -77,7 +77,7 @@
 		}
 
 		.k-loading-image {
-			background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
+			background-image: url('${resource(dir:'images',file:'loading-image.gif')}');
 		}
 
 		.modify-header {
