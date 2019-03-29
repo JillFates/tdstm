@@ -21,7 +21,9 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.http.HostnameVerifier
 import org.apache.commons.lang3.RandomStringUtils
+import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -303,17 +305,20 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Gets the RestTemplate for the RestBuilder according to the environment
-     * For PRODUCTION we should trust SSL certificates as they come but for
-     * other environments some certificates are self-signed so HTTPClient needs
-     * some help to trust them, so the custom trust store is doing that.
+     * Gets the RestTemplate with a truststore when authentication URL is secure. Otherwise
+     * HTTPClient will hit the endpoint as is.
      *
-     * @param environment - the credential environment
      * @return
      */
     private RestBuilder getRestBuilderForCredentialEnvironment(String url, CredentialEnvironment environment) {
-        if (UrlUtil.isSecure(url) && environment != CredentialEnvironment.PRODUCTION) {
-            return new RestBuilder(getRestTemplateWithTrustStore())
+        if (UrlUtil.isSecure(url)) {
+            if (environment == CredentialEnvironment.PRODUCTION) {
+                // use trust store with wildcard hostname validator
+                return new RestBuilder(getRestTemplateWithTrustStore(HostnameVerifier.STRICT))
+            } else {
+                // use trust store that accepts all hostnames
+                return new RestBuilder(getRestTemplateWithTrustStore(NoopHostnameVerifier.INSTANCE))
+            }
         } else {
             return new RestBuilder()
         }
@@ -325,7 +330,7 @@ class CredentialService implements ServiceMethods {
      *
      * @return a RestTemplate configured with a Allow All Trust Store
      */
-    private RestTemplate getRestTemplateWithTrustStore() {
+    private RestTemplate getRestTemplateWithTrustStore(javax.net.ssl.HostnameVerifier verifier) {
         TrustManager[] trustAllCerts = [
                 new X509TrustManager() {
                     X509Certificate[] getAcceptedIssuers() { return [] }
@@ -336,7 +341,7 @@ class CredentialService implements ServiceMethods {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, verifier)
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(connectionSocketFactory)
                 .build()

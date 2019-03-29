@@ -812,7 +812,11 @@
 										[pageSize]="25"
 										[height]="430">
 									<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
-										<button class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_PARAMETER' | translate }}</button>
+										<tds-button-add class="float-right mar-right-15" 
+											[id]="'btnAddParameter'" 
+											[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
+											(click)="onAddParameter()">
+										</tds-button-add>
 									</ng-template>
 									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
 													   field="{{column.property}}"
@@ -826,8 +830,10 @@
 											<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
-											<div class="text-center">
-												<button class="btn btn-default" *ngIf="dataItem.required === 0  || dataItem.required === false" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+											<div class="tds-action-button-set">
+												<tds-button-delete *ngIf="dataItem.required === 0  || dataItem.required === false" 
+													(click)="onDeleteParameter($event, dataItem)">
+												</tds-button-delete>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -985,9 +991,9 @@
 												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">- logic to determine the Success or other status based on API response.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(0)" [(model)]="apiActionModel.eventReactions[0]" (onClick)="verifyCode(apiActionModel.eventReactions[0])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[0].open, 'fa-angle-double-right': !apiActionModel.eventReactions[0].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[0].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[0].open">
@@ -1010,9 +1016,9 @@
 												<label for="apiActionSuccess" class="col-sm-8 control-label">Success <span class="font-normal">- logic to be performed upon the API call being successful.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(1)" [(model)]="apiActionModel.eventReactions[1]" (onClick)="verifyCode(apiActionModel.eventReactions[1])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[1])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[1].open, 'fa-angle-double-right': !apiActionModel.eventReactions[1].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[1].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[1])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[1].open">
@@ -1030,9 +1036,9 @@
 												<label for="apiActionDefault" class="col-sm-8 control-label">Default <span class="font-normal">- logic to be performed for events not explicitly defined.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(2)" [(model)]="apiActionModel.eventReactions[2]" (onClick)="verifyCode(apiActionModel.eventReactions[2])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[2])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[2].open, 'fa-angle-double-right': !apiActionModel.eventReactions[2].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[2].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[2])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[2].open">
@@ -1050,9 +1056,9 @@
 												<label for="apiActionError" class="col-sm-8 control-label">Error <span class="font-normal">- logic to perform when the API call fails for any cause.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(3)" [(model)]="apiActionModel.eventReactions[3]" (onClick)="verifyCode(apiActionModel.eventReactions[3])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[3])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[3].open, 'fa-angle-double-right': !apiActionModel.eventReactions[3].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[3].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[3])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[3].open">
@@ -1070,9 +1076,9 @@
 												<label for="apiActionFailed" class="col-sm-8 control-label">Failed <span class="font-normal">-logic to perform when API call receives 400 or 500 series HTTP error code.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(4)" [(model)]="apiActionModel.eventReactions[4]" (onClick)="verifyCode(apiActionModel.eventReactions[4])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[4])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[4].open, 'fa-angle-double-right': !apiActionModel.eventReactions[4].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[4].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[4])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[4].open">
@@ -1090,9 +1096,9 @@
 												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(5)" [(model)]="apiActionModel.eventReactions[5]" (onClick)="verifyCode(apiActionModel.eventReactions[5])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[5])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[5].open, 'fa-angle-double-right': !apiActionModel.eventReactions[5].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[5].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[5])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[5].open">
@@ -1110,9 +1116,9 @@
 												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(6)" [(model)]="apiActionModel.eventReactions[6]" (onClick)="verifyCode(apiActionModel.eventReactions[6])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[6])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[6].open, 'fa-angle-double-right': !apiActionModel.eventReactions[6].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[6].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[6])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[6].open">
@@ -1131,9 +1137,9 @@
 												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(7)" [(model)]="apiActionModel.eventReactions[7]" (onClick)="verifyCode(apiActionModel.eventReactions[7])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[7].open, 'fa-angle-double-right': !apiActionModel.eventReactions[7].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[7].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[7].open">
@@ -1151,9 +1157,9 @@
 												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [disabled]="isCheckSyntaxSectionDisabled(8)" [(model)]="apiActionModel.eventReactions[8]" (onClick)="verifyCode(apiActionModel.eventReactions[8])"></tds-check-action>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[8].open, 'fa-angle-double-right': !apiActionModel.eventReactions[8].open}" style="padding-right:0px;"></i>
-													</button>
+													<tds-button-custom [icon]="apiActionModel.eventReactions[8].open ? 'angle-double-down' : 'angle-double-right'" 
+														(click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">
+													</tds-button-custom>
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[8].open">
@@ -1175,35 +1181,35 @@
 			</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button"
-		        tabindex="20"
-		        *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left"
-		        [disabled]="!canSave()">
-			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button"
-		        tabindex="21"
-		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
-			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
-		<button type="button"
-		        tabindex="22"
-		        *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
-			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button type="button"
-		        tabindex="23"
-		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
-			<span class="fa fa-fw fa-trash"></span> Delete</button>
+		<tds-button-save *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE"
+		                 (click)="onSaveApiAction()" [disabled]="!canSave()"
+		                 tabindex="20" class="btn-primary pull-left">
+		</tds-button-save>
 
-		<button (click)="cancelCloseDialog()"
-		        tabindex="24"
-		        type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">
-				{{'GLOBAL.CLOSE' | translate }}
-			</span>
-			<span *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())">
-				<span>{{'GLOBAL.CANCEL' | translate }}</span>
-			</span>
-		</button>
+		<tds-button-custom
+		        tabindex="21"
+		        [icon]="'thumbs-o-up'"
+		        [title]="'Check Syntax'"
+		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)"
+		        (click)="onCheckAllSyntax()" class="btn-primary pull-left">
+		</tds-button-custom>
+
+		<tds-button-edit *ngIf="modalType === actionTypes.VIEW"
+		                 (click)="changeToEditApiAction()"
+		                 tabindex="22" class="btn-primary pull-left">
+		</tds-button-edit>
+
+		<tds-button-delete
+		        tabindex="23"
+		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn-danger">
+		</tds-button-delete>
+
+		<tds-button-close *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())"
+		                  (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
+		</tds-button-close>
+
+		<tds-button-cancel *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())"
+		                  (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
+		</tds-button-cancel>
 	</div>
 </div>

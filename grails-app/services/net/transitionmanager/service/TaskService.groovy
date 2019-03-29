@@ -1638,7 +1638,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def assets = getAssocAssets(contextObj)
 		if (!assets) {
-			throw new EmptyResultException("The selected event doesn't have associated bundles")
+			throw new EmptyResultException("The selected event does not have any assets with the associated Tags or Bundles.")
 		}
 
 		if(contextObj.eventId) {

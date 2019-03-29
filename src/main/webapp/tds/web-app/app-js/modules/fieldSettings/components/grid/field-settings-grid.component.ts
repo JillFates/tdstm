@@ -394,12 +394,12 @@ export class FieldSettingsGridComponent implements OnInit {
 		return dataItem.label.trim() === '' ||
 			fields.some((field) => field.errorMessage) ||
 			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
-			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields) ||
 			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
 	}
 
 	/**
-	 * Returns a boolean indicating if the fields contain atleast one field with error
+	 * Returns a boolean indicating if the fields contain at least one field with error
 	 */
 	private atLeastOneInvalidField(): boolean {
 		const fields = this.getFieldsExcludingDeleted() || [];
@@ -420,7 +420,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
 			dataItem.errorMessage = message;
 		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem, fields)) {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
 				dataItem.errorMessage = message;
 			} else {
 				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
