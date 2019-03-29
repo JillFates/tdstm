@@ -624,7 +624,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	 * initial load it should be set to false.
 	 * @param resetSaveAsDefault - set to true to show the Set Default Context otherwise the Clear Default Context is shown.
 	 */
-	scope.contexts.eventSelected = function(resetSaveAsDefault){
+	scope.contexts.eventSelected = function(){
 		scope.contexts.checkValidSelection();
 		if (scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
 			$http.get(utils.url.applyRootPath('/ws/tag/event/' + scope.contexts.selectedEvent.id),
@@ -643,9 +643,11 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 					scope.contexts.checkValidSelection();
 					if (!scope.$$phase) scope.$digest();
 				}
-				if (resetSaveAsDefault) {
-					// The Save Default Context should be enabled when the user changes the event
+
+				if (!validEventStatus() || !validTagStatus()) {
 					scope.contexts.enableClearDefaultContext = false;
+				} else {
+					scope.contexts.enableClearDefaultContext = true;
 				}
 			});
 		}
@@ -719,7 +721,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 			if (scope.editor.selectedRVersion && scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.eventId) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.editor.selectedRVersion.context.eventId);
-				scope.contexts.eventSelected(false);
+				scope.contexts.eventSelected();
 			} else if (scope.contexts.selectedEvent != null) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.contexts.selectedEvent.id);
 			}
