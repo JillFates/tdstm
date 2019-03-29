@@ -1404,13 +1404,20 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		params.taskSuccessor = createDependenciesArray(dependencies.successors);
 		params.deletedPreds = createDeletedDependencies(dependencies);
 		params.manageDependency = 1;
+
+		// Partially Remove Prototype
+		if(window.Prototype) {
+			delete Object.prototype.toJSON;
+			delete Array.prototype.toJSON;
+			delete Hash.prototype.toJSON;
+			delete String.prototype.toJSON;
+		}
 	};
 
 	var saveComment = function (params, dependencies) {
 		var deferred = q.defer();
 		createDependenciesParams(params, dependencies);
-		var params = $.param(params);
-		http.post(utils.url.applyRootPath('/assetEntity/saveComment'), params).
+		http.post(utils.url.applyRootPath('/assetEntity/saveComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
@@ -1423,8 +1430,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	var updateComment = function (params, dependencies) {
 		var deferred = q.defer();
 		createDependenciesParams(params, dependencies);
-		var params = $.param(params);
-		http.post(utils.url.applyRootPath('/assetEntity/updateComment'), params).
+		http.post(utils.url.applyRootPath('/assetEntity/updateComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
