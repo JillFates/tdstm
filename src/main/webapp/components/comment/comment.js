@@ -1405,6 +1405,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		params.deletedPreds = createDeletedDependencies(dependencies);
 		params.manageDependency = 1;
 
+		params.duration = (params.duration)? params.duration.toString() : "0";
+
 		// Partially Remove Prototype
 		if(window.Prototype) {
 			delete Object.prototype.toJSON;
