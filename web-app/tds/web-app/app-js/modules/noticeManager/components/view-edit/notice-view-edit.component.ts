@@ -117,8 +117,6 @@ export class NoticeViewEditComponent implements OnInit {
 
 		const returnValue =  (noticeType === NoticeType.Mandatory) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
 
-		console.log('IsValid:', returnValue);
-
 		return returnValue;
 	}
 

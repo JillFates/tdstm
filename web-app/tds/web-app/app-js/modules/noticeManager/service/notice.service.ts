@@ -121,6 +121,17 @@ export class NoticeService {
 	 * @returns any
 	 */
 	getPostNotices(): Observable<PostNoticeResponse> {
+		const postNoticeUrl = '/tdstm/ws/notice/fetchPostNotices';
+
+		return this.http.get(postNoticeUrl)
+			.map((res: Response) => {
+				let result = res.json();
+
+				return result && result.data || [];
+			})
+			.catch((error: any) => error.json());
+
+		/*
 		const mockResponse = {
 			redirectUri: '/tdstm/notices',
 			notices: [
@@ -242,6 +253,7 @@ export class NoticeService {
 		};
 
 		return Observable.of(mockResponse);
+		*/
 	}
 
 }
