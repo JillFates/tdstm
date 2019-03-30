@@ -90,6 +90,13 @@
                             {{notices[dataItem.typeId]}}
                         </ng-template>
 
+                        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.type === 'date'">
+                            <div>
+	                            {{dataItem[column.property] | tdsDate : dateFormat}}
+                            </div>
+						</ng-template>
+
+
                     </kendo-grid-column>
                 </kendo-grid>
             </div>

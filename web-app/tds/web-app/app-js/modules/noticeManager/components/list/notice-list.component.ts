@@ -73,14 +73,9 @@ export class NoticeListComponent implements OnInit {
 	ngOnInit() {
 		this.notices = this.noticeTypes
 			.map((notice) => notice.name);
-		console.log('The notices are:');
-		console.log(this.notices);
 
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.noticeColumnModel = new NoticeColumnModel(dateFormat);
-			});
+		this.dateFormat = this.preferenceService.getUserDateFormatForMomentJS();
+		this.noticeColumnModel = new NoticeColumnModel(this.dateFormat);
 
 		this.noticeService.getPostNotices()
 			.subscribe((response: PostNoticeResponse) => {
