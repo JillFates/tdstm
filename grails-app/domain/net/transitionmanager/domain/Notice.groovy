@@ -53,7 +53,7 @@ class Notice {
 
 	Person createdBy
 	Date dateCreated
-	Date lastModified
+	Date lastModified = new Date()
 
 	static hasMany = [noticeAcknowledgements: NoticeAcknowledgement]
 
@@ -90,6 +90,7 @@ class Notice {
 		active:          Object,
 		createdBy:       Person,
 		dateCreated:     Object,
+		activationDate:  Object,
 		expirationDate:  Object,
 		htmlText:        Object,
 		id:              Object,
