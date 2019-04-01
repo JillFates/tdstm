@@ -17,6 +17,8 @@ import java.security.SecureRandom
  */
 class SecurityUtil {
 	public static final String ACCOUNT_LOCKED_OUT = "accountLockedOut"
+	public static final String HAS_UNACKNOWLEDGED_NOTICES = "hasUnacknowledgedNotices"
+	public static final String REDIRECT_URI = "redirectUri"
 
 	private static SecureRandom randomGenerator = new SecureRandom()
 
