@@ -1,17 +1,13 @@
-import { Component, Inject, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import {State} from '@progress/kendo-data-query';
-
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
-import { Observable } from 'rxjs';
-import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
@@ -22,11 +18,10 @@ import { AssetExportModel } from '../../model/asset-export-model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
-import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
-import {TagModel} from '../../../assetTags/model/tag.model';
 import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
 import {clone} from 'ramda';
+import {AssetExplorerViewShowComponent} from '../view-show/asset-explorer-view-show.component';
 
 declare var jQuery: any;
 @Component({
@@ -338,7 +333,12 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
-			assetQueryParams: this.getQueryParams(),
+			assetQueryParams: AssetExplorerViewShowComponent.getQueryParamsForExport(
+				this.data,
+				this.gridState,
+				this.model,
+				this.justPlanning
+			),
 			domains: this.domains,
 			viewName: this.model.name
 		};
