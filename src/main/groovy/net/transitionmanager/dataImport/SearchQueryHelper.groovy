@@ -158,13 +158,15 @@ class SearchQueryHelper {
 				// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
 				Person existingPerson = entityInstance ? entityInstance[fieldName] : null
 				String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-				String errorMsg
-				(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-				if (errorMsg) {
-					// If no entity was found then we want to capture the error message to save in the cache
-					entity = errorMsg
-					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-					recordError(context, errorMsg)
+				if (searchValue){
+					String errorMsg
+					(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+					if (errorMsg) {
+						// If no entity was found then we want to capture the error message to save in the cache
+						entity = errorMsg
+						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+						recordError(context, errorMsg)
+					}
 				}
 				break
 
@@ -894,7 +896,7 @@ class SearchQueryHelper {
 	private static List fetchPerson(Person existingPerson, String searchValue, String fieldName, Map fieldsInfo, Map context) {
 		Person person
 		String errorMsg
-		Boolean isEmail = (!searchValue)?false:searchValue.contains('@')
+		Boolean isEmail = searchValue.contains('@')
 
 		// If the pre-existing person check if searchValue matches the person
 		if (existingPerson) {
@@ -905,7 +907,7 @@ class SearchQueryHelper {
 			}
 		}
 
-		if (!person && searchValue) {
+		if (!person) {
 			if (isEmail) {
 				person = context.staffList.find { it.email.equalsIgnoreCase(searchValue) }
 				if (!person) {
