@@ -16,10 +16,10 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
-import net.transitionmanager.domain.License as DomainLicense
-import net.transitionmanager.domain.Project
+import net.transitionmanager.license.License as DomainLicense
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.license.prefs.*
-import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.party.PartyGroup
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.beans.factory.InitializingBean

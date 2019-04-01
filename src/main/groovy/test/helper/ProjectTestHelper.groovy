@@ -3,12 +3,12 @@ package test.helper
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Timezone
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.RandomStringUtils as RSU

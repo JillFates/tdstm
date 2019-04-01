@@ -1,8 +1,8 @@
 package net.transitionmanager.service
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Permissions
-import net.transitionmanager.domain.RolePermissions
+import net.transitionmanager.security.Permissions
+import net.transitionmanager.security.RolePermissions
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Transactional

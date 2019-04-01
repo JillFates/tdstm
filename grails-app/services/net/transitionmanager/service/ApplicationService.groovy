@@ -1,16 +1,15 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.AppMoveEvent
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.project.AppMoveEvent
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 
 /**
  * The application service handles the logic for CRUD applications

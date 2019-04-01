@@ -6,9 +6,9 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import net.transitionmanager.command.CredentialCommand
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.Credential
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException

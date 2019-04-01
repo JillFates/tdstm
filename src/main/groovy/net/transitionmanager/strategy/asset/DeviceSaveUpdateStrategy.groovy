@@ -1,14 +1,14 @@
 package net.transitionmanager.strategy.asset
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.util.Holders
 import net.transitionmanager.command.AssetCommand
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ProjectService
 

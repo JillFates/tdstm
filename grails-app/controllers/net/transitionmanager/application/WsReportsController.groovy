@@ -2,8 +2,8 @@ package net.transitionmanager.application
 
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.UserPreferenceService

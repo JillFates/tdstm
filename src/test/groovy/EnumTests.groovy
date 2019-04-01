@@ -1,4 +1,4 @@
-import com.tds.asset.AssetEntityType
+import net.transitionmanager.asset.AssetEntityType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.SpeedScale

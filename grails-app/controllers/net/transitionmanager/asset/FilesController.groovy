@@ -1,7 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetOptions
-import com.tds.asset.Files
+
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -12,9 +11,9 @@ import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetOptionsService

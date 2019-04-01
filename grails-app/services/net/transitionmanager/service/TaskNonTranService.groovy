@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionStatus
 

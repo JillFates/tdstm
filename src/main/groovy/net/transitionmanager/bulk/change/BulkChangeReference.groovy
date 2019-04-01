@@ -1,10 +1,10 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 

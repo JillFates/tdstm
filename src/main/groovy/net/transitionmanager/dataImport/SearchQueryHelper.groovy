@@ -1,7 +1,7 @@
 package net.transitionmanager.dataImport
 
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -11,10 +11,10 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Room
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.person.Person
+import net.transitionmanager.asset.Room
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PersonService
 import org.grails.web.json.JSONObject

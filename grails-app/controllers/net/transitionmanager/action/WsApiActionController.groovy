@@ -9,8 +9,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ApiActionValidateScriptCommand
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService

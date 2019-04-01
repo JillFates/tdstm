@@ -1,4 +1,4 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.service.ImportService

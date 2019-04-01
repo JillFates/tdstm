@@ -1,5 +1,5 @@
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.service.MoveBundleService
 
 import org.junit.Ignore

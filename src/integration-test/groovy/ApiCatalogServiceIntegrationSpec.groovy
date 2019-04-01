@@ -2,8 +2,8 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.ApiCatalogCommand
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.ApiCatalogService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException

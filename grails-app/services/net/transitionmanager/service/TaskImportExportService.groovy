@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
@@ -11,8 +11,8 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.json.JsonBuilder
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory

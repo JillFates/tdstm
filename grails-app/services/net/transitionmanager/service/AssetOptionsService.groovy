@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetOptions.AssetOptionsType
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions.AssetOptionsType
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetOptionsCommand

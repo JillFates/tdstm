@@ -4,11 +4,11 @@ package test.helper
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.party.Party
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.PartyRelationshipService
 
 /**

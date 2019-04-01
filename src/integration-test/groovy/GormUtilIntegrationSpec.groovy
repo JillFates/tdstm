@@ -1,6 +1,6 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tds.test.TestDomain
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
@@ -8,12 +8,12 @@ import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
 import grails.test.mixin.integration.Integration
 import grails.validation.Validateable
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Workflow
+import net.transitionmanager.action.Credential
+import net.transitionmanager.notices.Notice
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.Workflow
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PersonService
@@ -600,7 +600,7 @@ class GormUtilIntegrationSpec extends Specification {
 	void '24. test the getDomainClass'() {
 		// Note that these are duplicated in Unit since this method works differently in Unit vs all other modes
 		when: 'getDomainClass is called for a domain class'
-			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+			def dc = GormUtil.getDomainClass(AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
 			'org.grails.orm.hibernate.cfg.HibernatePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'

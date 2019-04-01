@@ -1,6 +1,6 @@
 package net.transitionmanager.tasks
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.TimeUtil
@@ -9,8 +9,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService

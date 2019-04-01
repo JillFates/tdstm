@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
@@ -10,17 +10,17 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRole
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserLoginProjectAccess
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventNews
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRole
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserLoginProjectAccess
 import net.transitionmanager.security.Permission
 import net.transitionmanager.user.UserContext
 import org.springframework.jdbc.core.JdbcTemplate

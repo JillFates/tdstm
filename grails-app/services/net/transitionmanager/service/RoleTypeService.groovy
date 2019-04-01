@@ -3,7 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.RoleTypeCommand
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.RoleType
 import org.grails.datastore.mapping.query.api.Criteria
 
 class RoleTypeService implements ServiceMethods {

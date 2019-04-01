@@ -1,15 +1,12 @@
 package net.transitionmanager.application
 
-import com.tds.asset.Application
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tdsops.common.lang.ExceptionUtil
+import net.transitionmanager.asset.Application
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
-import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -24,18 +21,15 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.AppMoveEvent
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Workflow
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.project.AppMoveEvent
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
@@ -51,7 +45,7 @@ import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
-import org.hibernate.transform.Transformers
+
 import java.text.DateFormat
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

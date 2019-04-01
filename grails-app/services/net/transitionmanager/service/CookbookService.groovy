@@ -13,12 +13,12 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.command.cookbook.ContextCommand
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.project.Project
+import net.transitionmanager.task.Recipe
+import net.transitionmanager.task.RecipeVersion
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.security.Permission
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -30,7 +30,7 @@ import java.sql.SQLException
 
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
 import static com.tdsops.tm.enums.domain.ProjectStatus.COMPLETED
-import static net.transitionmanager.domain.Project.DEFAULT_PROJECT_ID
+import static net.transitionmanager.project.Project.DEFAULT_PROJECT_ID
 /**
  * Handles the logic for creating recipes and running the cookbook
  *

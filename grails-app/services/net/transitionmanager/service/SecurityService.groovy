@@ -22,18 +22,18 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.EmailDispatch
-import net.transitionmanager.PasswordHistory
-import net.transitionmanager.PasswordReset
+import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.security.PasswordHistory
+import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.command.UserUpdatePasswordCommand
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRole
-import net.transitionmanager.domain.Permissions
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RolePermissions
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRole
+import net.transitionmanager.security.Permissions
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.RolePermissions
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -46,8 +46,8 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
 
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
+import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.

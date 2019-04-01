@@ -3,7 +3,7 @@ package net.transitionmanager.admin
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 
 @Secured('isAuthenticated()')

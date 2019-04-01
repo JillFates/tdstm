@@ -2,7 +2,7 @@ package net.transitionmanager.admin
 
 import net.transitionmanager.command.RoleTypeCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.RoleType
 import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured

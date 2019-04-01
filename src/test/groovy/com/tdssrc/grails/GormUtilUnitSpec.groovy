@@ -1,22 +1,26 @@
 package com.tdssrc.grails
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
 import com.tdsops.etl.ETLProcessor
 import grails.testing.gorm.DataTest
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.Memoized
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.service.DataviewService
 import org.grails.datastore.mapping.model.PersistentProperty
 import spock.lang.See
@@ -60,7 +64,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 		and:
 			(GormUtil.getDomainPropertyType(asset, 'priority') == java.lang.Integer)
 		and:
-			(GormUtil.getDomainPropertyType(asset, 'owner') == net.transitionmanager.domain.PartyGroup)
+			(GormUtil.getDomainPropertyType(asset, 'owner') == PartyGroup)
 		and:
 			!GormUtil.getDomainPropertyType(asset, 'bogusPropertyName')
 	}
@@ -231,7 +235,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 
 	void '14 test the getDomainClass'() {
 		when: 'getDomainClass is called for a domain class'
-			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+			def dc = GormUtil.getDomainClass(AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
 			'org.grails.datastore.mapping.keyvalue.mapping.config.KeyValuePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
@@ -254,7 +258,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 
 	void '15 Test the domainShortName method'() {
 		expect: 'shortname of net.transitionmanager.domain.Person should be Person'
-			'Person' == GormUtil.domainShortName(net.transitionmanager.domain.Person)
+			'Person' == GormUtil.domainShortName(Person)
 	}
 
 	void '16 take getAlternateKeyPropertyName method for a spin'() {
@@ -295,22 +299,22 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 			Closure closure = Mock(Closure)
 
 			List<Class<?>> classes = [
-					com.tds.asset.Application,
-					com.tds.asset.AssetEntity,
-					com.tds.asset.Database,
-					com.tds.asset.Files,
-					com.tds.asset.AssetEntity,
-					com.tds.asset.AssetComment,
-					net.transitionmanager.domain.Person,
-					com.tds.asset.AssetComment,
-					com.tds.asset.AssetEntity,
-					net.transitionmanager.domain.Manufacturer,
-					net.transitionmanager.domain.Model,
-					com.tds.asset.AssetDependency,
-					net.transitionmanager.domain.Rack,
-					net.transitionmanager.domain.MoveBundle,
-					net.transitionmanager.domain.Room,
-					com.tds.asset.Files
+				Application,
+				AssetEntity,
+				Database,
+				Files,
+				AssetEntity,
+				AssetComment,
+				Person,
+				AssetComment,
+				AssetEntity,
+				Manufacturer,
+				Model,
+				AssetDependency,
+				Rack,
+				MoveBundle,
+				Room,
+				Files
 			]
 
 			List<String> propertyNames = [

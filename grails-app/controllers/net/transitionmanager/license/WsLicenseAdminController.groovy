@@ -5,9 +5,8 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.core.GrailsApplication
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.License
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseCommonService

@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -15,14 +15,13 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.event.CreateEventCommand
-import net.transitionmanager.domain.AppMoveEvent
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.project.AppMoveEvent
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.RoleType
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors

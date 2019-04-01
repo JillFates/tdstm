@@ -12,8 +12,7 @@ import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException

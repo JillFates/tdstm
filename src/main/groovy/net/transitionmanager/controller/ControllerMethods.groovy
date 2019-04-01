@@ -10,8 +10,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ErrorHandlerService

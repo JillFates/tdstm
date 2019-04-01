@@ -17,10 +17,10 @@ import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.credential.CredentialValidationExpression
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.Credential
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import net.transitionmanager.http.HostnameVerifier
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.http.conn.ssl.NoopHostnameVerifier

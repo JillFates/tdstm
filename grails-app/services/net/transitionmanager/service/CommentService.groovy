@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.CommentNote
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -15,12 +15,12 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.search.AssetCommentQueryBuilder
 import net.transitionmanager.security.Permission
 import com.tdsops.tm.enums.domain.AssetCommentCategory

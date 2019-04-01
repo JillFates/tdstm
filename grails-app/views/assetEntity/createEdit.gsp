@@ -1,5 +1,5 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
-<%@page import="com.tds.asset.AssetType"%>
+<%@page import="net.transitionmanager.asset.AssetType"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <%-- Set some vars based on the action being save or update --%>

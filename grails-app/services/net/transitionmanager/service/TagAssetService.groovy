@@ -1,12 +1,12 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.domain.TagEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagEvent
 /**
  * A service for managing the relationship of Tags to Assets.
  */

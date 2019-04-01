@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.*
+
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.asset.WorkbookSheetName
 import com.tdsops.tm.asset.export.SpreadsheetColumnMapper
@@ -14,13 +14,22 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataTransferSet
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+import net.transitionmanager.imports.DataTransferSet
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.utils.Profiler
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.openxml4j.util.ZipSecureFile
@@ -236,7 +245,7 @@ class AssetExportService {
 			}
 
 			if (doDependency) {
-				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ? ",[project])[0]
+				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ? ", [project])[0]
 				progressTotal += dependencySize
 			}
 
@@ -251,7 +260,7 @@ class AssetExportService {
 			}
 
 			if (doCabling) {
-				cablingSize = AssetCableMap.executeQuery( "select count(*) from AssetCableMap acm where acm.assetFrom.project = ?", [project])[0]
+				cablingSize = AssetCableMap.executeQuery("select count(*) from AssetCableMap acm where acm.assetFrom.project = ?", [project])[0]
 				progressTotal += cablingSize
 			}
 

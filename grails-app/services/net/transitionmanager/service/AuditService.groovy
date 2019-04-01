@@ -4,7 +4,7 @@ import com.tdssrc.grails.HtmlUtil
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
-import net.transitionmanager.UserAudit
+import net.transitionmanager.security.UserAudit
 import org.springframework.beans.factory.InitializingBean
 /**
  * Logs audit information

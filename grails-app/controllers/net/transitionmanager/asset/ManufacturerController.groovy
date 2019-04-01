@@ -1,15 +1,15 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetEntity
+
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.model.Model
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ManufacturerService
 import org.hibernate.criterion.Order

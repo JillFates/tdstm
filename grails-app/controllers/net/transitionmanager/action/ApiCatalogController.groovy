@@ -6,7 +6,6 @@ import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiCatalogService
 

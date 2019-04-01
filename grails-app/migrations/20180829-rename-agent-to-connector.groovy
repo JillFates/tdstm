@@ -1,5 +1,5 @@
 import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey
-import net.transitionmanager.domain.ApiCatalog
+import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.service.DatabaseMigrationService
 import org.grails.web.json.JSONObject
 

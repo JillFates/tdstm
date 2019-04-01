@@ -5,8 +5,8 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
 import org.apache.commons.lang3.StringUtils
 import org.grails.web.json.JSONObject
 import org.springframework.context.MessageSource

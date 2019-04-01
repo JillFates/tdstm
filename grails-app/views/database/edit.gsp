@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Database"%>
+<%@page import="net.transitionmanager.asset.Database"%>
 <%-- <g:set var="assetClass" value="${(new Database()).assetClass}" /> --%>
 <g:set var="assetClass" value="Database" />
 

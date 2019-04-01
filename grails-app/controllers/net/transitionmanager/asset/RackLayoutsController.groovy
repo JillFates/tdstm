@@ -1,8 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -16,18 +14,17 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelConnector
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.task.AssetComment
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -512,7 +509,7 @@ class RackLayoutsController implements ControllerMethods {
 					def taskAnchors = ""
 					if (!printView) {
 						def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity,
-							[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])
+																					 [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])
 						tasks.each {
 							taskAnchors += """<a href='#' class='${taskService.getCssClassForRackStatus(it.status)}' title='${
 								it.taskNumber + ':' + it.comment

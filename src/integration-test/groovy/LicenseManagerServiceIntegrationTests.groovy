@@ -3,11 +3,11 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.License
-import net.transitionmanager.domain.LicensedClient
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.license.License
+import net.transitionmanager.license.LicensedClient
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LicenseManagerService
 import net.transitionmanager.service.ProjectService

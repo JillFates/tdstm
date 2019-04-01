@@ -1,14 +1,14 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelAlias
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Transactional

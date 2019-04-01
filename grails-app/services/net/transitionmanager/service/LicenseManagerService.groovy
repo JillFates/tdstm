@@ -9,9 +9,9 @@ import grails.plugins.mail.MailService
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
-import net.transitionmanager.domain.License
-import net.transitionmanager.domain.LicenseActivityTrack
-import net.transitionmanager.domain.LicensedClient
+import net.transitionmanager.license.License
+import net.transitionmanager.license.LicenseActivityTrack
+import net.transitionmanager.license.LicensedClient
 import org.apache.commons.codec.binary.Base64
 import org.grails.web.json.JSONElement
 

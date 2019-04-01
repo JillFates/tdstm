@@ -1,12 +1,12 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.validators.CustomValidators
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 

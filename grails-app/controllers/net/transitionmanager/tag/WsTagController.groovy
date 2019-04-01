@@ -8,7 +8,6 @@ import net.transitionmanager.command.tag.ListCommand
 import net.transitionmanager.command.tag.SearchCommand
 import net.transitionmanager.command.tag.UpdateCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Tag
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.TagService
 

@@ -5,10 +5,10 @@ import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService

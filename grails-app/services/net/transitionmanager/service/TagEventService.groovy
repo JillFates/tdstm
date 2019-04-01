@@ -2,10 +2,10 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagEvent
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagEvent
 /**
  * A service for managing the relationship of Tags to Events.
  */

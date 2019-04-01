@@ -1,8 +1,8 @@
 package net.transitionmanager.model
 
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -11,7 +11,9 @@ import com.tdssrc.grails.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.*
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.person.Person
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
 import org.apache.poi.hssf.usermodel.HSSFWorkbook

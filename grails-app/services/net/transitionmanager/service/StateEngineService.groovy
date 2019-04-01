@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.domain.Swimlane
-import net.transitionmanager.domain.Workflow
-import net.transitionmanager.domain.WorkflowTransition
-import net.transitionmanager.domain.WorkflowTransitionMap
+import net.transitionmanager.project.Swimlane
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.project.WorkflowTransition
+import net.transitionmanager.project.WorkflowTransitionMap
 /**
  * Provides a state management engine driven by definitions in XML files, used
  * with workflow logic to help manage a stateful system.

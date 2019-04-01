@@ -1,16 +1,16 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.etl.ETLDomain
 import net.transitionmanager.dataImport.SearchQueryHelper
 import com.tdssrc.grails.JsonUtil
-
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Shared
-import spock.lang.Unroll
 
 @Title('Tests the ImportBatchRecord Domain class')
 class ImportBatchRecordUnitSpec extends Specification {

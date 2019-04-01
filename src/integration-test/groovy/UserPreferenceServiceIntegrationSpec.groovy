@@ -3,8 +3,8 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.beans.factory.annotation.Autowired

@@ -3,7 +3,7 @@ package net.transitionmanager.search
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import org.hibernate.Query
 import org.hibernate.Session
 import org.hibernate.transform.Transformers

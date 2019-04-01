@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.project.Project" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -39,7 +40,7 @@
                     <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowList('${workflows?.id}')">
 
                         <td nowrap="nowrap">${workflows?.process}</td>
-                        <td>${net.transitionmanager.domain.Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[", "").replace("]", "")}</td>
+                        <td>${net.transitionmanager.project.Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[", "").replace("]", "")}</td>
                         <td nowrap="nowrap">
                             <tds:convertDateTime date="${workflows?.dateCreated}"/>
                         </td>

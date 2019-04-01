@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.person.Person" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <div id="generalInfoShowId" class="person" >
 	<g:form name="personDialogForm" action="updatePerson">

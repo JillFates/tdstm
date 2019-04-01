@@ -13,11 +13,11 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.json.JsonBuilder
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.StringUtils

@@ -1,7 +1,7 @@
 package net.transitionmanager.admin
 
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.os.Shell
 import com.tdsops.common.security.AESCodec
@@ -12,12 +12,12 @@ import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventSnapshot
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventSnapshot
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.AssetOptionsService

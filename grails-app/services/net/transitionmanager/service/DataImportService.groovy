@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
@@ -20,14 +20,14 @@ import grails.gorm.transactions.Transactional
 import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.party.Party
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.grails.web.json.JSONObject

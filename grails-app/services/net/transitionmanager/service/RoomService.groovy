@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -8,10 +8,10 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.RoomCommand
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils

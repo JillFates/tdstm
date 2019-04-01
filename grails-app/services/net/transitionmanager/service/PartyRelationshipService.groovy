@@ -6,17 +6,17 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRelationshipType
-import net.transitionmanager.domain.PartyRole
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.party.Party
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipType
+import net.transitionmanager.party.PartyRole
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.security.RoleType
 import org.springframework.jdbc.core.JdbcTemplate
 
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder

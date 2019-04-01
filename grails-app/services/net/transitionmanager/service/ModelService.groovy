@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -11,12 +11,12 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelAlias
+import net.transitionmanager.model.ModelConnector
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

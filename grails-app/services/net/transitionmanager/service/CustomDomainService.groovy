@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
@@ -8,7 +8,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.grails.web.json.JSONArray
@@ -513,7 +513,7 @@ class CustomDomainService implements ServiceMethods {
      * @param project an instance of {@code Project}
      * @return and instance {@code FieldSpecProject}
      * @see net.transitionmanager.dataview.FieldSpecProject#addFieldSpecs(java.lang.String, java.util.Map)
-     * @see CustomDomainService#fieldSpecsWithCommon(net.transitionmanager.domain.Project)
+     * @see CustomDomainService#fieldSpecsWithCommon(Project)
      */
     FieldSpecProject createFieldSpecProject(Project project){
         return  new FieldSpecProject(this.fieldSpecsWithCommon(project))

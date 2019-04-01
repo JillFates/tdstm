@@ -13,7 +13,7 @@ import com.tdssrc.grails.XmlUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.domain.Credential
+import net.transitionmanager.action.Credential
 import net.transitionmanager.http.HostnameVerifier
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade

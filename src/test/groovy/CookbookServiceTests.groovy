@@ -1,10 +1,10 @@
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserPreference
 import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification

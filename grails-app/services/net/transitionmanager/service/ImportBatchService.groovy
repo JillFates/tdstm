@@ -8,9 +8,9 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.project.Project
 import net.transitionmanager.i18n.Message
 import org.apache.commons.lang3.BooleanUtils
 import org.quartz.Scheduler

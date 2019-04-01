@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import grails.core.GrailsApplication
 import  org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils

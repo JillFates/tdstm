@@ -1,9 +1,8 @@
 package net.transitionmanager.search
 
-import com.tds.asset.AssetDependency
-import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.asset.AssetDependency
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 
 class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearchMethods{
 

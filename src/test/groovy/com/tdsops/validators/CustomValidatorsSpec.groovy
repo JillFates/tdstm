@@ -1,9 +1,9 @@
 package com.tdsops.validators
 
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.CustomDomainService
 import org.springframework.context.ApplicationContext
 import org.springframework.validation.Errors

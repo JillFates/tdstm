@@ -1,5 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.service.TaskService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext

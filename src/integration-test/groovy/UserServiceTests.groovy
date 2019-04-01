@@ -1,8 +1,8 @@
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserService
 import spock.lang.Specification

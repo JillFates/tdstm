@@ -2,9 +2,9 @@ import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.project.WsProjectController
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService

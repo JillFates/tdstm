@@ -1,8 +1,8 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
@@ -10,11 +10,11 @@ import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.ProjectDailyMetric
+import net.transitionmanager.metric.ProjectDailyMetric
 import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
-import net.transitionmanager.domain.MetricResult
-import net.transitionmanager.domain.Project
+import net.transitionmanager.metric.MetricResult
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomUtils
 import org.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate

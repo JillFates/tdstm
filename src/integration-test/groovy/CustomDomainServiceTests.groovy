@@ -1,10 +1,10 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectService

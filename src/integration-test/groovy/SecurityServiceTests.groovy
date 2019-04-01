@@ -6,11 +6,11 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
 import groovy.time.TimeCategory
-import net.transitionmanager.EmailDispatch
-import net.transitionmanager.PasswordReset
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectService

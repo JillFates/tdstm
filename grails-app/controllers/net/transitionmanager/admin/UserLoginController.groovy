@@ -10,11 +10,11 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
 import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.DomainUpdateException

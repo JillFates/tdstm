@@ -3,8 +3,8 @@
  */
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -20,11 +20,11 @@ import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.FavoriteDataview
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.person.FavoriteDataview
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
@@ -34,7 +34,7 @@ import java.sql.Timestamp
 
 /**
  * Service class with main database operations for Dataview.
- * @see net.transitionmanager.domain.Dataview
+ * @see Dataview
  */
 class DataviewService implements ServiceMethods {
 

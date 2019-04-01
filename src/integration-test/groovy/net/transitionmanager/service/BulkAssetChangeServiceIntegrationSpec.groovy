@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
@@ -21,12 +21,12 @@ import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagAsset
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore

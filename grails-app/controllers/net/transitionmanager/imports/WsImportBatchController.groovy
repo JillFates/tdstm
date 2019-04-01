@@ -9,9 +9,7 @@ import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.command.PatchActionCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.security.Permission

@@ -1,16 +1,16 @@
 package net.transitionmanager.admin
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import net.transitionmanager.command.newseditor.SaveNewsCommand
 import net.transitionmanager.command.newseditor.UpdateNewsCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventNews
+import net.transitionmanager.project.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService

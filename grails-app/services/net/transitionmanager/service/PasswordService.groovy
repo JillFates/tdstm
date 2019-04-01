@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.UserLogin
 
 class PasswordService {
 	SpringSecurityService springSecurityService

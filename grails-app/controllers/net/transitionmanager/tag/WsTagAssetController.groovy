@@ -5,7 +5,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.tag.CreateTagAssetCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.TagAssetService
 

@@ -1,4 +1,4 @@
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
@@ -6,12 +6,12 @@ import grails.test.mixin.integration.Integration
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import net.transitionmanager.command.PersonCO
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService

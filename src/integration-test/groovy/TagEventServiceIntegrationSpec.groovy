@@ -2,11 +2,11 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagEvent
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService

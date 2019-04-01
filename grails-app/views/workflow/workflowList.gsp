@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.task.AssetComment; net.transitionmanager.task.AssetComment; net.transitionmanager.asset.AssetComment; net.transitionmanager.project.Project" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -204,7 +204,7 @@
 				</td>
 
 				<td nowrap="nowrap">
-					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}"  noSelection="['':'Please select']" ></g:select>
+					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}" noSelection="['':'Please select']" ></g:select>
 				</td>
 
 				<td nowrap="nowrap">
@@ -273,7 +273,7 @@
 		</div>
     </g:form>
     <div style="display: none;" >
-		<g:select id="createCategory" name="createCategory" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" optionValue="${{ e -> e.capitalize() }}" noSelection="['':'Please select']" ></g:select>
+		<g:select id="createCategory" name="createCategory" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}" optionValue="${{ e -> e.capitalize() }}" noSelection="['':'Please select']" ></g:select>
     </div>
     <div style="display: none;" >
     		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description}}"

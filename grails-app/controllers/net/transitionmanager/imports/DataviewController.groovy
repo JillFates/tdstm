@@ -5,8 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.UserPreferenceService

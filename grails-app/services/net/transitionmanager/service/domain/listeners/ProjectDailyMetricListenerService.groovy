@@ -2,7 +2,7 @@ package net.transitionmanager.service.domain.listeners
 
 import grails.events.annotation.gorm.Listener
 import grails.events.bus.EventBusAware
-import net.transitionmanager.ProjectDailyMetric
+import net.transitionmanager.metric.ProjectDailyMetric
 import net.transitionmanager.service.LicenseAdminService
 import org.apache.commons.codec.digest.DigestUtils
 import org.grails.datastore.mapping.engine.event.PreInsertEvent

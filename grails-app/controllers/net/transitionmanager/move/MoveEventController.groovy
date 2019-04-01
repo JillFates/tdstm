@@ -1,10 +1,10 @@
 package net.transitionmanager.move
 
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -15,10 +15,10 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventSnapshot
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventSnapshot
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.EmptyResultException

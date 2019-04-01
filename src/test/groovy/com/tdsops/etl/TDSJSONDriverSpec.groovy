@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import getl.data.Field
 import grails.test.mixin.Mock
 import net.transitionmanager.service.CoreService

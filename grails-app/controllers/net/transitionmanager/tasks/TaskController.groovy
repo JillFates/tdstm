@@ -1,8 +1,8 @@
 package net.transitionmanager.tasks
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.task.TaskDependency
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
@@ -19,11 +19,11 @@ import groovy.time.TimeDuration
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
@@ -52,9 +52,9 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN
+import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_MGR
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {

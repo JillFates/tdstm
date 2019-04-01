@@ -3,9 +3,9 @@ import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.SecurityService

@@ -6,8 +6,6 @@ import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.partygroup.ListCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyGroupService
 

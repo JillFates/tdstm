@@ -10,8 +10,8 @@ import grails.util.Holders
 import grails.web.databinding.DataBindingUtils
 import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Room
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Room
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException

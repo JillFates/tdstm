@@ -4,7 +4,7 @@ import com.tdsops.common.security.SecurityUtil
 import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Notice
+import net.transitionmanager.notices.Notice
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.NoticeService
 

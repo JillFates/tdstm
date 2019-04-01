@@ -5,7 +5,7 @@ import grails.plugin.springsecurity.userdetails.NoStackUsernameNotFoundException
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.UserLogin
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

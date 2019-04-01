@@ -4,11 +4,11 @@ import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.Notice.NoticeType
-import net.transitionmanager.domain.NoticeAcknowledgement
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.notices.Notice
+import net.transitionmanager.notices.Notice.NoticeType
+import net.transitionmanager.notices.NoticeAcknowledgement
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 import org.springframework.context.MessageSource

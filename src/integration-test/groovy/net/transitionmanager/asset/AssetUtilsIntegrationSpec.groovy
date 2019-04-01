@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import spock.lang.Specification

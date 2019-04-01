@@ -7,9 +7,9 @@ import grails.transaction.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
 

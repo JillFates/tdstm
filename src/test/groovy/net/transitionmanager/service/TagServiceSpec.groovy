@@ -5,11 +5,11 @@ import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.domain.Tag
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
+import net.transitionmanager.tag.Tag
 import spock.lang.Shared
 import spock.lang.Specification
 

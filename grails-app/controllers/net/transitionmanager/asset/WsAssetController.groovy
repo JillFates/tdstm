@@ -1,8 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
@@ -13,14 +11,13 @@ import com.tdssrc.grails.NumberUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.asset.DeviceUtils
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
@@ -31,6 +28,7 @@ import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.task.AssetComment
 
 /**
  * Created by @oluna on 4/5/17.

@@ -7,7 +7,7 @@ import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException

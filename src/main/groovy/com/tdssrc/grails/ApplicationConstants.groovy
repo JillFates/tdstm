@@ -1,6 +1,6 @@
 package com.tdssrc.grails
 
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.AssetType
 import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 

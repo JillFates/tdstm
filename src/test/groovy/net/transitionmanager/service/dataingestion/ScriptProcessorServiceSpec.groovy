@@ -1,7 +1,7 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
@@ -17,9 +17,9 @@ import getl.excel.ExcelDataset
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService

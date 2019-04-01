@@ -1,8 +1,8 @@
 import net.transitionmanager.connector.CallbackMode
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import test.helper.ProviderTestHelper
 

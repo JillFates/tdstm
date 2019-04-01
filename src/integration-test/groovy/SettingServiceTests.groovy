@@ -4,7 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.InvalidParamException

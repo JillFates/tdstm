@@ -4,10 +4,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataScriptMode
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 

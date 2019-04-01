@@ -5,9 +5,9 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.context.ServletContextHolder
 import net.transitionmanager.asset.AssetEntityController
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService

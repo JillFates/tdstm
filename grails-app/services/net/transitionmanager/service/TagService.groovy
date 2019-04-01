@@ -2,8 +2,8 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
 
 /**
  * A service for dealing with tags

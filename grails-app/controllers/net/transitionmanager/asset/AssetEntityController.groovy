@@ -1,15 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
-import com.tds.asset.CommentNote
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tds.asset.TaskDependency
+
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
@@ -34,21 +25,23 @@ import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.DataTransferSet
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectAssetMap
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.domain.Workflow
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.imports.DataTransferBatch
+import net.transitionmanager.imports.DataTransferSet
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectAssetMap
+import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.Recipe
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
@@ -73,6 +66,7 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU

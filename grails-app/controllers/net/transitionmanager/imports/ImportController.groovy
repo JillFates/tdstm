@@ -5,8 +5,8 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.DataTransferBatch
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DataTransferBatchService

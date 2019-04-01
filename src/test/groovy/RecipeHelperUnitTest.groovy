@@ -1,4 +1,4 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.tm.domain.RecipeHelper
 import grails.testing.gorm.DataTest

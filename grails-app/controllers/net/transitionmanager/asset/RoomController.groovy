@@ -1,8 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
@@ -12,11 +10,9 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.RoomCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
@@ -24,6 +20,7 @@ import net.transitionmanager.service.RackService
 import net.transitionmanager.service.RoomService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.task.AssetComment
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoomController implements ControllerMethods {
@@ -146,7 +143,7 @@ class RoomController implements ControllerMethods {
 		} else if (userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady")) {
 			def roomAssets = room.sourceAssets + room.targetAssets
 			Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
-								[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
+																						[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
 			racks = assetsByStatus.rackSource + assetsByStatus.rackTarget
 			racks.removeAll([null])
 			racks.each {

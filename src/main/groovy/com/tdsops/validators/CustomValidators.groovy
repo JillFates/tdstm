@@ -1,7 +1,7 @@
 package com.tdsops.validators
 
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetOptions.AssetOptionsType
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
 
 import java.text.NumberFormat
-import java.text.ParseException
 
 @Slf4j
 class CustomValidators {

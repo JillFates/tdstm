@@ -6,8 +6,8 @@ import com.tdsops.common.security.AESCodec
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.metaclass.CustomMethods
 import grails.util.Environment
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.Workflow
+import net.transitionmanager.notices.Notice
+import net.transitionmanager.project.Workflow
 import net.transitionmanager.domain.constraint.OfSameProjectConstraint
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.LicenseAdminService

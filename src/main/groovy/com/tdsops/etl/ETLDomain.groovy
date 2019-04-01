@@ -1,26 +1,30 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
 
 enum ETLDomain {
 
-	Application(com.tds.asset.Application),
-	Device(com.tds.asset.AssetEntity),
-	Database(com.tds.asset.Database),
-	Storage(com.tds.asset.Files),
-	External(com.tds.asset.AssetEntity),
-	Task(com.tds.asset.AssetComment),
-	Person(net.transitionmanager.domain.Person),
-	Comment(com.tds.asset.AssetComment),
-	Asset(com.tds.asset.AssetEntity),
-	Manufacturer(net.transitionmanager.domain.Manufacturer),
-	Model(net.transitionmanager.domain.Model),
-	Dependency(com.tds.asset.AssetDependency),
-	Rack(net.transitionmanager.domain.Rack),
-	Bundle(net.transitionmanager.domain.MoveBundle),
-	Room(net.transitionmanager.domain.Room),
-	Files(com.tds.asset.Files),
-	Event(net.transitionmanager.domain.MoveEvent)
+	Application(net.transitionmanager.asset.Application),
+	Device(AssetEntity),
+	Database(net.transitionmanager.asset.Database),
+	Storage(net.transitionmanager.asset.Files),
+	External(AssetEntity),
+	Task(AssetComment),
+	Person(net.transitionmanager.person.Person),
+	Comment(AssetComment),
+	Asset(AssetEntity),
+	Manufacturer(net.transitionmanager.manufacturer.Manufacturer),
+	Model(net.transitionmanager.model.Model),
+	Dependency(AssetDependency),
+	Rack(net.transitionmanager.asset.Rack),
+	Bundle(MoveBundle),
+	Room(net.transitionmanager.asset.Room),
+	Files(net.transitionmanager.asset.Files),
+	Event(MoveEvent)
 
 	private Class<?> clazz
 

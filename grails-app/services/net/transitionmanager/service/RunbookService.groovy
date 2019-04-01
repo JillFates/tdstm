@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
-import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.project.MoveEvent
 import org.hibernate.SessionFactory
 
-import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskDependency
 import com.tdssrc.grails.TimeUtil
 
 /**

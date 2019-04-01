@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ActionType
 import com.tdssrc.grails.ApiCatalogUtil
@@ -17,12 +17,12 @@ import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.connector.GenericHttpConnector
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Credential
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter

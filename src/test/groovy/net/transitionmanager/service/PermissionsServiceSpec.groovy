@@ -4,7 +4,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import net.transitionmanager.domain.Permissions
+import net.transitionmanager.security.Permissions
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 

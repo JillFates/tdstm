@@ -1,8 +1,8 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.event.CreateEventCommand
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService

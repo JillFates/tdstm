@@ -3,13 +3,8 @@ package net.transitionmanager.model
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerSync
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelConnector
-import net.transitionmanager.domain.ModelConnectorSync
-import net.transitionmanager.domain.ModelSync
-import net.transitionmanager.domain.ModelSyncBatch
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerSync
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ManufacturerService
 import net.transitionmanager.service.ModelService

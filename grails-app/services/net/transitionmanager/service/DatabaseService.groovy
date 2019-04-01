@@ -1,12 +1,12 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetType
-import com.tds.asset.Database
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.transaction.NotTransactional
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 
 @Transactional
 class DatabaseService implements ServiceMethods {

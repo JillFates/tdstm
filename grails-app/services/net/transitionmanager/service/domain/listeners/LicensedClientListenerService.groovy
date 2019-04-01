@@ -3,9 +3,9 @@ package net.transitionmanager.service.domain.listeners
 import com.tdsops.common.grails.ApplicationContextHolder
 import grails.events.annotation.gorm.Listener
 import grails.events.bus.EventBusAware
-import net.transitionmanager.domain.LicenseActivityTrack
-import net.transitionmanager.domain.LicensedClient
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.license.LicenseActivityTrack
+import net.transitionmanager.license.LicensedClient
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 

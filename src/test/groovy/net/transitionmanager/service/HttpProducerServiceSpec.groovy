@@ -9,10 +9,10 @@ import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable

@@ -5,11 +5,11 @@ import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventSnapshot
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.StepSnapshot
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventSnapshot
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.TaskService
 import org.springframework.jdbc.core.JdbcTemplate

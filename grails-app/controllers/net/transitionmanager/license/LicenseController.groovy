@@ -2,7 +2,7 @@ package net.transitionmanager.license
 
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.LicenseAdminService
 
 @Secured('isAuthenticated()')

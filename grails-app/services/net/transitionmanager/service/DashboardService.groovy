@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.TimeUtil
-import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.project.MoveEvent
 
 /**
  * Dashboard methods.

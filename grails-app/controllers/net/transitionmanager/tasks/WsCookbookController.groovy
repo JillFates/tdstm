@@ -5,8 +5,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.command.cookbook.GroupCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.task.Recipe
+import net.transitionmanager.task.RecipeVersion
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CookbookService
 import net.transitionmanager.service.InvalidRequestException

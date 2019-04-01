@@ -8,8 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService

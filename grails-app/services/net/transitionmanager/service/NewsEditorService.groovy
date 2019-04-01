@@ -3,9 +3,9 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventNews
+import net.transitionmanager.project.Project
 
 @Transactional
 class NewsEditorService {

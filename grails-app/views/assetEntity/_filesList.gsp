@@ -2,8 +2,8 @@
     This is used by the dependency Console
 --%>
 <%@page defaultCodec="html" %>
-<%@page import="com.tds.asset.AssetComment"%>
-<%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.task.AssetComment"%>
+<%@page import="net.transitionmanager.asset.Files" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new Files()).assetClass}" />

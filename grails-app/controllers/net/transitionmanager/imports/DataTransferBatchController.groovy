@@ -1,14 +1,12 @@
 package net.transitionmanager.imports
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.DataTransferValue
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
@@ -20,7 +18,6 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.EmptyResultException
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat

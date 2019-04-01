@@ -1,4 +1,4 @@
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.PartyRelationshipService
 
 class PersonRoleSelectTagLib {

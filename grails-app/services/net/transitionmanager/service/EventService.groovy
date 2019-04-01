@@ -1,8 +1,8 @@
 package net.transitionmanager.service
 
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 
 /**
  * Handles the logic for CRUD events

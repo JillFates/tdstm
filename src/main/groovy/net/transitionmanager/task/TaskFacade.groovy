@@ -1,9 +1,9 @@
 package net.transitionmanager.task
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.service.TaskService

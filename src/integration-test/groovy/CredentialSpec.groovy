@@ -3,9 +3,9 @@ import com.tdsops.tm.enums.domain.AuthenticationRequestMode as arm
 import com.tdsops.tm.enums.domain.CredentialHttpMethod as chm
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.Credential
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import spock.lang.Specification
 import test.helper.CredentialTestHelper
 import test.helper.ProjectTestHelper

@@ -3,7 +3,7 @@ import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.DataImportService
 import org.quartz.JobExecutionContext
 

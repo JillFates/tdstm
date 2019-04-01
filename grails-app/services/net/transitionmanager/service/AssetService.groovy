@@ -1,9 +1,9 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
@@ -13,8 +13,8 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 
 class AssetService {
 

@@ -3,8 +3,8 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.grails.web.json.JSONObject
 
 @Transactional

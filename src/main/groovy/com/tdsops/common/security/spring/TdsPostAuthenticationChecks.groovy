@@ -4,7 +4,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.PasswordService
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.core.userdetails.UserDetails

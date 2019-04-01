@@ -1,5 +1,4 @@
-import com.tds.asset.AssetEntity
-import grails.converters.JSON
+import net.transitionmanager.asset.AssetEntity
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil

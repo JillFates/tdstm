@@ -1,4 +1,4 @@
-import net.transitionmanager.domain.Setting
+import net.transitionmanager.common.Setting
 import net.transitionmanager.service.DatabaseMigrationService
 import org.grails.web.json.JSONObject
 
