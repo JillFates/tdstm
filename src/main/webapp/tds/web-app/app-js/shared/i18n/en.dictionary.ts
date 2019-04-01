@@ -132,6 +132,10 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
+	'ASSET_SUMMARY': {
+		'ASSET_SUMMARY': 'Asset Summary',
+		'SUMMARY': 'Summary'
+	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
 		'MANAGE_TAGS': 'Manage Tags',

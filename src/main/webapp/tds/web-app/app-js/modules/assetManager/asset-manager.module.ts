@@ -14,7 +14,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Assets Module
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
-import {AssetManagerRouteModule} from './asset-manager-route';
+import {AssetManagerRouteModule} from './asset-manager.route';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
