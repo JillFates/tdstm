@@ -1247,6 +1247,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/tasksReport" {
+			controller = "wsReports"
+			action = [
+					POST: "tasksReport"
+			]
+		}
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
