@@ -13,9 +13,9 @@ import net.transitionmanager.project.MoveEventNews
 import net.transitionmanager.project.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.NewsEditorService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.NewsEditorService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured

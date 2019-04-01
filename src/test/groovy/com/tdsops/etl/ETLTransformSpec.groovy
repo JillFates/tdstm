@@ -17,8 +17,8 @@ import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight

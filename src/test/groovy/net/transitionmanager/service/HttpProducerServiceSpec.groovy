@@ -7,6 +7,10 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
+import net.transitionmanager.action.HttpProducerService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.SettingService
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.action.ApiAction

@@ -1,7 +1,7 @@
 package version.v4_6_0
 
 import net.transitionmanager.imports.Dataview
-import net.transitionmanager.service.DatabaseMigrationService
+import net.transitionmanager.common.DatabaseMigrationService
 
 databaseChangeLog = {
 	changeSet(author: 'slopez', id: '20181123-TM-13152-2') {

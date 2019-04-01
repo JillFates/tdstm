@@ -14,7 +14,6 @@ import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.ImportBatchService
 
 @Secured("isAuthenticated()")
 @Slf4j

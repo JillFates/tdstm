@@ -12,8 +12,6 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ApiActionValidateScriptCommand
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.ApiCatalogService
 
 @Secured('isAuthenticated()')
 @Slf4j

@@ -14,8 +14,8 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import spock.lang.See
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges

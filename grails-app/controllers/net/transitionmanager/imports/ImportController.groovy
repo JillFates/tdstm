@@ -5,14 +5,11 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.imports.DataTransferBatch
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DataTransferBatchService
-import net.transitionmanager.service.ImportService
-import net.transitionmanager.service.ProgressService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.ProgressService
+import net.transitionmanager.person.UserPreferenceService
 import org.quartz.ObjectAlreadyExistsException
 import org.quartz.Scheduler
 import org.quartz.Trigger

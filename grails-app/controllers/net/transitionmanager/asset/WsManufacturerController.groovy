@@ -4,8 +4,8 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.ManufacturerService
+import net.transitionmanager.common.ControllerService
+
 /**
  * Handles WS calls of the ManufacturerService.
  *

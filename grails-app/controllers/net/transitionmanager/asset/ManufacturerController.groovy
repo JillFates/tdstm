@@ -11,7 +11,6 @@ import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.model.Model
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ManufacturerService
 import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 

@@ -8,7 +8,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.task.Recipe
 import net.transitionmanager.task.RecipeVersion
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.CookbookService
+import net.transitionmanager.task.CookbookService
 import net.transitionmanager.exception.InvalidRequestException
 /**
  * Handles WS calls of the CookbookService.

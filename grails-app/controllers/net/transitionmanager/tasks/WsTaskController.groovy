@@ -13,14 +13,14 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.CommentService
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.CommentService
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.CredentialService
+import net.transitionmanager.security.CredentialService
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.QzSignService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.TaskService
 
 /**
  * Handles WS calls of the TaskService.

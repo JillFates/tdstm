@@ -4,10 +4,10 @@ import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import grails.validation.ValidationException
 import spock.lang.Specification

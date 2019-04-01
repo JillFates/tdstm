@@ -11,7 +11,7 @@ import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

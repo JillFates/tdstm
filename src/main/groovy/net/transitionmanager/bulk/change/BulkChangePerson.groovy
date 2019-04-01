@@ -7,7 +7,7 @@ import grails.util.Holders
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.project.ProjectService
 
 @Transactional
 class BulkChangePerson {

@@ -16,8 +16,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint

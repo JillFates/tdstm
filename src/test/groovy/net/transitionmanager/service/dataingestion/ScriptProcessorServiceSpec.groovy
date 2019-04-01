@@ -20,11 +20,11 @@ import grails.testing.web.GrailsWebUnitTest
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SettingService
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.SettingService
+import net.transitionmanager.imports.ScriptProcessorService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow

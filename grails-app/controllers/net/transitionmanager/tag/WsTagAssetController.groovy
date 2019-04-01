@@ -6,7 +6,6 @@ import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.tag.CreateTagAssetCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.TagAssetService
 
 @Secured('isAuthenticated()')
 class WsTagAssetController implements ControllerMethods {

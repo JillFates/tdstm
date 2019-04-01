@@ -20,7 +20,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper

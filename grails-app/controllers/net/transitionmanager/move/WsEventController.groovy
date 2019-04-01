@@ -7,8 +7,8 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.EventService
-import net.transitionmanager.service.MoveEventService
+import net.transitionmanager.project.EventService
+import net.transitionmanager.project.MoveEventService
 /**
  * Handles WS calls of the EventService.
  *

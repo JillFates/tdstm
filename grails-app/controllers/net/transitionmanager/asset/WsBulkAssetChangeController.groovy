@@ -5,7 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.BulkAssetChangeService
+import net.transitionmanager.asset.BulkAssetChangeService
 
 @Secured('isAuthenticated()')
 class WsBulkAssetChangeController implements ControllerMethods {

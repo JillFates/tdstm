@@ -8,9 +8,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.LicenseCommonService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.project.ProjectService
 /**
  * Created by octavio on 11/14/16.
  */

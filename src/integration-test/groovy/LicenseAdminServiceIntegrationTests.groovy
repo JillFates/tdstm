@@ -8,9 +8,9 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.codec.binary.Base64
 import spock.lang.Narrative
 import spock.lang.See

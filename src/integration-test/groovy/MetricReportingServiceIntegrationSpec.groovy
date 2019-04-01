@@ -12,8 +12,8 @@ import net.transitionmanager.metric.MetricResult
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.MetricReportingService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.reporting.MetricReportingService
 import org.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared

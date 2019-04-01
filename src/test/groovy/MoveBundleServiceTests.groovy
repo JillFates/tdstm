@@ -1,6 +1,6 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.service.MoveBundleService
+import net.transitionmanager.project.MoveBundleService
 
 import org.junit.Ignore
 import org.springframework.jdbc.core.JdbcTemplate

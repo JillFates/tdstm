@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.BulkAssetChangeService
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -21,13 +22,18 @@ import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagAssetService
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore

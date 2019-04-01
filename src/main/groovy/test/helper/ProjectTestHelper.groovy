@@ -9,8 +9,8 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Timezone
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 /**
  * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting

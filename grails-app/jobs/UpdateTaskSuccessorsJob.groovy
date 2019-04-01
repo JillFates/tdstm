@@ -1,6 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TaskNonTranService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.task.TaskNonTranService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 import org.quartz.TriggerKey

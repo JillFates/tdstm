@@ -7,7 +7,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.dependency.analyzer.FilteredAssetsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.DependencyAnalyzerService
+import net.transitionmanager.asset.DependencyAnalyzerService
 import org.springframework.jdbc.core.JdbcTemplate
 /**
  * Controller used primarily for the Dependency Analyzer

@@ -19,12 +19,12 @@ import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.AwsService
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.AwsService
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.ProviderService
+import net.transitionmanager.project.ProviderService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore

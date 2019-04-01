@@ -21,10 +21,10 @@ import net.transitionmanager.task.Recipe
 import net.transitionmanager.common.Setting
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.LicenseManagerService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.license.LicenseManagerService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.project.ProjectService
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import test.helper.ApplicationTestHelper

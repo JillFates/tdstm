@@ -89,7 +89,7 @@ class Manufacturer {
 	 * @param createIfNotFound - optional flag to indicating if record should be created (default false)
 	 * @return a ManufacturerAlias object if found or was successfully created , or null if not found or not created
 	 *
-	 * @deprecated use {@link net.transitionmanager.service.ManufacturerService#findOrCreateAliasByName(Manufacturer, java.lang.String, boolean) ManufacturerService} instead.
+	 * @deprecated use {@link net.transitionmanager.asset.ManufacturerService#findOrCreateAliasByName(Manufacturer, java.lang.String, boolean) ManufacturerService} instead.
 	 */
 	@Deprecated
 	ManufacturerAlias findOrCreateAliasByName(String name, boolean createIfNotFound = false) {

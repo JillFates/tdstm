@@ -6,10 +6,10 @@ import net.transitionmanager.party.Party
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 

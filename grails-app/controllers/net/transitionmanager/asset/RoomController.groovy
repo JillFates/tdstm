@@ -14,12 +14,12 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.RackService
-import net.transitionmanager.service.RoomService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.asset.RackService
+import net.transitionmanager.asset.RoomService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

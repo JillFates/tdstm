@@ -3,7 +3,7 @@ package com.tdsops.common.security.spring
 import grails.plugin.springsecurity.web.authentication.GrailsUsernamePasswordAuthenticationFilter
 import groovy.transform.CompileStatic
 import net.transitionmanager.exception.WrappedAuthenticationException
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

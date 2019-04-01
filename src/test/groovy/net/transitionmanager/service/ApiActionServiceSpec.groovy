@@ -1,5 +1,7 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import grails.testing.gorm.DataTest
@@ -16,6 +18,7 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
+import net.transitionmanager.task.TaskService
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 

@@ -5,8 +5,8 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.person.UserPreferenceService
 
 
 @Secured("isAuthenticated()")

@@ -11,9 +11,9 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApiActionService
+import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 import com.tdssrc.grails.StopWatch

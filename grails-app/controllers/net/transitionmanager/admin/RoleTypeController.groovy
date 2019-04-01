@@ -8,7 +8,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.RoleTypeService
+import net.transitionmanager.security.RoleTypeService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoleTypeController implements ControllerMethods {

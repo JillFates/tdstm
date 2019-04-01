@@ -4,8 +4,8 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApplicationService
-import net.transitionmanager.service.QzSignService
+import net.transitionmanager.asset.ApplicationService
+import net.transitionmanager.task.QzSignService
 /**
  * Handles WS calls of the ApplicationService.
  *

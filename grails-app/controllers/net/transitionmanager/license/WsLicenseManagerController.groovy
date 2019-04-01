@@ -4,7 +4,7 @@ import net.transitionmanager.exception.InvalidLicenseException
 import net.transitionmanager.exception.ServiceException
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.service.LicenseManagerService
+
 /**
  * Created by octavio on 11/30/16.
  */

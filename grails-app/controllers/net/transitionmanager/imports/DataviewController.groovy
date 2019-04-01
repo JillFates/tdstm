@@ -7,8 +7,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 
 @Secured('isAuthenticated()')
 class DataviewController implements ControllerMethods, PaginationMethods {

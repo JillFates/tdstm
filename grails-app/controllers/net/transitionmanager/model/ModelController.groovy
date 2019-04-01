@@ -2,7 +2,10 @@ package net.transitionmanager.model
 
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntityAttributeLoaderService
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.ModelService
 import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -15,6 +18,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -31,10 +35,10 @@ class ModelController implements ControllerMethods {
 	static final OK_CONTENTS = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
-	AssetEntityService assetEntityService
-	JdbcTemplate jdbcTemplate
-	ModelService modelService
-	UserPreferenceService userPreferenceService
+	AssetEntityService                assetEntityService
+	JdbcTemplate                      jdbcTemplate
+	ModelService                      modelService
+	UserPreferenceService             userPreferenceService
 
 	@HasPermission(Permission.ModelList)
 	def list() {

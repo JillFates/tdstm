@@ -10,9 +10,9 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagService
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification

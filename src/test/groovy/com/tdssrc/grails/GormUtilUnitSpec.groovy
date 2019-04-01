@@ -21,7 +21,7 @@ import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.service.DataviewService
+import net.transitionmanager.imports.DataviewService
 import org.grails.datastore.mapping.model.PersistentProperty
 import spock.lang.See
 import spock.lang.Specification

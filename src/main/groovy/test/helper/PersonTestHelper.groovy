@@ -9,7 +9,7 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.party.PartyRelationshipService
 
 /**
  * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other
@@ -20,9 +20,9 @@ import net.transitionmanager.service.PartyRelationshipService
  * that's the idea...
  */
 
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.RandomStringUtils
 

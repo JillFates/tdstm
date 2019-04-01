@@ -13,7 +13,6 @@ import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.action.Credential
-import net.transitionmanager.service.CredentialService
 
 @Slf4j
 @Secured("isAuthenticated()")

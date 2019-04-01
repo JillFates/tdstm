@@ -1,6 +1,6 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.admin.WsUserController
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 import test.AbstractUnitSpec
 import spock.lang.Ignore
 

@@ -19,8 +19,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.MoveBundleService
-import net.transitionmanager.service.MoveEventService
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveEventService
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared

@@ -6,9 +6,9 @@ import grails.util.Holders
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
-import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 
 @Transactional
 class BulkChangeTag {

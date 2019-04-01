@@ -6,7 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 
 /**
  * Provides helper functionality for the AssetEntity domain

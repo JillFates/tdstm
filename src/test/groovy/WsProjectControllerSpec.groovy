@@ -6,8 +6,8 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.project.WsProjectController
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import org.quartz.DateBuilder
 import test.AbstractUnitSpec
 

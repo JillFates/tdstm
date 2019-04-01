@@ -15,14 +15,10 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.AssetOptionsService
-import net.transitionmanager.service.AssetService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DatabaseService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.exception.LogicException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate

@@ -1,7 +1,7 @@
 package net.transitionmanager.application
 
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.service.EnvironmentService
+import net.transitionmanager.common.EnvironmentService
 
 /**
  * Single App AngularJS 2-4

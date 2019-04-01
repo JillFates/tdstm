@@ -11,8 +11,8 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.grails.web.json.JSONObject
 import spock.lang.See
 

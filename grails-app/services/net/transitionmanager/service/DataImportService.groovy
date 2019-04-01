@@ -1,8 +1,15 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.asset.AssetService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
@@ -32,7 +39,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import net.transitionmanager.imports.ScriptProcessorService
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -55,15 +62,15 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 class DataImportService implements ServiceMethods {
 
 	// IOC
-	FileSystemService fileSystemService
+	FileSystemService        fileSystemService
 	PartyRelationshipService partyRelationshipService
-	PersonService personService
-	ProgressService progressService
-	Scheduler quartzScheduler
-	ScriptProcessorService scriptProcessorService
-	ProjectService projectService
-	AssetService assetService
-	CustomDomainService customDomainService
+	PersonService            personService
+	ProgressService          progressService
+	Scheduler                quartzScheduler
+	ScriptProcessorService   scriptProcessorService
+	ProjectService           projectService
+	AssetService             assetService
+	CustomDomainService      customDomainService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"

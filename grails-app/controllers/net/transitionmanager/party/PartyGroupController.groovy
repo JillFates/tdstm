@@ -7,9 +7,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.partygroup.ListCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyGroupService
-
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 
 /**
  * This Controller handles CRUD operations for PartyGroups(Companies).

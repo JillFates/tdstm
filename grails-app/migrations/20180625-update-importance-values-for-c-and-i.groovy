@@ -1,5 +1,5 @@
 import net.transitionmanager.common.Setting
-import net.transitionmanager.service.DatabaseMigrationService
+import net.transitionmanager.common.DatabaseMigrationService
 import org.grails.web.json.JSONObject
 
 databaseChangeLog = {

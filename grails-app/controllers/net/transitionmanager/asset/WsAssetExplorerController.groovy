@@ -14,8 +14,8 @@ import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.imports.DataviewService
+import net.transitionmanager.person.UserPreferenceService
 import org.grails.web.json.JSONObject
 
 /**

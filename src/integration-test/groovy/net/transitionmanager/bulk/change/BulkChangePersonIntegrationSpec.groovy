@@ -9,7 +9,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.project.ProjectService
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification

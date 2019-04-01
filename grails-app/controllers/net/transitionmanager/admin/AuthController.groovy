@@ -20,14 +20,14 @@ import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.notices.Notice
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.EmailDispatchService
-import net.transitionmanager.service.EnvironmentService
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.NoticeService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.EmailDispatchService
+import net.transitionmanager.common.EnvironmentService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.notice.NoticeService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 
 @Secured('permitAll')
 class AuthController implements ControllerMethods {

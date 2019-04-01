@@ -10,8 +10,8 @@ import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer

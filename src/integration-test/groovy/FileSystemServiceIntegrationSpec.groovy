@@ -3,7 +3,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile

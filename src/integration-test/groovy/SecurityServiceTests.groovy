@@ -13,8 +13,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import net.transitionmanager.exception.UnauthorizedException
 import spock.lang.Ignore
 import spock.lang.See

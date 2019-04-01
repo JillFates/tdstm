@@ -8,8 +8,8 @@ import grails.plugin.springsecurity.SpringSecurityService
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authentication.TestingAuthenticationToken

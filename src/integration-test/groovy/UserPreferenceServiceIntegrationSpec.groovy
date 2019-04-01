@@ -5,8 +5,8 @@ import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 

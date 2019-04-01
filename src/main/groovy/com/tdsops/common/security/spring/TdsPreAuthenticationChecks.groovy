@@ -6,8 +6,8 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.person.UserPreferenceService
 import org.eclipse.jdt.internal.core.Assert
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.authentication.DisabledException

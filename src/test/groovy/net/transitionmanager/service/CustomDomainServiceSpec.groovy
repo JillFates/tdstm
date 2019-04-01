@@ -9,6 +9,8 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.SettingService
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project

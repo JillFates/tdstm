@@ -13,10 +13,10 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagEvent
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagAssetService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper

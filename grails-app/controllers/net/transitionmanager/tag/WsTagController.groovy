@@ -9,7 +9,6 @@ import net.transitionmanager.command.tag.SearchCommand
 import net.transitionmanager.command.tag.UpdateCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.TagService
 
 @Secured('isAuthenticated()')
 class WsTagController implements ControllerMethods {

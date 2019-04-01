@@ -6,7 +6,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.ApplicationTestHelper

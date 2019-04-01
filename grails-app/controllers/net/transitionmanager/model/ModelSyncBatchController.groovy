@@ -6,8 +6,8 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerSync
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ManufacturerService
-import net.transitionmanager.service.ModelService
+import net.transitionmanager.asset.ManufacturerService
+import net.transitionmanager.asset.ModelService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ModelSyncBatchController implements ControllerMethods {

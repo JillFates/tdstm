@@ -22,18 +22,18 @@ import net.transitionmanager.security.RoleType
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ControllerService
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

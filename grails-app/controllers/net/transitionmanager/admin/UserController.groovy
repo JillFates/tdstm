@@ -3,7 +3,7 @@ package net.transitionmanager.admin
 import net.transitionmanager.controller.ControllerMethods
 import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.UserService
+import net.transitionmanager.person.UserService
 
 import static net.transitionmanager.utils.Profiler.KEY_NAME
 

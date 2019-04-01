@@ -14,11 +14,11 @@ import net.transitionmanager.security.RoleType
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 
 import java.text.DateFormat
 

@@ -15,9 +15,9 @@ import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.project.WorkflowTransitionMap
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.StateEngineService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.project.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 // TODO BB all called
 

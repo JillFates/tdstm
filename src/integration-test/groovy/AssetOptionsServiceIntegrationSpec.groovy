@@ -2,7 +2,7 @@ import net.transitionmanager.asset.AssetOptions
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.AssetOptionsCommand
-import net.transitionmanager.service.AssetOptionsService
+import net.transitionmanager.asset.AssetOptionsService
 import spock.lang.Specification
 
 import static net.transitionmanager.asset.AssetOptions.*

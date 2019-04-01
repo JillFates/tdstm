@@ -11,11 +11,11 @@ import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagAssetService
-import net.transitionmanager.service.TagEventService
-import net.transitionmanager.service.TagService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagAssetService
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.tag.TagService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper

@@ -9,8 +9,8 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

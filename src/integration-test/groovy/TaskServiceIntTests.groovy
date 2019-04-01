@@ -18,8 +18,8 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
 import spock.lang.Ignore

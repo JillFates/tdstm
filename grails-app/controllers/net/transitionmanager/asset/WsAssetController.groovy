@@ -19,15 +19,8 @@ import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApplicationService
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.AssetService
-import net.transitionmanager.service.CommentService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DatabaseService
-import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.StorageService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
 
 /**

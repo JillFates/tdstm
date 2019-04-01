@@ -8,8 +8,8 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.tag.TagAssetService
 import spock.lang.See
 import spock.lang.Specification
 

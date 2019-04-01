@@ -16,7 +16,7 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
 import net.transitionmanager.asset.Room
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.PersonService
+import net.transitionmanager.person.PersonService
 import org.grails.web.json.JSONObject
 
 @Slf4j

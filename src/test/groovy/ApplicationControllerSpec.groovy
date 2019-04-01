@@ -6,8 +6,8 @@ import grails.test.mixin.TestFor
 import net.transitionmanager.asset.ApplicationController
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.ApplicationService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.asset.ApplicationService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 
 import test.AbstractUnitSpec

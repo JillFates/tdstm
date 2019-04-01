@@ -2,7 +2,7 @@ package net.transitionmanager.integration
 
 import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.MessageSourceService
+import net.transitionmanager.common.MessageSourceService
 
 /**
  * This class is used for binding context in every Api Action script processed.

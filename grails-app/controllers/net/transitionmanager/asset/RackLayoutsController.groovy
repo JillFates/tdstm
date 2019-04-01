@@ -19,11 +19,9 @@ import net.transitionmanager.model.ModelConnector
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.RackService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
 import org.springframework.jdbc.core.JdbcTemplate
 

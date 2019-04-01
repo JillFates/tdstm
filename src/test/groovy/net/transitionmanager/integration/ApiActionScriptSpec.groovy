@@ -8,8 +8,8 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.person.Person
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.MessageSourceService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification

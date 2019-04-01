@@ -9,8 +9,8 @@ import grails.util.Holders
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.project.ProjectService
 
 class DeviceSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 

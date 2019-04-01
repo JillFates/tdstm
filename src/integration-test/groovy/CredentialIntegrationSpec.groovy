@@ -6,8 +6,8 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.CredentialTestHelper

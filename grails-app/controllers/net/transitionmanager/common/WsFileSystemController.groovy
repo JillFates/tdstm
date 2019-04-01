@@ -9,7 +9,6 @@ import net.transitionmanager.command.UploadTextCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.FileSystemService
 import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j

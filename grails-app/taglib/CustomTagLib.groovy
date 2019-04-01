@@ -10,15 +10,15 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectLogo
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.codec.net.URLCodec
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.validator.routines.UrlValidator
 import grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
-import net.transitionmanager.service.LicenseCommonService
-import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.license.LicenseCommonService
+import net.transitionmanager.license.LicenseAdminService
 
 import asset.pipeline.grails.AssetProcessorService
 import java.sql.Timestamp

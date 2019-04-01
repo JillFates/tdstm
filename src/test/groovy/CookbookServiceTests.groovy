@@ -5,8 +5,8 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
-import net.transitionmanager.service.CookbookService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.task.CookbookService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Specification
 import test.helper.mock.ProjectMock
 

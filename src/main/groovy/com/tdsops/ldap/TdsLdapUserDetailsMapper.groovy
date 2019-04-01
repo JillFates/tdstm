@@ -5,7 +5,7 @@ import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
 import groovy.util.logging.Slf4j
 import net.transitionmanager.exception.NoRolesException
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.UserService
+import net.transitionmanager.person.UserService
 import grails.core.GrailsApplication
 import grails.core.support.GrailsApplicationAware
 import org.springframework.beans.factory.annotation.Autowired

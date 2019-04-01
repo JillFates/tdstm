@@ -6,7 +6,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.action.Provider
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ProviderService
+import net.transitionmanager.project.ProviderService
 /**
  * Provide the endpoints for working with Providers.
  */

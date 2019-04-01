@@ -8,11 +8,11 @@ import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSu
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.NoticeService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.notice.NoticeService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
 import org.springframework.util.Assert

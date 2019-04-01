@@ -20,18 +20,18 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AccountImportExportService
-import net.transitionmanager.service.AssetOptionsService
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.CoreService
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CoreService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.person.UserService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.lang.management.ManagementFactory

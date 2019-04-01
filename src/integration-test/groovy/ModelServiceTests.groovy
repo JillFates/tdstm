@@ -7,9 +7,9 @@ import net.transitionmanager.model.ModelAlias
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.ModelService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.asset.ModelService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Specification
 
 @Integration

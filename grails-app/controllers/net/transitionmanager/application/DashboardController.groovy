@@ -8,14 +8,14 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectLogo
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DashboardService
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.reporting.DashboardService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class DashboardController implements ControllerMethods {

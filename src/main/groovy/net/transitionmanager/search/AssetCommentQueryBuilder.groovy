@@ -10,9 +10,9 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.BooleanUtils
 
 class AssetCommentQueryBuilder {

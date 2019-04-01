@@ -5,9 +5,9 @@ import com.tdssrc.grails.HtmlUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.project.ProjectService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class CommonController implements ControllerMethods {

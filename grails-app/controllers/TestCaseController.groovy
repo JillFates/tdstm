@@ -6,15 +6,15 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.AccountImportExportService
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.ApiCatalogService
-import net.transitionmanager.service.AwsService
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.ApiCatalogService
+import net.transitionmanager.action.AwsService
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN

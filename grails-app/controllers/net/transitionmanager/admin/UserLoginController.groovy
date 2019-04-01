@@ -16,14 +16,14 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AuditService
+import net.transitionmanager.security.AuditService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here

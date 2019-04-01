@@ -6,7 +6,7 @@ import com.tdsops.tm.enums.domain.UserAuditSeverity
 import net.transitionmanager.security.UserAudit
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 import org.springframework.web.context.request.RequestContextHolder
 
 import static com.tdsops.tm.enums.domain.UserAuditClassification.ADMIN

@@ -5,8 +5,8 @@ import grails.util.GrailsWebMockUtil
 import net.transitionmanager.admin.AdminController
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.security.SecurityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder

@@ -26,8 +26,8 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore

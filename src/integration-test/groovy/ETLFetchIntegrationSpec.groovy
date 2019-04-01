@@ -10,7 +10,7 @@ import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 import test.helper.AssetEntityTestHelper
 @Integration
 @Rollback

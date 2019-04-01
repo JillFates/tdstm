@@ -8,7 +8,7 @@ import getl.csv.CSVDataset
 import getl.utils.FileUtils
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.common.CustomDomainService
 import spock.lang.Specification
 
 abstract class ETLBaseIntegrationSpec extends Specification{

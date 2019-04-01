@@ -1,6 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.AssetExportService
-import net.transitionmanager.service.ProgressService
+import net.transitionmanager.asset.AssetExportService
+import net.transitionmanager.common.ProgressService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 

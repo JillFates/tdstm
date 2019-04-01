@@ -13,10 +13,10 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import org.springframework.transaction.annotation.Transactional
 import spock.lang.Ignore
 import spock.lang.Specification

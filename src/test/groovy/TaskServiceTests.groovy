@@ -14,8 +14,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
-import net.transitionmanager.service.SequenceService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.common.SequenceService
+import net.transitionmanager.task.TaskService
 import org.joda.time.DateTime
 import org.quartz.Scheduler
 import org.quartz.Trigger

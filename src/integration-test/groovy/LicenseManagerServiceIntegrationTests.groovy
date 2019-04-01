@@ -8,9 +8,9 @@ import net.transitionmanager.license.LicensedClient
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.LicenseManagerService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.license.LicenseManagerService
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.StringUtils
 import org.joda.time.DateTime
 import spock.lang.Narrative

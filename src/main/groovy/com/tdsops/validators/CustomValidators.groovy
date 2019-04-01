@@ -8,8 +8,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.AssetOptionsService
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.common.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors

@@ -4,7 +4,7 @@ import net.transitionmanager.asset.Application
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.common.CustomDomainService
 import org.springframework.context.ApplicationContext
 import org.springframework.validation.Errors
 import spock.lang.Shared

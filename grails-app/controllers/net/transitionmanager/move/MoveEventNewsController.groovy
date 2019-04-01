@@ -6,7 +6,7 @@ import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.StateEngineService
+import net.transitionmanager.project.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured

@@ -6,14 +6,14 @@ import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.service.CoreService
+import net.transitionmanager.common.CoreService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidConfigurationException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.InvalidSyntaxException
-import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.exception.UnauthorizedException
 

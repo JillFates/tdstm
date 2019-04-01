@@ -6,8 +6,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.metricdefinition.GetMetricsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.MetricReportingService
-import org.springframework.http.HttpStatus
 
 /**
  * An API controller for getting metric results.

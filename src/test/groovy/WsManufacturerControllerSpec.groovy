@@ -1,7 +1,7 @@
 import grails.test.mixin.TestFor
 import net.transitionmanager.asset.WsManufacturerController
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.ManufacturerService
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.asset.ManufacturerService
 import test.AbstractUnitSpec
 import spock.lang.Ignore
 

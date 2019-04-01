@@ -5,7 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.party.PartyRelationshipService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectTeamController implements ControllerMethods {

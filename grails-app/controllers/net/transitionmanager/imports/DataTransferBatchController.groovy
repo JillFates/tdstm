@@ -8,16 +8,14 @@ import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DataTransferBatchService
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.service.ImportService
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat

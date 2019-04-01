@@ -10,7 +10,9 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
+import net.transitionmanager.security.SecurityService
 import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagService
 import spock.lang.Shared
 import spock.lang.Specification
 
