@@ -43,13 +43,19 @@ export class NoticeViewEditComponent implements OnInit {
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
 		this.model = {...model};
-		this.model.typeId = this.model.typeId ?  parseInt(this.model.typeId, 10) : null;
-		this.noticeType = {typeId: this.model.typeId};
-		this.dataSignature = JSON.stringify(this.model);
 	}
 
 	ngOnInit() {
 		this.noticeIsLocked = this.model.locked;
+
+		this.model.typeId = this.model.typeId ?  parseInt(this.model.typeId, 10) : null;
+		this.model.active = this.mapActiveField(this.model.active);
+
+		if (this.model.needAcknowledgement) {
+			this.model.typeId = NoticeType.Mandatory;
+		}
+		this.noticeType = {typeId: this.model.typeId};
+		this.dataSignature = JSON.stringify(this.model);
 	}
 
 	protected cancelCloseDialog(): void {
@@ -144,5 +150,17 @@ export class NoticeViewEditComponent implements OnInit {
 	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
+	}
+
+	private mapActiveField(active: any): any {
+		if (active === 'Yes') {
+			return true;
+		}
+
+		if (active === 'No') {
+			return false;
+		}
+
+		return active;
 	}
 }

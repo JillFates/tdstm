@@ -224,15 +224,16 @@ export class NoticeListComponent implements OnInit {
 			.filter((notice: NoticeModel) =>  notice.typeId === NoticeType.PostLogin)
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
-		this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
-			.then((response: any) => {
-				console.log('The response is:');
-				console.log(response);
-			})
-			.catch((error) => {
-				console.log('The error calling the standard notice is:');
-				console.log(error);
-			});
+		if (notices && notices.length) {
+			this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
+				.then((response: any) => {
+					console.log('The response is:');
+					console.log(response);
+				})
+				.catch((error) => {
+					console.error('Error:', error.message || error);
+				});
+		}
 	}
 
 	openDialogWithDelay(notice: NoticeModel) {
