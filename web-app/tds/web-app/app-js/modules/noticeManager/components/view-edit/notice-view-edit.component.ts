@@ -81,13 +81,20 @@ export class NoticeViewEditComponent implements OnInit {
 	protected saveNotice(): void {
 		this.model.typeId = (this.noticeType && this.noticeType.typeId);
 
-		if (this.model.id) {
-			this.noticeService.editNotice(this.model)
+		const model = {...this.model};
+
+		if (model.typeId === NoticeType.Mandatory) {
+			model.typeId = NoticeType.PostLogin;
+			model.needAcknowledgement = true;
+		}
+
+		if (model.id) {
+			this.noticeService.editNotice(model)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
 		} else {
-			this.noticeService.createNotice(this.model)
+			this.noticeService.createNotice(model)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));

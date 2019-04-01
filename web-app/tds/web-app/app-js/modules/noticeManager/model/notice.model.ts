@@ -78,6 +78,7 @@ export class NoticeModel {
 	locked: boolean;
 	postMessageText: string;
 	notShowAgain?: boolean;
+	needAcknowledgement?: boolean;
 }
 
 export class PostNoticeResponse {
