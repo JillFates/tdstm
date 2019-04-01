@@ -894,7 +894,7 @@ class SearchQueryHelper {
 	private static List fetchPerson(Person existingPerson, String searchValue, String fieldName, Map fieldsInfo, Map context) {
 		Person person
 		String errorMsg
-		Boolean isEmail = searchValue.contains('@')
+		Boolean isEmail = (!searchValue)?false:searchValue.contains('@')
 
 		// If the pre-existing person check if searchValue matches the person
 		if (existingPerson) {
@@ -905,7 +905,7 @@ class SearchQueryHelper {
 			}
 		}
 
-		if (!person) {
+		if (!person && searchValue) {
 			if (isEmail) {
 				person = context.staffList.find { it.email.equalsIgnoreCase(searchValue) }
 				if (!person) {
