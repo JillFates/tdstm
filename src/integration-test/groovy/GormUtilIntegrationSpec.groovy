@@ -9,7 +9,7 @@ import grails.gorm.validation.Constraint
 import grails.test.mixin.integration.Integration
 import grails.validation.Validateable
 import net.transitionmanager.action.Credential
-import net.transitionmanager.notices.Notice
+import net.transitionmanager.notice.Notice
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project

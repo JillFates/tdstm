@@ -1,12 +1,12 @@
 package net.transitionmanager.admin
 
 import com.tdsops.common.security.SecurityUtil
-import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.notices.Notice
-import net.transitionmanager.security.Permission
+import net.transitionmanager.notice.Notice
 import net.transitionmanager.notice.NoticeService
+import net.transitionmanager.security.Permission
 
 /**
  * @author oluna
@@ -24,6 +24,7 @@ class WsNoticeController implements ControllerMethods {
 	def fetch(Integer typeId) {
 		try {
 			Notice.NoticeType type
+
 			if (typeId) {
 				type = Notice.NoticeType.forId(typeId)
 			}

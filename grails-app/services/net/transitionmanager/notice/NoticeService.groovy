@@ -1,15 +1,15 @@
 package net.transitionmanager.notice
 
-import net.transitionmanager.exception.ServiceException
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.notices.Notice
-import net.transitionmanager.notices.Notice.NoticeType
-import net.transitionmanager.notices.NoticeAcknowledgement
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.notice.Notice
+import net.transitionmanager.notice.Notice.NoticeType
+import net.transitionmanager.notice.NoticeAcknowledgement
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
@@ -17,7 +17,6 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
 import javax.xml.bind.DatatypeConverter
-
 /**
  * @author octavio
  */

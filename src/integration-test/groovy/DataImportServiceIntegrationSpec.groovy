@@ -25,7 +25,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils

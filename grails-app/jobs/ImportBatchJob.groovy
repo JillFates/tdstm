@@ -4,7 +4,7 @@ import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import org.quartz.JobExecutionContext
 
 @Slf4j

@@ -1,33 +1,33 @@
 package net.transitionmanager.person
 
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.Application
-import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.task.CommentNote
-import com.tdssrc.grails.StringUtil
 import net.transitionmanager.common.EmailDispatch
-import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.common.ExceptionDates
-import net.transitionmanager.imports.Dataview
-import net.transitionmanager.project.MoveEventNews
-import net.transitionmanager.project.MoveEventStaff
-import net.transitionmanager.project.Project
-import net.transitionmanager.task.RecipeVersion
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.project.Workflow
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.Dataview
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelSync
-import net.transitionmanager.notices.Notice
-import net.transitionmanager.notices.NoticeAcknowledgement
+import net.transitionmanager.notice.Notice
+import net.transitionmanager.notice.NoticeAcknowledgement
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRole
+import net.transitionmanager.project.MoveEventNews
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.RecipeVersion
 
 class Person extends Party {
 

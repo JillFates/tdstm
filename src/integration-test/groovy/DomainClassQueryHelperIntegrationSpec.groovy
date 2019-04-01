@@ -19,7 +19,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import spock.lang.Shared
 import spock.lang.Specification

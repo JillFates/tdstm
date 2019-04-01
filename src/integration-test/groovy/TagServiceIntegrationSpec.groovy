@@ -9,7 +9,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.tag.TagService

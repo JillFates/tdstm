@@ -11,7 +11,7 @@ import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.metric.MetricResult
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.reporting.MetricReportingService
 import org.grails.web.json.JSONObject

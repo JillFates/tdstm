@@ -1,4 +1,4 @@
-package net.transitionmanager.service
+package net.transitionmanager.imports
 
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.common.CustomDomainService
@@ -10,6 +10,7 @@ import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil

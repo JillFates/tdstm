@@ -9,11 +9,11 @@ import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.command.PatchActionCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.Project
 import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
+import net.transitionmanager.imports.DataImportService
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.DataImportService
 
 @Secured("isAuthenticated()")
 @Slf4j

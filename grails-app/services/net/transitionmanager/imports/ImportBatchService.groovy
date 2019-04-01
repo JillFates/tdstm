@@ -11,13 +11,13 @@ import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.ImportBatchRecord
-import net.transitionmanager.project.Project
-import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
+import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang3.BooleanUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger

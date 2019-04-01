@@ -5,7 +5,7 @@ import grails.test.mixin.integration.Integration
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.service.AccountImportExportService
+import net.transitionmanager.imports.AccountImportExportService
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService

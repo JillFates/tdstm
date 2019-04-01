@@ -1,7 +1,6 @@
 package net.transitionmanager.admin
 
 import com.tdsops.common.builder.UserAuditBuilder
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.StartPageEnum
@@ -11,23 +10,24 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.common.EmailDispatch
-import net.transitionmanager.security.PasswordReset
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventSnapshot
-import net.transitionmanager.notices.Notice
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.security.AuditService
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.EmailDispatch
 import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.EnvironmentService
-import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.notice.Notice
 import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.MoveEventSnapshot
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.UserLogin
 
 @Secured('permitAll')
 class AuthController implements ControllerMethods {

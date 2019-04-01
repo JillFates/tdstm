@@ -1,7 +1,7 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.ETLProcessor
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.imports.ScriptProcessorService
 import org.quartz.JobDataMap
