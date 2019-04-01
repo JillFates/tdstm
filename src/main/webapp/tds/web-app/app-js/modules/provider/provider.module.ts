@@ -15,6 +15,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {ProviderListComponent} from './components/list/provider-list.component';
 import {ProviderViewEditComponent} from './components/view-edit/provider-view-edit.component';
+import {ProviderAssociatedComponent} from './components/provider-associated/provider-associated.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {ProvidersResolveService} from './resolve/providers-resolve.service';
@@ -38,7 +39,8 @@ import {ProviderService} from './service/provider.service';
 	],
 	declarations: [
 		ProviderListComponent,
-		ProviderViewEditComponent
+		ProviderViewEditComponent,
+		ProviderAssociatedComponent
 	],
 	providers: [
 		// Resolve
@@ -50,9 +52,11 @@ import {ProviderService} from './service/provider.service';
 	exports: [
 		ProviderListComponent,
 		ProviderViewEditComponent,
+		ProviderAssociatedComponent
 	],
 	entryComponents: [
-		ProviderViewEditComponent
+		ProviderViewEditComponent,
+		ProviderAssociatedComponent
 	]
 })
 
