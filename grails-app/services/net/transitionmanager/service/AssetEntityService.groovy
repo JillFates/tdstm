@@ -1422,7 +1422,7 @@ class AssetEntityService implements ServiceMethods {
 			environmentOptions: getAssetEnvironmentOptions(),
 			moveBundleList: 	assetService.getMoveBundleOptions(project),
 			planStatusOptions: 	getAssetPlanStatusOptions(),
-			scaleOptions: 		getScaleOptions(),
+			scaleOptions: 		SizeScale.getAsJsonList(),
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),
