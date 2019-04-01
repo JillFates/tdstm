@@ -32,6 +32,7 @@ export class NoticeViewEditComponent implements OnInit {
 	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
 	protected EnumNoticeType = NoticeType;
 	protected noticeType: any;
+	noticeIsLocked: boolean;
 
 	constructor(
 		model: NoticeModel,
@@ -48,7 +49,7 @@ export class NoticeViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		console.log('On init');
+		this.noticeIsLocked = this.model.locked;
 	}
 
 	protected cancelCloseDialog(): void {

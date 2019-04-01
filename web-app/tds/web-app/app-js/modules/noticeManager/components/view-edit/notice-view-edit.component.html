@@ -79,7 +79,7 @@
 	                </div>
 	                <div class="col-sm-6 locked-container">
 		                <label for="locked" class="control-label">Locked:</label>
-		                <input id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
+		                <input [disabled]="noticeIsLocked" id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
 	                </div>
                 </div>
 
@@ -87,6 +87,7 @@
                     <label class="col-sm-12 control-label required-field">Message:</label>
                     <div class="col-sm-12">
                         <rich-text-editor
+                            [readonly]="noticeIsLocked"
                             #htmlTextField="richTextEditor"
                             [elementId]="'htmlText'"
                             [required]="true"
@@ -101,9 +102,10 @@
                     <label for="postMessageText" class="col-sm-12 control-label required-field">Post Message Text:</label>
 	                <div class="col-sm-12">
                         <input type="text"
-                               class="form-control"
-                               name="postMessageText" id="postMessageText"
-                               [(ngModel)]="model.postMessageText">
+                            [disabled]="noticeIsLocked"
+                            class="form-control"
+                            name="postMessageText" id="postMessageText"
+                            [(ngModel)]="model.postMessageText">
                     </div>
                 </div>
             </div>

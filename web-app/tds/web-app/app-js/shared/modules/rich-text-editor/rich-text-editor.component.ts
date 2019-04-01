@@ -21,6 +21,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 	@Input() elementId: String;
 	@Input() name: String;
 	@Input() required: boolean;
+	@Input() readonly: boolean;
 
 	@Input() value: any;
 	@Output() valueChange = new EventEmitter<any>();
@@ -37,6 +38,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			statusbar: false,
 			menu: {},
 			height: 250,
+			readonly: this.readonly,
 			skin_url: '../../dist/js/vendors/tinymce/lightgray',
 			setup: editor => {
 				this.editor = editor;
