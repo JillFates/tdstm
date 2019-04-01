@@ -20,6 +20,7 @@ export class NoticeService {
 
 	// private instance variable to hold base url
 	private noticeListUrl = '../ws/notices';
+	private singleNoticeUrl = '/tdstm/ws/notice';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
@@ -121,9 +122,7 @@ export class NoticeService {
 	 * @returns any
 	 */
 	getPostNotices(): Observable<PostNoticeResponse> {
-		const postNoticeUrl = '/tdstm/ws/notice/fetchPostNotices';
-
-		return this.http.get(postNoticeUrl)
+		return this.http.get(`${this.singleNoticeUrl}/fetchPostNotices`)
 			.map((res: Response) => {
 				let result = res.json();
 
@@ -254,6 +253,19 @@ export class NoticeService {
 
 		return Observable.of(mockResponse);
 		*/
+	}
+
+	/**
+	 * Set the Acknowledge state for a notice
+	 * @param {number} id:  Id of the notice
+	 * @returns NoticeModel
+	 */
+	setAcknowledge(id: number): Observable<NoticeModel> {
+		return this.http.patch(`${this.singleNoticeUrl}/acknowledge/${id}`, JSON.stringify({id: id}))
+			.map((res: Response) =>  {
+				return res.json();
+			})
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 }

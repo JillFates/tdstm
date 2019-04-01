@@ -60,7 +60,9 @@ export class EULAComponent {
 	}
 
 	protected onNext() {
-		this.activeDialog.close(true);
+		this.noticeService.setAcknowledge(this.model.id)
+			.subscribe(() => this.activeDialog.close(true),
+				(err) => console.error(err));
 	}
 
 }

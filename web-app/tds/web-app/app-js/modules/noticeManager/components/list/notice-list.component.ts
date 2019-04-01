@@ -83,6 +83,10 @@ export class NoticeListComponent implements OnInit {
 					if (!notice.sequence) {
 						notice.sequence = 0;
 					}
+					// notice.needAcknowledgement = true;
+					if (notice.needAcknowledgement) {
+						notice.typeId = NoticeType.Mandatory;
+					}
 
 					return notice;
 				});
