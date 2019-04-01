@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.asset.WsManufacturerController
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ManufacturerService
 import test.AbstractUnitSpec

@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.move.WsEventController
 import net.transitionmanager.service.EventService
 import test.AbstractUnitSpec
 import spock.lang.Ignore

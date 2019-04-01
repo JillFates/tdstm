@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.common.WsProgressController
 import net.transitionmanager.service.ProgressService
 import test.AbstractUnitSpec
 import spock.lang.Ignore

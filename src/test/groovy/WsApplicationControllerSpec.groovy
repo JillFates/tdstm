@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.asset.WsApplicationController
 import net.transitionmanager.service.ApplicationService
 import test.AbstractUnitSpec
 import spock.lang.Ignore

@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.context.ServletContextHolder
+import net.transitionmanager.asset.AssetEntityController
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin

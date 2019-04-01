@@ -2,6 +2,7 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
+import net.transitionmanager.admin.AdminController
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.CoreService
@@ -26,13 +27,13 @@ import test.helper.PersonTestHelper
 class AdminControllerTests extends Specification {
 
     @Autowired
-    AdminController controller
+	AdminController       controller
     @Autowired
-    WebApplicationContext ctx
+	WebApplicationContext ctx
     @Autowired
-    SecurityService securityService
+	SecurityService       securityService
     @Autowired
-    CoreService coreService
+	CoreService           coreService
 
     @Shared
     def personHelper

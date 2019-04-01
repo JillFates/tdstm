@@ -3,6 +3,7 @@ import com.tdssrc.grails.NumberUtil
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import net.transitionmanager.asset.ApplicationController
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ApplicationService
