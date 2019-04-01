@@ -14,7 +14,7 @@ import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 
 /*

@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import net.transitionmanager.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset

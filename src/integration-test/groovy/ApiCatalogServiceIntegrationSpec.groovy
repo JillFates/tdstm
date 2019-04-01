@@ -5,8 +5,8 @@ import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ApiCatalogService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ProviderService
 import net.transitionmanager.service.SecurityService
 import org.hibernate.SessionFactory

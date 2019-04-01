@@ -3,7 +3,7 @@ package net.transitionmanager.model
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -11,6 +11,7 @@ import com.tdssrc.grails.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.person.Person

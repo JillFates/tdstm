@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.DeviceUtils
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 

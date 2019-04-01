@@ -1,7 +1,7 @@
 package com.tdsops.tm.domain
 
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.common.exceptions.RecipeException
+import net.transitionmanager.exception.RecipeException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 

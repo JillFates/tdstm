@@ -1,4 +1,4 @@
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
@@ -12,10 +12,10 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.exception.UnauthorizedException
 import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared

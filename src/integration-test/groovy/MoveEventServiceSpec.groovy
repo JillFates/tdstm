@@ -3,7 +3,7 @@ import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService

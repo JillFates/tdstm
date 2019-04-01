@@ -22,7 +22,7 @@ import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.LogicException
+import net.transitionmanager.exception.LogicException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService

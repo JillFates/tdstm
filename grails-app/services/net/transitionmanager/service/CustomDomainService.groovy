@@ -1,13 +1,15 @@
 package net.transitionmanager.service
 
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
@@ -354,7 +356,7 @@ class CustomDomainService implements ServiceMethods {
     /**
      * Validate if custom field name is within custom field counts
      * @param fieldName
-     * @throws InvalidRequestException if the fieldName is invalid
+     * @throws net.transitionmanager.exception.InvalidRequestException if the fieldName is invalid
      */
     private void validateCustomFieldName(String fieldName) {
         if (! StringUtil.isBlank(fieldName) && fieldName.startsWith(CUSTOM_FIELD_NAME_PART)) {

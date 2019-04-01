@@ -4,7 +4,7 @@ import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.project.Project
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 class ApiCatalog {
 	// The project this Api Catalog belongs to

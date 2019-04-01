@@ -1,7 +1,7 @@
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -17,7 +17,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import org.apache.commons.lang3.RandomStringUtils

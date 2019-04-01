@@ -7,7 +7,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared

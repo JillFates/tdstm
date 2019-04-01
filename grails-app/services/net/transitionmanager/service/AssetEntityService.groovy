@@ -3,6 +3,11 @@ package net.transitionmanager.service
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.ApplicationAssetMap
 import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.LogicException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetDependencyBundle
@@ -11,7 +16,7 @@ import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.domain.AssetEntityHelper

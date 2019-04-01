@@ -1,4 +1,4 @@
-package net.transitionmanager.service
+package net.transitionmanager.exception
 
 import groovy.transform.CompileStatic
 

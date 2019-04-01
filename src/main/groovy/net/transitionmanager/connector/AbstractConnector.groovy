@@ -3,8 +3,8 @@ package net.transitionmanager.connector
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.AssetComment
 import com.tdssrc.grails.UrlUtil
 

@@ -17,12 +17,12 @@ import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 

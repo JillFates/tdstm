@@ -3,6 +3,11 @@
  */
 package net.transitionmanager.service
 
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
@@ -47,8 +52,8 @@ class DataviewService implements ServiceMethods {
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
-	static final InvalidParamException MISSING_ID_EXCEPTION = new InvalidParamException('Missing required id')
-	static final EmptyResultException VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
+	static final InvalidParamException MISSING_ID_EXCEPTION     = new InvalidParamException('Missing required id')
+	static final EmptyResultException  VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
 
 	// Limit the number of favorites that should be returned in queries.
 	static final int FAVORITES_MAX_SIZE = 10
@@ -120,7 +125,7 @@ class DataviewService implements ServiceMethods {
 	 * At this point just schema and isShared properties are accessible to be updated.
 	 * @param dataviewJson JSONObject to take changes from.
 	 * @return the Dataview object that was updated
-	 * @throws DomainUpdateException, UnauthorizedException
+	 * @throws net.transitionmanager.exception.DomainUpdateException, UnauthorizedException
 	 */
 	@Transactional
 	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
@@ -205,7 +210,7 @@ class DataviewService implements ServiceMethods {
 	 * - should belong to current project in session
 	 * - should be either system or shared or current person in session owned
 	 * @param dataview
-	 * @throws InvalidRequestException
+	 * @throws net.transitionmanager.exception.InvalidRequestException
 	 */
 	void validateDataviewViewAccessOrException(Long id, Dataview dataview) {
 		boolean throwNotFound = false
@@ -242,7 +247,7 @@ class DataviewService implements ServiceMethods {
 	 * Validates if the person updating a dataview has permission to it.
 	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
 	 * @param dataview - original object from database
-	 * @throws UnauthorizedException
+	 * @throws net.transitionmanager.exception.UnauthorizedException
 	 */
 	void validateDataviewUpdateAccessOrException(Long id, JSONObject dataviewJson, Dataview dataview) {
 		validateDataviewViewAccessOrException(id, dataview)
@@ -289,7 +294,7 @@ class DataviewService implements ServiceMethods {
 	/**
 	 * Used to validate if the Dataview JSON request has all of the required properties
 	 * @param dataviewJson - the JSON object to inspect
-	 * @throws InvalidRequestException with what property is missing or if no object present
+	 * @throws net.transitionmanager.exception.InvalidRequestException with what property is missing or if no object present
 	 */
 	void validateDataviewJson(JSONObject dataviewJson, List<String> props) {
 		if (dataviewJson) {

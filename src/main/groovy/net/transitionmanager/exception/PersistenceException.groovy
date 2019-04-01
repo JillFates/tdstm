@@ -1,4 +1,4 @@
-package com.tdsops.commons.lang.exception
+package net.transitionmanager.exception
 
 import org.apache.commons.lang3.exception.ContextedRuntimeException
 

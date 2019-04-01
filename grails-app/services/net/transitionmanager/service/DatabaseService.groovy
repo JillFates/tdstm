@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.transaction.NotTransactional
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.Project
 
 @Transactional

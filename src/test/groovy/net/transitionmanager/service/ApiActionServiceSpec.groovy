@@ -8,7 +8,7 @@ import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.person.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder

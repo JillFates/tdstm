@@ -1,4 +1,4 @@
-package net.transitionmanager.service
+package net.transitionmanager.exception
 
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic

@@ -1,5 +1,9 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
@@ -27,7 +31,7 @@ import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
-import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBinding

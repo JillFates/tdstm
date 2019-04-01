@@ -11,12 +11,12 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DataTransferBatchService
-import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.service.ImportService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 

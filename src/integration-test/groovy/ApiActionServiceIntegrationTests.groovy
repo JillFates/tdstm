@@ -21,9 +21,9 @@ import net.transitionmanager.action.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject

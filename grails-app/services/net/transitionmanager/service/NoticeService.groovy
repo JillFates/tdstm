@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional

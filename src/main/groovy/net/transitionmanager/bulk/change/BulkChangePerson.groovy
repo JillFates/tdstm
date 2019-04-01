@@ -6,7 +6,7 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ProjectService
 
 @Transactional

@@ -8,6 +8,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.RoomCommand
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack

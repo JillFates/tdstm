@@ -8,6 +8,8 @@ import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import org.grails.web.json.JSONObject
@@ -44,7 +46,7 @@ class ApiCatalogService implements ServiceMethods {
 	 * Save or update an api catalog
 	 * @param command
 	 * @return saved or update api catalog
-	 * @throws InvalidParamException
+	 * @throws net.transitionmanager.exception.InvalidParamException
 	 */
 	ApiCatalog saveOrUpdate(ApiCatalogCommand command) {
 		String unPrettyDictionaryJson = JsonUtil.validateJson(command.dictionary)
@@ -144,7 +146,7 @@ class ApiCatalogService implements ServiceMethods {
 	 * @param catalogId a api catalog id
 	 * @return a Map containing a dictionary methods where the key is the "apiMethod" and the value is the
 	 * method definition details
-	 * @throws InvalidParamException
+	 * @throws net.transitionmanager.exception.InvalidParamException
 	 */
 	@NotTransactional
 	Map getCatalogMethods(Long catalogId) {

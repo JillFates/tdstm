@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventNews
 import net.transitionmanager.project.Project

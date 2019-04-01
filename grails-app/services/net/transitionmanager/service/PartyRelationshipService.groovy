@@ -6,6 +6,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.party.Party

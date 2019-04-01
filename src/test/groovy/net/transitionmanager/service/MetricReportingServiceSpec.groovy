@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import net.transitionmanager.asset.Application
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity

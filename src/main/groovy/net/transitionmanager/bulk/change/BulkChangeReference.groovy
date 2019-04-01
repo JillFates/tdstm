@@ -5,7 +5,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 
 /**

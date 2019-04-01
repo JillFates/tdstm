@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
 import org.apache.commons.lang3.StringUtils

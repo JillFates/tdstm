@@ -1,6 +1,6 @@
 package com.tdssrc.grails
 
-import net.transitionmanager.service.InvalidParamException;
+import net.transitionmanager.exception.InvalidParamException;
 import spock.lang.Specification;
 
 class XmlUtilUnitSpec extends Specification {

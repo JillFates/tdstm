@@ -14,7 +14,7 @@ import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import spock.lang.Shared

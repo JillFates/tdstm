@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional

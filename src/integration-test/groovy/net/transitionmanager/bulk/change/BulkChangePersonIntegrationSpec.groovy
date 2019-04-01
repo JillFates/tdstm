@@ -8,7 +8,7 @@ import grails.test.mixin.integration.Integration
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ProjectService
 import spock.lang.See
 import spock.lang.Shared

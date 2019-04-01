@@ -1,4 +1,4 @@
-package net.transitionmanager.integration
+package net.transitionmanager.exception
 
 class ApiActionException extends GroovyRuntimeException {
 

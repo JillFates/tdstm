@@ -14,6 +14,9 @@ import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.action.Credential
+import net.transitionmanager.exception.ApiActionException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.http.HostnameVerifier
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade

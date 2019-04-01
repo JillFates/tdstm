@@ -22,6 +22,7 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent

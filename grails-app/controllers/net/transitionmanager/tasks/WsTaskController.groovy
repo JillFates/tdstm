@@ -15,10 +15,10 @@ import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.CredentialService
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 

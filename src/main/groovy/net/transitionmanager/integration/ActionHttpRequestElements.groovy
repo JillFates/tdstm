@@ -3,7 +3,7 @@ package net.transitionmanager.integration
 import org.springframework.http.HttpMethod
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 
 /**

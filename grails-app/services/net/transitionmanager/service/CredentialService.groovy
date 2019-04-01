@@ -19,6 +19,10 @@ import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.Credential
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.http.HostnameVerifier

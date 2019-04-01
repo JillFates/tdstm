@@ -15,7 +15,7 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ProgressService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.io.IOUtils

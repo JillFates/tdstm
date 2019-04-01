@@ -5,7 +5,7 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
@@ -21,7 +21,7 @@ import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService

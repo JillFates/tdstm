@@ -1,4 +1,4 @@
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
@@ -11,8 +11,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService

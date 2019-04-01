@@ -14,8 +14,8 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.Workflow
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.RandomStringUtils

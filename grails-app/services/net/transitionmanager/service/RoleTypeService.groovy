@@ -3,6 +3,8 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.RoleTypeCommand
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.security.RoleType
 import org.grails.datastore.mapping.query.api.Criteria
 

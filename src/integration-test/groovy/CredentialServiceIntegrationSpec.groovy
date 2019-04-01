@@ -10,10 +10,10 @@ import net.transitionmanager.action.Credential
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.service.CredentialService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectRequiredException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
 import org.hibernate.SessionFactory
 import spock.lang.Shared

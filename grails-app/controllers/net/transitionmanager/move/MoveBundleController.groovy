@@ -8,7 +8,7 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.DependencyAnalyzerTabs
 import com.tdsops.tm.enums.domain.AssetClass
@@ -39,8 +39,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService

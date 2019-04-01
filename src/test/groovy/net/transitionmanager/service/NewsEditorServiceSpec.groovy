@@ -3,6 +3,8 @@ package net.transitionmanager.service
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventNews
 import net.transitionmanager.party.PartyGroup

@@ -10,7 +10,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagEvent
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService

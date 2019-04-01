@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.dependency.analyzer.FilteredAssetsCommand
+import net.transitionmanager.exception.InvalidParamException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

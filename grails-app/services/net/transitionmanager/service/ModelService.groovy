@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF

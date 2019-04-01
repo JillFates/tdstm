@@ -11,6 +11,8 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.party.PartyGroup

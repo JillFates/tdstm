@@ -1,4 +1,4 @@
-package com.tdsops.common.exceptions
+package net.transitionmanager.exception
 
 import groovy.transform.CompileStatic
 

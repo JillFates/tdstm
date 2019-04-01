@@ -6,8 +6,8 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.SettingService
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore

@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.exceptions.InvalidLicenseException
+import net.transitionmanager.exception.InvalidLicenseException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
@@ -16,6 +16,7 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.license.License as DomainLicense
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.license.prefs.*

@@ -3,7 +3,7 @@ package net.transitionmanager.tasks
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.task.TaskDependency
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -31,7 +31,7 @@ import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.GraphvizService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService

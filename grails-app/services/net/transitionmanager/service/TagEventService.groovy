@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag

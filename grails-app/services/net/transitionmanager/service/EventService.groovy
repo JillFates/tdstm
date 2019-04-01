@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project

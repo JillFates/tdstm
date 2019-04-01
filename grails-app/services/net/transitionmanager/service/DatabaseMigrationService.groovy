@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.Project
 import org.grails.web.json.JSONObject
 

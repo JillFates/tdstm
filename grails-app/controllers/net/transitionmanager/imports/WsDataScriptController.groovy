@@ -12,7 +12,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 
 /**

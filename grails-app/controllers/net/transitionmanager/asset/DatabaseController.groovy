@@ -23,7 +23,7 @@ import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.LogicException
+import net.transitionmanager.exception.LogicException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

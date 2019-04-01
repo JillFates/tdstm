@@ -6,7 +6,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.AccountImportExportService
-import net.transitionmanager.service.LogicException
+import net.transitionmanager.exception.LogicException
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification

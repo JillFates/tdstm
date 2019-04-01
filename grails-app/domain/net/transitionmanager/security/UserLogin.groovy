@@ -11,7 +11,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserLoginProjectAccess
 import net.transitionmanager.person.UserPreference
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.exception.DomainUpdateException
 
 class UserLogin {
 

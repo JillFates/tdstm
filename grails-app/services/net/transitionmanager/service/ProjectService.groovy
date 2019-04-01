@@ -2,11 +2,15 @@ package net.transitionmanager.service
 
 import net.transitionmanager.asset.ApplicationAssetMap
 import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil

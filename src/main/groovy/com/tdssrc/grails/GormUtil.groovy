@@ -12,10 +12,10 @@ import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.mapping.config.Property

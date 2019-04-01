@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import net.transitionmanager.asset.Application
 import com.tdsops.common.builder.UserAuditBuilder
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
@@ -10,6 +10,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventNews

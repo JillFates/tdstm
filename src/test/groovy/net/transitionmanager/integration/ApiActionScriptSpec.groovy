@@ -1,5 +1,6 @@
 package net.transitionmanager.integration
 
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import grails.test.mixin.TestMixin

@@ -1,7 +1,7 @@
 package net.transitionmanager.asset
 
 
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON

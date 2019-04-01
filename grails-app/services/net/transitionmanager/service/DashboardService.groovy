@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.MoveEvent
 
 /**

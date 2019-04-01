@@ -9,7 +9,7 @@ import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.ApiCatalogService
 import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.TaskService

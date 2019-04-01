@@ -14,7 +14,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 import com.tdssrc.grails.StopWatch
 

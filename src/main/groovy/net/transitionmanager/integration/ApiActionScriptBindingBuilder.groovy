@@ -1,10 +1,10 @@
 package net.transitionmanager.integration
 
 import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.task.TaskFacade
-import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Fluent API for Builder pattern.

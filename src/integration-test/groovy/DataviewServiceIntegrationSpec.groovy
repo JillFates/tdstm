@@ -7,7 +7,7 @@ import net.transitionmanager.imports.Dataview
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject

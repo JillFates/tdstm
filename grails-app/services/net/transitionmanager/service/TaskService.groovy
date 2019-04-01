@@ -1,6 +1,10 @@
 package net.transitionmanager.service
 
 import net.transitionmanager.asset.Application
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -9,8 +13,8 @@ import net.transitionmanager.task.CommentNote
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.task.TaskDependency
-import com.tdsops.common.exceptions.RecipeException
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.RecipeException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
@@ -50,7 +54,7 @@ import net.transitionmanager.task.RecipeVersion
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.project.WorkflowTransition
-import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -1596,7 +1600,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return [jobId:String, taskBatch:Integer]
 	 *    jobId - the reference code to the ProgressService job of the batch being generated asynchronously
 	 *    taskbatch - the id number of the task batch that was created as part of the process
-	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
+	 * @throws net.transitionmanager.exception.UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
 	Map initiateCreateTasksWithRecipe(TaskGenerationCommand context, Project currentProject) {
 		Long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)

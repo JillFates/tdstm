@@ -6,6 +6,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import net.transitionmanager.exception.WrappedAuthenticationException
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.SecurityService

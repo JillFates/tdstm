@@ -1,7 +1,7 @@
 package net.transitionmanager.license
 
-import com.tdsops.common.exceptions.InvalidLicenseException
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.InvalidLicenseException
+import net.transitionmanager.exception.ServiceException
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.service.LicenseManagerService

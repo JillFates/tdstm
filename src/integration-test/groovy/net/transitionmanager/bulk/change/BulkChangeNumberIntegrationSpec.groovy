@@ -10,7 +10,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired

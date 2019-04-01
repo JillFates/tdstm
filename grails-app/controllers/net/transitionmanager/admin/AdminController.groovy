@@ -24,10 +24,10 @@ import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService

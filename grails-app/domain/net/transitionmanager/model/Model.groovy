@@ -1,7 +1,7 @@
 package net.transitionmanager.model
 
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.commons.lang.exception.PersistenceException
+import net.transitionmanager.exception.PersistenceException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j

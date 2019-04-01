@@ -14,6 +14,10 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.Recipe
 import net.transitionmanager.task.RecipeVersion
@@ -50,7 +54,7 @@ class CookbookService implements ServiceMethods {
 	TaskService		taskService
 
 	/**
-	 * Checks if current user can access project. If it can't then it throws an {@link UnauthorizedException}
+	 * Checks if current user can access project. If it can't then it throws an {@link net.transitionmanager.exception.UnauthorizedException}
 	 * @param project the project
 	 */
 	private void checkAccess(Project project) {
@@ -667,7 +671,7 @@ class CookbookService implements ServiceMethods {
 	 * Used to convert the Recipe source code from syntax into a Map
 	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
 	 * @return The recipe in a Groovy Map containing the various elements of the recipe
-	 * @throws InvalidSyntaxException if the sourcecode is invalid
+	 * @throws net.transitionmanager.exception.InvalidSyntaxException if the sourcecode is invalid
 	 */
 	Map parseRecipeSyntax(String  sourceCode) {
 		if (!sourceCode) {

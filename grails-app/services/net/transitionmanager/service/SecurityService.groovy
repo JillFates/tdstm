@@ -1,8 +1,8 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.builder.UserAuditBuilder
-import com.tdsops.common.exceptions.ConfigurationException
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.exception.ConfigurationException
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
@@ -23,6 +23,10 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.security.PasswordHistory
 import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.command.UserUpdatePasswordCommand

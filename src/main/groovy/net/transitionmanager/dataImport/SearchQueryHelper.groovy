@@ -15,7 +15,7 @@ import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
 import net.transitionmanager.asset.Room
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.PersonService
 import org.grails.web.json.JSONObject
 

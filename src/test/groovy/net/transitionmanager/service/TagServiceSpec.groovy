@@ -5,6 +5,7 @@ import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.project.Project

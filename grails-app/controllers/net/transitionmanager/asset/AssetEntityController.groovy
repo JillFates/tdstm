@@ -49,11 +49,11 @@ import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.ImportService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
@@ -63,7 +63,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskImportExportService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 import net.transitionmanager.task.TaskDependency

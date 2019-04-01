@@ -1,5 +1,5 @@
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.common.exceptions.RecipeException
+import net.transitionmanager.exception.RecipeException
 import com.tdsops.tm.domain.RecipeHelper
 import grails.testing.gorm.DataTest
 import spock.lang.Shared

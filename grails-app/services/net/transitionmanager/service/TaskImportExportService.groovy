@@ -1,5 +1,10 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.TimeScale
@@ -291,7 +296,7 @@ class TaskImportExportService implements ServiceMethods {
 				log.error "Unable to delete temporary task import worksheet $fqfn"
 			}
 			throw new InvalidParamException('The spreadsheet column headers did not match the expected format. Please '+
-				' export a new template before attempt an import.')
+											' export a new template before attempt an import.')
 		}
 
 		/*

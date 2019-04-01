@@ -6,7 +6,7 @@ import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.service.ImportBatchService
 import spock.lang.Specification
 

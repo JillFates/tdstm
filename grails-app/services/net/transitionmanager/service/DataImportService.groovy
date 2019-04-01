@@ -1,5 +1,8 @@
 package net.transitionmanager.service
 
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
@@ -377,7 +380,7 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * Used to update the ImportBatch to the Queued status
 	 * @param batchId - the ID of the batch to be updated
-	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
+	 * @throws net.transitionmanager.exception.DomainUpdateException if ImportBatch.status was not PENDING at the current time
 	 */
 	@NotTransactional()
 	void setBatchToQueued(Long batchId) {
