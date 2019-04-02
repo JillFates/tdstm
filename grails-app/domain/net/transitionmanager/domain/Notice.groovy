@@ -1,11 +1,13 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 
 class Notice {
 
 	static enum NoticeType {
-		Prelogin(1), Postlogin(2), General(3)
+		PRE_LOGIN(1), POST_LOGIN(2), GENERAL(3)
 
 		final int id
 
@@ -26,13 +28,22 @@ class Notice {
 
 	NoticeType typeId
 
-	// Flag if the notice can be acknowledged by the user and hidden
-	Boolean acknowledgeable = false
-
 	// Flag if the notice should be shown
 	Boolean active = false
 
 	Project project
+
+	// Flag if the notice requires that user acknowledges it (e.g. EULA)
+	Boolean needAcknowledgement = false
+
+	// The label to display next to the Acknowledgement checkbox for the needAcknowledgement notices
+	String acknowledgeLabel = ''
+
+	// Can be used to order the notifications when there are multiple
+	Integer sequence = 0
+
+	// Once set to 1 the notice can never be edited.
+	Boolean locked = false
 
 	// The datetime after which the notice should appear or if null always appears
 	Date activationDate
@@ -44,12 +55,18 @@ class Notice {
 	Date dateCreated
 	Date lastModified
 
+	static hasMany = [noticeAcknowledgements: NoticeAcknowledgement]
+
 	static constraints = {
 		activationDate nullable: true
 		expirationDate nullable: true
 		htmlText minSize: 1, maxSize: 65535
 		project nullable: true
 		rawText minSize: 1, maxSize: 65535
+		needAcknowledgement nullable: false
+		acknowledgeLabel blank: true, nullable: false, size: 1..255
+		sequence nullable: false
+		locked nullable: false
 	}
 
 	static mapping = {
@@ -62,17 +79,15 @@ class Notice {
 		}
 	}
 
-	// Be sure to delete all acknowledgments before deleting a notice
-	def beforeDelete() {
-		executeUpdate('delete NoticeAcknowledgment where notice = ?', [this])
+	def beforeInsert = {
+		dateCreated = TimeUtil.nowGMT()
 	}
-
-	def beforeValidate() {
-		lastModified = new Date()
+	def beforeUpdate = {
+		lastModified = TimeUtil.nowGMT()
 	}
 
 	private static final Map<String, Class> MARSHALLER_TYPES = [
-		acknowledgeable: Object,
+		needAcknowledgement: Object,
 		active:          Object,
 		createdBy:       Person,
 		dateCreated:     Object,
@@ -108,6 +123,10 @@ class Notice {
 							Project project = value
 							value = [id  : project.id, code: project.projectCode, name: project.name]
 							break
+					}
+
+					if (name == 'htmlText') {
+						value = StringUtil.sanitizeJavaScript(value)
 					}
 
 					jsonData[name] = value
