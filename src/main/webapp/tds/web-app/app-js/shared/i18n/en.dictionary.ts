@@ -66,7 +66,8 @@ export const en_DICTIONARY: Object = {
 			'TASKS' : 'Tasks',
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
-		}
+		},
+		'TOTAL': 'Total'
 	},
 	'ASSETS': {
 		'APPLICATION': 'Application',

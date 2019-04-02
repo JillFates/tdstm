@@ -364,7 +364,7 @@ body.skin-blue div.content-wrapper div.k-grid div.k-grid-header th.k-header a.k-
   color: #1c94c4 !important; }
 
 body.skin-blue div.content-wrapper div.k-grid .k-loading-image {
-  background-image: url("../dist/css/kendo/Default/loading-image.gif"); }
+  background-image: url("../images/loading-image.gif"); }
 
 body.skin-blue div.content-wrapper div.k-grid .k-filter-row th {
   padding: 5px 5px 5px 5px;
@@ -1906,7 +1906,10 @@ div.content-wrapper div.container .body div#roomListView {
 
 div.content-wrapper div.container .body div.dialog div.action-wrapper {
   text-align: right;
-  margin-top: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-left: auto;
   margin-right: 10px;
   margin-bottom: 10px; }
 
@@ -2173,8 +2176,7 @@ div.content-wrapper div.execution-phase-wrapper {
   display: flex;
   min-height: 200px; }
   .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
-    -ms-flex-preferred-size: 25%;
-    flex-basis: 25%; }
+    max-width: 285px; }
   .planning-dashboard .execution-phase {
     -ms-flex-preferred-size: 50%;
     flex-basis: 50%; }
@@ -2183,7 +2185,9 @@ div.content-wrapper div.execution-phase-wrapper {
   .planning-dashboard {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap; }
-    .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase, .planning-dashboard .execution-phase {
+    .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
+      max-width: 285px; }
+    .planning-dashboard .execution-phase {
       -ms-flex-preferred-size: 100%;
       flex-basis: 100%; } }
 
@@ -2192,8 +2196,7 @@ div.content-wrapper div.execution-phase-wrapper {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap; }
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
-      -ms-flex-preferred-size: 49%;
-      flex-basis: 49%; }
+      max-width: 285px; }
     .planning-dashboard .execution-phase {
       -ms-flex-preferred-size: 100%;
       flex-basis: 100%; } }
@@ -2204,8 +2207,7 @@ div.content-wrapper div.execution-phase-wrapper {
     display: -ms-flexbox;
     display: flex; }
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
-      -ms-flex-preferred-size: 25%;
-      flex-basis: 25%; }
+      max-width: 285px; }
     .planning-dashboard .execution-phase {
       -ms-flex-preferred-size: 49%;
       flex-basis: 49%; } }

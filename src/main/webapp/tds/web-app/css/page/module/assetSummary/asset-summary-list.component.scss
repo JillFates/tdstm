@@ -1,0 +1,28 @@
+.asset-summary-list-component {
+  kendo-grid {
+    .k-grid-content {
+      tbody {
+        tr {
+          td {
+            padding-left: 5px;
+          }
+          td:not(:first-child) {
+            text-align: right;
+            padding-right: 8px;
+            color: $color--black3;
+            font-weight: bold;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    tfoot {
+      tr {
+        td {
+          text-align: right;
+          padding-right: 8px;
+        }
+      }
+    }
+  }
+}
