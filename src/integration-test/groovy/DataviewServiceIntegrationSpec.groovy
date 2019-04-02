@@ -31,7 +31,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, null, dataviewJson)
 		then:
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property project of class net.transitionmanager.domain.Dataview cannot be null.*/
+			e.message ==~ /.*Property project of class net.transitionmanager.imports.Dataview cannot be null.*/
 	}
 
 	void '2. test create dataview with duplicate name within same project throws exception'() {
@@ -45,7 +45,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, project, dataviewJson)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.domain.Dataview with value \[.+\] must be unique.*/
+			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
 	}
 
 	@Ignore
@@ -69,7 +69,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.update(person, project, dataview2.id, dataviewJson1)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.domain.Dataview with value \[.+\] must be unique.*/
+			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
 	}
 
 	void '4. Test that unique name validation with duplicate name within same project returns false'() {

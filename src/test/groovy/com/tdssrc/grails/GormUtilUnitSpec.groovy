@@ -239,7 +239,7 @@ class GormUtilUnitSpec extends Specification implements DataTest{
 		then: 'a DefaultGrailsDomainClass should be returned'
 			'org.grails.datastore.mapping.keyvalue.mapping.config.KeyValuePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
-			'com.tds.asset.AssetEntity' == dc.name
+			AssetEntity.class.name == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)

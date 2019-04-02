@@ -646,6 +646,7 @@
                 }
             },
             {
+                "shared": 0,
                 "field": "custom2",
                 "label": "Contains PCI",
                 "tip": "This field is the Contains PCI",
@@ -1382,6 +1383,7 @@
                 }
             },
             {
+                "shared": 0,
                 "field": "custom2",
                 "label": "Contains PCI",
                 "tip": "This field is the Contains PCI",
@@ -1796,6 +1798,7 @@
                 }
             },
             {
+                "shared": 0,
                 "field": "custom2",
                 "label": "Contains PCI",
                 "tip": "This field is the Contains PCI",
@@ -2186,6 +2189,7 @@
                 }
             },
             {
+                "shared": 0,
                 "field": "custom2",
                 "label": "Contains PCI",
                 "tip": "This field is the Contains PCI",

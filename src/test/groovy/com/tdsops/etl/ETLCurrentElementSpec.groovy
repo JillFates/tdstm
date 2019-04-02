@@ -654,7 +654,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
+			AssetEntity.getName() >> 'net.transitionmanager.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { query, namedParams, metaParams ->
 				return []
 			}

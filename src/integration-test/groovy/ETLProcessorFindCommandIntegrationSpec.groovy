@@ -662,7 +662,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
+			AssetEntity.getName() >> 'net.transitionmanager.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')){
 					return assetEntities.findAll { it.getProjectId() == GMDEMO.id && it.id == namedParams.id }*.getId()

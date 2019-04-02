@@ -604,7 +604,7 @@ class GormUtilIntegrationSpec extends Specification {
 		then: 'a DefaultGrailsDomainClass should be returned'
 			'org.grails.orm.hibernate.cfg.HibernatePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
-			'com.tds.asset.AssetEntity' == dc.name
+			'net.transitionmanager.asset.AssetEntity' == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)

@@ -1,30 +1,26 @@
 package com.tdsops.etl
 
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
 
 enum ETLDomain {
 
 	Application(net.transitionmanager.asset.Application),
-	Device(AssetEntity),
+	Device(net.transitionmanager.asset.AssetEntity),
 	Database(net.transitionmanager.asset.Database),
 	Storage(net.transitionmanager.asset.Files),
-	External(AssetEntity),
-	Task(AssetComment),
+	External(net.transitionmanager.asset.AssetEntity),
+	Task(net.transitionmanager.task.AssetComment),
 	Person(net.transitionmanager.person.Person),
-	Comment(AssetComment),
-	Asset(AssetEntity),
+	Comment(net.transitionmanager.task.AssetComment),
+	Asset(net.transitionmanager.asset.AssetEntity),
 	Manufacturer(net.transitionmanager.manufacturer.Manufacturer),
 	Model(net.transitionmanager.model.Model),
-	Dependency(AssetDependency),
+	Dependency(net.transitionmanager.asset.AssetDependency),
 	Rack(net.transitionmanager.asset.Rack),
-	Bundle(MoveBundle),
+	Bundle(net.transitionmanager.project.MoveBundle),
 	Room(net.transitionmanager.asset.Room),
 	Files(net.transitionmanager.asset.Files),
-	Event(MoveEvent)
+	Event(net.transitionmanager.project.MoveEvent)
 
 	private Class<?> clazz
 
@@ -36,7 +32,7 @@ enum ETLDomain {
 		return clazz
 	}
 
-	static final ASSET_CLASSNAMES = [ 'com.tds.asset.Application', 'com.tds.asset.AssetEntity', 'com.tds.asset.Database', 'com.tds.asset.Files']
+	static final ASSET_CLASSNAMES = [ Application.clazz.name, Asset.clazz.name, Database.clazz.name, Files.clazz.name]
 
 	/**
 	 * Check if a domain instance has a Class in the AssetEntity hierarchy
