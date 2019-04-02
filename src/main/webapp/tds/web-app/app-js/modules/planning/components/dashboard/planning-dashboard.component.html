@@ -3,14 +3,14 @@
         <div class="dashboard-div discovery-phase">
             <span class="dashboard-head">Discovery Phase</span>
             <div>
-                <table style="margin-bottom: 10px; border-spacing: 0px;">
+                <table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
                     <!-- Applications Validated Progressbar -->
                     <tbody><tr>
                         <td class="dashboard-bar-base" style="background-color:lightyellow">
 
                             <div class="dashboard-bar-graph" id="discoverybar"  [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}%</b>
+                                <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}% </b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=Validated">
                                     Applications Validated
                                 </a>
@@ -24,7 +24,7 @@
 
                             <div class="dashboard-bar-graph" id="analysisbar" [style.width]="planningDashboardModel.discovery.appsPlanReadyPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                <b> {{planningDashboardModel.discovery.appsPlanReadyPercentage}}%</b>
+                                <b> {{planningDashboardModel.discovery.appsPlanReadyPercentage}}% </b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=PlanReady">Applications Plan Ready</a>
                             </div>
 
@@ -33,20 +33,37 @@
                     </tbody></table>
             </div>
             <h4>Total Discovered</h4>
-            <div>Table Here</div>
+            <table>
+                <tr *ngFor="let row of planningDashboardModel.discovery.totals">
+                    <td class="dashboard-stat-icon-td"><a [href]="row.link"><img height="16px" width="16px" [src]="row.img" ></a></td>
+                    <td class="dashboard-stat-desc-td"><a [href]="row.link">{{row.type}}</a></td>
+                    <td class="dashboard-stat-td-l"><a [href]="row.link">{{row.total}}</a></td>
+                    <td class="dashboard-stat-graph-td">
+                        <div class="dashboard-bar-base-small">
+                            <div class="dashboard-bar-graph-small" [style.width]="((row.total-row.toValidate)/ row.total)*100 + '%'"></div>
+                        </div>
+                        <a [href]="row.link">{{row.toValidate}} to validate</a>
+                    </td>
+                </tr>
+            </table>
             <h4>Open Tasks</h4>
-            <div>Details here</div>
+            <div>
+                <a href="/tdstm/assetEntity/listTasks?filter=openIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.activeTasks}} Active Tasks</a>
+            </div>
+            <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0">
+                <a href="/tdstm/assetEntity/listTasks?filter=dueOpenIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.overdueTasks}} Overdue Tasks</a>
+            </div>
         </div>
         <div class="dashboard-div analysis-phase">
             <span class="dashboard-head">Analysis & Planning Phase</span>
-            <div><table style="margin-bottom: 10px; border-spacing: 0px;">
+            <div><table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
 
                 <tbody><tr>
                     <td class="dashboard-bar-base">
 
-                        <div class="dashboard-bar-graph" id="assignmentbar" style="width: 55%;"></div>
+                        <div class="dashboard-bar-graph" id="assignmentbar" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
                         <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                            <b> 55% </b>
+                            <b> {{planningDashboardModel.analysis.assignedAppPerc}}% </b>
                             <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Assigned">Applications Assigned</a>
                         </div>
 
@@ -56,9 +73,9 @@
                 <tr>
                     <td class="dashboard-bar-base">
 
-                        <div class="dashboard-bar-graph" id="confirmedbar" style="width: 2%;"></div>
+                        <div class="dashboard-bar-graph" id="confirmedbar" [style.width]="planningDashboardModel.analysis.confirmedAppPerc+'%'"></div>
                         <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                            <b> 2%</b>
+                            <b> {{planningDashboardModel.analysis.confirmedAppPerc}}% </b>
                             <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Confirmed">Applications Confirmed</a>
                         </div>
 
@@ -68,16 +85,55 @@
             </table>
             </div>
             <h4>Application Review Status</h4>
-            <div>Details here</div>
+            <div>
+                <table class="dashboard-stat-table">
+                    <tr>
+                        <a href="/tdstm/application/list?filter=application&toValidate=Validated"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
+                    </tr>
+                    <tr>
+                        <a href="/tdstm/application/list?filter=application&toValidate=PlanReady"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.planReady}}</td><td>Plan Ready</td></a>
+                    </tr>
+                </table>
+            </div>
             <h4>Dependencies</h4>
-            <div>Table here</div>
+            <div>
+                <table class="dashboard-stat-table">
+                    <tr>
+                        <td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.pendingAppDependenciesCount}}</td>
+                        <td>
+                            <span>App dependencies to validate</span> <br/>
+                            <span>({{planningDashboardModel.analysis.appDependenciesCount ? ((planningDashboardModel.analysis.pendingAppDependenciesCount/planningDashboardModel.analysis.appDependenciesCount)*100| number:'1.0-0') : 0}}% of the {{planningDashboardModel.analysis.appDependenciesCount}} total)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.pendingServerDependenciesCount}}</td>
+                        <td>
+                            <span>Server dependencies to validate</span> <br/>
+                            <span>({{planningDashboardModel.analysis.serverDependenciesCount ? ((planningDashboardModel.analysis.pendingServerDependenciesCount/planningDashboardModel.analysis.serverDependenciesCount)*100| number:'1.0-0') : 0}}% of the {{planningDashboardModel.analysis.serverDependenciesCount}} total)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="/tdstm/application/list?filter=application&planMethodology=Unknown&ufp=true">{{planningDashboardModel.analysis.activeTasks}}</a></td>
+                        <td><a href="/tdstm/application/list?filter=application&planMethodology=Unknown&ufp=true">Active Tasks</a></td>
+                    </tr>
+                    <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
+                        <td><a href="/tdstm/application/list?filter=dueOpenIssue&planMethodology=Unknown&ufp=true">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
+                        <td><a href="/tdstm/application/list?filter=dueOpenIssue&planMethodology=Unknown&ufp=true">Overdue Tasks</a></td>
+                    </tr>
+                </table>
+            </div>
             <h4>Application Plans</h4>
-            <div>Details here</div>
+            <table class="dashboard-stat-table">
+                <tr *ngFor="let row of planningDashboardModel.analysis.groupPlanMethodologyCount">
+                    <td class="dashboard-stat-td-l"><a href="/tdstm/application/list?filter=application&planMethodology={{row.type}}&ufp=true">{{row.value}}</a></td>
+                    <td><a href="/tdstm/application/list?filter=application&planMethodology={{row.type}}&ufp=true">{{row.type}}</a></td>
+                </tr>
+            </table>
         </div>
         <div class="dashboard-div execution-phase">
-            <span class="dashboard-head">Discovery Phase</span>
+            <span class="dashboard-head">Execution Phase</span>
             <div>
-                <table style="margin-bottom: 10px; border-spacing: 0px;">
+                <table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
                     <tbody><tr>
                         <td class="dashboard-bar-base">
 
