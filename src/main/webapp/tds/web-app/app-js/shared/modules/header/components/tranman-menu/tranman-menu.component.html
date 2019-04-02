@@ -307,7 +307,7 @@
                         <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewPlanning)" class="menu-child-item menu-reports-task-report">
-                        <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
+												<a [routerLink]="['reports','taskReport']" >Task Report</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewProjectDailyMetrics)" class="menu-child-item menu-reports-activity-metrics">
                         <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>

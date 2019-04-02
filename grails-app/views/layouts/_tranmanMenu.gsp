@@ -390,12 +390,7 @@
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.ReportViewPlanning}">
-                                <li class="menu-child-item menu-reports-task-report">
-                                    <g:link controller="module" action="reports" id="taskReport" elementId="taskReport">Task Report <small>(Angular)</small></g:link>
+                                    <g:link controller="module" action="reports" id="taskReport" elementId="taskReport">Task Report</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">

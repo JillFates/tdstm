@@ -58,7 +58,7 @@ class WsReportsController implements ControllerMethods {
             def badReqEventIds
 
             if( !allBundles ){
-                events = events.split(',').collect {id-> NumberUtils.toDouble(id, 0).round() }
+                events = events.collect {id-> NumberUtils.toDouble(id, 0).round() }
                 //Verifying events id are in same project or not.
                 badReqEventIds = moveEventService.verifyEventsByProject(events, project)
             }
@@ -104,7 +104,7 @@ class WsReportsController implements ControllerMethods {
                     break
 
                 case "Generate Web" :
-                    render (view :'/reports/tasksReport',
+                    render (view : "/reports/tasksReport",
                             model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished,
                                    userDTFormat:userDTFormat, tzId:tzId])
                     break
