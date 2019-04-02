@@ -43,28 +43,20 @@
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
-                            <div class="text-center">
-                                <button kendoGridEditCommand *ngIf="canEdit()"
-                                        class="btn btn-action btn-default" title="Edit">
-                                    <span class="glyphicon glyphicon-pencil"></span>
-                                </button>
-                                <button kendoGridRemoveCommand *ngIf="canDelete()"
-                                        class="btn btn-action btn-default" title="Delete">
-                                    <span class="fa fa-fw fa-trash"></span>
-                                </button>
-                                <button kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
-                                        class="btn btn-action btn-default" title="Save"
-                                        [disabled]="myForm.invalid || duplicateName">
-                                    <span class="fa fa-fw fa-save"></span>
-                                </button>
-                                <button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
-                                    <span class="glyphicon glyphicon-ban-circle"></span>
-                                </button>
-                                <button *ngIf="((!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)) && canMerge()"
-                                        (click)="onMerge(dataItem)"
-                                        class="btn btn-action btn-default" title="Merge">
-                                    <span class="fa fa-fw fa-exchange"></span>
-                                </button>
+                            <div class="tds-action-button-set">
+                                <tds-button-edit kendoGridEditCommand *ngIf="canEdit()" class="btn btn-action btn-default">
+                                </tds-button-edit>
+                                <tds-button-delete kendoGridRemoveCommand *ngIf="canDelete()" class="btn btn-action btn-default" >
+                                </tds-button-delete>
+                                <tds-button-save kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
+                                        class="btn btn-action btn-default" [disabled]="myForm.invalid || duplicateName">
+                                </tds-button-save>
+                                <tds-button-cancel kendoGridCancelCommand class="btn-action">
+                                </tds-button-cancel>
+                                <tds-button-custom *ngIf="((!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)) && canMerge()"
+                                        (click)="onMerge(dataItem)" title="Merge"
+                                        class="btn btn-action btn-default" [icon]="'exchange'">
+                                </tds-button-custom>
                             </div>
                         </ng-template>
                     </kendo-grid-command-column>

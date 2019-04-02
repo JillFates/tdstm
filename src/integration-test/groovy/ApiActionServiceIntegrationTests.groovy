@@ -31,6 +31,7 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Title
+import test.helper.ApiActionTestHelper
 import test.helper.ApiCatalogTestHelper
 import test.helper.ProviderTestHelper
 

@@ -734,12 +734,15 @@ class Element implements RangeChecker, ETLCommand {
 	}
 
 	/**
-	 * It adds a new dynamic variable in he current script row execution.
+	 * <p>It adds a new dynamic variable in he current script row execution.</p>
+	 * <p>It also add {@code LocalVariableFacade} behaviour in the bound object.</p>
 	 * @param variableName
-	 * @return
+	 * @return current instance of {@code Element}
+	 * @see LocalVariableFacade
 	 */
 	private Element doSet(String variableName) {
-		processor.addLocalVariableInBinding(variableName, this.value)
+		LocalVariableFacade localVariableFacade = new LocalVariableFacade(this.value, this.processor)
+		processor.addLocalVariableInBinding(variableName, localVariableFacade)
 		return this
 	}
 

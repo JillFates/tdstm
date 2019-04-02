@@ -22,6 +22,7 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.UserLogin
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -101,6 +102,7 @@ class MoveEventService implements ServiceMethods {
 			videolink: event.videolink,
 			newsBarMode: event.newsBarMode,
 			estStartTime: event.estStartTime,
+			estCompletionTime: event.estCompletionTime,
 			apiActionBypass: event.apiActionBypass
 		)
 
@@ -489,5 +491,29 @@ class MoveEventService implements ServiceMethods {
 			SELECT MIN(start_time) AS start, MAX(completion_time) AS completion
 			FROM move_bundle
 			WHERE move_event_id = ?''', id)
+	}
+
+	/**
+	 * Used to get the list of events that a person is assigned to.
+	 * @param person - the person to find assigned event for
+	 * @param currentProject - the individual project to find events for, if null then the
+	 *  events of all projects that the user is assigned will be returned
+	 * @param completionCutoff - the date cut off the list based on the estCompletionDate.
+	 *  If the field is set then only events where the estCompletionDate >= to
+	 *  completionCutoff or completionCutoff is null will appear.
+	 */
+	List<MoveEvent> getAssignedEvents(Person person, Project currentProject =null, Date completionCutoff=null) {
+
+		return MoveEvent.where {
+			if (currentProject) {
+				project == currentProject
+			} else {
+				project.id in securityService.getUserProjectIds(null, person.userLogin)
+			}
+			if (completionCutoff) {
+				estCompletionTime > completionCutoff || estCompletionTime == null
+			}
+		}.list()
+
 	}
 }

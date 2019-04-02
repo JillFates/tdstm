@@ -10,6 +10,7 @@ import net.transitionmanager.domain.Provider
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
+import test.helper.ApiActionTestHelper
 import test.helper.ApiCatalogTestHelper
 
 @Integration
@@ -17,7 +18,7 @@ import test.helper.ApiCatalogTestHelper
 class AssetCommentSpec extends Specification {
 
     @Shared
-    ApiActionTestHelper apiActionHelper
+	ApiActionTestHelper apiActionHelper
     @Shared
     ProjectTestHelper projectHelper
     @Shared
