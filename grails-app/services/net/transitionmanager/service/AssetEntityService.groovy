@@ -1129,14 +1129,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Scale Options.
-	 * @return the values
-	 */
-	List<String> getScaleOptions() {
-		return SizeScale.getLabels()
-	}
-
-	/**
 	 * Get dependent assets of an asset
 	 * @param AssetEntity - the asset that we're finding the dependent assets
 	 * @return List of Assets
