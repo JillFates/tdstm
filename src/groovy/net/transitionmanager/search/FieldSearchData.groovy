@@ -130,13 +130,13 @@ class FieldSearchData {
            the corresponding AssetClass needs to be included to keep the search consistent and avoid
            matches for this custom field in other domains.
         */
-        if (isCustomField()) {
+        if (isCustomField() && parsedInfo.parameters) {
             /* Generate a name for the AssetClass parameter that will be unique for each domain.
                This is so when the user mixes custom fields from different domains, nothing is returned. */
             AssetClass assetClass = AssetClass.lookup(domain)
             String parameterName = "${assetClass.toString()}_assetClass"
             expression = "($expression AND assetClass = :$parameterName)"
-            parsedInfo.parameters[parameterName] = assetClass
+            addSqlSearchParameter(parameterName, assetClass)
         }
         return expression
     }
