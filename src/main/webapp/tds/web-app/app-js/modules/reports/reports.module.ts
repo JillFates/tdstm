@@ -17,6 +17,7 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
+import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
@@ -41,6 +42,7 @@ import {ReportsService} from './service/reports.service';
 		ReportsRouteModule
 	],
 	declarations: [
+		ApplicationConflictsComponent,
 		PreEventCheckListSelectorComponent
 	],
 	providers: [
@@ -49,7 +51,10 @@ import {ReportsService} from './service/reports.service';
 		ModuleResolveService,
 		TranslatePipe
 	],
-	exports: [PreEventCheckListSelectorComponent],
+	exports: [
+		ApplicationConflictsComponent,
+		PreEventCheckListSelectorComponent
+	],
 	entryComponents: []
 })
 

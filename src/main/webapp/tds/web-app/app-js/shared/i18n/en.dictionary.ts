@@ -199,7 +199,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'APPLICATION_CONFLICTS': 'Application Conflicts'
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
