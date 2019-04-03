@@ -1,10 +1,24 @@
 .asset-summary-list-component {
   kendo-grid {
+    thead {
+      th:not(:first-child) {
+        cursor: pointer;
+        label {
+          cursor: pointer;
+        }
+      }
+    }
     .k-grid-content {
       tbody {
         tr {
           td {
+            a {
+              display: inline-block;
+              height:100%;
+              width:100%;
+            }
             padding-left: 5px;
+            cursor: pointer;
           }
           td:not(:first-child) {
             text-align: right;

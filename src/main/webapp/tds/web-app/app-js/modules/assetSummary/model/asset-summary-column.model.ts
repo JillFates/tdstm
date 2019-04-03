@@ -5,37 +5,37 @@ export class AssetSummaryColumnModel {
 		this.columns = [
 			{
 				label: 'Bundle',
-				property: 'bundle.name',
+				property: 'bundle',
 				type: 'text',
 				width: 300
 			},
 			{
 				label: 'Applications',
-				property: 'applicationCount',
+				property: 'application',
 				type: 'text',
 				width: 70
 			},
 			{
 				label: 'Servers',
-				property: 'serverCount',
+				property: 'server',
 				type: 'text',
 				width: 70
 			},
 			{
 				label: 'Physical Devices',
-				property: 'deviceCount',
+				property: 'device',
 				type: 'text',
 				width: 80
 			},
 			{
 				label: 'Databases',
-				property: 'databaseCount',
+				property: 'database',
 				type: 'text',
 				width: 70
 			},
 			{
 				label: 'Logical Storage',
-				property: 'storageCount',
+				property: 'storage',
 				type: 'text',
 				width: 80
 			}
