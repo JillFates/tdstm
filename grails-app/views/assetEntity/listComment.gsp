@@ -5,7 +5,7 @@
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 	<meta name="layout" content="topNav" />
-		<title>Asset Comment</title>
+		<title>Comments</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 
