@@ -19,51 +19,51 @@ export class PlanningDashboardComponent {
 				appsPlanReadyPercentage: 0,
 				totals: [
 					{
-						type: "Applications",
-						img: "/tdstm/assets/icons/svg/application_menu.svg",
-						link: "/tdstm/application/list?filter=application",
+						type: 'Applications',
+						img: '/tdstm/assets/icons/svg/application_menu.svg',
+						link: '/tdstm/application/list?filter=application',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Physical Servers",
-						img: "/tdstm/assets/icons/svg/serverPhysical_menu.svg",
-						link: "/tdstm/assetEntity/list?filter=physicalServer",
+						type: 'Physical Servers',
+						img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
+						link: '/tdstm/assetEntity/list?filter=physicalServer',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Virtual Servers",
-						img: "/tdstm/assets/icons/svg/serverVirtual_menu.svg",
-						link: "/tdstm/assetEntity/list?filter=virtualServer",
+						type: 'Virtual Servers',
+						img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
+						link: '/tdstm/assetEntity/list?filter=virtualServer',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Databases",
-						img: "/tdstm/assets/icons/svg/database_menu.svg",
-						link: "/tdstm/database/list?filter=db",
+						type: 'Databases',
+						img: '/tdstm/assets/icons/svg/database_menu.svg',
+						link: '/tdstm/database/list?filter=db',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Physical Storage",
-						img: "/tdstm/assets/icons/svg/storagePhysical_menu.svg",
-						link: "/tdstm/assetEntity/list?filter=storage",
+						type: 'Physical Storage',
+						img: '/tdstm/assets/icons/svg/storagePhysical_menu.svg',
+						link: '/tdstm/assetEntity/list?filter=storage',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Logical Storage",
-						img: "/tdstm/assets/icons/svg/storageLogical_menu.svg",
-						link: "/tdstm/files/list?filter=storage",
+						type: 'Logical Storage',
+						img: '/tdstm/assets/icons/svg/storageLogical_menu.svg',
+						link: '/tdstm/files/list?filter=storage',
 						total: 0,
 						toValidate: 0
 					},
 					{
-						type: "Other Devices",
-						img: "/tdstm/assets/icons/svg/other_menu.svg",
-						link: "/tdstm/assetEntity/list?filter=other",
+						type: 'Other Devices',
+						img: '/tdstm/assets/icons/svg/other_menu.svg',
+						link: '/tdstm/assetEntity/list?filter=other',
 						total: 0,
 						toValidate: 0
 					}
