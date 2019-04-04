@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import { ApplicationConflict } from '../model/application-conflicts.model';
 
 /**
  * @name ReportsService
@@ -58,7 +59,7 @@ export class ReportsService {
 			.catch((error: any) => error);
 	}
 
-	getApplicatioConflicts(): Observable<any> {
+	getApplicatioConflicts(): Observable<Array<ApplicationConflict>> {
 		const data =  [
 			{
 				'application': {
@@ -74,7 +75,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Application',
 						'name': 'BlackBerry Enterprise Server Test',
-						'frecuency': 'Unknow',
+						'frequency': 'Unknow',
 						'bundle': 'M1 - Physical',
 						'status': 'Unknow'
 					},
@@ -82,7 +83,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Storage',
 						'name': 'Storage Enterprise Device - by CN',
-						'frecuency': 'Unknow',
+						'frequency': 'Unknow',
 						'bundle': '123110_qae2e',
 						'status': 'Unknow'
 					}
@@ -103,7 +104,7 @@ export class ReportsService {
 						'type': 'DB',
 						'class': 'Storage',
 						'name': 'DS4243-1',
-						'frecuency': 'constant',
+						'frequency': 'constant',
 						'bundle': 'TBD',
 						'status': 'Unknow'
 					}
@@ -113,7 +114,7 @@ export class ReportsService {
 						'type': 'Hosts',
 						'class': 'VM',
 						'name': 'ACME-WB-84',
-						'frecuency': 'daily',
+						'frequency': 'daily',
 						'bundle': 'M1-Phy',
 						'status': 'Future'
 					}
@@ -133,7 +134,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Application',
 						'name': 'BlackBerry Enterprise Server',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': 'Buildout',
 						'status': 'Unknown'
 					},
@@ -141,7 +142,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Application',
 						'name': '13181 - by CN',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': '123110_qae2e',
 						'status': 'Unknown'
 					},
@@ -149,7 +150,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': '',
 						'name': 'Device - by CN',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': 'e2e test*',
 						'status': 'Unknown'
 					}
@@ -159,7 +160,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'PDU',
 						'name': 'A8 PDU1 B - by CN',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': 'Master Bundle',
 						'status': 'Unknown'
 					},
@@ -167,7 +168,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Application',
 						'name': '13181 - by CN',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': '123110_qae2e',
 						'status': 'Archived'
 					},
@@ -175,7 +176,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Application',
 						'name': 'Cris Enterprise App',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': '123110_qae2e',
 						'status': 'Archived'
 					},
@@ -183,7 +184,7 @@ export class ReportsService {
 						'type': 'Backup',
 						'class': 'Database',
 						'name': 'Smoke Enterprise DB - by CN',
-						'frecuency': 'Unknown',
+						'frequency': 'Unknown',
 						'bundle': '123110_qae2e',
 						'status': 'Archived'
 					}
