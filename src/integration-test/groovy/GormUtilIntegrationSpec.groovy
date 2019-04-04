@@ -9,6 +9,8 @@ import grails.gorm.validation.Constraint
 import grails.test.mixin.integration.Integration
 import grails.validation.Validateable
 import net.transitionmanager.action.Credential
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
 import net.transitionmanager.notice.Notice
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
@@ -22,6 +24,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
@@ -37,6 +40,7 @@ class GormUtilIntegrationSpec extends Specification {
 	PersonTestHelper personHelper
 	ProjectService projectService
 	ProjectTestHelper projectHelper
+	CustomDomainService customDomainService
 
 	@Shared
 	Project sharedProject
@@ -44,7 +48,35 @@ class GormUtilIntegrationSpec extends Specification {
 	@Shared
 	Person sharedPerson
 
+	// Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
+	// After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
+	// as a resource for the application.
+	private static final String fieldSpecDefinitionJson = 'CustomDomainServiceTests_FieldSpec.json'
+
+	/**
+	 * This will load the JSON file that accompanies this test suite and will return
+	 * it as a JSONObject.
+	 */
+	private JSONObject loadFieldSpecJson() {
+		// Determine where we can write the resource file for testing
+		// this.class.classLoader.rootLoader.URLs.each{ println it }
+		// We'll only load it the first time and cache it into fieldSpecJson
+		JSONObject fieldSpecJson
+		if (!fieldSpecJson) {
+			String jsonText = this.getClass().getResource( fieldSpecDefinitionJson ).text
+			fieldSpecJson = new JSONObject(jsonText)
+			assert fieldSpecJson
+			// println "\n\n$fieldSpecJson\n\n"
+		}
+		return fieldSpecJson
+	}
+
 	def setup() {
+		// Clone the Field Specifications Setting records
+		Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
+		Setting.findAllByProject(defProject)*.delete(flush:true)
+		customDomainService.saveFieldSpecs(defProject, CustomDomainService.ALL_ASSET_CLASSES, loadFieldSpecJson())
+
 		assetHelper = new AssetTestHelper()
 		personHelper = new PersonTestHelper()
 		projectHelper = new ProjectTestHelper()

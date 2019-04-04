@@ -446,7 +446,7 @@ class CustomDomainService implements ServiceMethods {
 	 * @param project
 	 * @return
 	 */
-    Map<String, ?> fieldSpecsWithCommon(Project project = null){
+    Map<String, ?>  fieldSpecsWithCommon(Project project = null){
         assert project
         String APPLICATION = AssetClass.APPLICATION as String
 

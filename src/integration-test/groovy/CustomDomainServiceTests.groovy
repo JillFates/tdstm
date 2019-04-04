@@ -1,12 +1,12 @@
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.project.Project
-import net.transitionmanager.common.Setting
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.RandomStringUtils as RSU
@@ -36,6 +36,11 @@ class CustomDomainServiceTests extends Specification {
         assetHelper = new AssetTestHelper()
         customDomainTestHelper = new CustomDomainTestHelper()
         projectHelper = new ProjectTestHelper()
+
+        // Clone the Field Specifications Setting records
+        Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
+        Setting.findAllByProject(defProject)*.delete(flush:true)
+        customDomainService.saveFieldSpecs(defProject, CustomDomainService.ALL_ASSET_CLASSES, loadFieldSpecJson())
     }
 
     private static final String CUSTOM1_LABEL = 'Description'
@@ -88,7 +93,7 @@ class CustomDomainServiceTests extends Specification {
         when: 'Database custom field specs are requested'
             customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)
         then: 'Database domain fields are returned'
-            customFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
+            customFieldSpecsMap[domain]["domain"] == domain
         then: 'Only database udf fields are returned'
             [] == customFieldSpecsMap[domain]["fields"].findAll({field -> field.udf == 0})
     }
@@ -239,10 +244,13 @@ class CustomDomainServiceTests extends Specification {
 
     }
 
-    void '9. Test the getFieldSpecsForAssetExport method for different scenarios'() {
+    void 'Scenario 9. Test the getFieldSpecsForAssetExport method for different scenarios'() {
         setup: 'Create a project'
             Project project = projectHelper.createProject()
             String domain = AssetClass.APPLICATION.toString()
+            Setting.findAllByProject(project)*.delete(flush:true)
+            customDomainService.saveFieldSpecs(project, domain, loadFieldSpecJson())
+
         when: 'retrieving the fields to be exported and all available fields for the project'
             Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             Map allFields = customDomainService.allFieldSpecs(project, domain)
