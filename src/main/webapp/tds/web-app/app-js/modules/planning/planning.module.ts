@@ -14,6 +14,8 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {PlanningDashboardComponent} from './components/dashboard/planning-dashboard.component';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {PlanningService} from './service/planning.service';
 
@@ -36,6 +38,8 @@ import {PlanningService} from './service/planning.service';
 		PlanningDashboardComponent
 	],
 	providers: [
+		// Resolve
+		ModuleResolveService,
 		// Service
 		PlanningService
 	],
