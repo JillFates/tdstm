@@ -1,0 +1,176 @@
+<div class="application-conflicts">
+	<div class="settings">
+		<div class="application-section">
+			<div class="section-title">Bundle</div>
+			<div class="section-control">
+				<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
+					[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.defaultBundle">
+				</kendo-dropdownlist>
+			</div>
+		</div>
+
+		<div class="application-section">
+			<div class="section-title">App Owner</div>
+			<div class="section-control">
+				<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.appOwnerList"
+					[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.defaultAppowner">
+				</kendo-dropdownlist>
+			</div>
+		</div>
+
+		<div class="application-section">
+			<div class="section-title">
+				<input [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict"
+					id="bundleConflict" name="bundleConflict" type="checkbox">
+				<label for="bundleConflict">Bundle Conflict</label>
+			</div>
+			<div class="section-control">
+				<label>Having dependency references to assets assigned to unrelated bundles</label>
+			</div>
+		</div>
+
+		<div class="application-section">
+			<div class="section-title">
+				<input [checked]="model.unresolvedDependencies"
+					(change)="model.unresolvedDependencies = !model.unresolvedDependencies" id="unresolvedDependencies"
+					name="unresolvedDependencies" type="checkbox">
+				<label for="unresolvedDependencies">Unresolved Dependencies</label>
+			</div>
+			<div class="section-control">
+				<label>Having dependencies with status Unknown or Questioned</label>
+			</div>
+		</div>
+
+		<div class="application-section">
+			<div class="section-title">
+				<input [checked]="model.missingDependencies"
+					(change)="model.missingDependencies = !model.missingDependencies" id="missingDependencies"
+					name="missingDependencies" type="checkbox">
+				<label for="missingDependencies">Missing Dependencies</label>
+			</div>
+			<div class="section-control">
+				<label>Having no defined Supports or Requires dependencies</label>
+			</div>
+		</div>
+
+		<div class="application-section">
+			<div class="section-title">
+				<div>Maximum Applications to report</div>
+			</div>
+			<div class="section-control">
+				<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.maxApplicationsList"
+					[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxApplications">
+				</kendo-dropdownlist>
+			</div>
+		</div>
+		<div class="application-section">
+			<div class="section-title">
+				<tds-button-custom class="btn-primary" title="Generate" tooltip="Generate report"
+					(click)="onGenerateReport()" icon="check-square">
+				</tds-button-custom>
+			</div>
+			<div class="section-control">
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+
+		<div class="container" *ngFor="let item of applicationConflicts">
+			<div class="row">
+				<div class="col-sm-4">{{item.application.name}} {{item.application.bundle}}</div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-2">Supports {{item.supports.length}}</div>
+				<div class="col-sm-2">Depends on {{item.supports.dependencies}}</div>
+			</div>
+
+			<div class="row" *ngIf="item.supports.length">
+				<div class="col-sm-1"></div>
+				<div class="col-sm-2">Supports ({{item.supports.length}} issues)</div>
+				<div class="col-sm-9"></div>
+			</div>
+
+			<div class="row" *ngIf="item.supports.length">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-1">Type</div>
+					<div class="col-sm-1">Class</div>
+					<div class="col-sm-3">Name</div>
+					<div class="col-sm-2">Frequency</div>
+					<div class="col-sm-2">Bundle</div>
+					<div class="col-sm-2">Status</div>
+			</div>
+
+			<div class="row" *ngFor="let support of item.supports">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-1">{{support.type}}</div>
+					<div class="col-sm-1">{{support.class}}</div>
+					<div class="col-sm-3">{{support.name}}</div>
+					<div class="col-sm-2">{{support.frequency}}</div>
+					<div class="col-sm-2">{{support.bundle}}</div>
+					<div class="col-sm-2">{{support.status}}</div>
+			</div>
+
+			<div class="row" *ngIf="item.dependencies.length">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-2">Dependencies ({{item.supports.length}} issues)</div>
+					<div class="col-sm-9"></div>
+			</div>
+
+			<div class="row" *ngIf="item.dependencies.length">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-1">Type</div>
+					<div class="col-sm-1">Class</div>
+					<div class="col-sm-3">Name</div>
+					<div class="col-sm-2">Frequency</div>
+					<div class="col-sm-2">Bundle</div>
+					<div class="col-sm-2">Status</div>
+			</div>
+
+			<div class="row" *ngFor="let dependency of item.dependencies">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-1">{{dependency.type}}</div>
+					<div class="col-sm-1">{{dependency.class}}</div>
+					<div class="col-sm-3">{{dependency.name}}</div>
+					<div class="col-sm-2">{{dependency.frequency}}</div>
+					<div class="col-sm-2">{{dependency.bundle}}</div>
+					<div class="col-sm-2">{{dependency.status}}</div>
+			</div>
+		</div>
+
+		<!--
+		<div class="row">
+			<div class="col-sm-4">Enterprise App with new Buttons - by CN (123110_qae2e)</div>
+			<div class="col-sm-4"></div>
+			<div class="col-sm-2">Supports 2</div>
+			<div class="col-sm-2">Depends on 0</div>
+		</div>
+		-->
+
+		<!--
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-2">Supports (2 Issues)</div>
+			<div class="col-sm-9"></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-1">Type</div>
+			<div class="col-sm-1">Class</div>
+			<div class="col-sm-3">Name</div>
+			<div class="col-sm-2">Frequency</div>
+			<div class="col-sm-2">Bundle</div>
+			<div class="col-sm-2">Status</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-1">Backup</div>
+			<div class="col-sm-1">Application</div>
+			<div class="col-sm-3">BlackBerry Enterprise Server Test</div>
+			<div class="col-sm-2">Unknown</div>
+			<div class="col-sm-2">M1 - Physical</div>
+			<div class="col-sm-2">Unknown</div>
+		</div>
+		-->
+	</div>
+
+</div>
