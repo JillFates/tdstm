@@ -1,6 +1,7 @@
 import com.tdsops.common.security.SecurityUtil
 import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
+import net.transitionmanager.command.NoticeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.security.Permission
@@ -62,31 +63,23 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.NoticeCreate)
 	def create() {
-		try {
-			Map<String, ?> result = noticeService.create(request.JSON)
-			if (!result.status) {
-				response.status = 400
-			}
-			renderAsJson result.data
-		}
-		catch (e) {
-			renderError500 e
-		}
+		NoticeCommand command = populateCommandObject(NoticeCommand.class)
+		validateCommandObject(command)
+
+		Notice notice = noticeService.saveOrUpdate(command)
+
+		renderAsJson([model: notice])
 	}
 
 	@HasPermission(Permission.NoticeEdit)
-	def update() {
-		try {
-			Map<String, ?> result = noticeService.update(params.long('id'), request.JSON)
-			if (!result.status) {
-				response.status = 404
-			}
+	def update(Long id) {
+		NoticeCommand command = populateCommandObject(NoticeCommand.class)
+		command.id = id
+		validateCommandObject(command)
 
-			renderAsJson result.data
-		}
-		catch (e) {
-			renderError500 e
-		}
+		Notice notice = noticeService.saveOrUpdate(command, id)
+
+		renderAsJson([model: notice])
 	}
 
 	/**
@@ -107,8 +100,8 @@ class WsNoticeController implements ControllerMethods {
 	}
 
 	/**
-	 * Mark a Note Acknowledge by a User
-	 * TODO: (oluna)Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
+	 * Mark a Note Acknowledged by a User
+	 * TODO: (oluna) Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def ack(Long id, String username) {

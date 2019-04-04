@@ -5,6 +5,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.NoticeCommand
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.Notice.NoticeType
 import net.transitionmanager.domain.NoticeAcknowledgement
@@ -32,67 +33,101 @@ class NoticeService implements ServiceMethods {
 	 */
 	@Transactional
 	boolean ack(Long id, String username) {
-		log.info("ID: $id, username: $username")
-		Notice notice = Notice.get(id)
+		log.info('User: {}, is acknowledging notice: {}', username, id)
+
+		Notice notice = get(id)
 		if (!notice) {
 			return false
 		}
 
 		Person person = personService.findByUsername(username)
-		log.info("Person: $person")
 		if (!person) {
 			return false
 		}
 
 		NoticeAcknowledgement notack = new NoticeAcknowledgement(notice: notice, person: person)
-		notack.save()
+		notack.save(failOnError: true)
 
 		return !notack.hasErrors()
 	}
 
+	/**
+	 * Delete a notice by id
+	 * @param id - the notice id
+	 * @return - true when notice is deleted
+	 */
 	@Transactional
 	boolean delete(Long id) {
 		1 == Notice.where { id == id }.deleteAll()
 	}
 
+	/**
+	 * Fetch a list of notices by type or all
+	 * @param type - notice type filter
+	 * @return - a list of notices filtered by type or all if filter is null
+	 */
 	List<Notice> fetch(Notice.NoticeType type = null) {
 		type ? Notice.findAllByTypeId(type) : Notice.list()
 	}
 
+	/**
+	 * Get a notice by id
+	 * @param id - notice id
+	 * @return
+	 */
 	Notice get(Long id) {
-		Notice.get(id)
+		Notice.where { id == id }.find()
 	}
 
+//	@Transactional
+//	Map<String, ?> update(Long id, json) {
+//		if (!id) {
+//			return [status: false, errors: ["id not provided"]]
+//		}
+//
+//		Notice notice = get(id)
+//		if (notice) {
+//			return saveUpdate(json, notice)
+//		}
+//
+//		return [status: false, errors: ["Resource not found with id [$id]"]]
+//	}
+
+//	@Transactional
+//	Map<String, ?> create(json) {
+//		saveUpdate(json, new Notice(createdBy: securityService.userLoginPerson))
+//	}
+
+	/**
+	 * Create or update a notice
+	 * @param noticeCommand - the notice command
+	 * @param id - if updating an existing notice, it is the notice id
+	 * @return - new created or updated notice
+	 */
 	@Transactional
-	Map<String, ?> update(Long id, json) {
-		if (!id) {
-			return [status: false, errors: ["id not provided"]]
+	Notice saveOrUpdate(NoticeCommand noticeCommand, Long id = null) {
+		Notice notice
+		if (id) {
+			notice = get(id)
+		} else {
+			notice = new Notice(createdBy: securityService.userLoginPerson)
 		}
-
-		Notice notice = get(id)
-		if (notice) {
-			return saveUpdate(json, notice)
-		}
-
-		return [status: false, errors: ["Resource not found with id [$id]"]]
+		noticeCommand.populateDomain(notice, false)
+		notice.save(failOnError: true)
+		return notice
 	}
 
-	@Transactional
-	Map<String, ?> create(json) {
-		saveUpdate(json, new Notice(createdBy: securityService.userLoginPerson))
-	}
-
-		private static final Map<String, Class> TYPES = [
-		acknowledgeable: String,
-		activationDate:  Date,
-		active:          Boolean,
-		expirationDate:  Date,
-		htmlText:        String,
-		projectId:       Project,
-		rawText:         String,
-		title:           String,
-		typeId:          Notice.NoticeType
-	]
+//		private static final Map<String, Class> TYPES = [
+//		acknowledgeable: String,
+//		activationDate:  Date,
+//		active:          Boolean,
+//		expirationDate:  Date,
+//		htmlText:        String,
+//		projectId:       Project,
+//		rawText:         String,
+//		title:           String,
+//		typeId:          Notice.NoticeType
+//	]
 
 	/**
 	 * Check for any unacknowledged notices
@@ -106,6 +141,7 @@ class NoticeService implements ServiceMethods {
 		def result = Notice.withCriteria {
 			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ack.person", person))
 			eq('active', true)
+			eq('project', securityService.userCurrentProject)
 			and {
 				or {
 					isNull('activationDate')
@@ -131,52 +167,52 @@ class NoticeService implements ServiceMethods {
 	}
 
 	// HELPER METHODS /////////////////////////////////////////
-	private Map<String, ?> saveUpdate(json, Notice notice) {
-		TYPES.each { String propertyName, Class type ->
-			def val = json[propertyName]
-
-			if (val != null) {
-
-				// Sanitize the 3rd Party HTML
-				if (propertyName == 'htmlText') {
-					List<String> results = StringUtil.checkHTML(val as String)
-					if (!results.isEmpty()) {
-						throw new ServiceException("HTML passed is unsafe to render as it contains forbidden code in: [${results.join(',')}]")
-					}
-				}
-
-				switch (type) {
-					case Date:
-						val = DatatypeConverter.parseDateTime(val).time
-						break
-
-					case Notice.NoticeType:
-						val = Notice.NoticeType.forId(val)
-						break
-
-					case Project:
-						val = Project.get(val)
-						break
-
-				}
-
-				notice[propertyName] = val
-			}
-		}
-
-		def status = notice.save() // TODO this returns the Notice instance or null, not boolean
-		Map<String, ?> result = [status: status, data: [:]]
-
-		if (status) {
-			result.data.notice = notice
-		}
-		else {
-			Locale locale = LocaleContextHolder.locale
-			result.data.errors = notice.errors.allErrors.collect { messageSource.getMessage(it, locale) }
-		}
-
-		return result
-	}
+//	private Map<String, ?> saveUpdate(json, Notice notice) {
+//		TYPES.each { String propertyName, Class type ->
+//			def val = json[propertyName]
+//
+//			if (val != null) {
+//
+//				// Sanitize the 3rd Party HTML
+//				if (propertyName == 'htmlText') {
+//					List<String> results = StringUtil.checkHTML(val as String)
+//					if (!results.isEmpty()) {
+//						throw new ServiceException("HTML passed is unsafe to render as it contains forbidden code in: [${results.join(',')}]")
+//					}
+//				}
+//
+//				switch (type) {
+//					case Date:
+//						val = DatatypeConverter.parseDateTime(val).time
+//						break
+//
+//					case Notice.NoticeType:
+//						val = Notice.NoticeType.forId(val)
+//						break
+//
+//					case Project:
+//						val = Project.get(val)
+//						break
+//
+//				}
+//
+//				notice[propertyName] = val
+//			}
+//		}
+//
+//		def status = notice.save() // TODO this returns the Notice instance or null, not boolean
+//		Map<String, ?> result = [status: status, data: [:]]
+//
+//		if (status) {
+//			result.data.notice = notice
+//		}
+//		else {
+//			Locale locale = LocaleContextHolder.locale
+//			result.data.errors = notice.errors.allErrors.collect { messageSource.getMessage(it, locale) }
+//		}
+//
+//		return result
+//	}
 
 	/**
 	 * Return a list of person post login notices that has not been acknowledged
@@ -191,6 +227,7 @@ class NoticeService implements ServiceMethods {
 			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
 			eq('active', true)
 			eq('typeId', NoticeType.POST_LOGIN)
+			eq('project', securityService.userCurrentProject)
 			and {
 				or {
 					isNull('activationDate')
