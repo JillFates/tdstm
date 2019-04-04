@@ -99,14 +99,12 @@ export class ReportsService {
 			}, {'name': 'Wave1- Bundle1', 'id': 3661}
 			],
 			appOwnerList: [
-				{id: "5711", name: 'Varo'},
-				{id: "5893", name: 'Blocktest'},
-				{id: "5662", name: 'Admin, TDS'}
+				{id: '5711', name: 'Varo'},
+				{id: '5893', name: 'Blocktest'},
+				{id: '5662', name: 'Admin, TDS'}
 			]
 		};
 
 		return Observable.of(data);
 	}
-
-
 }
