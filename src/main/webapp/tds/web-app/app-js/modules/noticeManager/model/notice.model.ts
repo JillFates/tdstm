@@ -48,6 +48,6 @@ export class NoticeModel {
 }
 
 export const NoticeTypes = [
-	{typeId: '1', name: 'Prelogin'},
-	{typeId: '2', name: 'Postlogin'}
+	{typeId: '1', name: 'Postlogin'},
+	{typeId: '2', name: 'Prelogin'}
 ];
