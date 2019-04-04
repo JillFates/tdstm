@@ -152,7 +152,8 @@ class DashboardController implements ControllerMethods {
 	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEventsList() {
 		Person currentPerson = securityService.loadCurrentPerson()
-		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson)
+		Long projectId = NumberUtil.toPositiveLong(params.project)
+		List<MoveEvent> events = moveEventService.getAssignedEventsForDashboard(currentPerson, projectId)
 		Date now = TimeUtil.nowGMT()
 
 		List<Map> eventsMap = events.collect { MoveEvent moveEvent ->
