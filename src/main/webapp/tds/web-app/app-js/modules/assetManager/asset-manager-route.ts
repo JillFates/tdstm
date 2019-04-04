@@ -58,7 +58,7 @@ export const AssetManagerRoute: Routes = [
 		resolve: {
 			reports: ReportsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	},
 	{
@@ -80,7 +80,7 @@ export const AssetManagerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	},
 	{
@@ -102,7 +102,7 @@ export const AssetManagerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	},
 	{
@@ -123,7 +123,7 @@ export const AssetManagerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	}
 ];

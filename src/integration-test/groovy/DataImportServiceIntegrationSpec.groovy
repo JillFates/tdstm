@@ -39,7 +39,7 @@ import test.helper.AssetEntityTestHelper
 @Rollback
 class DataImportServiceIntegrationSpec extends Specification {
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
     DataImportService dataImportService
@@ -48,22 +48,22 @@ class DataImportServiceIntegrationSpec extends Specification {
     SecurityService securityService
 
 	@Shared
-	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+	DataScriptTestHelper dataScriptTestHelper
 
 	@Shared
 	FileSystemService fileSystemService
 
 	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
+	PersonTestHelper personTestHelper
 
 	@Shared
-    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+    ProjectTestHelper projectTestHelper
 
 	@Shared
-	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+	ProviderTestHelper providerTestHelper
 
 	@Shared
 	Project project
@@ -91,6 +91,12 @@ class DataImportServiceIntegrationSpec extends Specification {
 	}
 
 	void setup() {
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		dataScriptTestHelper = new DataScriptTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
+		personTestHelper = new PersonTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		providerTestHelper = new ProviderTestHelper()
 		whom = personTestHelper.createPerson()
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
@@ -949,7 +955,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			GormUtil.hasUnsavedChanges(server)
 
 		when: 'the server is saved'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'there should be no unsaved changes'
 			! GormUtil.hasUnsavedChanges(server)
@@ -993,7 +999,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			server.modifiedBy == clientStaff2
 
 		when: 'saving the changes after the latest changes'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'the server move bundle should now reference the new bundle'
 			server.moveBundle.id == mb2.id
@@ -1157,7 +1163,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			manufacturer = Manufacturer.findOrSaveWhere( name: manufacturerName )
 			new ManufacturerAlias(
 					  name: manufacturerAliasName, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return manufacturer
@@ -1180,7 +1186,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			model = Model.findOrSaveWhere( modelName:modelName , manufacturer: manufacturer )
 			new ModelAlias(
 					  name: modelAliasName, model: model, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return model

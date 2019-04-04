@@ -1204,7 +1204,7 @@ class AdminController implements ControllerMethods {
 					options.fileParamName = fileParamName
 					model = accountImportExportService.processFileUpload(request, project, options)
 
-					Map forwardParams = [stepAlt: 'review', filename: model.filename, importOption: params.importOption,
+					Map forwardParams = [stepAlt: 'review', filename: model.filename,
 					                     accountsToRemoveFromProject: model.accountsToRemoveFromProject]
 
 					// Redirect the user to the Review step

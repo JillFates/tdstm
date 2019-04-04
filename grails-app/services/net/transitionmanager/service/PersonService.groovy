@@ -25,6 +25,7 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
@@ -33,7 +34,7 @@ class PersonService implements ServiceMethods {
 	def auditService
 	def jdbcTemplate
 	def moveEventService
-	def namedParameterJdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	def partyRelationshipService
 	def projectService
 	def userPreferenceService
@@ -155,75 +156,77 @@ class PersonService implements ServiceMethods {
 		}
 
 		List persons = []
-		Map queryParams = [companyId: company.id]
+		Map queryParams = [company: company]
 		def (first, middle, last) = [false, false, false]
 
-		StringBuilder select = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
-		select.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
-		select.append(' WHERE pr.party_id_from_id=:companyId')
-		select.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
-		select.append(' AND pr.role_type_code_to_id="ROLE_STAFF" ')
+		StringBuilder select = new StringBuilder("select pr.partyIdTo from PartyRelationship pr")
+		select.append(" where pr.partyIdFrom = :company")
+		select.append(" and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'")
+		select.append(" and pr.roleTypeCodeTo = 'ROLE_STAFF'")
 
-		StringBuilder query = new StringBuilder(select)
+		StringBuilder query1 = new StringBuilder(select)
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
-			query.append(' AND p.first_name=:first')
+			query1.append(" AND pr.partyIdTo.firstName=:first")
 			first = true
 		}
 		if (nameMap.middle) {
 			queryParams.middle = nameMap.middle
-			query.append(' AND p.middle_name=:middle')
+			query1.append(" AND pr.partyIdTo.middleName=:middle")
 			middle = true
 		}
 		if (nameMap.last) {
 			queryParams.last = nameMap.last
-			query.append(' AND p.last_name=:last')
+			query1.append(" AND pr.partyIdTo.lastName=:last")
 			last = true
 		}
+
+		StringBuilder query2
 		if (first && middle && last) {
-			// Union to try and find individuals with just first and last, middle not set
-			query.append(' UNION ')
-			query.append(select)
-			query.append(" AND p.first_name=:first AND p.last_name=:last AND COALESCE(p.middle_name,'') = '' ")
+			// Try and find individuals with just first and last, middle not set
+			query2 = new StringBuilder(select)
+			query2.append(" AND pr.partyIdTo.firstName=:first AND pr.partyIdTo.lastName=:last")
+			query2.append(" AND pr.partyIdTo.middleName is null")
 		}
+		StringBuilder query3
 		if (first) {
-			// Union to try and find individuals with just first, middle and last not set
-			query.append(' UNION ')
-			query.append(select)
-			query.append(" AND p.first_name=:first AND COALESCE(p.last_name,'') = '' AND COALESCE(p.middle_name,'') = '' ")
+			// Try and find individuals with just first, middle and last not set
+			query3 = new StringBuilder(select)
+			query3.append(" AND pr.partyIdTo.firstName=:first")
+			query3.append(" AND pr.partyIdTo.lastName is null")
+			query3.append(" AND pr.partyIdTo.middleName is null")
 		}
-		// log.debug "findByCompanyAndName() Query = ${query.toString()}"
-		
-		List<Long> pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)*.id
-		if (pIds) {
-			persons = Person.where { id in pIds }.list()
+		 log.debug "findByCompanyAndName() Query = ${query.toString()}"
+		persons = PartyRelationship.executeQuery(query1.toString(), queryParams)
+
+		if (query2) {
+			queryParams.remove("middle")
+			persons.addAll(PartyRelationship.executeQuery(query2.toString(), queryParams))
 		}
+		if (query3) {
+			queryParams.remove("last")
+			persons.addAll(PartyRelationship.executeQuery(query3.toString(), queryParams))
+		}
+		persons = persons.unique()
 
 		return persons
 	}
 
 	/**
-	 * Find a person by their name for a specified client
+	 * Find a list of persons associated as Staff to a given company, queried by company and person email.
 	 * @param company - The company that the person would be associated as Staff
-	 * @param nameMap - a map of the person's name (map [first, last, middle])
-	 * @return A list of the person(s) found that match the name or null if none found
+	 * @param email - Person email
+	 * @return A list of the person(s) found that match the filter or an empty list if none found
 	 */
 	List<Person> findByCompanyAndEmail(PartyGroup company, String email) {
 		List<Person> persons = []
 		if (email) {
-			Map args = [company: company.id, email: email]
-			StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
-			query.append(' WHERE pr.party_id_from_id=:company')
-			query.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
-			query.append(' AND pr.role_type_code_to_id="ROLE_STAFF"')
-			query.append(' AND p.email=:email')
-
-			log.debug 'findByCompanyAndEmail: query {}, map {}', query, args
-			List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), args)
-			log.debug 'findByCompanyAndEmail: query {}, map {}, found ids {}', query, args, pIds
-			if (pIds) {
-				persons = Person.getAll(pIds*.id).findAll()
-			}
+			Map args = [company: company, email: email]
+			persons = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr " +
+					"where pr.partyIdFrom = :company " +
+					"and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY' " +
+					"and pr.roleTypeCodeTo = 'ROLE_STAFF' " +
+					"and pr.partyIdTo.email = :email", args)
 		}
 		return persons
 	}
@@ -566,7 +569,7 @@ class PersonService implements ServiceMethods {
 
 		// toPerson.properties = cmdObj
 		cmdObj.populateDomain(toPerson, true, ['constraintsMap'])
-		if (!toPerson.save(flush:true)) {
+		if (!toPerson.save(flush:true, failOnError: false)) {
 			throw new DomainUpdateException('Unable to update person ' + GormUtil.allErrorsString(toPerson))
 			toPerson.errors.allErrors.each{ println it }
 		}
@@ -1352,7 +1355,7 @@ class PersonService implements ServiceMethods {
 	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
 	PartyRelationship getProjectReference(Project project, Person person) {
-		return getProjectTeamReference(project, person, 'STAFF')
+		return getProjectTeamReference(project, person, 'ROLE_STAFF')
 	}
 
 	/**

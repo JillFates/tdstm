@@ -227,9 +227,9 @@ class AssetEntityServiceTests extends Specification{
 			Application app = assetHelper.createApplication(person, project)
 			assert app
 		and: 'some tags are added to the asset'
-			Tag tag1 = new Tag(name: 'first tag', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'second tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'third tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
+			Tag tag1 = new Tag(name: 'first tag', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+			Tag tag2 = new Tag(name: 'second tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+			Tag tag3 = new Tag(name: 'third tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
 			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
 			app.refresh() // needed to refresh because of Grails test transaction caching entities
 		and: 'the clone method is called'

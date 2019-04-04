@@ -1,154 +1,352 @@
 <ng-template #filterControl>
-    <div class="col-xs-2 col-md-2 col-lg-2">
-        <select class="form-control" (change)="onFilter()" name="fieldType" id="type" [(ngModel)]="gridState.filter.fieldType">
-            <option *ngFor="let t of availableFieldTypes" [ngValue]="t">{{t}}</option>
-        </select>
-    </div>
-    <div class="col-xs-3 col-md-3 col-lg-2">
-        <div class="form-group has-feedback" style="margin-bottom:0px;">
-            <input type="text" class="form-control searchFilterInput" (keyup.enter)="onFilter()" name="search" [(ngModel)]="gridState.filter.search"
-                placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}" value="">
-            <span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
-                aria-hidden="true"></span>
-        </div>
-    </div>
-    <div class="col-xs-2 col-md-2 col-lg-1">
-        <button type="button" class="btn btn-default" id="btnFilter" (click)="onFilter()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
-    </div>
+	<div class="col-xs-2 col-md-2 col-lg-2">
+		<select class="form-control"
+		        (change)="onFilter()"
+		        name="fieldType"
+		        id="type"
+		        [(ngModel)]="gridFilter.fieldType">
+			<option *ngFor="let t of availableFieldTypes" [ngValue]="t">{{t}}</option>
+		</select>
+	</div>
+	<div class="col-xs-3 col-md-3 col-lg-2">
+		<div class="form-group has-feedback" style="margin-bottom:0px;">
+			<input type="text"
+			       class="form-control searchFilterInput"
+			       (keyup.enter)="onFilter()"
+			       name="search"
+			       [(ngModel)]="gridFilter.search"
+			       placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}"
+			       value="">
+			<span style="cursor:pointer;color:#000;pointer-events:all"
+			      (click)="onClearTextFilter()"
+			      class="fa fa-times form-control-feedback"
+			      aria-hidden="true">
+			</span>
+		</div>
+	</div>
+	<div class="col-xs-2 col-md-2 col-lg-1">
+		<tds-button-filter [id]="'btnFilter'" (click)="onFilter()">
+		</tds-button-filter>
+	</div>
 </ng-template>
-<kendo-grid #fieldSettingGrid="kendoGrid" [filter]="state.filter" [data]="gridData" [sortable]="sortable" [sort]="state.sort"
-    (dataStateChange)="dataStateChange($event)" class="field-settings-grid">
-    <ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="isEditing; else defaultToolbar">
-        <div class="col-xs-4 col-md-3 col-lg-2">
-            <button type="button" class="btn" [ngClass]="{'btn-default':!gridState.dirty && !atLeastOneInvalidField(), 'btn-success':gridState.valid && gridState.dirty, 'btn-danger':(!gridState.valid && gridState.dirty) || atLeastOneInvalidField()}"
-                id="btnSaveAll" [disabled]="!gridState.editable || !gridState.dirty || !gridState.valid || atLeastOneInvalidField()" (click)="onSaveAll()"><i class="fa fa-fw fa-floppy-o"></i> {{'GLOBAL.SAVE_ALL' | translate}}</button>
-            <button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()"><i class="fa fa-fw fa-times"></i> {{'GLOBAL.CANCEL' | translate}}</button>
-        </div>
-        <div *ngIf="isFilterDisabled; else filterControl"></div>
-        <div class="col-xs-3 col-md-3 col-lg-5">
-            <button type="button" class="btn btn-default float-right" id="btnAddCustom" (click)="onAddCustom()"><i class="fa fa-fw fa-plus-circle"></i> {{'FIELD_SETTINGS.CREATE_CUSTOM' | translate}}</button>
-        </div>
-    </ng-template>
-    <ng-template kendoGridToolbarTemplate [position]="'top'" #defaultToolbar>
-        <div class="col-xs-4 col-md-3 col-lg-2">
-            <button type="button" class="btn btn-default" id="btnEdit" [disabled]="!gridState.editable" (click)="onEdit()"><i class="fa fa-fw fa-list-ul"></i> {{'GLOBAL.EDIT' | translate}}</button>
-        </div>
-        <div *ngIf="isFilterDisabled; else filterControl"></div>
-    </ng-template>
-    <kendo-grid-column title="Action" *ngIf='isEditing' [width]="70">
-        <ng-template kendoGridCellTemplate let-dataItem>
-            <button title="Deleting the custom field removes the definition but does not delete the data" class="btn btn-default" *ngIf="dataItem.udf && !toBeDeleted(dataItem)" (click)="onDelete(dataItem)" [disabled]="isFieldUsedAsPlanMethodology(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
-            <button class="btn btn-default" *ngIf="dataItem.udf && toBeDeleted(dataItem)" (click)="undoDelete(dataItem)"><span class="fa fa-fw fa-undo"></span></button>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="field" title="Field">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input type="text" *ngIf="dataItem.udf" disabled class="form-control" [(ngModel)]="dataItem.field" name="field"
-                   [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}" [ngStyle]="{'margin-top': isFieldUsedAsPlanMethodology(dataItem) ? '15px' : '0'}">
-            <div class="text-center text-danger" *ngIf="isFieldUsedAsPlanMethodology(dataItem)" >
-                <small>{{'FIELD_SETTINGS.PLAN_METHODOLOGY_DELETE_WARNING' | translate}}</small>
-            </div>
-            <span *ngIf="!dataItem.udf">{{dataItem.field}}</span>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="order" title="Order" [width]="100">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing; else orderTemp" let-dataItem>
-            <kendo-numerictextbox *ngIf="dataItem.udf && !toBeDeleted(dataItem)" [format]="'n'" [(value)]="dataItem.order" [min]="0" [autoCorrect]="true" style="width: 70px;"></kendo-numerictextbox>
-            <div *ngIf="!dataItem.udf" style="width:45px" class="text-center">{{dataItem.order}}</div>
-            <input type="text" style="width: 70px;" disabled class="form-control to-be-deleted" [(value)]="dataItem.order" *ngIf="dataItem.udf && toBeDeleted(dataItem)">
-        </ng-template>
-        <ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>
-            <div class="text-center" style="width:45px"> {{ dataItem.order }} </div>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="label" title="Label" [width]="150">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <input (blur)="onBlur(dataItem, $event)" (keyup)="onKeyPressed($event)" type="text" [ngClass]="{'has-error': hasError(dataItem), 'to-be-deleted': toBeDeleted(dataItem)}" *ngIf="dataItem.udf" class="form-control" [(ngModel)]="dataItem.label"
-                id="{{dataItem.field}}" name="{{dataItem.field}}" [disabled]="toBeDeleted(dataItem)">
-            <div *ngIf="dataItem.errorMessage" class="error-message">
-                {{dataItem.errorMessage}}
-            </div>
-            <span *ngIf="!dataItem.udf">{{dataItem.label}}</span>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="shared" title="Shared" [width]="65" [class]="{'text-center':!isEditing}">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing; else sharedTemp" let-dataItem>
-            <div class="checkbox text-center">
-                <label><input type="checkbox" (change)="onShare(dataItem)" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.shared" name="shared"></label>
-            </div>
-        </ng-template>
-        <ng-template kendoGridCellTemplate class="text-center" let-dataItem #sharedTemp>
-            {{dataItem.shared | tdsUIBoolean}}
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="imp" title="Highlighting" [width]="155">
-        <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
-            Highlighting
-            <popup-legends></popup-legends>
-        </ng-template>
-        <ng-template kendoGridCellTemplate let-dataItem>
-            <field-settings-imp *ngIf="!toBeDeleted(dataItem)" [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
-            <div *ngIf="toBeDeleted(dataItem)" [ngClass]="dataItem.imp" class="text-center to-be-deleted" style="cursor: not-allowed">
-                <span *ngFor="let color of colors">{{color}}&nbsp;</span>
-            </div>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="constraints.required" title="Required" [width]="100" [class]="{'text-center':!isEditing}">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
-            <div class="checkbox text-center">
-                <label><input type="checkbox" (change)="onRequired(dataItem)" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.constraints.required" name="required"></label>
-            </div>
-        </ng-template>
-        <ng-template class="text-center" kendoGridCellTemplate let-dataItem #requiredTemp>
-            {{(dataItem.constraints? dataItem.constraints.required:false) | tdsUIBoolean}}
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display" [width]="90" [class]="{'text-center':!isEditing}">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
-            <div class="checkbox text-center">
-                <label><input type="checkbox" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.show" name="required"></label>
-            </div>
-        </ng-template>
-        <ng-template class="text-center" kendoGridCellTemplate let-dataItem #displayTemp>
-            {{dataItem.show | tdsUIBoolean}}
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="default" title="Default Value">
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="isEditing">
-            <div *ngIf="isAllowedDefaultValueForField(dataItem?.control)">
-                <input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')" type="text" class="form-control"
-                       [(ngModel)]="dataItem.default" name="default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
-                <span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
-                <select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'" class="form-control" name="default" [(ngModel)]="dataItem.default" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}">
-                    <option value="">Select...</option>
-                    <option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
-                </select>
-            </div>
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="control" title="Control" [width]="150">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing; else controlTemp" let-dataItem>
-            <div *ngIf="dataItem.udf">
-                <select class="form-control" style="float:left;width:100px; padding-top: 0px; padding-bottom: 0px;" name="control" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}"
-                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem)" [ngModel]="dataItem.control">
-                    <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
-                </select>
-                <span *ngIf="!toBeDeleted(dataItem) && isAllowedConfigurationForField(dataItem.control)">
-                    <div (click)="openFieldSettingsPopup(dataItem)" class="open-close-dropdown-container text-center">
+
+<kendo-grid #fieldSettingGrid="kendoGrid"
+            [filter]="state.filter"
+            [data]="gridData"
+            [sortable]="sortable"
+            [sort]="state.sort"
+            (dataStateChange)="dataStateChange($event)"
+            class="field-settings-grid">
+
+	<!--// toolbar editing-->
+	<ng-template kendoGridToolbarTemplate
+	             [position]="'top'"
+	             *ngIf="isEditing; else defaultToolbar">
+		<div class="col-xs-4 col-md-3 col-lg-2">
+			<tds-button-save 
+			        [ngClass]="{
+			            'btn-default': !isDirty,
+			            'btn-success':  isDirty && !formHasError,
+			            'btn-danger': isDirty && formHasError
+			        }"
+			        [id]="'btnSaveAll'"
+			        [disabled]="!isEditable || !isDirty || formHasError"
+			        (click)="onSaveAll()">
+			</tds-button-save>
+			<tds-button-cancel [id]="'btnCancel'" (click)="onCancel()" [icon]="'times'" > 
+			</tds-button-cancel>
+		</div>
+		<div *ngIf="isFilterDisabled; else filterControl"></div>
+		<div class="col-xs-3 col-md-3 col-lg-5">
+			<tds-button-add class="float-right"
+					[id]="'btnAddCustom'"
+					[title]="'FIELD_SETTINGS.CREATE_CUSTOM' | translate"
+			        (click)="onAddCustom()">
+			</tds-button-add>
+		</div>
+	</ng-template>
+
+	<!--// toolbar readonly-->
+	<ng-template kendoGridToolbarTemplate
+	             [position]="'top'"
+	             #defaultToolbar>
+		<div class="col-xs-4 col-md-3 col-lg-2">
+			<tds-button-edit [id]="'btnEdit'" icon="list-ul" [disabled]="!isEditable" (click)="onEdit()">
+			</tds-button-edit>
+		</div>
+		<div *ngIf="isFilterDisabled; else filterControl"></div>
+	</ng-template>
+
+	<kendo-grid-column title="Action"
+	                   *ngIf='isEditing'
+	                   [width]="70">
+		<ng-template kendoGridCellTemplate let-dataItem>
+			<div class="tds-action-button-set">
+				<tds-button-delete tooltip="Deleting the custom field removes the definition but does not delete the data"
+						*ngIf="dataItem.udf && !dataItem.toBeDeleted"
+						(click)="onDelete(dataItem)"
+						[disabled]="isFieldUsedAsPlanMethodology(dataItem)">
+				</tds-button-delete>
+				<tds-button-undo *ngIf="dataItem.udf && dataItem.toBeDeleted"
+						(click)="undoDelete(dataItem)">
+				</tds-button-undo>
+			</div>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="field"
+	                   title="Field">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing"
+		             let-dataItem>
+			<input type="text"
+			       *ngIf="dataItem.udf"
+			       disabled
+			       class="form-control"
+			       [(ngModel)]="dataItem.field"
+			       (keyup)="setIsDirty(true)"
+			       name="field"
+			       [ngClass]="{
+			        'to-be-deleted': dataItem.toBeDeleted
+			        }"
+			       [ngStyle]="{
+			        'margin-top': isFieldUsedAsPlanMethodology(dataItem) ? '15px' : '0'
+			        }">
+			<div class="text-center text-danger"
+			     *ngIf="isFieldUsedAsPlanMethodology(dataItem)">
+				<small>{{'FIELD_SETTINGS.PLAN_METHODOLOGY_DELETE_WARNING' | translate}}</small>
+			</div>
+			<span *ngIf="!dataItem.udf">{{dataItem.field}}</span>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="order"
+	                   title="Order"
+	                   [width]="100">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing; else orderTemp" let-dataItem>
+			<kendo-numerictextbox *ngIf="dataItem.udf && !dataItem.toBeDeleted"
+			                      [format]="'n'"
+			                      [(value)]="dataItem.order"
+			                      (valueChange)="setIsDirty(true)"
+			                      [min]="0"
+			                      [autoCorrect]="true"
+			                      style="width: 70px;">
+			</kendo-numerictextbox>
+			<div *ngIf="!dataItem.udf"
+			     style="width:45px" class="text-center">
+				{{dataItem.order}}
+			</div>
+			<input type="text"
+			       style="width: 70px;"
+			       disabled
+			       class="form-control to-be-deleted"
+			       (keyup)="setIsDirty(true)"
+			       [(value)]="dataItem.order"
+			       *ngIf="dataItem.udf && dataItem.toBeDeleted">
+		</ng-template>
+		<ng-template kendoGridCellTemplate class="text-center" let-dataItem #orderTemp>
+			<div class="text-center" style="width:45px"> {{ dataItem.order }}</div>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="label"
+	                   title="Label"
+	                   [width]="150">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing"
+		             let-dataItem>
+			<!--'has-error': hasError(dataItem),-->
+			<input (blur)="onLabelBlur(dataItem, $event)"
+			       (keyup)="onKeyPressed($event)"
+			       type="text"
+			       [ngClass]="{
+			        'has-error': dataItem.errorMessage,
+			        'to-be-deleted': dataItem.toBeDeleted
+			        }"
+			       *ngIf="dataItem.udf"
+			       class="form-control"
+			       [(ngModel)]="dataItem.label"
+			       id="{{dataItem.field}}"
+			       name="{{dataItem.field}}"
+			       [disabled]="dataItem.toBeDeleted">
+			<div *ngIf="dataItem.errorMessage"
+			     class="error-message">
+				{{dataItem.errorMessage}}
+			</div>
+			<span *ngIf="!dataItem.udf">
+				{{dataItem.label}}
+			</span>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="shared"
+	                   title="Shared"
+	                   [width]="65"
+	                   [class]="{'text-center':!isEditing}">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing; else sharedTemp"
+		             let-dataItem>
+			<div class="checkbox text-center">
+				<label>
+					<input type="checkbox"
+					       (change)="onShare(dataItem);setIsDirty(true);"
+				           [disabled]="!dataItem.udf || dataItem.toBeDeleted"
+				           [(ngModel)]="dataItem.shared"
+				           name="shared">
+				</label>
+			</div>
+		</ng-template>
+		<ng-template kendoGridCellTemplate class="text-center" let-dataItem #sharedTemp>
+			{{dataItem.shared | tdsUIBoolean}}
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="imp"
+	                   title="Highlighting"
+	                   [width]="155">
+		<ng-template kendoGridHeaderTemplate
+		             let-column
+		             let-columnIndex="columnIndex">
+			Highlighting
+			<popup-legends></popup-legends>
+		</ng-template>
+		<ng-template kendoGridCellTemplate
+		             let-dataItem>
+			<field-settings-imp *ngIf="!dataItem.toBeDeleted"
+			                    [edit]="isEditing"
+			                    (modelChange)="setIsDirty(true)"
+			                    [(model)]="dataItem.imp">
+			</field-settings-imp>
+			<div *ngIf="dataItem.toBeDeleted"
+			     [ngClass]="dataItem.imp"
+			     class="text-center to-be-deleted"
+			     style="cursor: not-allowed">
+				<span *ngFor="let color of colors">{{color}}&nbsp;</span>
+			</div>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="constraints.required"
+	                   title="Required"
+	                   [width]="100"
+	                   [class]="{'text-center':!isEditing}">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing; else requiredTemp"
+		             let-dataItem>
+			<div class="checkbox text-center">
+				<label>
+					<input type="checkbox"
+					       (change)="onRequired(dataItem);setIsDirty(true)"
+				           [disabled]="!dataItem.udf || dataItem.toBeDeleted"
+				           [(ngModel)]="dataItem.constraints.required" name="required">
+				</label>
+			</div>
+		</ng-template>
+		<ng-template class="text-center"
+		             kendoGridCellTemplate
+		             let-dataItem #requiredTemp>
+			{{(dataItem.constraints? dataItem.constraints.required:false) | tdsUIBoolean}}
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="show"
+	                   title="Display"
+	                   [width]="90"
+	                   [class]="{'text-center':!isEditing}">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing; else displayTemp" let-dataItem>
+			<div class="checkbox text-center">
+				<label>
+					<input type="checkbox"
+					       (change)="setIsDirty(true)"
+					       [disabled]="!dataItem.udf || dataItem.toBeDeleted"
+				           [(ngModel)]="dataItem.show" name="required">
+				</label>
+			</div>
+		</ng-template>
+		<ng-template class="text-center"
+		             kendoGridCellTemplate
+		             let-dataItem #displayTemp>
+			{{dataItem.show | tdsUIBoolean}}
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="default"
+	                   title="Default Value">
+		<ng-template kendoGridCellTemplate
+		             let-dataItem
+		             *ngIf="isEditing">
+			<div *ngIf="isAllowedDefaultValueForField(dataItem?.control)">
+				<input *ngIf="(dataItem.udf) && (dataItem.control!='List' && dataItem.control!='YesNo')"
+				       type="text"
+				       class="form-control"
+				       [(ngModel)]="dataItem.default"
+				       (keypress)="setIsDirty(true)"
+				       name="default"
+				       [disabled]="dataItem.toBeDeleted"
+				       [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}">
+				<span *ngIf="!dataItem.udf">{{dataItem.default}}</span>
+				<select *ngIf="dataItem.control=='List' || dataItem.control=='YesNo'"
+				        class="form-control"
+				        name="default"
+				        (change)="setIsDirty(true)"
+				        [(ngModel)]="dataItem.default"
+				        [disabled]="dataItem.toBeDeleted"
+				        [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}">
+					<option value="">Select...</option>
+					<option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
+				</select>
+			</div>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="control"
+	                   title="Control"
+	                   [width]="150">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing; else controlTemp" let-dataItem>
+			<div *ngIf="dataItem.udf">
+				<select class="form-control"
+				        style="float:left;width:100px; padding-top: 0px; padding-bottom: 0px;"
+				        name="control"
+				        [disabled]="dataItem.toBeDeleted"
+				        [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}"
+				        id="control{{dataItem.field}}"
+				        (ngModelChange)="onControlModelChange($event,dataItem)"
+				        [ngModel]="dataItem.control">
+					<option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
+				</select>
+
+				<span *ngIf="!dataItem.toBeDeleted && isAllowedConfigurationForField(dataItem.control)">
+                    <div (click)="openFieldSettingsPopup(dataItem)"
+                         class="open-close-dropdown-container text-center">
                         <i class="open-close-dropdown-icon fa fa-gear"></i>
                     </div>
                 </span>
-            </div>
-            <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
-        </ng-template>
-        <ng-template kendoGridCellTemplate #controlTemp let-dataItem>
-            {{dataItem.control}}
-        </ng-template>
-    </kendo-grid-column>
-    <kendo-grid-column field="tip" title="Tooltip Help">
-        <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <textarea style="resize: vertical;" class="form-control" [(ngModel)]="dataItem.tip" name="tip" rows="2" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}" [disabled]="toBeDeleted(dataItem)">
+			</div>
+			<span *ngIf="!dataItem.udf">
+				{{dataItem.control}}
+			</span>
+		</ng-template>
+		<ng-template kendoGridCellTemplate #controlTemp let-dataItem>
+			{{dataItem.control}}
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-column field="tip" title="Tooltip Help">
+		<ng-template kendoGridCellTemplate
+		             *ngIf="isEditing"
+		             let-dataItem>
+            <textarea style="resize: vertical;"
+                      class="form-control"
+                      [(ngModel)]="dataItem.tip"
+                      (keyup)="setIsDirty(true)"
+                      name="tip"
+                      rows="2"
+                      [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}"
+                      [disabled]="dataItem.toBeDeleted">
             </textarea>
-        </ng-template>
-    </kendo-grid-column>
+		</ng-template>
+	</kendo-grid-column>
 </kendo-grid>

@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -10,7 +9,6 @@ import net.transitionmanager.EmailDispatch
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
 /**
  * Generic service to send emails using templates
  *
@@ -39,10 +37,7 @@ class EmailDispatchService implements ServiceMethods {
 		ed.toAddress = toAddress
 		ed.toPerson = toPerson
 		ed.createdBy = createdBy
-		if (!ed.validate() || !ed.save()) {
-			log.error "Can't create email dispatch object: ${GormUtil.allErrorsString(ed)}"
-			return null
-		}
+		ed.save()
 
 		return ed
 	}
@@ -106,9 +101,7 @@ class EmailDispatchService implements ServiceMethods {
 
 		ed.sentDate = TimeUtil.nowGMT()
 
-		if (! ed.validate() || ! ed.save(flush:true)) {
-			log.error "sendEmail() Unable to update email dispatch object: ${GormUtil.allErrorsString(ed)}"
-		}
+		ed.save(flush:true)
 	}
 
 	/**

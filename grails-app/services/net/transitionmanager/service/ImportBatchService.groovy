@@ -428,7 +428,7 @@ class ImportBatchService implements ServiceMethods {
 		}
 
 		record.fieldsInfo = JsonUtil.convertMapToJsonString(fieldsMap)
-		record.save(failOnError: true)
+		record.save()
 		return record
 	}
 

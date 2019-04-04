@@ -853,7 +853,7 @@ class PartyRelationshipService implements ServiceMethods {
 				partyIdTo: person,
 				roleTypeCodeTo: functionRoleType
 			)
-			if (! pr.save(flush:true)) {
+			if (! pr.save(flush:true, failOnError: false)) {
 				msg = "Unable to create Company/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
 				log.error 'AddStaffFunction() {}', msg
 				throw new RuntimeException(msg)
@@ -870,7 +870,7 @@ class PartyRelationshipService implements ServiceMethods {
 					partyIdTo: person,
 					roleTypeCodeTo: functionRoleType
 				)
-				if (! pr.save(flush:true)) {
+				if (! pr.save(flush:true, failOnError: false)) {
 					msg = "Unable to create Project/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
 					log.error 'AddStaffFunction() {}', msg
 					throw new RuntimeException(msg)
@@ -952,7 +952,7 @@ class PartyRelationshipService implements ServiceMethods {
 						roleTypeCodeFrom: coRoleType,
 						roleTypeCodeTo: RoleType.load(teamCode),
 						partyIdFrom: personCompany,
-						partyIdTo: person).save(failOnError: true, flush:true)
+						partyIdTo: person).save( flush:true)
 				}
 			}
 		}
@@ -1139,7 +1139,7 @@ class PartyRelationshipService implements ServiceMethods {
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
 				WHERE pr.role_type_code_to_id in ('ROLE_STAFF')
 					AND pr.role_type_code_from_id in ('ROLE_COMPANY')
-					AND pr.party_relationship_type_id in ('ROLE_STAFF')
+					AND pr.party_relationship_type_id in ('STAFF')
 					AND pr.party_id_from_id IN ($project.client.id)
 					AND p.active = 'Y'
 				GROUP BY personId

@@ -1,6 +1,6 @@
 <%@ page import="net.transitionmanager.domain.Person" %>
 <%@page import="net.transitionmanager.security.Permission"%>
-<g:form name="personDialogForm" action="updatePerson">
+<g:form name="personDialogForm" action="updatePerson" autocomplete="off">
 	<div id="generalInfoEditId" class="person">
 		<input type="hidden" name="id" value="${person.id}" />
 		<div class="dialog">
@@ -25,6 +25,14 @@
 						</td>
 						<td valign="top" class="value" style="width: 40px">
 							<input type="text" maxlength="64" id="firstNameId" name="firstName" value="${person.firstName}" size="10" />
+						</td>
+						<td rowspan="2" style="position:absolute; left:60%">
+							<g:if test="${!person.personImageURL}">
+								<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60">
+							</g:if>
+							<g:else>
+								<img src="${person.personImageURL}" onError="this.onerror=null;this.src='../../images/blankPerson.jpg'" height="60" width="60">
+							</g:else>
 						</td>
 					</tr>
 
@@ -114,7 +122,7 @@
 							<label for="keyWords">Keywords:</label>
 						</td>
 						<td valign="top" class="value" >
-							<input type="text" maxlength="64" id="keyWordsId" name="keyWords" size="40" value="${person.keyWords}" />
+							<input type="text" maxlength="64" id="keyWordsId" name="keyWords" size="20" value="${person.keyWords}" />
 						</td>
 					</tr>
 
@@ -123,7 +131,7 @@
 							<label for="tdsNote">Comments:</label>
 						</td>
 						<td valign="top" class="value" colspan="2" >
-							<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />
+							<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="20" />
 						</td>
 					</tr>
 
@@ -132,7 +140,7 @@
 							<label for="tdsLink">Contact URL:</label>
 						</td>
 						<td valign="top" class="value" colspan="2">
-							<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />
+							<input type="text" id="tdsLinkId" name="tdsLink" size="20" value="${person.tdsLink}" />
 						</td>
 					</tr>
 

@@ -27,9 +27,9 @@ export const ReportsRoute: Routes = [
 		path: ReportStates.PRE_EVENT_CHECK_LIST.url,
 		data: {
 			page: {
-				title: 'REPORTS.PRE_EVENT_CHECKLIST',
+				title: 'PLANNING.PRE_EVENT_CHECKLIST',
 				instruction: '',
-				menu: ['REPORTS.REPORTS', 'REPORTS.PRE_EVENT_CHECKLIST'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.PRE_EVENT_CHECKLIST'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-planning-pre-checklist', subMenu: true }
 			},
 			requiresAuth: true,
@@ -37,8 +37,8 @@ export const ReportsRoute: Routes = [
 		component: PreEventCheckListSelectorComponent,
 		canActivate: [
 			AuthGuardService,
-			ModuleResolveService,
-			PreferencesResolveService],
+			ModuleResolveService
+		],
 		resolve: {},
 		runGuardsAndResolvers: 'always'
 	}

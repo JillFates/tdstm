@@ -11,10 +11,12 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.user.SavePreferenceCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -28,7 +30,12 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.UserService
+
+import java.text.DateFormat
+
 /**
  * Handles WS calls of the UserService.
  *
@@ -42,6 +49,8 @@ class WsUserController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	MoveEventService moveEventService
 	CustomDomainService customDomainService
+	UserService userService
+	ProjectService projectService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -93,6 +102,144 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
 	}
 
+	/**
+	 * Used by the User Dashboard
+	 * @param id - ID of the user requested
+	 * @return Success structure with person, projects, project instance, and moveday categories
+	 */
+	def modelForUserDashboard(String id) {
+		Project project
+		Person person = currentPerson()
+
+		if(id && id != "undefined") {
+			project = Project.findById(id.toLong())
+			userPreferenceService.setCurrentProjectId(project.id)
+		} else {
+			project = getProjectForWs()
+		}
+
+		List projects = [project]
+		List userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+		if (userProjects) {
+			projects = (userProjects + project).unique()
+		}
+
+		renderSuccessJson(
+				person: person,
+				projects: projects,
+				projectInstance: project,
+				movedayCategories: AssetComment.moveDayCategories
+		)
+	}
+
+	/**
+	 * Get events assigned to current user in the current project
+	 * @return list of events
+	 */
+	def getAssignedEvents() {
+		Project project = getProjectForWs()
+		List events = userService.getEventDetails(project).values().collect { value -> [
+				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
+				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
+				days: value.daysToGo + ' days', teams: value.teams]
+		}
+		renderSuccessJson(events: events)
+	}
+
+	/**
+	 * Get the event news assigned to the current user in the current project
+	 * @return list of event news
+	 */
+	def getAssignedEventNews() {
+		Project project = getProjectForWs()
+		List eventNews = []
+		DateFormat formatter = TimeUtil.createFormatter("MM/dd/yyyy hh:mm a")
+		if (project) {
+			userService.getEventNews(project).each { news ->
+				eventNews << [eventId: news.moveEvent.id,
+							  projectName: news.moveEvent.project.name,
+							  date: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, (news.dateCreated != null? news.dateCreated : new Date()), formatter),
+							  event: news.moveEvent.name,
+							  news: news.message]
+			}
+		}
+		renderSuccessJson(eventNews: eventNews)
+	}
+
+	/**
+	 * Get the tasks assigned to the current user in the current project and a summary string for the user dashboard
+	 * @return list of tasks and summary string
+	 */
+	def getAssignedTasks() {
+		Project project = getProjectForWs()
+		List taskList = []
+		Map taskSummary = userService.getTaskSummary(project)
+		DateFormat formatter = TimeUtil.createFormatter("MM/dd kk:mm")
+
+		taskSummary.taskList.each { task ->
+			task.item.estFinish?.clearTime()
+			taskList.add([
+					projectName: task.projectName,
+					taskId: task.item.id,
+					task: ((task.item.taskNumber)? task.item.taskNumber + " - " : "") + task.item.comment,
+					css: task.css,
+					overDue: (task.item.dueDate && task.item.dueDate < TimeUtil.nowGMT()? 'task_overdue' : ''),
+					assetClass: task.item.assetClass.toString(),
+					assetId: task.item.assetId,
+					related: task.item.assetName,
+					dueEstFinish: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone,
+							(task.item.estFinish != null? task.item.estFinish : new Date()), formatter),
+					status: task.item.status,
+					successors: task.item.successors,
+					predacessors: task.item.predecessors,
+					instructionsLink: task.item.instructionsLink,
+                    category: task.item.category
+			])
+		}
+
+		def dueTaskCount = taskSummary.dueTaskCount
+
+		def summaryDetail = 'No active tasks were found.'
+		if (taskSummary.taskList.size() > 0) {
+			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${dueTaskCount} ${(dueTaskCount == 1) ? ('is') : ('are')} overdue)"
+		}
+		renderSuccessJson(tasks: taskList, summaryDetail: summaryDetail)
+	}
+
+	/**
+	 * Get the applications assigned to the current user in the current project
+	 * @return list of applications
+	 */
+	def getAssignedApplications() {
+		Project project = getProjectForWs()
+		Map<String, Object> appSummary = userService.getApplications(project)
+
+		def appList = appSummary.appList.collect { Application app -> [
+				projectName: app.project.name,
+				name: app.assetName,
+				appId: app.id,
+				assetClass: app.assetClass.toString(),
+				planStatus: app.planStatus,
+				moveBundle: app.moveBundle.name,
+				relation: appSummary.relationList[app.id]
+		] }
+		renderSuccessJson(applications: appList)
+	}
+
+	/**
+	 * Get the active people assigned to the current project
+	 * @return list of people
+	 */
+	def getAssignedPeople() {
+		Project project = getProjectForWs()
+
+		ArrayList activePeople = userService.getActivePeople(project).collect { login ->
+			[personId: login.personId, projectName: login.projectName,
+			 personName: login.personName, lastActivity: login.lastActivity]
+		}
+		renderSuccessJson(activePeople: activePeople)
+	}
+
     /**
      * Used to reset all preferences of a user
      */
@@ -117,9 +264,9 @@ class WsUserController implements ControllerMethods {
 	* @param value - the value to set the preference to
 	*/
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreference() {
-		Map preference = request.JSON
-		userPreferenceService.setPreference(preference.code?.toString() ?: '', preference.value ?: '')
+	def savePreference(SavePreferenceCommand savePreference) {
+		validateCommandObject(savePreference)
+		userPreferenceService.setPreference(savePreference.code, savePreference.value)
 		renderSuccessJson()
 	}
 

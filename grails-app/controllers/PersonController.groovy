@@ -265,6 +265,7 @@ class PersonController implements ControllerMethods {
 		def errMsg
 		def person
 		Map personParams = (request.format == 'json') ? request.JSON : params
+
 		def duplicatePersonId
 		try {
 			person = personService.savePerson(personParams, companyId, project, true)
@@ -814,7 +815,7 @@ class PersonController implements ControllerMethods {
 	def editTimezone () {
 		def currDateTimeFormat = userPreferenceService.dateFormat ?: TimeUtil.getDefaultFormatType()
 
-		render(template: "../project/showTimeZoneSelect",
+		render(template: "/project/showTimeZoneSelect",
 		       model: [areas: userPreferenceService.timezonePickerAreas(), timezones: Timezone.findAll(), userPref: true,
 		               currTimeZone: userPreferenceService.timeZone, currDateTimeFormat: currDateTimeFormat])
 	}

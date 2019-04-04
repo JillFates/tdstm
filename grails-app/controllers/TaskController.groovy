@@ -11,6 +11,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.validation.ValidationException
 import groovy.time.TimeDuration
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.DictionaryItem
@@ -29,7 +31,6 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.GraphvizService
-import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
@@ -37,6 +38,7 @@ import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.math.NumberUtils
+import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -51,9 +53,6 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_MGR
-
-import grails.plugin.springsecurity.annotation.Secured
-import org.springframework.context.MessageSource
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -99,12 +98,16 @@ class TaskController implements ControllerMethods {
 		String userDTFormat = userPreferenceService.dateFormat
 		// Deal with legacy view parameters.
 		Map requestParams = null
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			params.taskDependency = params.list('taskDependency[]')
-			params.taskSuccessor = params.list('taskSuccessor[]')
-			requestParams = params
+
+		withFormat {
+			js {
+				requestParams = request.JSON
+			}
+			html {
+				params.taskDependency = params.list('taskDependency[]')
+				params.taskSuccessor = params.list('taskSuccessor[]')
+				requestParams = params
+			}
 		}
 
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
@@ -145,10 +148,15 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
 		Map requestParams
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			requestParams = params
+
+		withFormat {
+			js {
+				requestParams = request.JSON
+			}
+
+			html {
+				requestParams = params
+			}
 		}
 
 		String errorMsg = ''
@@ -873,16 +881,18 @@ digraph runbook {
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
 		Map preferencesMap
+		withFormat {
+			js {
+				preferencesMap = request.JSON
 
-		if (request.format == "json") {
-			preferencesMap = request.JSON
-
-		} else {
-			preferencesMap = [:]
-			def key = params.preference
-			def value = params.value
-			if (value) {
-				preferencesMap[key] = value
+			}
+			html {
+				preferencesMap = [:]
+				def key = params.preference
+				def value = params.value
+				if (value) {
+					preferencesMap[key] = value
+				}
 			}
 		}
 
@@ -924,7 +934,7 @@ digraph runbook {
 			AssetComment comment = taskService.changeEstTime(commentId, day)
 			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
 			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
-		} catch (EmptyResultException | InvalidParamException e) {
+		} catch (EmptyResultException | ValidationException e) {
 			retMap['etext'] = e.message
 		}
 		render retMap as JSON

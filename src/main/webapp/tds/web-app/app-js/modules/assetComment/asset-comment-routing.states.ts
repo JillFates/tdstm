@@ -37,7 +37,7 @@ export const AssetCommentRoute: Routes = [
 		resolve: {
 			assetComments: AssetCommentResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	}
 ];

@@ -29,7 +29,7 @@ class AssetCommentTestHelper {
 				commentType: AssetCommentType.TASK,
 				duration: 0,
 				isPublished: published
-		).save(flush: true, failOnError: true)
+		).save(flush: true)
 		return assetComment
 	}
 

@@ -125,7 +125,7 @@ class ProjectController implements ControllerMethods {
 
 		[
 			projectInstance      : project,
-			timezone             : project.timezone ?: '',
+			timezone             : project.timezone.label ?: '',
 			client               : project.client,
 			defaultBundle        : project.defaultBundle,
 			projectPartners      : partyRelationshipService.getProjectPartners(project),
@@ -287,7 +287,7 @@ class ProjectController implements ControllerMethods {
                 }
 
 				if (logoFile) {
-					ProjectLogo.createOrUpdate(project, logoFile)
+					projectService.createOrUpdate(project, logoFile)
 				}
 
 				// Audit project changes
@@ -419,8 +419,9 @@ class ProjectController implements ControllerMethods {
 
 			// Deal with the adding the project logo if one was supplied
 			ProjectLogo projectLogo
+
 			if (logoFile) {
-				projectLogo = ProjectLogo.createOrUpdate(project, logoFile)
+				projectLogo = projectService.createOrUpdate(project, logoFile)
 			}
 
 			userPreferenceService.setCurrentProjectId(project.id)

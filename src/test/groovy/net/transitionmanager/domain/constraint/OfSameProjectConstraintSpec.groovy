@@ -36,7 +36,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			client        : [name: 'something'] as PartyGroup
 		] as Project
 
-		project1.save(failOnError: true)
+		project1.save()
 
 		Project project2 = [
 			id            : 2L,
@@ -52,7 +52,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			client        : [name: 'something else'] as PartyGroup
 		] as Project
 
-		project2.save(failOnError: true)
+		project2.save()
 
 		Provider provider1 = [
 			name       : RandomStringUtils.randomAlphabetic(10),

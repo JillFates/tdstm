@@ -8,19 +8,13 @@
 import * as R from 'ramda';
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
-import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {Observable} from 'rxjs';
-import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
-
-declare var jQuery: any;
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function DeviceEditComponent(template, editModel, metadata: any) {
 
@@ -34,14 +28,14 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
-			preference: PreferenceService,
+			userContextService: UserContextService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
 
-			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {

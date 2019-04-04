@@ -33,7 +33,7 @@ class CustomDomainTestHelper {
 		JSONObject fieldSpecJson = JsonUtil.parseJson(setting.json)
 		updateFieldSpecClosure(fieldSpecJson)
 		setting.json = JsonUtil.validateJsonAndConvertToString(fieldSpecJson)
-		setting.save(failOnError: true, flush: true)
+		setting.save(flush: true)
 	}
 
 }

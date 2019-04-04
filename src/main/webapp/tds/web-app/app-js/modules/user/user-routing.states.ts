@@ -7,10 +7,14 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
+import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
 
 export class UserStates {
 	public static readonly USER_LIST = {
 		url: 'list'
+	};
+	public static readonly USER_DASHBOARD = {
+		url: 'dashboard'
 	};
 }
 
@@ -26,6 +30,19 @@ export const UserRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: UserListComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
+	},
+	{
+		path: UserStates.USER_DASHBOARD.url,
+		data: {
+			page: {
+				title: 'User Dashboard',
+				instruction: '',
+				menu: ['Dashboard', 'User']
+			},
+			requiresAuth: true,
+		},
+		component: UserDashboardComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];

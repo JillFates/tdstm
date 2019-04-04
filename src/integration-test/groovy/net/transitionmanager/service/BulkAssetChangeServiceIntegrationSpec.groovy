@@ -24,6 +24,7 @@ import net.transitionmanager.command.bulk.EditCommand
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import org.grails.web.json.JSONObject
@@ -40,6 +41,9 @@ import test.helper.PersonTestHelper
 class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
+
+	@Autowired
+	CustomDomainService customDomainService
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper
@@ -166,14 +170,14 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-			tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
-			tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
-			tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
-			tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+			tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+			tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+			tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+			tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
 			now = TimeUtil.nowGMT().clearTime()
 
@@ -194,7 +198,9 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 
 			JSONObject fieldSpec = loadFieldSpecJson()
-			bulkAssetChangeService.dataviewService.projectService.customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+
+			Setting.findAllByProject(project)*.delete(flush:true)
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true
 		}

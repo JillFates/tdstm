@@ -23,10 +23,11 @@ class ModelServiceTests extends Specification{
 	private Person adminPerson
 	UserLogin adminUser
 	SecurityService securityService
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper
+	private ProjectTestHelper projectHelper
 
 	def setup() {
+		personHelper = new PersonTestHelper()
 		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 

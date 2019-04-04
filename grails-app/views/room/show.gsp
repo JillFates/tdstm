@@ -127,7 +127,7 @@
 		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 			<g:if test="${rack.rackType == 'Rack'}">
 				<a href="#" onclick="getRackLayout(${rack.id })">
-				<g:if test="${rack?.model?.layoutStyle == null}">
+					<g:if test="${ ! rack.model?.layoutStyle }">
 					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front } adjustRack">
 				</g:if>
 				<g:else>

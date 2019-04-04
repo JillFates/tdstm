@@ -59,11 +59,11 @@ class AuthController implements ControllerMethods {
 		def preLoginList = [];
 		def postLoginList = [];
 		noticeList.each {
-			if (it.typeId == Notice.NoticeType.Prelogin && it.active) {
+			if (it.typeId == Notice.NoticeType.PRE_LOGIN && it.active) {
 				preLoginList.push(it)
 			}
 
-			if (it.typeId == Notice.NoticeType.Postlogin && it.active) {
+			if (it.typeId == Notice.NoticeType.POST_LOGIN && it.active) {
 				postLoginList.push(it)
 			}
 		}
@@ -98,14 +98,14 @@ class AuthController implements ControllerMethods {
 				uri = '/admin/home'
 			}
 			else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-				uri = '/dashboard/userPortal'
+				uri = '/module/user/dashboard'
 			}
 			else {
 				uri = '/projectUtil'
 			}
 		}
 		else if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-			uri = '/dashboard/userPortal'
+			uri = '/module/user/dashboard'
 		}
 		else {
 			uri = '/projectUtil'

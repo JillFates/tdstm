@@ -180,10 +180,10 @@ class CookbookService implements ServiceMethods {
 			context: context,
 			project: project,
 			archived: false
-		).save(flush:true, failOnError: true)
+		).save(flush:true)
 
 		new RecipeVersion(sourceCode: sourceCode, changelog: changelog, clonedFrom: recipeVersion,
-				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save(failOnError: true)
+				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save()
 	}
 
 	/**
@@ -210,12 +210,12 @@ class CookbookService implements ServiceMethods {
 		}
 
 		recipe.releasedVersion=null
-		recipe.save(flush:true, failOnError:true)
+		recipe.save(flush:true)
 
 		// Remove all versions of the recipes
 		RecipeVersion.executeUpdate('delete RecipeVersion rv where rv.recipe=:recipe', [recipe:recipe])
 
-		recipe.delete(failOnError: true)
+		recipe.delete()
 
 		return recipe
 	}
@@ -329,7 +329,7 @@ class CookbookService implements ServiceMethods {
 		wip.sourceCode = sourceCode
 		wip.changelog = changelog
 
-		wip.save(failOnError: true)
+		wip.save()
 
 		return wip
 	}
@@ -362,7 +362,7 @@ class CookbookService implements ServiceMethods {
 		wip.versionNumber = max + 1
 		wip.recipe.releasedVersion = wip
 
-		wip.save(failOnError: true)
+		wip.save()
 	}
 
 	/**
@@ -390,7 +390,7 @@ class CookbookService implements ServiceMethods {
 
 		recipe.releasedVersion = recipeVersion
 
-		if (! recipe.save()) {
+		if (! recipe.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to save change', recipe)
 		}
 
@@ -500,7 +500,7 @@ class CookbookService implements ServiceMethods {
 	 *
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
-	List<Map> findRecipes(String isArchived, catalogContext, searchText, projectType, sortField="last_updated", sortOrder="desc") {
+	List<Map> findRecipes(String isArchived, catalogContext, searchText, projectType, sortField="lastUpdated", sortOrder="desc") {
 		def projectIds = []
 
 		Project project = securityService.userCurrentProject
@@ -570,11 +570,15 @@ class CookbookService implements ServiceMethods {
 		String sortBy = " ORDER BY $sortField $sortOrder "
 
 		namedParameterJdbcTemplate.query('''
-			SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context,
-			       IF(ISNULL(recipe_version.last_updated), rv2.last_updated, recipe_version.last_updated) as last_updated,
+			SELECT DISTINCT recipe.recipe_id as recipeId,
+				recipe.name,
+				recipe.description,
+				recipe.context,
+				COALESCE(rv2.last_updated, recipe_version.last_updated) as lastUpdated,
 			       IF(ISNULL(p2.first_name), CONCAT(p1.first_name, ' ', p1.last_name),
-			       CONCAT(p2.first_name, ' ', p2.last_name)) as createdBy, recipe.last_updated as lastUpdated,
-			       recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP
+				CONCAT(p2.first_name, ' ', p2.last_name)) as createdBy,
+				recipe_version.version_number as versionNumber,
+				IF(ISNULL(rv2.version_number), false, true) as hasWIP
 			FROM recipe
 			LEFT OUTER JOIN recipe_version ON recipe.released_version_id = recipe_version.recipe_version_id
 			LEFT OUTER JOIN recipe_version as rv2 ON recipe.recipe_id = rv2.recipe_id AND rv2.version_number = 0
@@ -1431,7 +1435,7 @@ class CookbookService implements ServiceMethods {
 
 		recipe.context = JsonUtil.convertMapToJsonString(context)
 
-		recipe.save(flush:true, failOnError: true)
+		recipe.save(flush:true)
 	}
 
 	void deleteRecipeContext(Long recipeId) {
@@ -1442,7 +1446,7 @@ class CookbookService implements ServiceMethods {
 		assertProject(recipe, project)
 		recipe.context = null
 
-		recipe.save(flush:true, failOnError: true)
+		recipe.save(flush:true)
 	}
 
 	private void assertProject(Recipe recipe, Project project) {
@@ -1468,7 +1472,7 @@ class RecipeMapper implements RowMapper {
 		versionNumber: rs.getInt('versionNumber') ?: '',
 		hasWIP:        rs.getString('hasWIP') == '1' ? 'yes' : '',
 		context:       rs.getString('context'),
-		lastUpdated:   rs.getTimestamp('last_updated')
+		lastUpdated:   rs.getTimestamp('lastUpdated')
 	]}
 }
 

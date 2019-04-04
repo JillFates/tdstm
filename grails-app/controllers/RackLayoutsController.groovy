@@ -1,18 +1,18 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.annotation.Secured
+import grails.web.mapping.LinkGenerator
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelConnector
@@ -26,8 +26,6 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang3.math.NumberUtils
-import grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -127,8 +125,9 @@ class RackLayoutsController implements ControllerMethods {
 		boolean generateView = params.viewMode == 'Generate'
 
 		if (bundleIds && !bundleIds.contains("all")) {
-			def bundlesString = bundleIds.toString().replace("[", "(").replace("]", ")")
-			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${bundlesString} ")
+			String bundlesString = bundleIds.toString().replace("[", "").replace("]", "")
+			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundlesString.split(',').toList())
+			moveBundles = MoveBundle.findAll("from MoveBundle where id in ${moveBundleIds} ")
 		}
 		def rackLayoutsHasPermission = securityService.hasPermission(Permission.RackLayoutModify)
 
@@ -356,7 +355,9 @@ class RackLayoutsController implements ControllerMethods {
 			moveBundles = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
 		}
 		else if (bundleIds) {
-			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($bundleIds)")
+			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundleIds.split(',').toList())
+
+			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($moveBundleIds)")
 		}
 
 		def sourceRacks = []
@@ -428,7 +429,8 @@ class RackLayoutsController implements ControllerMethods {
 					queryParams.roomName = assetEntity.getTargetRoomName()
 					queryParams.rackName = assetEntity.getTargetRackName()
 				}
-				def query = "FROM AssetEntity AS a \
+
+				String query = "FROM AssetEntity AS a \
 					JOIN a.room$srcTrg AS room \
 					JOIN a.rack$srcTrg as rack \
 					WHERE a.project=:project AND a.assetClass=:assetClass AND (a.assetType IS NULL OR a.assetType<>'Blade') \

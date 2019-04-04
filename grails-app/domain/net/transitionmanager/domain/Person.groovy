@@ -8,8 +8,6 @@ import com.tds.asset.CommentNote
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
-// Domain classes that Person is associated with that are impacted by merging which are not in
-// this package.
 
 class Person extends Party {
 
@@ -97,32 +95,32 @@ class Person extends Party {
 
 	// The list of domains and the propert(y/ies) that have a reference the Person domain
 	static final List<Map> domainReferences = [
-		[domain: Application, 		onDelete: 'null',   properties: ['sme', 'sme2'] ],
-		[domain: Application, 		onDelete: 'null',   properties: ['shutdownBy', 'startupBy', 'testingBy'], transform:{ it.id.toString() } ],
-		[domain: AssetComment, 		onDelete: 'null',   properties: ['resolvedBy', 'createdBy', 'assignedTo'] ],
-		[domain: AssetDependency, 	onDelete: 'null',   properties: ['createdBy','updatedBy'] ],
-		[domain: AssetEntity, 		onDelete: 'null',   properties: ['appOwner', 'modifiedBy'] ],
-		[domain: CommentNote, 		onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: DataScript,        onDelete: 'null',   properties: ['createdBy', 'lastModifiedBy'] ],
-		[domain: Dataview, 			onDelete: 'null',   properties: ['person'] ],
-		[domain: EmailDispatch, 	onDelete: 'delete', properties: ['toPerson'] ],
-		[domain: EmailDispatch, 	onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: ExceptionDates, 	onDelete: 'delete', properties: ['person'] ],
-		[domain: ImportBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: Model, 			onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
-		[domain: ModelSync, 		onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
-		[domain: MoveEventNews, 	onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],
-		[domain: MoveEventStaff, 	onDelete: 'delete', properties: ['person'] ],
-		[domain: Notice, 			onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: NoticeAcknowledgment, onDelete: 'null',   properties: ['person'] ],
-		[domain: PartyRole, 		onDelete: 'delete', properties: ['party'] ],
-		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdFrom'] ],
-		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdTo'] ],
-		[domain: PasswordReset, 	onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: RecipeVersion, 	onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: TaskBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
-		[domain: UserLogin, 		onDelete: 'delete', properties: ['person'] ],
-		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ]
+			[domain: Application, 			onDelete: 'null',   properties: ['sme', 'sme2'] ],
+			[domain: Application, 			onDelete: 'null',   properties: ['shutdownBy', 'startupBy', 'testingBy'], transform:{ it.id.toString() } ],
+			[domain: AssetComment, 			onDelete: 'null',   properties: ['resolvedBy', 'createdBy', 'assignedTo'] ],
+			[domain: AssetDependency, 		onDelete: 'null',   properties: ['createdBy','updatedBy'] ],
+			[domain: AssetEntity, 			onDelete: 'null',   properties: ['appOwner', 'modifiedBy'] ],
+			[domain: CommentNote, 			onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: DataScript,        	onDelete: 'null',   properties: ['createdBy', 'lastModifiedBy'] ],
+			[domain: Dataview, 				onDelete: 'null',   properties: ['person'] ],
+			[domain: EmailDispatch, 		onDelete: 'delete', properties: ['toPerson'] ],
+			[domain: EmailDispatch, 		onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: ExceptionDates, 		onDelete: 'delete', properties: ['person'] ],
+			[domain: ImportBatch, 			onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: Model, 				onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
+			[domain: ModelSync, 			onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
+			[domain: MoveEventNews, 		onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],
+			[domain: MoveEventStaff, 		onDelete: 'delete', properties: ['person'] ],
+			[domain: Notice, 				onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: NoticeAcknowledgement, onDelete: 'null', 	properties: ['person'] ],
+			[domain: PartyRole, 			onDelete: 'delete', properties: ['party'] ],
+			[domain: PartyRelationship, 	onDelete: 'delete', properties: ['partyIdFrom'] ],
+			[domain: PartyRelationship, 	onDelete: 'delete', properties: ['partyIdTo'] ],
+			[domain: PasswordReset, 		onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: RecipeVersion, 		onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: TaskBatch, 			onDelete: 'null',   properties: ['createdBy'] ],
+			[domain: UserLogin, 			onDelete: 'delete', properties: ['person'] ],
+			[domain: Workflow, 				onDelete: 'null',   properties: ['updatedBy'] ]
 	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
@@ -299,7 +297,7 @@ class Person extends Party {
 				active: active,
 				company: company.toString(),
 				country: country,
-				stateProv: stateProv,
+				stateProv: stateProv ?: '',
 				keyWords: keyWords,
 				tdsNote: tdsNote,
 				tdsLink: tdsLink,

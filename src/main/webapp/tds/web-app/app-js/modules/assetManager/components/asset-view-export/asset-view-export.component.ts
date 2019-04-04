@@ -28,7 +28,8 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
                 <tds-button-export class="btn-primary pull-left" (click)="getExportData()" [disabled]="!exportForm.form.valid">
                 </tds-button-export>
                 <kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
-                    <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title" [locked]="column.locked" [cellOptions]="column.cell"></kendo-excelexport-column>
+                    <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title" [locked]="column.locked" [cellOptions]="column.cell">
+										</kendo-excelexport-column>
                 </kendo-excelexport>
                 <tds-button-cancel class="pull-right"  (click)="cancelCloseDialog()"></tds-button-cancel>
             </div>
@@ -117,6 +118,7 @@ export class AssetViewExportComponent {
 
 	protected onExportDataResponse(results: any): void {
 		this.dataToExport = results;
+		this.prepareAssetTagsData();
 		setTimeout(() => {
 			this.excelexport.save();
 			this.activeDialog.close();
@@ -125,5 +127,25 @@ export class AssetViewExportComponent {
 
 	cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
+	}
+
+	/**
+	 * Builds a string value for Assets Tags fields in order to be excel exported.
+	 */
+	private prepareAssetTagsData() {
+		const match = this.columns.find(col => col.name === 'common_tagAssets');
+		if (match) {
+			this.dataToExport.forEach(item => {
+				const tags = [...item['common_tagAssets']];
+				let tagsValue = '';
+				tags.forEach((tag, index) => {
+					tagsValue += `${tag.name}`;
+					if (index < (tags.length - 1) ) {
+						tagsValue += ', ';
+					}
+				});
+				item['common_tagAssets'] = tagsValue;
+			});
+		}
 	}
 }

@@ -19,6 +19,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
@@ -549,7 +550,7 @@ class AssetEntityService implements ServiceMethods {
 		String error
 		String errObject = 'dependencies'
 		try {
-			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+			if (!assetEntity.save(flush:true, failOnError: false)) {
 				errObject = 'asset'
 				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
 			}
@@ -617,7 +618,7 @@ class AssetEntityService implements ServiceMethods {
 	void deleteAssetEntityDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId) {
 		String error
 		try {
-			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+			if (!assetEntity.save(flush:true, failOnError: false)) {
 				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
 			}
 
@@ -686,7 +687,7 @@ class AssetEntityService implements ServiceMethods {
 		assetDependency.updatedBy = securityService.loadCurrentPerson()
 
 		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-		if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+		if (!assetDependency.save(failOnError: false, flush:true)) {
 			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 		}
 
@@ -770,7 +771,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			log.debug "addOrUpdateDependencies() Attempting to ${isNew ? 'CREATE' : 'UPDATE'} dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-			if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+			if (!assetDependency.save(flush:true, failOnError: false)) {
 				throw new DomainUpdateException("Unable to save $depType dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 			}
 		}
@@ -1413,6 +1414,7 @@ class AssetEntityService implements ServiceMethods {
 			environmentOptions: getAssetEnvironmentOptions(),
 			moveBundleList: 	assetService.getMoveBundleOptions(project),
 			planStatusOptions: 	getAssetPlanStatusOptions(),
+			scaleOptions: 		SizeScale.getAsJsonList(),
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),

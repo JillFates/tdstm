@@ -23,7 +23,7 @@ class ProviderTestHelper {
                 comment: 'Test comment',
                 description: 'Test description',
                 project: project
-        ).save(flush: true, failOnError: true)
+        ).save(flush: true)
         return provider
     }
 
@@ -43,7 +43,7 @@ class ProviderTestHelper {
                     comment: providerData.comment ? providerData.comment :'Test comment',
                     description: providerData.description ? providerData.description : 'Test description',
                     project: project
-            ).save(flush: true, failOnError: true)
+            ).save(flush: true)
             return provider
         }
         return existingProvider

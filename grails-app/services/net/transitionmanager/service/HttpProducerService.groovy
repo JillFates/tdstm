@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.domain.Credential
+import net.transitionmanager.http.HostnameVerifier
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade
 import org.apache.commons.io.IOUtils
@@ -536,10 +537,14 @@ class HttpProducerService {
         URIBuilder builder = new URIBuilder(httpElements.uri(httpMethod))
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setDefaultRequestConfig(requestBuilder.build())
 
-        // only provides a trust store if endpoint url is secure and credentials are nor for production
+        // only provides a trust store if endpoint url is secure
         if (UrlUtil.isSecure(actionRequest.options.apiAction.endpointUrl)) {
-            if (actionRequest.options.credentials && actionRequest.options.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
-                configureTrustStore(httpClientBuilder)
+            if (actionRequest.options.credentials && actionRequest.options.credentials.environment == CredentialEnvironment.PRODUCTION.name()) {
+                // use trust store with wildcard hostname validator
+                configureTrustStore(httpClientBuilder, HostnameVerifier.STRICT)
+            } else {
+                // use trust store that accepts all hostnames
+                configureTrustStore(httpClientBuilder, NoopHostnameVerifier.INSTANCE)
             }
         }
 
@@ -670,13 +675,13 @@ class HttpProducerService {
     }
 
     /**
-     * Configures a trust store for non-production environments.
+     * Configures a trust store for the given HTTPClient.
      * Useful when calling endpoints using SSL with self-signed certificates, so we trust them
      * to avoid hand shaking errors.
      *
      * @param httpClientBuilder
      */
-    private void configureTrustStore(HttpClientBuilder httpClientBuilder) {
+    private void configureTrustStore(HttpClientBuilder httpClientBuilder, javax.net.ssl.HostnameVerifier verifier) {
         TrustManager[] trustAllCerts = [
                 new X509TrustManager() {
                     X509Certificate[] getAcceptedIssuers() { return [] }
@@ -689,7 +694,7 @@ class HttpProducerService {
 
         SSLContext sslContext = SSLContext.getInstance('TLS')
         sslContext.init(null, trustAllCerts, new SecureRandom())
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE)
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, verifier)
 
         final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory> create()
                 .register('http', PlainConnectionSocketFactory.getSocketFactory())

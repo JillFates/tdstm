@@ -5,7 +5,6 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
@@ -503,9 +502,7 @@ class MoveBundleService implements ServiceMethods {
 	def createManualMoveEventSnapshot(MoveEvent moveEvent, int dialIndicator = 50){
 		if(moveEvent.project.runbookOn ==1){
 			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent , dialIndicator: dialIndicator)
-			if (!moveEventSnapshot.save()){
-				log.error('Unable to save changes to MoveEventSnapshot: {}', moveEventSnapshot)
-			}
+			!moveEventSnapshot.save()
 		}
 	}
 
@@ -887,7 +884,7 @@ class MoveBundleService implements ServiceMethods {
 			AssetEntity asset = get(AssetEntity, assetId, currentProject)
 			asset.moveBundle = moveBundleInstance
 			asset.planStatus = planStatus
-			asset.save(failOnError: true)
+			asset.save()
 		}
 
 		BulkChangeTag.validateBulkValues(currentProject, tagIds)
@@ -918,13 +915,9 @@ class MoveBundleService implements ServiceMethods {
 		MoveBundle moveBundle = findById(id, true)
 		command.populateDomain(moveBundle, false, ['constraintsMap'])
 
-		if (!moveBundle.hasErrors() && moveBundle.save()) {
-			return moveBundle
-		}
+		moveBundle.save()
 
-		log.info("Error updating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
-		throw new DomainUpdateException("Error updating MoveBundle.")
-
+		return moveBundle
 	}
 
 	/**
@@ -937,11 +930,8 @@ class MoveBundleService implements ServiceMethods {
 		command.populateDomain(moveBundle, false, ['constraintsMap'])
 		moveBundle.project = securityService.getUserCurrentProject()
 
-		if (!moveBundle.hasErrors() && moveBundle.save()) {
-			return moveBundle
-		}
+		moveBundle.save()
 
-		log.info("Error creating MoveBundle. {}", GormUtil.allErrorsString(moveBundle))
-		throw new ServiceException("Error creating MoveBundle.")
+		return moveBundle
 	}
 }

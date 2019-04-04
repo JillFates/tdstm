@@ -26,6 +26,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	editing = false;
 	private lastSnapshot;
 	protected navigationSubscription;
+	private isEditable: boolean;
 
 	private filter = {
 		search: '',
@@ -91,6 +92,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		for (let domain of this.domains) {
 			this.fieldsToDelete[domain.domain] = [];
 		}
+		this.isEditable = this.isEditAvailable();
 	}
 
 	protected onTabChange(domain: string): void {
@@ -181,15 +183,6 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		// }
 		result = result || this.hasPendingDeletes();
 		return result;
-	}
-
-	protected getCurrentState(domain: DomainModel) {
-		return {
-			editable: this.isEditAvailable(),
-			dirty: this.isDirty(),
-			valid: this.isValid(domain),
-			filter: this.filter
-		};
 	}
 
 	protected refresh(): void {

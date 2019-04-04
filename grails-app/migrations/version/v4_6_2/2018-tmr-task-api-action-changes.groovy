@@ -94,4 +94,15 @@ databaseChangeLog = {
 			}
 		}
 	}
+
+	changeSet(author: 'jmartin', id: '20190204 TM-14060-4b') {
+		comment('Change api_action.api_catalog and http_method columns to be nullable')
+
+		sql ('''
+			ALTER TABLE `api_action` 
+			MODIFY `api_catalog_id` bigint(20),
+			MODIFY `http_method` varchar(10);
+		''')
+	}
+
 }

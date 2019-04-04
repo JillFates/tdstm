@@ -8,15 +8,13 @@
 import * as R from 'ramda';
 import {Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {DeviceCommonComponent} from './model-device/device-common.component';
-
-declare var jQuery: any;
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function DeviceCreateComponent(template, model: any, metadata: any) {
 
@@ -30,13 +28,13 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
-			preference: PreferenceService,
+			userContextService: UserContextService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
-			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {

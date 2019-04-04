@@ -106,7 +106,7 @@ class TaskNonTranService implements ServiceMethods {
 								msg = "$msg failed READY of successor task(#:$successorTask.taskNumber Id:$successorTask.id) - $whom : ${GormUtil.allErrorsString(successorTask)}"
 								log.error msg
 							} else {
-								if ( successorTask.save(flush:true) ) {
+								if ( successorTask.save(flush:true, failOnError: false) ) {
 									msg = "$msg successor task(#:$successorTask.taskNumber Id:$successorTask.id) Saved - $whom"
 									success = true
 									if (notificationRequired) {

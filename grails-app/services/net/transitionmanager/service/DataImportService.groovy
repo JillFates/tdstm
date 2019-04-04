@@ -414,7 +414,7 @@ class DataImportService implements ServiceMethods {
 				processStopFlag = 0
 			}
 			log.debug 'setBatchToQueued() dirtyProperties {}', batch.dirtyPropertyNames
-			batch.save(failOnError:true, flush:true)
+			batch.save(flush:true)
 		}
 	}
 
@@ -495,7 +495,7 @@ class DataImportService implements ServiceMethods {
 
 			}
 			log.debug 'setBatchToRunning() dirtyProperties {}', batch.dirtyPropertyNames
-			batch.save(failOnError:true, flush:true)
+			batch.save(flush:true)
 		}
 	}
 
@@ -524,7 +524,7 @@ class DataImportService implements ServiceMethods {
 		if (status) {
 			batch.status = status
 		}
-		batch.save(failOnError:true)
+		batch.save()
 
 		return (0 == batch.processStopFlag)
 	}
@@ -644,7 +644,7 @@ class DataImportService implements ServiceMethods {
 							processBatchRecord(batch, record, context, rowsProcessed)
 						} catch (e) {
 							record.addError(e.getMessage())
-							record.save(failOnError: true)
+							record.save()
 							log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${rowsProcessed}", e, 80)
 						}
 					}
@@ -901,7 +901,7 @@ class DataImportService implements ServiceMethods {
 				comment: comment,
 				commentType: AssetCommentType.COMMENT,
 				assetEntity: entity
-			).save(failOnError: true)
+			).save()
 		}
 	}
   
@@ -971,7 +971,7 @@ class DataImportService implements ServiceMethods {
 	 * @return the newly minted entity instance
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	Object createEntity(Class domainClass, Map fieldsMap, Map context) {
+	Object createEntity(def domainClass, Map fieldsMap, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
 		}

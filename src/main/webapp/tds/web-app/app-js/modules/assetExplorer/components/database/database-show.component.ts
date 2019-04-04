@@ -1,7 +1,7 @@
-import { Component} from '@angular/core';
-import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { AssetEditComponent } from '../asset/asset-edit.component';
-import { DependecyService } from '../../service/dependecy.service';
+import {Component} from '@angular/core';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {AssetEditComponent} from '../asset/asset-edit.component';
+import {DependecyService} from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -10,8 +10,8 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {WindowService} from '../../../../shared/services/window.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -26,9 +26,9 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 			prompt: UIPromptService,
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
-			preferenceService: PreferenceService,
+			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
 		}

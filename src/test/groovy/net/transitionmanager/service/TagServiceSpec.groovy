@@ -26,7 +26,7 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 	}
 
 	void setup() {
-		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true, failOnError: true)
+		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true)
 
 		project = new Project(
 			name: 'projectName',
@@ -36,7 +36,7 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 			client: partyGroup,
 			workflowCode: '12345',
 			guid: StringUtil.generateGuid()
-		).save(flush: true, failOnError: true)
+		).save(flush: true)
 
 		service.securityService = [
 			getUserCurrentProject: { -> project },

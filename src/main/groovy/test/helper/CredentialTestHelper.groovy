@@ -92,7 +92,7 @@ class CredentialTestHelper {
 		credential.project = project
 		credential.salt = '{sha}'
 
-		return credential.save(flush: true, failOnError: true)
+		return credential.save(flush: true)
 	}
 
 	/**
@@ -112,6 +112,6 @@ class CredentialTestHelper {
 		credential.salt = SALT
 		credential.password = AESCodec.instance.encode(password, SALT)
 
-		return credential.save(flush: true, failOnError: true)
+		return credential.save(flush: true)
 	}
 }

@@ -3,7 +3,6 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
@@ -36,7 +35,7 @@ export const FieldSettingsRoute: Routes = [
 		resolve: {
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

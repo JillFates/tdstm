@@ -77,7 +77,6 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.math.NumberUtils
-import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -650,15 +649,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		// Deal with legacy view parameters.
-		Map requestParams = null
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			params.taskDependency = params.list('taskDependency[]')
-			params.taskSuccessor = params.list('taskSuccessor[]')
-			requestParams = params
-		}
+
+		Map requestParams  = request.JSON
 
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, true, flash)
 		if (requestParams.forWhom == "update") {
@@ -674,15 +666,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		Map requestParams = null
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			params.taskDependency = params.list('taskDependency[]')
-			params.taskSuccessor = params.list('taskSuccessor[]')
-			requestParams = params
 
-		}
+		Map requestParams  = request.JSON
+
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {
 			if (map.error) {
@@ -2289,15 +2275,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def setImportPreferences() {
 		Map preferencesMap
 
-		if (request.format == "json") {
-			preferencesMap = request.JSON
+		withForm {
+			js {
+				preferencesMap = request.JSON
 
-		} else {
-			preferencesMap = [:]
-			def key = params.preference
-			def value = params.value
-			if (value) {
-				preferencesMap[key] = value
+			}
+
+			html {
+				preferencesMap = [:]
+				def key = params.preference
+				def value = params.value
+				if (value) {
+					preferencesMap[key] = value
+				}
 			}
 		}
 

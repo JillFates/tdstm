@@ -1,0 +1,21 @@
+.provider-associated-content {
+  .modal-body {
+    font-size: 13px;
+    overflow-y: auto;
+    span.associated-total {
+      display: block;
+      margin-bottom: 10px;
+      span.associated-count {
+        font-weight: bold;
+      }
+    }
+    p {
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+  }
+  .modal-footer {
+    padding-top: 13px;
+    padding-bottom: 2px;
+  }
+}

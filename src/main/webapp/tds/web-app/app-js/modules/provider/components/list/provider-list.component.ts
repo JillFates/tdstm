@@ -1,18 +1,26 @@
+// Angular
 import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-
+import {ActivatedRoute} from '@angular/router';
+// Services
 import {ProviderService} from '../../service/provider.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+// Components
+import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../../dataScript/model/data-script.model';
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+// Models
+import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
-import {PageChangeEvent} from '@progress/kendo-angular-grid';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute} from '@angular/router';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+// Kendo
+import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
+
 declare var jQuery: any;
 
 @Component({
@@ -51,22 +59,21 @@ export class ProviderListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private providerService: ProviderService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2) {
+		private renderer: Renderer2,
+		private userContext: UserContextService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['providers'];
 		this.gridData = process(this.resultSet, this.state);
-
 	}
 
 	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.providerColumnModel = new ProviderColumnModel(`{0:${dateFormat}}`);
+		this.userContext.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+				this.providerColumnModel = new ProviderColumnModel(`{0:${this.dateFormat}}`);
 				this.gridColumns = this.providerColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
@@ -113,16 +120,21 @@ export class ProviderListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.providerService.deleteProvider(dataItem.id).subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
-				}
-			});
+		this.providerService.deleteContext(dataItem.id).subscribe((result: any) => {
+			this.dialogService.extra(ProviderAssociatedComponent,
+				[{provide: ProviderAssociatedModel, useValue: result}],
+				false, false)
+				.then((toDelete: any) => {
+					if (toDelete) {
+						this.providerService.deleteProvider(dataItem.id).subscribe(
+							(result) => {
+								this.reloadData();
+							},
+							(err) => console.log(err));
+					}
+				})
+				.catch(error => console.log('Closed'));
+		});
 	}
 
 	/**

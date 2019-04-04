@@ -63,7 +63,7 @@ abstract class AssetSaveUpdateStrategy {
 		populateAsset(assetEntity)
 
 		// Save the asset or fail
-		assetEntity.save(failOnError: true)
+		assetEntity.save()
 
 		// Assign the asset to the corresponding Move Bundle.
 		assetEntityService.assignAssetToBundle(project, assetEntity, command.asset['moveBundleId'].toString())
@@ -248,7 +248,7 @@ abstract class AssetSaveUpdateStrategy {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
 		dependency.updatedBy = currentPerson
-		dependency.save(failOnError: true)
+		dependency.save()
 	}
 
 	/**

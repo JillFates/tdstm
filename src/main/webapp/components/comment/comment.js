@@ -325,6 +325,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				}
 			);
 
+		} else {
+			GraphUtil.applyHighlights(null);
 		}
 	};
 
@@ -516,6 +518,13 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
 				dateTZ = tdsCommon.getISOString(userDateInput)
 			}
 			$('#estStartTime').val(dateTZ);
+
+			userDateInput = $('#kendoEstCompletionTime').data("kendoDateTimePicker").value();
+			if (userDateInput !== null) {
+				dateTZ = tdsCommon.getISOString(userDateInput)
+			}
+
+			$('#estCompletionTime').val(dateTZ);
 
 			$scope.validEditEventSubmit = true;
 			if (qPromises.length > 0) {
@@ -1402,13 +1411,22 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		params.taskSuccessor = createDependenciesArray(dependencies.successors);
 		params.deletedPreds = createDeletedDependencies(dependencies);
 		params.manageDependency = 1;
+
+		params.duration = (params.duration)? params.duration.toString() : "0";
+
+		// Partially Remove Prototype
+		if(window.Prototype) {
+			delete Object.prototype.toJSON;
+			delete Array.prototype.toJSON;
+			delete Hash.prototype.toJSON;
+			delete String.prototype.toJSON;
+		}
 	};
 
 	var saveComment = function (params, dependencies) {
 		var deferred = q.defer();
 		createDependenciesParams(params, dependencies);
-		var params = $.param(params);
-		http.post(utils.url.applyRootPath('/assetEntity/saveComment'), params).
+		http.post(utils.url.applyRootPath('/assetEntity/saveComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
@@ -1421,8 +1439,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	var updateComment = function (params, dependencies) {
 		var deferred = q.defer();
 		createDependenciesParams(params, dependencies);
-		var params = $.param(params);
-		http.post(utils.url.applyRootPath('/assetEntity/updateComment'), params).
+		http.post(utils.url.applyRootPath('/assetEntity/updateComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).

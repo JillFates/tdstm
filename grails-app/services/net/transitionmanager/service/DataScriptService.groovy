@@ -93,7 +93,7 @@ class DataScriptService implements ServiceMethods{
         }
 
         // Try to save or fail.
-        if (!dataScript.save()) {
+        if (!dataScript.save(failOnError: false)) {
             throw new DomainUpdateException("Error creating or updating DataScript ${GormUtil.allErrorsString(dataScript)}")
         }
         return dataScript
@@ -110,7 +110,7 @@ class DataScriptService implements ServiceMethods{
         Project project = securityService.userCurrentProject
         DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
         dataScript.etlSourceCode = scriptContent
-        dataScript.save(failOnError: true)
+        dataScript.save()
 
         return dataScript
     }
