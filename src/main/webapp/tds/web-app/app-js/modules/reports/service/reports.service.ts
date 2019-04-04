@@ -58,6 +58,142 @@ export class ReportsService {
 			.catch((error: any) => error);
 	}
 
+	getApplicatioConflicts(): Observable<any> {
+		const data =  [
+			{
+				'application': {
+					'id': 1,
+					'name': 'Enterprise App with new Buttons - by CN',
+				},
+				'bundle': {
+					'id': 2,
+					'name': '123110_qae2e'
+				},
+				'supports': [
+					{
+						'type': 'Backup',
+						'class': 'Application',
+						'name': 'BlackBerry Enterprise Server Test',
+						'frecuency': 'Unknow',
+						'bundle': 'M1 - Physical',
+						'status': 'Unknow'
+					},
+					{
+						'type': 'Backup',
+						'class': 'Storage',
+						'name': 'Storage Enterprise Device - by CN',
+						'frecuency': 'Unknow',
+						'bundle': '123110_qae2e',
+						'status': 'Unknow'
+					}
+				],
+				'dependencies': []
+			},
+			{
+				'application': {
+					'id': 2,
+					'name': 'testing tm 12077 app',
+				},
+				'bundle': {
+					'id': 2,
+					'name': '123110_qae2e'
+				},
+				'supports': [
+					{
+						'type': 'DB',
+						'class': 'Storage',
+						'name': 'DS4243-1',
+						'frecuency': 'constant',
+						'bundle': 'TBD',
+						'status': 'Unknow'
+					}
+				],
+				'dependencies': [
+					{
+						'type': 'Hosts',
+						'class': 'VM',
+						'name': 'ACME-WB-84',
+						'frecuency': 'daily',
+						'bundle': 'M1-Phy',
+						'status': 'Future'
+					}
+				]
+			},
+			{
+				'application': {
+					'id': 3,
+					'name': 'Enterprise - by CN',
+				},
+				'bundle': {
+					'id': 2,
+					'name': '123110_qae2e'
+				},
+				'supports': [
+					{
+						'type': 'Backup',
+						'class': 'Application',
+						'name': 'BlackBerry Enterprise Server',
+						'frecuency': 'Unknown',
+						'bundle': 'Buildout',
+						'status': 'Unknown'
+					},
+					{
+						'type': 'Backup',
+						'class': 'Application',
+						'name': '13181 - by CN',
+						'frecuency': 'Unknown',
+						'bundle': '123110_qae2e',
+						'status': 'Unknown'
+					},
+					{
+						'type': 'Backup',
+						'class': '',
+						'name': 'Device - by CN',
+						'frecuency': 'Unknown',
+						'bundle': 'e2e test*',
+						'status': 'Unknown'
+					}
+				],
+				'dependencies': [
+					{
+						'type': 'Backup',
+						'class': 'PDU',
+						'name': 'A8 PDU1 B - by CN',
+						'frecuency': 'Unknown',
+						'bundle': 'Master Bundle',
+						'status': 'Unknown'
+					},
+					{
+						'type': 'Backup',
+						'class': 'Application',
+						'name': '13181 - by CN',
+						'frecuency': 'Unknown',
+						'bundle': '123110_qae2e',
+						'status': 'Archived'
+					},
+					{
+						'type': 'Backup',
+						'class': 'Application',
+						'name': 'Cris Enterprise App',
+						'frecuency': 'Unknown',
+						'bundle': '123110_qae2e',
+						'status': 'Archived'
+					},
+					{
+						'type': 'Backup',
+						'class': 'Database',
+						'name': 'Smoke Enterprise DB - by CN',
+						'frecuency': 'Unknown',
+						'bundle': '123110_qae2e',
+						'status': 'Archived'
+					}
+				]
+			}
+		];
+
+		return Observable.of(data);
+	}
+
 	getDefaultsApplicationConflicts(): Observable<any> {
 		const data = {
 			moveBundleList: [{'name': '123110_qae2e', 'id': 5849}, {'name': 'B01', 'id': 5910}, {
