@@ -51,6 +51,9 @@ class ETLValueHelper {
 			case FindingsFacade:
 				fieldValue = ((FindingsFacade)value).result() // FINDINGS.result()
 				break
+			case LocalVariableFacade:
+				fieldValue = ((LocalVariableFacade)value).wrappedObject
+				break
 			case LocalVariableDefinition:
 				throw ETLProcessorException.missingPropertyException(((LocalVariableDefinition)value).name)
 				break

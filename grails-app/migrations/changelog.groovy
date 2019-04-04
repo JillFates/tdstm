@@ -50,5 +50,6 @@ databaseChangeLog = {
 	include file: 'version/v4_6_2/20190311-eula-notifications-mandatory-acknowledgements-changes.groovy'
 	include file: 'version/v4_6_2/20190319-rename-asset-system-views.groovy'
 	include file: 'version/v4_7_0/20181219-Updating-role-prefix.groovy'
+	include file: 'version/v4_7_0/20190327-Change-scale-field-control-type-to-inList.groovy'
 	include file: 'version/v4_7_0/20190326-Updating-recipe-size.groovy'
 }

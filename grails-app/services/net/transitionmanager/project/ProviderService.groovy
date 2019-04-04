@@ -3,11 +3,14 @@ package net.transitionmanager.project
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.Credential
+import net.transitionmanager.action.Provider
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
 import net.transitionmanager.service.ServiceMethods
 import org.grails.web.json.JSONObject
 
@@ -135,6 +138,19 @@ class ProviderService implements ServiceMethods {
         if (provider) {
             provider.delete()
         }
+    }
+
+    /**
+     * Collects all associations for Provider and returns a list of them
+     * @param providerId a valid id for a {@code Provider} saved in database.
+     */
+    Map<String, Number> contextForDeleteProvider(Long providerId) {
+        Provider provider = getProvider(providerId, null, true)
+        return [
+            actionCount: ApiAction.where { provider == provider }.count(),
+            credentialCount: Credential.where { provider == provider }.count(),
+            etlScriptCount: DataScript.where { provider == provider }.count()
+        ]
     }
 
     /**

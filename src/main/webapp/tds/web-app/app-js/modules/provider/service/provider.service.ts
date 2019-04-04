@@ -71,6 +71,14 @@ export class ProviderService {
 			.catch((error: any) => error);
 	}
 
+	deleteContext (id: number): Observable<string> {
+		return this.http.get(`../wsProvider/deleteContext/${id}`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * Based on provided column, update the structure which holds the current selected filters
 	 * @param {any} column: Column to filter

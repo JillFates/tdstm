@@ -82,4 +82,10 @@ class WsProviderController implements ControllerMethods{
         providerService.deleteProvider(id)
         renderSuccessJson([status: DELETE_OK_MESSAGE] )
     }
+
+    @HasPermission(Permission.ProviderDelete)
+    def deleteContext(Long id) {
+        Map<String, Number> associations = providerService.contextForDeleteProvider(id)
+        renderSuccessJson(associations)
+    }
 }

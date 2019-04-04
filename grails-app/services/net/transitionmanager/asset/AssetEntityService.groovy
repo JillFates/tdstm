@@ -16,6 +16,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
@@ -1406,6 +1407,7 @@ class AssetEntityService implements ServiceMethods {
 			environmentOptions: getAssetEnvironmentOptions(),
 			moveBundleList: 	assetService.getMoveBundleOptions(project),
 			planStatusOptions: 	getAssetPlanStatusOptions(),
+			scaleOptions: 		SizeScale.getAsJsonList(),
 			priorityOption:		assetService.getAssetPriorityOptions(),
 			// Required for Supports On and Depends On
 			dependencyMap:		dependencyEditMap(asset.project, asset),

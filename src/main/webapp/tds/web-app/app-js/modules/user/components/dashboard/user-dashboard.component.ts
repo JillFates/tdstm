@@ -4,6 +4,8 @@ import {Component, OnInit} from '@angular/core';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserService} from '../../service/user.service';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 // Components
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
@@ -18,6 +20,7 @@ import {
 } from '../../model/user-dashboard-columns.model';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 @Component({
 	selector: 'user-dashboard',
@@ -43,11 +46,18 @@ export class UserDashboardComponent implements OnInit {
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 
-	constructor(private userService: UserService, private taskService: TaskService, private dialogService: UIDialogService) {
-
+	constructor(
+		private userService: UserService,
+		private taskService: TaskService,
+		private dialogService: UIDialogService,
+		private notifierService: NotifierService,
+		private userContextService: UserContextService) {
 	}
 
 	ngOnInit() {
+		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.notifierService.broadcast( {name: 'notificationHeaderTitleChange', title: 'User Dashboard for ' + userContext.person.fullName});
+		});
 		this.populateData();
 	}
 

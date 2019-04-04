@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.user.SavePreferenceCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
@@ -248,8 +249,9 @@ class WsUserController implements ControllerMethods {
 	* @param value - the value to set the preference to
 	*/
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreference(String code, String value) {
-		userPreferenceService.setPreference(code ?: '', value)
+	def savePreference(SavePreferenceCommand savePreference) {
+		validateCommandObject(savePreference)
+		userPreferenceService.setPreference(savePreference.code, savePreference.value)
 		renderSuccessJson()
 	}
 

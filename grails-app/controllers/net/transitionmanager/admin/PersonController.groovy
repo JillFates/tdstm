@@ -266,12 +266,7 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
-		Map personParams = [:]
-
-		withFormat {
-			js { request.JSON }
-			html { params }
-		}
+		Map personParams = (request.format == 'json') ? request.JSON : params
 
 		def duplicatePersonId
 		try {

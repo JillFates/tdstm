@@ -10,6 +10,7 @@ import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
+import test.helper.ApiActionTestHelper
 import test.helper.ApiCatalogTestHelper
 
 @Integration

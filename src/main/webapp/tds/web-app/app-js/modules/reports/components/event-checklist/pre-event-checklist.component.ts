@@ -30,7 +30,7 @@ declare var jQuery: any;
 	selector: 'tds-event-checklist',
 	template: `
 		<div class="pre-event-checklist">
-			<div class="report-controls">
+			<div *ngIf="!html || isReportFailing" class="report-controls">
 				<div class="event-selector">
 					<div>
 						<kendo-dropdownlist
@@ -72,6 +72,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 		defaultEvent: {id: null, text: ''}
 	};
 	public html: SafeHtml;
+	private isReportFailing: boolean;
 
 	constructor(
 		private sanitizer: DomSanitizer,
@@ -102,6 +103,8 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 	 * @param {string} eventId Report id to generate
 	 */
 	onGenerateReport(eventId: string): void {
+		this.isReportFailing = false;
+
 		this.reportsService.getPreventsCheckList(eventId)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
@@ -111,6 +114,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 						errorMessage = errorResponse.errors.shift();
 					}
 
+					this.isReportFailing = true;
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: errorMessage

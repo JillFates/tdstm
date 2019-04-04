@@ -290,6 +290,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	}
 
 	/**
+	 * <p>Selects a domain based on an instance of {@code LocalVariableFacade}</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * @param element an instance of {@code LocalVariableFacade} class
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
+	 */
+	DomainBuilder domain(LocalVariableFacade localVariableFacade) {
+		return domain(localVariableFacade.wrappedObject)
+	}
+
+	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
@@ -687,7 +697,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @throws ETLProcessorException
 	 * @See ETLProcessorException.missingPropertyException
 	 */
-	Element load(LocalVariableDefinition localVariableDefinition){
+	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -942,12 +952,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLFindElement}
 	 */
-	ETLFindElement find(String domainName) {
-		ETLDomain domain = ETLDomain.lookup(domainName)
+	ETLFindElement find(LocalVariableFacade localVariableFacade) {
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject.toString())
 		if (domain) {
 			return find(domain)
 		}
-		throw ETLProcessorException.invalidDomain(domainName)
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject.toString())
 	}
 
 	/**
@@ -1005,12 +1015,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLProcessor}
 	 */
-	ETLProcessor elseFind(String domainName) {
-		ETLDomain domain = ETLDomain.lookup(domainName)
+	ETLProcessor elseFind(LocalVariableFacade localVariableFacade) {
+		ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject)
 		if (domain) {
 			return elseFind(domain)
 		}
-		throw ETLProcessorException.invalidDomain(domainName)
+		throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject)
 	}
 
 	/**
@@ -1756,6 +1766,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
 		setUpProgressIndicator(script, progressCallback)
 
+		script = applyLocalVariableTransformation(script)
+
 		String tag = this.dataSetFacade.fileName()
 		this.stopWatch.begin(tag)
 
@@ -1768,6 +1780,23 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 		logMeasurements(this.stopWatch.lap(tag))
 		return result
+	}
+
+	/**
+	 * <p>This transformation converts local variables
+	 * adding a dot ('.') character</p>
+	 * <pre>
+	 * 	nameVar transform with uppercase() set upperNameVar
+	 * </pre>
+	 * It is going to be transformed:
+	 * <pre>
+	 * 	nameVar.transform with uppercase() set upperNameVar
+	 * </pre>
+	 * @param etlScript an ETL String content
+	 * @return same ETL script received by parameter modified
+	 */
+	String applyLocalVariableTransformation(String etlScript) {
+		return etlScript.replaceAll(/(^[^<>]+)(\w*Var\b)\s(transform\swith\s.*)/, '$1$2.$3')
 	}
 
 	/**
