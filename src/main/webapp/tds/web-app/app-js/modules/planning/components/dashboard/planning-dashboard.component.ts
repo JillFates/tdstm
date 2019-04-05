@@ -82,6 +82,35 @@ export class PlanningDashboardComponent {
 				activeTasks: 0,
 				overdueTasks: 0,
 				groupPlanMethodologyCount: []
+			},
+			execution: {
+				movedAppPerc: 0,
+				movedServersPerc: 0,
+				moveEventList: [],
+				openTasks: [],
+				unassignedAppCount: 0,
+				percentageUnassignedAppCount: 0,
+				percAppDoneCount: 0,
+				unassignedPhysicalServerCount: 0,
+				percentagePhysicalServerCount: 0,
+				unassignedVirtualServerCount: 0,
+				percVirtualServerCount: 0,
+				unassignedDbCount: 0,
+				percentageDBCount: 0,
+				unAssignedPhyStorageCount: 0,
+				percentagePhyStorageCount: 0,
+				unassignedFilesCount: 0,
+				percentageFilesCount: 0,
+				unassignedOtherCount: 0,
+				percentageOtherCount: 0,
+				appList: [],
+				phyServerList: [],
+				virtServerList: [],
+				dbList: [],
+				phyStorageList: [],
+				filesList: [],
+				otherTypeList: [],
+				eventStartDate: {}
 			}
 		};
 		this.planningDashboardModel = Object.assign({},  defaultModel, this.planningDashboardModel);
@@ -120,6 +149,33 @@ export class PlanningDashboardComponent {
 					for (let prop of groups) {
 						this.planningDashboardModel.analysis.groupPlanMethodologyCount.push({type: prop, value: result.groupPlanMethodologyCount[prop]});
 					}
+					this.planningDashboardModel.execution.movedAppPerc = result.movedAppPerc;
+					this.planningDashboardModel.execution.movedServersPerc = result.movedServersPerc;
+					this.planningDashboardModel.execution.moveEventList = result.moveEventList;
+					this.planningDashboardModel.execution.openTasks = result.openTasks;
+					this.planningDashboardModel.execution.unassignedAppCount = result.unassignedAppCount;
+					this.planningDashboardModel.execution.percentageUnassignedAppCount = result.percentageUnassignedAppCount;
+					this.planningDashboardModel.execution.percAppDoneCount = result.percAppDoneCount;
+					this.planningDashboardModel.execution.appList = result.appList;
+					this.planningDashboardModel.execution.unassignedPhysicalServerCount = result.unassignedPhysicalServerCount;
+					this.planningDashboardModel.execution.percentagePhysicalServerCount = result.percentagePhysicalServerCount;
+					this.planningDashboardModel.execution.phyServerList = result.phyServerList;
+					this.planningDashboardModel.execution.unassignedVirtualServerCount = result.unassignedVirtualServerCount;
+					this.planningDashboardModel.execution.percVirtualServerCount = result.percVirtualServerCount;
+					this.planningDashboardModel.execution.virtServerList = result.virtServerList;
+					this.planningDashboardModel.execution.unassignedDbCount = result.unassignedDbCount;
+					this.planningDashboardModel.execution.percentageDBCount = result.percentageDBCount;
+					this.planningDashboardModel.execution.dbList = result.dbList;
+					this.planningDashboardModel.execution.unAssignedPhyStorageCount = result.unAssignedPhyStorageCount;
+					this.planningDashboardModel.execution.percentagePhyStorageCount = result.percentagePhyStorageCount;
+					this.planningDashboardModel.execution.phyStorageList = result.phyStorageList;
+					this.planningDashboardModel.execution.unassignedFilesCount = result.unassignedFilesCount;
+					this.planningDashboardModel.execution.percentageFilesCount = result.percentageFilesCount;
+					this.planningDashboardModel.execution.filesList = result.filesList;
+					this.planningDashboardModel.execution.unassignedOtherCount = result.unassignedOtherCount;
+					this.planningDashboardModel.execution.percentageOtherCount = result.percentageOtherCount;
+					this.planningDashboardModel.execution.otherTypeList = result.otherTypeList;
+					this.planningDashboardModel.execution.eventStartDate = result.eventStartDate;
 				}
 			});
 	}

@@ -69,4 +69,33 @@ export class PlanningDashboardModel {
 		overdueTasks: number,
 		groupPlanMethodologyCount: any[]
 	}
+	execution: {
+		movedAppPerc: number,
+		movedServersPerc: number,
+		moveEventList: any[],
+		openTasks: any[],
+		unassignedAppCount: number,
+		percentageUnassignedAppCount: number,
+		percAppDoneCount: number,
+		unassignedPhysicalServerCount: number,
+		percentagePhysicalServerCount: number,
+		unassignedVirtualServerCount: number,
+		percVirtualServerCount: number,
+		unassignedDbCount: number,
+		percentageDBCount: number,
+		unAssignedPhyStorageCount: number,
+		percentagePhyStorageCount: number,
+		unassignedFilesCount: number,
+		percentageFilesCount: number,
+		unassignedOtherCount: number,
+		percentageOtherCount: number,
+		appList: any[],
+		phyServerList: any[],
+		virtServerList: any[],
+		dbList: any[],
+		phyStorageList: any[],
+		filesList: any[],
+		otherTypeList: any[],
+		eventStartDate: any
+	}
 }
