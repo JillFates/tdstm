@@ -77,7 +77,7 @@ export class ReportsService {
 						'name': 'BlackBerry Enterprise Server Test',
 						'frequency': 'Unknow',
 						'bundle': 'M1 - Physical',
-						'status': 'Unknow'
+						'status': 'Unknown'
 					},
 					{
 						'type': 'Backup',
@@ -85,7 +85,7 @@ export class ReportsService {
 						'name': 'Storage Enterprise Device - by CN',
 						'frequency': 'Unknow',
 						'bundle': '123110_qae2e',
-						'status': 'Unknow'
+						'status': 'Unknown'
 					}
 				],
 				'dependencies': []
@@ -106,7 +106,7 @@ export class ReportsService {
 						'name': 'DS4243-1',
 						'frequency': 'constant',
 						'bundle': 'TBD',
-						'status': 'Unknow'
+						'status': 'Unknown'
 					}
 				],
 				'dependencies': [
@@ -148,7 +148,7 @@ export class ReportsService {
 					},
 					{
 						'type': 'Backup',
-						'class': '',
+						'class': 'Database',
 						'name': 'Device - by CN',
 						'frequency': 'Unknown',
 						'bundle': 'e2e test*',

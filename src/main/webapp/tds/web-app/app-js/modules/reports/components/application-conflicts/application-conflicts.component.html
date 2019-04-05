@@ -74,23 +74,25 @@
 		</div>
 	</div>
 
-	<div class="container">
+	<div class="container results">
+		<div class="header">
+			<div class="main-title">Application Conflicts - TM-Demo : Buildout and App Owner:All</div>
+			<div class="sub-title">This analysis was performed on 04/05/2019 05:09 PM for TDS.</div>
+		</div>
 
-		<div class="container" *ngFor="let item of applicationConflicts">
-			<div class="row">
-				<div class="col-sm-4">{{item.application.name}} {{item.application.bundle}}</div>
-				<div class="col-sm-4"></div>
-				<div class="col-sm-2">Supports {{item.supports.length}}</div>
-				<div class="col-sm-2">Depends on {{item.supports.dependencies}}</div>
+		<div class="container application-container" *ngFor="let item of applicationConflicts">
+			<div class="row application-header" >
+				<div class="col-sm-12 pull-left">
+					{{item.application.name}} ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+				</div>
 			</div>
 
-			<div class="row" *ngIf="item.supports.length">
-				<div class="col-sm-1"></div>
-				<div class="col-sm-2">Supports ({{item.supports.length}} issues)</div>
-				<div class="col-sm-9"></div>
+			<div class="row support-header" *ngIf="item.supports.length">
+				<div class="col-sm-2 title">Supports ({{item.supports.length}} issues)</div>
+				<div class="col-sm-10"></div>
 			</div>
 
-			<div class="row" *ngIf="item.supports.length">
+			<div class="row item-header" *ngIf="item.supports.length">
 					<div class="col-sm-1"></div>
 					<div class="col-sm-1">Type</div>
 					<div class="col-sm-1">Class</div>
@@ -100,23 +102,24 @@
 					<div class="col-sm-2">Status</div>
 			</div>
 
-			<div class="row" *ngFor="let support of item.supports">
+			<div class="row" 
+				*ngFor="let support of item.supports; let even = even; let odd = odd;"
+				[ngClass]="{ odd: odd, even: even }">
 					<div class="col-sm-1"></div>
-					<div class="col-sm-1">{{support.type}}</div>
-					<div class="col-sm-1">{{support.class}}</div>
-					<div class="col-sm-3">{{support.name}}</div>
-					<div class="col-sm-2">{{support.frequency}}</div>
-					<div class="col-sm-2">{{support.bundle}}</div>
-					<div class="col-sm-2">{{support.status}}</div>
+					<div class="col-sm-1 data-item">{{support.type}}</div>
+					<div class="col-sm-1 data-item">{{support.class}}</div>
+					<div class="col-sm-3 data-item">{{support.name}}</div>
+					<div class="col-sm-2 data-item">{{support.frequency}}</div>
+					<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
+					<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
 			</div>
 
-			<div class="row" *ngIf="item.dependencies.length">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-2">Dependencies ({{item.supports.length}} issues)</div>
-					<div class="col-sm-9"></div>
+			<div class="row dependency-header" *ngIf="item.dependencies.length">
+					<div class="col-sm-2 title">Dependencies ({{item.supports.length}} issues)</div>
+					<div class="col-sm-10"></div>
 			</div>
 
-			<div class="row" *ngIf="item.dependencies.length">
+			<div class="row item-header" *ngIf="item.dependencies.length">
 					<div class="col-sm-1"></div>
 					<div class="col-sm-1">Type</div>
 					<div class="col-sm-1">Class</div>
@@ -126,51 +129,16 @@
 					<div class="col-sm-2">Status</div>
 			</div>
 
-			<div class="row" *ngFor="let dependency of item.dependencies">
+			<div class="row" *ngFor="let dependency of item.dependencies; let even = even; let odd = odd;" 
+				[ngClass]="{ odd: odd, even: even }">
 					<div class="col-sm-1"></div>
-					<div class="col-sm-1">{{dependency.type}}</div>
-					<div class="col-sm-1">{{dependency.class}}</div>
-					<div class="col-sm-3">{{dependency.name}}</div>
-					<div class="col-sm-2">{{dependency.frequency}}</div>
-					<div class="col-sm-2">{{dependency.bundle}}</div>
-					<div class="col-sm-2">{{dependency.status}}</div>
+					<div class="col-sm-1 data-item">{{dependency.type}}</div>
+					<div class="col-sm-1 data-item">{{dependency.class}}</div>
+					<div class="col-sm-3 data-item">{{dependency.name}}</div>
+					<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
+					<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
+					<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
 			</div>
 		</div>
-
-		<!--
-		<div class="row">
-			<div class="col-sm-4">Enterprise App with new Buttons - by CN (123110_qae2e)</div>
-			<div class="col-sm-4"></div>
-			<div class="col-sm-2">Supports 2</div>
-			<div class="col-sm-2">Depends on 0</div>
-		</div>
-		-->
-
-		<!--
-		<div class="row">
-			<div class="col-sm-1"></div>
-			<div class="col-sm-2">Supports (2 Issues)</div>
-			<div class="col-sm-9"></div>
-		</div>
-		<div class="row">
-			<div class="col-sm-1"></div>
-			<div class="col-sm-1">Type</div>
-			<div class="col-sm-1">Class</div>
-			<div class="col-sm-3">Name</div>
-			<div class="col-sm-2">Frequency</div>
-			<div class="col-sm-2">Bundle</div>
-			<div class="col-sm-2">Status</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-1"></div>
-			<div class="col-sm-1">Backup</div>
-			<div class="col-sm-1">Application</div>
-			<div class="col-sm-3">BlackBerry Enterprise Server Test</div>
-			<div class="col-sm-2">Unknown</div>
-			<div class="col-sm-2">M1 - Physical</div>
-			<div class="col-sm-2">Unknown</div>
-		</div>
-		-->
 	</div>
-
 </div>

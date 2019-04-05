@@ -32,6 +32,7 @@ declare var jQuery: any;
 	templateUrl: 'application-conflicts.component.html'
 })
 export class ApplicationConflictsComponent implements OnInit {
+	invalidStatusList = ['Questioned', 'Unknown'];
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
