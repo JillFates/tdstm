@@ -23,6 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UserService} from '../../../security/services/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
 
 declare var jQuery: any;
@@ -33,11 +34,13 @@ declare var jQuery: any;
 })
 export class ApplicationConflictsComponent implements OnInit {
 	invalidStatusList = ['Questioned', 'Unknown'];
+	userContext = null;
+	isDisplayingReport: boolean;
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
-		defaultBundle: {id: -1, text: 'Planning Bundles'},
-		defaultAppOwner: {id: -1, text: 'All'},
+		defaultBundle: {id: -1, name: 'Planning Bundles'},
+		defaultAppOwner: {id: -1, name: 'All'},
 		bundleConflict: true,
 		unresolvedDependencies: true,
 		missingDependencies: true,
@@ -52,27 +55,33 @@ export class ApplicationConflictsComponent implements OnInit {
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
+		private userService: UserService,
 		private reportsService: ReportsService) {
 	}
 
 	ngOnInit() {
-		const commonCalls = [this.reportsService.getDefaults(), this.reportsService.getDefaultsApplicationConflicts()];
+		this.isDisplayingReport = false;
+		const commonCalls = [
+			this.reportsService.getDefaults(),
+			this.reportsService.getDefaultsApplicationConflicts(),
+			this.userService.getUserContext()
+		];
 
 		// on init
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
-				const [events, defaultsApplication] = results;
+				const [events, defaultsApplication, userContext] = results;
 				this.model.moveBundleList = defaultsApplication.moveBundleList;
 				this.model.appOwnerList = defaultsApplication.appOwnerList;
+				this.userContext = userContext;
 			});
 	}
 
 	onGenerateReport(): void {
 		this.reportsService.getApplicatioConflicts()
 			.subscribe((results: Array<ApplicationConflict>) => {
-				console.log('The application conficts are:');
-				console.log(results);
 				this.applicationConflicts = results;
+				this.isDisplayingReport = true;
 			});
 	}
 
