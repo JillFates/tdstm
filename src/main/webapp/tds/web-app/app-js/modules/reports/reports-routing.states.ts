@@ -8,6 +8,7 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
+import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -18,6 +19,9 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-planning';
 export class ReportStates {
 	public static readonly PRE_EVENT_CHECK_LIST = {
 		url: 'preEventCheckList'
+	};
+	public static readonly SERVER_CONFLICTS_REPORT = {
+		url: 'serverConflictsReport'
 	};
 }
 
@@ -35,6 +39,25 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: PreEventCheckListSelectorComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.SERVER_CONFLICTS_REPORT.url,
+		data: {
+			page: {
+				title: 'REPORTS.SERVER_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.SERVER_CONFLICTS'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-reports-server-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ServerConflictsReportComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

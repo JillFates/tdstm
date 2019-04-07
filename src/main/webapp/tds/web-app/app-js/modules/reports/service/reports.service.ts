@@ -22,11 +22,19 @@ export class ReportsService {
 	 * Get events list
 	 * @returns {Observable<any>}
 	 */
-	getEvents(): Observable<any[]> {
+	getEvents(): Observable<any> {
 		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get move bundle list
+	 * @returns {Observable<any>}
+	 */
+	getMoveBundles(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/reports/moveBundles`)
 			.map((response: any) => {
 				return response && response.data || [];
-
 			})
 			.catch((error: any) => error);
 	}
