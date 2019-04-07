@@ -1261,6 +1261,13 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/generateServerConflicts" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateServerConflicts"
+            ]
+        }
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )

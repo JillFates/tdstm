@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {catchError} from 'rxjs/operators';
 
 /**
  * @name ReportsService
@@ -64,5 +65,37 @@ export class ReportsService {
 				return response && response.status === 'success' && response.data;
 			})
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * POST - Generate Server Conflicts report.
+	 * @param moveBundleId: number
+	 * @param bundleConflict: boolean
+	 * @param unresolvedDependencies: boolean
+	 * @param noSupportDependencies: boolean
+	 * @param noVmHost: boolean
+	 * @param maxAssetsToReport: number
+	 */
+	generateServerConflictsReport(
+		moveBundleId: number,
+		bundleConflict = false,
+		unresolvedDependencies = false,
+		noSupportDependencies = false,
+		noVmHost = false,
+		maxAssetsToReport = 100): Observable<any> {
+		const request = {
+			moveBundle: moveBundleId,
+			bundleConflicts: bundleConflict,
+			unresolvedDep: unresolvedDependencies,
+			noRuns: noSupportDependencies,
+			vmWithNoSupport: noVmHost,
+			report_max_assets: maxAssetsToReport
+		}
+		return this.http.post(`${this.baseURL}/ws/reports/generateServerConflicts`, request, {responseType: 'text'}).pipe(
+			catchError(error => {
+				console.error(error);
+				return error
+			})
+		);
 	}
 }
