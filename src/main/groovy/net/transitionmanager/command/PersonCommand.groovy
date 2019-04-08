@@ -26,7 +26,6 @@ class PersonCommand implements CommandObject {
 	String staffType
 	Integer travelOK
 
-
 	static constraints = {
 		importFrom Person, include: [
 			'firstName',
