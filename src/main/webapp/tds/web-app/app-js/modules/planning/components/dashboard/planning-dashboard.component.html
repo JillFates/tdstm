@@ -1,14 +1,14 @@
 <div class="planning-dashboard-component">
     <div class="phase-wrapper">
-        <div class="dashboard-div discovery-phase">
+        <div class="dashboard-div">
             <span class="dashboard-head">Discovery Phase</span>
             <div>
-                <table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
+                <table class="percentage-bars">
                     <!-- Applications Validated Progressbar -->
                     <tbody><tr>
-                        <td class="dashboard-bar-base" style="background-color:lightyellow">
+                        <td class="dashboard-bar-base">
 
-                            <div class="dashboard-bar-graph" id="discoverybar"  [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
+                            <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                                 <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}% </b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=Validated">
@@ -22,7 +22,7 @@
                     <tr>
                         <td class="dashboard-bar-base">
 
-                            <div class="dashboard-bar-graph" id="analysisbar" [style.width]="planningDashboardModel.discovery.appsPlanReadyPercentage+'%'"></div>
+                            <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsPlanReadyPercentage+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                                 <b> {{planningDashboardModel.discovery.appsPlanReadyPercentage}}% </b>
                                 <a href="/tdstm/application/list?filter=application&amp;toValidate=PlanReady">Applications Plan Ready</a>
@@ -54,14 +54,13 @@
                 <a href="/tdstm/assetEntity/listTasks?filter=dueOpenIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.overdueTasks}} Overdue Tasks</a>
             </div>
         </div>
-        <div class="dashboard-div analysis-phase">
+        <div class="dashboard-div">
             <span class="dashboard-head">Analysis & Planning Phase</span>
-            <div><table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
-
+            <div><table class="percentage-bars">
                 <tbody><tr>
                     <td class="dashboard-bar-base">
 
-                        <div class="dashboard-bar-graph" id="assignmentbar" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
+                        <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
                         <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                             <b> {{planningDashboardModel.analysis.assignedAppPerc}}% </b>
                             <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Assigned">Applications Assigned</a>
@@ -69,16 +68,13 @@
 
                     </td>
                 </tr>
-
                 <tr>
                     <td class="dashboard-bar-base">
-
-                        <div class="dashboard-bar-graph" id="confirmedbar" [style.width]="planningDashboardModel.analysis.confirmedAppPerc+'%'"></div>
+                        <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.confirmedAppPerc+'%'"></div>
                         <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                             <b> {{planningDashboardModel.analysis.confirmedAppPerc}}% </b>
                             <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Confirmed">Applications Confirmed</a>
                         </div>
-
                     </td>
                 </tr>
                 </tbody>
@@ -133,11 +129,11 @@
         <div class="dashboard-div execution-phase">
             <span class="dashboard-head">Execution Phase</span>
             <div>
-                <table class="percentage-bars" style="margin-bottom: 10px; border-spacing: 0px;">
+                <table class="percentage-bars">
                     <tbody><tr>
                         <td class="dashboard-bar-base">
 
-                            <div class="dashboard-bar-graph" id="appmovedbar" [style.width]="planningDashboardModel.execution.movedAppPerc+'%'"></div>
+                            <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.execution.movedAppPerc+'%'"></div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                                 <b> {{planningDashboardModel.execution.movedAppPerc}}% </b>
                                 <a href="/tdstm/application/list?filter=application&amp;plannedStatus=Moved">Applications Completed</a>
@@ -150,9 +146,9 @@
                     <tr>
                         <td class="dashboard-bar-base">
 
-                            <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.execution.movedServersPerc+'%'"> </div>
+                            <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.execution.movedServerPerc+'%'"> </div>
                             <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                <b> {{planningDashboardModel.execution.movedServersPerc}}% </b>
+                                <b> {{planningDashboardModel.execution.movedServerPerc}}% </b>
                                 <a href="/tdstm/application/list?filter=server&amp;plannedStatus=Moved">Servers Completed</a>
                             </div>
 
@@ -161,14 +157,14 @@
 
                     </tbody></table>
             </div>
-            <div class="container-fluid" style="padding-left: 0px;">
+            <div class="container-fluid">
                 <div class="row-fluid">
                     <div class="col-md-10 col-xs-10" style="padding-left: 0px; padding-right: 0px;">
-                        <div id="eventDataTableId" style="overflow-y: hidden;">
+                        <div style="overflow-y: hidden;">
                             <table class="dashboard-right-table dashboard-stat-table" style="border-spacing: 5px 0px; border-collapse: separate; width: auto">
                                     <thead *ngIf="planningDashboardModel.execution.moveEventList.length > 0">
                                     <tr>
-                                        <th style="background-color: transparent;" class="">&nbsp;</th>
+                                        <th style="background-color: transparent;" ></th>
                                         <th></th>
                                         <th rowspan="3" class="dashboard-stat-exec-td "  valign="bottom">
                                             <div style="padding-bottom: 5px; font-size: 10px; text-align: right;"><b>Unassigned</b></div>
@@ -204,95 +200,95 @@
                                     </thead>
                                 <tbody>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/application_menu.svg"/></td>
                                     <td style="vertical-align: middle;"> <a>Applications</a></td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedAppCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedAppCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let app of planningDashboardModel.execution.appList" style="text-align: right;">
                                         <span *ngIf="app.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="app.count!=0">
                                             {{app.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percAppDoneCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.appDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverPhysical_menu.svg"/></td>
                                     <td>
                                         <a>Physical Server</a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhysicalServerCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let server of planningDashboardModel.execution.phyServerList" style="text-align: right;">
                                         <span *ngIf="server.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="server.count!=0">
                                             {{server.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percentagePhysicalServerCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.phyServerDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverVirtual_menu.svg"/></td>
                                     <td>
                                         <a>Virtual Server</a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedVirtualServerCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let server of planningDashboardModel.execution.virtServerList" style="text-align: right;">
                                         <span *ngIf="server.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="server.count!=0">
                                             {{server.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percVirtualServerCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.virtServerDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/database_menu.svg"/></td>
                                     <td><a>Databases</a></td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedDbCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedDbCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let db of planningDashboardModel.execution.dbList" style="text-align: right;">
                                         <span *ngIf="db.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="db.count!=0">
                                             {{db.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percentageDBCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.dbDonePercentage}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/storagePhysical_menu.svg"/></td>
                                     <td nowrap="nowrap"><a>Physical Storage</a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unAssignedPhyStorageCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyStorageCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let storage of planningDashboardModel.execution.phyStorageList" style="text-align: right;">
                                         <span *ngIf="storage.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="storage.count!=0">
                                             {{storage.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percentagePhyStorageCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.phyStorageDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/storageLogical_menu.svg"/></td>
                                     <td><a>Logical Storage</a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedFilesCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedFilesCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                     <td *ngFor="let file of planningDashboardModel.execution.filesList" style="text-align: right;">
                                         <span *ngIf="file.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="file.count!=0">
                                             {{file.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percentageFilesCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.filesDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
-                                    <td class="dashboard-stat-icon-td"></td>
+                                    <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/others_menu.svg"/></td>
                                     <td><a>Other</a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.percentageUnassignedAppCount}}%)</a></td>
-                                    <td *ngFor="let other of planningDashboardModel.execution.otherTypeList" style="text-align: right;">
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                    <td *ngFor="let other of planningDashboardModel.execution.otherList" style="text-align: right;">
                                         <span *ngIf="other.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="other.count!=0">
                                             {{other.count}}
                                         </a>
                                     </td>
-                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.percentageOtherCount}}%</a></td>
+                                    <td style="text-align: right;"><a>{{planningDashboardModel.execution.otherDonePerc}}%</a></td>
                                 </tr>
                                 <tr>
                                     <td class="dashboard-stat-icon-td">&nbsp;</td>

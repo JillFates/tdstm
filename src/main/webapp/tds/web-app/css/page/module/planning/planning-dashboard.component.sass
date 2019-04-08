@@ -1,5 +1,6 @@
 .planning-dashboard-component
   font-family: helvetica, arial, sans-serif
+  line-height: 12px
   a
     color: black
     font-weight: bold
@@ -8,6 +9,8 @@
     color: black
   .percentage-bars
     border: 1px solid #63a242
+    margin-bottom: 10px
+    border-spacing: 0px
   table
     width: 100%
     .dashboard-stat-icon-td
@@ -18,7 +21,6 @@
     .dashboard-stat-desc-td
       width: 90px
       padding-right: 2px
-    .dashboard-stat-table
     .dashboard-stat-td-l
       width: 20px
       text-align: left
@@ -54,16 +56,13 @@
       font-weight: bold
       line-height: 31px
       margin-bottom: -15px
+      white-space: nowrap
     .dashboard-div
       margin-top: 10px
       margin-left: 5px
       background-image: url('../../../images/news_bg.jpg')
       background-size: contain
       padding: 15px
-    .discovery-phase
-      width: 31%
-    .analysis-phase
-      width: 31%
     .execution-phase
       width: 63%
   .dashboard-bar-base
@@ -80,3 +79,5 @@
       border-right-style: inset
   .dashboard-stat-exec-tdmc
     width: 48px
+  .container-fluid
+    padding-left: 0px
