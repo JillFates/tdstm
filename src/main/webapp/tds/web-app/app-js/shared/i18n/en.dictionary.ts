@@ -5,6 +5,8 @@
 export const en_DICTIONARY: Object = {
 	'GLOBAL': {
 		'OK': 'Ok',
+		'YES': 'Yes',
+		'NO': 'No',
 		'ADD': 'Add',
 		'ADMIN': 'Admin',
 		'ACTION': 'Action',
@@ -74,7 +76,8 @@ export const en_DICTIONARY: Object = {
 		'ASSETS': 'Assets',
 		'COMMON': 'Common',
 		'SINGLE_NAME': 'Asset',
-		'PLURAL_NAME': 'Assets'
+		'PLURAL_NAME': 'Assets',
+		'COMMENTS': 'Comments'
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',

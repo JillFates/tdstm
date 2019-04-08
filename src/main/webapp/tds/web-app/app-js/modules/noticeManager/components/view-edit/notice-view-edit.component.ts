@@ -1,5 +1,5 @@
 // Angular
-import {Component, Inject, ViewChild} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -21,6 +21,7 @@ import {ModalType} from '../../../../shared/model/constants';
 	templateUrl: 'notice-view-edit.component.html'
 })
 export class NoticeViewEditComponent {
+	@ViewChild('noticeViewEditContainerElement', {read: ElementRef}) noticeViewEditContainerElement: ElementRef;
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 	@ViewChild('noticeForm') noticeForm: FormControl;
@@ -100,7 +101,7 @@ export class NoticeViewEditComponent {
 			[{provide: NoticeModel, useValue: this.model}],
 			false, false)
 			.then((result) => {
-				//
+				this.noticeViewEditContainerElement.nativeElement.focus();
 			})
 			.catch(error => console.log('View HTML Closed'));
 	}
