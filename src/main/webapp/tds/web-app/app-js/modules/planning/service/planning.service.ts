@@ -16,7 +16,7 @@ export class PlanningService {
 	constructor(private http: HttpClient) {}
 
 	fetchModelForPlanningDashboard() {
-		return this.http.get(`${this.userPreferenceUrl}/getPlanningStats`)
+		return this.http.get(`${this.dashboardUrl}/getPlanningStats`)
 			.map((response: any) => {
 				let data = response && response.status === 'success' && response.data;
 				return data;
