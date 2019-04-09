@@ -1,30 +1,44 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.tm.enums.FilenameFormat
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
+import grails.gorm.transactions.Transactional
+import grails.web.servlet.mvc.GrailsParameterMap
 import net.transitionmanager.asset.Application
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.task.RunbookService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
-import grails.gorm.transactions.Transactional
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.party.PartyRelationship
-import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
-import grails.web.servlet.mvc.GrailsParameterMap
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.jdbc.core.JdbcTemplate
+
+import javax.servlet.http.HttpServletResponse
 
 @Transactional
 class ReportsService implements ServiceMethods {
@@ -33,6 +47,9 @@ class ReportsService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	RunbookService           runbookService
 	TaskService              taskService
+	MoveBundleService        moveBundleService
+	UserPreferenceService    userPreferenceService
+	MoveEventService         moveEventService
 
 	@Transactional(readOnly = true)
 	def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -653,7 +670,7 @@ class ReportsService implements ServiceMethods {
 	 * @return String the URI to access the resulting file
 	 * @throws RuntimeException when the generation fails, the exception message will contain the output from the dot command
 	 *
-	 * @deprecated As of release 4.1.4, replaced by {@link net.transitionmanager.common.GraphvizService#generateSVGFromDOT()}
+	 * @deprecated As of release 4.1.4, replaced by {net.transitionmanager.common.GraphvizService#generateSVGFromDOT()}
 	 */
 	@Deprecated
 	def generateDotGraph( filenamePrefix, dotText ) {
@@ -1058,5 +1075,122 @@ class ReportsService implements ServiceMethods {
 
 	private find(target1, target2, Closure closure) {
 		target1.find(closure) || target2.find(closure)
+	}
+
+	/**
+	 * Generates the model used to create the Tasks Report.
+	 *
+	 * @param events  The ids of the events, or 'all' for all events.
+	 * @param project  The associated Project
+	 * @param wUnresolved  Flag that indicates that only remaining tasks should be included in the report
+	 * @param viewUnpublished  Flag that indicates if unpublished tasks should be included in the report
+	 * @param wComment  Flag that indicates if comments should be included in the report
+	 * @return  A map with model used to create the report [taskList, tzId, userDTFormat, vUnpublished]
+	 */
+	def getTasksReportModel(def events, Project project, Boolean wUnresolved, Boolean viewUnpublished, Boolean wComment) {
+		String tzId = userPreferenceService.timeZone
+		String userDTFormat = userPreferenceService.dateFormat
+
+		boolean allBundles = events.find { it == 'all' }
+		List badReqEventIds
+
+		if( !allBundles ){
+			events = events.collect {id-> NumberUtil.toLong(id, 0) }
+			//Verifying events id are in same project or not.
+			badReqEventIds = moveEventService.verifyEventsByProject(events, project)
+		}
+		//if found any bad id returning to the user
+		if( badReqEventIds ){
+			throw new InvalidParamException("Event ids $badReqEventIds is not associated with current project.")
+		}
+		Map argMap = [type: AssetCommentType.ISSUE, project: project]
+		String taskListHql = "FROM AssetComment WHERE project =:project AND commentType =:type "
+
+		if(!allBundles){
+			taskListHql +=" AND moveEvent.id IN (:events) "
+			argMap.events = events
+		}
+		if( wUnresolved ){
+			taskListHql += "AND status != :status"
+			argMap.status = AssetCommentStatus.COMPLETED
+		}
+		// handle unpublished tasks
+		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished as Boolean)
+
+		boolean vUnpublished = securityService.hasPermission(Permission.TaskPublish) && viewUnpublished
+		if (!vUnpublished) {
+			taskListHql += " AND isPublished = :isPublished "
+			argMap.isPublished = true
+		}
+
+		List taskList = AssetComment.findAll(taskListHql, argMap)
+		if (vUnpublished) {
+			taskList.addAll(wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project) : [])
+		}
+		else {
+			taskList.addAll(wComment ? AssetComment.findAllByCommentTypeAndProjectAndIsPublished(AssetCommentType.COMMENT, project, true) : [])
+		}
+		return [taskList: taskList, tzId: tzId, userDTFormat: userDTFormat, vUnpublished: vUnpublished]
+	}
+
+	/**
+	 * Export task report in XLS format
+	 * @param taskList : list of tasks
+	 * @param tzId : timezone
+	 * @param project : project instance
+	 * @param reqEvents : list of requested events.
+	 * @return : will generate a XLS file having task task list
+	 */
+	def exportTaskReportExcel(List taskList, String tzId, String userDTFormat, Project project, reqEvents, HttpServletResponse response){
+		File file = grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
+
+		String eventsTitleSheet = "ALL"
+		boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
+		List moveEvents = []
+		if(!allEvents){
+			reqEvents = reqEvents.collect {id-> NumberUtil.toLong(id, 0) }
+			moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			List eventNames = moveEvents.collect{it.name}
+			eventsTitleSheet = eventNames.join(", ")
+		}
+		Map nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
+		String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams, 'xls')
+
+		//set MIME TYPE as Excel
+		response.setContentType( "application/vnd.ms-excel" )
+		response.addHeader("Content-Disposition", "attachment; filename=\""+filename+"\"")
+
+
+		HSSFWorkbook book = new HSSFWorkbook(new FileInputStream( file ))
+
+		HSSFSheet tasksSheet = book.getSheet("tasks")
+
+		List preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
+								 '','','', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+								 'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
+
+		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
+				userDTFormat, 3, securityService.viewUnpublished())
+
+		Closure exportTitleSheet = {
+			UserLogin userLogin = securityService.getUserLogin()
+			HSSFSheet titleSheet = book.getSheet("Title")
+			WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
+			WorkbookUtil.addCell(titleSheet, 1, 3, project.id.toString())
+			WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
+			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project).toString())
+			WorkbookUtil.addCell(titleSheet, 1, 5, eventsTitleSheet)
+			WorkbookUtil.addCell(titleSheet, 1, 6, userLogin.person.toString())
+
+			String exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
+			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
+			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
+			WorkbookUtil.addCell(titleSheet, 1, 9, userDTFormat)
+
+			WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
+		}
+		exportTitleSheet()
+
+		book.write(response.getOutputStream())
 	}
 }

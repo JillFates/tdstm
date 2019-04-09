@@ -9,7 +9,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
-import net.transitionmanager.command.PersonCO
+import net.transitionmanager.command.PersonCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
@@ -250,7 +250,7 @@ class PersonController implements ControllerMethods {
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
 	@HasPermission(Permission.PersonCreate)
-	def save() {
+	def save(PersonCommand personCommand) {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -266,11 +266,9 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
-		Map personParams = (request.format == 'json') ? request.JSON : params
-
 		def duplicatePersonId
 		try {
-			person = personService.savePerson(personParams, companyId, project, true)
+			person = personService.savePerson(personCommand, params, companyId, project, true)
 		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
@@ -879,7 +877,7 @@ class PersonController implements ControllerMethods {
 	 * @return The appropriate message after merging completed or error message
 	 */
 	@HasPermission(Permission.PersonEdit)
-	def mergePerson(PersonCO cmdObj) {
+	def mergePerson(PersonCommand cmdObj) {
 		String msg
 		UserLogin byWhom = securityService.getUserLogin()
 

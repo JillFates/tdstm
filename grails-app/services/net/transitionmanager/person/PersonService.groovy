@@ -18,7 +18,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.command.PersonCO
+import net.transitionmanager.command.PersonCommand
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.party.Party
@@ -565,7 +565,7 @@ class PersonService implements ServiceMethods {
 	 * the toId parameter and then will merge each of the persons referenced in the fromId List parameter.
 	 */
 	@Transactional
-	String processMergePersonRequest(UserLogin byWhom, PersonCO cmdObj, params) {
+	String processMergePersonRequest(UserLogin byWhom, PersonCommand cmdObj, params) {
 		Person toPerson = Person.get(params.long('toId'))
 
 		hasAccessToPerson(byWhom.person, toPerson, true, true)
@@ -1711,7 +1711,7 @@ class PersonService implements ServiceMethods {
 	 * @return The Person record being created or throws an exception for various issues
 	 */
 	@Transactional
-	Person savePerson(Map params, Long companyId, Project defaultProject, boolean byAdmin = false)
+	Person savePerson(PersonCommand personCommand, Map params, Long companyId, Project defaultProject, boolean byAdmin = false)
 			throws DomainUpdateException, InvalidParamException {
 
 		PartyGroup companyParty
@@ -1735,24 +1735,20 @@ class PersonService implements ServiceMethods {
 			// TODO : JPM 3/2016 : savePerson() Switch the person lookup to use the finder service
 			person = personList.find {
 				// Find person using case-insensitive search
-				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
-					((StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName)) ||
-					  StringUtils.equalsIgnoreCase(it.lastName, params.lastName)) &&
-					((StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName)) ||
-					  StringUtils.equalsIgnoreCase(it.middleName, params.middleName))
+				StringUtils.equalsIgnoreCase(it.firstName, personCommand.firstName) &&
+					((StringUtils.isEmpty(personCommand.lastName) && StringUtils.isEmpty(it.lastName)) ||
+					  StringUtils.equalsIgnoreCase(it.lastName, personCommand.lastName)) &&
+					((StringUtils.isEmpty(personCommand.middleName) && StringUtils.isEmpty(it.middleName)) ||
+					  StringUtils.equalsIgnoreCase(it.middleName, personCommand.middleName))
 			}
 
 			if (person != null) {
 				throw new DomainUpdateException("A person with that name already exists. Person Id:$person.id")
 			}
 
-			// Create the person and relationship appropriately
-			Map reducedParams = [:] + params
-			reducedParams.remove('company')
-			reducedParams.remove('function')
-
 			// TODO : JPM 12/2016 : The save method should assign params to the person with command or list of properties
-			person = new Person(reducedParams)
+			person = new Person()
+			personCommand.populateDomain(person, true)
 			save person, true
 
 			if (person.hasErrors()) {

@@ -422,9 +422,11 @@ class ReportsController implements ControllerMethods {
 		redirect( action:"applicationConflicts")
 	}
 
-	/*
+	/**
 	 * Generate Task Report
+	* @deprecated Use {@link WsReportsController#tasksReport()} instead
 	 */
+	@Deprecated
 	def tasksReport() {
 		def reqEvents = params.list("moveEvent").toList()
 		String tzId = userPreferenceService.timeZone
@@ -507,7 +509,10 @@ class ReportsController implements ControllerMethods {
 	 * @param project : project instance
 	 * @param reqEvents : list of requested events.
 	 * @return : will generate a XLS file having task task list
+	 *
+	 * @deprecated Use {@link ReportsService#exportTaskReportExcel()} instead
 	 */
+	@Deprecated
 	def exportTaskReportExcel(taskList, tzId, userDTFormat, project, reqEvents){
 		File file = grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
 

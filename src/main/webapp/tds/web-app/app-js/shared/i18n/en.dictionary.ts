@@ -200,7 +200,9 @@ export const en_DICTIONARY: Object = {
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'REPORT': 'Report',
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'TASK_REPORT': 'Task Report'
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
