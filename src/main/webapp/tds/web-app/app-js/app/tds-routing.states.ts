@@ -3,7 +3,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 
 export const TDSAppRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: 'security'},
+	{path: '', pathMatch: 'full', redirectTo: 'login'},
+	{path: 'auth', loadChildren: '../modules/auth/auth.module#AuthModule'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
 	{path: 'assetcomment', loadChildren: '../modules/assetComment/asset-comment.module#AssetCommentModule'},
