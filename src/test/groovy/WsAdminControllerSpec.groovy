@@ -1,7 +1,8 @@
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.admin.WsAdminController
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.SecurityService
 import test.AbstractUnitSpec
 import spock.lang.Ignore
 

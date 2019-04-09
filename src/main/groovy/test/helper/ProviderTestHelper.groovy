@@ -1,8 +1,8 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 
 import org.apache.commons.lang3.RandomStringUtils as RSU
 

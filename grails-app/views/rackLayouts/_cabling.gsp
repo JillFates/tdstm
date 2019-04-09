@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetCableMap"%>
+<%@page import="net.transitionmanager.asset.AssetCableMap"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <script type="text/javascript">
 var app = angular.module("cablingApp${assetId}", ['ui']);

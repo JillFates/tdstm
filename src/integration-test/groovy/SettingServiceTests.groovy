@@ -4,11 +4,11 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.SettingService
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.common.SettingService
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Specification

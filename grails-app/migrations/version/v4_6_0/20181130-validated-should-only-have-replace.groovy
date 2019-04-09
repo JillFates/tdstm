@@ -1,8 +1,8 @@
 package version.v4_6_0
 
 import com.tdsops.tm.enums.domain.SettingType
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.service.DatabaseMigrationService
+import net.transitionmanager.common.Setting
+import net.transitionmanager.common.DatabaseMigrationService
 
 /**
  * Replacing validation actions with just remove, it shouldn't have replace.

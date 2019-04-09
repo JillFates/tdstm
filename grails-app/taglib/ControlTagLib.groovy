@@ -1,7 +1,7 @@
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import com.tdsops.tm.enums.ControlType
 
 class ControlTagLib {

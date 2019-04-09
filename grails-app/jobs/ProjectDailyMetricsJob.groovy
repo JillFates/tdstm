@@ -1,4 +1,4 @@
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.project.ProjectService
 import org.quartz.JobExecutionContext
 
 class ProjectDailyMetricsJob {

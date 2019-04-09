@@ -1,5 +1,5 @@
-<%@page import="net.transitionmanager.domain.MoveEvent" %>
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.project.MoveEvent" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>

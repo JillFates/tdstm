@@ -1,11 +1,11 @@
 package net.transitionmanager.connector
 
-import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.action.ApiAction
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
-import com.tds.asset.AssetComment
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.task.AssetComment
 import com.tdssrc.grails.UrlUtil
 
 import groovy.util.logging.Slf4j

@@ -1,7 +1,7 @@
 package net.transitionmanager.credential
 
 import grails.plugins.rest.client.RestResponse
-import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.exception.InvalidSyntaxException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

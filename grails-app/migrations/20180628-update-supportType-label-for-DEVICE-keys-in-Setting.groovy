@@ -1,7 +1,7 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.service.DatabaseMigrationService
+import net.transitionmanager.common.Setting
+import net.transitionmanager.common.DatabaseMigrationService
 import org.grails.web.json.JSONObject
 
 databaseChangeLog = {

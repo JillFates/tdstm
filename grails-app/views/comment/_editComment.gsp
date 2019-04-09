@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="net.transitionmanager.task.AssetComment; net.transitionmanager.asset.AssetComment; net.transitionmanager.security.Permission"%>
 <div draggable id="editCommentPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-front" style="width: 700px" tabindex="-1" >
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Comment':'Create Comment'}}</span>
@@ -26,7 +26,7 @@
 							<label for="category">Category:</label>&nbsp;<span class="error-msg" ng-show="form.category.$error.required"><b>*</b></span>
 						</td>
 						<td colspan="4">
-							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}"
+							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}"
 							noSelection="['':'please select']" ng-change="updateWorkflowTransitions(ac.assetEntity, this.value, 'workFlowTransitionId', 'predecessorId','')"></tds:select>
 						</td>
 					</tr>

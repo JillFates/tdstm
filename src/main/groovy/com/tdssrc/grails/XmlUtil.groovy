@@ -2,7 +2,7 @@ package com.tdssrc.grails
 
 import groovy.util.logging.Slf4j
 import groovy.xml.MarkupBuilder
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 @Slf4j(value='logger')
 class XmlUtil {

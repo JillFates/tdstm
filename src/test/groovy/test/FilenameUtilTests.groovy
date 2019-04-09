@@ -5,10 +5,10 @@ import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
 import spock.lang.See
 import spock.lang.Shared
 

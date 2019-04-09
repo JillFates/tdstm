@@ -1,10 +1,10 @@
-<%@page import="com.tds.asset.AssetCableMap" %>
-<%@page import="com.tds.asset.AssetDependency" %>
-<%@page import="com.tds.asset.AssetEntity" %>
-<%@page import="com.tds.asset.Application" %>
-<%@page import="com.tds.asset.Database" %>
-<%@page import="com.tds.asset.Files" %>
-<%@page import="net.transitionmanager.domain.Room" %>
+<%@page import="net.transitionmanager.asset.AssetCableMap" %>
+<%@page import="net.transitionmanager.asset.AssetDependency" %>
+<%@page import="net.transitionmanager.asset.AssetEntity" %>
+<%@page import="net.transitionmanager.asset.Application" %>
+<%@page import="net.transitionmanager.asset.Database" %>
+<%@page import="net.transitionmanager.asset.Files" %>
+<%@page import="net.transitionmanager.asset.Room" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>

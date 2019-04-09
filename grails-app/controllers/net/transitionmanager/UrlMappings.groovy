@@ -1254,6 +1254,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/tasksReport" {
+			controller = "wsReports"
+			action = [
+					POST: "tasksReport"
+			]
+		}
+
         "/ws/reports/moveBundles" {
             controller = "wsReports"
             action = [

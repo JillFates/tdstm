@@ -1,7 +1,7 @@
 package net.transitionmanager.command.metricdefinition
 
 import net.transitionmanager.command.CommandObject
-import net.transitionmanager.service.MetricReportingService.MetricMode
+import net.transitionmanager.reporting.MetricReportingService.MetricMode
 
 /**
  * A Command object to bind the individual metric definition JSON, and validate it.

@@ -1,11 +1,11 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataScriptMode
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataScriptMode
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 
 /**

@@ -1,7 +1,7 @@
 package net.transitionmanager.controller
 
 import com.tdsops.common.ui.Pagination
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.NumberUtil
 import com.tdsops.common.grails.ApplicationContextHolder

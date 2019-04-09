@@ -1,15 +1,13 @@
 package com.tdsops.common.security
 
 import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.TdsUserDetails
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.SecurityService
-import org.apache.commons.lang3.StringUtils
+import net.transitionmanager.security.SecurityService
 
 import javax.servlet.http.HttpSession
 import javax.servlet.http.HttpSessionAttributeListener

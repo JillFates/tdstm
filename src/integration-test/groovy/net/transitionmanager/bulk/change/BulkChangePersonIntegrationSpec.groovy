@@ -1,15 +1,15 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.ProjectService
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification

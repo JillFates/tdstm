@@ -1,6 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.MoveBundleService
-import net.transitionmanager.service.ProgressService
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.common.ProgressService
 import org.quartz.JobExecutionContext
 
 class GenerateDependencyGroupsJob {

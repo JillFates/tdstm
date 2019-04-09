@@ -3,6 +3,10 @@ package net.transitionmanager.service
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.SettingService
+import net.transitionmanager.imports.DataScriptService
 import spock.lang.Specification
 
 @TestFor(DataScriptService)

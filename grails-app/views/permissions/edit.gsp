@@ -1,5 +1,5 @@
-<%@page import="net.transitionmanager.domain.Permissions" %>
-<%@page import="net.transitionmanager.domain.RolePermissions" %>
+<%@page import="net.transitionmanager.security.Permissions" %>
+<%@page import="net.transitionmanager.security.RolePermissions" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>

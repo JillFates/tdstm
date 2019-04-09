@@ -3,7 +3,7 @@ package com.tdsops.etl
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 
 /**
  * This trait implements all the necessary ETL methods that manages file system functionality
