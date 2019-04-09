@@ -1,6 +1,10 @@
-import {Component, ElementRef, OnInit} from '@angular/core';
+import {Component, ElementRef} from '@angular/core';
 import {ReportsService} from '../../service/reports.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
 
 @Component({
 	selector: 'tds-server-conflicts-report',
@@ -103,7 +107,11 @@ export class ServerConflictsReportComponent {
 	maxAssetsToReport = 100;
 	reportResult: SafeHtml;
 
-	constructor(private reportsService: ReportsService, private sanitizer: DomSanitizer, private elRef: ElementRef) {
+	constructor(
+		private reportsService: ReportsService,
+		private sanitizer: DomSanitizer,
+		private elRef: ElementRef,
+		private dialogService: UIDialogService) {
 		this.onLoad();
 	}
 
@@ -153,6 +161,27 @@ export class ServerConflictsReportComponent {
 	 * @param event: any
 	 */
 	onAssetLinkClick(event: any): void {
-		console.log(event.target.dataset);
+		if (event.target) {
+			const {assetClass, assetId} = event.target.dataset;
+			this.onOpenLinkAsset(assetId, assetClass);
+		}
+	}
+
+	/**
+	 * Show the asset
+	 * @param assetId: number
+	 * @param assetClass: string
+	 */
+	protected onOpenLinkAsset(assetId: number, assetClass: string) {
+		this.dialogService.open(AssetShowComponent,
+			[UIDialogService,
+				{ provide: 'ID', useValue: assetId },
+				{ provide: 'ASSET', useValue: assetClass },
+				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
+			], DIALOG_SIZE.LG).then(result => {
+				// Do nothing
+		}).catch(result => {
+			// Do nothing
+		});
 	}
 }

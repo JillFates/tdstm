@@ -21,7 +21,7 @@ export class ReportStates {
 		url: 'preEventCheckList'
 	};
 	public static readonly SERVER_CONFLICTS_REPORT = {
-		url: 'serverConflictsReport'
+		url: 'serverConflicts'
 	};
 }
 

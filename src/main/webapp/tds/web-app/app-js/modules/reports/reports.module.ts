@@ -5,6 +5,7 @@ import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 import {TranslatePipe} from '../../shared/pipes/translate.pipe';
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
 import {ReportsRouteModule} from './reports-routing.states';
 // Kendo
@@ -19,7 +20,6 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-// import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
@@ -29,6 +29,7 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 		// Angular
 		CommonModule,
 		SharedModule,
+		AssetExplorerModule,
 		FormsModule,
 		// Kendo
 		DropDownsModule,

@@ -386,7 +386,7 @@
                                 <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
-                                <g:link controller="module" action="reports" id="serverConflictsReport" elementId="serverConflictsReport">Server Conflicts <small>(Angular)</small></g:link>
+                                <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts <small>(Angular)</small></g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
                                 <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
