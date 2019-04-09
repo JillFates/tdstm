@@ -5,7 +5,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
-import net.transitionmanager.command.PersonCO
+import net.transitionmanager.command.PersonCommand
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
@@ -752,7 +752,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		def params = new GrailsParameterMap(mockRequest)
 		// Perform the merge of the accounts
-		def test = personService.processMergePersonRequest(toUser, new PersonCO(), params)
+		def test = personService.processMergePersonRequest(toUser, new PersonCommand(), params)
 		then: 'the From UserLogin should be switched to the To Person'
         test == "John Jeffrey Doe was merged to Jane Mary Doe"
 	}
