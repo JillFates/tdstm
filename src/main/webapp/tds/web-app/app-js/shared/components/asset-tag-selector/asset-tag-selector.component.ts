@@ -38,6 +38,7 @@ declare var jQuery: any;
 		            [textField]="'name'"
 		            [valueField]="'id'"
 		            (valueChange)="onTagValueChange($event)"
+                    placeholder="{{placeholder}}"
 		            (open)="onOpen()">
 		        <ng-template kendoMultiSelectTagTemplate let-dataItem>
 		            <div class="{{dataItem.css}}" [title]="dataItem.name">{{ dataItem.name }}</div>
@@ -67,6 +68,8 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('model') model: any;
 	// Model coming from the views filters.
 	@Input('viewFilterModel') viewFilterModel: string;
+	// Optional Place holder
+	@Input('placeholder') placeholder = '';
 
 	// Use to control if the Switch becomes visible
 	public switchVisible = false;
