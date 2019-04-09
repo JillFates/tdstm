@@ -28,7 +28,7 @@ export const DependenciesRoute: Routes = [
 		path: DependenciesStates.DEPENDENCIES_LIST.url,
 		data: {
 			page: {
-				title: 'DEPENDENCIES.LIST_TITLE',
+				title: 'DEPENDENCIES.MENU_TITLE',
 				instruction: '',
 				menu: ['ASSETS.ASSETS', 'DEPENDENCIES.MENU_TITLE'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependencies-list', subMenu: true }
