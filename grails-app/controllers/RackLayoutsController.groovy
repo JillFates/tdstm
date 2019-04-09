@@ -495,7 +495,7 @@ class RackLayoutsController implements ControllerMethods {
 								else {
 									assetTag.append("EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})")
 								}
-								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 22) + '</a>')
+								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 15) + '</a>')
 							}
 
 							if (hasBlades) {
