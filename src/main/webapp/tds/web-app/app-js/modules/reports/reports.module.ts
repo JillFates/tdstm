@@ -22,6 +22,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 // import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
+import {TaskReportComponent} from './components/task-report/task-report.component';
 
 @NgModule({
 	imports: [
@@ -41,7 +42,8 @@ import {ReportsService} from './service/reports.service';
 		ReportsRouteModule
 	],
 	declarations: [
-		PreEventCheckListSelectorComponent
+		PreEventCheckListSelectorComponent,
+		TaskReportComponent
 	],
 	providers: [
 		ReportsService,
