@@ -1,5 +1,6 @@
 /* Exclusive for Angular*/
 .asset-tag-selector-component
+  $asset-tag-placeholder: #999
   .k-widget
     div.k-multiselect-wrap
       min-height: 30px
@@ -79,6 +80,10 @@
   .k-switch:focus,
   .k-switch.k-state-focused
     box-shadow: unset
+  .k-searchbar
+    .k-input::-webkit-input-placeholder
+      font-size: 14px
+      color: $asset-tag-placeholder
 /* Global, but protected by the scope */
 $asset-tag-selector-default-label-color: #656565
 .asset-tag-selector-single-container
