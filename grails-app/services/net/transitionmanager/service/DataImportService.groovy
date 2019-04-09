@@ -16,8 +16,8 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import grails.gorm.transactions.Transactional
 import grails.gorm.transactions.NotTransactional
+import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
@@ -1165,7 +1165,7 @@ class DataImportService implements ServiceMethods {
 								noErrorsEncountered = false
 							}
 						} else {
-							recordErrorHelper(fieldName, 'Unable to find record')
+							recordErrorHelper(fieldName, 'Unable to manage this reference record')
 						}
 						break
 
@@ -1319,7 +1319,9 @@ class DataImportService implements ServiceMethods {
 	 * @return true if the field contains the 'create' map and the map contains key/value pairs otherwise false
 	 */
 	Boolean hasWhenNotFoundCreate(fieldName, fieldsInfo) {
-		return fieldsInfo[fieldName].containsKey(WHEN_NOT_FOUND_CREATE_PROPERTY) && fieldsInfo[fieldName][WHEN_NOT_FOUND_CREATE_PROPERTY].size() > 0
+		return (fieldsInfo[fieldName].containsKey(WHEN_NOT_FOUND_CREATE_PROPERTY)
+			&& fieldsInfo[fieldName][WHEN_NOT_FOUND_CREATE_PROPERTY] != null
+			&& fieldsInfo[fieldName][WHEN_NOT_FOUND_CREATE_PROPERTY]?.size() > 0)
 	}
 
 	/**
@@ -1329,7 +1331,9 @@ class DataImportService implements ServiceMethods {
 	 * @return true if the field contains the 'update' map and the map contains key/value pairs otherwise false
 	 */
 	Boolean hasWhenFoundUpdate(fieldName, fieldsInfo) {
-		return fieldsInfo[fieldName].containsKey(WHEN_FOUND_UPDATE_PROPERTY) && fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY].size() > 0
+		return (fieldsInfo[fieldName].containsKey(WHEN_FOUND_UPDATE_PROPERTY)
+			&& fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY] != null
+			&& fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY].size() > 0)
 	}
 
 	/**

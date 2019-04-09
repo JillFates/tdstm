@@ -615,7 +615,9 @@ class SearchQueryHelper {
 			switch (refDomainName) {
 				case 'Room':
 					// Get the Location field
-					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
+					if (referenceFieldName == 'roomSource'){
+						extraCriteria.put('source',  1)
+					}
 					List parts = searchValue.split('/')
 					if (parts.size() != 2) {
 						result.error = 'Room must be formatted as Location/Name'
