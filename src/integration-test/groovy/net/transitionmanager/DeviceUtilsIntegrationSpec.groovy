@@ -1,15 +1,15 @@
 package net.transitionmanager
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.asset.DeviceUtils
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared

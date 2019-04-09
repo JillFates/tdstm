@@ -8,9 +8,9 @@ import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.CredentialCommand
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.Credential
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 
 /**

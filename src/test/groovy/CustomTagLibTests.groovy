@@ -2,9 +2,9 @@ import asset.pipeline.grails.AssetProcessorService
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserPreference
 import org.grails.web.mapping.DefaultLinkGenerator
 import test.AbstractUnitSpec
 

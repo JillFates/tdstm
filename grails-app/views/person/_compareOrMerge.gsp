@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.person.Person" %>
 <html>
 <body>
 	<div>

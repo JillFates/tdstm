@@ -1,4 +1,4 @@
-<%@ page import="net.transitionmanager.domain.Person" %>
+<%@ page import="net.transitionmanager.person.Person" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <g:form name="personDialogForm" action="updatePerson" autocomplete="off">
 	<div id="generalInfoEditId" class="person">

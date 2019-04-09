@@ -1,7 +1,7 @@
 package com.tdsops.etl
 
 import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.common.CustomDomainService
 
 /**
  * <p>Implements {@code ETLFieldsValidator} construction for Test purposes.</p>

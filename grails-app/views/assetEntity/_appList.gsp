@@ -2,8 +2,8 @@
     This is used by the dependency Console
 --%>
 <%@page defaultCodec="html" %>
-<%@page import="com.tds.asset.AssetComment" %>
-<%@page import="com.tds.asset.Application" %>
+<%@page import="net.transitionmanager.task.AssetComment" %>
+<%@page import="net.transitionmanager.asset.Application" %>
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 <%@page import="net.transitionmanager.security.Permission"%>

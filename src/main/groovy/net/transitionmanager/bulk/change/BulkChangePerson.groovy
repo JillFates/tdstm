@@ -4,10 +4,10 @@ package net.transitionmanager.bulk.change
 import com.tdssrc.grails.NumberUtil
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.ProjectService
 
 @Transactional
 class BulkChangePerson {

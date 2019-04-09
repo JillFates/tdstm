@@ -1,6 +1,6 @@
 <%@page expressionCodec="none" %>
-<%@page import="net.transitionmanager.domain.Manufacturer" %>
-<%@page import="net.transitionmanager.domain.ModelConnector" %>
+<%@page import="net.transitionmanager.manufacturer.Manufacturer" %>
+<%@page import="net.transitionmanager.model.ModelConnector" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>

@@ -1,7 +1,7 @@
 package com.tdsops.common.sql
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.SizeScale
 import net.transitionmanager.search.FieldSearchData
 import spock.lang.Specification

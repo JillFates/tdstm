@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.person.Person" %>
 <%@ page import="net.transitionmanager.security.Permission" %>
 <div draggable id="showTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" role="dialog" style="width: 1000px" tabindex="-1">
 <%@page import="com.tdssrc.grails.HtmlUtil"%>

@@ -1,7 +1,7 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.util.Metadata
-import net.transitionmanager.service.CoreService
+import net.transitionmanager.common.CoreService
 import org.grails.core.exceptions.GrailsConfigurationException
 import org.grails.config.NavigableMap
 import spock.lang.Specification

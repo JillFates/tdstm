@@ -2,7 +2,7 @@ package net.transitionmanager.connector
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.AwsService
+import net.transitionmanager.action.AwsService
 import groovy.transform.CompileStatic
 
 /**

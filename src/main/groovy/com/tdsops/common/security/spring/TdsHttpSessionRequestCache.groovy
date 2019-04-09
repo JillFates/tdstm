@@ -1,7 +1,7 @@
 package com.tdsops.common.security.spring
 
 import com.tdssrc.grails.WebUtil
-import net.transitionmanager.service.CoreService
+import net.transitionmanager.common.CoreService
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.http.HttpHeaders

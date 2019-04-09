@@ -1,6 +1,6 @@
 <%@page import="com.tdssrc.grails.TimeUtil"%>
-<%@page import="net.transitionmanager.domain.Project" %>
-<%@page import="net.transitionmanager.domain.UserPreference" %>
+<%@page import="net.transitionmanager.project.Project" %>
+<%@page import="net.transitionmanager.person.UserPreference" %>
 
 <script>
 	$(document).ready(function(){

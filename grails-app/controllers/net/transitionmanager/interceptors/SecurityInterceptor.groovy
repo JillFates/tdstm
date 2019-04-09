@@ -1,12 +1,12 @@
 package net.transitionmanager.interceptors
 
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserService
 
 class SecurityInterceptor {
 

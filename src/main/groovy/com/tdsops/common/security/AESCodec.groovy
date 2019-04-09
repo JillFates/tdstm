@@ -1,7 +1,7 @@
 package com.tdsops.common.security
 
 import groovy.transform.CompileStatic
-import net.transitionmanager.service.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidConfigurationException
 import org.apache.commons.codec.binary.Hex
 
 import javax.crypto.Cipher

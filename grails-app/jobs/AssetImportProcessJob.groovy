@@ -1,6 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.ImportService
-import net.transitionmanager.service.ProgressService
+import net.transitionmanager.imports.ImportService
+import net.transitionmanager.common.ProgressService
 import org.quartz.JobExecutionContext
 
 class AssetImportProcessJob extends SecureJob {

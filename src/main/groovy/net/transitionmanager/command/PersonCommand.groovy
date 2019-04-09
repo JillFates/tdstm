@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 /**
  * PersonCommand is to be used with the creation and editing of Person domain
  */

@@ -1,8 +1,8 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional

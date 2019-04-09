@@ -1,13 +1,11 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
+
 import com.tdsops.tm.enums.domain.AssetClass
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import com.tds.asset.AssetOptions
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 
 @CompileStatic
 class AssetUtils {
@@ -40,7 +38,7 @@ class AssetUtils {
 	/*
 	 * Default value for AssetEntity.assetType field
 	 */
-	static final ASSET_OPTION_TYPE_DEFAULT = com.tds.asset.AssetType.SERVER.toString()
+	static final ASSET_OPTION_TYPE_DEFAULT = AssetType.SERVER.toString()
 
 	/**
 	 * Create and return a list with the values for all the AssetOptions with the given type.

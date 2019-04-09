@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.project.Project" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>

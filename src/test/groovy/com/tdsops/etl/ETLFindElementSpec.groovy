@@ -1,19 +1,20 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import com.tdssrc.grails.JsonUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
 @TestFor(AssetEntity)
 @TestMixin([DomainClassUnitTestMixin])
-@Mock([AssetOptions])
+@Mock([AssetOptions, AssetDependency])
 class ETLFindElementSpec extends ETLBaseSpec {
 
 	ETLProcessor processor

@@ -1,6 +1,6 @@
-<%@page import="net.transitionmanager.domain.Manufacturer" %>
-<%@page import="net.transitionmanager.domain.ModelConnector" %>
-<%@page import="net.transitionmanager.domain.ModelSync" %>
+<%@page import="net.transitionmanager.manufacturer.Manufacturer" %>
+<%@page import="net.transitionmanager.model.ModelConnector" %>
+<%@page import="net.transitionmanager.model.ModelSync" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>

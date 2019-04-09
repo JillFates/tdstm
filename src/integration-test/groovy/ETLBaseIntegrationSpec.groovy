@@ -6,9 +6,9 @@ import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CustomDomainService
 import spock.lang.Specification
 
 abstract class ETLBaseIntegrationSpec extends Specification{

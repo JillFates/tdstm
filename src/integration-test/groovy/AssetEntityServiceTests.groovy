@@ -1,15 +1,15 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.CloneAssetCommand
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.tag.TagAssetService
 import spock.lang.See
 import spock.lang.Specification
 

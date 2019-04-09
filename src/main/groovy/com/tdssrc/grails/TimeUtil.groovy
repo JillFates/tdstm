@@ -6,14 +6,13 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.util.Assert
 
 import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
-import java.text.ParseException
 import java.text.SimpleDateFormat
 
 /**

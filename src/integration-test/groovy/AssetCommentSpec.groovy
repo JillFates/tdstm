@@ -1,12 +1,12 @@
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,7 +18,7 @@ import test.helper.ApiCatalogTestHelper
 class AssetCommentSpec extends Specification {
 
     @Shared
-	ApiActionTestHelper apiActionHelper
+    ApiActionTestHelper apiActionHelper
     @Shared
     ProjectTestHelper projectHelper
     @Shared
