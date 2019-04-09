@@ -81,7 +81,9 @@
   .k-switch.k-state-focused
     box-shadow: unset
   .k-searchbar
-    .k-input::-webkit-input-placeholder
+    .k-input::-webkit-input-placeholder,
+    .k-input::-moz-placeholder,
+    .k-input:-ms-input-placeholder
       font-size: 14px
       color: $asset-tag-placeholder
 /* Global, but protected by the scope */
