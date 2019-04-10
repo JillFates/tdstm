@@ -1,7 +1,5 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.exceptions.ServiceException
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -10,13 +8,10 @@ import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.Notice.NoticeType
 import net.transitionmanager.domain.NoticeAcknowledgement
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 
-import javax.xml.bind.DatatypeConverter
 
 /**
  * @author octavio
