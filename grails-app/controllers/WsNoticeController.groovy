@@ -104,7 +104,7 @@ class WsNoticeController implements ControllerMethods {
 	 * TODO: (oluna) Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
-	def ack(Long id, String username) {
+	def acknowledge(Long id, String username) {
 		try {
 			boolean result = noticeService.ack(id, username)
 			if (!result) {

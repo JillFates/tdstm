@@ -79,25 +79,6 @@ class NoticeService implements ServiceMethods {
 		Notice.where { id == id }.find()
 	}
 
-//	@Transactional
-//	Map<String, ?> update(Long id, json) {
-//		if (!id) {
-//			return [status: false, errors: ["id not provided"]]
-//		}
-//
-//		Notice notice = get(id)
-//		if (notice) {
-//			return saveUpdate(json, notice)
-//		}
-//
-//		return [status: false, errors: ["Resource not found with id [$id]"]]
-//	}
-
-//	@Transactional
-//	Map<String, ?> create(json) {
-//		saveUpdate(json, new Notice(createdBy: securityService.userLoginPerson))
-//	}
-
 	/**
 	 * Create or update a notice
 	 * @param noticeCommand - the notice command
@@ -116,18 +97,6 @@ class NoticeService implements ServiceMethods {
 		notice.save(failOnError: true)
 		return notice
 	}
-
-//		private static final Map<String, Class> TYPES = [
-//		acknowledgeable: String,
-//		activationDate:  Date,
-//		active:          Boolean,
-//		expirationDate:  Date,
-//		htmlText:        String,
-//		projectId:       Project,
-//		rawText:         String,
-//		title:           String,
-//		typeId:          Notice.NoticeType
-//	]
 
 	/**
 	 * Check for any unacknowledged notices
@@ -165,54 +134,6 @@ class NoticeService implements ServiceMethods {
 
 		return result[0] > 0
 	}
-
-	// HELPER METHODS /////////////////////////////////////////
-//	private Map<String, ?> saveUpdate(json, Notice notice) {
-//		TYPES.each { String propertyName, Class type ->
-//			def val = json[propertyName]
-//
-//			if (val != null) {
-//
-//				// Sanitize the 3rd Party HTML
-//				if (propertyName == 'htmlText') {
-//					List<String> results = StringUtil.checkHTML(val as String)
-//					if (!results.isEmpty()) {
-//						throw new ServiceException("HTML passed is unsafe to render as it contains forbidden code in: [${results.join(',')}]")
-//					}
-//				}
-//
-//				switch (type) {
-//					case Date:
-//						val = DatatypeConverter.parseDateTime(val).time
-//						break
-//
-//					case Notice.NoticeType:
-//						val = Notice.NoticeType.forId(val)
-//						break
-//
-//					case Project:
-//						val = Project.get(val)
-//						break
-//
-//				}
-//
-//				notice[propertyName] = val
-//			}
-//		}
-//
-//		def status = notice.save() // TODO this returns the Notice instance or null, not boolean
-//		Map<String, ?> result = [status: status, data: [:]]
-//
-//		if (status) {
-//			result.data.notice = notice
-//		}
-//		else {
-//			Locale locale = LocaleContextHolder.locale
-//			result.data.errors = notice.errors.allErrors.collect { messageSource.getMessage(it, locale) }
-//		}
-//
-//		return result
-//	}
 
 	/**
 	 * Return a list of person post login notices that has not been acknowledged

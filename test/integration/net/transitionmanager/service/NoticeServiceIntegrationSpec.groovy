@@ -17,8 +17,8 @@ import test.helper.ProjectTestHelper
 class NoticeServiceIntegrationSpec extends IntegrationSpec {
 	NoticeService noticeService
 
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper
+	private ProjectTestHelper projectHelper
 
 	@Shared
 	Project project
@@ -33,6 +33,9 @@ class NoticeServiceIntegrationSpec extends IntegrationSpec {
 	private UserLogin user
 
 	void setup() {
+		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
+
 		project = projectHelper.createProject()
 
 		whom = personHelper.createPerson()
