@@ -893,6 +893,10 @@ class PartyRelationshipService implements ServiceMethods {
 
 		boolean debugEnabled = log.debugEnabled
 
+		// ROLE_STAFF is not a Team Code (not grouped under ROLE_TEAM), so remove it if it exists
+		teamCodes.removeAll {it == RoleType.ROLE_STAFF}
+
+		// Get all Role Types that are grouped under 'ROLE_TEAM' (Team Codes)
 		List<String> allTeamCodes = getTeamCodes()
 		//if there are codes that are not part of TEAMCODES those CANNOT be assigned.
 		List<String> invalidTeamCodes = teamCodes ? teamCodes - allTeamCodes : []

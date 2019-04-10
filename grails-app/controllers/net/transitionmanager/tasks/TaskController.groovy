@@ -101,15 +101,12 @@ class TaskController implements ControllerMethods {
 		// Deal with legacy view parameters.
 		Map requestParams = null
 
-		withFormat {
-			js {
-				requestParams = request.JSON
-			}
-			html {
-				params.taskDependency = params.list('taskDependency[]')
-				params.taskSuccessor = params.list('taskSuccessor[]')
-				requestParams = params
-			}
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+			requestParams = params
 		}
 
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)

@@ -756,7 +756,7 @@ class AccountImportExportService implements ServiceMethods {
 						changeMsg.append("\n\t$prop was '$origVal' now is '${accounts[i][p]}'")
 						chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${accounts[i][p]}</td></tr>\r\n")
 					}
-					log.info changeMsg
+					log.info changeMsg.toString()
 					chgSB.append("</table>\r\n")
 				}
 
