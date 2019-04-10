@@ -22,6 +22,8 @@ import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -30,6 +32,8 @@ class WsDashboardController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
 	TaskService taskService
+	MoveEventService moveEventService
+	CustomDomainService customDomainService
 
 	/**
 	 * Returns the data used to render the Event Dashboard including the work flow steps and the statistics of
@@ -311,6 +315,17 @@ class WsDashboardController implements ControllerMethods {
 			runbookOn: project.runbookOn,
 			eventStartDate: eventStartDate
 		])
+	}
+
+	/**
+	 * Calculates percentage of Filtered Apps on Total Planned apps.
+	 * @param totalAppCount : Total count of Application that is in Planned Bundle
+	 * @param filteredAppCount : This is filtered app based on PlanStatus
+	 * @return : Percentage of Calculated app
+	 */
+	@HasPermission(Permission.AssetView)
+	def countAppPercentage(int totalAppCount, int filteredAppCount) {
+		return totalAppCount ? Math.round((filteredAppCount /  totalAppCount) * 100) : 0
 	}
 
 	// @HasPermission(Permission.DashboardMenuView)
