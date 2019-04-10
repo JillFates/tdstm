@@ -4,6 +4,8 @@ import net.transitionmanager.party.PartyRole
 
 class RoleType {
 
+
+	/* Role Types | Each of this works as a category that groups one or more Role Type Codes */
 	/** Code that represent User Security Group types */
 	public static final String SECURITY = 'ROLE_SECURITY'
 
@@ -18,6 +20,12 @@ class RoleType {
 
 	/** Code that represents Application roles - do not think this is utilized */
 	public static final String APP = 'ROLE_APP'
+
+
+	/* Role Type Codes | Each of this is a role in the system, and is grouped by one Role Type */
+	/** Code that represents STAFF in the system - Is grouped under ROLE_TEAM */
+	public static final String ROLE_STAFF = 'ROLE_STAFF'
+
 
 	String id
 	String description
