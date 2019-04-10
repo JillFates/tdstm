@@ -1748,19 +1748,19 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		if(scope.editor.originalRecipeType && scope.editor.originalRecipeType == 'release' && scope.editor.selectedRecipe.hasWIP){
 			proceedToSave = confirm("There is already a WIP of this recipe. Press Okay to overwrite the existing WIP with this version of the recipe or Cancel to abort.")
 		}
+
 		if(proceedToSave){
 			var tmpObj = angular.copy(scope.editor.selectedRWip);
 			var selectedId = stateParams.recipeId;
 			var selectedVersion = scope.editor.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
-			cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
-				log.info('Success on Saving WIP');
-				alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-				scope.getRecipeData('wip');
-				rootScope.$broadcast("refreshRecipes");
-			}, function(){
-				log.warn('Error on Saving WIP');
-				alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
+			cookbookService.saveWIP({details:selectedId}, dataToSend, function(result){
+				if (result.status !== 'error') {
+					log.info('Success on Saving WIP');
+					alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+					scope.getRecipeData('wip');
+					rootScope.$broadcast("refreshRecipes");
+				}
 			});
 		}
 
