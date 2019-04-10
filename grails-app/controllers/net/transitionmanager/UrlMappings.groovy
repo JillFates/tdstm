@@ -216,11 +216,6 @@ class UrlMappings {
 			action = [GET:"bundleData"]
 		}
 
-		"/ws/user/getPlanningStats" {
-			controller = "wsUser"
-			action = [GET:"getDataForPlanningDashboard"]
-		}
-
 		"/ws/dashboard/getPlanningStats" {
 			controller = "wsDashboard"
 			action = [GET:"getDataForPlanningDashboard"]

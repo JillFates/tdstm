@@ -11,7 +11,6 @@ export class PlanningService {
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
 	private dashboardUrl = this.baseURL + '/ws/dashboard';
-	private userPreferenceUrl = this.baseURL + '/ws/user';
 
 	constructor(private http: HttpClient) {}
 

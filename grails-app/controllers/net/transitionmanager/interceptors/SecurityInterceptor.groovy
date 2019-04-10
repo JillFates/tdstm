@@ -35,6 +35,10 @@ class SecurityInterceptor {
 			// TODO : JPM 12/2016 : Need to review security filter for 'moveEventNews' and 'wsDashboard' that doesn't make any sense
 			if (!webSvcCtrl.contains(controllerName)) {
 				return true
+			} else {
+				if (controllerName == 'wsDashboard' && actionName == "getDataForPlanningDashboard") {
+					return true
+				}
 			}
 
 			if (securityService.loggedIn) {

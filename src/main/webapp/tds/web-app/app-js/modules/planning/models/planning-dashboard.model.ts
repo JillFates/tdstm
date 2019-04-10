@@ -4,51 +4,51 @@ export class PlanningDashboardModel {
 		appsPlanReadyPercentage: number,
 		totals: [
 			{
-				type: 'Applications',
-				img: '/tdstm/assets/icons/svg/application_menu.svg',
-				link: '/tdstm/application/list?filter=application',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Physical Servers',
-				img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
-				link: '/tdstm/assetEntity/list?filter=physicalServer',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Virtual Servers',
-				img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
-				link: '/tdstm/assetEntity/list?filter=virtualServer',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Databases',
-				img: '/tdstm/assets/icons/svg/database_menu.svg',
-				link: '/tdstm/database/list?filter=db',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Physical Storage',
-				img: '/tdstm/assets/icons/svg/storagePhysical_menu.svg',
-				link: '/tdstm/assetEntity/list?filter=storage',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Logical Storage',
-				img: '/tdstm/assets/icons/svg/storageLogical_menu.svg',
-				link: '/tdstm/files/list?filter=storage',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			},
 			{
-				type: 'Other Devices',
-				img: '/tdstm/assets/icons/svg/other_menu.svg',
-				link: '/tdstm/assetEntity/list?filter=other',
+				type: string,
+				img: string,
+				link: string,
 				total: number,
 				toValidate: number
 			}
@@ -73,7 +73,6 @@ export class PlanningDashboardModel {
 		movedAppPerc: number,
 		movedServerPerc: number,
 		unassignedAppCount: number,
-		unassignedAppPerc: number,
 		appDonePerc: number,
 		unassignedPhyServerCount: number,
 		phyServerDonePerc: number,
@@ -87,6 +86,13 @@ export class PlanningDashboardModel {
 		filesDonePerc: number,
 		unassignedOtherCount: number,
 		otherDonePerc: number,
+		unassignedAppPerc: number,
+		unassignedPhyServerPerc: number,
+		unassignedVirtServerPerc: number,
+		unassignedDbPerc: number,
+		unassignedPhyStoragePerc: number,
+		unassignedFilesPerc: number,
+		unassignedOtherPerc: number,
 		moveEventList: any[],
 		openTasks: any[],
 		appList: any[],

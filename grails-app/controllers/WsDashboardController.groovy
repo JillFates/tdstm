@@ -328,7 +328,7 @@ class WsDashboardController implements ControllerMethods {
 		return totalAppCount ? Math.round((filteredAppCount /  totalAppCount) * 100) : 0
 	}
 
-	// @HasPermission(Permission.DashboardMenuView)
+	@HasPermission(Permission.DashboardMenuView)
 	def getDataForPlanningDashboard() {
 		Project project = securityService.userCurrentProject
 
@@ -344,10 +344,6 @@ class WsDashboardController implements ControllerMethods {
 		def appList = []
 		def eventStartDate = [:]
 		def movedPlan = AssetEntityPlanStatus.MOVED
-		def app = AssetType.APPLICATION.toString()
-		def server = AssetType.SERVER.toString()
-		def vm = AssetType.VM.toString()
-		def blade = AssetType.BLADE.toString()
 
 		// Get the list of Move Events and sort on the start date
 		List<MoveEvent> moveEventList = moveBundleList*.moveEvent.unique()
@@ -462,13 +458,10 @@ class WsDashboardController implements ControllerMethods {
 		// Find Move bundles that are not assigned to a Event and is the bundle is used for planning
 		def unassignedMoveBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
 			AND mb.useForPlanning = true AND mb.project = :project ", [project:project])
-		def assetTypeQuery = 'AND ae.assetType IN (:type)'
 
 		// Construct the query that will include counts of non-event bundles if any exist just the bundle being NULL
 		def assetCountQueryArgs = [project:project]
-		def unassignedMBQuery = 'ae.moveBundle IS NULL'
 		if (unassignedMoveBundles) {
-			unassignedMBQuery = "(ae.moveBundle IN (:unassignedMoveBundles) OR $unassignedMBQuery)"
 			assetCountQueryArgs.unassignedMoveBundles = unassignedMoveBundles
 		}
 
@@ -521,8 +514,6 @@ class WsDashboardController implements ControllerMethods {
 					unassignedFilesCount = ua[2]; break
 			}
 		}
-		// Calculate the Assigned Application Count
-		def unassignedAssetCount = unassignedDbCount + unassignedFilesCount + unassignedAppCount + unassignedDeviceCount
 
 		// Get the various DEVICE types broken out
 		def deviceMetricsQuery = """SELECT
@@ -557,7 +548,6 @@ class WsDashboardController implements ControllerMethods {
 			 phyNetworkCount, unAssignedPhyNetworkCount) = deviceMetrics
 
 		// Computed values from previous gathered data points
-		def unassignedServerCount = unassignedPhysicalServerCount + unassignedVirtualServerCount
 		def totalServerCount = totalPhysicalServerCount + totalVirtualServerCount
 		// def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount - phyNetworkCount
 		// TODO : JPM 12/2015 TM-4332 : We're including the Network Devices in the Other count for the time being
@@ -648,7 +638,6 @@ class WsDashboardController implements ControllerMethods {
 
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated", order:"desc"])?.lastUpdated
-		time = TimeUtil.formatDateTime(date, TimeUtil.FORMAT_DATE_TIME_8)
 
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
@@ -686,13 +675,14 @@ class WsDashboardController implements ControllerMethods {
 
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
 		def percentagePlanReady = applicationCount ? percOfCount(planReady, applicationCount) : 0
-		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100
-		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
-		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
-		def percentageStorToValidate=phyStorageCount ? percOfCount(phyStorageToValidate, phyStorageCount) :100
 		int percentageFilesCount = percOfCount(fileToValidate, fileCount)
-		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
+		def percentageUnassignedPhyServerCount = totalPhysicalServerCount ? percOfCount(unassignedPhysicalServerCount, totalPhysicalServerCount) :100
+		def percentageUnassignedVirtServerCount = totalVirtualServerCount ? percOfCount(unassignedVirtualServerCount, totalVirtualServerCount) :100
+		def percentageUnassignedDatabaseCount = databaseCount ? percOfCount(unassignedDbCount, databaseCount) :100
+		def percentageUnassignedPhyStorageCount = phyStorageCount ? percOfCount(unAssignedPhyStorageCount, phyStorageCount) :100
+		def percentageUnassignedFileCount = fileCount ? percOfCount(unassignedFilesCount, fileCount) :100
+		def percentageUnassignedOtherCount = otherAssetCount ? percOfCount(unassignedOtherCount, otherAssetCount) :100
 
 		// Query to obtain the count of Servers in 'Moved' Plan Status
 		def serversCountsQuery = """SELECT
@@ -769,16 +759,22 @@ class WsDashboardController implements ControllerMethods {
 				unassignedAppPerc: percentageUnassignedAppCount,
 				appDonePerc: percAppDoneCount,
 				unassignedPhyServerCount: unassignedPhysicalServerCount,
+				unassignedPhyServerPerc: percentageUnassignedPhyServerCount,
 				phyServerDonePerc: percentagePhysicalServerCount,
 				unassignedVirtServerCount: unassignedVirtualServerCount,
+				unassignedVirtServerPerc: percentageUnassignedVirtServerCount,
 				virtServerDonePerc: percVirtualServerCount,
 				unassignedDbCount: unassignedDbCount,
 				dbDonePercentage: percentageDBCount,
+				unassignedDbPerc: percentageUnassignedDatabaseCount,
 				unassignedPhyStorageCount: unAssignedPhyStorageCount,
 				phyStorageDonePerc: percentagePhyStorageCount,
+				unassignedPhyStoragePerc: percentageUnassignedPhyStorageCount,
 				unassignedFilesCount: unassignedFilesCount,
+				unassignedFilesPerc: percentageUnassignedFileCount,
 				filesDonePerc: percentageFilesCount,
 				unassignedOtherCount: unassignedOtherCount,
+				unassignedOtherPerc: percentageUnassignedOtherCount,
 				otherDonePerc: percentageOtherCount,
 				appList: appList,
 				phyServerList: phyServerList,

@@ -171,7 +171,7 @@
 
                                     <th *ngFor="let event of planningDashboardModel.execution.moveEventList" class="dashboard-stat-exec-tdmc" style="text-align: right !important; padding-right: 0px !important;"> <!-- For each in move event list-->
                                         <div class="dashboard-stat-exec-tdmc-title">
-                                            <a>
+                                            <a href="/tdstm/dashboard/index?moveEvent={{event.id}}">
                                                 {{event.name.length > 18 ? event.name.substring(0,15) + '...' : event.name}}
                                             </a>
                                         </div>
@@ -215,7 +215,7 @@
                                 <td>
                                     <a>Physical Server</a>
                                 </td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedPhyServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.phyServerList" style="text-align: right;">
                                     <span *ngIf="server.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="server.count!=0">
@@ -229,7 +229,7 @@
                                 <td>
                                     <a>Virtual Server</a>
                                 </td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedVirtServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.virtServerList" style="text-align: right;">
                                     <span *ngIf="server.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="server.count!=0">
@@ -241,7 +241,7 @@
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/database_menu.svg"/></td>
                                 <td><a>Databases</a></td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedDbCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedDbCount}} ({{planningDashboardModel.execution.unassignedDbPerc}}%)</a></td>
                                 <td *ngFor="let db of planningDashboardModel.execution.dbList" style="text-align: right;">
                                     <span *ngIf="db.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="db.count!=0">
@@ -254,7 +254,7 @@
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/storagePhysical_menu.svg"/></td>
                                 <td nowrap="nowrap"><a>Physical Storage</a>
                                 </td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyStorageCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedPhyStorageCount}} ({{planningDashboardModel.execution.unassignedPhyStoragePerc}}%)</a></td>
                                 <td *ngFor="let storage of planningDashboardModel.execution.phyStorageList" style="text-align: right;">
                                     <span *ngIf="storage.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="storage.count!=0">
@@ -267,7 +267,7 @@
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/storageLogical_menu.svg"/></td>
                                 <td><a>Logical Storage</a>
                                 </td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedFilesCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedFilesCount}} ({{planningDashboardModel.execution.unassignedFilesPerc}}%)</a></td>
                                 <td *ngFor="let file of planningDashboardModel.execution.filesList" style="text-align: right;">
                                     <span *ngIf="file.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="file.count!=0">
@@ -280,7 +280,7 @@
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/other_menu.svg"/></td>
                                 <td><a>Other</a>
                                 </td>
-                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td style="text-align: right;"><a>{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
                                 <td *ngFor="let other of planningDashboardModel.execution.otherList" style="text-align: right;">
                                     <span *ngIf="other.count==0" class='colorGrey'>0</span>
                                     <a *ngIf="other.count!=0">

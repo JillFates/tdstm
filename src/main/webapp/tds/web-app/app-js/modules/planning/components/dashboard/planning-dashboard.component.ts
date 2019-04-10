@@ -88,7 +88,6 @@ export class PlanningDashboardComponent {
 				movedAppPerc: 0,
 				movedServerPerc: 0,
 				unassignedAppCount: 0,
-				unassignedAppPerc: 0,
 				appDonePerc: 0,
 				unassignedPhyServerCount: 0,
 				phyServerDonePerc: 0,
@@ -102,6 +101,13 @@ export class PlanningDashboardComponent {
 				filesDonePerc: 0,
 				unassignedOtherCount: 0,
 				otherDonePerc: 0,
+				unassignedAppPerc: 0,
+				unassignedPhyServerPerc: 0,
+				unassignedVirtServerPerc: 0,
+				unassignedDbPerc: 0,
+				unassignedPhyStoragePerc: 0,
+				unassignedFilesPerc: 0,
+				unassignedOtherPerc: 0,
 				moveEventList: [],
 				openTasks: [],
 				appList: [],
@@ -110,7 +116,7 @@ export class PlanningDashboardComponent {
 				dbList: [],
 				phyStorageList: [],
 				filesList: [],
-				otherTypeList: [],
+				otherList: [],
 				eventStartDate: {}
 			}
 		};
@@ -118,10 +124,22 @@ export class PlanningDashboardComponent {
 		this.planningService.fetchModelForPlanningDashboard().subscribe(
 			(result) => {
 				if (result) {
-					this.planningDashboardModel.discovery.appsValidatedPercentage = result.discovery.appsValidatedPercentage;
-					this.planningDashboardModel.discovery.appsPlanReadyPercentage = result.discovery.appsPlanReadyPercentage;
-					this.planningDashboardModel.discovery.activeTasks = result.discovery.activeTasks;
-					this.planningDashboardModel.discovery.overdueTasks = result.discovery.overdueTasks;
+					let model = this.planningDashboardModel;
+					Object.keys(result.discovery).forEach(function(key) {
+						if (key in model.discovery) {
+							model.discovery[key] = result.discovery[key];
+						}
+					});
+					Object.keys(result.analysis).forEach(function(key) {
+						if (key in model.analysis) {
+							model.analysis[key] = result.analysis[key];
+						}
+					});
+					Object.keys(result.execution).forEach(function(key) {
+						if (key in model.execution) {
+							model.execution[key] = result.execution[key];
+						}
+					});
 					this.planningDashboardModel.discovery.totals[0].total = result.discovery.appCount;
 					this.planningDashboardModel.discovery.totals[0].toValidate = result.discovery.appToValidate;
 					this.planningDashboardModel.discovery.totals[1].total = result.discovery.phyServerCount;
@@ -136,47 +154,11 @@ export class PlanningDashboardComponent {
 					this.planningDashboardModel.discovery.totals[5].toValidate = result.discovery.fileToValidate;
 					this.planningDashboardModel.discovery.totals[6].total = result.discovery.otherCount;
 					this.planningDashboardModel.discovery.totals[6].toValidate = result.discovery.otherToValidate;
-					this.planningDashboardModel.analysis.assignedAppPerc = result.analysis.assignedAppPerc;
-					this.planningDashboardModel.analysis.confirmedAppPerc = result.analysis.confirmedAppPerc;
-					this.planningDashboardModel.analysis.validated = result.analysis.validated;
-					this.planningDashboardModel.analysis.planReady = result.analysis.planReady;
-					this.planningDashboardModel.analysis.pendingAppDependenciesCount = result.analysis.pendingAppDependenciesCount;
-					this.planningDashboardModel.analysis.pendingServerDependenciesCount = result.analysis.pendingServerDependenciesCount;
-					this.planningDashboardModel.analysis.appDependenciesCount = result.analysis.appDependenciesCount;
-					this.planningDashboardModel.analysis.serverDependenciesCount = result.analysis.serverDependenciesCount;
-					this.planningDashboardModel.analysis.activeTasks = result.analysis.activeTasks;
-					this.planningDashboardModel.analysis.overdueTasks = result.analysis.overdueTasks;
+					this.planningDashboardModel.analysis.groupPlanMethodologyCount = [];
 					let groups = Object.keys(result.analysis.groupPlanMethodologyCount);
 					for (let prop of groups) {
 						this.planningDashboardModel.analysis.groupPlanMethodologyCount.push({type: prop, value: result.analysis.groupPlanMethodologyCount[prop]});
 					}
-					this.planningDashboardModel.execution.movedAppPerc = result.execution.movedAppPerc;
-					this.planningDashboardModel.execution.movedServerPerc = result.execution.movedServerPerc;
-					this.planningDashboardModel.execution.moveEventList = result.execution.moveEventList;
-					this.planningDashboardModel.execution.openTasks = result.execution.openTasks;
-					this.planningDashboardModel.execution.unassignedAppCount = result.execution.unassignedAppCount;
-					this.planningDashboardModel.execution.unassignedAppPerc = result.execution.unassignedAppPerc;
-					this.planningDashboardModel.execution.appDonePerc = result.execution.appDonePerc;
-					this.planningDashboardModel.execution.appList = result.execution.appList;
-					this.planningDashboardModel.execution.unassignedPhyServerCount = result.execution.unassignedPhyServerCount;
-					this.planningDashboardModel.execution.phyServerDonePerc = result.execution.phyServerDonePerc;
-					this.planningDashboardModel.execution.phyServerList = result.execution.phyServerList;
-					this.planningDashboardModel.execution.unassignedVirtServerCount = result.execution.unassignedVirtServerCount;
-					this.planningDashboardModel.execution.virtServerDonePerc = result.execution.virtServerDonePerc;
-					this.planningDashboardModel.execution.virtServerList = result.execution.virtServerList;
-					this.planningDashboardModel.execution.unassignedDbCount = result.execution.unassignedDbCount;
-					this.planningDashboardModel.execution.dbDonePercentage = result.execution.dbDonePercentage;
-					this.planningDashboardModel.execution.dbList = result.execution.dbList;
-					this.planningDashboardModel.execution.unassignedPhyStorageCount = result.execution.unassignedPhyStorageCount;
-					this.planningDashboardModel.execution.phyStorageDonePerc = result.execution.phyStorageDonePerc;
-					this.planningDashboardModel.execution.phyStorageList = result.execution.phyStorageList;
-					this.planningDashboardModel.execution.unassignedFilesCount = result.execution.unassignedFilesCount;
-					this.planningDashboardModel.execution.filesDonePerc = result.execution.filesDonePerc;
-					this.planningDashboardModel.execution.filesList = result.execution.filesList;
-					this.planningDashboardModel.execution.unassignedOtherCount = result.execution.unassignedOtherCount;
-					this.planningDashboardModel.execution.otherDonePerc = result.execution.otherDonePerc;
-					this.planningDashboardModel.execution.otherList = result.execution.otherList;
-					this.planningDashboardModel.execution.eventStartDate = result.execution.eventStartDate;
 				}
 			});
 	}
