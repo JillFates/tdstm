@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.asset.AssetType; com.tds.asset.AssetType;"%>
+<%@page import="net.transitionmanager.asset.AssetType; net.transitionmanager.asset.AssetType;"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <tds:hasPermission permission="${Permission.AssetEdit}">
