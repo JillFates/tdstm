@@ -3,6 +3,7 @@ package net.transitionmanager.reporting
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
@@ -26,6 +27,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
