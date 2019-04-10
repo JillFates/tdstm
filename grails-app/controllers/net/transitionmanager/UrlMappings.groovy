@@ -1247,6 +1247,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/applicationConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getApplicationConflicts"
+			]
+		}
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
