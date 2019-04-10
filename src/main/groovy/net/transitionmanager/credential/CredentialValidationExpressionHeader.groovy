@@ -1,6 +1,6 @@
 package net.transitionmanager.credential
 
-import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.exception.InvalidSyntaxException
 
 class CredentialValidationExpressionHeader implements CredentialValidationExpressionTraits {
 

@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.PartyType" %>
+<%@page import="net.transitionmanager.party.PartyType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>

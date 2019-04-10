@@ -1,21 +1,20 @@
 package com.tdsops.validators
 
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetOptions.AssetOptionsType
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.AssetOptionsService
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.common.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
 
 import java.text.NumberFormat
-import java.text.ParseException
 
 @Slf4j
 class CustomValidators {

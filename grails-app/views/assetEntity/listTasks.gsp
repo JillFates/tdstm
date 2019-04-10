@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetComment"%>
+<%@page import="net.transitionmanager.task.AssetComment"%>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.StringUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>

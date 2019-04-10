@@ -1,6 +1,6 @@
 package com.tdssrc.grails
 
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Unroll

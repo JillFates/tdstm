@@ -1,4 +1,4 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.validators.CustomValidators
 import spock.lang.Specification
 import com.tdsops.validators.CustomValidators.ErrorHolder

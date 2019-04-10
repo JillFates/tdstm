@@ -1,7 +1,7 @@
 package net.transitionmanager.interceptors
 
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.SecurityService
 
 class ForcePasswordChangeInterceptor {
 

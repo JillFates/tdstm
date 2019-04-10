@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import groovy.transform.CompileStatic
-
 /**
  * ETL find command implementation.
  * <code>
@@ -227,7 +224,7 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @param conditions a List of {@code FindCondition} used to calculate HQL sentences
 	 * @return a list of results based on findCache results
 	 *          or after querying database using a DomainClassQueryHelper
-	 * @see DomainClassQueryHelper#where(com.tdsops.etl.ETLDomain, net.transitionmanager.domain.Project, java.util.List, java.lang.Boolean)
+	 * @see DomainClassQueryHelper#where(com.tdsops.etl.ETLDomain, net.transitionmanager.project.Project, java.util.List, java.lang.Boolean)
 	 */
 	private List lookupResultsInCache(String domain, List<FindCondition> conditions) {
 

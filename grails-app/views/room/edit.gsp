@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <html>
 <head>
 </head>

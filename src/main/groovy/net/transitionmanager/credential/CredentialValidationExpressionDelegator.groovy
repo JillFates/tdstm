@@ -1,6 +1,6 @@
 package net.transitionmanager.credential
 
-import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.exception.InvalidSyntaxException
 
 /**
  * This class is used to limit the methods that are available in the DSL

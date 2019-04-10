@@ -1,9 +1,9 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 

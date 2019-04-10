@@ -4,12 +4,12 @@
  @param dependencyType - list of the various dependency type values
  @param dependencyStatus - list of the various dependency status values
 --%>
-<%@page import="com.tdsops.tm.enums.domain.AssetClass"%>
+<%@page import="net.transitionmanager.asset.AssetDependency; com.tdsops.tm.enums.domain.AssetClass"%>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 		<tr>
 			<%-- Frequency SELECT --%>
-			<td><g:select name="dataFlowFreq_FIELD_SUFFIX" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetDependency).dataFlowFreq.inList}"></g:select></td>
+			<td><g:select name="dataFlowFreq_FIELD_SUFFIX" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.asset.AssetDependency).dataFlowFreq.inList}"></g:select></td>
 
 			<%-- Asset Class Options SELECT --%>
 			<td class="class-wrap-depend">

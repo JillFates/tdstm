@@ -1,14 +1,14 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 

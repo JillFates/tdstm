@@ -1,14 +1,18 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
 import grails.testing.gorm.DataTest
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Provider
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
+import net.transitionmanager.project.Project
 import spock.lang.Specification
 import spock.lang.Title
 import test.helper.ApiCatalogTestHelper
@@ -17,12 +21,12 @@ import test.helper.mock.ProjectMock
 @Title('Tests for the ApiAction domain class')
 class ApiActionSpec extends Specification implements DataTest{
 
-	private Project project
-	private Provider provider
-	private ApiCatalog apiCatalog
-	private ApiAction action
+	private Project      project
+	private Provider     provider
+	private ApiCatalog   apiCatalog
+	private ApiAction    action
 	private AssetComment task
-	private AssetEntity asset
+	private AssetEntity  asset
 
 	void setupSpec(){
 		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetEntity, AssetComment

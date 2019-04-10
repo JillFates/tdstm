@@ -2,8 +2,8 @@ package com.tdssrc.grails
 
 import com.tdsops.tm.enums.FilenameFormat
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
 import org.apache.commons.io.FilenameUtils
 
 /**

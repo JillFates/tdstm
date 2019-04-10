@@ -1,7 +1,7 @@
 package net.transitionmanager.command
 
 
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.security.RoleType
 
 
 class RoleTypeCommand implements CommandObject {

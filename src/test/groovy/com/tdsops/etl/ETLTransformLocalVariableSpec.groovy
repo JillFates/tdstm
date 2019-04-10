@@ -3,9 +3,9 @@ package com.tdsops.etl
 
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.project.Project
 import spock.lang.Specification
 
 class ETLTransformLocalVariableSpec extends Specification implements FieldSpecValidateableTrait, ETLFileSystemTrait, ETLAssertTrait, DataTest, AutowiredTest {
@@ -21,9 +21,9 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 		}
 	}
 
-	FileSystemService fileSystemService
-	Project GMDEMO
-	DebugConsole debugConsole
+	FileSystemService  fileSystemService
+	Project            GMDEMO
+	DebugConsole       debugConsole
 	ETLFieldsValidator validator
 
 	void setupSpec() {

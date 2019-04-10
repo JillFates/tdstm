@@ -1,6 +1,6 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
 import com.tdsops.tm.domain.AssetEntityHelper
 import grails.testing.gorm.DataTest
 import spock.lang.Shared

@@ -1,5 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 import org.quartz.JobExecutionContext
 
 class PasswordResetCleanupJob {

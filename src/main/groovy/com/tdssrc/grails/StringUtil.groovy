@@ -3,7 +3,7 @@ package com.tdssrc.grails
 import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
 import groovy.transform.CompileStatic
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils

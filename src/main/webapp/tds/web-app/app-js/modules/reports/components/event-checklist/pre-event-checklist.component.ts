@@ -7,7 +7,6 @@ import {
 import {AlertType} from '../../../../shared/model/alert.model';
 
 import {
-	DomSanitizer,
 	SafeHtml
 } from '@angular/platform-browser';
 
@@ -75,7 +74,6 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 	private isReportFailing: boolean;
 
 	constructor(
-		private sanitizer: DomSanitizer,
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
@@ -124,15 +122,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 					errorMessage = '';
 				}
 
-				this.html = (errorMessage) ? this.getSafeHtml('') : this.getSafeHtml(content);
+				this.html = (errorMessage) ? this.reportsService.getSafeHtml('') : this.reportsService.getSafeHtml(content);
 			});
-	}
-
-	/**
-	 * Based on the text passed it generates the corresponding safe html string
-	 * @param {string} content: html to be proccessed
-	 */
-	getSafeHtml(content: string): SafeHtml {
-		return this.sanitizer.bypassSecurityTrustHtml(content);
 	}
 }

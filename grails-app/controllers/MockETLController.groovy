@@ -4,12 +4,9 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataScriptMode
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.ScriptProcessorService
 
 @Slf4j(value = 'log', category = 'grails.app.controllers.MockETLController')
 @Secured('isAuthenticated()')

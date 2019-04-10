@@ -1,5 +1,5 @@
 <%@page expressionCodec="none" %>
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <body>

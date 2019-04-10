@@ -2,10 +2,12 @@ package net.transitionmanager.service
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Provider
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProviderService
+import net.transitionmanager.security.SecurityService
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
@@ -23,27 +25,27 @@ import test.helper.ProviderTestHelper
 class ProviderServiceIntegrationSpec extends Specification {
 
 	@Autowired
-	ProviderService service
+	ProviderService      service
 	@Shared
-	ProjectTestHelper projectTestHelper
+	ProjectTestHelper    projectTestHelper
 	@Shared
-	ProviderTestHelper providerHelper
+	ProviderTestHelper   providerHelper
 	@Shared
-	ApiActionTestHelper apiActionHelper
+	ApiActionTestHelper  apiActionHelper
 	@Shared
 	ApiCatalogTestHelper apiCatalogHelper
 	@Shared
 	DataScriptTestHelper etlScriptHelper
 	@Shared
-	PersonTestHelper personTestHelper
+	PersonTestHelper     personTestHelper
 	@Shared
-	Project project
+	Project              project
 	@Shared
-	Provider provider
+	Provider             provider
 	@Shared
-	ApiCatalog apiCatalog
+	ApiCatalog           apiCatalog
 	@Shared
-	Person whom
+	Person               whom
 
 	def setup() {
 

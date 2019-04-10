@@ -1,10 +1,10 @@
 package net.transitionmanager.strategy.asset
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.AssetCommand
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 
 class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 
