@@ -946,4 +946,18 @@ class MoveBundleService implements ServiceMethods {
 
 		return moveBundle
 	}
+
+    /**
+     * Returns the list of Move Bundles (id, name, description) by project.
+     * @param project Project to filer the list by.
+     * @return List of Move Bundles.
+     */
+    def moveBundlesByProject(Project project) {
+        List<MoveBundle> moveBundles = MoveBundle.findAllByProject(project)
+        moveBundles.collect { MoveBundle entry -> [
+                id: entry.id,
+                name: entry.name,
+                description: entry.description,
+        ]}
+    }
 }

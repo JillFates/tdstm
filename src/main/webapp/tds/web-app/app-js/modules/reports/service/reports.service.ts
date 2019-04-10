@@ -16,7 +16,9 @@ export class ReportsService {
 	// private instance variable to hold base url
 	private readonly baseURL = '/tdstm/ws';
 	private readonly EVENT_LIST_URL = `${this.baseURL}/event`;
+	private readonly MOVE_BUNDLES_LIST_URL = `${this.baseURL}/reports/moveBundles`;
 	private readonly TASKS_REPORT_URL = `${this.baseURL}/reports/tasksReport`;
+	private readonly SERVER_CONFLICTS_REPORT_URL = `${this.baseURL}/reports/generateServerConflicts`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -45,7 +47,7 @@ export class ReportsService {
 	 * @returns {Observable<any>}
 	 */
 	getMoveBundles(): Observable<any[]> {
-		return this.http.get(`${this.baseURL}/ws/reports/moveBundles`)
+		return this.http.get(this.MOVE_BUNDLES_LIST_URL)
 			.map((response: any) => {
 				return response && response.data || [];
 			})
@@ -148,7 +150,7 @@ export class ReportsService {
 			vmWithNoSupport: noVmHost,
 			report_max_assets: maxAssetsToReport
 		}
-		return this.http.post(`${this.baseURL}/ws/reports/generateServerConflicts`, request, {responseType: 'text'}).pipe(
+		return this.http.post(this.SERVER_CONFLICTS_REPORT_URL, request, {responseType: 'text'}).pipe(
 			catchError(error => {
 				console.error(error);
 				return error

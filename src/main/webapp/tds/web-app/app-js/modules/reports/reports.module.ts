@@ -45,7 +45,7 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 	],
 	declarations: [
 		PreEventCheckListSelectorComponent,
-		TaskReportComponent
+		TaskReportComponent,
 		ServerConflictsReportComponent
 	],
 	providers: [
