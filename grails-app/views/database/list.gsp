@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
+<%@page import="net.transitionmanager.asset.AssetEntity;net.transitionmanager.asset.Application;net.transitionmanager.asset.Files;"%>
 <%@page import="net.transitionmanager.asset.Database"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <g:set var="assetClass" value="${(new Database()).assetClass}" />

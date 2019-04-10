@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.task.AssetComment; net.transitionmanager.task.AssetComment; net.transitionmanager.asset.AssetComment; net.transitionmanager.project.Project" %>
+<%@page import="net.transitionmanager.task.AssetComment; net.transitionmanager.project.Project" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

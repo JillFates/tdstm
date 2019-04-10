@@ -1,5 +1,5 @@
 <%@page defaultCodec="none" %>
-<%@page import="net.transitionmanager.task.AssetComment; net.transitionmanager.task.AssetComment; net.transitionmanager.asset.AssetComment; org.apache.commons.lang.StringEscapeUtils" %>
+<%@page import="net.transitionmanager.task.AssetComment; org.apache.commons.lang.StringEscapeUtils" %>
 <%@page import="grails.converters.JSON" %>
 <script>
     tds.core.service.commonDataService.loadCategories([{'id':'', 'name':'please select'}<g:collect in="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}" expr="it">,{'id':'${it}','name':'${StringEscapeUtils.escapeJavaScript(it)}'}</g:collect>]);
