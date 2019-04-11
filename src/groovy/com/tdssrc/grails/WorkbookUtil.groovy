@@ -255,7 +255,10 @@ class WorkbookUtil {
 				break
 
 			default :
-				def stringValue = value.toString()
+				String stringValue = value.toString()
+				if (stringValue?.matches("(=|-|\\+|@).*")) {
+					cell.getCellStyle().setQuotePrefixed(true)
+				}
 				// Prevent the cell from exceeding the maximum allowed length for XLS.
 				cell.setCellValue(trucanteXlsCell(stringValue))
 		}
