@@ -16,7 +16,9 @@ export class ReportsService {
 	// private instance variable to hold base url
 	private readonly baseURL = '/tdstm/ws';
 	private readonly EVENT_LIST_URL = `${this.baseURL}/event`;
+	private readonly MOVE_BUNDLES_LIST_URL = `${this.baseURL}/reports/moveBundles`;
 	private readonly TASKS_REPORT_URL = `${this.baseURL}/reports/tasksReport`;
+	private readonly SERVER_CONFLICTS_REPORT_URL = `${this.baseURL}/reports/generateServerConflicts`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -36,6 +38,18 @@ export class ReportsService {
 			.map((response: any) => {
 				return response && response.data || [];
 
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get move bundle list
+	 * @returns {Observable<any>}
+	 */
+	getMoveBundles(): Observable<any[]> {
+		return this.http.get(this.MOVE_BUNDLES_LIST_URL)
+			.map((response: any) => {
+				return response && response.data || [];
 			})
 			.catch((error: any) => error);
 	}
@@ -110,5 +124,37 @@ export class ReportsService {
 				return response && response.status === 'success' && response.data;
 			})
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * POST - Generate Server Conflicts report.
+	 * @param moveBundleId: number
+	 * @param bundleConflict: boolean
+	 * @param unresolvedDependencies: boolean
+	 * @param noSupportDependencies: boolean
+	 * @param noVmHost: boolean
+	 * @param maxAssetsToReport: number
+	 */
+	generateServerConflictsReport(
+		moveBundleId: number,
+		bundleConflict = false,
+		unresolvedDependencies = false,
+		noSupportDependencies = false,
+		noVmHost = false,
+		maxAssetsToReport = 100): Observable<any> {
+		const request = {
+			moveBundle: moveBundleId,
+			bundleConflicts: bundleConflict,
+			unresolvedDep: unresolvedDependencies,
+			noRuns: noSupportDependencies,
+			vmWithNoSupport: noVmHost,
+			report_max_assets: maxAssetsToReport
+		}
+		return this.http.post(this.SERVER_CONFLICTS_REPORT_URL, request, {responseType: 'text'}).pipe(
+			catchError(error => {
+				console.error(error);
+				return error
+			})
+		);
 	}
 }

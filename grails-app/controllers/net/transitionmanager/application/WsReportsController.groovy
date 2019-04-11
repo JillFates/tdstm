@@ -1,7 +1,10 @@
 package net.transitionmanager.application
 
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
@@ -14,6 +17,7 @@ class WsReportsController implements ControllerMethods {
 
     ReportsService reportsService
     UserPreferenceService userPreferenceService
+    MoveBundleService moveBundleService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -63,6 +67,63 @@ class WsReportsController implements ControllerMethods {
             }
         } else{
             throw new InvalidParamException("Please select a Move Event to get the Task Report.")
+        }
+    }
+
+    /**
+     * Get and returns the list of curent Project move bundles to be rendered in a select input.
+     * @return List of Move Bundles {id, name, description}
+     */
+    def moveBundles() {
+        Project project = getProjectForWs()
+        renderSuccessJson(moveBundleService.moveBundlesByProject(project))
+    }
+
+    /**
+     * Generates the Server Conflicts web output report.
+     *
+     * @param moveBundle The id of the move bundle selected or 'useForPlanning' value.
+     * @param bundleConflicts Flag to enable/disable bundleConflicts on the report
+     * @param unresolvedDep Flag to enable/disable unresolvedDependencies on the report
+     * @param noRuns Flag to enable/disable noRunsOn on the report
+     * @param vmWithNoSupport Flag to enable/disable vmWithNoSupport on the report
+     * @param report_max_assets number to limit the number of assets on the report
+     * @return The html Server Conflicts report.
+     */
+    def generateServerConflicts() {
+        Project project = getProjectForWs()
+        def moveBundleId = (request.JSON.moveBundle).toString()
+        int assetCap = request.JSON.report_max_assets ? request.JSON.report_max_assets : 100 // default value
+        def view = request.JSON.rows ? "_serverConflicts" : "/reports/generateServerConflicts"
+
+        if( request.JSON.moveBundle == 'useForPlanning' ){
+            render (view : view ,
+                    model : reportsService.genServerConflicts(project,
+                            moveBundleId,
+                            request.JSON.bundleConflicts,
+                            request.JSON.unresolvedDep,
+                            request.JSON.noRuns,
+                            request.JSON.vmWithNoSupport,
+                            true,
+                            params,
+                            assetCap))
+        }
+
+        def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
+        if ( !isProjMoveBundle ) {
+            log.warn "generateCheckList: User tried to access moveBundle $moveBundleId that was not found in project : $project"
+            throw new InvalidParamException("generateCheckList: User tried to access moveBundle $moveBundleId that was not found in project : $project")
+        } else {
+            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, moveBundleId)
+            render(view: view , model: reportsService.genServerConflicts(project,
+                    moveBundleId,
+                    request.JSON.bundleConflicts,
+                    request.JSON.unresolvedDep,
+                    request.JSON.noRuns,
+                    request.JSON.vmWithNoSupport,
+                    false,
+                    params,
+                    assetCap))
         }
     }
 }

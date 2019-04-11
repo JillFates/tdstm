@@ -8,6 +8,7 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
+import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 
 /**
@@ -23,6 +24,9 @@ export class ReportStates {
 	};
 	public static readonly TASK_REPORT = {
 		url: 'taskReport'
+	};
+	public static readonly SERVER_CONFLICTS_REPORT = {
+		url: 'serverConflicts'
 	};
 }
 
@@ -59,6 +63,25 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: TaskReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.SERVER_CONFLICTS_REPORT.url,
+		data: {
+			page: {
+				title: 'REPORTS.SERVER_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.SERVER_CONFLICTS'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-server-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ServerConflictsReportComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

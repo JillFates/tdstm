@@ -643,6 +643,8 @@ class ReportsController implements ControllerMethods {
 
 	/**
 	 * Used to generate server Conflicts.
+     * @deprecated Moved this report to angular
+     * @see WsReportsController#generateServerConflicts()
 	 */
 	def generateServerConflicts() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')
