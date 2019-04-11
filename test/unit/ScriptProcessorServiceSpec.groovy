@@ -25,6 +25,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SettingService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -734,7 +735,8 @@ application id,vendor name,technology,location
 		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 			XSSFRow currentRow = sheet.createRow(rowNumber)
 			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
+				Cell cell = currentRow.createCell(columnNumber)
+				WorkbookUtil.setCellValue(cell, cellContent)
 			}
 		}
 
