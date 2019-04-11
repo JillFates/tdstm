@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -29,10 +29,8 @@ export class NoticeViewEditComponent {
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-	protected typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Prelogin'},
-		{typeId: 2, name: 'Postlogin'}
-	];
+
+	typeDataSource = [...NoticeTypes];
 
 	constructor(
 		model: NoticeModel,
@@ -44,7 +42,8 @@ export class NoticeViewEditComponent {
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
-		this.model.typeId = parseInt(this.model.typeId, 10);
+		// this.model.typeId = parseInt(this.model.typeId, 10);
+		this.model.typeId = this.model.typeId;
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
@@ -66,7 +65,7 @@ export class NoticeViewEditComponent {
 	}
 
 	protected deleteNotice(): void {
-		this.noticeService.deleteNotice(this.model)
+		this.noticeService.deleteNotice(this.model.id.toString())
 			.subscribe(
 				res => this.activeDialog.close(),
 				error => this.activeDialog.dismiss(error));
@@ -105,6 +104,8 @@ export class NoticeViewEditComponent {
 	}
 
 	protected formValid(): boolean {
+		console.log('TypeId:', !!this.model.typeId);
+		console.log('Html', this.htmlText.valid());
 		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
 	}
 
@@ -124,5 +125,18 @@ export class NoticeViewEditComponent {
 	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
+	}
+	/**
+	 * Grab the current html value emitted by rich text editor
+	 */
+	onValueChange(value: string) {
+		this.model.htmlText = value;
+	}
+
+	/**
+	 * Grab the current raw value emitted by rich text editor
+	 */
+	onRawValueChange(value: string) {
+		this.model.rawText = value;
 	}
 }

@@ -10,8 +10,9 @@ import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
-import {NoticeColumnModel, NoticeModel, NoticeTypes} from '../../model/notice.model';
+import {NoticeColumnModel, NoticeModel, NoticeTypes, NOTICE_TYPE_PRE_LOGIN} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
+import {YesNoList} from '../../../../shared/model/constants';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
@@ -41,6 +42,11 @@ export class NoticeListComponent {
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected noticeTypes = NoticeTypes;
+	protected yesNoList = [...YesNoList];
+	protected defaultNoticeType = {typeId: '', name: 'Please Select'};
+	protected defaultYesNoList = {value: null, name: 'Please Select'};
+
+	protected PRE_LOGIN = NOTICE_TYPE_PRE_LOGIN;
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];
@@ -178,6 +184,14 @@ export class NoticeListComponent {
 
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeCreate);
+	}
+
+	/*
+	*  Reset the column value and the corresponding filter
+	*/
+	resetTypeFilter(column: any): void {
+		this.clearValue(column);
+		column.filter = null;
 	}
 
 }

@@ -33,7 +33,7 @@ export class NoticeService {
 				let result = res.json();
 				result.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
-					notice.active = notice.active ? 'Yes' : 'No';
+					notice.active = notice.active;
 				});
 				return result && result.notices;
 			})
@@ -52,8 +52,8 @@ export class NoticeService {
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
-	deleteNotice(noticeId: NoticeModel): Observable<NoticeModel[]> {
-		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
+	deleteNotice(id: string): Observable<NoticeModel[]> {
+		return this.http.delete(`${this.noticeListUrl}/${id}`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
@@ -69,11 +69,10 @@ export class NoticeService {
 
 		let [filter] = Flatten(root).filter(item => item.field === column.property);
 
-		if (!column.filter) {
-			column.filter = '';
-		}
-
 		if (column.type === 'text') {
+			if (!column.filter) {
+				column.filter = '';
+			}
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
@@ -86,6 +85,23 @@ export class NoticeService {
 					return r['field'] === column.property;
 				});
 				filter.value = column.filter;
+			}
+		}
+
+		if (column.type === 'boolean') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: column.filter
+				});
+			} else {
+				if (column.filter !== null) {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = column.filter
+				}
 			}
 		}
 
