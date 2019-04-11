@@ -48,11 +48,16 @@
       .k-switch-background
         background: unset
     .k-switch-container
-      border-radius: 14px
+      border: 0
+      background-color: unset
+      border-radius: unset
+      outline: 0
+      box-shadow: none
       border-color: rgba(0, 0, 0, 0.17)
       height: 22px
       padding-top: 3px
       .k-switch-handle
+        left: unset
         margin: 0 2px 0 2px
         border-radius: 50%
         background-color: $color-material--blue1 !important
@@ -64,9 +69,22 @@
           font-size: 11px
           line-height: 1.7em
         .k-switch-label-on
-          margin-left: 4px
+          width: unset
+          top: 0
+          left: unset
+          position: unset
+          margin-left: -20px
         .k-switch-label-off
-          left: 1.6em
+          width: unset
+          left: unset
+          top: 0
+          right: unset
+          display: block
+          position: absolute
+          transform: unset
+          text-shadow: none
+          vertical-align: middle
+          right: -22px
       .k-switch-label-on,
       .k-switch-label-off
         top: -3px
