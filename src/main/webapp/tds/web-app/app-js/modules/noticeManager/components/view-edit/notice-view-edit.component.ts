@@ -77,7 +77,6 @@ export class NoticeViewEditComponent {
 	 */
 	public saveNotice(): void {
 		const payload = {...this.model};
-		payload.typeId = payload.typeId === 1 ? NOTICE_TYPE_PRE_LOGIN : NOTICE_TYPE_POST_LOGIN;
 
 		if (payload.id) {
 			this.noticeService.editNotice(payload)
