@@ -37,8 +37,10 @@
                             [elementId]="'htmlText'"
                             [required]="true"
                             [name]="'htmlText'"
-                            [(rawValue)]="model.rawText"
-                            [(value)]="model.htmlText">
+                            (valueChange)="onValueChange($event)"
+                            (rawValueChange)="onRawValueChange($event)"
+                            [rawValue]="model.rawText"
+                            [value]="model.htmlText">
                         </rich-text-editor>
                     </div>
                 </div>
@@ -46,7 +48,7 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button (click)="saveNotice()" [disabled]="!formValid() && !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
+        <button (click)="saveNotice()" [disabled]="!formValid() || !isCreateEditAvailable()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
         <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
         <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action===1" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
