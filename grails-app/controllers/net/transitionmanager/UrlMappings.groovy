@@ -639,7 +639,14 @@ class UrlMappings {
 		"/ws/notices/$id/ack" {
 			controller = "wsNotice"
 			action = [
-					POST: "ack"
+					POST: "acknowledge"
+			]
+		}
+
+		"/ws/notice/fetchPostNotices" {
+			controller = "wsNotice"
+			action = [
+					GET: "fetchPostLoginNotices"
 			]
 		}
 
