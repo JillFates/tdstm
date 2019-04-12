@@ -95,8 +95,9 @@ class ApiActionServiceIntegrationTests extends Specification{
 
 			// Make sure we start testing without any Api Actions
 			List apiActions = ApiAction.list()
-			assert apiActions
-			apiActions*.delete(flush:true)
+			if (apiActions) {
+				apiActions*.delete(flush:true)
+			}
 			assert apiActionService.list(project).size() == 0
 
 			action = new ApiAction(
