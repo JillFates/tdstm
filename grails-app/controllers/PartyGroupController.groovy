@@ -104,9 +104,7 @@ class PartyGroupController implements ControllerMethods {
 		def showUrl = createLink(controller:'partyGroup', action:'show')
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
-		def results = companies?.collect { [cell: ['<a href="' + showUrl + '/' + it.companyId + '">' + it.companyName + '</a>',
-		                                          it.partner, it.dateCreated, it.lastUpdated],
-		                                   id: it.companyId] }
+		def results = companies?.collect { [cell: [it.companyName, it.partner, it.dateCreated, it.lastUpdated], id: it.companyId] }
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
