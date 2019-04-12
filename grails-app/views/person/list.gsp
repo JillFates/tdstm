@@ -84,8 +84,8 @@
 						{name:'middlename', width:'80', formatter: myLinkFormatter},
 						{name:'lastname', index: 'lastname', width:'80', formatter: myLinkFormatter},
 						{name:'userLogin', width:'130' },
-						{name:'email',width:'220'},
-						{name:'company',width:'130'},
+						{name:'email',width:'220', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'company',width:'130', formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'dateCreated',width:'100', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'lastUpdated',width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'lastname'"
