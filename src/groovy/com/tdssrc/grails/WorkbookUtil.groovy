@@ -257,7 +257,8 @@ class WorkbookUtil {
 			default :
 				String stringValue = value.toString()
 				if (stringValue?.matches("(=|-|\\+|@).*")) {
-					cell.getCellStyle().setQuotePrefixed(true)
+					// See TM-14767: cell.setQuotePrefixed(true) won't produce a result accepted across all versions of Excel.
+					stringValue = "'$stringValue"
 				}
 				// Prevent the cell from exceeding the maximum allowed length for XLS.
 				cell.setCellValue(trucanteXlsCell(stringValue))
