@@ -27,9 +27,9 @@ export const AssetCommentRoute: Routes = [
 		path: AssetCommentStates.COMMENT_LIST.url,
 		data: {
 			page: {
-				title: 'Asset Comments',
+				title: 'ASSETS.COMMENTS',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', 'Asset Comments'],
+				menu: ['ASSETS.ASSETS', 'ASSETS.COMMENTS'],
 			},
 			requiresAuth: true
 		},
@@ -37,7 +37,7 @@ export const AssetCommentRoute: Routes = [
 		resolve: {
 			assetComments: AssetCommentResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	}
 ];

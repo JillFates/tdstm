@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.RoleType" %>
+<%@page import="net.transitionmanager.security.RoleType" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -58,7 +58,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form action="save" method="post" name="createUserForm" >
+			<g:form action="save" method="post" name="createUserForm" autocomplete="off">
 				<div class="dialog loginView">
 					<table>
 						<tbody>

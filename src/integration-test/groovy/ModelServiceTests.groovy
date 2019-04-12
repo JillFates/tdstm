@@ -1,15 +1,15 @@
 import com.tdsops.tm.enums.domain.SecurityRole
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.ModelService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelAlias
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.asset.ModelService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Specification
 
 @Integration
@@ -23,10 +23,11 @@ class ModelServiceTests extends Specification{
 	private Person adminPerson
 	UserLogin adminUser
 	SecurityService securityService
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper
+	private ProjectTestHelper projectHelper
 
 	def setup() {
+		personHelper = new PersonTestHelper()
 		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 

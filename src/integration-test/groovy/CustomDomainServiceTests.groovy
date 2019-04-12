@@ -1,13 +1,13 @@
-import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
@@ -36,6 +36,11 @@ class CustomDomainServiceTests extends Specification {
         assetHelper = new AssetTestHelper()
         customDomainTestHelper = new CustomDomainTestHelper()
         projectHelper = new ProjectTestHelper()
+
+        // Clone the Field Specifications Setting records
+        Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
+        Setting.findAllByProject(defProject)*.delete(flush:true)
+        customDomainService.saveFieldSpecs(defProject, CustomDomainService.ALL_ASSET_CLASSES, loadFieldSpecJson())
     }
 
     private static final String CUSTOM1_LABEL = 'Description'
@@ -83,11 +88,12 @@ class CustomDomainServiceTests extends Specification {
             loadFieldSpecJson()
             def fieldSpec = loadFieldSpecJson()
             def customFieldSpecsMap
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Database custom field specs are requested'
             customFieldSpecsMap = customDomainService.customFieldSpecs(project, domain)
         then: 'Database domain fields are returned'
-            customFieldSpecsMap[domain]["domain"] == domain.toLowerCase()
+            customFieldSpecsMap[domain]["domain"] == domain
         then: 'Only database udf fields are returned'
             [] == customFieldSpecsMap[domain]["fields"].findAll({field -> field.udf == 0})
     }
@@ -98,6 +104,7 @@ class CustomDomainServiceTests extends Specification {
             def domain = AssetClass.APPLICATION as String
             def fieldSpec = loadFieldSpecJson()
             def standardFieldSpecsMap
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
         when: 'Application standard field specs are requested'
             standardFieldSpecsMap = customDomainService.standardFieldSpecsByField(project, domain)
@@ -114,6 +121,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = "-invalid-"
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
         when: 'Save fields specs providing invalid AssetClass should throw an exception'
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'InvalidParamException should be thrown'
@@ -125,6 +133,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
         when: 'Save fields specs should save without errors'
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
         then: 'Saved fields specs should exists'
@@ -136,6 +145,7 @@ class CustomDomainServiceTests extends Specification {
             Project project = projectHelper.createProjectWithDefaultBundle()
             def domain = CustomDomainService.ALL_ASSET_CLASSES
             def fieldSpec = loadFieldSpecJson()
+            Setting.findAllByProject(project)*.delete(flush:true)
             customDomainService.saveFieldSpecs(project, domain, fieldSpec)
             def foundFieldSpec
         when: 'Retrieving fields specs from database should return them'
@@ -234,10 +244,13 @@ class CustomDomainServiceTests extends Specification {
 
     }
 
-    void '9. Test the getFieldSpecsForAssetExport method for different scenarios'() {
+    void 'Scenario 9. Test the getFieldSpecsForAssetExport method for different scenarios'() {
         setup: 'Create a project'
             Project project = projectHelper.createProject()
             String domain = AssetClass.APPLICATION.toString()
+            Setting.findAllByProject(project)*.delete(flush:true)
+            customDomainService.saveFieldSpecs(project, domain, loadFieldSpecJson())
+
         when: 'retrieving the fields to be exported and all available fields for the project'
             Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain, [])
             Map allFields = customDomainService.allFieldSpecs(project, domain)

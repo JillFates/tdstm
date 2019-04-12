@@ -1,6 +1,6 @@
 package com.tdsops
 
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions
 
 /**
  * <p>This class is a cache for the valid AssetDependency types defined in system</p>

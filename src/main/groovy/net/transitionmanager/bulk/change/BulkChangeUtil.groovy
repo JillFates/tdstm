@@ -1,7 +1,7 @@
 package net.transitionmanager.bulk.change
 
 import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 /**
  * Class for common methods used by bulk change classes.

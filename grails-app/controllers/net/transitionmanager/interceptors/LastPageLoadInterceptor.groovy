@@ -1,8 +1,8 @@
 package net.transitionmanager.interceptors
 
 
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserService
 
 class LastPageLoadInterceptor {
 	SecurityService securityService

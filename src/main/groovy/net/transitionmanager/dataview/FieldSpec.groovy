@@ -253,7 +253,7 @@ class FieldSpec {
 	 * @param property
 	 * @return a HSQL cast sentence to be used in DataviewService
 	 * @see com.tdsops.common.sql.BigDecimalSQLFunction
-	 * @see net.transitionmanager.service.DataviewService#propertyFor(java.util.Map)
+	 * @see net.transitionmanager.imports.DataviewService#propertyFor(java.util.Map)
 	 */
 	String getHibernateCastSentence(String property) {
 

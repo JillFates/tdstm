@@ -214,7 +214,6 @@ hibernate {
 		region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
 	}
 
-	flush.mode = 'manual' // OSIV session flush mode outside of transactional context
 	// format_sql = true
 	singleSession = true
 	// use_sql_comments = true
@@ -475,3 +474,6 @@ Specify jndi name of datasource to monitor in production environment
         javamelody.datasources = 'java:comp/env/myapp/mydatasource'
     }
 }*/
+
+// TM-11135 Change so that GORM save defaults to failOnError:true
+grails.gorm.failOnError = true

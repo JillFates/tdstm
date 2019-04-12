@@ -10,13 +10,10 @@ import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetCommonHelper} from '../asset/asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
-
-declare var jQuery: any;
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -31,9 +28,9 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			prompt: UIPromptService,
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
-			preferenceService: PreferenceService,
+			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
 		}
@@ -53,7 +50,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 				this.dialogService.extra(UserManageStaffComponent, [
 					{provide: 'id', useValue: id},
 					{provide: PersonModel, useValue: {}}
-				], false, false).then( (result: any)  => {
+				], false, true).then( (result: any)  => {
 					console.log(result);
 				}).catch(result => {
 					if (result) {

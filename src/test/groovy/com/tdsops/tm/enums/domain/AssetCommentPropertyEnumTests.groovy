@@ -1,6 +1,6 @@
 package com.tdsops.tm.enums.domain
 
-import net.transitionmanager.service.InvalidParamException;
+import net.transitionmanager.exception.InvalidParamException;
 import spock.lang.Specification;
 
 class AssetCommentPropertyEnumTests extends Specification {

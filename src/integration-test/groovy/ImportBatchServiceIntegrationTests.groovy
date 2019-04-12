@@ -3,11 +3,11 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.ImportBatchService
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.imports.ImportBatchService
 import spock.lang.Specification
 
 @Integration
@@ -80,7 +80,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			Integer progress = 50
 			batch.processLastUpdated = lastUpdated
 			batch.processProgress = progress
-			batch.save(failOnError: true)
+			batch.save()
 			progressInfo = importBatchService.getImportBatchInfo(project, batch.id, info)
 		then: 'the progress info was updated with the new values'
 			progressInfo[progressKey] == progress

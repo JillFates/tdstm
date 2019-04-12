@@ -22,6 +22,9 @@
     .successor-predecessor-table
       max-height: 200px
       height: 200px
+      tbody tr:hover,
+      tbody tr.k-state-hover
+        color: initial
   .modal-content.task-create-component
     min-height: 720px
     min-width: 769px
@@ -285,6 +288,8 @@
       @include task-pending
 
     .task-ready
+      @include task-ready
+    .task-ready:hover
       @include task-ready
 
     .task-started

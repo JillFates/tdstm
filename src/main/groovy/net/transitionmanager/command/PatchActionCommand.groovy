@@ -1,7 +1,7 @@
 package net.transitionmanager.command
 
 
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 /**
  * Command class that will be used typically for PATCH activities that accept an "action" name

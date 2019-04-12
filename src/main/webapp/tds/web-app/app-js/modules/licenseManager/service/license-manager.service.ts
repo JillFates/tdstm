@@ -68,7 +68,7 @@ export class LicenseManagerService {
 	 * @param id
 	 */
 	revokeLicense(id: number): Observable<any> {
-		return this.http.delete(`${this.licenseUrl}/${id}`, null)
+		return this.http.delete(`${this.licenseUrl}/${id}`)
 			.map((response: any) => response.data)
 			.catch((error: any) => error);
 	}

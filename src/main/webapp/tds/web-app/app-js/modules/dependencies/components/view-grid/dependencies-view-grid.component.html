@@ -69,22 +69,19 @@
 			</ng-template>
 
 			<!-- Default Generic Filter Template -->
-			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
-			             *ngIf="!tagsFieldNames.includes(column.property)">
-				<kendo-grid-string-filter-cell
-						[showOperators]="false"
-						[column]="column"
-						[filter]="filter">
-				</kendo-grid-string-filter-cell>
-			</ng-template>
-
 			<!-- Asset Tags Filter Template -->
-			<ng-template kendoGridFilterCellTemplate let-filter let-column="column"
-			             *ngIf="tagsFieldNames.includes(column.property)">
-				<tds-asset-tag-selector #tagSelector
-				                        [tagList]="state.tagList"
-				                        (valueChange)="onTagFilterChange(column.field, $event)">
-				</tds-asset-tag-selector>
+			<ng-template kendoGridFilterCellTemplate let-filter >
+				<div class="has-feedback" style="margin-bottom:0px;">
+					<tds-asset-tag-selector *ngIf="column.property === 'tagsAsset'"
+						[tagList]="state.tagList"
+						(valueChange)="onTagFilterChange(column.property, $event)"
+						[placeholder]="'Filter ' + column.label">
+					</tds-asset-tag-selector>
+					<div *ngIf="column.property !== 'tagsAsset'">
+						<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+						<span *ngIf="column.filter" (click)="onClearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+					</div>
+				</div>
 			</ng-template>
 
 			<!-- Asset and Dependency Tags Cell Template -->
@@ -118,7 +115,6 @@
 			<kendo-pager-info></kendo-pager-info>
 		</ng-template>
 	</kendo-grid>
-
 </div>
 
 

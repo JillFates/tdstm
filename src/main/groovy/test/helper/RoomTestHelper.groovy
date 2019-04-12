@@ -1,8 +1,8 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Room
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Room
 
 @Transactional
 class RoomTestHelper {
@@ -25,7 +25,7 @@ class RoomTestHelper {
 		room.city = city
 		room.stateProv = stateProv
 		room.postalCode = postalCode
-		room.save(failOnError: true)
+		room.save()
 		return room
 	}
 }

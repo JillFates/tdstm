@@ -3,7 +3,7 @@ package net.transitionmanager.integration
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.service.MessageSourceService
+import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException

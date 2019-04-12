@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Database"%>
+<%@page import="net.transitionmanager.asset.Database"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="grails.converters.JSON"%>

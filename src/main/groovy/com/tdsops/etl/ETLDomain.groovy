@@ -1,26 +1,26 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 
 enum ETLDomain {
 
-	Application(com.tds.asset.Application),
-	Device(com.tds.asset.AssetEntity),
-	Database(com.tds.asset.Database),
-	Storage(com.tds.asset.Files),
-	External(com.tds.asset.AssetEntity),
-	Task(com.tds.asset.AssetComment),
-	Person(net.transitionmanager.domain.Person),
-	Comment(com.tds.asset.AssetComment),
-	Asset(com.tds.asset.AssetEntity),
-	Manufacturer(net.transitionmanager.domain.Manufacturer),
-	Model(net.transitionmanager.domain.Model),
-	Dependency(com.tds.asset.AssetDependency),
-	Rack(net.transitionmanager.domain.Rack),
-	Bundle(net.transitionmanager.domain.MoveBundle),
-	Room(net.transitionmanager.domain.Room),
-	Files(com.tds.asset.Files),
-	Event(net.transitionmanager.domain.MoveEvent)
+	Application(net.transitionmanager.asset.Application),
+	Device(net.transitionmanager.asset.AssetEntity),
+	Database(net.transitionmanager.asset.Database),
+	Storage(net.transitionmanager.asset.Files),
+	External(net.transitionmanager.asset.AssetEntity),
+	Task(net.transitionmanager.task.AssetComment),
+	Person(net.transitionmanager.person.Person),
+	Comment(net.transitionmanager.task.AssetComment),
+	Asset(net.transitionmanager.asset.AssetEntity),
+	Manufacturer(net.transitionmanager.manufacturer.Manufacturer),
+	Model(net.transitionmanager.model.Model),
+	Dependency(net.transitionmanager.asset.AssetDependency),
+	Rack(net.transitionmanager.asset.Rack),
+	Bundle(net.transitionmanager.project.MoveBundle),
+	Room(net.transitionmanager.asset.Room),
+	Files(net.transitionmanager.asset.Files),
+	Event(net.transitionmanager.project.MoveEvent)
 
 	private Class<?> clazz
 
@@ -32,7 +32,7 @@ enum ETLDomain {
 		return clazz
 	}
 
-	static final ASSET_CLASSNAMES = [ 'com.tds.asset.Application', 'com.tds.asset.AssetEntity', 'com.tds.asset.Database', 'com.tds.asset.Files']
+	static final ASSET_CLASSNAMES = [ Application.clazz.name, Asset.clazz.name, Database.clazz.name, Files.clazz.name]
 
 	/**
 	 * Check if a domain instance has a Class in the AssetEntity hierarchy

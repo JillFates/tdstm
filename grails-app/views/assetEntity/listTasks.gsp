@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetComment"%>
+<%@page import="net.transitionmanager.task.AssetComment"%>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.StringUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
@@ -170,11 +170,6 @@
 		$.jgrid.formatter.integer.thousandsSeparator='';
 
 		function checkSelectedEvent (event) {
-			var moveEvent = $("#moveEventId").val();
-			if (moveEvent == '0') {
-				alert("Please select an event first.");
-				event.preventDefault();
-			}
 			if ($('#viewUnpublishedCB').size() > 0) {
 				var href = $('#viewtaskgraph_button_graph').attr('href');
 				if (href.indexOf('&viewUnpublished=') != -1) {

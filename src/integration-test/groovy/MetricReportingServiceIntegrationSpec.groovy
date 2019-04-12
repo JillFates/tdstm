@@ -1,19 +1,19 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.ValidationType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.MetricResult
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.MetricReportingService
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.metric.MetricResult
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
+import net.transitionmanager.imports.DataImportService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.reporting.MetricReportingService
 import org.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared
@@ -141,24 +141,24 @@ class MetricReportingServiceIntegrationSpec extends Specification {
 
 		device.assetType = 'Server'
 		device.validation = ValidationType.PLAN_READY
-		device.save(flush: true, failOnError: true)
+		device.save(flush: true)
 
 		device2.assetType = 'Server'
 		device2.validation = ValidationType.UNKNOWN
-		device2.save(flush: true, failOnError: true)
+		device2.save(flush: true)
 
 		moveBundle2.useForPlanning = 0
-		moveBundle2.save(flush: true, failOnError: true)
+		moveBundle2.save(flush: true)
 
 		// Create a second project with a device with the same name and type as device above
 		otherProjectDevice.assetName = device.assetName
 		otherProjectDevice.assetType = device.assetType
 		otherProjectDevice.validation = ValidationType.UNKNOWN
-		otherProjectDevice.save(flush: true, failOnError: true)
+		otherProjectDevice.save(flush: true)
 
-		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true)
+		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true)
+		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true)
 	}
 
 	void "test gatherMetric for query mode"() {
@@ -422,15 +422,15 @@ class MetricReportingServiceIntegrationSpec extends Specification {
 
 			project1.collectMetrics = 1
 			project1.startDate = new Date() - 5
-			project1.save(flush: true, failOnError: true)
+			project1.save(flush: true)
 
 			project2.collectMetrics = 1
 			project2.startDate = project2.startDate + 5
-			project2.save(flush: true, failOnError: true)
+			project2.save(flush: true)
 
 			project3.collectMetrics = 1
 			project3.completionDate = new Date() - 1
-			project3.save(flush: true, failOnError: true)
+			project3.save(flush: true)
 
 		when: 'projectIdsForMetrics() is run'
 			List<Long> projectIds = metricReportingService.projectIdsForMetrics()

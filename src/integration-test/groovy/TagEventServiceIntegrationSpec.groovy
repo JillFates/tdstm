@@ -2,16 +2,16 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagEvent
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagEventService
-import net.transitionmanager.service.TagService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.tag.TagService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.MoveEventTestHelper
@@ -107,14 +107,14 @@ class TagEventServiceIntegrationSpec extends Specification{
 		event2 = moveEventTestHelper.createMoveEvent(project)
 		event3 = moveEventTestHelper.createMoveEvent(otherProject)
 
-		tag1 = new Tag(name: 'grouping events', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-		tag2 = new Tag(name: 'some events', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping events', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+		tag2 = new Tag(name: 'some events', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true, failOnError: true)
-		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
-		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
-		tagEvent4 = new TagEvent(tag: tag3, event: event3).save(flush: true, failOnError: true)
+		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true)
+		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true)
+		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true)
+		tagEvent4 = new TagEvent(tag: tag3, event: event3).save(flush: true)
 
 		tagService.securityService = [
 			getUserCurrentProject  : { -> project },

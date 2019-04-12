@@ -7,11 +7,12 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.AuditService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.notice.NoticeService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
 import org.springframework.util.Assert
@@ -28,6 +29,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	UserService userService
+	NoticeService noticeService
 
 	@Transactional
 	void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
@@ -38,6 +40,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 		try {
 			String redirectUri
+			String unacknowledgedNoticesUri = '/module/notice/list'
+			Boolean hasUnacknowledgedNotices = false
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
 
 			UserLogin userLogin = securityService.userLogin
@@ -72,11 +76,22 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 											redirectToPrefPage()
 				}
 
+				// check if user has unacknowledged notices, if so, redirect user to notices page
+				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(userLogin.person)
+				if (hasUnacknowledgedNotices) {
+					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
+					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
+				}
+
 				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
 			}
 
+			if (hasUnacknowledgedNotices) {
+				redirectStrategy.sendRedirect request, response, unacknowledgedNoticesUri
+			} else {
 			redirectStrategy.sendRedirect request, response, redirectUri
+			}
 		} finally {
 			// always remove the saved request
 			requestCache.removeRequest request, response
@@ -110,6 +125,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		Assert.notNull securityService, 'securityService is required'
 		Assert.notNull userPreferenceService, 'userPreferenceService is required'
 		Assert.notNull userService, 'userService is required'
+		Assert.notNull noticeService, 'noticeService is required'
 	}
 
 	/**
@@ -117,9 +133,19 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 	 * @param request
 	 */
 	private void setAccountLockedOutAttribute(HttpServletRequest request) {
+		addAttributeToSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT,  true)
+	}
+
+	/**
+	 * Puts an attribute on the session
+	 * @param request
+	 * @param attribute
+	 * @param value
+	 */
+	private void addAttributeToSession(HttpServletRequest request, String attribute, Object value) {
 		HttpSession session = request.getSession()
 		if (session) {
-			session.setAttribute(SecurityUtil.ACCOUNT_LOCKED_OUT,  true)
+			session.setAttribute(attribute,  value)
 		}
 	}
 

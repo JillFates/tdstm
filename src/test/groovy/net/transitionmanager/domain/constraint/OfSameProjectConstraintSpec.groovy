@@ -3,11 +3,11 @@ package net.transitionmanager.domain.constraint
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.StringUtil
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.domain.Timezone
+import net.transitionmanager.action.Credential
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
+import net.transitionmanager.common.Timezone
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.validation.Errors
 import org.springframework.validation.MapBindingResult
@@ -36,7 +36,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			client        : [name: 'something'] as PartyGroup
 		] as Project
 
-		project1.save(failOnError: true)
+		project1.save()
 
 		Project project2 = [
 			id            : 2L,
@@ -52,7 +52,7 @@ class OfSameProjectConstraintSpec extends Specification {
 			client        : [name: 'something else'] as PartyGroup
 		] as Project
 
-		project2.save(failOnError: true)
+		project2.save()
 
 		Provider provider1 = [
 			name       : RandomStringUtils.randomAlphabetic(10),

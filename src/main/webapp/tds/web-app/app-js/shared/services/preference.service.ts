@@ -75,9 +75,10 @@ export class PreferenceService {
 	 */
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
 		const httpOptions = {
-			headers: new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'})
+			headers: new HttpHeaders({'Content-Type': 'application/json'})
 		};
-		const body = `code=${preferenceCode}&value=${value}`;
+		const body = JSON.stringify({code: preferenceCode, value});
+
 		return this.http.post(this.preferenceUrlPost, body, httpOptions);
 	}
 
@@ -92,6 +93,7 @@ export class PreferenceService {
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
 
+	// TODO: I don't see this returning the Date with any "special MomentJS" format?
 	getUserDateFormatForMomentJS(): string {
 		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		if (currentUserDateFormat) {
@@ -148,7 +150,7 @@ export class PreferenceService {
 	 */
 	public getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
 		const unitSizeSeparator = 'x';
-		const defaultWidth = 580;
+		const defaultWidth = 850;
 		const defaultHeight = 680;
 
 		return this.getPreference(PREFERENCES_LIST.DATA_SCRIPT_SIZE)
@@ -165,6 +167,7 @@ export class PreferenceService {
 	/**
 	 * Used to retrieve the user preference current date format
 	 */
+	// TODO: this is doing the same as the method getUserDateFormat on this same class...
 	getUserCurrentDateFormatOrDefault(): string {
 		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 

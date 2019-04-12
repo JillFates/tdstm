@@ -1,6 +1,6 @@
 import grails.test.mixin.Mock
 import groovy.time.TimeCategory
-import net.transitionmanager.domain.MoveBundleStep
+import net.transitionmanager.project.MoveBundleStep
 import spock.lang.Specification
 
 @Mock(MoveBundleStep)

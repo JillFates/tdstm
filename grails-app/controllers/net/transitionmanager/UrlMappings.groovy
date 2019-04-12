@@ -643,6 +643,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/notice/fetchPostNotices" {
+			controller = "wsNotice"
+			action = [
+					GET: "fetchPostLoginNotices"
+			]
+		}
+
 		///// LICENSES Admin API (Client Side) /////////
 
 		"/ws/license" {
@@ -658,9 +665,6 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
-			constraints {
-				id(matches:/[0-9]{1,}/)
-			}
 		}
 
 		// Licensing Information
@@ -1249,6 +1253,27 @@ class UrlMappings {
 					POST: "generateCheckList"
 			]
 		}
+
+		"/ws/reports/tasksReport" {
+			controller = "wsReports"
+			action = [
+					POST: "tasksReport"
+			]
+		}
+
+        "/ws/reports/moveBundles" {
+            controller = "wsReports"
+            action = [
+                    GET: "moveBundles"
+            ]
+        }
+
+        "/ws/reports/generateServerConflicts" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateServerConflicts"
+            ]
+        }
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

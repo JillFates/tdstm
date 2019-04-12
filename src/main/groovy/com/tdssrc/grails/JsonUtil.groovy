@@ -8,8 +8,8 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.grails.web.json.JSONElement

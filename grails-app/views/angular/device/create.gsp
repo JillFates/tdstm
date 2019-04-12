@@ -1,6 +1,6 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="grails.converters.JSON"%>
-<%@page import="com.tds.asset.AssetType"%>
+<%@page import="net.transitionmanager.asset.AssetType"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <%-- Set some vars based on the action being save or update --%>
@@ -261,7 +261,7 @@
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetInstance.assetTag}" tabindex="18" ngmodel="model.asset.assetTag"/>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}" />
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance?.retireDate}" />
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <tds-date-control
                                             [(ngModel)]="model.asset.retireDate"

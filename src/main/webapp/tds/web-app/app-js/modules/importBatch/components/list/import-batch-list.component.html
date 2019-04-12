@@ -27,12 +27,19 @@
 
                         <!-- Toolbar Template -->
                         <ng-template kendoGridToolbarTemplate [position]="'top'">
+	                        <tds-button-delete *ngIf="canBulkDelete()"
+	                                           [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+	                                           [id]="'btnBulkDelete'"
+	                                           (click)="confirmDelete()">
+	                        </tds-button-delete>
+	                        <!--
                             <button *ngIf="canBulkDelete()"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                     (click)="confirmDelete()"
                                     class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
+                            -->
                             <button *ngIf="canBulkArchive() && !viewArchived"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                     (click)="confirmArchive()"

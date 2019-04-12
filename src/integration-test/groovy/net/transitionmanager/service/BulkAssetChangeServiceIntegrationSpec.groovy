@@ -1,7 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.BulkAssetChangeService
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -21,11 +22,18 @@ import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.imports.DataviewService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagAssetService
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
@@ -40,6 +48,9 @@ import test.helper.PersonTestHelper
 class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
+
+	@Autowired
+	CustomDomainService customDomainService
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper
@@ -166,14 +177,14 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-			tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
-			tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
-			tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
-			tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+			tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+			tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+			tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+			tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
 			now = TimeUtil.nowGMT().clearTime()
 
@@ -194,7 +205,9 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 
 			JSONObject fieldSpec = loadFieldSpecJson()
-			bulkAssetChangeService.dataviewService.projectService.customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
+
+			Setting.findAllByProject(project)*.delete(flush:true)
+			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true
 		}

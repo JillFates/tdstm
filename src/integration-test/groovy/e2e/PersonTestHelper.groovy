@@ -1,10 +1,10 @@
 package e2e
 
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -31,7 +31,7 @@ class PersonTestHelper extends test.helper.PersonTestHelper {
                 email: personData.email,
                 username: personData.username
         ])
-        person.save(flush: true, failOnError:true)
+        person.save(flush: true)
         return person
     }
 

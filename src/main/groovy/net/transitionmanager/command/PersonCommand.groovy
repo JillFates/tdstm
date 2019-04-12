@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 /**
  * PersonCommand is to be used with the creation and editing of Person domain
  */
@@ -25,7 +25,6 @@ class PersonCommand implements CommandObject {
 	String tdsLink
 	String staffType
 	Integer travelOK
-
 
 	static constraints = {
 		importFrom Person, include: [

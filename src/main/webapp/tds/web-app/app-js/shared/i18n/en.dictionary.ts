@@ -5,6 +5,8 @@
 export const en_DICTIONARY: Object = {
 	'GLOBAL': {
 		'OK': 'Ok',
+		'YES': 'Yes',
+		'NO': 'No',
 		'ADD': 'Add',
 		'ADMIN': 'Admin',
 		'ACTION': 'Action',
@@ -29,6 +31,7 @@ export const en_DICTIONARY: Object = {
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
+		'UNDO': 'Undo',
 		'DEFAULT': 'Default',
 		'SHOW': 'Show',
 		'SORT': 'Sort',
@@ -73,12 +76,13 @@ export const en_DICTIONARY: Object = {
 		'ASSETS': 'Assets',
 		'COMMON': 'Common',
 		'SINGLE_NAME': 'Asset',
-		'PLURAL_NAME': 'Assets'
+		'PLURAL_NAME': 'Assets',
+		'COMMENTS': 'Comments'
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
-		'API_ACTION': 'API Action',
-		'API_ACTIONS': 'API Actions',
+		'API_ACTION': 'Action',
+		'API_ACTIONS': 'Actions',
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'View Manager',
@@ -196,6 +200,13 @@ export const en_DICTIONARY: Object = {
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
+		'REPORT': 'Report',
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'TASK_REPORT': 'Task Report',
+		'SERVER_CONFLICTS': 'Server Conflicts'
+	},
+	'PLANNING': {
+		'PLANNING': 'Planning',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
 	},
 	'FIELD_SETTINGS': {

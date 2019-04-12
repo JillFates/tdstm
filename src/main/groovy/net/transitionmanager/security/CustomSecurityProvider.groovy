@@ -3,8 +3,6 @@ package net.transitionmanager.security
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsUserDetails
 import grails.compiler.GrailsCompileStatic
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.PasswordService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

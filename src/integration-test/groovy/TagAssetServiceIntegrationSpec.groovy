@@ -1,21 +1,21 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.domain.TagEvent
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagAssetService
-import net.transitionmanager.service.TagEventService
-import net.transitionmanager.service.TagService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagAssetService
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.tag.TagService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -132,22 +132,22 @@ class TagAssetServiceIntegrationSpec extends Specification{
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
-		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
-		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
-		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
 
 		event = moveEventTestHelper.createMoveEvent(project)
 		event2 = moveEventTestHelper.createMoveEvent(project)
 
-		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true, failOnError: true)
-		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
-		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
+		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true)
+		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true)
+		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true)
 
 		tagService.securityService = [
 			getUserCurrentProject  : { -> project },

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8647f487-3f9e-42b9-a14f-8872e17df25f",
+		"_postman_id": "a8eb1501-bac4-4663-83ae-207badaa2b66",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,8 +22,21 @@
 							"});",
 							"",
 							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project:\");",
-							"});"
+							"    pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
+							"}); ",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}

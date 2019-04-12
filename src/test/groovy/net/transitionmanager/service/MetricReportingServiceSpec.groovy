@@ -1,9 +1,12 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.common.SettingService
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.reporting.MetricReportingService
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ValidationType
 import grails.testing.gorm.DataTest
@@ -13,11 +16,11 @@ import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.command.metricdefinition.QueryCommand
 import net.transitionmanager.command.metricdefinition.WhereCommand
-import net.transitionmanager.domain.MetricResult
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
+import net.transitionmanager.metric.MetricResult
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges

@@ -272,14 +272,20 @@
 				$('#detailTdId_'+id).css('display','table-row')
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
-				new Ajax.Request(tdsCommon.createAppURL('/assetEntity/updateStatusSelect?id='+id),{asynchronous:false,evalScripts:true,
-					onComplete:function(e){
-						var resp = e.responseText;
+				new jQuery.ajax({
+					url: tdsCommon.createAppURL('/assetEntity/updateStatusSelect'),
+					data: {'id': id},
+					type: 'POST',
+					headers: {
+						'Accept': 'text/html'
+					},
+					success:function(responseText){
+						var resp = responseText;
 						resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
 						$('#statusEditTrId_'+id).html(resp)
 						// $('#statusEditId_'+id).val(status)
 			 		}
-				})
+				});
 
 				new Ajax.Request(tdsCommon.createAppURL('/assetEntity/isAllowToChangeStatus?id='+id),{asynchronous:false,evalScripts:true,
 					onComplete:function(e){
@@ -480,5 +486,7 @@ setFocus();
 </g:if>
 	<g:render template="/assetEntity/initAssetEntityData"/>
 	<g:render template="/layouts/error"/>
+
+	<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 </body>
 </html>

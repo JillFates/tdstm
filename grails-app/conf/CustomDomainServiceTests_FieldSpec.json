@@ -1,2239 +1,2973 @@
 {
-    "APPLICATION": {
-        "domain": "application",
-        "version": 0,
-        "fields": [
-            {
-                "field": "appFunction",
-                "label": "Function",
-                "tip": "This field is the Function",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 31,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appOwner",
-                "label": "App Owner",
-                "tip": "This field is the App Owner",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Person",
-                "order": 24,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appSource",
-                "label": "Source",
-                "tip": "This field is the Source",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 7,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appTech",
-                "label": "Technology",
-                "tip": "This field is the Technology",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 6,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appVendor",
-                "label": "Vendor",
-                "tip": "This field is the Vendor",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 4,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "appVersion",
-                "label": "Version",
-                "tip": "This field is the Version",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 5,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "assetName",
-                "label": "Name",
-                "tip": "This field is the Name",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 1,
-                "imp": "I",
-                "constraints": {
-                    "required": 1
-                }
-            },
-            {
-                "field": "businessUnit",
-                "label": "Business Unit",
-                "tip": "This field is the Business Unit",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 25,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "criticality",
-                "label": "Criticality",
-                "tip": "This field is the Criticality",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 33,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "description",
-                "label": "Description",
-                "tip": "This field is the Description",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 2,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "drRpoDesc",
-                "label": "DR RPO",
-                "tip": "This field is the DR RPO",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 44,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "drRtoDesc",
-                "label": "DR RTO",
-                "tip": "This field is the DR RTO",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 45,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "environment",
-                "label": "Environment",
-                "tip": "This field is the Environment",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 32,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "externalRefId",
-                "label": "External Ref Id",
-                "tip": "This field is the External Ref Id",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 28,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "lastUpdated",
-                "label": "Modified Date",
-                "tip": "This field is the Modified Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "String",
-                "order": 99,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "latency",
-                "label": "Latency OK",
-                "tip": "This field is the Latency OK",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 37,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "license",
-                "label": "License",
-                "tip": "This field is the License",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 8,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "maintExpDate",
-                "label": "Maint Expiration",
-                "tip": "This field is the Maint Expiration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 27,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveBundle",
-                "label": "Bundle",
-                "tip": "This field is the Bundle",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 34,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "planStatus",
-                "label": "Plan Status",
-                "tip": "This field is the Plan Status",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 35,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "retireDate",
-                "label": "Retire Date",
-                "tip": "This field is the Retire Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 26,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "shutdownBy",
-                "label": "Shutdown By",
-                "tip": "This field is the Shutdown By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 50,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "shutdownDuration",
-                "label": "Shutdown Duration",
-                "tip": "This field is the Shutdown Duration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 51,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "shutdownFixed",
-                "label": "Shutdown Fixed",
-                "tip": "This field is the Shutdown Fixed",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 52,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sme",
-                "label": "SME1",
-                "tip": "This field is the SME1",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Person",
-                "order": 22,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sme2",
-                "label": "SME2",
-                "tip": "This field is the SME2",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Person",
-                "order": 23,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "startupBy",
-                "label": "Startup By",
-                "tip": "This field is the Startup By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 53,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "startupDuration",
-                "label": "Startup Duration",
-                "tip": "This field is the Startup Duration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 54,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "startupFixed",
-                "label": "Startup Fixed",
-                "tip": "This field is the Startup Fixed",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 55,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "startupProc",
-                "label": "Startup Proc OK",
-                "tip": "This field is the Startup Proc OK",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 47,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "supportType",
-                "label": "Support",
-                "tip": "This field is the Support",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 21,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "testingBy",
-                "label": "Testing By",
-                "tip": "This field is the Testing By",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 56,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "testingDuration",
-                "label": "Testing Duration",
-                "tip": "This field is the Testing Duration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 57,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "testingFixed",
-                "label": "Testing Fixed",
-                "tip": "This field is the Testing Fixed",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 58,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "testProc",
-                "label": "Test Proc OK",
-                "tip": "This field is the Test Proc OK",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 46,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "url",
-                "label": "URL",
-                "tip": "This field is the URL",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 9,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "useFrequency",
-                "label": "Use Frequency",
-                "tip": "This field is the Use Frequency",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 43,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "userCount",
-                "label": "Users",
-                "tip": "This field is the Users",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 41,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "userLocations",
-                "label": "User Location",
-                "tip": "This field is the User Location",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 42,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "validation",
-                "label": "Validation",
-                "tip": "This field is the Validation",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 36,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom1",
-                "label": "Plan Strategy",
-                "tip": "This field is the Plan Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 101,
-                "imp": "I",
-                "constraints": {
-                    "required": 0,
-                    "values": [
-                        "Rehost",
-                        "Refactor",
-                        "Revise",
-                        "Rebuild",
-                        "Replace",
-                        "Retire"
-                    ]
-                }
-            },
-            {
-                "field": "custom2",
-                "label": "Contains PCI",
-                "tip": "This field is the Contains PCI",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 102,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom3",
-                "label": "Contains HIPPA",
-                "tip": "This field is the Contains HIPPA",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 103,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom4",
-                "label": "Load Balanced",
-                "tip": "This field is the Load Balanced",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 104,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom5",
-                "label": "VIP IP",
-                "tip": "This field is the VIP IP",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 105,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom6",
-                "label": "Requires License",
-                "tip": "This field is the Requires License",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 106,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom7",
-                "label": "Vendor Contact",
-                "tip": "This field is the Vendor Contact",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 107,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "bulkChangeActions" : [ "replace", "clear" ],
-                "constraints" : {
-                  "allowNegative" : false,
-                  "format" : "0",
-                  "maxRange" : 1000,
-                  "minRange" : 0,
-                  "precision" : 0,
-                  "required" : 0,
-                  "separator" : false
-                },
-                "control" : "Number",
-                "field" : "custom8",
-                "imp" : "N",
-                "label" : "Number test",
-                "order" : 124,
-                "shared" : null,
-                "show" : 1,
-                "udf" : 1
-              }
-        ]
-    },
-    "DEVICE": {
-        "domain": "device",
-        "version": 0,
-        "fields": [
-            {
-                "field": "assetName",
-                "label": "Asset Name",
-                "tip": "This field is the Asset Name",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 1,
-                "imp": "I",
-                "constraints": {
-                    "required": 1
-                }
-            },
-            {
-                "field": "assetTag",
-                "label": "Asset Tag",
-                "tip": "This field is the Asset Tag",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 8,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "assetType",
-                "label": "Asset Type",
-                "tip": "This field is the Asset Type",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "select",
-                "order": 3,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "cart",
-                "label": "Cart",
-                "tip": "This field is the Cart",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 28,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "description",
-                "label": "Description",
-                "tip": "This field is the Description",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 2,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "environment",
-                "label": "Environment",
-                "tip": "This field is the Environment",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 21,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "externalRefId",
-                "label": "External Ref Id",
-                "tip": "This field is the External Ref Id",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 10,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "ipAddress",
-                "label": "IP1",
-                "tip": "This field is the IP1",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 23,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "lastUpdated",
-                "label": "Modified Date",
-                "tip": "This field is the Modified Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 99,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "maintExpDate",
-                "label": "Maint Expiration",
-                "tip": "This field is the Maint Expiration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Date",
-                "order": 26,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "manufacturer",
-                "label": "Manufacturer",
-                "tip": "This field is the Manufacturer",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 4,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "model",
-                "label": "Model",
-                "tip": "This field is the Model",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 5,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveBundle",
-                "label": "Move Bundle",
-                "tip": "This field is the Move Bundle",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 50,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "os",
-                "label": "OS",
-                "tip": "This field is the OS",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 24,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "planStatus",
-                "label": "Plan Status",
-                "tip": "This field is the Plan Status",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "select",
-                "order": 51,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "priority",
-                "label": "Priority",
-                "tip": "This field is the Priority",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "select",
-                "order": 22,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "railType",
-                "label": "Rail Type",
-                "tip": "This field is the Rail Type",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "select",
-                "order": 9,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 55,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "retireDate",
-                "label": "Retire Date",
-                "tip": "This field is the Retire Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 26,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "scale",
-                "label": "Scale",
-                "tip": "This field is the Scale",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 54,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "serialNumber",
-                "label": "Serial #",
-                "tip": "This field is the Serial #",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 7,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "shelf",
-                "label": "Shelf",
-                "tip": "This field is the Shelf",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 29,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "shortName",
-                "label": "Alternate Name",
-                "tip": "This field is the Alternate Name",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 6,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "size",
-                "label": "Size",
-                "tip": "This field is the Size",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 53,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceBladePosition",
-                "label": "Source Blade Position",
-                "tip": "This field is the Source Blade Position",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 41,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceChassis",
-                "label": "Source Blade",
-                "tip": "This field is the Source Blade",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Chassis(s)",
-                "order": 40,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceLocation",
-                "label": "Source Location",
-                "tip": "This field is the Source Location",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Location(s)",
-                "order": 31,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceRack",
-                "label": "Source Rack/Cab",
-                "tip": "This field is the Source Rack/Cab",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Rack(s)",
-                "order": 33,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceRackPosition",
-                "label": "Source Position",
-                "tip": "This field is the Source Position",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 34,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "sourceRoom",
-                "label": "Source Room",
-                "tip": "This field is the Source Room",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Room(s)",
-                "order": 32,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "supportType",
-                "label": "SupportType",
-                "tip": "This field is the SupportType",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 25,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetBladePosition",
-                "label": "Target Blade Position",
-                "tip": "This field is the Target Blade Position",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 43,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetChassis",
-                "label": "Target Blade",
-                "tip": "This field is the Target Blade",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Chassis(t)",
-                "order": 42,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetLocation",
-                "label": "Target Location",
-                "tip": "This field is the Target Location",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Location(t)",
-                "order": 36,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetRack",
-                "label": "Target Rack/Cab",
-                "tip": "This field is the Target Rack/Cab",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Rack(t)",
-                "order": 38,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetRackPosition",
-                "label": "Target Position",
-                "tip": "This field is the Target Position",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 39,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "targetRoom",
-                "label": "Target Room",
-                "tip": "This field is the Target Room",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Room(t)",
-                "order": 37,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "truck",
-                "label": "Truck",
-                "tip": "This field is the Truck",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 27,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "validation",
-                "label": "Validation",
-                "tip": "This field is the Validation",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 52,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom1",
-                "label": "Plan Strategy",
-                "tip": "This field is the Plan Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 1000,
-                "imp": "I",
-                "constraints": {
-                    "required": 0,
-                    "values": [
-                        "Lift&Shift",
-                        "Rebuild",
-                        "P2V",
-                        "V2C"
-                    ]
-                }
-            },
-            {
-                "field": "custom2",
-                "label": "Contains PCI",
-                "tip": "This field is the Contains PCI",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 102,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom3",
-                "label": "Contains HIPPA",
-                "tip": "This field is the Contains HIPPA",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 103,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom4",
-                "label": "Load Balanced",
-                "tip": "This field is the Load Balanced",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 104,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom5",
-                "label": "VIP IP",
-                "tip": "This field is the VIP IP",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 105,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom6",
-                "label": "Tier Level",
-                "tip": "This field is the Tier Level",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 106,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom7",
-                "label": "DNS Change Required",
-                "tip": "This field is the DNS Change Required",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 107,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "bulkChangeActions": [
-                    "replace",
-                    "clear"
-                ],
-                "constraints": {
-                    "allowNegative": false,
-                    "format": "0",
-                    "maxRange": 1000,
-                    "minRange": 0,
-                    "precision": 0,
-                    "required": 0,
-                    "separator": false
-                },
-                "control": "Number",
-                "field": "custom8",
-                "imp": "N",
-                "label": "Number test",
-                "order": 124,
-                "shared": null,
-                "show": 1,
-                "udf": 1
-            },
-            {
-                "field": "custom9",
-                "label": "Transfer Time",
-                "tip": "This field is the Transfer Time",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 109,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            }
-        ]
-    },
-    "DATABASE": {
-        "domain": "database",
-        "version": 0,
-        "fields": [
-            {
-                "field": "assetName",
-                "label": "Name",
-                "tip": "This field is the Name",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 1,
-                "imp": "I",
-                "constraints": {
-                    "required": 1
-                }
-            },
-            {
-                "field": "description",
-                "label": "Description",
-                "tip": "This field is the Description",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 2,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "assetType",
-                "label": "Class",
-                "tip": "This field is the Class",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 3,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "supportType",
-                "label": "Support",
-                "tip": "This field is the Support",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 21,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "environment",
-                "label": "Environment",
-                "tip": "This field is the Environment",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 31,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "externalRefId",
-                "label": "External Ref Id",
-                "tip": "This field is the External Ref Id",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 24,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "dbFormat",
-                "label": "Format",
-                "tip": "This field is the Format",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 4,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "retireDate",
-                "label": "Retire Date",
-                "tip": "This field is the Retire Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 22,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveBundle",
-                "label": "Bundle",
-                "tip": "This field is the Bundle",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 32,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "size",
-                "label": "Size",
-                "tip": "This field is the Size",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 5,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "scale",
-                "label": "Scale",
-                "tip": "This field is the Scale",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 6,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "maintExpDate",
-                "label": "Maint Expiration",
-                "tip": "This field is the Maint Expiration",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 23,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "planStatus",
-                "label": "Plan Status",
-                "tip": "This field is the Plan Status",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 33,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 7,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "validation",
-                "label": "Validation",
-                "tip": "This field is the Validation",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 34,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "lastUpdated",
-                "label": "Modified Date",
-                "tip": "This field is the Modified Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 99,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom1",
-                "label": "Plan Strategy",
-                "tip": "This field is the Plan Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 101,
-                "imp": "I",
-                "constraints": {
-                    "required": 0,
-                    "values": [
-                        "Replication",
-                        "Backup/Restore",
-                        "Log Shipping",
-                        "LUN replication"
-                    ]
-                }
-            },
-            {
-                "field": "custom2",
-                "label": "Contains PCI",
-                "tip": "This field is the Contains PCI",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 102,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom3",
-                "label": "Contains HIPPA",
-                "tip": "This field is the Contains HIPPA",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 103,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom4",
-                "label": "Load Balanced",
-                "tip": "This field is the Load Balanced",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 104,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom5",
-                "label": "VIP IP",
-                "tip": "This field is the VIP IP",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 105,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom6",
-                "label": "Backup Strategy",
-                "tip": "This field is the Backup Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 106,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom7",
-                "label": "Backup Time",
-                "tip": "This field is the Backup Time",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 107,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom8",
-                "label": "Restore Time",
-                "tip": "This field is the Restore Time",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 108,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom9",
-                "label": "Clustered",
-                "tip": "This field is the Clustered",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 109,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            }
-        ]
-    },
-    "STORAGE": {
-        "domain": "storage",
-        "version": 0,
-        "fields": [
-            {
-                "field": "assetName",
-                "label": "Name",
-                "tip": "This field is the Name",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 1,
-                "imp": "I",
-                "constraints": {
-                    "required": 1
-                }
-            },
-            {
-                "field": "description",
-                "label": "Description",
-                "tip": "This field is the Description",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 2,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "assetType",
-                "label": "Class",
-                "tip": "This field is the Class",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 3,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "LUN",
-                "label": "LUN",
-                "tip": "This field is the LUN",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 21,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "moveBundle",
-                "label": "Bundle",
-                "tip": "This field is the Bundle",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 41,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "fileFormat",
-                "label": "Format",
-                "tip": "This field is the Format",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 4,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "environment",
-                "label": "Environment",
-                "tip": "This field is the Environment",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 22,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "externalRefId",
-                "label": "External Ref Id",
-                "tip": "This field is the External Ref Id",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 34,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "supportType",
-                "label": "Support",
-                "tip": "This field is the Support",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 33,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "planStatus",
-                "label": "Plan Status",
-                "tip": "This field is the Plan Status",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 42,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "size",
-                "label": "Size",
-                "tip": "This field is the Size",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 5,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "rateOfChange",
-                "label": "Rate Of Change (%)",
-                "tip": "This field is the Rate Of Change (%)",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 23,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "validation",
-                "label": "Validation",
-                "tip": "This field is the Validation",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 43,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "lastUpdated",
-                "label": "Modified Date",
-                "tip": "This field is the Modified Date",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 0,
-                "control": "Date",
-                "order": 99,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "scale",
-                "label": "Scale",
-                "tip": "This field is the Scale",
-                "udf": 0,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 6,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom1",
-                "label": "Plan Strategy",
-                "tip": "This field is the Plan Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 101,
-                "imp": "I",
-                "constraints": {
-                    "required": 0,
-                    "values": [
-                        "Replication",
-                        "Backup/Restore",
-                        "Mirror"
-                    ]
-                }
-            },
-            {
-                "field": "custom2",
-                "label": "Contains PCI",
-                "tip": "This field is the Contains PCI",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 102,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom3",
-                "label": "Contains HIPPA",
-                "tip": "This field is the Contains HIPPA",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 103,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom4",
-                "label": "Load Balanced",
-                "tip": "This field is the Load Balanced",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "YesNo",
-                "order": 104,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom5",
-                "label": "VIP IP",
-                "tip": "This field is the VIP IP",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 105,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom6",
-                "label": "Backup Strategy",
-                "tip": "This field is the Backup Strategy",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "Select List",
-                "order": 106,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom7",
-                "label": "Backup Time",
-                "tip": "This field is the Backup Time",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 107,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom8",
-                "label": "Restore Time",
-                "tip": "This field is the Restore Time",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 108,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            },
-            {
-                "field": "custom9",
-                "label": "Custom9",
-                "tip": "This field is the Custom9",
-                "udf": 1,
-                "default": "",
-                "shared": 0,
-                "show": 1,
-                "control": "String",
-                "order": 109,
-                "imp": "I",
-                "constraints": {
-                    "required": 0
-                }
-            }
-        ]
-    }
+  "APPLICATION": {
+    "domain": "APPLICATION",
+    "planMethodology": "",
+    "fields": [
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "id",
+        "imp": "U",
+        "label": "Id",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "appFunction",
+        "imp": "N",
+        "label": "Function",
+        "order": 31,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Person",
+        "default": "",
+        "field": "appOwner",
+        "imp": "G",
+        "label": "App Owner",
+        "order": 24,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "appSource",
+        "imp": "U",
+        "label": "Source",
+        "order": 7,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "appTech",
+        "imp": "N",
+        "label": "Technology",
+        "order": 6,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "appVendor",
+        "imp": "N",
+        "label": "Vendor",
+        "order": 4,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "appVersion",
+        "imp": "N",
+        "label": "Version",
+        "order": 5,
+        "shared": 0,
+        "show": 1,
+        "tip": "Enter version of app",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetName",
+        "imp": "Y",
+        "label": "Name",
+        "order": 1,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "businessUnit",
+        "imp": "N",
+        "label": "Business Unit",
+        "order": 25,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "criticality",
+        "imp": "G",
+        "label": "Criticality",
+        "order": 33,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "description",
+        "imp": "G",
+        "label": "Description",
+        "order": 2,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "drRpoDesc",
+        "imp": "N",
+        "label": "DR RPO",
+        "order": 44,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "drRtoDesc",
+        "imp": "N",
+        "label": "DR RTO",
+        "order": 45,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.Environment",
+        "default": "",
+        "field": "environment",
+        "imp": "G",
+        "label": "Environment",
+        "order": 32,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "externalRefId",
+        "imp": "N",
+        "label": "External Ref Id",
+        "order": 28,
+        "shared": 0,
+        "show": 1,
+        "tip": "ServiceNow (sys_id)",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "default": "",
+        "field": "lastUpdated",
+        "imp": "N",
+        "label": "Modified Date",
+        "order": 99,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0,
+          "values": [
+            "",
+            "Yes",
+            "No"
+          ]
+        },
+        "control": "YesNo",
+        "default": "",
+        "field": "latency",
+        "imp": "G",
+        "label": "Latency OK",
+        "order": 37,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "license",
+        "imp": "N",
+        "label": "License",
+        "order": 8,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "maintExpDate",
+        "imp": "N",
+        "label": "Maint Expiration",
+        "order": 27,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Reference",
+        "default": "",
+        "field": "moveBundle",
+        "imp": "G",
+        "label": "Bundle",
+        "order": 34,
+        "shared": 0,
+        "show": 1,
+        "tip": "Items moving together",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.PlanStatus",
+        "default": "",
+        "field": "planStatus",
+        "imp": "G",
+        "label": "Plan Status",
+        "order": 35,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "retireDate",
+        "imp": "N",
+        "label": "Retire Date",
+        "order": 26,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "shutdownBy",
+        "imp": "G",
+        "label": "Shutdown By",
+        "order": 50,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "shutdownDuration",
+        "imp": "N",
+        "label": "Shutdown Duration",
+        "order": 51,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "shutdownFixed",
+        "imp": "N",
+        "label": "Shutdown Fixed",
+        "order": 52,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Person",
+        "default": "",
+        "field": "sme",
+        "imp": "Y",
+        "label": "SME1",
+        "order": 22,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Person",
+        "default": "",
+        "field": "sme2",
+        "imp": "G",
+        "label": "SME2",
+        "order": 23,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "startupBy",
+        "imp": "N",
+        "label": "Startup By",
+        "order": 53,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "startupDuration",
+        "imp": "N",
+        "label": "Startup Duration",
+        "order": 54,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "startupFixed",
+        "imp": "N",
+        "label": "Startup Fixed",
+        "order": 55,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0,
+          "values": [
+            "",
+            "Yes",
+            "No"
+          ]
+        },
+        "control": "YesNo",
+        "default": "",
+        "field": "startupProc",
+        "imp": "U",
+        "label": "Startup Proc OK",
+        "order": 47,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "supportType",
+        "imp": "N",
+        "label": "Support",
+        "order": 21,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "testingBy",
+        "imp": "N",
+        "label": "Testing By",
+        "order": 56,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "testingDuration",
+        "imp": "N",
+        "label": "Testing Duration",
+        "order": 57,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "testingFixed",
+        "imp": "N",
+        "label": "Testing Fixed",
+        "order": 58,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0,
+          "values": [
+            "",
+            "Yes",
+            "No"
+          ]
+        },
+        "control": "YesNo",
+        "default": "",
+        "field": "testProc",
+        "imp": "N",
+        "label": "Test Proc OK",
+        "order": 46,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "url",
+        "imp": "N",
+        "label": "URL",
+        "order": 9,
+        "shared": 0,
+        "show": 1,
+        "tip": "be sure to state https;//",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "useFrequency",
+        "imp": "N",
+        "label": "Use Frequency",
+        "order": 43,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "userCount",
+        "imp": "G",
+        "label": "User Count",
+        "order": 41,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "userLocations",
+        "imp": "N",
+        "label": "User Locations",
+        "order": 42,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "validation",
+        "imp": "G",
+        "label": "Validation",
+        "order": 36,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0,
+          "values": [
+            "",
+            "Date Created:",
+            "123",
+            "abc",
+            "456",
+            "xyz"
+          ]
+        },
+        "control": "List",
+        "default": "",
+        "field": "custom1",
+        "imp": "N",
+        "label": "Network Interfaces",
+        "order": 101,
+        "shared": 0,
+        "show": 1,
+        "tip": "List any network interfaces that need to be updated",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0,
+          "values": [
+            "",
+            "12/20/2017 11:42 AM",
+            "Item 1",
+            "Item 2",
+            "Item 3"
+          ]
+        },
+        "control": "List",
+        "default": "Item 1",
+        "field": "custom2",
+        "imp": "N",
+        "label": "Custom2 b",
+        "order": 102,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom3",
+        "imp": "N",
+        "label": "Cost Basis",
+        "order": 103,
+        "shared": 0,
+        "show": 1,
+        "tip": "Cost basis",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom4",
+        "imp": "N",
+        "label": "Name and blank  space",
+        "order": 104,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom5",
+        "imp": "U",
+        "label": "Custom5",
+        "order": 105,
+        "shared": 0,
+        "show": 1,
+        "tip": "hover over and bite me",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom6",
+        "imp": "U",
+        "label": "Custom6-new",
+        "order": 106,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetClass",
+        "imp": "G",
+        "label": "Asset Class",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "a3",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "CNN|http://www.cnn.com",
+        "field": "custom7",
+        "imp": "G",
+        "label": "CNN",
+        "order": 107,
+        "shared": 1,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "field": "custom9",
+        "imp": "N",
+        "label": "IPs",
+        "order": 109,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "add",
+          "clear",
+          "replace",
+          "remove"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "asset-tag-selector",
+        "default": "",
+        "field": "tagAssets",
+        "imp": "N",
+        "label": "Tags",
+        "order": 0,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 200,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "QAE2EcpRUw",
+        "field": "custom11",
+        "imp": "O",
+        "label": "QAE2EcpRUw",
+        "order": 116,
+        "shared": 0,
+        "show": 0,
+        "tip": "QAE2E Non-Displayed Application Field for testing purposes",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 200,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "QAE2E0EAo5",
+        "field": "custom8",
+        "imp": "B",
+        "label": "QAE2E0EAo5",
+        "order": 117,
+        "shared": 0,
+        "show": 0,
+        "tip": "QAE2E Non-Displayed Application Field for testing purposes",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "field": "custom10",
+        "imp": "Y",
+        "label": "date time required",
+        "order": 110,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+    ],
+    "version": 121
+  },
+  "DATABASE": {
+    "domain": "DATABASE",
+    "fields": [
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "id",
+        "imp": "U",
+        "label": "Id",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetName",
+        "imp": "O",
+        "label": "Name",
+        "order": 1,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "description",
+        "imp": "O",
+        "label": "Description",
+        "order": 2,
+        "shared": 0,
+        "show": 1,
+        "tip": "testing tm9466",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "supportType",
+        "imp": "U",
+        "label": "Support",
+        "order": 21,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.Environment",
+        "default": "",
+        "field": "environment",
+        "imp": "U",
+        "label": "Environment",
+        "order": 31,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "externalRefId",
+        "imp": "U",
+        "label": "External Ref Id",
+        "order": 24,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "dbFormat",
+        "imp": "U",
+        "label": "Format",
+        "order": 4,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "retireDate",
+        "imp": "U",
+        "label": "Retire Date",
+        "order": 22,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Reference",
+        "default": "",
+        "field": "moveBundle",
+        "imp": "U",
+        "label": "Bundle",
+        "order": 32,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "size",
+        "imp": "O",
+        "label": "Size",
+        "order": 5,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "scale",
+        "imp": "B",
+        "label": "Scale",
+        "order": 6,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "maintExpDate",
+        "imp": "U",
+        "label": "Maint Expiration",
+        "order": 23,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.PlanStatus",
+        "default": "",
+        "field": "planStatus",
+        "imp": "U",
+        "label": "Plan Status",
+        "order": 33,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "rateOfChange",
+        "imp": "U",
+        "label": "Rate Of Change",
+        "order": 7,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "validation",
+        "imp": "U",
+        "label": "Validation",
+        "order": 34,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "default": "",
+        "field": "lastUpdated",
+        "imp": "U",
+        "label": "Modified Date",
+        "order": 99,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom1",
+        "imp": "U",
+        "label": "Network Interfaces",
+        "order": 101,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom2",
+        "imp": "U",
+        "label": "Custom2",
+        "order": 102,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom3",
+        "imp": "U",
+        "label": "Cost Basis",
+        "order": 103,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom4",
+        "imp": "U",
+        "label": "Custom4",
+        "order": 104,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom5",
+        "imp": "U",
+        "label": "Custom5",
+        "order": 105,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom6",
+        "imp": "U",
+        "label": "Custom6",
+        "order": 106,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "CNN|http://www.cnn.com",
+        "field": "custom7",
+        "imp": "G",
+        "label": "CNN",
+        "order": 107,
+        "shared": 1,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom8",
+        "imp": "U",
+        "label": "Custom8",
+        "order": 108,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetClass",
+        "imp": "N",
+        "label": "Asset Class",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "testing tm9466",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "field": "custom9",
+        "imp": "N",
+        "label": "IPs",
+        "order": 109,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "add",
+          "clear",
+          "replace",
+          "remove"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "asset-tag-selector",
+        "default": "",
+        "field": "tagAssets",
+        "imp": "N",
+        "label": "Tags",
+        "order": 0,
+        "shared": 0,
+        "show": 1,
+        "tip": "Tags",
+        "udf": 0
+      },
+    ],
+    "version": 41
+  },
+  "DEVICE": {
+    "domain": "DEVICE",
+    "fields": [
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "id",
+        "imp": "U",
+        "label": "Id",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetName",
+        "imp": "O",
+        "label": "Name",
+        "order": 1,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetTag",
+        "imp": "N",
+        "label": "Asset Tag",
+        "order": 8,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "AssetType",
+        "default": "",
+        "field": "assetType",
+        "imp": "N",
+        "label": "Device Type",
+        "order": 3,
+        "shared": 0,
+        "show": 1,
+        "tip": "testing tm9466",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "cart",
+        "imp": "N",
+        "label": "Cart",
+        "order": 28,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "description",
+        "imp": "O",
+        "label": "Description",
+        "order": 2,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.Environment",
+        "default": "",
+        "field": "environment",
+        "imp": "G",
+        "label": "Environment",
+        "order": 21,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "externalRefId",
+        "imp": "N",
+        "label": "External Ref Id",
+        "order": 10,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "ipAddress",
+        "imp": "N",
+        "label": "IP Address",
+        "order": 23,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "default": "",
+        "field": "lastUpdated",
+        "imp": "N",
+        "label": "Modified Date",
+        "order": 99,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "maintExpDate",
+        "imp": "N",
+        "label": "Maint Expiration",
+        "order": 26,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "manufacturer",
+        "imp": "N",
+        "label": "Manufacturer",
+        "order": 4,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "model",
+        "imp": "N",
+        "label": "Model",
+        "order": 5,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Reference",
+        "default": "",
+        "field": "moveBundle",
+        "imp": "G",
+        "label": "Bundle",
+        "order": 50,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "os",
+        "imp": "N",
+        "label": "OS",
+        "order": 24,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.PlanStatus",
+        "default": "",
+        "field": "planStatus",
+        "imp": "G",
+        "label": "Plan Status",
+        "order": 51,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.Priority",
+        "default": "",
+        "field": "priority",
+        "imp": "N",
+        "label": "Priority",
+        "order": 22,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "railType",
+        "imp": "U",
+        "label": "Rail Type",
+        "order": 9,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "rateOfChange",
+        "imp": "N",
+        "label": "Rate Of Change",
+        "order": 55,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "default": "",
+        "field": "retireDate",
+        "imp": "N",
+        "label": "Retire Date",
+        "order": 26,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "scale",
+        "imp": "N",
+        "label": "Scale",
+        "order": 54,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "serialNumber",
+        "imp": "N",
+        "label": "Serial #",
+        "order": 7,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "shelf",
+        "imp": "U",
+        "label": "Shelf",
+        "order": 29,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "shortName",
+        "imp": "N",
+        "label": "Alternate Name",
+        "order": 6,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "size",
+        "imp": "N",
+        "label": "Size",
+        "order": 53,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "sourceBladePosition",
+        "imp": "N",
+        "label": "Source Blade Position",
+        "order": 41,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Chassis.S",
+        "default": "",
+        "field": "sourceChassis",
+        "imp": "N",
+        "label": "Source Chassis",
+        "order": 40,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Location.S",
+        "default": "",
+        "field": "locationSource",
+        "imp": "Y",
+        "label": "Source Location",
+        "order": 31,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Rack.S",
+        "default": "",
+        "field": "rackSource",
+        "imp": "Y",
+        "label": "Source Rack",
+        "order": 33,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "sourceRackPosition",
+        "imp": "Y",
+        "label": "Source Position",
+        "order": 34,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Room.S",
+        "default": "",
+        "field": "roomSource",
+        "imp": "Y",
+        "label": "Source Room",
+        "order": 32,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "supportType",
+        "imp": "N",
+        "label": "Support",
+        "order": 25,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "targetBladePosition",
+        "imp": "N",
+        "label": "Target Blade Position",
+        "order": 43,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Chassis.T",
+        "default": "",
+        "field": "targetChassis",
+        "imp": "N",
+        "label": "Target Chassis",
+        "order": 42,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Location.T",
+        "default": "",
+        "field": "locationTarget",
+        "imp": "G",
+        "label": "Target Location",
+        "order": 36,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Rack.T",
+        "default": "",
+        "field": "rackTarget",
+        "imp": "G",
+        "label": "Target Rack",
+        "order": 38,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "targetRackPosition",
+        "imp": "G",
+        "label": "Target Position",
+        "order": 39,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Room.T",
+        "default": "",
+        "field": "roomTarget",
+        "imp": "G",
+        "label": "Target Room",
+        "order": 37,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "truck",
+        "imp": "U",
+        "label": "Truck",
+        "order": 27,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "validation",
+        "imp": "Y",
+        "label": "Validation",
+        "order": 52,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "Display it anyways",
+        "field": "custom1",
+        "imp": "N",
+        "label": "Power State",
+        "order": 101,
+        "shared": 0,
+        "show": 0,
+        "tip": "by - CN",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0,
+          "values": []
+        },
+        "control": "String",
+        "default": "Display it",
+        "field": "custom2",
+        "imp": "N",
+        "label": "Clean Power Off",
+        "order": 102,
+        "shared": 0,
+        "show": 0,
+        "tip": "by - CN",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom3",
+        "imp": "N",
+        "label": "Cost Basis",
+        "order": 103,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom4",
+        "imp": "N",
+        "label": "Custom4",
+        "order": 104,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom5",
+        "imp": "N",
+        "label": "Custom5",
+        "order": 105,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom6",
+        "imp": "N",
+        "label": "Custom6",
+        "order": 106,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "CNN|http://www.cnn.com",
+        "field": "custom7",
+        "imp": "G",
+        "label": "CNN",
+        "order": 107,
+        "shared": 1,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom8",
+        "imp": "N",
+        "label": "Custom8",
+        "order": 108,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetClass",
+        "imp": "N",
+        "label": "Asset Class",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "field": "custom9",
+        "imp": "N",
+        "label": "IPs",
+        "order": 109,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "add",
+          "clear",
+          "replace",
+          "remove"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "asset-tag-selector",
+        "default": "",
+        "field": "tagAssets",
+        "imp": "N",
+        "label": "Tags",
+        "order": 0,
+        "shared": 0,
+        "show": 1,
+        "tip": "Tags",
+        "udf": 0
+      },
+    ],
+    "version": 41
+  },
+  "STORAGE": {
+    "domain": "STORAGE",
+    "fields": [
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "id",
+        "imp": "U",
+        "label": "Id",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetName",
+        "imp": "O",
+        "label": "Name",
+        "order": 1,
+        "shared": 0,
+        "show": 1,
+        "tip": "Storage Asset Name - by CN",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "description",
+        "imp": "O",
+        "label": "Description",
+        "order": 2,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "LUN",
+        "imp": "N",
+        "label": "LUN",
+        "order": 21,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Reference",
+        "default": "",
+        "field": "moveBundle",
+        "imp": "U",
+        "label": "Bundle",
+        "order": 41,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "fileFormat",
+        "imp": "B",
+        "label": "Format",
+        "order": 4,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.Environment",
+        "default": "",
+        "field": "environment",
+        "imp": "U",
+        "label": "Environment",
+        "order": 22,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "externalRefId",
+        "imp": "U",
+        "label": "External Ref Id",
+        "order": 34,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "supportType",
+        "imp": "Y",
+        "label": "Support",
+        "order": 33,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Options.PlanStatus",
+        "default": "",
+        "field": "planStatus",
+        "imp": "U",
+        "label": "Plan Status",
+        "order": 42,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "size",
+        "imp": "P",
+        "label": "Size",
+        "order": 5,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Number",
+        "default": "",
+        "field": "rateOfChange",
+        "imp": "U",
+        "label": "Rate Of Change",
+        "order": 23,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "InList",
+        "default": "",
+        "field": "validation",
+        "imp": "U",
+        "label": "Validation",
+        "order": 43,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "default": "",
+        "field": "lastUpdated",
+        "imp": "U",
+        "label": "Modified Date",
+        "order": 99,
+        "shared": 0,
+        "show": 0,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "scale",
+        "imp": "O",
+        "label": "Scale",
+        "order": 6,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom1",
+        "imp": "U",
+        "label": "Network Interfaces",
+        "order": 101,
+        "shared": 0,
+        "show": 1,
+        "tip": "testing tm9466",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom2",
+        "imp": "U",
+        "label": "Custom2",
+        "order": 102,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom3",
+        "imp": "U",
+        "label": "Cost Basis",
+        "order": 103,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom4",
+        "imp": "U",
+        "label": "Custom4",
+        "order": 104,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom5",
+        "imp": "U",
+        "label": "Custom5",
+        "order": 105,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom6",
+        "imp": "U",
+        "label": "Custom6",
+        "order": 106,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "CNN|http://www.cnn.com",
+        "field": "custom7",
+        "imp": "G",
+        "label": "CNN",
+        "order": 107,
+        "shared": 1,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "",
+        "field": "custom8",
+        "imp": "U",
+        "label": "Custom8",
+        "order": 108,
+        "shared": 0,
+        "show": 1,
+        "tip": "",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [],
+        "constraints": {
+          "required": 1
+        },
+        "control": "String",
+        "default": "",
+        "field": "assetClass",
+        "imp": "N",
+        "label": "Asset Class",
+        "order": 0,
+        "shared": 0,
+        "show": 0,
+        "tip": "a2",
+        "udf": 0
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "String",
+        "field": "custom9",
+        "imp": "N",
+        "label": "IPs",
+        "order": 109,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "add",
+          "clear",
+          "replace",
+          "remove"
+        ],
+        "constraints": {
+          "required": 1
+        },
+        "control": "asset-tag-selector",
+        "default": "",
+        "field": "tagAssets",
+        "imp": "N",
+        "label": "Tags",
+        "order": 0,
+        "shared": 0,
+        "show": 1,
+        "tip": "Tags",
+        "udf": 0
+      },
+    ],
+    "version": 42
+  }
 }

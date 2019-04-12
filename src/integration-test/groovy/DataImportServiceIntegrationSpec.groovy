@@ -1,8 +1,8 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
@@ -15,19 +15,19 @@ import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelAlias
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
+import net.transitionmanager.imports.DataImportService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
@@ -39,7 +39,7 @@ import test.helper.AssetEntityTestHelper
 @Rollback
 class DataImportServiceIntegrationSpec extends Specification {
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
     DataImportService dataImportService
@@ -48,22 +48,22 @@ class DataImportServiceIntegrationSpec extends Specification {
     SecurityService securityService
 
 	@Shared
-	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+	DataScriptTestHelper dataScriptTestHelper
 
 	@Shared
 	FileSystemService fileSystemService
 
 	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
+	PersonTestHelper personTestHelper
 
 	@Shared
-    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+    ProjectTestHelper projectTestHelper
 
 	@Shared
-	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+	ProviderTestHelper providerTestHelper
 
 	@Shared
 	Project project
@@ -91,6 +91,12 @@ class DataImportServiceIntegrationSpec extends Specification {
 	}
 
 	void setup() {
+		assetEntityTestHelper = new AssetEntityTestHelper()
+		dataScriptTestHelper = new DataScriptTestHelper()
+		moveBundleTestHelper = new MoveBundleTestHelper()
+		personTestHelper = new PersonTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		providerTestHelper = new ProviderTestHelper()
 		whom = personTestHelper.createPerson()
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
@@ -949,7 +955,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			GormUtil.hasUnsavedChanges(server)
 
 		when: 'the server is saved'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'there should be no unsaved changes'
 			! GormUtil.hasUnsavedChanges(server)
@@ -993,7 +999,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			server.modifiedBy == clientStaff2
 
 		when: 'saving the changes after the latest changes'
-			server.save(failOnError:true, flush:true)
+			server.save(flush:true)
 			server.refresh()
 		then: 'the server move bundle should now reference the new bundle'
 			server.moveBundle.id == mb2.id
@@ -1157,7 +1163,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			manufacturer = Manufacturer.findOrSaveWhere( name: manufacturerName )
 			new ManufacturerAlias(
 					  name: manufacturerAliasName, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return manufacturer
@@ -1180,7 +1186,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			model = Model.findOrSaveWhere( modelName:modelName , manufacturer: manufacturer )
 			new ModelAlias(
 					  name: modelAliasName, model: model, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return model

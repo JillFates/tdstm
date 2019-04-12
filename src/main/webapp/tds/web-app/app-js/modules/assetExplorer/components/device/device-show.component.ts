@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
-import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { DependecyService } from '../../service/dependecy.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DependecyService} from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
 import {AssetEditComponent} from '../asset/asset-edit.component';
-import { DeviceModel } from './model-device/model/device-model.model';
-import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.model';
-import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
-import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
+import {DeviceModel} from './model-device/model/device-model.model';
+import {DeviceManufacturer} from './manufacturer/model/device-manufacturer.model';
+import {ModelDeviceShowComponent} from './model-device/components/model-device-show/model-device-show.component';
+import {ManufacturerShowComponent} from './manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -16,9 +16,8 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetCommonHelper} from '../asset/asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -37,9 +36,9 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			prompt: UIPromptService,
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
-			preferenceService: PreferenceService,
+			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, preferenceService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
 				this.manufacturerName = null;

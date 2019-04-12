@@ -1,6 +1,6 @@
 import org.quartz.JobExecutionContext
 import org.springframework.util.Assert
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 
 /**
  * The SecureJob class is used to initialize the security context of a job to that of the user

@@ -1,10 +1,10 @@
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserService
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -19,13 +19,13 @@ class UserServiceTests extends Specification {
 
     private UserLogin createUserAccount(String username = null, Date createdDate = null, Date lastLogin = null) {
         Date now = TimeUtil.nowGMT()
-        Person person = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save(failOnError: true)
+        Person person = new Person(firstName: 'Jack', lastName: 'Rabbit', staffType: 'Salary').save()
         UserLogin userLogin = new UserLogin(username: username ?: 'bendover', password: 'guessit', person: person, active: 'Y',
                 createdDate: createdDate,
                 expiryDate: now + 1,
                 lastLogin: lastLogin,
                 lockedOutUntil: null
-        ).save(failOnError: true)
+        ).save()
         return userLogin
     }
 

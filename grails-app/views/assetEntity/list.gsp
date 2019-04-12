@@ -1,8 +1,8 @@
-<%@page import="com.tds.asset.AssetComment" %>
-<%@page import="com.tds.asset.AssetEntity" %>
-<%@page import="com.tds.asset.Application" %>
-<%@page import="com.tds.asset.Database" %>
-<%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.task.AssetComment" %>
+<%@page import="net.transitionmanager.asset.AssetEntity" %>
+<%@page import="net.transitionmanager.asset.Application" %>
+<%@page import="net.transitionmanager.asset.Database" %>
+<%@page import="net.transitionmanager.asset.Files" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new AssetEntity()).assetClass}" />

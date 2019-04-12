@@ -1,12 +1,12 @@
 package net.transitionmanager.task
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.MessageSourceService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.task.TaskService
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.beans.factory.annotation.Autowired

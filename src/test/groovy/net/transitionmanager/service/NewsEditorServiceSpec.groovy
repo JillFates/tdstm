@@ -3,12 +3,16 @@ package net.transitionmanager.service
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.common.NewsEditorService
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventNews
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -31,7 +35,7 @@ class NewsEditorServiceSpec extends Specification implements ServiceUnitTest<New
 	}
 
 	void setup() {
-		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true, failOnError: true)
+		partyGroup = new PartyGroup(name: 'projectClientName').save(flush: true)
 
 		project = new Project(
 			name: 'projectName',
@@ -41,10 +45,10 @@ class NewsEditorServiceSpec extends Specification implements ServiceUnitTest<New
 			client: partyGroup,
 			workflowCode: '12345',
 			guid: StringUtil.generateGuid()
-		).save(flush: true, failOnError: true)
+		).save(flush: true)
 
-		whom = new Person(firstName: 'Danger', lastName: 'Powers').save(flush: true, failOnError: true)
-		moveEvent = new MoveEvent([project: project, name: 'ERP Event']).save(flush: true, failOnError: true)
+		whom = new Person(firstName: 'Danger', lastName: 'Powers').save(flush: true)
+		moveEvent = new MoveEvent([project: project, name: 'ERP Event']).save(flush: true)
 
 		service.securityService = [
 			getUserCurrentProject: { -> project },

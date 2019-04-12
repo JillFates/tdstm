@@ -2,7 +2,7 @@ package com.tdsops.common.security.spring
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication

@@ -1,13 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="topNav" />
-	<title>Server Conflicts</title>
-	<g:javascript src="asset.tranman.js" />
-	<g:javascript src="entity.crud.js" />
-	<g:render template="/layouts/responsiveAngularResources" />
-	<g:javascript src="asset.comment.js" />
+	%{--<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />--}%
+	%{--<meta name="layout" content="topNav" />--}%
+	%{--<title>Server Conflicts</title>--}%
+	%{--<g:javascript src="asset.tranman.js" />--}%
+	%{--<g:javascript src="entity.crud.js" />--}%
+	%{--<g:render template="/layouts/responsiveAngularResources" />--}%
+	%{--<g:javascript src="asset.comment.js" />--}%
 	<script>
 		var maxR
 		var ofst
@@ -56,7 +54,7 @@
 	</script>
 </head>
 <body>
-	<tds:subHeader title="Server Conflicts" crumbs="['Reports','Server Conflicts']"/>
+	%{--<tds:subHeader title="Server Conflicts" crumbs="['Reports','Server Conflicts']"/>--}%
 	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>${project.name} : ${moveBundle} - Includes servers matching: ${title?:'' }</b><br/>
@@ -68,7 +66,7 @@
 		${eventErrorString}
 		<table class="planning-application-table">
 			<tbody id="serverConflictTbody">
-				<g:render template="serverConflicts"></g:render>
+				<g:render template="/reports/serverConflicts"></g:render>
 			</tbody>
 		</table>
 

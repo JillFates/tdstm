@@ -8,12 +8,14 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 // Model
 import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
 // Other
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {ManualRequestComponent} from '../manual-request/manual-request.component';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 @Component({
 	selector: 'tds-license-detail',
@@ -35,13 +37,14 @@ export class LicenseDetailComponent implements OnInit {
 		private licenseAdminService: LicenseAdminService,
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private userContext: UserContextService) {
 	}
 
 	ngOnInit(): void {
 
-		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
-			this.dateFormat = dateFormat;
+		this.userContext.getUserContext().subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 		});
 
 		this.licenseAdminService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {

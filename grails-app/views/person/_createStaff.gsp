@@ -1,7 +1,7 @@
-<%@ page import="net.transitionmanager.domain.Person" %>
+<%@ page import="net.transitionmanager.person.Person" %>
 <div class="dialog">
 
-<g:form action="save" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
+<g:form action="save" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')" autocomplete="off">
           <input type="hidden"  id="createstaff" name="createstaff" value="${forWhom}" />
           <div class="dialog">
             <table>

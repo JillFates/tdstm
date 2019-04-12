@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.person.Person" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
@@ -18,7 +18,6 @@
 		<jqgrid:resources />
 		<g:javascript src="admin.js" />
 		<g:javascript src="projectStaff.js" />
-		<g:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
 		<g:javascript src="asset.comment.js" />
 	</head>

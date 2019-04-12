@@ -1,19 +1,21 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.SettingService
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.domain.Timezone
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
+import net.transitionmanager.common.Timezone
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -47,7 +49,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			guid = StringUtil.generateGuid()
 		}
 
-		defaultProject.save(failOnError: true)
+		defaultProject.save()
 
 		[
 			'Application': createJSONFieldSpecFor(AssetClass.APPLICATION),
@@ -60,7 +62,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			setting.type = SettingType.CUSTOM_DOMAIN_FIELD_SPEC
 			setting.key = it.key.toUpperCase()
 			setting.json = it.value
-			setting.save(failOnError: true)
+			setting.save()
 		}
 
 		fieldSpecProject = service.createFieldSpecProject(defaultProject)

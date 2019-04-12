@@ -1,7 +1,7 @@
 package com.tdssrc.grails
 
 import spock.lang.Specification
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 /**
  * Unit test cases for the StringUtil class

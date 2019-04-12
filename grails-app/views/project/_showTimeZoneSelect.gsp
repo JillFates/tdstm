@@ -1,6 +1,6 @@
 <%@page import="com.tdssrc.grails.TimeUtil"%>
-<%@page import="net.transitionmanager.domain.Project" %>
-<%@page import="net.transitionmanager.domain.UserPreference" %>
+<%@page import="net.transitionmanager.project.Project" %>
+<%@page import="net.transitionmanager.person.UserPreference" %>
 
 <script>
 	$(document).ready(function(){
@@ -21,7 +21,7 @@
 	</div>
 
 	<img id="timezoneImage" src="${assetPath(src: 'images/world_map_800.jpg')}" width="800" height="400" usemap="#timezoneMap"/>
-	<asset:image src="images/pin.png" style="padding-top: 4px;" />
+	<asset:image class="timezone-pin" src="images/pin.png" style="padding-top: 4px;" />
 
 	<map name="timezoneMap" id="timezoneMap">
 		<g:each in="${areas}" var="tzName, tzInfo">
