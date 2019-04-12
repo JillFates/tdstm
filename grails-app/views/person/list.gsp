@@ -84,8 +84,8 @@
 						{name:'m1ddlename', width:'80', formatter: myLinkFormatter},
 						{name:'laztname', index: 'laztname', width:'80', formatter: myLinkFormatter},
 						{name:'uzerLogin', width:'80' },
-						{name:'zmail',width:'100'},
-						{name:'zompany',width:'100'},
+						{name:'zmail',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'zompany',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'laztname'"
