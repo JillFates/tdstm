@@ -114,6 +114,11 @@ export class TaskColumnModel {
 	constructor() {
 		this.columns = [
 			{
+				label: 'Action',
+				property: 'action',
+				type: 'text',
+				width: 40
+			}, {
 				label: 'Task',
 				property: 'task',
 				type: 'text',

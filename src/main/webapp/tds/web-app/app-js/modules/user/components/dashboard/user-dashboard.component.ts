@@ -46,6 +46,14 @@ export class UserDashboardComponent implements OnInit {
 	public taskColumnModel;
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public items: any[] = [{
+		text: 'Item1',
+		items: [{ text: 'Item1.1' }, { text: 'Item1.2' }]
+	}, {
+		text: 'Item2'
+	}, {
+		text: 'Item3'
+	}];
 	@ViewChild('taskGrid')
 	taskGrid: GridComponent;
 

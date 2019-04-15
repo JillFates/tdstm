@@ -60,6 +60,12 @@
                                 <label>{{column.label}}</label>
                             </div>
                         </ng-template>
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                            <span #optionsButton *ngIf="column.property=='action'">more</span>
+                            <kendo-contextmenu [target]="optionsButton" [items]="items">
+                            </kendo-contextmenu>
+                            <span *ngIf="column.property!='action'">{{dataItem[column.property]}}</span>
+                        </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
                 <span>{{summaryDetail}}</span>
