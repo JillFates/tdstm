@@ -49,7 +49,7 @@
 
                     <td>
                         <label><b>Source</b></label><br/>
-                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px; height:96px"
+                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:400px; height:96px"
                                 size="4">
                             <option value="null" selected="selected">All</option>
                         </select>
