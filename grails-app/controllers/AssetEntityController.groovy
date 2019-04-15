@@ -83,6 +83,7 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.util.HtmlUtils
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -2739,6 +2740,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 
 		def results = dependencies?.collect {
+			String escapedPref1Value = HtmlUtils.htmlEscape(it[depPref['1']])
+			String escapedPref2Value = HtmlUtils.htmlEscape(it[depPref['2']])
 			[id: it.id,
 			 cell: [it.assetName,
 			        it.assetType,
@@ -2747,8 +2750,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			        it.dependentName,
 			        it.dependentType,
 			        it.dependentBundle,
-			        (depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>$it.comment</div>" : ''),
-			        (depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>$it.comment</div>" : ''),
+			        (depPref['1']!='comment') ? escapedPref1Value : (it[depPref['1']]? "<div class='commentEllip'>$escapedPref1Value</div>" : ''),
+			        (depPref['2']!='comment') ? escapedPref2Value : (it[depPref['2']]? "<div class='commentEllip'>$escapedPref2Value</div>" : ''),
 			        it.status,
 			        it.assetId, // 10
 			        it.dependentId, // 11
