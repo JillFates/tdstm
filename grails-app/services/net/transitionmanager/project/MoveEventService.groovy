@@ -70,6 +70,10 @@ class MoveEventService implements ServiceMethods {
 														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
 														'actStart', 'actFinish', 'workflow']
+	/**
+	 * Number of days to use as a cutoff for events in the user dashboard.
+	 */
+	private static final Integer COMPLETION_DATE_CUTOFF = 14
 
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
@@ -516,5 +520,20 @@ class MoveEventService implements ServiceMethods {
 			}
 		}.list()
 
+	}
+
+	/**
+	 * Query and return the events the given person has access to.
+	 * @param person - the person for whom the assigned events are retrieved.
+	 * @param projectId - if a project is specified, use that id to narrow down results.
+	 * @return a list of events the person has access to.
+	 */
+	List<MoveEvent> getAssignedEventsForDashboard(Person person, Long projectId) {
+		Project project
+		if (projectId > 0) {
+			project = Project.read(projectId)
+		}
+		Date completionCutoff = TimeUtil.nowGMT().minus(COMPLETION_DATE_CUTOFF)
+		return getAssignedEvents(person, project, completionCutoff)
 	}
 }
