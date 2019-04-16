@@ -61,13 +61,15 @@
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                            <span #optionsButton *ngIf="column.property=='action'">more</span>
-                            <kendo-contextmenu [target]="optionsButton" [items]="items">
-                            </kendo-contextmenu>
+                            <div class="optionsButton" *ngIf="column.property=='action'">
+                                <span>more</span>
+                            </div>
                             <span *ngIf="column.property!='action'">{{dataItem[column.property]}}</span>
                         </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
+                <kendo-contextmenu [target]="taskGrid" filter=".optionsButton" [items]="items">
+                </kendo-contextmenu>
                 <span>{{summaryDetail}}</span>
             </div>
             <div class="col-md-6 cell-container">
