@@ -220,7 +220,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
-		}, 100);
+		}, 1500);
 	}
 
 	/**
