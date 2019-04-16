@@ -28,6 +28,11 @@ class CustomDomainService implements ServiceMethods {
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
     SettingService settingService
+    /**
+     * Cache for field specs
+     */
+    FieldSpecsCacheService fieldSpecsCacheService
+
     def jdbcTemplate
 
     /**
@@ -142,7 +147,14 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     Map allFieldSpecs(Project project, String domain, boolean showOnly = false){
-        Map fieldSpec = [:]
+
+        Map fieldSpec = fieldSpecsCacheService.getAllFieldSpecs(project, domain)
+        if (fieldSpec) {
+            return fieldSpec
+        } else {
+            fieldSpec = [:]
+        }
+
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
         for (String assetClassType : assetClassTypes) {
@@ -158,6 +170,7 @@ class CustomDomainService implements ServiceMethods {
             }
         }
 
+        fieldSpecsCacheService.setAllFieldSpecs(project, domain, fieldSpec)
         return fieldSpec
     }
 
@@ -217,6 +230,8 @@ class CustomDomainService implements ServiceMethods {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")
             }
         }
+
+        fieldSpecsCacheService.removeFieldSpecs(project, domain)
     }
 
     /**
