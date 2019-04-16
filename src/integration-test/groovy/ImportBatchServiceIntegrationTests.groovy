@@ -2,12 +2,13 @@ import com.tdsops.etl.ETLDomain
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.command.ImportBatchRecordFieldUpdateCommand
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.ImportBatchService
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.imports.ImportBatchService
 import spock.lang.Specification
 
 @Integration
@@ -40,7 +41,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 
 
 			ImportBatchRecordUpdateCommand cmd = new ImportBatchRecordUpdateCommand()
-			Map newValues = [fieldName: field1, value: field1Value]
+			ImportBatchRecordFieldUpdateCommand newValues = new ImportBatchRecordFieldUpdateCommand(fieldName: field1, value: field1Value)
 			cmd.fieldsInfo = [newValues]
 		when: 'Updating the record with some new values'
 			importBatchService.updateBatchRecord(project, batch.id, record.id, cmd)
@@ -49,7 +50,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			fieldsInfo[field1].value == field1Value
 		when: 'Overriding the previous value'
 			String field1UpdatedValue = 'some other value'
-			newValues = [fieldName: field1, value: field1UpdatedValue]
+			newValues = new ImportBatchRecordFieldUpdateCommand(fieldName: field1, value: field1UpdatedValue)
 			cmd.fieldsInfo = [newValues]
 			importBatchService.updateBatchRecord(project, batch.id, record.id, cmd)
 			fieldsInfo = record.fieldsInfoAsMap()

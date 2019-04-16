@@ -1,16 +1,15 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.party.Party
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 

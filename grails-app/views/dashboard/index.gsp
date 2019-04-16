@@ -1,4 +1,4 @@
-<%@ page import="net.transitionmanager.domain.MoveBundleStep" %>
+<%@ page import="net.transitionmanager.project.MoveBundleStep" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>

@@ -1,7 +1,7 @@
 package com.tdssrc.grails
 
 import net.transitionmanager.command.ApiCatalogCommand
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 import spock.lang.See
 import spock.lang.Specification

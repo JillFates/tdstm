@@ -278,7 +278,7 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Live Dashboards</li>
                     <li class="menu-child-item menu-parent-dashboard-user-dashboard">
-                        <a href="/tdstm/modules/user/dashboard">User Dashboard</a>
+                        <a href="/tdstm/module/user/dashboard">User Dashboard</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewPlanning)" class="menu-child-item menu-parent-dashboard-planning-dashboard">
                         <a href="/tdstm/moveBundle/planningStats">Planning Dashboard</a>
@@ -301,13 +301,13 @@
                         <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
                     </li>
                     <li class="menu-child-item menu-reports-server-conflicts">
-                        <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
+											<a [routerLink]="['reports','serverConflicts']" >Server Conflicts</a>
                     </li>
                     <li class="menu-child-item menu-reports-database-conflicts">
                         <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewPlanning)" class="menu-child-item menu-reports-task-report">
-                        <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
+												<a [routerLink]="['reports','taskReport']" >Task Report</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewProjectDailyMetrics)" class="menu-child-item menu-reports-activity-metrics">
                         <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>

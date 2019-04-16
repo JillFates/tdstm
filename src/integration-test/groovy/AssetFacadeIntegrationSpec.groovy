@@ -1,12 +1,12 @@
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 import spock.lang.Specification
 import test.helper.ProjectTestHelper
 import test.helper.MoveBundleTestHelper

@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Files"%>
+<%@page import="net.transitionmanager.asset.Files"%>
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files" />
 

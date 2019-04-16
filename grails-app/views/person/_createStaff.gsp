@@ -1,4 +1,4 @@
-<%@ page import="net.transitionmanager.domain.Person" %>
+<%@ page import="net.transitionmanager.person.Person" %>
 <div class="dialog">
 
 <g:form action="save" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')" autocomplete="off">

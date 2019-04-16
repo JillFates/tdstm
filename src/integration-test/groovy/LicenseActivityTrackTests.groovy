@@ -1,6 +1,5 @@
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.LicenseActivityTrack
-import net.transitionmanager.domain.LicensedClient
+import net.transitionmanager.license.LicenseActivityTrack
 import spock.lang.Specification
 
 /**

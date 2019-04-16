@@ -6,7 +6,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.integration.ReactionScriptCode
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 
 import java.util.regex.Pattern

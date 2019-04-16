@@ -1,7 +1,7 @@
 package com.tdsops.ldap
 
 import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
-import net.transitionmanager.service.UserService
+import net.transitionmanager.person.UserService
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetailsService

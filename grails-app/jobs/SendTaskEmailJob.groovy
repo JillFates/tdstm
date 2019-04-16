@@ -1,5 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.CommentService
+import net.transitionmanager.asset.CommentService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 import org.quartz.TriggerKey

@@ -1,14 +1,16 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
@@ -16,6 +18,7 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
+import net.transitionmanager.task.TaskService
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 

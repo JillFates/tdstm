@@ -52,7 +52,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 	private saveContent(): void {
 		this.isPristine = false;
 		const content = this.editor.getContent();
-		const rawContent = this.editor.getContent({format: 'raw'});
+		const rawContent = this.editor.getContent({format: 'text'});
 		this.valueChange.emit(content);
 		this.rawValueChange.emit(rawContent);
 	}

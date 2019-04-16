@@ -1,6 +1,6 @@
 package com.tdsops.tm.asset.graph
 
-import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.project.MoveBundle
 
 /**
  * Struct to maintain an asset dependency graph, that allow operation like group assets by references

@@ -383,14 +383,14 @@
                                 <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
-                                <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
+                                <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
                                 <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
+                                    <g:link controller="module" action="reports" id="taskReport" elementId="taskReport">Task Report</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">

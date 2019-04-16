@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetType;"%>
+<%@page import="net.transitionmanager.asset.AssetType; net.transitionmanager.asset.AssetType;"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <tds:hasPermission permission="${Permission.AssetEdit}">
@@ -39,7 +39,7 @@
 </tds:hasPermission>
 
 <%-- TODO : JPM 10/2014 : Refactor logic for cable button test to be in domain --%>
-<g:if test="${assetEntity && assetEntity?.assetType in AssetType.physicalServerTypes && assetEntity?.model && assetEntity.isCableExist()}">
+<g:if test="${assetEntity && assetEntity?.assetType in net.transitionmanager.asset.AssetType.physicalServerTypes && assetEntity?.model && assetEntity.isCableExist()}">
     <button class="btn btn-default" type="button" onclick="openCablingDiv(${assetEntity?.id},'S')">
         <asset:image src="icons/disconnect.png" border="0px"/> Cable
     </button>

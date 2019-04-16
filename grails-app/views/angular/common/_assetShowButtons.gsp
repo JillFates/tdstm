@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetType;"%>
+<%@page import="net.transitionmanager.asset.AssetType; net.transitionmanager.asset.AssetType;"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <g:if test="${redirectTo!='dependencyConsole'}">
@@ -21,7 +21,7 @@
 </g:else>
 
 <%-- TODO : JPM 08/2014 - isCableExist does NOT seem to make sense and it should be ALL physical servers, network, etc - need to move to domain asset.canCable() --%>
-<g:if test="${asset && asset.model?.assetType && asset.model.assetType in AssetType.getPhysicalServerTypes() && asset.isCableExist()}">
+<g:if test="${asset && asset.model?.assetType && asset.model.assetType in net.transitionmanager.asset.AssetType.getPhysicalServerTypes() && asset.isCableExist()}">
  	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv('${asset.id}','S')" /> </span>
 </g:if>
 

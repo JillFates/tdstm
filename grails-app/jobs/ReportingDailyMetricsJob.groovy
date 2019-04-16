@@ -1,4 +1,4 @@
-import net.transitionmanager.service.MetricReportingService
+import net.transitionmanager.reporting.MetricReportingService
 import org.quartz.JobExecutionContext
 /**
  * A job to run the daily reporting metrics from the metricReportingService.

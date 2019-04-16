@@ -1,8 +1,8 @@
 package net.transitionmanager.strategy.asset
 
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tds.asset.Files
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.AssetCommand
 
 class StorageSaveUpdateStrategy extends AssetSaveUpdateStrategy{

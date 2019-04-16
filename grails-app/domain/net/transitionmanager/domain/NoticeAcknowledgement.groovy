@@ -1,6 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.notice.Notice
+import net.transitionmanager.person.Person
 
 /**
  * @author octavio

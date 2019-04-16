@@ -267,12 +267,13 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	 */
 	var checkForSelectedRow = function() {
 		var row = -1;
-		if (state.params.recipeId) {
 			// The scope.sortedRows is a separate dataset from the scope.gridData that gets populated when the user sorts the
 			// list. The original scope.gridData does not get remains in the order when retrieved from the server. So if sortedRows
 			// exists then this logic will figure out the selected row index from that dataset otherwise use the gridData list.
 			// Note that the location of the recipeId is in different places within the List<Object>.
 			var datagridSet = scope.sortedRows ? scope.sortedRows : scope.gridData;
+
+		if (state.params.recipeId) {
 			var recipeId = state.params.recipeId;
 			row = (datagridSet.length > 0) ? 0 : -1;
 			for (var i = 0; i < datagridSet.length; i++) {
@@ -1748,19 +1749,19 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		if(scope.editor.originalRecipeType && scope.editor.originalRecipeType == 'release' && scope.editor.selectedRecipe.hasWIP){
 			proceedToSave = confirm("There is already a WIP of this recipe. Press Okay to overwrite the existing WIP with this version of the recipe or Cancel to abort.")
 		}
+
 		if(proceedToSave){
 			var tmpObj = angular.copy(scope.editor.selectedRWip);
 			var selectedId = stateParams.recipeId;
 			var selectedVersion = scope.editor.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
-			cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
-				log.info('Success on Saving WIP');
-				alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-				scope.getRecipeData('wip');
-				rootScope.$broadcast("refreshRecipes");
-			}, function(){
-				log.warn('Error on Saving WIP');
-				alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
+			cookbookService.saveWIP({details:selectedId}, dataToSend, function(result){
+				if (result.status !== 'error') {
+					log.info('Success on Saving WIP');
+					alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+					scope.getRecipeData('wip');
+					rootScope.$broadcast("refreshRecipes");
+				}
 			});
 		}
 

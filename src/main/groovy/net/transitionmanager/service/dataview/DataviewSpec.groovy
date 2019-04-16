@@ -5,7 +5,7 @@ import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.domain.Dataview
+import net.transitionmanager.imports.Dataview
 import org.grails.web.json.JSONObject
 
 /**

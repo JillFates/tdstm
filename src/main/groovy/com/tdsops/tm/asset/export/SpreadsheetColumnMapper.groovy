@@ -1,7 +1,7 @@
 package com.tdsops.tm.asset.export
 
 import com.tdsops.common.lang.CollectionUtils
-import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.common.CustomDomainService
 
 /**
  * Asset export spreadsheet column mapper

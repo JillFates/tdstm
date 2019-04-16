@@ -1,4 +1,4 @@
-import net.transitionmanager.service.DatabaseMigrationService
+import net.transitionmanager.common.DatabaseMigrationService
 
 databaseChangeLog = {
     changeSet(author: "slopez", id: "20180809 TM-10208-1") {

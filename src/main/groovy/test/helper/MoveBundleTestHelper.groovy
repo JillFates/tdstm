@@ -2,9 +2,9 @@ package test.helper
 
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional

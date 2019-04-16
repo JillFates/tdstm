@@ -312,7 +312,15 @@ tdsops.buildFile = "build.txt"
 //tdstm.security.auditLogging = "access"
 
 tdstm {
-
+	testing {
+		foo {
+			intVal = 123
+			stringVal = 'abc'
+			configVal {
+				hasSomeProp = true
+			}
+		}
+	}
 }
 
 grails {

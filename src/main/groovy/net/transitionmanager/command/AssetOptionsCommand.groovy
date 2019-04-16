@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import com.tds.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptions
 
 
 

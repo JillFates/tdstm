@@ -27,6 +27,7 @@ apply plugin: "org.grails.grails-gsp"
 
 war {
     archiveName = "tdstm-${version}.war"
+	exclude '*/node_modules/*'
 }
 
 repositories {

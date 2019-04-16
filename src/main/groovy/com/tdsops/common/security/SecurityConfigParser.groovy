@@ -1,6 +1,6 @@
 package com.tdsops.common.security
 
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page import="com.tds.asset.AssetCableMap" %>
+<%@ page import="net.transitionmanager.asset.AssetCableMap" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -21,7 +21,7 @@
 
 <body>
 <tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/>
-<div class="body" style="width:98%; min-width:1110px" ng-app="tdsComments"
+<div class="body" style="width:98%; min-width:1225px" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 
     <g:if test="${flash.message}">
@@ -30,7 +30,7 @@
 
     <div class="dialog">
         <g:form action="generateElevations" name="rackLayoutCreate" method="post" target="_blank"
-                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%; display: flex; align-items: baseline;  position:relative">
+                onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%; display: flex; align-items: baseline;  position:relative; flex-direction: column; flex-flow: wrap;">
             <input type="hidden" id="redirectTo" value="rack"/>
             <input type="hidden" id="fromRoomOrRack" value="rack"/>
             <table style="width:auto; border: none; float: left">
@@ -39,7 +39,7 @@
                     <td>
                         <label><b>Bundle</b></label><br/>
                         <select id="bundleId" name="moveBundle" multiple="multiple" size="3"
-                                onchange="getRackDetails(this.id)" style="width:150px; height:96px">
+                                onchange="getRackDetails(this.id)" style="width:300px; height:96px">
                             <option value="all" selected="selected">All</option>
                             <g:each in="${moveBundleList}" var="moveBundle">
                                 <option value="${moveBundle?.id}">${moveBundle?.name}</option>
@@ -49,16 +49,16 @@
 
                     <td>
                         <label><b>Source</b></label><br/>
-                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px; height:96px"
+                        <select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:400px; height:96px"
                                 size="4">
                             <option value="null" selected="selected">All</option>
                         </select>
                     </td>
 
                     <td>
-                        <div style="width:250px">
+                        <div style="width:450px">
                             <label><b>Target</b></label><br/>
-                            <select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px; height:96px"
+                            <select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:400px; height:96px"
                                     size="4">
                                 <option value="null" selected="selected">All</option>
                             </select>

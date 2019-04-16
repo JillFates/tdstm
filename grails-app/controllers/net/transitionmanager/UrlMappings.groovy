@@ -644,7 +644,14 @@ class UrlMappings {
 		"/ws/notices/$id/ack" {
 			controller = "wsNotice"
 			action = [
-					POST: "ack"
+					POST: "acknowledge"
+			]
+		}
+
+		"/ws/notice/fetchPostNotices" {
+			controller = "wsNotice"
+			action = [
+					GET: "fetchPostLoginNotices"
 			]
 		}
 
@@ -1258,6 +1265,27 @@ class UrlMappings {
 					POST: "generateCheckList"
 			]
 		}
+
+		"/ws/reports/tasksReport" {
+			controller = "wsReports"
+			action = [
+					POST: "tasksReport"
+			]
+		}
+
+        "/ws/reports/moveBundles" {
+            controller = "wsReports"
+            action = [
+                    GET: "moveBundles"
+            ]
+        }
+
+        "/ws/reports/generateServerConflicts" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateServerConflicts"
+            ]
+        }
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

@@ -1,5 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
-import net.transitionmanager.service.EmailDispatchService
+import net.transitionmanager.common.EmailDispatchService
 import org.quartz.JobExecutionContext
 
 class EmailDispatchJob extends SecureJob {
