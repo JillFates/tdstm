@@ -223,4 +223,28 @@ class SqlUtilTests extends Specification {
 		then:
 			thrown RuntimeException
 	}
+
+	void 'Test addWhereOrAndToQuery'() {
+		when: 'setting up an empty StringBuilder'
+			StringBuilder sb = new StringBuilder()
+		and: 'calling addWhereOrAndToQuery needing WHERE'
+			Boolean needsWhere = SqlUtil.addWhereOrAndToQuery(sb, true)
+		then: 'needsWhere should always be false'
+			! needsWhere
+		and: 'the StringBuilder should contain WHERE'
+			sb.toString().contains(' WHERE ')
+		and: 'not contain AND'
+			! sb.toString().contains(' AND ')
+
+		when: 'setting up an empty StringBuilder'
+			sb = new StringBuilder()
+		and: 'calling addWhereOrAndToQuery NOT needing a WHERE'
+			needsWhere = SqlUtil.addWhereOrAndToQuery(sb, false)
+		then: 'needsWhere should always be false'
+			! needsWhere
+		and: 'the StringBuilder should NOT contain WHERE'
+			! sb.toString().contains(' WHERE ')
+		and: 'should contain AND'
+			sb.toString().contains(' AND ')
+	}
 }
