@@ -1,4 +1,3 @@
-<%@page expressionCodec="none" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -17,15 +16,12 @@
 	<tds:subHeader title="Pre-Event Checklist" crumbs="['Reports','Pre-Event Checklist']"/> <br />
 	<div class="generated-check-list">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>${project.name} : ${moveEvent.name }</b>
+			<b>${project.name} : ${moveEvent.name}</b>
 		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>
 		${raw(eventErrorString)}
-
-
-
 
 		<table>
 			<tr>
