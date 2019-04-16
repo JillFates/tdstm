@@ -9,13 +9,24 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 

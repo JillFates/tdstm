@@ -1,6 +1,7 @@
 package net.transitionmanager.admin
 
 import net.transitionmanager.asset.Application
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
