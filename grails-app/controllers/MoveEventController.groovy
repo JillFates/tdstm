@@ -65,16 +65,13 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 		List<MoveEvent> events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", securityService.loadUserCurrentProject())
 			if (params.name) {
-				String name = StringEscapeUtils.unescapeHtml4(params.name.trim())
-				ilike('name', SqlUtil.formatForLike(name))
+				ilike('name', SqlUtil.formatForLike(params.name.trim()))
 			}
 			if (params.description) {
-				String description = StringEscapeUtils.unescapeHtml4(params.description.trim())
-				ilike('description', SqlUtil.formatForLike(description))
+				ilike('description', SqlUtil.formatForLike(params.description.trim()))
 			}
 			if (params.runbookStatus) {
-				String runbookStatus = StringEscapeUtils.unescapeHtml4(params.runbookStatus.trim())
-				ilike('runbookStatus', SqlUtil.formatForLike(runbookStatus))
+				ilike('runbookStatus', SqlUtil.formatForLike(params.runbookStatus.trim()))
 			}
 			def newsBM = retrieveNewsBMList(params.newsBarMode)
 			if (newsBM) {
