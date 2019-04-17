@@ -4,6 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
@@ -14,6 +15,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
@@ -28,6 +30,7 @@ import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -39,7 +42,7 @@ import java.sql.Timestamp
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 @Slf4j(value='logger', category='grails.app.controllers.MoveEventController')
-class MoveEventController implements ControllerMethods {
+class MoveEventController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -95,28 +98,28 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def listJson() {
-
-		String sortIndex = params.sidx ?: 'assetName'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		String sortIndex = paginationOrderBy(MoveEvent, 'sidx', 'name')
+		String sortOrder = paginationSortOrder('sord')
 
 		List<MoveEvent> events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", securityService.loadUserCurrentProject())
 			if (params.name) {
-				ilike('name', "%${params.name.trim()}%")
+				ilike('name', SqlUtil.formatForLike(params.name.trim()))
 			}
 			if (params.description) {
-				ilike('description', "%$params.description%")
+				ilike('description', SqlUtil.formatForLike(params.description.trim()))
 			}
 			if (params.runbookStatus) {
-				ilike('runbookStatus', "%$params.runbookStatus%")
+				ilike('runbookStatus', SqlUtil.formatForLike(params.runbookStatus.trim()))
 			}
 			def newsBM = retrieveNewsBMList(params.newsBarMode)
 			if (newsBM) {
 				'in'('newsBarMode', newsBM)
 			}
-			order(params.sord == "desc"? Order.desc(sortIndex).ignoreCase():Order.asc(sortIndex).ignoreCase())
+			order(sortOrder == 'DESC' ? Order.desc(sortIndex).ignoreCase() : Order.asc(sortIndex).ignoreCase())
 		}
 
 		int totalRows = events.totalCount
