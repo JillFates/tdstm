@@ -343,7 +343,6 @@
                     },
                     {
                         field: "name",
-                        title: "Name",
                         template: '<a href="index?moveEvent=#=eventId#">#=name#</a>'
                     },
                     {
