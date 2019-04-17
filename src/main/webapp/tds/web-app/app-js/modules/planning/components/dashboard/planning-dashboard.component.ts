@@ -21,49 +21,63 @@ export class PlanningDashboardComponent {
 					{
 						type: 'Applications',
 						img: '/tdstm/assets/icons/svg/application_menu.svg',
-						link: '/tdstm/application/list?filter=application',
+						link: ['/asset', 'views', 7, 'show'],
+						queryParamMain: {},
+						queryParam: {toValidate: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Physical Servers',
 						img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
-						link: '/tdstm/assetEntity/list?filter=physicalServer',
+						link: ['/asset', 'views', 4, 'show'],
+						queryParamMain: {deviceType: 'Server|Appliance|Blade'},
+						queryParam: {toValidate: 'Unknown', deviceType: 'Server|Appliance|Blade'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Virtual Servers',
 						img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
-						link: '/tdstm/assetEntity/list?filter=virtualServer',
+						link: ['/asset', 'views', 4, 'show'],
+						queryParamMain: {deviceType: 'VM|Virtual'},
+						queryParam: {toValidate: 'Unknown', deviceType: 'VM|Virtual'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Databases',
 						img: '/tdstm/assets/icons/svg/database_menu.svg',
-						link: '/tdstm/database/list?filter=db',
+						link: ['/asset', 'views', 2, 'show'],
+						queryParamMain: {},
+						queryParam: {toValidate: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Physical Storage',
 						img: '/tdstm/assets/icons/svg/storagePhysical_menu.svg',
-						link: '/tdstm/assetEntity/list?filter=storage',
+						link: ['/asset', 'views', 5, 'show'],
+						queryParamMain: {},
+						queryParam: {toValidate: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Logical Storage',
 						img: '/tdstm/assets/icons/svg/storageLogical_menu.svg',
-						link: '/tdstm/files/list?filter=storage',
+						link: ['/asset', 'views', 6, 'show'],
+						queryParamMain: {},
+						queryParam: {toValidate: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
 					{
 						type: 'Other Devices',
 						img: '/tdstm/assets/icons/svg/other_menu.svg',
-						link: '/tdstm/assetEntity/list?filter=other',
+						link: ['/asset', 'views', 4, 'show'],
+						queryParamMain: {deviceType: ''},
+						queryParam: {toValidate: 'Unknown', deviceType: ''},
 						total: 0,
 						toValidate: 0
 					}

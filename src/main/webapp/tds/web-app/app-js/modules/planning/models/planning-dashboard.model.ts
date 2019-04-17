@@ -7,6 +7,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -14,6 +15,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -21,6 +23,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -28,6 +31,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -35,6 +39,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -42,6 +47,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			},
@@ -49,6 +55,7 @@ export class PlanningDashboardModel {
 				type: string,
 				img: string,
 				link: string,
+				queryParams: string,
 				total: number,
 				toValidate: number
 			}
