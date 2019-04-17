@@ -138,7 +138,7 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static CSVDataset buildCVSDataset(String fileName) {
+	CSVDataset buildCVSDataset(String fileName) {
 		validateFilename(fileName)
 		CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
 		return new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
@@ -149,7 +149,7 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static ExcelDataset buildExcelDataset(String fileName){
+	ExcelDataset buildExcelDataset(String fileName){
 		validateFilename(fileName)
 		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
 		Workbook workbook = WorkbookFactory.create( new File(fileName) )
@@ -177,7 +177,7 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static JSONDataset buildJSONDataset(String fileName){
+	JSONDataset buildJSONDataset(String fileName){
 		validateFilename(fileName)
 		JSONConnection con = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fileName), driver:TDSJSONDriver)
 		JSONDataset dataset = new JSONDataset(connection: con, rootNode: "", fileName: FileUtils.FileName(fileName))
@@ -190,7 +190,7 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName it can be a type CSV, XLSX or XLS
 	 * @return
 	 */
-	static Dataset buildDataset(String fileName) {
+	Dataset buildDataset(String fileName) {
 		validateFilename(fileName)
 		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
 
@@ -334,7 +334,13 @@ class FileSystemService implements InitializingBean {
         if (StringUtil.isBlank(filename)) {
             throw new InvalidParamException('Filename contains no characters')
         }
-        if (filename.contains(File.separator)) {
+
+		// doing this because some methods return filename with temporary directory already attached
+		// so, if a further validation on the file name is required, we need to remove the
+		// temporaryDirectory which is a well known path for the application
+		String filenameWithoutTemporaryDirectoryPart = filename - temporaryDirectory
+
+        if (filenameWithoutTemporaryDirectoryPart.contains(File.separator)) {
             securityService.reportViolation("Attempted to access file with path separator ($filename)")
             throw new InvalidParamException('Invalid filename was specified.')
         }
