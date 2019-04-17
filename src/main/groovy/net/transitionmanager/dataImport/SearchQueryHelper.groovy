@@ -158,13 +158,15 @@ class SearchQueryHelper {
 				// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
 				Person existingPerson = entityInstance ? entityInstance[fieldName] : null
 				String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-				String errorMsg
-				(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-				if (errorMsg) {
-					// If no entity was found then we want to capture the error message to save in the cache
-					entity = errorMsg
-					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-					recordError(context, errorMsg)
+				if (searchValue){
+					String errorMsg
+					(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+					if (errorMsg) {
+						// If no entity was found then we want to capture the error message to save in the cache
+						entity = errorMsg
+						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+						recordError(context, errorMsg)
+					}
 				}
 				break
 
