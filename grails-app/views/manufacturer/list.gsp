@@ -26,12 +26,12 @@
 			<jqgrid:grid id="manufacturerId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Name','AKA', 'Description', 'Corporate Name', 'Corporate Location', 'Website', 'Models', 'AssetCount'"
 				colModel="{name:'name', index: 'name', width:'100',formatter: myLinkFormatter},
-					{name:'aka', width:'200',search:false,sortable:false},
-					{name:'description',width:'100'},
-					{name:'corporateName',width:'100'},
-					{name:'corporateLocation',width:'100'},
-					{name:'website',width:'100'},
-					{name:'models', width:'40',search:false,sortable:false}, 
+					{name:'aka', width:'200',search:false,sortable:false, formatter: tdsCommon.jqgridTextCellFormatter},
+					{name:'description',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+					{name:'corporateName',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+					{name:'corporateLocation',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+					{name:'website',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+					{name:'models', width:'40',search:false,sortable:false},
 					{name:'assetCount',width:'50',search:false,sortable:false}"
 				sortname="'name'"
 				caption="listCaption"
@@ -44,7 +44,7 @@
 
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObjcet) {
-				var value = cellvalue ? cellvalue : ''
+				var value = cellvalue ? _.escape(cellvalue) : ''
 					return '<a href="javascript:showOrEditModelManuDetails(\'manufacturer\','+options.rowId+',\'Manufacturer\',\'show\',\'Show\')">'+value+'</a>'
 			}
 		})
