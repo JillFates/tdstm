@@ -123,7 +123,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 		}
 
 		if (moveEvent) {
-			moveEventNewsQuery.append(" mn.move_event_id = menqMoveEventId  and p.project_id = :menqProjectId ")
+			moveEventNewsQuery.append(" mn.move_event_id = :menqMoveEventId  and p.project_id = :menqProjectId ")
 			queryParams.menqMoveEventId = moveEvent.id
 		} else {
 			moveEventNewsQuery.append(" p.project_id = :menqProjectId ")
