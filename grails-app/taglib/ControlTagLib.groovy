@@ -108,7 +108,6 @@ class ControlTagLib {
 		sb.append(tooltipAttrib(fieldSpec, attrs.tooltipDataPlacement))
 		sb.append(" >")
         sb.append(HtmlUtil.escape( fieldValue + (suffixFieldValue?:'') ) )
-//        sb.append(suffixFieldValue)
 		sb.append("</span>")
 		sb.append("</td>")
 		out << sb.toString()
