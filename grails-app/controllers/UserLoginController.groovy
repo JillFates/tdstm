@@ -1,12 +1,16 @@
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.transform.CompileStatic
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
@@ -21,17 +25,20 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
-import org.springframework.jdbc.core.JdbcTemplate
-import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
+import java.sql.ResultSet
+import java.sql.SQLException
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class UserLoginController implements ControllerMethods {
+class UserLoginController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
 	AuditService auditService
-	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
@@ -61,16 +68,24 @@ class UserLoginController implements ControllerMethods {
 
 	@HasPermission(Permission.UserView)
 	def listJson() {
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+
+		//int maxRows = params.int('rows', 25)
+		//int currentPage = params.int('page', 1)
+		//int rowOffset = (currentPage - 1) * maxRows
 
 		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
 		// seem to work in jqgrid.
 		Map chromeAutocompleteFieldNameSubs = [
 			uzername: 'username',
 			zompany: 'company',
-			last1ogin: 'lastLogin'
+			last1ogin: 'lastLogin',
+			dateCreated: 'dateCreated',
+			roles: 'roles'
 		]
 
 		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
@@ -87,15 +102,13 @@ class UserLoginController implements ControllerMethods {
 			sortIndex = chromeAutocompleteFieldNameSubs[params.sidx]
 
 		} else if (sortableFields.contains(params.sidx)) {
-			sortIndex = params.sidx
+			sortIndex = paginationOrderBy(UserLogin, 'sidx', 'username')
 		}
 
 		// Deal with order
-		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
-
-
+		String sortOrder = paginationSortOrder('sord')
 		def companyId
-		List<UserLogin> userLogins = []
+		List<Map> userLogins = []
 		def filterParams = [
 			username: params.uzername,
 			fullname: params.fullname,
@@ -112,14 +125,9 @@ class UserLoginController implements ControllerMethods {
 		}
 
 		def presentDate = TimeUtil.nowGMTSQLFormat()
+		Map queryParams = [:]
 
-		def active = params.activeUsers ?: session.getAttribute("InActive")
-		if (!active) {
-			active = 'Y'
-		}
-
-
-		def query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
+		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
 			FROM person p
@@ -128,11 +136,22 @@ class UserLoginController implements ControllerMethods {
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE u.active = '$active'""")
-		if (active=='Y')
-			query.append(" AND u.expiry_date > '$presentDate' ")
-		else
-			query.append(" OR u.expiry_date < '$presentDate' ")
+			WHERE u.active = :ulActive """)
+
+		def active = params.activeUsers ?: session.getAttribute("InActive")
+		if (!active) {
+			active = 'Y'
+		}
+		queryParams.ulActive = active
+
+		if (active=='Y'){
+			query.append(" AND u.expiry_date > :uPresentDate ")
+			queryParams.uPresentDate = presentDate
+		} else {
+			query.append(" OR u.expiry_date < :uPresentDate ")
+			queryParams.uPresentDate = presentDate
+		}
+
 		if (securityService.hasPermission(Permission.UserListAll)) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
@@ -147,28 +166,22 @@ class UserLoginController implements ControllerMethods {
 				}
 			}
 			if (companyId) {
-				query.append(" AND pg.party_group_id = $companyId ")
+				query.append(" AND pg.party_group_id = :pgCompanyId ")
+				queryParams.pgCompanyId = companyId
 			}
-			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name) as users")
-			query.append(" GROUP BY p.person_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 
+			query.append(" GROUP BY p.person_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 			// Handle the filtering by each column's text field
 			Boolean firstWhere = true
-			List<String> queryParams = []
 			filterParams.each {
 				if (it.value) {
-					if (firstWhere) {
-						query.append(" WHERE ")
-						firstWhere = false
-					} else {
-						query.append(" AND ")
-					}
-					query.append("users.${it.key} LIKE ?")
-					queryParams << "%${it.value.trim()}%"
+					firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+					query.append("users.${it.key} LIKE :${it.key}")
+					queryParams[it.key] = "%${it.value.trim()}%"
 				}
 			}
 
-			userLogins = jdbcTemplate.queryForList(query.toString(), queryParams as Object[])
+			userLogins = namedParameterJdbcTemplate.query(query.toString(), queryParams, new UserLoginMapper())
 		}
 
 		// Limit the returned results to the user's page size and number
@@ -191,6 +204,17 @@ class UserLoginController implements ControllerMethods {
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
+	}
+
+	/**
+	 * RowMapper that maps each result from the query for the Event News list
+	 * into a map column -> value that can be sent back to the UI.
+	 */
+	@CompileStatic
+	private class UserLoginMapper implements RowMapper {
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.toRowResult()
+		}
 	}
 
 	@HasPermission(Permission.UserView)
