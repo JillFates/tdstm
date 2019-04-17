@@ -86,7 +86,8 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 			zompany: 'company',
 			last1ogin: 'lastLogin',
 			dateCreated: 'dateCreated',
-			roles: 'roles'
+			roles: 'roles',
+			fullname: 'fullname'
 		]
 
 		// Contains the list of other sortable fields besides the chromeAutocompleteFieldNameSubs Map fields
