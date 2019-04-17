@@ -32,11 +32,11 @@
 					colNames="'Asset','Asset Type', 'Bundle','Type', 'Depends On', 'Dep Asset Type', 'Dep Asset Bundle', '${columnLabelpref['1']}', '${columnLabelpref['2']}', 'Status'"
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 						{name:'assetType', editable: true},
-						{name:'assetBundle', editable: true},
+						{name:'assetBundle', editable: true, formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'type', editable: true, formatter: dependencyViewFormatter},
 						{name:'dependentName', editable: true, formatter: dependentFormatter,width:'200'},
 						{name:'dependentType', editable: true},
-						{name:'dependentBundle', editable: true},
+						{name:'dependentBundle', editable: true, formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'${depPref['1']}', editable: true,width:'100'},
 						{name:'${depPref['2']}',editable:true, width:'100'},
   						{name:'status', editable: true, width:'80'}"

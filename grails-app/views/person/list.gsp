@@ -80,12 +80,12 @@
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
 					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'Email', 'User Company', 'Date Created', 'Last Updated'"
-					colModel="{name:'firztname', width:'80'},
-						{name:'m1ddlename', width:'80'},
-						{name:'laztname', index: 'laztname', width:'80'},
+					colModel="{name:'firztname', width:'80', formatter: myLinkFormatter},
+						{name:'m1ddlename', width:'80', formatter: myLinkFormatter},
+						{name:'laztname', index: 'laztname', width:'80', formatter: myLinkFormatter},
 						{name:'uzerLogin', width:'80' },
-						{name:'zmail',width:'100'},
-						{name:'zompany',width:'100'},
+						{name:'zmail',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'zompany',width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'laztname'"
@@ -101,6 +101,11 @@
 				TDS.jqGridFilterToolbar('personId');
 
 				$.jgrid.formatter.integer.thousandsSeparator='';
+				function myLinkFormatter (cellvalue, options, rowObjcet) {
+					var value = cellvalue ? _.escape(cellvalue) : ''
+					return '<a href="javascript:Person.showPersonDialog(' + +options.rowId + ',\'generalInfoShow\')">' + value + '</a>'
+
+				}
 
 			})
 		</script>

@@ -4,7 +4,6 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import net.transitionmanager.command.PersonCO
 import net.transitionmanager.controller.ControllerMethods
@@ -36,6 +35,8 @@ import net.transitionmanager.service.UserService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.web.util.HtmlUtils
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PersonController implements ControllerMethods {
 
@@ -198,9 +199,7 @@ class PersonController implements ControllerMethods {
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
 		def results = personInstanceList?.collect {
-			[cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
-			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
-			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
+			[cell: [it.firstname, it.middlename,  it.lastname,
 			genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
 			it.email, it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
@@ -226,7 +225,7 @@ class PersonController implements ControllerMethods {
 		String element
 		if (personData.userLoginId) {
 			if (haveUserEditPerm) {
-				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + personData.userLogin + '</a>'
+				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + HtmlUtils.htmlEscape(personData.userLogin) + '</a>'
 			} else {
 				element = personData.userLogin
 			}

@@ -58,7 +58,7 @@
 						{name:'uzername', index: 'uzername', width:'80'},
 						{name:'fullname', width:'100'},
 						{name:'roles',width:'100'},
-						{name:'zompany', width:'100'},
+						{name:'zompany', width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
 						{name:'isLocal', width:'80', fixed:true},
 						{name:'last1ogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
