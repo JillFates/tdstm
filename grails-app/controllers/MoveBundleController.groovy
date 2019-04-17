@@ -13,6 +13,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -100,7 +101,7 @@ class MoveBundleController implements ControllerMethods {
 		List<MoveBundle> bundleList = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
 		renderAsJson bundleList.collect { MoveBundle entry -> [
 			bundleId: entry.id,
-			name: entry.name,
+			name: HtmlUtil.escape(entry.name),
 			description: entry.description,
 			planning: entry.useForPlanning,
 			assetqty: entry.assetQty,
