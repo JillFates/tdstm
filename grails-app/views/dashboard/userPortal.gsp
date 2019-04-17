@@ -348,12 +348,12 @@
                     {
                         field: "startDate",
                         title: "Start Date",
-                        template:"#= (startDate && startDate !== null)? moment(startDate).format(tdsCommon.defaultDateFormat()): ''#"
+                        template:"#= moment(startDate).format(tdsCommon.defaultDateFormat())#"
                     },
 					{
-						field: "endDate",
+						field: "estCompletionTime",
 						title: "Completion Time",
-						template:"#= (endDate && endDate !== null)? moment(endDate).format(tdsCommon.defaultDateFormat()): ''#"
+						template:"#= moment(estCompletionTime).format(tdsCommon.defaultDateFormat())#"
 					},
                     {
                         field: "days",
