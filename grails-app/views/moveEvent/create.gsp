@@ -221,30 +221,17 @@
 
     $(document).ready(function(){
 		$("#kendoEstStartTime").kendoDateTimePicker({ animation: false, change: onEstStartTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />'  });
-		$("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, change: onEstCompletionTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />'  });
-
-		/**
-		 * Process the Start and Completion time
-		 */
-		function changeTime(kendoInput, timeInput) {
-			if ($('#' + kendoInput).data("kendoDateTimePicker")) {
-				var userDateInput = $('#' + kendoInput).data("kendoDateTimePicker").value();
-				var dateTZ = '';
-				if (userDateInput !== null) {
-					dateTZ = tdsCommon.getISOString(userDateInput)
-				}
-				$('#' + timeInput).val(dateTZ);
+		$("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />'  });
+    	function onEstStartTimeChange() {
+        	if ($('#kendoEstStartTime').data("kendoDateTimePicker")) {
+                var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
+                var dateTZ = '';
+                if (userDateInput !== null) {
+                    dateTZ = tdsCommon.getISOString(userDateInput)
+                }
+                $('#estStartTime').val(dateTZ);
 			}
-		}
-
-		function onEstStartTimeChange() {
-			changeTime('kendoEstStartTime', 'estStartTime');
         }
-
-		function onEstCompletionTimeChange() {
-    		changeTime('kendoEstCompletionTime', 'estCompletionTime');
-		}
-
     });
 
 </script>
