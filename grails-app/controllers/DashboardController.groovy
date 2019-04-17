@@ -6,19 +6,18 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DashboardService
-import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
@@ -32,7 +31,6 @@ class DashboardController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	ControllerService controllerService
 	DashboardService dashboardService
-	MoveEventService moveEventService
 	ProjectService projectService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
@@ -148,32 +146,12 @@ class DashboardController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.DashboardMenuView)
 	def retrieveEventsList() {
-		Person currentPerson = securityService.loadCurrentPerson()
-		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson)
-		Date now = TimeUtil.nowGMT()
-
-		List<Map> eventsMap = events.collect { MoveEvent moveEvent ->
-			List<MoveEventStaff> teams = MoveEventStaff.findAllByMoveEventAndPerson(moveEvent, currentPerson).role
-			String teamsString = WebUtil.listAsMultiValueString(teams.collect { team -> team.toString() })
-			moveEvent.with {
-				String daysToGo
-				if (estStartTime) {
-					daysToGo = estStartTime > now ? estStartTime - now : (" + " + (now - estStartTime))
-					daysToGo = "${daysToGo} days"
-				}
-				return [
-				    eventId: id,
-				    name: name,
-					projectName: project.name,
-					startDate: estStartTime,
-					endDate: estCompletionTime,
-					days: daysToGo,
-					teams: teamsString
-				]
-			}
+		def result = userService.getEventDetails(getProjectOrAll()).values().collect { value -> [
+				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
+				name: value.moveEvent.name, startDate: value.moveEvent.eventTimes.start,
+				days: value.daysToGo + ' days', teams: value.teams]
 		}
-
-		render eventsMap as JSON
+		render result as JSON
 	}
 
 	/**
