@@ -16,6 +16,18 @@
 			 .k-grid{
 				 height: auto !important;
 			 }
+			#gridBundleList  table.k-selectable  tbody tr td {
+				cursor: default;
+			}
+			#gridBundleList  table.k-selectable  tbody tr td:nth-child(2) {
+				color: #2C61AA;
+				font-weight: bold;
+				cursor: pointer;
+			}
+			#gridBundleList  table.k-selectable  tbody tr .k-state-selected {
+				background-color: inherit;
+				color: #444;
+			}
 		</style>
 
 	</head>
@@ -106,8 +118,7 @@
 					},
 					{
 						field: "name",
-						title: "Name",
-						template: "<a class='cell-url-element' href='#=contextPath#/moveBundle/show/#=bundleId#'>#=name#</a>"
+						title: "Name"
 					},
 					{
 						field: "description",
@@ -164,6 +175,18 @@
 					}
 				],
 				sortable: true,
+			 	selectable: 'cell',
+			 	change: function(e) {
+					var colIdx = this.select().index();
+					// If column is the first one, then open the move bundle based on the ID
+					if(colIdx === 1) {
+						var selected = this.select();
+						setTimeout(function(){
+							var dataItem = grid.dataItem(selected.parent());
+							(window).location.href = contextPath + '/moveBundle/show/' + dataItem.bundleId;
+						});
+					}
+				},
 				filterable: {
 					mode: "row",
 					operators: {
@@ -177,7 +200,7 @@
 				 pageable: {
 					 pageSize: ${raw(com.tdsops.common.ui.Pagination.MAX_DEFAULT)},
 					 pageSizes: [ ${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) } ]
-				 },
+				 }
 			}).data("kendoGrid");
 
 			grid.dataSource.originalFilter = grid.dataSource.filter;
