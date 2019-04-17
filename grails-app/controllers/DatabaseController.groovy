@@ -3,6 +3,7 @@ import com.tds.asset.Database
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -26,7 +27,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class DatabaseController implements ControllerMethods {
+class DatabaseController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -61,20 +62,18 @@ class DatabaseController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
-		String sortIndex = params.sidx ?: 'assetName'
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		String sortIndex = paginationOrderBy(Database, 'sidx', 'assetName')
+		String sortOrder  = paginationSortOrder('sord')
+		int maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		int currentPage = paginationPage()
+		int rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
 		session.DB = [:]
 
-		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
-
-		def moveBundleList
+		List moveBundleList
 		if (params.event?.isNumber()) {
-			def moveEvent = MoveEvent.read(params.event)
+			MoveEvent moveEvent = MoveEvent.read(params.event) // cambiar (aunque es number)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
@@ -82,13 +81,13 @@ class DatabaseController implements ControllerMethods {
 		//def unknownQuestioned = "'$AssetDependencyStatus.UNKNOWN','$AssetDependencyStatus.QUESTIONED'"
 		//def validUnkownQuestioned = "'$AssetDependencyStatus.VALIDATED'," + unknownQuestioned
 
-		def filterParams = [
+		Map filterParams = [
 			assetName: params.assetName,
 			depNumber: params.depNumber,
 			depResolve: params.depResolve,
 			depConflicts: params.depConflicts
 		]
-		def dbPref = assetEntityService.getExistingPref(PREF.Database_Columns)
+		Map dbPref = assetEntityService.getExistingPref(PREF.Database_Columns)
 
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DATABASE.toString(), true)
@@ -100,8 +99,8 @@ class DatabaseController implements ControllerMethods {
 			}
 		}
 
-		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
-		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
+		Boolean initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
+		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
 		//TODO:need to move the code to AssetEntityService
 		String temp = ''
 		String joinQuery = ''
@@ -148,7 +147,7 @@ class DatabaseController implements ControllerMethods {
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-		def query = new StringBuilder("""
+		StringBuilder query = new StringBuilder("""
 			SELECT * FROM (SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
 			(SELECT if (count(ac_task.comment_type) = 0, 'noTasks','tasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
 			(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,""")
@@ -195,8 +194,8 @@ class DatabaseController implements ControllerMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		def queryParams = [:]
-		def whereConditions = []
+		Map queryParams = [:]
+		List whereConditions = []
 		filterParams.each { key, val ->
 			if (val && val.trim().size()){
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -236,7 +235,7 @@ class DatabaseController implements ControllerMethods {
 			query.append(" WHERE ${whereConditions.join(" AND ")} ")
 		}
 
-		def dbsList = []
+		List dbsList = []
 		query.append(" ORDER BY $sortIndex $sortOrder")
 
 		try {
@@ -250,8 +249,8 @@ class DatabaseController implements ControllerMethods {
 			throw new LogicException("Unabled to perform query based on parameters and user preferences")
 		}
 
-		def totalRows = dbsList.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
+		int totalRows = dbsList.size()
+		double numberOfPages = Math.ceil(totalRows / maxRows)
 		if (totalRows > 0) {
 			dbsList = dbsList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		}
@@ -259,7 +258,7 @@ class DatabaseController implements ControllerMethods {
 			dbsList = []
 		}
 
-		def results = dbsList?.collect {
+		List results = dbsList?.collect {
 			def commentType = it.commentType
 			[ cell: [
 			'',it.assetName, (it[dbPref["1"]] ?: ''), (it[dbPref["2"]] ?: ''), (it[dbPref["3"]] ?: ''), (it[dbPref["4"]] ?: ''), (it[dbPref["5"]] ?: ''),
@@ -271,7 +270,7 @@ class DatabaseController implements ControllerMethods {
 					escapedName:assetEntityService.getEscapedName(it)
 			]}
 
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+		Map jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
 	}
