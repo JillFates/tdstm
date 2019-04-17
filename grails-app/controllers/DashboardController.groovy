@@ -12,9 +12,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.security.Permission
