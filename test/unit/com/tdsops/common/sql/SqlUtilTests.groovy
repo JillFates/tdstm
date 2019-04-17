@@ -344,4 +344,23 @@ class SqlUtilTests extends Specification {
 		and: 'should contain AND'
 			sb.toString().contains(' AND ')
 	}
+
+	void 'Test formatForLike with a list of words'() {
+		expect: 'a list of words is wrapped for a sql like syntax'
+			SqlUtil.formatForLike(words) == result
+		where:
+			words 					| result
+			['word-a'] 				| ['%word-a%']
+			['word-a','word-b'] 	| ['%word-a%', '%word-b%']
+	}
+
+	void 'Test formatForLike with a word'() {
+		expect: 'a word is wrapped for a sql like syntax'
+			SqlUtil.formatForLike(word) == result
+		where:
+			word 		| result
+			'word-a' 	| '%word-a%'
+			''			| null
+	}
+
 }
