@@ -11,7 +11,7 @@
                             <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div class="percentage-bar-text">
                                 <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}% </b>
-                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{toValidate:'Validated'}">
+                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated'}">
                                     Applications Validated
                                 </a>
                             </div>
@@ -25,7 +25,7 @@
                             <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsPlanReadyPercentage+'%'"></div>
                             <div class="percentage-bar-text">
                                 <b> {{planningDashboardModel.discovery.appsPlanReadyPercentage}}% </b>
-                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{toValidate:'PlanReady'}">
+                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'PlanReady'}">
                                     Applications Plan Ready
                                 </a>
                             </div>
@@ -86,10 +86,10 @@
             <div>
                 <table class="dashboard-stat-table">
                     <tr>
-                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{toValidate:'Validated'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
+                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
                     </tr>
                     <tr>
-                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{toValidate:'PlanReady'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.planReady}}</td><td>Plan Ready</td></a>
+                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'PlanReady'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.planReady}}</td><td>Plan Ready</td></a>
                     </tr>
                 </table>
             </div>

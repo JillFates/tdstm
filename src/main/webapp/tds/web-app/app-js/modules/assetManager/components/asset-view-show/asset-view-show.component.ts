@@ -1,26 +1,30 @@
-import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
+// Angular
+import {Component, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
-import { Observable } from 'rxjs';
-import {State} from '@progress/kendo-data-query';
-
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
+// Model
 import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
-import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
-import { AssetViewSelectorComponent } from '../asset-view-selector/asset-view-selector.component';
-import { AssetViewSaveComponent } from '../../../assetManager/components/asset-view-save/asset-view-save.component';
-import { AssetViewExportComponent } from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import { AssetQueryParams } from '../../../assetExplorer/model/asset-query-params';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { AssetExportModel } from '../../../assetExplorer/model/asset-export-model';
-import {TagModel} from '../../../assetTags/model/tag.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {AlertType} from '../../../../shared/model/alert.model';
+import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
+import {DomainModel} from '../../../fieldSettings/model/domain.model';
+import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
+// Service
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Component
+import {AssetViewSelectorComponent} from '../asset-view-selector/asset-view-selector.component';
+import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+// Other
+import {State} from '@progress/kendo-data-query';
+import * as R from 'ramda';
 
 declare var jQuery: any;
+
 @Component({
 	selector: 'tds-asset-view-show',
 	templateUrl: 'asset-view-show.component.html'
@@ -36,6 +40,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private lastSnapshot;
 	protected navigationSubscription;
 	protected justPlanning: boolean;
+	protected globalQueryParams = {};
 	public data: any;
 	public gridState: State = {
 		skip: 0,
@@ -64,6 +69,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
+
+		// Get all Query Params
+		this.route.queryParams.subscribe(map => map);
+		this.globalQueryParams = this.route.snapshot.queryParams;
+
 		this.reloadStrategy();
 		this.initialiseComponent();
 	}
@@ -133,13 +143,39 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: this.model.schema.columns
 			}
 		};
+
 		if (this.justPlanning) {
 			params['justPlanning'] = true;
 		}
+
+		this.addGlobalFilters(params.filters);
+
 		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 			this.data = result;
 			jQuery('[data-toggle="popover"]').popover();
 		}, err => console.log(err));
+	}
+
+	/**
+	 * Add Global Filters to the Query Params based on the URL
+	 */
+	private addGlobalFilters(filters: any): void {
+		// Verify if we have a global query param
+		if (!R.isEmpty(this.globalQueryParams)) {
+			// Iterate the URL Params
+			Object.entries(this.globalQueryParams).forEach(query => {
+				let queryFilter = query[0].split('_');
+				// Validate the domain exists
+				if (filters.domains.find((x) => x === queryFilter[0])) {
+					let filterColumn = filters.columns.find(r => r.domain === queryFilter[0] && r.property === queryFilter[1]);
+					// Validate the property exists
+					if (filterColumn) {
+						filterColumn.filter = query[1];
+					}
+					// if not, Do we add it  to the filters?
+				}
+			});
+		}
 	}
 
 	protected onEdit(): void {

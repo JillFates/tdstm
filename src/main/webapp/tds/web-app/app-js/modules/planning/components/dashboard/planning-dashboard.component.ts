@@ -23,7 +23,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/application_menu.svg',
 						link: ['/asset', 'views', 7, 'show'],
 						queryParamMain: {},
-						queryParam: {toValidate: 'Unknown'},
+						queryParam: {common_validation: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
@@ -32,7 +32,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
 						queryParamMain: {deviceType: 'Server|Appliance|Blade'},
-						queryParam: {toValidate: 'Unknown', deviceType: 'Server|Appliance|Blade'},
+						queryParam: {common_validation: 'Unknown', deviceType: 'Server|Appliance|Blade'},
 						total: 0,
 						toValidate: 0
 					},
@@ -41,7 +41,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
 						queryParamMain: {deviceType: 'VM|Virtual'},
-						queryParam: {toValidate: 'Unknown', deviceType: 'VM|Virtual'},
+						queryParam: {common_validation: 'Unknown', deviceType: 'VM|Virtual'},
 						total: 0,
 						toValidate: 0
 					},
@@ -50,7 +50,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/database_menu.svg',
 						link: ['/asset', 'views', 2, 'show'],
 						queryParamMain: {},
-						queryParam: {toValidate: 'Unknown'},
+						queryParam: {common_validation: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
@@ -59,7 +59,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/storagePhysical_menu.svg',
 						link: ['/asset', 'views', 5, 'show'],
 						queryParamMain: {},
-						queryParam: {toValidate: 'Unknown'},
+						queryParam: {common_validation: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
@@ -68,7 +68,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/storageLogical_menu.svg',
 						link: ['/asset', 'views', 6, 'show'],
 						queryParamMain: {},
-						queryParam: {toValidate: 'Unknown'},
+						queryParam: {common_validation: 'Unknown'},
 						total: 0,
 						toValidate: 0
 					},
@@ -77,7 +77,7 @@ export class PlanningDashboardComponent {
 						img: '/tdstm/assets/icons/svg/other_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
 						queryParamMain: {deviceType: ''},
-						queryParam: {toValidate: 'Unknown', deviceType: ''},
+						queryParam: {common_validation: 'Unknown', deviceType: ''},
 						total: 0,
 						toValidate: 0
 					}
