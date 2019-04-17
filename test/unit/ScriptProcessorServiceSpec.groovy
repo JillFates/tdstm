@@ -23,6 +23,7 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.SettingService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.apache.poi.ss.usermodel.Cell
@@ -47,8 +48,12 @@ class ScriptProcessorServiceSpec extends Specification {
 		coreService(CoreService) {
 			grailsApplication = ref('grailsApplication')
 		}
+		securityService(SecurityService) {
+			grailsApplication = ref('grailsApplication')
+		}
 		fileSystemService(FileSystemService) {
 			coreService = ref('coreService')
+			securityService = ref('securityService')
 			transactionManager = ref('transactionManager')
 		}
 		settingService(SettingService)
