@@ -176,20 +176,6 @@
 				                  </g:hasErrors>
 				                </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="description">Estimated Completion Time:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estCompletionTime','errors')}">
-                                    <input type="text" class="dateRange" size="15" style="width: 210px;" id="kendoEstCompletionTime"/>
-                                    <input type="hidden" id="estCompletionTime" name="estCompletionTime" />
-                                    <g:hasErrors bean="${moveEventInstance}" field="estCompletionTime">
-                                        <div class="errors">
-                                            <g:renderErrors bean="${moveEventInstance}" as="list" field="estCompletionTime"/>
-                                        </div>
-                                    </g:hasErrors>
-                                </td>
-                            </tr>
 							<tr class="prop">
 								<td class="name">
 									<label for="apiActionBypass">By-Pass API Actions:</label>
@@ -221,30 +207,16 @@
 
     $(document).ready(function(){
 		$("#kendoEstStartTime").kendoDateTimePicker({ animation: false, change: onEstStartTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />'  });
-		$("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, change: onEstCompletionTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />'  });
-
-		/**
-		 * Process the Start and Completion time
-		 */
-		function changeTime(kendoInput, timeInput) {
-			if ($('#' + kendoInput).data("kendoDateTimePicker")) {
-				var userDateInput = $('#' + kendoInput).data("kendoDateTimePicker").value();
-				var dateTZ = '';
-				if (userDateInput !== null) {
-					dateTZ = tdsCommon.getISOString(userDateInput)
-				}
-				$('#' + timeInput).val(dateTZ);
+    	function onEstStartTimeChange() {
+        	if ($('#kendoEstStartTime').data("kendoDateTimePicker")) {
+                var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
+                var dateTZ = '';
+                if (userDateInput !== null) {
+                    dateTZ = tdsCommon.getISOString(userDateInput)
+                }
+                $('#estStartTime').val(dateTZ);
 			}
-		}
-
-		function onEstStartTimeChange() {
-			changeTime('kendoEstStartTime', 'estStartTime');
         }
-
-		function onEstCompletionTimeChange() {
-    		changeTime('kendoEstCompletionTime', 'estCompletionTime');
-		}
-
     });
 
 </script>

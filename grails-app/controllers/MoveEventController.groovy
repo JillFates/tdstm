@@ -126,7 +126,7 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = events.collect {
-			[cell: [it.name, it.estStartTime, it.estCompletionTime, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
+			[cell: [it.name, it.estStartTime, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
 			        it.runbookStatus, it.moveBundlesString], id: it.id]
 		}
 
