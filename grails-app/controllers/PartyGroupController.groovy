@@ -1,9 +1,11 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyRelationship
@@ -19,7 +21,7 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class PartyGroupController implements ControllerMethods {
+class PartyGroupController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -43,52 +45,53 @@ class PartyGroupController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CompanyView)
 	def listJson() {
-
     	Person whom = securityService.userLoginPerson
 
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+
+		// TODO : SL : using unchecked sortIndex because paginationOrderBy does not support aliases still
+		// String sortIndex = paginationOrderBy(PartyGroup, 'sidx', 'companyName')
 		String sortIndex = params.sidx ?: 'companyName'
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+
+		String sortOrder = paginationSortOrder('sord')
+
 		def companies
-		def filterParams = [companyName: params.companyName, dateCreated: params.dateCreated,
-		    lastUpdated: params.lastUpdated, partner: params.partner]
+		Map filterParams = [
+				companyName: params.companyName,
+				dateCreated: params.dateCreated,
+				lastUpdated: params.lastUpdated,
+				partner: params.partner]
 
 		// Validate that the user is sorting by a valid column
-		if( ! sortIndex in filterParams)
+		if ( ! sortIndex in filterParams ) {
 			sortIndex = 'companyName'
-
-		String active = params.activeUsers ?: session.getAttribute("InActive") ?: 'Y'
+		}
 
 		def queryParams = [:]
-		def query = new StringBuilder("""SELECT * FROM (
-			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
-			FROM party_group pg
-			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
-			LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'COMPANY' and pr.role_type_code_to_id = 'PARTNER' and pr.party_id_to_id = pg.party_group_id
-			WHERE party_group_id in (
-				SELECT party_id_to_id FROM party_relationship
-				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
-				AND role_type_code_to_id='CLIENT' AND party_id_from_id=:whomCompanyId
-				) OR party_group_id =:whomCompanyId
+		StringBuilder query = new StringBuilder("""
+			SELECT * FROM (
+				SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
+				FROM party_group pg
+				INNER JOIN party p ON party_type_id = 'COMPANY' AND p.party_id = pg.party_group_id
+				LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'COMPANY' and pr.role_type_code_to_id = 'PARTNER' and pr.party_id_to_id = pg.party_group_id
+				WHERE party_group_id in (
+					SELECT party_id_to_id FROM party_relationship
+					WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id = 'COMPANY'
+					AND role_type_code_to_id = 'CLIENT' AND party_id_from_id = ${whom.company.id}
+				) OR party_group_id = ${whom.company.id}
 			GROUP BY party_group_id ORDER BY
 		""")
-		query.append( " $sortIndex $sortOrder ) as companies")
+		query << ' ' << sortIndex << ' ' << sortOrder << ' ) as companies '
 
-		queryParams.whomCompanyId = whom.company.id
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
-			if(it.value) {
-				if (firstWhere) {
-					query.append(" WHERE companies.$it.key LIKE :$it.key")
-					firstWhere = false
-				}
-				else {
-					query.append(" AND companies.$it.key LIKE :$it.key")
-				}
-				queryParams[it.key] = "%$it.value%"
+			if (it.value) {
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+				query.append(' companies.').append(it.key).append(' LIKE :').append(it.key)
+				queryParams[it.key] = SqlUtil.formatForLike(it.value)
 			}
 		}
 
@@ -100,8 +103,6 @@ class PartyGroupController implements ControllerMethods {
 		if (totalRows > 0) {
 			companies = companies[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		}
-
-		def showUrl = createLink(controller:'partyGroup', action:'show')
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = companies?.collect { [cell: [it.companyName, it.partner, it.dateCreated, it.lastUpdated], id: it.companyId] }
