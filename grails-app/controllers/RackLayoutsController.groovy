@@ -468,10 +468,10 @@ class RackLayoutsController implements ControllerMethods {
 
 							String title = "Tag: ${overlapAsset.assetTag}\nName: ${overlapAsset.assetName}"
 							if (overlapAsset.model) {
-								title += "\nModel: ${overlapAsset.model.modelName}"
+								title += "\nModel: ${overlapAsset.model.modelName.encodeAsHTML()}"
 							}
 
-							moveBundle += (overlapAsset?.moveBundle?.name ?: "") + "<br/>"
+							moveBundle += HtmlUtil.escape(overlapAsset?.moveBundle?.name ?: "") + "<br/>"
 							if (overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')) {
 								hasBlades = true
 								bladeLayoutMap << ['overlappedAsset': overlapAsset]
@@ -485,7 +485,7 @@ class RackLayoutsController implements ControllerMethods {
 								assetTag.append(StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 22))
 							}
 							else {
-								assetTag.append('<a title="' + title + '" href="javascript:')
+								assetTag.append('<a title="' + HtmlUtil.escape(title) + '" href="javascript:')
 								if (forWhom) {
 									assetTag.append("editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})")
 								}
