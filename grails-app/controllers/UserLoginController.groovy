@@ -8,6 +8,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import groovy.sql.GroovyRowResult
 import groovy.transform.CompileStatic
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -74,10 +75,6 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
 		Integer currentPage = paginationPage()
 		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
-
-		//int maxRows = params.int('rows', 25)
-		//int currentPage = params.int('page', 1)
-		//int rowOffset = (currentPage - 1) * maxRows
 
 		// The following form filter names had to be hacked to avoid the autocompletion as disabling autocomplete doesn't
 		// seem to work in jqgrid.
@@ -146,18 +143,17 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		}
 		queryParams.ulActive = active
 
-		if (active=='Y'){
+		if (active == 'Y') {
 			query.append(" AND u.expiry_date > :uPresentDate ")
-			queryParams.uPresentDate = presentDate
 		} else {
 			query.append(" OR u.expiry_date < :uPresentDate ")
-			queryParams.uPresentDate = presentDate
 		}
+		queryParams.uPresentDate = presentDate
 
 		if (securityService.hasPermission(Permission.UserListAll)) {
 			if (params.id && params.id != "All") {
 				// If companyId is requested
-				companyId = params.id
+				companyId = params.long('id')
 			}
 			if (!companyId && params.id != "All") {
 				// Still if no companyId found trying to get companyId from the session
@@ -209,12 +205,14 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * RowMapper that maps each result from the query for the Event News list
-	 * into a map column -> value that can be sent back to the UI.
+	 * RowMapper that maps each result from the query used in {@code UserLoginController#listJson} method.
+	 * It implements one method defined in {@code RowMapper} interface.
+	 * This implementation returns an instance of {@code GroovyRowResult}
+	 * that is an extension of {@code Map} class.
 	 */
 	@CompileStatic
 	private class UserLoginMapper implements RowMapper {
-		def mapRow(ResultSet rs, int rowNum) throws SQLException {
+		GroovyRowResult mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return rs.toRowResult()
 		}
 	}
