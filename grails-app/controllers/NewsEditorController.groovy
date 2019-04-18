@@ -4,7 +4,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import groovy.transform.CompileStatic
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
@@ -13,14 +15,19 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.UserPreferenceService
-import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
+import java.sql.ResultSet
+import java.sql.SQLException
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class NewsEditorController implements ControllerMethods {
+class NewsEditorController implements ControllerMethods, PaginationMethods {
 
 	ControllerService controllerService
-	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	UserPreferenceService userPreferenceService
 
 	static defaultAction = 'newsEditorList'
@@ -69,122 +76,15 @@ class NewsEditorController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.NewsView)
-	def listEventNewsJson() {
-
-		Project project = securityService.userCurrentProject
-		String viewFilter = params.viewFilter
-		MoveEvent moveEvent = MoveEvent.read(params.moveEvent)
-		MoveBundle moveBundle = params.moveBundle ? MoveBundle.get(params.moveBundle) : null
-
-		String sortIndex = params.sidx ?: 'comment'
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows')
-		int currentPage = params.int('page', 1)
-
-		def assetCommentsQuery = new StringBuilder('''\
-			select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption, comment,
-			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, ac.comment_type as commentType,
-			       CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy, ac.date_resolved as resolvedAt,
-			       resolution, ae.asset_entity_id as assetEntity
-			from asset_comment ac
-			     left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
-			     left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
-			     left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
-			     left join person p2 on (p2.person_id = ac.resolved_by)
-			where ac.comment_type = 'issue'
-			  and ''')
-
-		def moveEventNewsQuery = new StringBuilder('''\
-			select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
-			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy,
-			       'news' as commentType, message as comment, resolution, date_archived as resolvedAt, null as assetEntity
-			from move_event_news mn
-			     left join move_event me on (me.move_event_id = mn.move_event_id)
-			     left join project p on (p.project_id = me.project_id)
-			     left join person p1 on (p1.person_id = mn.created_by)
-			     left join person p2 on (p2.person_id = mn.archived_by)
-			where ''')
-
-		if (moveBundle) {
-			assetCommentsQuery.append(" mb.move_bundle_id = $moveBundle.id  ")
-		} else {
-			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id})")
-		}
-
-		if (moveEvent) {
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = $project.id ")
-		} else {
-			moveEventNewsQuery.append(" p.project_id = $project.id ")
-		}
-		if (viewFilter == "active") {
-			assetCommentsQuery.append(" and ac.date_resolved is null ")
-			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
-		} else if (viewFilter == "archived") {
-			assetCommentsQuery.append(" and ac.date_resolved is not null ")
-			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
-		}
-		if (params.comment) {
-			assetCommentsQuery.append("and ac.comment like '%$params.comment%'")
-			moveEventNewsQuery.append("and mn.message like '%$params.comment%'")
-		}
-		if (params.createdAt) {
-			assetCommentsQuery.append("and ac.date_created like '%$params.createdAt%'")
-			moveEventNewsQuery.append("and mn.date_created like '%$params.createdAt%'")
-		}
-		if (params.resolvedAt) {
-			assetCommentsQuery.append("and ac.date_resolved like '%$params.resolvedAt%'")
-			moveEventNewsQuery.append("and mn.date_archived like '%$params.resolvedAt%'")
-		}
-		if (params.createdBy) {
-			assetCommentsQuery.append("and p1.first_name like '%$params.createdBy%'")
-			moveEventNewsQuery.append("and p1.first_name like '%$params.createdBy%'")
-		}
-		if (params.resolvedBy) {
-			assetCommentsQuery.append("and p2.first_name like '%$params.resolvedBy%'")
-			moveEventNewsQuery.append("and p2.first_name like '%$params.resolvedBy%'")
-		}
-		if (params.commentType) {
-			assetCommentsQuery.append("and ac.comment_type like '%$params.commentType%'")
-			moveEventNewsQuery.append("and news like '%$params.commentType%'")
-		}
-		if (params.resolution) {
-			assetCommentsQuery.append("and ac.resolution like '%$params.resolution%'")
-			moveEventNewsQuery.append("and mn.resolution like '%$params.resolution%'")
-		}
-
-		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
-
-		def queryForCommentsList = new StringBuilder()
-		queryForCommentsList << assetCommentsQuery << " union all " << moveEventNewsQuery
-		queryForCommentsList << 'order by ' << sortIndex << ' ' << sortOrder
-		def totalComments = jdbcTemplate.queryForList(queryForCommentsList.toString())
-
-		int totalRows = totalComments.size()
-		int numberOfPages = Math.ceil(totalRows / maxRows)
-
-		def results = totalComments.collect {
-			[cell: [TimeUtil.formatDate(it.createdAt),
-			        it.createdBy, it.commentType, it.comment, it.resolution,
-			        TimeUtil.formatDate(it.resolvedAt),
-			        it.resolvedBy],
-			 id: it.id]
-		}
-
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-
-		render jsonData as JSON
-	}
-
-	@HasPermission(Permission.NewsView)
 	def getEventNewsList() {
 
-		Project project = securityService.userCurrentProject
+		Project project = getProjectForWs()
 		String viewFilter = params.viewFilter
-		MoveEvent moveEvent = MoveEvent.read(params.moveEvent)
+		MoveEvent moveEvent = fetchDomain(MoveEvent, [id: params.moveEvent])
 		def bundleId = params.moveBundle
-		MoveBundle moveBundle = bundleId ? MoveBundle.get(bundleId) : null
+		MoveBundle moveBundle = bundleId ? fetchDomain(MoveBundle, [id: bundleId]) : null
 
-		def assetCommentsQuery = new StringBuilder("""select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption,
+		StringBuilder assetCommentsQuery = new StringBuilder("""select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption,
 									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
 									from asset_comment ac
@@ -193,7 +93,7 @@ class NewsEditorController implements ControllerMethods {
 									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
 									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """)
 
-		def moveEventNewsQuery = new StringBuilder("""select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
+		StringBuilder moveEventNewsQuery = new StringBuilder("""select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
 											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
 											from move_event_news mn
@@ -201,18 +101,24 @@ class NewsEditorController implements ControllerMethods {
 											left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
 											left join person p2 on (p2.person_id = mn.archived_by) where """)
 
+		Map queryParams = [:]
 
 		if (moveBundle) {
-			assetCommentsQuery.append(" mb.move_bundle_id = $moveBundle.id  ")
-		} else {
-			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEvent?.id})")
+			assetCommentsQuery.append(" mb.move_bundle_id = :acqMoveBundleId ")
+			queryParams.acqMoveBundleId = moveBundle.id
+		} else if (moveEvent) {
+			assetCommentsQuery.append(" mb.move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = :acqMoveEventId)")
+			queryParams.acqMoveEventId = moveEvent.id
 		}
 
 		if (moveEvent) {
-			moveEventNewsQuery.append(" mn.move_event_id = ${moveEvent.id}  and p.project_id = $project.id ")
+			moveEventNewsQuery.append(" mn.move_event_id = :menqMoveEventId  and p.project_id = :menqProjectId ")
+			queryParams.menqMoveEventId = moveEvent.id
 		} else {
-			moveEventNewsQuery.append(" p.project_id = $project.id ")
+			moveEventNewsQuery.append(" p.project_id = :menqProjectId")
 		}
+
+		queryParams.menqProjectId = project.id
 
 		if (viewFilter == "active") {
 			assetCommentsQuery.append(" and ac.date_resolved is null ")
@@ -227,7 +133,7 @@ class NewsEditorController implements ControllerMethods {
 
 		def queryForCommentsList = new StringBuilder(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery)
 
-		def result = jdbcTemplate.queryForList(queryForCommentsList.toString()).collect {[
+		List<Map> result = namedParameterJdbcTemplate.query(queryForCommentsList.toString(), queryParams, new MoveEventNewsMapper()).collect {[
 			createdAt: it.createdAt,
 			createdBy: it.createdBy,
 			commentType: it.commentType,
@@ -499,5 +405,23 @@ class NewsEditorController implements ControllerMethods {
 		}
 
 		renderSuccessJson()
+	}
+
+	/**
+	 * RowMapper that maps each result from the query for the Event News list
+	 * into a map column -> value that can be sent back to the UI.
+	 */
+	@CompileStatic
+	private class MoveEventNewsMapper implements RowMapper {
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {[
+			id:      rs.getInt('id'),
+			createdAt: rs.getDate('createdAt'),
+			createdBy: rs.getString('createdBy'),
+			comment: rs.getString('comment'),
+			commentType: rs.getString('commentType'),
+			resolution: rs.getString('resolution'),
+			resolvedAt: rs.getDate('resolvedAt'),
+			resolvedBy: rs.getString('resolvedBy')
+		]}
 	}
 }
