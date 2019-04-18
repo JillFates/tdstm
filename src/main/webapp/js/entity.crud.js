@@ -819,9 +819,9 @@ var EntityCrud = (function ($) {
 	var modelSelectFormatResult = function (item) {
 		if (item.text) {
 			if (item.isValid) {
-				return '<b>' + item.text + '</b>';
+				return '<b>' + _.escape(item.text) + '</b>';
 			} else {
-				return '<i>' + item.text + '</i>';
+				return '<i>' + _.escape(item.text) + '</i>';
 			}
 		} else {
 			return '';
@@ -831,9 +831,9 @@ var EntityCrud = (function ($) {
 	var modelSelectFormatSelection = function (item) {
 		if (item.text) {
 			if ((('isValid' in item) && item.isValid) || item.text.indexOf('?') == -1) {
-				return '<b>' + item.text + '</b>';
+				return '<b>' + _.escape(item.text) + '</b>';
 			} else {
-				return '<i>' + item.text + '</i>';
+				return '<i>' + _.escape(item.text) + '</i>';
 			}
 		} else {
 			return '';
