@@ -392,7 +392,7 @@ class CustomTagLib implements InitializingBean {
 		if (client && personCo && client.id != personCo.id) {
 			fullString += ', ' + personCo.name
 		}
-		out << fullString
+		out << HtmlUtil.escape(fullString)
 	}
 
 	/**
