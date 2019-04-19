@@ -11,26 +11,31 @@ class CollectionUtils {
 	/**
 	 * Converts an object to a List if not already a List
 	 * @param Any type of object
-	 * @param escape: false by default, this flag signals the need to escape string values in the first parameter.
 	 * @return the object contained within a list
 	 */
-	static List asList(object, boolean escape = false) {
-		List list =  (object == null || object instanceof List) ? object :
-				isCollectionOrArray(object) ? (object as List) : [object]
-		List results = []
-		if (list && escape) {
-			list.each { Object listElement ->
+	static List asList(object) {
+		(object == null || object instanceof List) ? object :
+			isCollectionOrArray(object) ? (object as List) : [object]
+	}
+
+	/**
+	 * Provides a "safe" version of asList to send values to the front-end.
+	 * @param object - a discrete value or list.
+	 * @return a list where string values are escaped correctly. Null if the parameter is also null.
+	 */
+	static List asHTMLSanitizedList(object) {
+		List list =  asList(object)
+		List sanitizedList = null
+		if (list != null) {
+			sanitizedList = list.collect { listElement ->
 				if (listElement instanceof String) {
-					results << HtmlUtil.escape(listElement)
+					HtmlUtil.escape(listElement)
 				} else {
-					results << listElement
+					listElement
 				}
 			}
-		} else {
-			results = list
 		}
-
-		return results
+		return sanitizedList
 	}
 
 	/**
