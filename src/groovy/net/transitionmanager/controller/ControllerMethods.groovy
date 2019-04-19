@@ -124,11 +124,11 @@ trait ControllerMethods {
 	}
 
 	Map errors(errorStringOrList) {
-		[status: 'error', errors: CollectionUtils.asList(errorStringOrList, true)]
+		[status: 'error', errors: CollectionUtils.asHTMLSanitizedList(errorStringOrList)]
 	}
 
 	Map warnings(warnStringOrList) {
-		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList, true)]
+		[status: 'warning', warnings: CollectionUtils.asHTMLSanitizedList(warnStringOrList)]
 	}
 
 //	void respondAsJson(File file) {

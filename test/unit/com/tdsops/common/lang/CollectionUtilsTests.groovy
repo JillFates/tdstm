@@ -63,54 +63,54 @@ class CollectionUtilsTests extends Specification {
 			cloned.c == source.c
 	}
 
-	void 'test asList' () {
+	void 'test toHTMLSanitizedList' () {
 		when: 'converting a simple value to a list'
 			int anInt = 2
-			List result = CollectionUtils.asList(anInt)
+			List result = CollectionUtils.asHTMLSanitizedList(anInt)
 		then: 'the list has one element and one element only'
 			result.size() == 1
 		and: 'and the element is the original parameter'
 			result[0] == anInt
 		when: 'sending a list as argument'
 			List aList = [1, 2]
-			result = CollectionUtils.asList(aList)
+			result = CollectionUtils.asHTMLSanitizedList(aList)
 		then: 'the same reference was returned'
 			result == aList
 		and: 'the values in the list are unchanged'
 			result.eachWithIndex{ value, int i ->
 				result[i] == aList[i]
 			}
-		when: 'requesting values to be escaped and the parameter is a string but does not need it'
+		when: 'the parameter is a string but does not require escaping'
 			String aString = 'foo'
-			result = CollectionUtils.asList( aString, true)
+			result = CollectionUtils.asHTMLSanitizedList( aString)
 		then: 'the parameter remains unchanged'
 			result[0] == aString
 		when: 'requesting escaping on non-string values'
-			result = CollectionUtils.asList(anInt, true)
+			result = CollectionUtils.asHTMLSanitizedList(anInt)
 		then: 'the parameter remains unchanged'
 			result[0] == anInt
 		when: 'requesting escaping on a string that should be escaped'
 			String xssString = "XSS+Exploit%3Csjavascript%3Acript%3Ealert%28%22XSS%22%29%3C%2Fsjavascript%3Acript%3E"
-			result = CollectionUtils.asList(xssString, true)
+			result = CollectionUtils.asHTMLSanitizedList(xssString)
 		then: 'the string is correctly escaped'
 			result[0] == HtmlUtil.escape(xssString)
 		when: 'requesting escaping on a list with a string that should be escaped'
-			result = CollectionUtils.asList([xssString], true)
+			result = CollectionUtils.asHTMLSanitizedList([xssString])
 		then: 'the string is correctly escaped'
 			result[0] == HtmlUtil.escape(xssString)
 		when: 'converting to list a list with mixed types and also requesting escaping'
 			List mixedList = [xssString, aString, anInt]
-			result = CollectionUtils.asList(mixedList, true)
+			result = CollectionUtils.asHTMLSanitizedList(mixedList)
 		then: 'each value was handled accordingly'
 			result[0] == HtmlUtil.escape(xssString)
 			result[1] == aString
 			result[2] == anInt
 		when: 'when sending a null value'
-			result = CollectionUtils.asList(null, true)
+			result = CollectionUtils.asHTMLSanitizedList(null)
 		then: 'the result is null'
 			result == null
 		when: 'sending an empty list'
-			result = CollectionUtils.asList([], true)
+			result = CollectionUtils.asHTMLSanitizedList([])
 		then: 'the result is also an empty list'
 			result.size() == 0
 
