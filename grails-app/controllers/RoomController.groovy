@@ -6,6 +6,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
@@ -443,7 +444,7 @@ class RoomController implements ControllerMethods {
 		if (rack) {
 			op += """
 					<tr>
-						<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag.encodeAsHTML() ?:""}</b></td>
+						<td colspan=2 class='powertable_L'><b>Rack : ${HtmlUtil.escape(rack?.tag) ?:""}</b></td>
 						<td colspan=3 class='powertable_L' nowrap>$spaceString</td>
 					</tr>
 					<tr>

@@ -50,7 +50,7 @@ class Room {
 	}
 
 	String toString() {
-		location + ' / ' + roomName
+		HtmlUtil.escape(location) + ' / ' + HtmlUtil.escape(roomName)
 	}
 
 	int getRackCount() {

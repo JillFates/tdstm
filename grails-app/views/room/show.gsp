@@ -1,6 +1,7 @@
 <%@page expressionCodec="none" %>
 <%@page import="net.transitionmanager.domain.Rack" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <html>
 <body>
 <div class="body" style="width:98%;">
