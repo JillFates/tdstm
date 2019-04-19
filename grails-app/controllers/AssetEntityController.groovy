@@ -17,7 +17,6 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
@@ -1155,8 +1154,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
-		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
-		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
+
+		Map<String, String> definedSortableFields = [
+			'taskNumber': 'taskNumber',
+			'comment': 'comment',
+			'assetName': 'assetName',
+			'dueDate': 'dueDate',
+			'status': 'status',
+			'assignedTo': 'assignedTo',
+			'instructionsLink': 'instructionsLink',
+			'category': 'category',
+			'score': 'score'
+		].withDefault { key -> session.TASK?.JQ_FILTERS?.sidx }
+
+		String sortIndex =  definedSortableFields[params.sidx]
+		String sortOrder =  paginationSortOrder('sord', session.TASK?.JQ_FILTERS?.sord)
 
 		// Get the pagination and set the user preference appropriately
 		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true)
@@ -1170,7 +1182,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			// zero (0) = All events
 			// log.info "listCommentsOrTasks: Handling MoveEvent based on params $params.moveEvent"
 			if (params.moveEvent != '0') {
-				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent, project)
 				if (!moveEvent) {
 					log.warn "listCommentsOrTasks: $securityService.currentUsername tried to access moveEvent $params.moveEvent that was not found in project $project.id"
 				}
@@ -1187,16 +1199,31 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			userPreferenceService.setMoveEventId moveEvent.id
 		}
 
-		def assetType = params.filter ? ApplicationConstants.assetFilters[params.filter ] : []
+		def taskNumbers = []
+		if (params.taskNumber) {
+			taskNumbers = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.taskNumber) like :taskNumber 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, taskNumber: "%${params.taskNumber}%"]
+			)?.taskNumber
+		}
 
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%$params.moveBundle%", project) : []
-		def models = params.model ? Model.findAllByModelNameIlike("%$params.model%") : []
-
-		def taskNumbers = params.taskNumber ? AssetComment.findAll("from AssetComment where project =:project \
-			and taskNumber like '%$params.taskNumber%'",[project:project])?.taskNumber : []
-
-		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
-			and duration like '%$params.duration%'",[project:project])?.duration : []
+		def duration = null
+		if (params.duration) {
+			duration = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType
+				   and AC.duration = :duration 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, duration: params.long('duration').toInteger()]
+			)?.duration
+		}
 
 		boolean viewUnpublished = securityService.viewUnpublished()
 
@@ -1206,13 +1233,96 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		 	String "Date" representation of the field ("2017-05-13 17:35:24") and if we try to use "named-params" it will fail the type-check (comparing Strings to Dates)
 		 	so leave this implementation alone unless you find a better way :)
 		*/
-		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%$params.dueDate%' ",[project:project])?.dueDate : []
-		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%$params.estStart%' ",[project:project])?.estStart : []
-		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%$params.actStart%' ",[project:project])?.actStart : []
-		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
-		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
-		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
-		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
+		def dates = []
+		if (params.dueDate){
+			dates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.dueDate) like :dueDate 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, dueDate: "%${params.dueDate}%"]
+			)?.dueDate
+		}
+
+		def estStartdates = []
+		if (params.estStart){
+			estStartdates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.estStart) like :estStart 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, estStart: "%${params.estStart}%"]
+			)?.estStart
+		}
+
+		def actStartdates = []
+		if (params.actStart) {
+			actStartdates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.actStart) like :actStart 
+			""".stripIndent(),
+					[project: project, commentType: AssetCommentType.TASK, actStart: "%${params.actStart}%"]
+				)?.actStart
+		}
+
+		def dateCreateddates = []
+		if (params.dateCreated) {
+			dateCreateddates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.dateCreated) like :dateCreated 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, dateCreated: "%${params.dateCreated}%"]
+			)?.dateCreated
+		}
+
+		def dateResolveddates = []
+		if (params.dateResolved){
+			dateResolveddates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.dateResolved) like :dateResolved 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, dateResolved: "%${params.dateResolved}%"]
+			)?.dateResolved
+		}
+
+		def estFinishdates = []
+		if (params.estFinish) {
+			estFinishdates = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.estFinish) like :estFinish 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, estFinish: "%${params.estFinish}%"]
+			)?.estFinish
+		}
+
+		def statusUpdated = []
+		if (params.statusUpdated) {
+			statusUpdated = AssetComment.executeQuery("""
+				select AC
+				  from AssetComment AC
+				 where AC.project = :project
+				   and AC.commentType = :commentType	
+				   and str(AC.statusUpdated) like :statusUpdated 
+			""".stripIndent(),
+				[project: project, commentType: AssetCommentType.TASK, statusUpdated: "%${params.statusUpdated}%"]
+			)?.statusUpdated
+		}
 
 		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
@@ -1259,10 +1369,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (params.displayOption) {
 				ilike('displayOption', "%$params.displayOption%")
 			}
-			if (durations) {
-				'in'('duration', durations)
+			if (duration) {
+				eq('duration', duration)
 			}
-			if (params.durationScale) {+
+			if (params.durationScale) {
 				ilike('durationScale', "%$params.durationScale%")
 			}
 			if (params.category) {
