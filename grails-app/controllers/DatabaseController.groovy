@@ -74,7 +74,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		List moveBundleList
 		if (params.event?.isNumber()) {
-			MoveEvent moveEvent = MoveEvent.read(params.event) // cambiar (aunque es number)
+			MoveEvent moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
