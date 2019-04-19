@@ -25,6 +25,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.imports.DataTransferBatch
@@ -341,10 +342,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
-
-		renderAsJson assetEntityService.getDeviceDataForList(project, session, params)
+		Project project = getProjectForWs()
+		PaginationObject paginationObj = paginationAsObject()
+		renderAsJson assetEntityService.getDeviceDataForList(project, session, params, paginationObj)
 	}
 
 	@HasPermission(Permission.AssetDelete)

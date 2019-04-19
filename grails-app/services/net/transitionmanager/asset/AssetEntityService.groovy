@@ -29,6 +29,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.project.AppMoveEvent
@@ -2250,66 +2251,78 @@ class AssetEntityService implements ServiceMethods {
 		return model
 	}
 
-
-	long countServers(Project project = null){
-		if(project == null){
+	/**
+	 * Used to get the count of Servers for a project
+	 * @param project - the project to count servers for
+	 * @return the count of servers
+	 */
+	Long countServers(Project project = null, Boolean justPlanning=true) {
+		if (project == null) {
 			project = securityService.userCurrentProject
 		}
 
-		if(!project) return 0L
+		if (!project) {
+			return 0L
+		}
 
-		def sql = """
-			SELECT
-				count(distinct ae.asset_entity_id)
-			FROM asset_entity ae
-			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-			LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-			LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = 'issue'
-			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = 'comment'
-			LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id
-			LEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id
-			LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id
-			WHERE ae.project_id = :pid
-			AND ae.asset_class = 'DEVICE'
-			AND mb.use_for_planning=true
-			AND ae.asset_class='DEVICE'
-			AND ae.asset_type IN ('Server','Appliance','Blade','VM','Virtual')
-		"""
-		/* id = 2445 */
-		namedParameterJdbcTemplate.queryForObject(sql, [pid: project.id], Long.class)
+		Long count = AssetEntity.where {
+			project == project
+			assetClass == AssetClass.DEVICE.toString()
+			assetType in AssetType.allServerTypes
+			moveBundle.useForPlanning == justPlanning
+		}.count()
+		return count
 	}
+
+	/**
+	 * Used to retrieve a list of Bundle IDs for a project where the bundle is not assiged to an event
+	 * @param project - the project that the bundles are in
+	 * @param justForPlanning - indicate if only planning bundles or all (default true)
+	 * @return List of bundle ids
+	 */
+	List<Long> getUnassignedBundleIds(Project project, Boolean justForPlanning = true) {
+		List unassignedBundles = MoveBundle.where {
+			project == project
+			moveEvent == null
+			if (justForPlanning) {
+				useForPlanning == true
+			}
+		}.projections {
+			property('id')
+		}.list()
+	}
+
 	/**
 	 * Used to retrieve the data used by the AssetEntity List
 	 */
-	Map getDeviceDataForList(Project project, HttpSession session, Map params) {
-		def filterParams = [
-				assetName: params.assetName,
-				assetType: params.assetType,
-				depConflicts: params.depConflicts,
-				depNumber: params.depNumber,
-				depToResolve: params.depToResolve,
-				event: params.event,
-				model: params.model,
-				manufacturer: params.manufacturer,
-				moveBundle: params.moveBundle,
-				planStatus: params.planStatus,
-				sourceLocationName: params.sourceLocationName,
-				sourceRackName: params.sourceRackName,
+	Map getDeviceDataForList(Project project, HttpSession session, Map params, PaginationObject paginationObj) {
+		Map filterParams = [
+			assetName: params.assetName,
+			assetType: params.assetType,
+			depConflicts: params.depConflicts,
+			depNumber: params.depNumber,
+			depToResolve: params.depToResolve,
+			event: params.event,
+			model: params.model,
+			manufacturer: params.manufacturer,
+			moveBundle: params.moveBundle,
+			planStatus: params.planStatus,
+			sourceLocationName: params.sourceLocationName
 		]
-		def validSords = ['asc', 'desc']
-		String sortOrder = validSords.indexOf(params.sord) != -1 ? params.sord : 'asc'
-		int maxRows = params.rows.toInteger()
-		int currentPage = params.page.toInteger() ?: 1
-		int rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
-		def moveBundleList
+		// Used for the SQL Query parameters
+		Map queryParams = [:]
+
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationObj.paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationObj.paginationPage()
+		Integer rowOffset = paginationObj.paginationRowOffset(currentPage, maxRows)
+		String sortOrder = paginationObj.paginationSortOrder('sord')
 
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
-		def prefType = PREF.Asset_Columns
-		def assetPref= getExistingPref(prefType)
+		Map assetPref = getExistingPref(PREF.Asset_Columns)
 
 		List assetPrefColumns = assetPref*.value
 		for (String fieldName in assetPrefColumns) {
@@ -2319,37 +2332,44 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		// Lookup the field name reference for the sort
-		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
+		String sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
 
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
 
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 
-		if (params.event && params.event.isNumber()) {
-			def moveEvent = MoveEvent.read(params.event)
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
-		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
+		Long eventId = params.long('event')
+		List moveBundleList = MoveBundle.where {
+			project == project
+			if (eventId) {
+				moveEvent.id == eventId
+			}
+			useForPlanning == true
+		}.list()
+
+		List assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
+
+		List bundleList = []
+		if (params.moveBundle) {
+			bundleList = MoveBundle.where {
+				project == project
+				name =~ "%${params.moveBundle}%"
+			}.list()
 		}
-
-		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
-
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%$params.moveBundle%", project) : []
 
 		StringBuilder altColumns = new StringBuilder()
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS sourceLocationName ")
+		altColumns.append(",srcRack.tag AS rackSource, srcRoom.location AS sourceLocationName")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
 		// join the manufacturer name from the model if it exists, otherwise from the asset's manufacturer property
-		altColumns.append(", IFNULL(manu.name, manu2.name) AS manufacturer")
+		altColumns.append(",\nIFNULL(manu.name, manu2.name) AS manufacturer")
 		joinQuery.append("\nLEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
 		joinQuery.append("\nLEFT OUTER JOIN manufacturer manu2 ON manu2.manufacturer_id=ae.manufacturer_id ")
-
 
 		boolean srcRoomAdded = true 	// Can set to false if the above lines are removed
 		boolean tgtRoomAdded = false
@@ -2358,21 +2378,21 @@ class AssetEntityService implements ServiceMethods {
 		assetPref.each { key,value->
 			switch (value) {
 				case 'appOwner':
-					altColumns.append(", CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner")
+					altColumns.append(",\nCONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner")
 					joinQuery.append("\nLEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id ")
 					break
 				case 'os':
-					altColumns.append(", ae.hinfo AS os")
+					altColumns.append(",\nae.hinfo AS os")
 					break
 				case ~/custom\d{1,}/:
-					altColumns.append(", ae.$value AS $value")
+					altColumns.append(",\nae.$value AS $value")
 					break
 				case 'lastUpdated':
-					altColumns.append(", ee.last_updated AS $value")
+					altColumns.append(", \nee.last_updated AS $value")
 					joinQuery.append("\nLEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id ")
 					break
 				case 'modifiedBy':
-					altColumns.append(", CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
+					altColumns.append(",\nCONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
 					joinQuery.append("\nLEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
 					break
 
@@ -2388,9 +2408,9 @@ class AssetEntityService implements ServiceMethods {
 						// Note that this is added by default above
 						// altColumns.append(', srcRoom.location AS sourceLocation')
 					} else if (locOrRoom == 'room') {
-						altColumns.append(', srcRoom.room_name AS roomSource')
+						altColumns.append(',\nsrcRoom.room_name AS roomSource')
 					} else {
-						throw new RuntimeException("Unhandled condition for property ($value)")
+						throw new InvalidParamException("Invalid parameter $value")
 					}
 					break
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
@@ -2407,24 +2427,24 @@ class AssetEntityService implements ServiceMethods {
 						tgtRoomAdded = true
 					}
 					if (locOrRoom == 'location') {
-						altColumns.append(', tgtRoom.location AS locationTarget')
+						altColumns.append(',\ntgtRoom.location AS locationTarget')
 					} else if (locOrRoom == 'room') {
-						altColumns.append(', tgtRoom.room_name AS roomTarget')
+						altColumns.append(',\ntgtRoom.room_name AS roomTarget')
 					} else {
-						throw new RuntimeException("Unhandled condition for property ($value)")
+						throw new InvalidParamException("Invalid parameter $value")
 					}
 					break
 				case 'rackTarget':
 					// Property was moved to the Rack domain
-					altColumns.append(", tgtRack.tag AS rackTarget")
+					altColumns.append(",\ntgtRack.tag AS rackTarget")
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
 					break
 				case 'sourceChassis':
-					altColumns.append(", aeSourceChassis.asset_name AS sourceChassis")
+					altColumns.append(",\naeSourceChassis.asset_name AS sourceChassis")
 					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeSourceChassis ON aeSourceChassis.asset_entity_id=ae.source_chassis_id ")
 					break
 				case 'targetChassis':
-					altColumns.append(", aeTargetChassis.asset_name AS targetChassis")
+					altColumns.append(",\naeTargetChassis.asset_name AS targetChassis")
 					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.target_chassis_id ")
 					break
 
@@ -2432,7 +2452,7 @@ class AssetEntityService implements ServiceMethods {
 					break
 				case 'tagAssets':
 					altColumns.append("""
-						, CONCAT(
+						,\nCONCAT(
 		                    '[',
 		                    if(
 		                        ta.tag_asset_id,
@@ -2449,7 +2469,7 @@ class AssetEntityService implements ServiceMethods {
 						""")
 					break
 				default:
-					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS $value ")
+					altColumns.append(",\nae.${WebUtil.splitCamelCase(value)} AS $value ")
 			}
 		}
 
@@ -2479,77 +2499,73 @@ class AssetEntityService implements ServiceMethods {
 		//
 		// Begin the WHERE section of the query
 		//
-		query.append("\nWHERE ae.project_id = $project.id\nAND ae.asset_class = '$AssetClass.DEVICE'")
+		query.append("""
+			WHERE ae.project_id = :projectId
+				AND ae.asset_class = :assetClass
+			""")
+		queryParams.projectId = project.id
+		queryParams.assetClass = AssetClass.DEVICE.toString()
 
-		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)?:'true'
+		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		/*
 		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
 		if (params.justPlanning)
 			justPlanning = params.justPlanning
 		*/
-		if (justPlanning == 'true')
-			query.append("\nAND mb.use_for_planning=$justPlanning")
+		if (justPlanning == 'true') {
+			query.append("AND mb.use_for_planning=true")
+		}
 
-		query.append("\nAND ae.asset_class='$AssetClass.DEVICE'")
-
-		def filter = params.filter ?: 'all'
+		String filter = params.filter ?: 'all'
 
 		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
 		switch(filter) {
 			case 'physical':
-				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.virtualServerTypes)}) ")
+				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.virtualServerTypes
 				break
 			case 'physicalServer':
-				def phyServerTypes = AssetType.allServerTypes - AssetType.virtualServerTypes
-				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(phyServerTypes)}) ")
+				query.append("\nAND ae.asset_type IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.physicalServerTypes
 				break
 			case 'server':
-				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.allServerTypes)}) ")
+				query.append("\nAND ae.asset_type IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.allServerTypes
 				break
 			case 'storage':
-				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.storageTypes)}) ")
+				query.append("\nAND ae.asset_type IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.storageTypes
 				break
 			case 'virtualServer':
-				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.virtualServerTypes)}) ")
+				query.append("\nAND ae.asset_type IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.virtualServerTypes
 				break
 			case 'other':
-				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.nonOtherTypes)}) ")
+				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (:assetTypes) ")
+				queryParams.assetTypes = AssetType.nonOtherTypes
 				break
-
 			case 'all':
 				break
 		}
 
-		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append("\nAND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})")
+		if (params.event && params.event.isNumber() && moveBundleList) {
+			query.append("\nAND ae.move_bundle_id IN (:bundleIdList)")
+			queryParams.bundleIdList = moveBundleList*.id
+		}
 
+		// Include only devices of unassigned bundles in planning
 		if (params.unassigned) {
-			def unasgnMB = MoveBundle.findAll("\nFROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
-
-			if (unasgnMB) {
-				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
-				query.append("\nAND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id IS NULL)")
+			List<Long> unassignedBundles = getUnassignedBundleIds(project)
+			if (unassignedBundles) {
+				query.append("\nAND ae.move_bundle_id IN (:unassignedBundles)")
+				queryParams.unassignedBundles = unassignedBundles
 			}
 		}
 
 		query.append("\nGROUP BY assetId \n) AS assets")
 
-		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
-		def firstWhere = true
-		def whereAnd = {
-			if (firstWhere) {
-				firstWhere = false
-				return ' WHERE'
-			} else {
-				return ' AND'
-			}
-		}
-
-
-
 		// Handle the filtering by each column's text field
-		def whereConditions = []
-		def queryParams = [:]
+		List<String> whereConditions = []
 		filterParams.each { key, val ->
 			if (val?.trim()) {
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -2562,50 +2578,56 @@ class AssetEntityService implements ServiceMethods {
 
 				SqlUtil.parseParameter(fieldSearchData)
 
-				whereConditions << fieldSearchData.sqlSearchExpression
+				whereConditions << "\n" + fieldSearchData.sqlSearchExpression
 				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
+		// Flag used by the SqlUtil.addWhereOrAndToQuery below
+		Boolean firstWhere = true
+
 		if (whereConditions.size()) {
-			firstWhere = false
-			query.append(" WHERE ${whereConditions.join(" AND ")}")
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append(" ${whereConditions.join(" AND ")}")
 		}
 		if (params.moveBundleId) {
-			// TODO : JPM 9/2014 : params.moveBundleId!='unAssigned' - is that even possible anymore? moveBundle can't be unassigned...
-			if (params.moveBundleId!='unAssigned') {
-				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(whereAnd() + " assets.moveBundle  = '$bundleName' ")
-			} else {
-				query.append(whereAnd() + " assets.moveBundle IS NULL ")
-			}
+			MoveBundle bundle = get(MoveBundle, params.moveBundleId, project)
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append("\n   assets.moveBundle = :bundleName ")
+			queryParams.bundleName = bundle.name
 		}
 
 		if (params.type && params.type == 'toValidate') {
-			query.append(whereAnd() + " assets.validation='${ValidationType.UNKNOWN}' ") //eq ('validation','Discovery')
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append("\n   assets.validation=:validation ") //eq ('validation','Discovery')
+			queryParams.validation = ValidationType.UNKNOWN
 		}
 
 		// Allow filtering on the Validate
 		if (params.toValidate && ValidationType.list.contains(params.toValidate)) {
-			query.append(whereAnd() + " assets.validation='$params.toValidate' ")
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append("\n   assets.validation=:toValidate ")
+			queryParams.toValidate = params.toValidate
 		}
 
 		if (params.plannedStatus) {
-			query.append(whereAnd() + " assets.planStatus='$params.plannedStatus'")
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append("\n   assets.planStatus=:plannedStatus")
+			queryParams.plannedStatus = params.plannedStatus
 		}
-		query.append(" ORDER BY $sortIndex $sortOrder")
-		// log.debug  "query = $query"
 
-		def assetList = []
-		if (queryParams.size()) {
-			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
-		} else {
-			try {
+		query.append(" ORDER BY $sortIndex $sortOrder")
+
+		List assetList = []
+		try {
+			if (queryParams.size()) {
+				assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+			} else {
 				assetList = jdbcTemplate.queryForList(query.toString())
-			} catch (e) {
-				log.error "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
-				throw new LogicException("Unabled to perform query based on parameters and user preferences")
 			}
+		} catch (e) {
+			log.warn "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
+			throw new LogicException("Unabled to perform query based on parameters and user preferences")
 		}
 
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
@@ -2614,11 +2636,8 @@ class AssetEntityService implements ServiceMethods {
 		if (totalRows > 0) {
 			assetList = assetList[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
 		}
-		else {
-			assetList = []
-		}
 
-		def results = assetList?.collect {
+		List<Map> results = assetList?.collect {
 			def commentType = it.commentType
 			[id: it.assetId,
 			 cell: ['', // The action checkbox
