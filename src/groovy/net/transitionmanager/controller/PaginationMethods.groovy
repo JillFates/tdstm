@@ -103,6 +103,15 @@ trait PaginationMethods {
 	}
 
 	/**
+	 * Used to return a new Object that contains the controller params from the request that shares
+	 * all of the pagination methods.
+	 * @return the object to interact with PaginationMethods in a service
+	 */
+	PaginationObject paginationAsObject() {
+		return new PaginationObject(params)
+	}
+
+	/**
 	 * Used internally to validate that the sort order param value is one of the correct values. If set
 	 * or the errorOnBlank is true then if blank or bad value the InvalidParamException parameter is thrown.
 	 * @param orderValue - the value is evaluated for ASC|DESC|A|D
