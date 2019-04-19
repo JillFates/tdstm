@@ -1,4 +1,5 @@
-	<g:javascript src="tech_teams.js" />
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
+    <g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />
 	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
@@ -92,7 +93,7 @@
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
@@ -202,26 +203,26 @@
 				<tr><td colspan=2>
 				<dl>
 	               <g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
-		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+		                <dt>Application Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
 						<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
 						<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	               </g:if>
 	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
-	                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+	                    <dt>Database Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
 						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
 						<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	                </g:elseif>
 	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Files'}">
-	                    <dt>Storage Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+	                    <dt>Storage Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
 						<dt>Storage Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}</dd>
 						<dt>Storage Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	                </g:elseif>
 	                <g:else>
-						<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetTag}</dd>
-						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
+						<dt>Asset Tag:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity?.assetTag)}</dd>
+						<dt>Asset Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity?.assetName)}</dd>
 						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
 						<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd>
