@@ -127,7 +127,7 @@ trait ControllerMethods {
 	}
 
 	Map errors(errorStringOrList) {
-		[status: 'error', errors: CollectionUtils.asList(errorStringOrList)]
+		[status: 'error', errors: CollectionUtils.asList(errorStringOrList, true)]
 	}
 
 	Map warnings(warnStringOrList) {
