@@ -332,7 +332,7 @@ class RackLayoutsController implements ControllerMethods {
 				paramsMap.remove('backView')
 				frontViewRows = retrieveRackLayout(paramsMap)
 			}
-			rackLayout << [assetDetails : assetDetails, rack: rack.tag, room: rack.room,
+			rackLayout << [assetDetails : assetDetails, rack: HtmlUtil.escape(rack.tag), room: rack.room,
 			               frontViewRows: frontViewRows, backViewRows: backViewRows, rackId: rack.id]
 		}
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
@@ -471,7 +471,7 @@ class RackLayoutsController implements ControllerMethods {
 
 							String title = "Tag: ${overlapAsset.assetTag}\nName: ${overlapAsset.assetName}"
 							if (overlapAsset.model) {
-								title += "\nModel: ${overlapAsset.model.modelName.encodeAsHTML()}"
+								title += "\nModel: ${HtmlUtil.escape(overlapAsset.model.modelName)}"
 							}
 
 							moveBundle += HtmlUtil.escape(overlapAsset?.moveBundle?.name ?: "") + "<br/>"
