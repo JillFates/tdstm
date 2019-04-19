@@ -1,31 +1,32 @@
 import com.tds.asset.AssetOptions
 import com.tds.asset.Database
-import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.search.FieldSearchData
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
+import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.LogicException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class DatabaseController implements ControllerMethods, PaginationMethods {
 
@@ -104,6 +105,8 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 		//TODO:need to move the code to AssetEntityService
 		String temp = ''
 		String joinQuery = ''
+		Map queryParams = [:]
+
 		dbPref.each { key, value ->
 			switch(value){
 			case 'tagAssets':
@@ -167,14 +170,18 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 			query.append(joinQuery)
 
 		query.append(""" \n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-			WHERE ae.project_id = $project.id """)
+			WHERE ae.project_id = :projectId """)
 
-		if (justPlanning == 'true') {
-			query.append(" AND mb.use_for_planning=$justPlanning ")
+		queryParams.projectId = NumberUtil.toPositiveLong(project.id)
+
+		if (justPlanning) {
+			query.append(" AND mb.use_for_planning=true ")
 		}
 
-		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append(" AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})")
+		if (params.event && params.event.isNumber() && moveBundleList) {
+			query.append(" AND ae.move_bundle_id IN (:moveBundleIdList) ")
+			queryParams.moveBundleIdList = moveBundleList*.id
+		}
 
 		if (params.unassigned){
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
@@ -194,7 +201,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		Map queryParams = [:]
+
 		List whereConditions = []
 		filterParams.each { key, val ->
 			if (val && val.trim().size()){
