@@ -1088,18 +1088,29 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listCommentJson() {
-		String sortIndex = params.sidx ?: 'lastUpdated'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+
+		Map<String, String> definedSortableFields = [
+			'comment': 'comment',
+			'commentType': 'commentType',
+			'category': 'category',
+			'lastUpdated': 'lastUpdated',
+			'assetType': 'assetType',
+			'assetName': 'assetName'
+		].withDefault { key -> 'lastUpdated' }
+
+		String sortIndex = definedSortableFields[params.sidx]
+		String sortOrder = paginationSortOrder('sord')
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
 		List<Date> lastUpdatedTime = params.lastUpdated ? AssetComment.executeQuery('''
 			select lastUpdated from AssetComment
-			where project=:project
-			  and commentType=:comment
-			  and str(lastUpdated) like :lastUpdated
+			 where project=:project
+			   and commentType=:comment
+			   and str(lastUpdated) like :lastUpdated
 		''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
 
 		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
