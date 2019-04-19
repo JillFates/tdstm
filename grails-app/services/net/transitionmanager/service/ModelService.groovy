@@ -12,6 +12,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerSync
 import net.transitionmanager.domain.Model
@@ -106,10 +107,12 @@ class ModelService implements ServiceMethods {
 	 * @param sortOrder  the order to sort by. Should be either 'asc' or 'desc'
 	 * @return List results the list of rows selected by the query
 	 */
-	def listOfFilteredModels(Map filterParams, String sortColumn, String sortOrder) {
+	List listOfFilteredModels(Map<String, String> filterParams, PaginationObject paginationObj) {
+
+		String sortOrder = paginationObj.paginationSortOrder('sord')
 
 		// Cut the list of fields to filter by down to only the fields the user has entered text into
-		def queryParams = [:]
+		Map queryParams = [:]
 		filterParams.each { k, v -> if (v?.trim()) queryParams[k] = v }
 
 		// These values are mapped to real columns in the database, so they can be used in the WHERE clause
@@ -142,23 +145,32 @@ class ModelService implements ServiceMethods {
 		}
 
 		// These values are mapped to derived columns, so they will be used in the HAVING clause if included in the filter
-		def aliasValuesAggregate = [noOfConnectors: 'COUNT(DISTINCT mc.model_connectors_id)',
-		                            assetsCount: 'COUNT(DISTINCT ae.asset_entity_id)']
+		Map aliasValuesAggregate = [
+			modelConnectors: 'COUNT(DISTINCT mc.model_connectors_id)',
+			assetsCount: 'COUNT(DISTINCT ae.asset_entity_id)'
+		]
 
 		// If the user is sorting by a valid column, order by that one instead of the default
-		sortColumn = sortColumn && filterParams.containsKey(sortColumn) ? sortColumn : "man.name, m.name"
-
-		def query = new StringBuilder("SELECT ")
-
-		// Add all the columns to the query
-		def comma = false
-		(aliasValuesBase + aliasValuesAggregate).each {
-			query.append("${comma ? ', ' : ''}$it.value AS $it.key")
-			comma = true
+		// Grab the potential ORDER BY property or default to modelName
+		String sortColumn = paginationObj.params.sidx ?: null
+		if (sortColumn) {
+			if (! (filterParams.containsKey(sortColumn) || aliasValuesAggregate.containsKey(sortColumn)) ) {
+				throw paginationObj.PAGINATION_INVALID_ORDER_BY_EXCEPTION
+			}
+		} else {
+			sortColumn = 'man.name, m.name'
 		}
 
+		StringBuilder query = new StringBuilder("SELECT ")
+
+		String columnList = (aliasValuesBase + aliasValuesAggregate)
+			.collect { "$it.value AS $it.key" }
+			.join(', ')
+		query << columnList
+
 		// Perform all the needed table joins
-		query.append(""" FROM model m
+		query.append("""
+			FROM model m
 			LEFT OUTER JOIN model_connector mc on mc.model_id = m.model_id
 			LEFT OUTER JOIN model_sync ms on ms.model_id = m.model_id
 			LEFT OUTER JOIN manufacturer man on man.manufacturer_id = m.manufacturer_id
@@ -166,13 +178,15 @@ class ModelService implements ServiceMethods {
 			LEFT OUTER JOIN person p ON p.person_id = m.created_by
 			LEFT OUTER JOIN person p1 ON p1.person_id = m.updated_by
 			LEFT OUTER JOIN person p2 ON p2.person_id = m.validated_by
-			LEFT OUTER JOIN project pr ON pr.project_id = m.model_scope_id""")
+			LEFT OUTER JOIN project pr ON pr.project_id = m.model_scope_id
+		""")
 
 		// Handle the filtering by each column's text field for base columns
-		def firstWhere = true
+		Boolean firstWhere = true
 		aliasValuesBase.each { k, v ->
 			if (queryParams.containsKey(k)) {
-				query.append(" ${firstWhere ? ' WHERE' : ' AND'} $v ")
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+				query.append("$v ")
 
 				def aggVal = queryParams[k]
 				def expr = 'LIKE'
@@ -183,23 +197,19 @@ class ModelService implements ServiceMethods {
 					query.append("$expr :$k")
 				}
 				queryParams[k] = aggVal
-				firstWhere = false
 			}
 		}
 
 		// Group the models by
-		query.append(" GROUP BY modelId ")
+		query.append("\nGROUP BY modelId ")
 
 		// Handle the filtering by each column's text field for aggregate columns
 		def firstHaving = true
 		aliasValuesAggregate.each { k, v ->
 			if (queryParams.containsKey(k)) {
-
-				// TODO : refactor the query expression parsing <,> into reusable function as it could be used in a number of places
-
 				// Handle <, >, <= or >= options on the numeric filter
 				def aggVal = queryParams[k]
-				def expr = '='
+				String expr = '='
 				(aggVal, expr) = SqlUtil.parseExpression(aggVal, expr)
 				if (aggVal.isNumber()) {
 					// Need to save the query param without the expression
@@ -210,7 +220,7 @@ class ModelService implements ServiceMethods {
 			}
 		}
 
-		query << ' ORDER BY ' << sortColumn << ' ' << sortOrder
+		query << "\nORDER BY $sortColumn $sortOrder"
 
 		if (queryParams) {
 			namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
@@ -258,7 +268,7 @@ class ModelService implements ServiceMethods {
 			throw new ServiceException(error)
 		}
 	}
-	
+
 	/**
 	 * Validates whether the given alias is valid for the given model
 	 * @param newAlias, the alias to be added
@@ -284,18 +294,18 @@ class ModelService implements ServiceMethods {
 			return false
 		}
 
-		// check if there is another model from the same manufacturer with this alias as their name 
+		// check if there is another model from the same manufacturer with this alias as their name
 		def modelsWithName = Model.createCriteria().list {
 			eq('modelName', newAlias)
 			eq('manufacturer', manufacturer)
 			if (model)
 				ne('modelName', model.modelName)
 		}
-		
+
 		if (modelsWithName.size() > 0) {
 			return false
 		}
-			
+
 		// check if there is a model from this manufacturer already using this alias
 		def modelsWithAlias = ModelAlias.createCriteria().list {
 			eq('name', newAlias)
@@ -303,7 +313,7 @@ class ModelService implements ServiceMethods {
 			if (allowLocalDuplicates && model)
 				ne('model', model)
 		}
-		
+
 		if (modelsWithAlias) {
 			return false
 		}
