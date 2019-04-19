@@ -433,7 +433,7 @@ class RoomController implements ControllerMethods {
 		if (rack) {
 			op += """
 					<tr>
-						<td colspan=2 class='powertable_L'><b>Rack : ${HtmlUtil.escape(rack?.tag) ?:""}</b></td>
+						<td colspan=2 class='powertable_L'><b>Rack : ${HtmlUtil.escape(rack?.tag)}</b></td>
 						<td colspan=3 class='powertable_L' nowrap>$spaceString</td>
 					</tr>
 					<tr>
