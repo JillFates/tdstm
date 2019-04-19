@@ -155,6 +155,7 @@ class ModelService implements ServiceMethods {
 		String sortColumn = paginationObj.params.sidx ?: null
 		if (sortColumn) {
 			if (! (filterParams.containsKey(sortColumn) || aliasValuesAggregate.containsKey(sortColumn)) ) {
+				log.debug "listOfFilteredModels() Invalid ORDER BY [$sortColumn], filterParams[${filterParams.keySet() as List}], aliasValuesAggregate[${aliasValuesAggregate.keySet() as List}]"
 				throw paginationObj.PAGINATION_INVALID_ORDER_BY_EXCEPTION
 			}
 		} else {
