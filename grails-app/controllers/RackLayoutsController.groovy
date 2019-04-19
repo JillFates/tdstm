@@ -475,7 +475,7 @@ class RackLayoutsController implements ControllerMethods {
 								title += "\nModel: ${HtmlUtil.escape(overlapAsset.model.modelName)}"
 							}
 
-							moveBundle += HtmlUtil.escape(overlapAsset?.moveBundle?.name ?: "") + "<br/>"
+							moveBundle += HtmlUtil.escape(overlapAsset?.moveBundle?.name) + "<br/>"
 							if (overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')) {
 								hasBlades = true
 								bladeLayoutMap << ['overlappedAsset': overlapAsset]

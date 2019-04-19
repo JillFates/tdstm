@@ -73,9 +73,9 @@ class Room {
 	}
 
 	String getRoomAddress(String forWhom) {
-		String safeAddress = address ? HtmlUtil.escape(address) : ''
+		String safeAddress = HtmlUtil.escape(address)
 		return (safeAddress ? (forWhom == 'link' ? safeAddress : safeAddress + '<br/>') : '') +
-				(city ? HtmlUtil.escape(city) : '') +
+				(HtmlUtil.escape(city)) +
 				(stateProv ? ', ' + stateProv : '') +
 				(postalCode ? '  ' + postalCode : '') +
 				(country ? ' ' + country : '')
