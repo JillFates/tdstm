@@ -386,11 +386,13 @@ class CustomTagLib implements InitializingBean {
 		def client = attrs.client
 		def person = attrs.person
 		def personCo = person?.company
+		String fullString = ""
 
-		out << (person ? person.toString() : '')
+		fullString += (person ? person.toString() : '')
 		if (client && personCo && client.id != personCo.id) {
-			out << ', ' << personCo.name
+			fullString += ', ' + personCo.name
 		}
+		out << HtmlUtil.escape(fullString)
 	}
 
 	/**
