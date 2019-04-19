@@ -5,7 +5,6 @@ import com.google.gson.JsonSyntaxException
 import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.ui.Pagination
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
@@ -123,11 +122,11 @@ trait ControllerMethods {
 	}
 
 	Map errors(errorStringOrList) {
-		[status: 'error', errors: CollectionUtils.asList(errorStringOrList, true)]
+		[status: 'error', errors: CollectionUtils.asHTMLSanitizedList(errorStringOrList)]
 	}
 
 	Map warnings(warnStringOrList) {
-		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList, true)]
+		[status: 'warning', warnings: CollectionUtils.asHTMLSanitizedList(warnStringOrList)]
 	}
 
 //	void respondAsJson(File file) {
