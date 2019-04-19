@@ -131,7 +131,7 @@ trait ControllerMethods {
 	}
 
 	Map warnings(warnStringOrList) {
-		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList)]
+		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList, true)]
 	}
 
 //	void respondAsJson(File file) {
