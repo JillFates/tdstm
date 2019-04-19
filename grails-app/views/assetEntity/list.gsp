@@ -53,7 +53,7 @@
 						EntityCrud.showAssetDetailView('DEVICE', id);
 					}
 				});
-				
+
 				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false });
 				$("#editEntityView").dialog({ autoOpen: false });
@@ -112,11 +112,11 @@
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
-						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter}, 
+						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['4']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['5']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'planStatus', formatter:tdsCommon.jqgridTextCellFormatter},
@@ -134,7 +134,7 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
-						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
+						moveBundle : moveBundle, assetType:assetType, model :model, sourceLocationName: sourceLocationName,
 						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
@@ -152,7 +152,7 @@
 					var assetPref= '${assetPref[key]}';
 					$("#assetListIdGrid_" + assetPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+assetPref+"','assetList','"+${key}+"')\">");
 				</g:each>
-			
+
 				$.jgrid.formatter.integer.thousandsSeparator = '';
 				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? _.escape(cellvalue) : '';
@@ -202,11 +202,11 @@
 					} else if (plannedStatus){
 						$("#gs_planStatus").val(plannedStatus)
 					}
-					
+
 					$("#gs_moveBundle").val('${moveBundle}')
 					$("#gs_assetTag").val('${assetTag}')
 				}
-				
+
 			})
 		</script>
 	</head>
@@ -221,7 +221,7 @@
 						%{--<g:each var="attribute" in="${attributesList}">--}%
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}"
-								${assetPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:2px;" 
+								${assetPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:2px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${prefType}')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>
