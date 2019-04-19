@@ -327,7 +327,8 @@ class RackLayoutsController implements ControllerMethods {
 				paramsMap.remove('backView')
 				frontViewRows = retrieveRackLayout(paramsMap)
 			}
-			rackLayout << [assetDetails : assetDetails, rack: HtmlUtil.escape(rack.tag), room: rack.room,
+
+			rackLayout << [assetDetails : assetDetails, rack: rack.tag, room: rack.room,
 			               frontViewRows: frontViewRows, backViewRows: backViewRows, rackId: rack.id]
 		}
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)

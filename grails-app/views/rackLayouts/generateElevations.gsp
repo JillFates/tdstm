@@ -1,4 +1,3 @@
-<%@page defaultCodec="none" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -41,7 +40,7 @@
 							<th>Device</th>
 							<th>Bundle</th>
 						</tr>
-						${rackLayoutIt?.frontViewRows}
+						${raw(rackLayoutIt?.frontViewRows)}
 					</table>
 					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">
@@ -83,7 +82,7 @@
 							<th>Bundle</th>
 							<th>Cabling</th>
 						</tr>
-						${rackLayoutIt?.backViewRows}
+						${raw(rackLayoutIt?.backViewRows)}
 					</table>
 					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">
