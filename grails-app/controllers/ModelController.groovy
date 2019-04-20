@@ -8,6 +8,8 @@ import com.tdssrc.grails.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
@@ -21,7 +23,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 import java.text.DateFormat
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class ModelController implements ControllerMethods {
+class ModelController implements ControllerMethods, PaginationMethods {
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
 	static defaultAction = 'list'
 	static final OK_CONTENTS = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
@@ -35,7 +37,7 @@ class ModelController implements ControllerMethods {
 	@HasPermission(Permission.ModelList)
 	def list() {
 		Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
-		Map attributes = Model.getModelFieldsAndlabels()
+		Map attributes = Model.getModelFieldsAndLabels()
 		Map columnLabelpref = [:]
 		modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
 		[modelPref: modelPref, attributesList: attributes.keySet().sort(), columnLabelpref: columnLabelpref]
@@ -46,36 +48,33 @@ class ModelController implements ControllerMethods {
 	*/
 	@HasPermission(Permission.ModelList)
 	def listJson() {
-		String sortOrder = params.sord in ['asc','desc'] ? params.sord : 'asc'
-		int maxRows = params.int('rows')
-		int currentPage = params.int('page', 1)
-		int rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def modelInstanceList
 
 		// This map contains all the possible fileds that the user could be sorting or filtering on
-		Map<String, Object> filterParams = [
+		Map<String, String> filterParams = [
 			modelName: params.modelName, manufacturer: params.manufacturer, description: params.description,
-			assetType: params.assetType, powerUse: params.powerUse, noOfConnectors: params.modelConnectors,
+			assetType: params.assetType, powerUse: params.powerUse, modelConnectors: params.modelConnectors,
 			assetsCount: params.assetsCount, sourceTDSVersion: params.sourceTDSVersion, sourceTDS: params.sourceTDS,
 			modelStatus: params.modelStatus]
-		Map<String, Object> attributes = Model.modelFieldsAndlabels
-		def modelPref= assetEntityService.getExistingPref(PREF.Model_Columns)
-		def modelPrefVal = modelPref.collect{it.value}
-		attributes.keySet().each { attribute ->
-			if (attribute in modelPrefVal && attribute!='modelConnectors') {
+
+		// Get user configurable column names
+		Map modelPref= assetEntityService.getExistingPref(PREF.Model_Columns)
+		List modelPrefVal = modelPref.collect{it.value}
+
+		// Iterate over the Model domain fields and add the user configured columns to the filter params if a valid property
+		Model.modelFieldsAndLabels.keySet().each { attribute ->
+			if (attribute in modelPrefVal && attribute != 'modelConnectors') {
 				filterParams[attribute] = params[attribute]
 			}
 		}
-		// Cut the list of fields to filter by down to only the fields the user has entered text into
-		def usedFilters = filterParams.findAll { key, val -> val != null }
 
-		// Get the actual list from the service
-		modelInstanceList = modelService.listOfFilteredModels(filterParams, params.sidx, sortOrder)
+		List modelInstanceList = modelService.listOfFilteredModels(filterParams, paginationAsObject() )
 
-		// TODO : this looks like a good utility function to refactor
 		// Limit the returned results to the user's page size and number
-		def totalRows = modelInstanceList.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		Integer totalRows = modelInstanceList.size()
+		Integer numberOfPages = Math.ceil(totalRows / maxRows)
 
 		// Get the subset of all records based on the pagination
 		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
@@ -97,11 +96,11 @@ class ModelController implements ControllerMethods {
 		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
 		switch (value) {
-			case ~/dateCreated|lastModified|endOfLifeDate/: 
+			case ~/dateCreated|lastModified|endOfLifeDate/:
 				TimeUtil.formatDateTime(model[value], formatter)
 				break
-			case 'modelConnectors':                         
-				model.noOfConnectors
+			case 'modelConnectors':
+				model.modelConnectors
 				break
 			default:
 				model[value]
@@ -1069,7 +1068,7 @@ class ModelController implements ControllerMethods {
 						powerDesign : powerDesign]
 		render modelMap as JSON
 	}
-	
+
 	@HasPermission(Permission.ModelValidate)
 	def validateModel() {
 		def modelInstance = Model.get(params.id)
@@ -1083,7 +1082,7 @@ class ModelController implements ControllerMethods {
 		flash.message = "$modelInstance.modelName Validated"
 		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
 	}
-	
+
 	/**
 	* Validate whether requested alias already exist in DB or not
 	* @param: alias, the new alias to be validated
@@ -1098,7 +1097,7 @@ class ModelController implements ControllerMethods {
 		def modelId = params.id
 		def manufacturerId = params.manufacturerId
 		def newModelName = params.parentName
-		
+
 		// get the model and manufacturer if specified and call the service method for alias validation
 		def model = modelId ? Model.read(modelId) : null
 		def manufacturer = manufacturerId ? Manufacturer.read(manufacturerId) : null
@@ -1108,7 +1107,7 @@ class ModelController implements ControllerMethods {
 		else
 			render 'invalid'
 	}
-	
+
 	/**
 	 * Updates a model for audit view , not using update method as there have a lot of code in update action might degrade performance.
 	 * @param id : id of model for update
