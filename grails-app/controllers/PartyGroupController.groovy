@@ -14,6 +14,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
@@ -95,7 +96,12 @@ class PartyGroupController implements ControllerMethods, PaginationMethods {
 			}
 		}
 
-		companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		try {
+			companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		} catch(e) {
+			log.error "listJson() encountered SQL error : ${e.getMessage()}"
+			throw new LogicException("Unabled to perform query based on parameters and user preferences")
+		}
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = companies.size()
