@@ -1,6 +1,7 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import net.transitionmanager.service.InvalidParamException
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -9,6 +10,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -351,18 +353,36 @@ class RackLayoutsController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.RackView)
+	/**
+	 * Used to retrieve the list of racks
+	 * @param bundleIds - set to 'all' or comma separated list of ids to filter racks to specific bundles
+	 * @return Map of List<Map>sourceRackList and List<Map>targetRackList as JSON
+	 */
 	def retrieveRackDetails() {
-		def bundleIds = params.bundles
-		def moveBundles = []
-		if (bundleIds.contains('all')) {
-			moveBundles = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
-		}
-		else if (bundleIds) {
-			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($bundleIds)")
+		Project project = getProjectForWs()
+
+		// Get the bundle IDs and if not 'all'
+		List bundleIds = params.list('bundles')
+		Boolean showAllBundles = bundleIds.contains('all')
+		if (!showAllBundles) {
+			bundleIds = bundleIds.collect { NumberUtil.toPositiveLong(it, 0) }
 		}
 
-		def sourceRacks = []
-		def targetRacks = []
+		List moveBundles = []
+		try {
+			moveBundles = MoveBundle.where {
+				project == project
+				if (! showAllBundles ) {
+					id in bundleIds
+				}
+			}.list()
+		} catch (e) {
+			log.error "retrieveRackDetails failed query with params ${params}, ${e.message}"
+			throw new InvalidParamException('Invalid filter parameter(s) specified')
+		}
+
+		List sourceRacks = []
+		List targetRacks = []
 
 		moveBundles.each { moveBundle ->
 			moveBundle.sourceRacks.each {
