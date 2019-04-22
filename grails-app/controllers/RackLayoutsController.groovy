@@ -621,13 +621,13 @@ class RackLayoutsController implements ControllerMethods {
 						<ul>
 							<li><a href="javascript:${
 						forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"
-					}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+					}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${HtmlUtil.escape(it.rackDetails.location)}','${HtmlUtil.escape(it.rack)}')">Create asset  </a></li>
 							<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.id}','${
 						it.rackDetails.room?.id
-					}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
+					}','${HtmlUtil.escape(it.rackDetails.location)}','${HtmlUtil.escape(it.rack)}')">Assign asset </a></li>
 							<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.id}','${
 						it.rackDetails.room?.id
-					}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
+					}','${HtmlUtil.escape(it.rackDetails.location)}','${HtmlUtil.escape(it.rack)}')">Reassign asset </a></li>
 						</ul></img></div>&nbsp;""")
 				}
 				row.append("</td><td>&nbsp;</td>")
