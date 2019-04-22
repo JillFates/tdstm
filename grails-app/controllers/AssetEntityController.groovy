@@ -1103,9 +1103,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			'lastUpdated': 'lastUpdated',
 			'assetType': 'assetType',
 			'assetName': 'assetName'
-		].withDefault { key -> 'lastUpdated' }
+		].withDefault { key -> throw PAGINATION_INVALID_ORDER_BY_EXCEPTION }
 
-		String sortIndex = definedSortableFields[params.sidx]
+		String sortIndex = params.sidx ? definedSortableFields[params.sidx] : 'lastUpdated'
 		String sortOrder = paginationSortOrder('sord')
 		// Get the pagination and set the user preference appropriately
 		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
