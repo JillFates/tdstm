@@ -79,6 +79,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
+import groovy.util.logging.Slf4j
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.quartz.Scheduler
@@ -92,6 +93,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 import java.sql.ResultSet
 import java.sql.SQLException
 
+@Slf4j
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class AssetEntityController implements ControllerMethods, PaginationMethods {
@@ -2732,7 +2734,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
 				LEFT OUTER JOIN move_bundle mbd ON mbd.move_bundle_id = aed.move_bundle_id
 				WHERE ae.project_id = :projectId
-				ORDER BY ${sortIndex + " " + sortOrder}
+				ORDER BY $sortIndex $sortOrder
 			) AS deps
 		 """)
 
@@ -2748,7 +2750,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 		}
 
-		List dependencies = namedParameterJdbcTemplate.query(query.toString(), queryParams, new AssetDependencyRowMapper(depPref))
+		List dependencies = []
+		String queryStr = query.toString()
+		log.debug "listDepJson() called invalid query:\n{}\nparams:", queryStr, queryParams.dump()
+		try {
+			dependencies = namedParameterJdbcTemplate.query(queryStr, queryParams, new AssetDependencyRowMapper(depPref))
+		} catch (e) {
+			log.warn "listDepJson() called invalid query:\n{}\nparams:{}", queryStr, queryParams.dump()
+			throw new InvalidParamException('Invalid parameter for filtering or sort was encountered')
+		}
+
 		int totalRows = dependencies.size()
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
