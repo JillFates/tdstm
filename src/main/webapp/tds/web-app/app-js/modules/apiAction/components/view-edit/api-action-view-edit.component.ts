@@ -220,7 +220,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
-		}, 100);
+		}, 1500);
 	}
 
 	/**
@@ -401,7 +401,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		if (this.isDirty() || this.isParameterListDirty()) {
+		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
