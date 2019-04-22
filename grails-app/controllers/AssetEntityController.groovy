@@ -2688,18 +2688,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		int maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
 		int currentPage = paginationPage()
 		int rowOffset = paginationRowOffset(currentPage, maxRows)
-		List<String> aliases = [
-			"id", "assetName", "assetClass", "assetType", "assetBundle", "type", "dependentName", "dependentClass",
-			"dependentType", "dependentBundle", "status", "comment", "frequency", "assetId", "dependentId",
-			"c1", "c2", "c3", "c4", "direction"
-		]
-		String sortIndex = paginationOrderBy(aliases, 'sidx', 'assetName')
 
-		def filterParams = [assetName: params.assetName, assetType: params.assetType, assetBundle: params.assetBundle,
+		Map filterParams = [assetName: params.assetName, assetType: params.assetType, assetBundle: params.assetBundle,
 		                    type: params.type, dependentName: params.dependentName, dependentType: params.dependentType,
 		                    dependentBundle: params.dependentBundle, status: params.status,frequency: params.frequency,
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
+
+		Set<String> aliases = filterParams.keySet()
+		String sortIndex = paginationOrderByAlias(aliases, 'sidx', 'assetName')
+
 		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
 		StringBuilder query = new StringBuilder("""
 			SELECT * FROM (

@@ -72,7 +72,7 @@ trait PaginationMethods {
 	 * @return the propertyName to order by if specified in params or the default property otherwise
 	 * @throws InvalidParamException - when paramName specified with an invalid property for the domain
 	 */
-	String paginationOrderBy(Class domainClass, String paramName, String defaultProperty) {
+	String paginationOrderBy(def domainClass, String paramName, String defaultProperty) {
 		if (params.containsKey(paramName) && params[paramName]) {
 			if (! GormUtil.isDomainProperty(domainClass, params[paramName]) ) {
 				throw PAGINATION_INVALID_ORDER_BY_EXCEPTION
@@ -96,7 +96,7 @@ trait PaginationMethods {
 	 * @return the propertyName to order by if specified in params or the default property otherwise
 	 * @throws InvalidParamException - when paramName specified with an invalid property for the domain
 	 */
-	String paginationOrderBy(List<String> aliases, String paramName, String defaultProperty) {
+	String paginationOrderByAlias(Set<String> aliases, String paramName, String defaultProperty) {
 		if (params.containsKey(paramName) && params[paramName] && aliases) {
 			if (aliases.contains(params[paramName])) {
 				return params[paramName]
