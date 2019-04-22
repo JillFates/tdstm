@@ -155,7 +155,7 @@
 		<g:if test="${preLoginList && preLoginList.size() > 0}">
 			<g:each var="notice" in="${preLoginList}">
 				<div class="callout pre-login-message">
-					${raw( notice.htmlText )}
+					${raw(notice.htmlText)}
 				</div>
 			</g:each>
 		</g:if>
@@ -257,7 +257,7 @@
 			<g:if test="${postLoginList && postLoginList.size() > 0}">
 				<g:each var="notice" in="${postLoginList}">
 					<h4>${notice.title}</h4>
-					${notice.htmlText}
+					${raw(notice.htmlText)}
 				</g:each>
 			</g:if>
 			<div class="modal-footer">
