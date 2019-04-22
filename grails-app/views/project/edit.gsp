@@ -1,5 +1,6 @@
 <%@page defaultCodec="none" %>
 <%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="com.tdssrc.grails.HtmlUtil" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -156,7 +157,7 @@
 							<td class="valueNW">
 								<ul>
 									<g:each status="i" in="${projectManagers}" var="manager">
-									<li>${manager.toString() + (manager.title ? ', '+manager.title : '') }</li>
+									<li>${HtmlUtil.escape(manager.toString()) + (manager.title ? ', '+ HtmlUtil.escape(manager.title) : '') }</li>
 									</g:each>
 								</ul>
 							</td>
