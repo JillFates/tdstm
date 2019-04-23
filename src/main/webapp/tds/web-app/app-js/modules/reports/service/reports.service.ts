@@ -19,6 +19,9 @@ export class ReportsService {
 	private readonly MOVE_BUNDLES_LIST_URL = `${this.baseURL}/reports/moveBundles`;
 	private readonly TASKS_REPORT_URL = `${this.baseURL}/reports/tasksReport`;
 	private readonly SERVER_CONFLICTS_REPORT_URL = `${this.baseURL}/reports/generateServerConflicts`;
+	private readonly SME_LIST_URL = `${this.baseURL}/reports/smeList/{id}`;
+	private readonly APP_EVENT_RESULTS_LISTS_URL = `${this.baseURL}/reports/generateApplicationMigration/{id}`;
+	private readonly APP_EVENT_RESULTS_REPORT_URL = `${this.APP_EVENT_RESULTS_LISTS_URL}`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -43,7 +46,7 @@ export class ReportsService {
 	}
 
 	/**
-	 * Get move bundle list
+	 * GET - Get move bundle list
 	 * @returns {Observable<any>}
 	 */
 	getMoveBundles(): Observable<any[]> {
@@ -61,6 +64,20 @@ export class ReportsService {
 				return error;
 			})
 		);
+	}
+
+	/**
+	 * GET - Return the list of SME that belongs to a move bundle.
+	 * @param moveBundleId
+	 */
+	getSmeList(moveBundleId: number): Observable<any> {
+		return this.http.get(this.SME_LIST_URL.replace('{id}', moveBundleId.toString())).pipe(
+			map( (response: any) => response && response.data || []),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
 	}
 
 	/**
@@ -156,5 +173,49 @@ export class ReportsService {
 				return error
 			})
 		);
+	}
+
+	/**
+	 * GET - Return the list of SME that belongs to a move bundle.
+	 * @param moveBundleId
+	 */
+	getApplicationEventReportLists(moveBundleId: number): Observable<any> {
+		return this.http.get(this.APP_EVENT_RESULTS_LISTS_URL.replace('{id}', moveBundleId.toString())).pipe(
+			map( (response: any) => response && response.data || null),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
+	}
+
+	/**
+	 * POST - Return the list of SME that belongs to a move bundle.
+	 * @param moveBundleId
+	 */
+	getApplicationEventReport(
+		moveBundle: number,
+		sme: number,
+		startCategory: string,
+		stopCategory: string,
+		testing: number,
+		outageWindow: string): Observable<any> {
+		const request = {
+			moveBundle: moveBundle,
+			sme: sme === -1 ? 'null' : sme,
+			startCategory: startCategory,
+			stopCategory: stopCategory,
+			outageWindow: outageWindow,
+			testing: testing
+		};
+		return this.http.post(
+			this.APP_EVENT_RESULTS_REPORT_URL.replace('{id}', moveBundle.toString()),
+			request,
+			{responseType: 'text'}).pipe(
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
 	}
 }

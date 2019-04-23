@@ -11,6 +11,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
+import groovy.time.TimeCategory
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -27,6 +28,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -36,6 +38,7 @@ import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.jdbc.core.JdbcTemplate
@@ -1195,4 +1198,89 @@ class ReportsService implements ServiceMethods {
 
 		book.write(response.getOutputStream())
 	}
+
+    /**
+     * Generates Application Migration Report web output.
+     * @param project: Project, the current user project.
+     * @param moveBundle: The id of the move bundle selected value.
+     * @param smeByModel: The id of the SME selected value.
+     * @param startCategory: string.
+     * @param stopCategory: string.
+     * @param workflowTransId: integer - The id of the Workflow.
+     * @param outageWindow: string - The custom field.
+     * @returns the model report to be used on the view gsp rendering.
+     */
+    def generateApplicationMigration(project, moveBundle, smeByModel, startCategory, stopCategory, workflowTransId, outageWindow) {
+        def applicationList
+        def currentSme
+        def currentBundle
+        def appList = []
+        if(moveBundle == 'useForPlanning'){
+            if(smeByModel!='null'){
+                currentSme = Person.get(smeByModel)
+                applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
+                        [project:project,smes:currentSme])
+            }else {
+                applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
+            }
+        }else{
+            currentBundle = MoveBundle.get(moveBundle)
+            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, moveBundle)
+            if(smeByModel!='null'){
+                currentSme = Person.get(smeByModel)
+                applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle \
+					and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
+            }else {
+                applicationList = Application.findAllByMoveBundle(currentBundle)
+            }
+        }
+
+        applicationList.each {
+            Application application = Application.get( it.id )
+            def appComments = application.comments
+            def startTimeList = appComments.findAll{it.category == startCategory}.sort{it.actStart}?.actStart
+            def finishTimeList = appComments.findAll{it.category == stopCategory}.sort{it.actStart}?.actStart
+
+            startTimeList.removeAll([null])
+
+            def finishTime= finishTimeList ? finishTimeList[-1] : null
+            def startTime = startTimeList ? startTimeList[0] : null
+
+            def duration = new StringBuilder()
+            def customParam
+            def windowColor
+            def workflow
+            def durationHours
+
+            if(finishTime && startTime){
+                def dayTime = TimeCategory.minus(finishTime, startTime)
+                durationHours = (dayTime.days*24)+dayTime.hours
+                if(durationHours){
+                    duration.append(durationHours)
+                }
+                if(dayTime.minutes){
+                    duration.append((durationHours?':':'0:')+dayTime.minutes)
+                }
+            }
+            if(outageWindow == 'drRtoDesc'){
+                customParam = application.drRtoDesc ? NumberUtils.toInt((application.drRtoDesc).split(" ")[0]) : ''
+                if (duration && customParam) {
+                    windowColor = customParam < durationHours ? 'red' : ''
+                }
+            } else {
+                customParam = it[outageWindow]
+            }
+
+            if (workflowTransId) {
+                def workflowTransaction = WorkflowTransition.get(workflowTransId)
+                workflow = appComments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
+                workflow.removeAll([null])
+            }
+            appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
+                    customParam: customParam ? customParam + (outageWindow == 'drRtoDesc' ? 'h': '') : '',
+                    windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
+        }
+
+        [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
+    }
 }

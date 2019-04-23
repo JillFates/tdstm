@@ -124,7 +124,7 @@ export class ServerConflictsReportComponent {
 			if (this.bundleList.length > 0) {
 				this.selectedBundle = this.bundleList[0];
 			}
-		})
+		});
 	}
 
 	/**
@@ -138,7 +138,7 @@ export class ServerConflictsReportComponent {
 			this.noSupportDependencies,
 			this.noVmHost,
 			this.maxAssetsToReport).subscribe(result => {
-			this.reportResult = this.getSafeHtml(result);
+			this.reportResult = this.reportsService.getSafeHtml(result);
 			setTimeout(() => {
 				const assetLinks = this.elRef.nativeElement.querySelectorAll('.inlineLink');
 				assetLinks.forEach(item => {
@@ -146,14 +146,6 @@ export class ServerConflictsReportComponent {
 				})
 			}, 300);
 		})
-	}
-
-	/**
-	 * Based on the text passed it generates the corresponding safe html string
-	 * @param {string} content: html to be proccessed
-	 */
-	getSafeHtml(content: string): SafeHtml {
-		return this.sanitizer.bypassSecurityTrustHtml(content);
 	}
 
 	/**

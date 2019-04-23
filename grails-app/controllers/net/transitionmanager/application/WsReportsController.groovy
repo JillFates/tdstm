@@ -1,15 +1,21 @@
 package net.transitionmanager.application
 
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.task.AssetComment
 
 
 @Secured("isAuthenticated()")
@@ -18,6 +24,7 @@ class WsReportsController implements ControllerMethods {
     ReportsService reportsService
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
+    CustomDomainService customDomainService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -79,6 +86,37 @@ class WsReportsController implements ControllerMethods {
         renderSuccessJson(moveBundleService.moveBundlesByProject(project))
     }
 
+    def smeList(Long moveBundleId) {
+        if ( !moveBundleId ) {
+            log.warn "moveBundleId param missing"
+            throw new InvalidParamException("moveBundleId param missing")
+        }
+        renderSuccessJson(reportsService.getSmeList(moveBundleId, true).sort({it.lastName}))
+    }
+
+    /**
+     * Retunrs the UI options lists for the Application Migration Report.
+     * @param moveBundleId: Id of the move bundle.
+     * @return Object containing the option lists.
+     */
+    def applicationMigrationLists(Long moveBundleId) {
+        if ( !moveBundleId ) {
+            log.warn "moveBundleId param missing"
+            throw new InvalidParamException("moveBundleId param missing")
+        }
+        Project project = getProjectForWs()
+        def smeList = reportsService.getSmeList(moveBundleId, true)
+        def testingList = WorkflowTransition.findAll(
+                'FROM WorkflowTransition where workflow=? order by transId',
+                [Workflow.findByProcess(project.workflowCode)])
+        List outageList = customDomainService.fieldSpecs(project, AssetClass.APPLICATION.toString(), CustomDomainService.ALL_FIELDS, ["field", "label"])
+        def categories = GormUtil.getConstrainedProperties(AssetComment).category.inList.collect { entry -> [
+                id: entry,
+                text: entry
+        ]}
+        renderSuccessJson([smeList: smeList.sort{it.lastName}, testingList: testingList, outageList: outageList,  categories: categories ])
+    }
+
     /**
      * Generates the Server Conflicts web output report.
      *
@@ -125,5 +163,28 @@ class WsReportsController implements ControllerMethods {
                     params,
                     assetCap))
         }
+    }
+
+    /**
+     * Generates Application Migration Report web output.
+     * @param moveBundle: The id of the move bundle selected value.
+     * @param sme: The id of the SME selected value.
+     * @param startCategory: string.
+     * @param stopCategory: string.
+     * @param testing: integer - The id of the Workflow.
+     * @param outageWindow: string - The custom field.
+     * @returns The rendered gsp view.
+     */
+    def generateApplicationMigration() {
+        Project project = getProjectForWs()
+        render(view: "/reports/generateApplicationMigration" , model: reportsService.generateApplicationMigration(
+                project,
+                request.JSON.moveBundle,
+                request.JSON.sme,
+                request.JSON.startCategory,
+                request.JSON.stopCategory,
+                request.JSON.testing,
+                request.JSON.outageWindow)
+        )
     }
 }

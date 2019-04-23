@@ -10,6 +10,7 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
+import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -27,6 +28,9 @@ export class ReportStates {
 	};
 	public static readonly SERVER_CONFLICTS_REPORT = {
 		url: 'serverConflicts'
+	};
+	public static readonly APPLICATION_EVENT_RESULTS = {
+		url: 'applicationEventResults'
 	};
 }
 
@@ -82,6 +86,25 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: ServerConflictsReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.APPLICATION_EVENT_RESULTS.url,
+		data: {
+			page: {
+				title: 'REPORTS.APPLICATION_EVENT_RESULTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.APPLICATION_EVENT_RESULTS'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-application-migration', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ApplicationEventResultsReportComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

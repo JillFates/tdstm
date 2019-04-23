@@ -1282,6 +1282,21 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/smeList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "smeList"
+            ]
+        }
+
+        "/ws/reports/generateApplicationMigration/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "applicationMigrationLists",
+                    POST: "generateApplicationMigration"
+            ]
+        }
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )

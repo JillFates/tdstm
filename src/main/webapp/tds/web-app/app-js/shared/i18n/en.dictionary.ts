@@ -203,7 +203,8 @@ export const en_DICTIONARY: Object = {
 		'REPORT': 'Report',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'TASK_REPORT': 'Task Report',
-		'SERVER_CONFLICTS': 'Server Conflicts'
+		'SERVER_CONFLICTS': 'Server Conflicts',
+		'APPLICATION_EVENT_RESULTS': 'Application Event Results'
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
