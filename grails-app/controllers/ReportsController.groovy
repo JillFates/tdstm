@@ -580,7 +580,7 @@ class ReportsController implements ControllerMethods {
 			return [errorMessage: "Please Select a Bundle"]
 		}
 
-		Project project = getProjectForPage()
+		Project project = getProjectForWs()
 
 		List sourceRacks = []
 		List targetRacks = []
@@ -594,7 +594,7 @@ class ReportsController implements ControllerMethods {
 			moveBundles = MoveBundle.where {
 				project == project
 				id in bundleIdList
-			}
+			}.list()
 		}
 		if (! bundleIdList) {
 			return [errorMessage: "Specified bundle(s) not found"]
