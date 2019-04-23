@@ -360,16 +360,25 @@ class RackLayoutsController implements ControllerMethods {
 		def sourceRacks = []
 		def targetRacks = []
 
+		// Helper closure to add a Rack into a list HTML sanitized
+		def addRackToList = { Rack rack, List list ->
+			Long id = rack.id
+			String location = HtmlUtil.escape(rack.location)
+			String roomName = HtmlUtil.escape(rack.room?.roomName)
+			String tag = HtmlUtil.escape(rack.tag)
+
+			if (!list.contains([id: id, location: location, room: roomName, tag: tag])) {
+				list.add([id: id, location: location, room: roomName, tag: tag])
+			}
+		}
+
 		moveBundles.each { moveBundle ->
 			moveBundle.sourceRacks.each {
-				if (!sourceRacks.contains([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])) {
-					sourceRacks.add([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])
-				}
+				addRackToList(it, sourceRacks)
 			}
+
 			moveBundle.targetRacks.each {
-				if (!targetRacks.contains([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])) {
-					targetRacks.add([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])
-				}
+				addRackToList(it, targetRacks)
 			}
 		}
 
