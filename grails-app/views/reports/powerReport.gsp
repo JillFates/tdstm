@@ -145,6 +145,15 @@
         </div>
 
         <script type="text/javascript">
+            // Script to get the combined rack list
+            function getRackDetails(objId) {
+                var bundles = new Array()
+                $("#" + objId + " option:selected").each(function () {
+                    bundles.push($(this).val())
+                });
+
+                ${remoteFunction(controller:'rackLayouts', action:'retrieveRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(XMLHttpRequest)')}
+            }
 
             var click = 1
             $(document).ready(function () {

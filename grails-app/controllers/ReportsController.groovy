@@ -574,20 +574,30 @@ class ReportsController implements ControllerMethods {
 	 */
 	def powerReportDetails() {
 
-		List bundleId = request.getParameterValues("moveBundle")
-		if (bundleId == ['null']) {
-			return [errorMessage: "Please Select a Bundle."]
+		List bundleIdList = request.getParameterValues("moveBundle")
+		// TODO : JPM 4/2019 : not sure what this should be if no bundle was selected
+		if (bundleIdList == ['null']) {
+			return [errorMessage: "Please Select a Bundle"]
 		}
 
-		Project project = controllerService.getProjectForPage(this, 'to view Reports')
-		if (!project) return
+		Project project = getProjectForPage()
 
-		def sourceRacks = []
-		def targetRacks = []
+		List sourceRacks = []
+		List targetRacks = []
 		List<MoveBundle> moveBundles = MoveBundle.findAllByProject(project)
+
 		String powerType = params.powerType ?: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)
-		if (!bundleId.contains("all")){
-			moveBundles = MoveBundle.findAll("from MoveBundle m where id in (${bundleId.join(',')})")
+
+		if (! bundleIdList.contains("all")) {
+			// Cast all of the bundle IDs into Long
+			bundleIdList = bundleIdList.collect { NumberUtil.toPositiveLong(it, 0) }
+			moveBundles = MoveBundle.where {
+				project == project
+				id in bundleIdList
+			}
+		}
+		if (! bundleIdList) {
+			return [errorMessage: "Specified bundle(s) not found"]
 		}
 
 		def rackIds = request.getParameterValues("sourcerack")
@@ -881,17 +891,17 @@ class ReportsController implements ControllerMethods {
 			appList.add([
 				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
 				redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
-				appMoveEvent: appMoveEvent, 
-				moveEventList: moveEventList, 
+				appMoveEvent: appMoveEvent,
+				moveEventList: moveEventList,
 				appMoveEvent: appMoveEventlist,
 				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				project: project, prefValue: prefValue, 
-				shutdownById: shutdownById, 
-				startupById: startupById, 
+				project: project, prefValue: prefValue,
+				shutdownById: shutdownById,
+				startupById: startupById,
 				testingById: testingById,
-				shutdownBy: shutdownBy, 
-				startupBy: startupBy, 
-				testingBy: testingBy, 
+				shutdownBy: shutdownBy,
+				startupBy: startupBy,
+				testingBy: testingBy,
 				errors: params.errors
 			])
 		}
