@@ -55,7 +55,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form method="post" name="editUserForm" autocomplete="off">
+			<g:form method="post" name="editUserForm" autocomplete="off" useToken="true">
 				<input type="hidden" name="id" value="${userLoginInstance?.id}" />
 				<input type="hidden" name="companyId" value="${companyId}" />
 				<div class="dialog loginView">
