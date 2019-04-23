@@ -473,6 +473,9 @@ class WorkbookUtil {
 				case Cell.CELL_TYPE_STRING:
 					result = Integer.parseInt(cell.getStringCellValue())
 					break
+				case Cell.CELL_TYPE_BLANK:
+					result = null
+					break
 				default:
 					throw new NumberFormatException("Invalid cell number.")
 			}
