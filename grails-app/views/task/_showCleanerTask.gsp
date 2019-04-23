@@ -378,7 +378,7 @@
 		}
 
 		jQuery.ajax({
-			url: '/task/update',
+			url: tdsCommon.createAppURL('/task/update'),
 			data: params,
 			type:'POST',
 			success: function(data) {
