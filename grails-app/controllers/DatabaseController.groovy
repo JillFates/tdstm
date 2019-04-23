@@ -3,17 +3,11 @@ import com.tds.asset.Database
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.tdsops.tm.enums.domain.ValidationType
-=======
 import net.transitionmanager.controller.PaginationMethods
->>>>>>> a33cad503... TM-14813 Eliminate SQL Injection in the Database List data endpoint
 import net.transitionmanager.search.FieldSearchData
-=======
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.NumberUtil
->>>>>>> 9dca54d7e... TM-14813 making the same changes that Octavio did in  2658
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -85,7 +79,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		List moveBundleList
 		if (params.event?.isNumber()) {
-			MoveEvent moveEvent = MoveEvent.read(params.event) // cambiar (aunque es number)
+			MoveEvent moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
