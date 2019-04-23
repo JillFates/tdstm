@@ -76,7 +76,7 @@ class Room {
 		String safeAddress = HtmlUtil.escape(address)
 		return (safeAddress ? (forWhom == 'link' ? safeAddress : safeAddress + '<br/>') : '') +
 				(HtmlUtil.escape(city)) +
-				(stateProv ? ', ' + stateProv : '') +
+				(stateProv ? ", ${HtmlUtil.escape(stateProv)}" : '') +
 				(postalCode ? '  ' + postalCode : '') +
 				(country ? ' ' + country : '')
 	}
