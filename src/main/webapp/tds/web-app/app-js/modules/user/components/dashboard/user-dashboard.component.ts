@@ -22,6 +22,7 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GridComponent} from '@progress/kendo-angular-grid';
 import {UserContextModel} from '../../../security/model/user-context.model';
+import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 
 @Component({
 	selector: 'user-dashboard',
@@ -47,12 +48,7 @@ export class UserDashboardComponent implements OnInit {
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public items: any[] = [{
-		text: 'Item1',
-		items: [{ text: 'Item1.1' }, { text: 'Item1.2' }]
-	}, {
-		text: 'Item2'
-	}, {
-		text: 'Item3'
+		text: 'Sample Box'
 	}];
 	@ViewChild('taskGrid')
 	taskGrid: GridComponent;
