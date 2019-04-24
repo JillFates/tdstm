@@ -224,7 +224,7 @@ function updateRackPower(rackId){
 	var moveBundleId = ''
 	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
-		url: "retrieveRackPowerData",
+		url: tdsCommon.createAppURL("retrieveRackPowerData"),
 		data: moveBundleId+"roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType+"&otherBundle="+otherBundle,
 		type:'POST',
 		success: function(data) {
@@ -242,7 +242,7 @@ function capacityView(){
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var roomId = "${roomInstance.id}"
 	jQuery.ajax({
-		url: "retrieveCapacityView",
+		url: tdsCommon.createAppURL("retrieveCapacityView"),
 		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {
