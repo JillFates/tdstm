@@ -314,26 +314,26 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				errMsg = e.message
 			} catch (e) {
 				log.error "update() failed : ${ExceptionUtil.stackTraceToString(e)}"
-				errMsg = 'An error occurred the prevented the update of the user'
+				errMsg = 'An error occurred that prevented the update of the user'
 			}
 
 			if (errMsg) {
 				flash.message = errMsg
-				redirect(action: "edit", id: params.id, params: model)
+				redirect(action: "edit", id: id, params: model)
 			} else {
 				flash.message = "UserLogin $userLogin updated"
-				redirect(action: "show", id: userLogin.id, params: [companyId: params.companyId])
+				redirect(action: "show", id: id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
 			flash.message = INVALID_CSRF_TOKEN
 
 			if (id) {
 				// Make sure the user exists before sending to edit otherwise the CSRF message gets lost
-				userLogin = UserLogin.get(params.id)
+				userLogin = UserLogin.get(id)
 			}
 
 			if (userLogin) {
-				redirect(action: "edit", id: params.id, params: model)
+				redirect(action: "edit", id: id, params: model)
 			} else {
 				redirect(action: "list")
 			}
@@ -393,7 +393,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				errMsg = e.message
 			} catch (e) {
 				log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-				errMsg = 'An error occurred that prevents creates a user'
+				errMsg = 'An error occurred that prevented creating the user'
 			}
 
 			if (errMsg) {
