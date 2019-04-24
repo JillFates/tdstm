@@ -3,9 +3,12 @@ import net.transitionmanager.security.Permission
 
 grails {
 	profile = 'web'
+	session.timeout = 3600 //60 minute session timeout
+
 	codegen {
 		defaultPackage = 'net.transitionmanager'
 	}
+
 	gorm {
 		reactor {
 			events = false
@@ -14,6 +17,7 @@ grails {
 }
 
 server.contextPath = '/tdstm'
+
 info {
 	app {
 		name = '@info.app.name@'
@@ -26,6 +30,7 @@ spring {
 	main {
 		main['banner-mode'] = 'off'
 	}
+
 	groovy {
 		template {
 			template['check-template-location'] = false
@@ -59,6 +64,7 @@ grails {
 				}
 			}
 		}
+
 		types {
 			all = '*/*'
 			atom = 'application/atom+xml'
@@ -114,6 +120,7 @@ grails {
 		'default' {
 			codec = 'none'
 		}
+
 		gsp {
 			encoding = 'UTF-8'
 			htmlcodec = 'xml'
@@ -259,6 +266,7 @@ environments {
 			}
 		}
 	}
+
 	test {
 		grails.plugin.springsecurity.rest.token.storage.jwt.secret = 'Some secret key to dev, hope this is long enough.'
 		dataSource {
@@ -268,6 +276,7 @@ environments {
 			logSql = false
 		}
 	}
+
 	production {
 		dataSource {
 			// url = "jdbc:mysql://127.0.0.1/tdstm"
@@ -322,6 +331,34 @@ tdstm {
 		}
 	}
 }
+List staticSecurityRules = [
+	[pattern: '/ws/**', access: 'isAuthenticated()'],
+	[pattern: '/', access: 'permitAll'],
+	[pattern: '/index', access: 'permitAll'],
+	[pattern: '/index.gsp', access: 'permitAll'],
+	[pattern: '/assets/**', access: 'permitAll'],        // Don't believe it is used
+	[pattern: '/auth/**', access: 'permitAll'],        // Authentication Controller
+	[pattern: '/**/js/**', access: 'permitAll'],        // Javascript
+	[pattern: '/**/css/**', access: 'permitAll'],
+	[pattern: '/**/images/**', access: 'permitAll'],
+	[pattern: '/i/**', access: 'permitAll'],
+	[pattern: '/**/icons/**', access: 'permitAll'],
+	[pattern: '/**/favicon.ico', access: 'permitAll'],
+	[pattern: '/app-js/**', access: 'permitAll'], // Angular1.6 - resource]s
+	[pattern: '/i18n/**', access: 'permitAll'], // Angular - Translate
+	[pattern: '/tds/web-app/**', access: 'permitAll'], // Angular2* - resources
+	[pattern: '/module/**', access: 'permitAll'], // Angular2  - router access
+	[pattern: '/test/**', access: 'permitAll'], // Angular - Tes]t
+	[pattern: '/dist/**', access: 'permitAll'],
+	[pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
+	[pattern: '/greenmail/**', access: 'permitAll'],
+	[pattern: '/components/**', access: 'permitAll'],
+	[pattern: '/templates/**', access: 'permitAll'],
+	[pattern: '/jasper/**', access: 'permitAll'],
+	[pattern: '/oauth/access_token', access: 'permitAll'],
+	[pattern: '/health/**', access: 'ROLE_ADMIN'],
+	[pattern: '/info/**', access: 'ROLE_ADMIN']
+]
 
 grails {
 	plugin {
@@ -367,38 +404,7 @@ grails {
 			//rejectIfNoRule = false
 			//fii.rejectPublicInvocations = true
 
-			//TODO fix after adding permission class
-			controllerAnnotations.staticRules = [
-				[pattern: '/ws/**'              , access: 'isAuthenticated()'],
-				[pattern: '/'                   , access: 'permitAll'],
-				[pattern: '/index'              , access: 'permitAll'],
-				[pattern: '/index.gsp'          , access: 'permitAll'],
-				[pattern: '/assets/**'          , access: 'permitAll'],        // Don't believe it is used
-				[pattern: '/auth/**'            , access: 'permitAll'],        // Authentication Controller
-				[pattern: '/**/js/**'           , access: 'permitAll'],        // Javascript
-				[pattern: '/**/css/**'          , access: 'permitAll'],
-				[pattern: '/**/images/**'       , access: 'permitAll'],
-				[pattern: '/i/**'               , access: 'permitAll'],
-				[pattern: '/**/icons/**'        , access: 'permitAll'],
-				[pattern: '/**/favicon.ico'     , access: 'permitAll'],
-				[pattern: '/app-js/**'          , access: 'permitAll'], // Angular1.6 - resource]s
-				[pattern: '/i18n/**'            , access: 'permitAll'], // Angular - Translate
-				[pattern: '/tds/web-app/**'     , access: 'permitAll'], // Angular2* - resources
-				[pattern: '/module/**'          , access: 'permitAll'], // Angular2  - router access
-				[pattern: '/test/**'            , access: 'permitAll'], // Angular - Tes]t
-				[pattern: '/dist/**'            , access: 'permitAll'],
-				[pattern: '/monitoring'         , access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
-				[pattern: '/greenmail/**'       , access: 'permitAll'],
-				[pattern: '/components/**'      , access: 'permitAll'],
-				[pattern: '/templates/**'       , access: 'permitAll'],
-				[pattern: '/console/**'         , access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
-				[pattern: '/plugins/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
-				[pattern: '/jasper/**'          , access: 'permitAll'],
-				[pattern: '/oauth/access_token' , access: 'permitAll'],
-				[pattern: '/health/**'          , access: 'ROLE_ADMIN'],
-				[pattern: '/info/**'            , access: 'ROLE_ADMIN']
-			]
-
+			controllerAnnotations.staticRules = staticSecurityRules
 			ldap.active = false
 
 			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
@@ -410,6 +416,20 @@ grails {
 				}
 			}
 
+		}
+	}
+}
+
+environments {
+	development {
+		grails {
+			plugin {
+				springsecurity {
+					staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+					staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+					controllerAnnotations.staticRules = staticSecurityRules
+				}
+			}
 		}
 	}
 }
