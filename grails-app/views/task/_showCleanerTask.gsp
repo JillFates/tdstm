@@ -338,7 +338,7 @@
 		startprintjob({
 			onSuccess: function(){
 				jQuery.ajax({
-					url: '/task/update',
+					url: tdsCommon.createAppURL('/task/update'),
 					data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
 					type:'POST',
 					success: function(data) {
