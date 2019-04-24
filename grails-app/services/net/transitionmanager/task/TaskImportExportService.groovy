@@ -618,7 +618,7 @@ class TaskImportExportService implements ServiceMethods {
 			if (task.errors) {
 				icon = 'exclamation.png'
 			}
-			task.icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
+			task.icon = HtmlUtil.resource([dir: 'assets/icons', file: icon, absolute: false])
 		}
 	}
 
