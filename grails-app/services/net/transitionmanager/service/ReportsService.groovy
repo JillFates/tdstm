@@ -5,6 +5,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
@@ -380,7 +381,7 @@ class ReportsService implements ServiceMethods {
 			from AssetComment comment
 			where comment.assetEntity.id in (:assetIds)
 			  and commentType ='issue'
-			  and dateResolved = null 
+			  and dateResolved = null
 			  and comment.category not in (:categories)
 			  and comment.isPublished IN (:publishedValues)
 			order by comment.assetEntity.assetName
@@ -463,10 +464,10 @@ class ReportsService implements ServiceMethods {
 		def steps = [:]
 
 		if (workFlowCode.size() == 1) {
-			workFlowCodeSelected[moveEvent.name + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
+			workFlowCodeSelected[HtmlUtil.safe(moveEvent.name) + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
 		} else {
 			moveBundles.each {
-				workFlowCodeSelected[it.name + '(Bundle)    Uses WorkFlow '] = it.workflowCode
+				workFlowCodeSelected[HtmlUtil.safe(it.name) + '(Bundle)    Uses WorkFlow '] = it.workflowCode
 			}
 		}
 
@@ -481,7 +482,7 @@ class ReportsService implements ServiceMethods {
 			} else {
 				moveBundleStep.each { step->
 					labels << step.label + '(' + (step.planDuration / 60) + 'm)'
-					steps[moveBundle.name] = labels.toString().replace('[[', '').replace('], [', ' , ').replace(']]', '')
+					steps[HtmlUtil.safe(moveBundle.name)] = labels.toString().replace('[[', '').replace('], [', ' , ').replace(']]', '')
 				}
 
 				dashBoardOk << greenSpan('Dashboard OK:')
@@ -504,7 +505,7 @@ class ReportsService implements ServiceMethods {
 		moveBundles.each {
 			if (it.startTime > project.startDate && it.completionTime > project.completionDate) {
 				eventErrorList << 'Project'
-				errorForEventTime += redSpan('Move bundle ' + it.name + ' is completing after project completion')
+				errorForEventTime += redSpan('Move bundle ' + HtmlUtil.safe(it.name) + ' is completing after project completion')
 			}
 			else {
 				def projectStartTime = 'Not Available'
@@ -532,12 +533,12 @@ class ReportsService implements ServiceMethods {
 		String newsBarModeError
 		if (moveEvent.newsBarMode == 'on') {
 			eventErrorList << 'Project'
-			newsBarModeError = redSpan(moveEvent.name + ': MoveEvent In Progress')
+			newsBarModeError = redSpan(HtmlUtil.safe(moveEvent.name) + ': MoveEvent In Progress')
 		} else if (moveEventCompletiondate < project.startDate) {
 			eventErrorList << 'Project'
-			newsBarModeError = redSpan(moveEvent.name + ': MoveEvent In Past', '', false)
+			newsBarModeError = redSpan(HtmlUtil.safe(moveEvent.name) + ': MoveEvent In Past', '', false)
 		} else {
-			newsBarModeError = greenSpan(moveEvent.name + ': OK', '', false)
+			newsBarModeError = greenSpan(HtmlUtil.safe(moveEvent.name) + ': OK', '', false)
 		}
 
 		List<Map> list = partyRelationshipService.getProjectStaff(currProj)
