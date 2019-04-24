@@ -119,7 +119,7 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		when: 'notice is not active'
 			notice.active = false
-			notice.save()
+			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
 			!noticeService.hasUnacknowledgedNotices(whom)
@@ -137,7 +137,7 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		when: 'activation date is future'
 			notice.activationDate = activationDate.plus(1)
-			notice.save()
+			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
 			!noticeService.hasUnacknowledgedNotices(whom)
@@ -156,7 +156,7 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		when: 'expiration date is past'
 			notice.expirationDate = expirationDate.minus(1)
-			notice.save()
+			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
 			!noticeService.hasUnacknowledgedNotices(whom)
