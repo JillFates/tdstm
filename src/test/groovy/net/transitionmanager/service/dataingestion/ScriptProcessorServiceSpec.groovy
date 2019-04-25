@@ -25,6 +25,7 @@ import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -53,8 +54,12 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
 			}
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+			}
 			fileSystemService(FileSystemService) {
 				coreService = ref('coreService')
+				securityService = ref('securityService')
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
