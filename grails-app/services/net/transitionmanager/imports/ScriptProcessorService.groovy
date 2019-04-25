@@ -47,7 +47,7 @@ class ScriptProcessorService {
      */
     ETLProcessor execute (Project project, String scriptContent, String filename) {
 
-        Dataset dataset = FileSystemService.buildDataset(filename)
+        Dataset dataset = fileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
@@ -80,7 +80,7 @@ class ScriptProcessorService {
 
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
-			new DataSetFacade(FileSystemService.buildDataset(filename)),
+			new DataSetFacade(fileSystemService.buildDataset(filename)),
 			new DebugConsole(buffer: new StringBuilder()),
 			createFieldsSpecValidator(project))
 
@@ -143,7 +143,7 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-	        Dataset dataset = FileSystemService.buildDataset(filename)
+	        Dataset dataset = fileSystemService.buildDataset(filename)
             etlProcessor = new ETLProcessor(project,
                     new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuilder()),
@@ -223,7 +223,7 @@ class ScriptProcessorService {
      */
     Map<String, ?> checkSyntax (Project project, String scriptContent, String filename) {
 
-	    Dataset dataset = FileSystemService.buildDataset(filename)
+	    Dataset dataset = fileSystemService.buildDataset(filename)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
