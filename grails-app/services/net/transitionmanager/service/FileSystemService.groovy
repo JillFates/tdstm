@@ -30,7 +30,6 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.InitializingBean
-import javax.management.RuntimeErrorException
 
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
@@ -139,7 +138,8 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static CSVDataset buildCVSDataset(String fileName) {
+	CSVDataset buildCVSDataset(String fileName) {
+		validateFilename(fileName)
 		CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
 		return new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
 	}
@@ -149,7 +149,8 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static ExcelDataset buildExcelDataset(String fileName){
+	ExcelDataset buildExcelDataset(String fileName){
+		validateFilename(fileName)
 		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
 		Workbook workbook = WorkbookFactory.create( new File(fileName) )
 		// Getting the Sheet at index zero
@@ -176,7 +177,8 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName
 	 * @return
 	 */
-	static JSONDataset buildJSONDataset(String fileName){
+	JSONDataset buildJSONDataset(String fileName){
+		validateFilename(fileName)
 		JSONConnection con = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fileName), driver:TDSJSONDriver)
 		JSONDataset dataset = new JSONDataset(connection: con, rootNode: "", fileName: FileUtils.FileName(fileName))
 
@@ -188,7 +190,8 @@ class FileSystemService implements InitializingBean {
 	 * @param fileName it can be a type CSV, XLSX or XLS
 	 * @return
 	 */
-	static Dataset buildDataset(String fileName) {
+	Dataset buildDataset(String fileName) {
+		validateFilename(fileName)
 		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
 
 		Dataset dataset
@@ -248,36 +251,38 @@ class FileSystemService implements InitializingBean {
      * @param filename
      * @return an InputStream to read the file contents if it exists otherwise NULL
      */
-    InputStream openTemporaryFile(String filename) {
-        InputStream is
-        validateFilename(filename)
-	     File file = openTempFile(filename)
-        if (file.exists()) {
-            is = file.newInputStream()
-        }
-        return is
-    }
+	InputStream openTemporaryFile(String filename) {
+		validateFilename(filename)
+		InputStream is
+		File file = openTempFile(filename)
+		if (file.exists()) {
+			is = file.newInputStream()
+		}
+		return is
+	}
 
 	/**
 	 * Open an temporary File and 'touches' it
 	 * @param filename
 	 * @return a file object
 	 */
-	 static File openTempFile(String filename) {
-		  File file = new File(temporaryDirectory, filename)
-		  return FileSystemUtil.touch(file)
-	 }
+	File openTempFile(String filename) {
+		validateFilename(filename)
+		File file = new File(temporaryDirectory, filename)
+		return FileSystemUtil.touch(file)
+	}
 
-    /**
+	/**
      * Used to determine if a file exists in the temporary directory
      * @param filename
      * @return true if the file exists otherwise false
      */
-    static boolean temporaryFileExists(String filename) {
-        return new File(temporaryDirectory, filename).exists()
-    }
+	boolean temporaryFileExists(String filename) {
+		validateFilename(filename)
+		return new File(temporaryDirectory, filename).exists()
+	}
 
-    /**
+	/**
      * Used to get unique filename in the temporary directory
      * @param prefix
      * @param extension
@@ -294,7 +299,7 @@ class FileSystemService implements InitializingBean {
             }
             if (! --tries) {
                 log.error 'Failed to generate a unique filename in {} directory', temporaryDirectory
-                throw new RuntimeErrorException('getUniqueFilename() unable to determine unique filename')
+                throw new InvalidParamException('getUniqueFilename() unable to determine unique filename')
             }
         }
         return filename
@@ -325,13 +330,19 @@ class FileSystemService implements InitializingBean {
      * @param filename
      * @throws InvalidRequestException
      */
-    private void validateFilename(String filename) {
+    void validateFilename(String filename) {
         if (StringUtil.isBlank(filename)) {
             throw new InvalidParamException('Filename contains no characters')
         }
-        if (filename.contains(File.separator)) {
-            securityService.reportViolation("attempted to access file with path separator ($filename)")
-            throw new InvalidParamException('Filename contains path separator')
+
+		// doing this because some methods return filename with temporary directory already attached
+		// so, if a further validation on the file name is required, we need to remove the
+		// temporaryDirectory which is a well known path for the application
+		String filenameWithoutTemporaryDirectoryPart = filename - temporaryDirectory
+
+        if (filenameWithoutTemporaryDirectoryPart.contains(File.separator)) {
+            securityService.reportViolation("Attempted to access file with path separator ($filename)")
+            throw new InvalidParamException('Invalid filename was specified.')
         }
     }
 
