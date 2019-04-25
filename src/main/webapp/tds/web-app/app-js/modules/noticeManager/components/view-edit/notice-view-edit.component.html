@@ -38,8 +38,10 @@
                             [elementId]="'htmlText'"
                             [required]="true"
                             [name]="'htmlText'"
-                            [(rawValue)]="model.rawText"
-                            [(value)]="model.htmlText">
+                            (valueChange)="onValueChange($event)"
+                            (rawValueChange)="onRawValueChange($event)"
+                            [rawValue]="model.rawText"
+                            [value]="model.htmlText">
                         </rich-text-editor>
                     </div>
                 </div>
