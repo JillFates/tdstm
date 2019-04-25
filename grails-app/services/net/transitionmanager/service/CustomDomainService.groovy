@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import grails.converters.JSON
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.domain.Project
@@ -462,6 +463,30 @@ class CustomDomainService implements ServiceMethods {
         return fieldSpecs
     }
 
+
+    /**
+     * Create a COMMON domain from the common fields (belonging to AssetEntity.COMMON_FIELD_LIST or *shared*)
+     * in all the domains returned by allFieldsSpecs.
+     * It returns that content in a JSON string format.
+     *
+     * @param project
+     * @return a String json content with field specs retrieve from database
+     * @see CustomDomainService#allFieldSpecs(net.transitionmanager.domain.Project, java.lang.String, boolean)
+     */
+    String jsonFieldSpecsWithCommon(Project project = null){
+
+        String jsonFieldSpec = fieldSpecsCacheService.getJsonFieldSpecs(project)
+        if (jsonFieldSpec) {
+            return jsonFieldSpec
+        } else {
+            jsonFieldSpec = ''
+        }
+        Map fieldSpec = fieldSpecsWithCommon(project)
+        jsonFieldSpec = (fieldSpec as JSON).toString()
+        fieldSpecsCacheService.setJsonFieldSpecs(project, jsonFieldSpec)
+
+        return jsonFieldSpec
+    }
 	/**
 	 * Create a COMMON domain from the common fields (belonging to AssetEntity.COMMON_FIELD_LIST or *shared*)
 	 * in all the domains returned by allFieldsSpecs

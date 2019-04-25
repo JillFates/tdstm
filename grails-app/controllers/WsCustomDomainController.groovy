@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -54,7 +55,8 @@ class WsCustomDomainController implements ControllerMethods {
      */
     def fieldSpecsWithCommon() {
         Project project = getProjectForWs()
-        Map data = customDomainService.fieldSpecsWithCommon(project)
-        renderAsJson(data)
+        String data = customDomainService.jsonFieldSpecsWithCommon(project)
+        response.addHeader('content-type', 'application/json')
+        render(data)
     }
 }
