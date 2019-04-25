@@ -516,7 +516,7 @@ class MoveEventService implements ServiceMethods {
 				project.id in securityService.getUserProjectIds(null, person.userLogin)
 			}
 			if (completionCutoff) {
-				estCompletionTime > completionCutoff || estCompletionTime == null
+				estCompletionTime < completionCutoff || estCompletionTime == null
 			}
 		}.list()
 
