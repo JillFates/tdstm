@@ -1864,7 +1864,7 @@ class ProjectService implements ServiceMethods {
 			origFileName = origFileName.substring(slashIndex + 1)
 		}
 
-		ProjectLogo pl = findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
+		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
 		pl.setData file.inputStream
 
 		return pl.save(flush: true)
