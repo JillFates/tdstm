@@ -10,22 +10,21 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
+import grails.gorm.transactions.NotTransactional
+import grails.gorm.transactions.Transactional
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
-import grails.transaction.NotTransactional
-import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
-import net.transitionmanager.command.CredentialCommand
-import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.Credential
+import net.transitionmanager.action.Provider
+import net.transitionmanager.command.CredentialCommand
+import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ProjectRequiredException
-import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
 import net.transitionmanager.http.HostnameVerifier
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProviderService
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang3.RandomStringUtils
@@ -48,7 +47,6 @@ import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 
 @Transactional
-@Slf4j
 class CredentialService implements ServiceMethods {
 	ProviderService providerService
 
