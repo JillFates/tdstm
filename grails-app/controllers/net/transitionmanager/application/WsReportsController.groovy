@@ -55,11 +55,9 @@ class WsReportsController implements ControllerMethods {
      */
     def tasksReport() {
         def events = request.JSON.moveEvent
-
         if(events) {
             Project project = getProjectForWs()
             Map model = reportsService.getTasksReportModel(events, project, request.JSON.wUnresolved, request.JSON.viewUnpublished, request.JSON.wComment)
-
             //Generating XLS Sheet
             switch(request.JSON._action_tasksReport){
                 case "Generate Xls" :
@@ -175,7 +173,7 @@ class WsReportsController implements ControllerMethods {
      * @param outageWindow: string - The custom field.
      * @returns The rendered gsp view.
      */
-    def generateApplicationMigration() {
+    def generateApplicationMigration(Long moveBundleId) {
         Project project = getProjectForWs()
         render(view: "/reports/generateApplicationMigration" , model: reportsService.generateApplicationMigration(
                 project,

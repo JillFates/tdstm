@@ -104,9 +104,15 @@ export class ReportsService {
 				})
 			);
 		} else {
-			return this.http.post(this.TASKS_REPORT_URL, request, {responseType: 'blob'}).pipe(
-				map(result => {
-					return new Blob([result], { type: 'application/vnd.ms-excel' });
+			return this.http.post(this.TASKS_REPORT_URL, request, {observe: 'response', responseType: 'blob'}).pipe(
+				map((result: any) => {
+					let filename: string = result.headers.get('content-disposition');
+					filename = filename.replace('attachment; filename=', '');
+					filename = filename.replace(new RegExp('"', 'g'), '');
+					return {
+						blob: new Blob([result.body], { type: result.body.type }),
+						filename: filename
+					}
 				}),
 				catchError(error => {
 					console.error(error);

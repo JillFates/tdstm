@@ -1,110 +1,119 @@
 import {ReportsService} from '../../service/reports.service';
 import {Component, ElementRef} from '@angular/core';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {SafeHtml} from '@angular/platform-browser';
+import {ReportComponent} from '../report.component';
 
 @Component({
 	selector: 'tds-application-event-results-report',
 	template: `
 		<div class="content body">
-			<section>
+			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
 						<div class="box box-primary">
 							<div class="box-header">
 							</div>
 							<div class="box-body">
-								<div class="form-group row">
-									<label class="col-sm-1 control-label" for="bundleList">Bundle</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="bundleList"
-											class="form-control"
-											[data]="bundleList"
-											[textField]="'name'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedBundle"
-											(ngModelChange)="onBundleListChange($event)">
-										</kendo-dropdownlist>
+								<div class="filters-wrapper" [hidden]="hideFilters">
+									<div class="form-group row input">
+										<label class="col-sm-2 control-label" for="bundleList">Bundle</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="bundleList"
+												class="form-control"
+												[data]="bundleList"
+												[textField]="'name'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedBundle"
+												(ngModelChange)="onBundleListChange($event)">
+											</kendo-dropdownlist>
+										</div>
 									</div>
-									<label class="col-sm-1 control-label" for="smeList">SME</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="smeList"
-											class="form-control"
-											[data]="smeList"
-											[textField]="'text'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedSme"
-											[loading]="loadingSmeList || loadingLists">
-										</kendo-dropdownlist>
+									<div class="form-group row input">
+										<label class="col-sm-2 control-label" for="smeList">SME</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="smeList"
+												class="form-control"
+												[data]="smeList"
+												[textField]="'text'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedSme"
+												[loading]="loadingSmeList || loadingLists">
+											</kendo-dropdownlist>
+										</div>
 									</div>
-									<label class="col-sm-1 control-label" for="starstWithList">Start of with</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="startsWithList"
-											class="form-control"
-											[data]="startsWithList"
-											[textField]="'text'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedStartWith"
-											[loading]="loadingLists">
-										</kendo-dropdownlist>
+									<div class="form-group row input">
+										<label class="col-sm-2 control-label" for="starstWithList">Start of with</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="startsWithList"
+												class="form-control"
+												[data]="startsWithList"
+												[textField]="'text'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedStartWith"
+												[loading]="loadingLists">
+											</kendo-dropdownlist>
+										</div>
 									</div>
+									<div class="form-group row input">
+										<label class="col-sm-2 control-label" for="testingList">Testing</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="testingList"
+												class="form-control"
+												[data]="testingList"
+												[textField]="'name'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedTesting"
+												[loading]="loadingLists">
+											</kendo-dropdownlist>
+										</div>
+									</div>
+									<div class="form-group row input">
+										<label class="col-sm-2 control-label" for="endsWithList">Ends with</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="endsWithList"
+												class="form-control"
+												[data]="endsWithList"
+												[textField]="'text'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedEndWith"
+												[loading]="loadingLists">
+											</kendo-dropdownlist>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 control-label" for="outageWindowList">Outage window</label>
+										<div class="col-sm-3">
+											<kendo-dropdownlist
+												name="outageWindowList"
+												class="form-control"
+												[data]="outageWindowList"
+												[textField]="'label'"
+												[valueField]="'field'"
+												[(ngModel)]="selectedOutage"
+												[loading]="loadingLists">
+											</kendo-dropdownlist>
+										</div>
+									</div>
+									<div class="form-group row ">
+										<div class="col-sm-2 col-sm-offset-2 buttons">
+											<tds-button-custom class="btn-primary"
+																				 [disabled]="loadingSmeList || loadingLists"
+																				 (click)="onGenerateReport()"
+																				 title="Generate Report"
+																				 tooltip="Generate Report"
+																				 icon="check-square">
+											</tds-button-custom>
+										</div>
+									</div>
+									<hr/>
 								</div>
-								<div class="form-group row">
-									<label class="col-sm-1 control-label" for="testingList">Testing</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="testingList"
-											class="form-control"
-											[data]="testingList"
-											[textField]="'name'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedTesting"
-											[loading]="loadingLists">
-										</kendo-dropdownlist>
-									</div>
-									<label class="col-sm-1 control-label" for="endsWithList">Ends with</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="endsWithList"
-											class="form-control"
-											[data]="endsWithList"
-											[textField]="'text'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedEndWith"
-											[loading]="loadingLists">
-										</kendo-dropdownlist>
-									</div>
-									<label class="col-sm-1 control-label" for="outageWindowList">Outage window</label>
-									<div class="col-sm-3">
-										<kendo-dropdownlist
-											name="outageWindowList"
-											class="form-control"
-											[data]="outageWindowList"
-											[textField]="'label'"
-											[valueField]="'field'"
-											[(ngModel)]="selectedOutage"
-											[loading]="loadingLists">
-										</kendo-dropdownlist>
-									</div>
-								</div>
-								<div class="form-group row ">
-									<div class="col-sm-12 buttons text-right">
-										<tds-button-custom class="btn-primary"
-																			 (click)="onGenerateReport()"
-																			 title="Generate Report"
-																			 tooltip="Generate Report"
-																			 icon="check-square">
-										</tds-button-custom>
-									</div>
-								</div>
-								<hr/>
 								<div class="report-content" [innerHTML]="reportResult"></div>
 							</div>
 						</div>
@@ -112,7 +121,7 @@ import {SafeHtml} from '@angular/platform-browser';
 				</div>
 			</section>
 		</div>`})
-export class ApplicationEventResultsReportComponent {
+export class ApplicationEventResultsReportComponent extends ReportComponent {
 
 	bundleList: Array<any>;
 	selectedBundle: any = null;
@@ -121,22 +130,22 @@ export class ApplicationEventResultsReportComponent {
 	testingList: Array<any>;
 	selectedTesting: any = null;
 	startsWithList: Array<any>;
-	selectedStartWith: null;
+	selectedStartWith: any = null;
 	endsWithList: Array<any>;
-	selectedEndWith: null;
+	selectedEndWith: any = null;
 	outageWindowList: Array<any>;
 	selectedOutage: any = null;
-	reportResult: SafeHtml;
 	loadingLists = false;
 	loadingSmeList = false;
 
 	private readonly allSmeOption = {id: -1, text: 'All'};
 
 	constructor(
-		private reportsService: ReportsService,
+		reportsService: ReportsService,
+		dialogService: UIDialogService,
 		private elRef: ElementRef,
-		private userPreferenceService: PreferenceService,
-		private dialogService: UIDialogService) {
+		private userPreferenceService: PreferenceService) {
+		super(reportsService, dialogService);
 		this.onLoad();
 	}
 
@@ -202,10 +211,11 @@ export class ApplicationEventResultsReportComponent {
 		this.reportsService.getApplicationEventReport(
 			this.selectedBundle.id,
 			this.selectedSme.id,
-			this.selectedStartWith,
-			this.selectedEndWith,
+			this.selectedStartWith.id,
+			this.selectedEndWith.id,
 			this.selectedTesting.id,
 			this.selectedOutage.field).subscribe(result => {
+				this.hideFilters = true;
 				this.reportResult = this.reportsService.getSafeHtml(result);
 				setTimeout(() => {
 					const assetLinks = this.elRef.nativeElement.querySelectorAll('.inlineLink');
@@ -216,32 +226,4 @@ export class ApplicationEventResultsReportComponent {
 		})
 	}
 
-	/**
-	 * Asset name link handler
-	 * @param event: any
-	 */
-	onAssetLinkClick(event: any): void {
-		if (event.target) {
-			const {assetClass, assetId} = event.target.dataset;
-			this.onOpenLinkAsset(assetId, assetClass);
-		}
-	}
-
-	/**
-	 * Show the asset
-	 * @param assetId: number
-	 * @param assetClass: string
-	 */
-	protected onOpenLinkAsset(assetId: number, assetClass: string) {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: assetId },
-				{ provide: 'ASSET', useValue: assetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
-			// Do nothing
-		}).catch(result => {
-			// Do nothing
-		});
-	}
 }
