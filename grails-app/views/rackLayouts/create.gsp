@@ -21,7 +21,7 @@
 
 <body>
 <tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/>
-<div class="body" style="width:98%; min-width:1225px" ng-app="tdsComments"
+<div class="body" style="width:98%; min-width:1385px" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 
     <g:if test="${flash.message}">
