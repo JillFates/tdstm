@@ -237,11 +237,11 @@ class HtmlUtil {
 	}
 
 	/**
-	 * Used return text as safe HTML
+	 * Used encode/escape text into safe to render HTML
 	 * @param text
 	 * @return text that has been encoded for HTML or blank if the text is NULL
 	 */
-	static String safe(Object text) {
+	static String escape(Object text) {
 		if (text) {
 			return (text instanceof CharSequence) ? StringEscapeUtils.escapeHtml(text.toString()) : "$text"
 		} else {
