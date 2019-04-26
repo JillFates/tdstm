@@ -1,5 +1,5 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 // Services
 import {TaskService} from '../../../taskManager/service/task.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -20,7 +20,9 @@ import {
 } from '../../model/user-dashboard-columns.model';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {GridComponent} from '@progress/kendo-angular-grid';
 import {UserContextModel} from '../../../security/model/user-context.model';
+import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 
 @Component({
 	selector: 'user-dashboard',
@@ -45,6 +47,11 @@ export class UserDashboardComponent implements OnInit {
 	public taskColumnModel;
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public items: any[] = [{
+		text: 'Sample Box'
+	}];
+	@ViewChild('taskGrid')
+	taskGrid: GridComponent;
 
 	constructor(
 		private userService: UserService,
@@ -159,6 +166,11 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public fetchTasksForGrid(): void {
+		if(this.taskList) {
+			for (let i = 0; i < this.taskList.length; i++) {
+				this.taskGrid.collapseRow(i);
+			}
+		}
 		this.userService.getAssignedTasks()
 			.subscribe((result) => {
 				this.taskList = result.tasks;
