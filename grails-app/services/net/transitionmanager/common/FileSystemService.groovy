@@ -4,6 +4,7 @@ import com.tdsops.etl.TDSExcelDriver
 import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.WorkbookUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Dataset
@@ -101,7 +102,7 @@ class FileSystemService implements ServiceMethods {
 			List<String> cellValues = line.split(',')
 			for (String value : cellValues) {
 				Cell cell = row.createCell(colNum++)
-				cell.setCellValue(value)
+				WorkbookUtil.setCellValue(cell, value)
 			}
 		}
 

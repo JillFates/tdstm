@@ -142,20 +142,20 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		}, err => console.log(err));
 	}
 
-	protected onEdit(): void {
+	public onEdit(): void {
 		if (this.isEditAvailable()) {
 			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 		}
 	}
 
-	protected onSave() {
+	public onSave() {
 		this.assetExplorerService.saveReport(this.model)
 			.subscribe(result => {
 				this.dataSignature = this.stringifyCopyOfModel(this.model);
 			});
 	}
 
-	protected onSaveAs(): void {
+	public onSaveAs(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
@@ -171,14 +171,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	protected isDirty(): boolean {
+	public isDirty(): boolean {
 		let result = this.dataSignature !== this.stringifyCopyOfModel(this.model);
 		return result;
 	}
 
 	public onExport(): void {
 		let assetExportModel: AssetExportModel = {
-			assetQueryParams: this.getQueryParamsForExport(),
+			assetQueryParams: AssetViewShowComponent.getQueryParamsForExport(
+				this.data,
+				this.gridState,
+				this.model,
+				this.justPlanning
+			),
 			domains: this.domains,
 			queryId: this.model.id,
 			viewName: this.model.name
@@ -222,21 +227,21 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * the configured pagination results.
 	 * @returns {AssetQueryParams}
 	 */
-	private getQueryParamsForExport(): AssetQueryParams {
+	public static getQueryParamsForExport(data: any, gridState: State, model: ViewModel, justPlanning: boolean): AssetQueryParams {
 		let assetQueryParams: AssetQueryParams = {
-			offset: this.data ? 0 : this.gridState.skip,
-			limit: this.data ? this.data.pagination.total : this.gridState.take,
+			offset: data ? 0 : gridState.skip,
+			limit: data ? data.pagination.total : gridState.take,
 			forExport: true,
-			sortDomain: this.model.schema.sort.domain,
-			sortProperty: this.model.schema.sort.property,
-			sortOrder: this.model.schema.sort.order,
+			sortDomain: model.schema.sort.domain,
+			sortProperty: model.schema.sort.property,
+			sortOrder: model.schema.sort.order,
 			filters: {
-				domains: this.model.schema.domains,
-				columns: this.model.schema.columns
+				domains: model.schema.domains,
+				columns: model.schema.columns
 			}
 		};
-		if (this.justPlanning) {
-			assetQueryParams['justPlanning'] = this.justPlanning;
+		if (justPlanning) {
+			assetQueryParams['justPlanning'] = justPlanning;
 		}
 
 		return assetQueryParams;
@@ -268,7 +273,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Determines if current user can Save view.
 	 * @returns {boolean}
 	 */
-	protected canSave(): boolean {
+	public canSave(): boolean {
 		// If it's all assets view then don't Save is allowed.
 		if (this.assetExplorerService.isAllAssets(this.model)) {
 			return false;
@@ -287,7 +292,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Determine if current user can Save As (new) view.
 	 * @returns {boolean}
 	 */
-	protected canSaveAs(): boolean {
+	public canSaveAs(): boolean {
 		// If it's a system view
 		if (this.model.isSystem) {
 			return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) &&
@@ -325,14 +330,14 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	/**
 	 * Determines which save operation to call based on the button id.
 	 */
-	protected save(saveButtonId: string) {
+	public save(saveButtonId: string) {
 		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
 	}
 
 	/**
 	 * Determines if primary button can be Save or Save all based on permissions.
 	 */
-	protected getSaveButtonId(): string {
+	public getSaveButtonId(): string {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
 }

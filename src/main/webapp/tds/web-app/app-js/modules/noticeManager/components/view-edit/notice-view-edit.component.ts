@@ -66,10 +66,15 @@ export class NoticeViewEditComponent {
 	}
 
 	protected deleteNotice(): void {
-		this.noticeService.deleteNotice(this.model.id.toString())
-			.subscribe(
-				res => this.activeDialog.close(),
-				error => this.activeDialog.dismiss(error));
+		this.promptService.open('Confirmation Required', 'You are about to delete the selected notice. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.noticeService.deleteNotice(this.model.id.toString())
+						.subscribe(
+							res => this.activeDialog.close(),
+							error => this.activeDialog.dismiss(error));
+				}
+			});
 	}
 
 	/**
@@ -121,5 +126,19 @@ export class NoticeViewEditComponent {
 	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
+	}
+
+	/**
+	 * Grab the current html value emitted by rich text editor
+	 */
+	public onValueChange(value: string) {
+		this.model.htmlText = value;
+	}
+
+	/**
+	 * Grab the current raw value emitted by rich text editor
+	 */
+	public onRawValueChange(value: string) {
+		this.model.rawText = value;
 	}
 }

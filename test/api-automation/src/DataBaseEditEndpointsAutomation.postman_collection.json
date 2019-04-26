@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "0b604edc-c89b-447d-ba08-a802ecdd4ddd",
-		"name": "DataBaseEdit",
+		"_postman_id": "a6b1d09e-c885-4797-8583-4c0850ff97c5",
+		"name": "DataBaseEdit UPDATE",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -85,7 +85,7 @@
 						"exec": [
 							"pm.test(\"Set the DB ID for later\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
-							"    var dbID = jsonObject.data.assets[0].common_id; ",
+							"    var dbID = jsonObject.rows[0].id;",
 							"    postman.setGlobalVariable(\"dataBaseID\", dbID);",
 							"    ",
 							"});"
@@ -109,16 +109,96 @@
 					"raw": "{\n   \"offset\":0,\n   \"limit\":25,\n   \"sortDomain\":\"common\",\n   \"sortProperty\":\"assetName\",\n   \"sortOrder\":\"a\",\n   \"filters\":{\n      \"domains\":[\n         \"common\",\n         \"database\"\n      ],\n      \"columns\":[\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Name\",\n            \"locked\":true,\n            \"property\":\"assetName\",\n            \"width\":220\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Description\",\n            \"locked\":false,\n            \"property\":\"description\",\n            \"width\":220\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Environment\",\n            \"locked\":false,\n            \"property\":\"environment\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Bundle\",\n            \"locked\":false,\n            \"property\":\"moveBundle\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Tags\",\n            \"locked\":false,\n            \"property\":\"tagAssets\",\n            \"width\":220\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Validation\",\n            \"locked\":false,\n            \"property\":\"validation\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Plan Status\",\n            \"locked\":false,\n            \"property\":\"planStatus\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"External Ref Id\",\n            \"locked\":false,\n            \"property\":\"externalRefId\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Modified Date\",\n            \"locked\":false,\n            \"property\":\"lastUpdated\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Format\",\n            \"locked\":false,\n            \"property\":\"dbFormat\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Size\",\n            \"locked\":false,\n            \"property\":\"size\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Scale\",\n            \"locked\":false,\n            \"property\":\"scale\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Rate Of Change\",\n            \"locked\":false,\n            \"property\":\"rateOfChange\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"common\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Support\",\n            \"locked\":false,\n            \"property\":\"supportType\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Retire Date\",\n            \"locked\":false,\n            \"property\":\"retireDate\",\n            \"width\":140\n         },\n         {\n            \"domain\":\"database\",\n            \"edit\":false,\n            \"filter\":\"\",\n            \"label\":\"Maint Expiration\",\n            \"locked\":false,\n            \"property\":\"maintExpDate\",\n            \"width\":140\n         }\n      ]\n   }\n}"
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/assetExplorer/query/2",
+					"raw": "{{host}}/tdstm/database/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"ws",
-						"assetExplorer",
-						"query",
-						"2"
+						"database",
+						"listJson"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "all"
+						},
+						{
+							"key": "event",
+							"value": ""
+						},
+						{
+							"key": "type",
+							"value": ""
+						},
+						{
+							"key": "plannedStatus",
+							"value": ""
+						},
+						{
+							"key": "assetName",
+							"value": ""
+						},
+						{
+							"key": "planStatus",
+							"value": ""
+						},
+						{
+							"key": "moveBundle",
+							"value": ""
+						},
+						{
+							"key": "assetType",
+							"value": ""
+						},
+						{
+							"key": "model",
+							"value": ""
+						},
+						{
+							"key": "sourceLocationName",
+							"value": ""
+						},
+						{
+							"key": "sourceRackName",
+							"value": ""
+						},
+						{
+							"key": "targetLocationName",
+							"value": ""
+						},
+						{
+							"key": "targetRackName",
+							"value": ""
+						},
+						{
+							"key": "assetTag",
+							"value": ""
+						},
+						{
+							"key": "serialNumber",
+							"value": ""
+						},
+						{
+							"key": "moveBundleId",
+							"value": ""
+						},
+						{
+							"key": "manufacturer",
+							"value": ""
+						},
+						{
+							"key": "unassigned",
+							"value": ""
+						},
+						{
+							"key": "rows",
+							"value": "100"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						}
 					]
 				}
 			},
