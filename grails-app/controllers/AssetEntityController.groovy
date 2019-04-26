@@ -1124,11 +1124,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.CommentView)
 	def listCommentJson() {
-		String sortIndex = params.sidx ?: 'lastUpdated'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		Map<String, String> definedSortableFields = [
+			'comment': 'comment',
+			'commentType': 'commentType',
+			'category': 'category',
+			'lastUpdated': 'lastUpdated',
+			'assetType': 'assetType',
+			'assetName': 'assetName'
+		].withDefault { key -> throw PAGINATION_INVALID_ORDER_BY_EXCEPTION }
+
+		String sortIndex = definedSortableFields[params.sidx] ?: 'lastUpdated'
+		String sortOrder = paginationSortOrder('sord')
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
 		List<Date> lastUpdatedTime = params.lastUpdated ? AssetComment.executeQuery('''
