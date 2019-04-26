@@ -213,7 +213,7 @@
                 }
 
                 reqLoadRack = jQuery.ajax({
-                    url: $(form).attr('action'),
+                    url: tdsCommon.createAppURL("$(form).attr('action')"),
                     data: $(form).serialize(),
                     type: 'POST',
                     success: function (data) {
