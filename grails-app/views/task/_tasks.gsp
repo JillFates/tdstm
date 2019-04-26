@@ -1,4 +1,5 @@
 <%@page defaultCodec="none" %>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
@@ -47,11 +48,11 @@
 						<td id="comment_${item?.id}" class="actionBar asset_details_block_task"
 							data-itemId="${item?.id}" data-status="${item?.status}">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
-							${item?.comment}
+							${HtmlUtil.escape(item?.comment)}
 						</td>
 						<td id="asset_${item?.id}" class="asset_details_block"
 						${item?.assetName ? 'onclick="EntityCrud.showAssetDetailView(\''+item?.assetClass+'\',\''+item?.assetId+'\')"' : ''}>
-							${item?.assetName}
+							${HtmlUtil.escape(item?.assetName)}
 						</td>
 						<td id="lastUpdated_${item?.id}" class="actionBar asset_details_block"
 							data-itemId="${item?.id}" data-status="${item?.status}">
@@ -114,6 +115,7 @@
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"
 								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
 							</g:if>
+
 
 							<g:if test="${ HtmlUtil.isMarkupURL(issue.item.instructionsLink) }">
 								<g:if test="${ HtmlUtil.isURL(issue.item.instructionsLink) }">
