@@ -1186,8 +1186,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
-		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
-		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
+
+		Map<String, String> definedSortableFields = [
+			'taskNumber': 'taskNumber',
+			'comment': 'comment',
+			'assetName': 'assetName',
+			'dueDate': 'dueDate',
+			'status': 'status',
+			'assignedTo': 'assignedTo',
+			'instructionsLink': 'instructionsLink',
+			'category': 'category',
+			'score': 'score'
+		].withDefault { key -> session.TASK?.JQ_FILTERS?.sidx }
+
+		String sortIndex =  definedSortableFields[params.sidx]
+		String sortOrder =  paginationSortOrder('sord', session.TASK?.JQ_FILTERS?.sord)
 
 		// Get the pagination and set the user preference appropriately
 		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true)
