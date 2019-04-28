@@ -1,23 +1,22 @@
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.transform.CompileStatic
 import net.transitionmanager.command.newseditor.SaveNewsCommand
 import net.transitionmanager.command.newseditor.UpdateNewsCommand
-import groovy.transform.CompileStatic
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.NewsEditorService
 import net.transitionmanager.service.UserPreferenceService
-
-import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -27,12 +26,10 @@ import java.sql.SQLException
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class NewsEditorController implements ControllerMethods, PaginationMethods {
 
-	NewsEditorService     newsEditorService
-	ControllerService     controllerService
-	JdbcTemplate          jdbcTemplate
-	ControllerService controllerService
+	NewsEditorService          newsEditorService
+	ControllerService          controllerService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	UserPreferenceService userPreferenceService
+	UserPreferenceService      userPreferenceService
 
 	static defaultAction = 'newsEditorList'
 
