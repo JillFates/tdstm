@@ -31,8 +31,12 @@ class PaginationMethodsUtilSpec extends Specification {
 			paramName	| paramValue	| defaultSort	| result
 			'sord'		| 'DESC'		| 'ASC'			| 'DESC'
 			'sord'		| 'ASC'			| 'DESC'		| 'ASC'
+			'sord'		| 'desc'		| 'ASC'			| 'DESC'
+			'sord'		| 'aSc'			| 'DESC'		| 'ASC'
 			'sord'		| 'A'			| 'D'			| 'ASC'
 			'sord'		| 'D'			| 'A'			| 'DESC'
+			'sord'		| 'a'			| 'D'			| 'ASC'
+			'sord'		| 'd'			| 'A'			| 'DESC'
 			'sord'		| ''			| 'A'			| 'ASC'
 			'sord'		| null			| 'A'			| 'ASC'
 			null		| null			| 'ASC'			| 'ASC'

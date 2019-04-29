@@ -291,8 +291,6 @@ class ApplicationController implements ControllerMethods, PaginationMethods {
 			} else {
 				appsList = jdbcTemplate.queryForList(query.toString())
 			}
-		} catch (InvalidParamException  e) {
-			throw e
 		} catch (e) {
 			log.error "listJson() encountered SQL error : ${e.getMessage()}"
 			throw new LogicException("Unabled to perform query based on parameters and user preferences")
