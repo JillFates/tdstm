@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
