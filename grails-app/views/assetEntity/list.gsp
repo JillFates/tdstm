@@ -34,12 +34,12 @@
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
 			$(document).on('entityAssetUpdated',function (e,obj) {
-				$("#messageId").html(obj.asset.assetName + ' Updated').show();
+				$("#messageId").html(_.escape(obj.asset.assetName) + ' Updated').show();
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
 			$(document).on('entityAssetCreated',function (e,obj) {
                 if(obj != null) {
-                    $("#messageId").html(obj.asset.assetName + ' Created').show();
+                    $("#messageId").html(_.escape(obj.asset.assetName) + ' Created').show();
                 }
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
