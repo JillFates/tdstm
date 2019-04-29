@@ -16,10 +16,10 @@
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
 						{name:'estStartTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
 						{name:'estCompletionTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
-						{name:'description'},
-						{name:'newsBarMode'}, 
-						{name:'runbookStatus'},
-						{name:'moveBundlesString', search:false, sortable:false}"
+						{name:'description', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'newsBarMode', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'runbookStatus', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'moveBundlesString', search:false, sortable:false, formatter: tdsCommon.jqgridTextCellFormatter}"
 					sortname="'name'"
 					caption="listCaption"
 					width="'100%'"
@@ -33,7 +33,7 @@
 			})
 			
 			function linkFormatter (cellvalue, options, rowObjcet) {
-				var value = cellvalue ? cellvalue : ''
+				var value = cellvalue ? _.escape(cellvalue) : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
 
