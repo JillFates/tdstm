@@ -122,13 +122,8 @@ class TaskController implements ControllerMethods {
 				flash.message = map.error
 			}
 
-			def redirParams = [view: requestParams.view]
-			if (requestParams.containsKey('tab') && requestParams.tab) {
-				redirParams.tab = requestParams.tab
-			}
-			if (requestParams.containsKey('sort') && requestParams.sort) {
-				redirParams.sort = requestParams.sort
-			}
+			def redirParams = []
+
 			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
