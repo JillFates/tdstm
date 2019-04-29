@@ -396,8 +396,7 @@
 					if (status=='Started') {
 						$('#started_'+objId).hide();
 					}
-
-					timerBar.Restart();
+					progressTimer.Restart();
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -420,7 +419,7 @@
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide();
 		$('#detailTdId_'+id).css('display','none');
-		timerBar.Start();
+		progressTimer.Start();
 	}
  </script>
 
