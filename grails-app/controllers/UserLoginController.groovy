@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.sql.GroovyRowResult
 import groovy.transform.CompileStatic
 import net.transitionmanager.command.UserUpdatePasswordCommand
@@ -23,8 +24,6 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
-import org.springframework.jdbc.core.JdbcTemplate
-import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -296,7 +295,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				redirect(action: "show", id: id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
-			flash.message = INVALID_CSRF_TOKEN
+			flash.message = message(code: 'invalid.csrf.token')
 
 			if (id) {
 				// Make sure the user exists before sending to edit otherwise the CSRF message gets lost
@@ -375,7 +374,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
-			flash.message = INVALID_CSRF_TOKEN
+			flash.message = message(code: 'invalid.csrf.token')
 			redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
 		}
 
