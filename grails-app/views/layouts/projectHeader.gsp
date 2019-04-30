@@ -73,7 +73,7 @@ int minPasswordLength = tds.minPasswordLength()
 						<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
 					</g:if>
 					<g:else>
-						<asset:image src="images/TMMenuLogo.png" style="float: left;border: 0px;height: 30px;" />
+						<asset:image src="images/TMHeaderLogo_v4.7.png" style="float: left;border: 0px;height: 30px;" />
 					</g:else>
 				</div>
 				<div class="title">&nbsp;TransitionManager&trade;
