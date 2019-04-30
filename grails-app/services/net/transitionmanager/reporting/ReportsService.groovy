@@ -1280,7 +1280,7 @@ class ReportsService implements ServiceMethods {
                 workflow.removeAll([null])
             }
             appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
-                    customParam: customParam ? customParam + (outageWindow == 'drRtoDesc' ? 'h': '') : '',
+                    customParam: customParam ? customParam + (command.outageWindow == 'drRtoDesc' ? 'h': '') : '',
                     windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
         }
 
