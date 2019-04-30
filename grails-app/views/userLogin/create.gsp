@@ -58,7 +58,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form action="save" method="post" name="createUserForm" autocomplete="off">
+			<g:form action="save" method="post" name="createUserForm" autocomplete="off" useToken="true">
 				<div class="dialog loginView">
 					<table>
 						<tbody>
@@ -66,7 +66,7 @@
 								<td colspan="2">
 									<div class="required"> Fields marked ( * ) are mandatory </div>
 									<input name="companyId" type="hidden" value="${companyId}" />
-									<input name="personId" type="hidden" value="${personInstance.id}" />
+									<input name="personId" type="hidden" value="${personInstance?.id}" />
 								</td>
 							</tr>
 
@@ -75,7 +75,7 @@
 									<label for="person">Company:</label>
 								</td>
 								<td valign="top" class="value">
-									${personInstance.company}
+									${personInstance?.company}
 								</td>
 							</tr>
 
@@ -93,7 +93,7 @@
 									<label for="username">Username (use email):</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${personInstance.email}" autocomplete="off" />
+									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${personInstance?.email}" autocomplete="off" />
 									<g:hasErrors bean="${userLoginInstance}" field="username">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -115,7 +115,7 @@
 									<label for="isLocal">Local Account:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}
+									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance?.isLocal) ? 'checked="checked"' : ''}
 										onchange="togglePasswordEditFields( $(this) )"/>
 								</td>
 							</tr>
@@ -178,7 +178,7 @@
 									<label for="active">Active:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
-									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
+									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance?.active}" ></g:select>
 									<g:hasErrors bean="${userLoginInstance}" field="active">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>

@@ -274,39 +274,41 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 	 * update user details and set the User Roles to the Person
 	 */
 	@HasPermission(Permission.UserEdit)
-	def update() {
+	def update(Long id) {
 		UserLogin userLogin
 		String errMsg
-		try {
-			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, false)
-		}
-		catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
-			errMsg = e.message
-		}
-		catch (e) {
-			log.error "update() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = 'An error occurred the prevented the update of the user'
-		}
+		Map model = [companyId: params.companyId, personId: params.personId, projectId: params.projectId]
 
-		if (errMsg) {
-			flash.message = errMsg
-			Map model = [companyId: params.companyId, personId: params.personId, projectId: params.projectId]
-			redirect(action: "edit", id: params.id, params: model)
-			/*
-			Person person = userLogin?.person
-			List availableRoles = securityService.getAvailableRoles(person)
-			List assignedRoles = securityService.getAssignedRoles(person)
-			render(view: 'edit', model: [
-				userLogin: userLogin,
-				vailableRoles: availableRoles,
-				assignedRoles: assignedRoles,
-				companyId: params.companyId
-			])
-			*/
-		}
-		else {
-			flash.message = "UserLogin $userLogin updated"
-			redirect(action: "show", id: userLogin.id, params: [companyId: params.companyId])
+		withForm {
+			try {
+				userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, false)
+			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+				errMsg = e.message
+			} catch (e) {
+				log.error "update() failed : ${ExceptionUtil.stackTraceToString(e)}"
+				errMsg = 'An error occurred that prevented the update of the user'
+			}
+
+			if (errMsg) {
+				flash.message = errMsg
+				redirect(action: "edit", id: id, params: model)
+			} else {
+				flash.message = "UserLogin $userLogin updated"
+				redirect(action: "show", id: id, params: [companyId: params.companyId])
+			}
+		}.invalidToken {
+			flash.message = INVALID_CSRF_TOKEN
+
+			if (id) {
+				// Make sure the user exists before sending to edit otherwise the CSRF message gets lost
+				userLogin = UserLogin.get(id)
+			}
+
+			if (userLogin) {
+				redirect(action: "edit", id: id, params: model)
+			} else {
+				redirect(action: "list")
+			}
 		}
 	}
 
@@ -356,24 +358,26 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		UserLogin newUserLogin
 		String errMsg
 
-		try {
-			newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
-		}
-		catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
-			errMsg = e.message
-		}
-		catch (e) {
-			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = 'An error occurred that prevents creates a user'
-		}
+		withForm {
+			try {
+				newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
+			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+				errMsg = e.message
+			} catch (e) {
+				log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
+				errMsg = 'An error occurred that prevented creating the user'
+			}
 
-		if (errMsg) {
-			flash.message = errMsg
+			if (errMsg) {
+				flash.message = errMsg
+				redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
+			} else {
+				flash.message = "UserLogin $newUserLogin created"
+				redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
+			}
+		}.invalidToken {
+			flash.message = INVALID_CSRF_TOKEN
 			redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
-		}
-		else {
-			flash.message = "UserLogin $newUserLogin created"
-			redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
 		}
 
 	}
