@@ -11,6 +11,8 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
@@ -29,7 +31,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class ApplicationController implements ControllerMethods {
+class ApplicationController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -72,11 +74,13 @@ class ApplicationController implements ControllerMethods {
 	def listJson() {
 		Project project = getProjectForWs()
 
-		String sortIndex = params.sidx ?: 'assetName'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		String sortIndex = paginationOrderBy(Application, 'sidx', 'assetName')
+		String sortOrder = paginationSortOrder('sord')
+
 		boolean firstWhere = true
 
 		Map filterParams = [
@@ -143,11 +147,11 @@ class ApplicationController implements ControllerMethods {
 				query.append(" AND ")
 
 				// Unescaping the parameter since it can include HTML encoded characters (like \' == &#39; )
-				def planMethodology = StringEscapeUtils.unescapeHtml4(params.planMethodology)
+				String planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
 
 				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
-				}else{
+				} else {
 					query.append(" ae.`${customField}` = :planMethodology ")
 					queryParams['planMethodology'] = planMethodology
 				}
@@ -161,25 +165,33 @@ class ApplicationController implements ControllerMethods {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve,  adb.dependency_bundle AS depNumber,
 		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 
-		query.append('''\n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+		query.append("""
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-			WHERE ae.project_id=''').append(securityService.userCurrentProjectId).append(' ')
+			WHERE ae.project_id=${project.id}
+			""")
 
 		if (justPlanning == 'true' || params.ufp == 'true') {
 			query.append(" AND mb.use_for_planning=true ")
 		}
 
-		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append(" AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})")
+		if (params.event && params.event.isNumber() && moveBundleList) {
+			query.append(" AND ae.move_bundle_id IN (:bundleListIds)")
+			queryParams.bundleListIds = moveBundleList*.id
+		}
 
+		// params.unassigned when set will ONLY show assets not assigned to Events
 		if (params.unassigned) {
-			def unasgnMB = MoveBundle.executeQuery('FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
-				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ',
-				[useForPlanning: true, project: securityService.loadUserCurrentProject()])
 
-			if (unasgnMB) {
-				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
-				query.append(" AND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id is null)")
+			List<Long> unassignedToEvents = MoveBundle.where {
+				project == project
+				moveEvent == null
+				useForPlanning == true
+			}.projections { property 'id' }.list()
+
+			if (unassignedToEvents) {
+				query.append(" AND ae.move_bundle_id IN (:unassignedToEvents)")
+				queryParams.unassignedToEvents = unassignedToEvents
 			}
 		}
 
@@ -219,27 +231,19 @@ class ApplicationController implements ControllerMethods {
 		}
 
 		if (params.latencys) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			if (params.latencys == 'unknown') {
+				// Look for latencys not defined or incorrectly defined
+				query.append(" coalesce(apps.latency,'') NOT IN ('Y','N') ")
 			} else {
-				query.append(' AND ')
-			}
-			if (params.latencys != 'unknown') {
-				query.append(" apps.latency = '${params.latencys.replaceAll("'", "")}' ")
-			} else {
-				query.append(" (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")
+				query.append(' apps.latency = :latencysParam')
+				queryParams.latencysParam = params.latencys
 			}
 
 		}
 
 		if (params.moveBundleId) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
-			} else {
-				query.append(' AND ')
-			}
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
 			if (params.moveBundleId != 'unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				// @TODO : JPM 1/2016 : Fix for SQL injections @SECURITY
@@ -251,52 +255,31 @@ class ApplicationController implements ControllerMethods {
 
 		// Filter on validation
 		if (params.toValidate) {
-			String validationWhere = ''
-			switch (params.toValidate) {
-				case ValidationType.UNKNOWN:
-					validationWhere = "apps.validation = '${ValidationType.UNKNOWN}'"
-					break
-				case ValidationType.VALIDATED:
-					validationWhere = "apps.validation != '${ValidationType.UNKNOWN}'"
-					break
-				case ValidationType.PLAN_READY:
-					validationWhere = "apps.validation = '${ValidationType.PLAN_READY}'"
-					break
-				default:
-					log.warn "listJson called with invalid toValidate parameter {}", params.toValidate
+			ValidationType validationType
+			if (params.toValidate == ValidationType.UNKNOWN || params.toValidate == ValidationType.VALIDATED) {
+				validationType = ValidationType.UNKNOWN
+			} else if (params.toValidate == ValidationType.PLAN_READY) {
+				validationType = ValidationType.PLAN_READY
+			} else {
+				log.warn "listJson called with invalid toValidate parameter {}", params.toValidate
 			}
 
-			if (validationWhere) {
-				if (firstWhere) {
-					query.append(' WHERE ')
-					firstWhere = false
-				} else {
-					query.append(' AND ')
-				}
-				query.append(validationWhere)
+			if (validationType) {
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+				query.append("apps.validation=:toValidationParam")
+				queryParams.toValidationParam = validationType
 			}
 		}
 
 		if (params.plannedStatus) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
-			}
-			else {
-				query.append(' AND ')
-			}
-			query.append(" apps.planStatus='$params.plannedStatus'")
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append("apps.planStatus=:plannedStatusParam")
+			queryParams.plannedStatusParam = params.plannedStatus
 		}
 
 		if (params.runbook) {
-			if (firstWhere) {
-				query.append(' WHERE ')
-				firstWhere = false
-			}
-			else {
-				query.append(' AND ')
-			}
-			query.append(''' apps.runbookStatus='Done' ''')
+			firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+			query.append(" apps.runbookStatus='Done' ")
 		}
 
 		query << ' ORDER BY ' << sortIndex <<  ' '  << sortOrder
@@ -313,8 +296,6 @@ class ApplicationController implements ControllerMethods {
 			throw new LogicException("Unabled to perform query based on parameters and user preferences")
 		}
 
-		//def appsList = jdbcTemplate.queryForList(query.toString())
-
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		int totalRows = appsList.size()
 		int numberOfPages = Math.ceil(totalRows / maxRows)
@@ -322,7 +303,7 @@ class ApplicationController implements ControllerMethods {
 			appsList = appsList[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
 		}
 
-		def results = appsList?.collect {
+		List<Map> results = appsList?.collect {
 			[cell: ['', it.assetName, it[appPref['1']] ?: '', it[appPref['2']] ?: '', it[appPref['3']] ?: '',
 			        it[appPref['4']] ?: '', it[appPref['5']] ?: '',
 			        /*it.depNumber, it.depResolve == 0 ? '' : it.depResolve, it.depConflicts == 0 ? '' : it.depConflicts,*/

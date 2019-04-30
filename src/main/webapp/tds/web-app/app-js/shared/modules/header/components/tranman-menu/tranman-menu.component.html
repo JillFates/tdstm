@@ -315,9 +315,9 @@
                     <ng-template [ngIf]="hasPermission(permission.ReportViewEventDay)">
                         <li class="divider"></li>
                         <li class="menu-parent-item">Event Day</li>
-                        <li class="menu-child-item menu-reports-application-migration">
-                            <a href="/tdstm/reports/applicationMigrationReport">Application Event Results</a>
-                        </li>
+												<li class="menu-child-item menu-reports-application-migration">
+													<a [routerLink]="['reports','applicationEventResults']" >Application Event Results</a>
+												</li>
                     </ng-template>
                 </ul>
             </li>

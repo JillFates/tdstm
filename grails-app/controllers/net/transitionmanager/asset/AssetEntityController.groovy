@@ -21,6 +21,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import groovy.time.TimeDuration
+import groovy.transform.CompileStatic
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -72,8 +73,12 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
+import java.sql.ResultSet
+import java.sql.SQLException
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -2328,18 +2333,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listDepJson() {
-		String sortIndex = params.sidx ?: 'asset'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
-		def sid
-
-		def filterParams = [assetName: params.assetName, assetType: params.assetType, assetBundle: params.assetBundle,
+		String sortOrder = paginationSortOrder('sord')
+		int maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		int currentPage = paginationPage()
+		int rowOffset = paginationRowOffset(currentPage, maxRows)
+		Map filterParams = [assetName: params.assetName, assetType: params.assetType, assetBundle: params.assetBundle,
 		                    type: params.type, dependentName: params.dependentName, dependentType: params.dependentType,
 		                    dependentBundle: params.dependentBundle, status: params.status,frequency: params.frequency,
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
+
+		Set<String> aliases = filterParams.keySet()
+		String sortIndex = paginationOrderByAlias(aliases, 'sidx', 'assetName')
+
 		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
 		StringBuilder query = new StringBuilder("""
 			SELECT * FROM (
@@ -2362,27 +2368,33 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
 				LEFT OUTER JOIN move_bundle mbd ON mbd.move_bundle_id = aed.move_bundle_id
-				WHERE ae.project_id = $securityService.userCurrentProjectId
-				ORDER BY ${sortIndex + " " + sortOrder}
+				WHERE ae.project_id = :projectId
+				ORDER BY $sortIndex $sortOrder
 			) AS deps
 		 """)
 
 		// Handle the filtering by each column's text field
 		boolean firstWhere = true
+		Map queryParams = [projectId: securityService.userCurrentProjectId]
 		filterParams.each {
 			if (it.value) {
-				if (firstWhere) {
-					query.append(' WHERE ')
-					firstWhere = false
-				}
-				else {
-					query.append(' AND ')
-				}
-				query.append("deps.$it.key LIKE '%$it.value%'")
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+				String fieldName = it.key
+				query.append("deps.$fieldName LIKE :$fieldName ")
+				queryParams[fieldName] = "%${it.value}%"
 			}
 		}
 
-		def dependencies = jdbcTemplate.queryForList(query.toString())
+		List dependencies = []
+		String queryStr = query.toString()
+		log.debug "listDepJson() called invalid query:\n{}\nparams:", queryStr, queryParams.dump()
+		try {
+			dependencies = namedParameterJdbcTemplate.query(queryStr, queryParams, new AssetDependencyRowMapper(depPref))
+		} catch (e) {
+			log.warn "listDepJson() called invalid query:\n{}\nparams:{}", queryStr, queryParams.dump()
+			throw new InvalidParamException('Invalid parameter for filtering or sort was encountered')
+		}
+
 		int totalRows = dependencies.size()
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
@@ -2391,6 +2403,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 
 		def results = dependencies?.collect {
+			def escapedPref1Value = HtmlUtil.escape(it.pref1Value)
+			def escapedPref2Value = HtmlUtil.escape(it.pref2Value)
 			[id: it.id,
 			 cell: [it.assetName,
 			        it.assetType,
@@ -2399,8 +2413,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			        it.dependentName,
 			        it.dependentType,
 			        it.dependentBundle,
-			        (depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>$it.comment</div>" : ''),
-			        (depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>$it.comment</div>" : ''),
+			        (depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>$escapedPref1Value</div>" : ''),
+			        (depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>$escapedPref2Value</div>" : ''),
 			        it.status,
 			        it.assetId, // 10
 			        it.dependentId, // 11
@@ -3318,5 +3332,45 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	private Integer computeTardyFactor(Integer durationInMin) {
 		return Math.min(30, Math.max(5, (Integer)(durationInMin * 0.1)))
 	}
+
+
+
+	/**
+	 * This class maps a row from the query for AssetDependencies to
+	 * a structure that can be sent to the UI.
+	 */
+	@CompileStatic
+	private class AssetDependencyRowMapper implements RowMapper {
+
+		private Map<String, String> preferencesMap
+
+		AssetDependencyRowMapper(Map<String, String> preferences) {
+			preferencesMap = preferences
+		}
+
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return [
+				id: rs.getLong('id'),
+				assetName: rs.getString('assetName'),
+				assetType: rs.getString('assetType'),
+				assetBundle: rs.getString('assetBundle'),
+				type: rs.getString('type'),
+				dependentName: rs.getString('dependentName'),
+				dependentType: rs.getString('dependentType'),
+				dependentBundle: rs.getString('dependentBundle'),
+
+				pref1Value: rs.getObject(preferencesMap['1']),
+				pref2Value: rs.getObject(preferencesMap['2']),
+
+				status: rs.getString('status'),
+				assetId: rs.getLong('assetId'),
+				dependentId: rs.getLong('dependentId'),
+				assetClass: rs.getString('assetClass'),
+				dependentClass: rs.getString('dependentClass'),
+			]
+		}
+	}
+
+
 
 }

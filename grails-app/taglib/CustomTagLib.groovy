@@ -182,7 +182,7 @@ class CustomTagLib implements InitializingBean {
 			out << '>' << label << '</a>'
 		}
 		else if (text) {
-			out << text
+			out << HtmlUtil.escape(text)
 		}
 	}
 

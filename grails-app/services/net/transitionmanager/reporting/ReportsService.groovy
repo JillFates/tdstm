@@ -12,10 +12,12 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
+import groovy.time.TimeCategory
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
@@ -28,6 +30,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -37,6 +40,7 @@ import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.jdbc.core.JdbcTemplate
@@ -494,10 +498,10 @@ class ReportsService implements ServiceMethods {
 		def steps = [:]
 
 		if (workFlowCode.size() == 1) {
-			workFlowCodeSelected[HtmlUtil.safe(moveEvent.name) + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
+			workFlowCodeSelected[HtmlUtil.escape(moveEvent.name) + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
 		} else {
 			moveBundles.each {
-				workFlowCodeSelected[HtmlUtil.safe(it.name) + '(Bundle)    Uses WorkFlow '] = it.workflowCode
+				workFlowCodeSelected[HtmlUtil.escape(it.name) + '(Bundle)    Uses WorkFlow '] = it.workflowCode
 			}
 		}
 
@@ -512,7 +516,7 @@ class ReportsService implements ServiceMethods {
 			} else {
 				moveBundleStep.each { step->
 					labels << step.label + '(' + (step.planDuration / 60) + 'm)'
-					steps[HtmlUtil.safe(moveBundle.name)] = labels.toString().replace('[[', '').replace('], [', ' , ').replace(']]', '')
+					steps[HtmlUtil.escape(moveBundle.name)] = labels.toString().replace('[[', '').replace('], [', ' , ').replace(']]', '')
 				}
 
 				dashBoardOk << greenSpan('Dashboard OK:')
@@ -535,7 +539,7 @@ class ReportsService implements ServiceMethods {
 		moveBundles.each {
 			if (it.startTime > project.startDate && it.completionTime > project.completionDate) {
 				eventErrorList << 'Project'
-				errorForEventTime += redSpan('Move bundle ' + HtmlUtil.safe(it.name) + ' is completing after project completion')
+				errorForEventTime += redSpan('Move bundle ' + HtmlUtil.escape(it.name) + ' is completing after project completion')
 			}
 			else {
 				def projectStartTime = 'Not Available'
@@ -563,12 +567,12 @@ class ReportsService implements ServiceMethods {
 		String newsBarModeError
 		if (moveEvent.newsBarMode == 'on') {
 			eventErrorList << 'Project'
-			newsBarModeError = redSpan(HtmlUtil.safe(moveEvent.name) + ': MoveEvent In Progress')
+			newsBarModeError = redSpan(HtmlUtil.escape(moveEvent.name) + ': MoveEvent In Progress')
 		} else if (moveEventCompletiondate < project.startDate) {
 			eventErrorList << 'Project'
-			newsBarModeError = redSpan(HtmlUtil.safe(moveEvent.name) + ': MoveEvent In Past', '', false)
+			newsBarModeError = redSpan(HtmlUtil.escape(moveEvent.name) + ': MoveEvent In Past', '', false)
 		} else {
-			newsBarModeError = greenSpan(HtmlUtil.safe(moveEvent.name) + ': OK', '', false)
+			newsBarModeError = greenSpan(HtmlUtil.escape(moveEvent.name) + ': OK', '', false)
 		}
 
 		List<Map> list = partyRelationshipService.getProjectStaff(currProj)
@@ -1196,4 +1200,91 @@ class ReportsService implements ServiceMethods {
 
 		book.write(response.getOutputStream())
 	}
+
+    /**
+     * Generates Application Migration Report web output.
+     * @param project: Project, the current user project.
+     * @param command: ApplicationMigrationCommand instance with the user's selection.
+     * @returns a Map with the model report to be used on the view gsp rendering.
+     */
+    Map generateApplicationMigration(Project project, ApplicationMigrationCommand command) {
+        List<Map> appList = []
+
+	    Person currentSme
+	    if (command.sme != 'null') {
+		    Long smeId = NumberUtil.toPositiveLong(command.sme)
+		    currentSme = Person.get(smeId)
+	    }
+
+	    MoveBundle currentBundle
+	    if (command.moveBundle != 'useForPlanning') {
+		    Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+		    currentBundle = MoveBundle.get(moveBundleId)
+		    userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+	    }
+
+	    List<Application> applicationList = Application.where {
+		    project == project
+
+		    if (currentSme) {
+			    sme == currentSme || sme2 == currentSme
+		    }
+
+		    if (currentBundle) {
+			    moveBundle == currentBundle
+		    } else {
+			    moveBundle in MoveBundle.getUseForPlanningBundlesByProject(project)
+		    }
+	    }.list()
+
+
+        applicationList.each {
+            Application application = Application.get( it.id )
+            Collection<AssetComment> appComments = application.comments
+            List<Date> startTimeList = appComments.findAll{it.category == command.startCategory}.sort{it.actStart}?.actStart
+            List<Date> finishTimeList = appComments.findAll{it.category == command.stopCategory}.sort{it.actFinish}?.actFinish
+
+            startTimeList.removeAll([null])
+
+            Date finishTime= finishTimeList ? finishTimeList[-1] : null
+            Date startTime = startTimeList ? startTimeList[0] : null
+
+            StringBuilder duration = new StringBuilder()
+            def customParam
+            String windowColor
+            List<AssetComment> workflow
+            def durationHours
+
+            if(finishTime && startTime){
+                def dayTime = TimeCategory.minus(finishTime, startTime)
+                durationHours = (dayTime.days*24)+dayTime.hours
+                if(durationHours){
+                    duration.append(durationHours)
+                }
+                if(dayTime.minutes){
+                    duration.append((durationHours?':':'0:')+dayTime.minutes)
+                }
+            }
+            if(command.outageWindow == 'drRtoDesc'){
+                customParam = application.drRtoDesc ? NumberUtils.toInt((application.drRtoDesc).split(" ")[0]) : ''
+                if (duration && customParam) {
+                    windowColor = customParam < durationHours ? 'red' : ''
+                }
+            } else {
+                customParam = it[command.outageWindow]
+            }
+
+            if (command.testing) {
+	            Long workflowTransitionId = NumberUtil.toPositiveLong(command.testing)
+	            WorkflowTransition workflowTransaction = WorkflowTransition.get(workflowTransitionId)
+                workflow = appComments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
+                workflow.removeAll([null])
+            }
+            appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
+                    customParam: customParam ? customParam + (command.outageWindow == 'drRtoDesc' ? 'h': '') : '',
+                    windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
+        }
+
+        [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
+    }
 }

@@ -1,11 +1,4 @@
 <head>
-	%{--<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />--}%
-	%{--<meta name="layout" content="topNav" />--}%
-	%{--<title>Server Conflicts</title>--}%
-	%{--<g:javascript src="asset.tranman.js" />--}%
-	%{--<g:javascript src="entity.crud.js" />--}%
-	%{--<g:render template="/layouts/responsiveAngularResources" />--}%
-	%{--<g:javascript src="asset.comment.js" />--}%
 	<script>
 		var maxR
 		var ofst
@@ -55,7 +48,7 @@
 </head>
 <body>
 	%{--<tds:subHeader title="Server Conflicts" crumbs="['Reports','Server Conflicts']"/>--}%
-	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
+	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:100%;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>${project.name} : ${moveBundle} - Includes servers matching: ${title?:'' }</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${tds.currentPersonName()}.
