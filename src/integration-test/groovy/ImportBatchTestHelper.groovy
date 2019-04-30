@@ -1,9 +1,9 @@
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Project
+import net.transitionmanager.imports.ImportBatch
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.project.Project
 
 class ImportBatchTestHelper {
 

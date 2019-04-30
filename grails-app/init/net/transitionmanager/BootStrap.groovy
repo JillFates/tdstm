@@ -1,19 +1,18 @@
 package net.transitionmanager
 
-
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.metaclass.CustomMethods
 import grails.util.Environment
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.Workflow
+import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.domain.constraint.OfSameProjectConstraint
-import net.transitionmanager.service.AssetEntityAttributeLoaderService
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.QzSignService
-import net.transitionmanager.service.StateEngineService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.notice.Notice
+import net.transitionmanager.project.StateEngineService
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.ExceptionLoggerFilter
 import org.apache.log4j.Logger
 import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry

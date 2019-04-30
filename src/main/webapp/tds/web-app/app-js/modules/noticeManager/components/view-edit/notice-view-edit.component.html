@@ -1,4 +1,4 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content notice-view-edit">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content notice-view-edit" #noticeViewEditContainerElement>
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">{{ (modalType === 0 ? 'NOTICE.CREATE_NOTICE':'NOTICE.EDIT_NOTICE') | translate }}</h4>
@@ -38,8 +38,10 @@
                             [elementId]="'htmlText'"
                             [required]="true"
                             [name]="'htmlText'"
-                            [(rawValue)]="model.rawText"
-                            [(value)]="model.htmlText">
+                            (valueChange)="onValueChange($event)"
+                            (rawValueChange)="onRawValueChange($event)"
+                            [rawValue]="model.rawText"
+                            [value]="model.htmlText">
                         </rich-text-editor>
                     </div>
                 </div>

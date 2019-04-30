@@ -1,10 +1,10 @@
 package test.helper
 
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional

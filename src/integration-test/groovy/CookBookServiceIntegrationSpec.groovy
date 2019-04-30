@@ -2,15 +2,15 @@ import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.cookbook.ContextCommand
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.service.CookbookService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.task.Recipe
+import net.transitionmanager.task.RecipeVersion
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.task.CookbookService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Shared
 import spock.lang.Specification
 

@@ -1,5 +1,5 @@
-<%@page import="com.tds.asset.Application"%>
-<%@page import="com.tds.asset.AssetType"%>
+<%@page import="net.transitionmanager.asset.Application"%>
+<%@page import="net.transitionmanager.asset.AssetType"%>
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <g:set var="assetClass" value="Application" />

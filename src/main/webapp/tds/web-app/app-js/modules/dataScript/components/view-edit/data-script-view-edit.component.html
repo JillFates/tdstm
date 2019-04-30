@@ -99,8 +99,7 @@
 		</tds-button-edit>
 
 		<tds-button-custom *ngIf="modalType === actionTypes.VIEW" [icon]="'eye'"
-			(click)="onDataScriptDesigner()" class="btn-primary pull-left">
-			{{'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate }}
+			(click)="onDataScriptDesigner()" class="btn-primary pull-left" title="{{'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate }}">
 		</tds-button-custom>
 
 		<tds-button-delete *ngIf="modalType !== actionTypes.CREATE" 

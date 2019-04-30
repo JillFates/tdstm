@@ -1,7 +1,7 @@
 package com.tdsops.etl
 
 import com.tdsops.tm.enums.ControlType
-import net.transitionmanager.domain.Person
+import net.transitionmanager.person.Person
 import org.grails.datastore.mapping.model.PersistentProperty
 
 class ETLFieldDefinition {

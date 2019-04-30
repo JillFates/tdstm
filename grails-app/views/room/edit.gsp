@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <html>
 <head>
 </head>
@@ -307,7 +307,7 @@ function showRoomObjectsDiv(rackId){
 	if( draggable.val() != 1){
 		var id=rackId.split("_")[1];
 		$.ajax({
-			url: "/room/roomObject",
+			url: tdsCommon.createAppURL("/room/roomObject"),
 			data:{'id':id},
 			type:'POST',
 			datatype:'json',
@@ -455,7 +455,7 @@ function enableDraggableRack(){
 		$("#roomObjects").draggable('destroy')
 	  }
 	  jQuery.ajax({
-		  url:"/room/setDraggableRackPref",
+		  url:tdsCommon.createAppURL("/room/setDraggableRackPref"),
 		  data:"prefVal="+drag
 	  });
 }
@@ -469,7 +469,7 @@ function submitForm(form){
  		alert("Please enter room")
  	} else {
 		jQuery.ajax({
-			url: $(form).attr('action'),
+			url: tdsCommon.createAppURL("$(form).attr('action')"),
 			data: $(form).serialize(),
 			type:'POST',
 			success: function(data) {
@@ -528,7 +528,7 @@ function delShadowCss(id){
 }
 function verifyAndDeleteRacks(id){
 	jQuery.ajax({
-		url: "verifyRackAssociatedRecords",
+		url: tdsCommon.createAppURL("verifyRackAssociatedRecords"),
 		data: "rackId="+id,
 		type:'POST',
 		success: function(data) {

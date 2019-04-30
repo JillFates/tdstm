@@ -7,7 +7,6 @@ import {
 import {AlertType} from '../../../../shared/model/alert.model';
 
 import {
-	DomSanitizer,
 	SafeHtml
 } from '@angular/platform-browser';
 
@@ -30,7 +29,7 @@ declare var jQuery: any;
 	selector: 'tds-event-checklist',
 	template: `
 		<div class="pre-event-checklist">
-			<div class="report-controls">
+			<div *ngIf="!html || isReportFailing" class="report-controls">
 				<div class="event-selector">
 					<div>
 						<kendo-dropdownlist
@@ -72,9 +71,9 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 		defaultEvent: {id: null, text: ''}
 	};
 	public html: SafeHtml;
+	private isReportFailing: boolean;
 
 	constructor(
-		private sanitizer: DomSanitizer,
 		private route: ActivatedRoute,
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
@@ -102,6 +101,8 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 	 * @param {string} eventId Report id to generate
 	 */
 	onGenerateReport(eventId: string): void {
+		this.isReportFailing = false;
+
 		this.reportsService.getPreventsCheckList(eventId)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
@@ -111,6 +112,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 						errorMessage = errorResponse.errors.shift();
 					}
 
+					this.isReportFailing = true;
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: errorMessage
@@ -120,15 +122,7 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 					errorMessage = '';
 				}
 
-				this.html = (errorMessage) ? this.getSafeHtml('') : this.getSafeHtml(content);
+				this.html = (errorMessage) ? this.reportsService.getSafeHtml('') : this.reportsService.getSafeHtml(content);
 			});
-	}
-
-	/**
-	 * Based on the text passed it generates the corresponding safe html string
-	 * @param {string} content: html to be proccessed
-	 */
-	getSafeHtml(content: string): SafeHtml {
-		return this.sanitizer.bypassSecurityTrustHtml(content);
 	}
 }

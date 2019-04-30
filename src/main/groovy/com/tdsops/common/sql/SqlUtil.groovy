@@ -39,6 +39,21 @@ class SqlUtil {
 	}
 
 	/**
+	 * Used to add the WHERE or AND to a criteria
+	 * @param criteria - the buffer that the appropriate clause is added to
+	 * @param needToAddWhere - flag to indicate that the WHERE is needed vs AND
+	 * @return false - all the time indicating needing to add the WHERE to the criteria
+	 */
+	static Boolean addWhereOrAndToQuery(StringBuilder criteria, Boolean needToAddWhere) {
+		if (needToAddWhere) {
+			criteria.append(' WHERE ')
+		} else {
+			criteria.append(' AND ')
+		}
+		return false
+	}
+
+	/**
 	 * Used to do a multiple word match against a particular field
 	 * @param property - the property to query on
 	 * @param words - a list of words to search on
@@ -522,10 +537,12 @@ class SqlUtil {
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
 		String searchColumn = fieldSearchData.whereProperty
 		Object paramValue
+		boolean isNumber = false
 
 		if (isNumericField(fieldSearchData)) {
 			if (fieldSearchData.filter.isNumber()) {
 				paramValue = parseNumberParameter(fieldSearchData)
+				isNumber = true
 			}
 		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
@@ -533,11 +550,35 @@ class SqlUtil {
 
 		// Calculate the expression only if there's a valid value to be added to the query.
 		if (paramValue != null) {
-			String expression = getSingleValueExpression(searchColumn, fieldSearchData.columnAlias, operator)
-			fieldSearchData.sqlSearchExpression = expression
+			calculateExpression(searchColumn, fieldSearchData, operator, isNumber)
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
 		}
 	}
+
+	/**
+	 * Build sql search expression.
+	 * It returns a search expression of the form column + ' ' + operator + ' :' + namedParameter.
+	 * In case operator == LIKE and isNumber = true, it will return an expression of the form
+	 * column + ' LIKE  CONCAT(:namedParameter, '%'), so all numbers starting with nameParameter
+	 * are returned, and no just the exact match. So for example f we have LIKE '5.2', we want
+	 * to return LIKE '5.2%' results, so we will get 5.20, 5.22, 5.27 etc.
+	 * @See TM-13420
+	 *
+	 * @param column  The column name
+	 * @param fieldSearchData  The fieldSearchData that contains the parameter
+	 * @param operator  The SQL operator ( =, LIKE etc)
+	 * @param isNumber  Flag indicating if the parameter is a number or not
+	 */
+	private static void calculateExpression(String column, FieldSearchData fieldSearchData, String operator, boolean isNumber) {
+		String expression
+		if (operator == 'LIKE' && isNumber) {
+			expression =  column + " LIKE CONCAT(:$fieldSearchData.columnAlias, '%')"
+		} else {
+			expression = getSingleValueExpression(column, fieldSearchData.columnAlias, operator)
+		}
+		fieldSearchData.sqlSearchExpression = expression
+	}
+
 	/**
 	 * Escape the parameter to avoid SQL Injection attacks.
 	 * @param parameter

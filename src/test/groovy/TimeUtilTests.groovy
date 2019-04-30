@@ -4,9 +4,9 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserPreference
 import spock.lang.Issue
 import test.AbstractUnitSpec
 

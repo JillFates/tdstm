@@ -1,4 +1,4 @@
-<%@page import="com.tdssrc.grails.GormUtil; net.transitionmanager.domain.Rack" %>
+<%@page import="com.tdssrc.grails.GormUtil; net.transitionmanager.asset.Rack" %>
 
 <table>
 <g:set var="rack_id" value="${rack.id?:rackId }"></g:set>

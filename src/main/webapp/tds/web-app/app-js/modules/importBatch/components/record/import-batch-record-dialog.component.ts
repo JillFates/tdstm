@@ -5,16 +5,12 @@ import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {ImportBatchRecordFieldsComponent} from './import-batch-record-fields.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {KEYSTROKE} from '../../../../shared/model/constants';
 import {PROMPT_DEFAULT_MESSAGE_KEY, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'import-batch-record-dialog',
-	templateUrl: 'import-batch-record-dialog.component.html',
-	host: {
-		'(keydown)': 'keyDownHandler($event)'
-	}
+	templateUrl: 'import-batch-record-dialog.component.html'
 })
 export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 

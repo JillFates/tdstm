@@ -1,8 +1,8 @@
-import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskDependency
 import com.tdsops.metaclass.CustomMethods
 import grails.test.mixin.TestFor
-import net.transitionmanager.service.RunbookService
+import net.transitionmanager.task.RunbookService
 import spock.lang.Specification
 
 @TestFor(RunbookService)

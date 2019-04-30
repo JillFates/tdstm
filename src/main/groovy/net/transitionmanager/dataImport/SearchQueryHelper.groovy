@@ -1,7 +1,7 @@
 package net.transitionmanager.dataImport
 
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -11,12 +11,12 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.PersonService
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.person.Person
+import net.transitionmanager.asset.Room
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.person.PersonService
 import org.grails.web.json.JSONObject
 
 @Slf4j
@@ -158,13 +158,15 @@ class SearchQueryHelper {
 				// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
 				Person existingPerson = entityInstance ? entityInstance[fieldName] : null
 				String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-				String errorMsg
-				(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-				if (errorMsg) {
-					// If no entity was found then we want to capture the error message to save in the cache
-					entity = errorMsg
-					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-					recordError(context, errorMsg)
+				if (searchValue){
+					String errorMsg
+					(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+					if (errorMsg) {
+						// If no entity was found then we want to capture the error message to save in the cache
+						entity = errorMsg
+						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+						recordError(context, errorMsg)
+					}
 				}
 				break
 
@@ -615,7 +617,9 @@ class SearchQueryHelper {
 			switch (refDomainName) {
 				case 'Room':
 					// Get the Location field
-					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
+					if (referenceFieldName == 'roomSource'){
+						extraCriteria.put('source',  1)
+					}
 					List parts = searchValue.split('/')
 					if (parts.size() != 2) {
 						result.error = 'Room must be formatted as Location/Name'

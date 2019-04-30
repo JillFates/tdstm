@@ -7,14 +7,14 @@ import spock.lang.Shared
 
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
-import net.transitionmanager.service.DataImportService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tds.asset.Database
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper

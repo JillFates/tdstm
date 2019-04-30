@@ -1,7 +1,7 @@
-<%@page import="com.tds.asset.AssetComment"%>
-<%@page import="net.transitionmanager.domain.Manufacturer" %>
-<%@page import="net.transitionmanager.domain.Model" %>
-<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.task.AssetComment"%>
+<%@page import="net.transitionmanager.manufacturer.Manufacturer" %>
+<%@page import="net.transitionmanager.model.Model" %>
+<%@page import="net.transitionmanager.project.Project" %>
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>

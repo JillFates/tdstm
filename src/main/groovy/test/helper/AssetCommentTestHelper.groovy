@@ -1,13 +1,13 @@
 package test.helper
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional

@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Application"%>
+<%@page import="net.transitionmanager.asset.Application"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />

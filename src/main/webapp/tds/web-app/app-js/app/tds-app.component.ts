@@ -4,7 +4,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
+import {ActivatedRoute, NavigationStart, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
@@ -47,31 +47,32 @@ export class TDSAppComponent implements OnInit {
 	 * Listen to the Transitions
 	 */
 	private handleTransitions(): void {
-		// As soon as a transition start
-		this.router.events.subscribe((event) => {
-				this.notifierService.broadcast({
-					name: 'notificationRouteChange'
-				});
-			});
-
 		// Specific filter to get the information from the current Page of the latest request event
 		this.router.events
-			.filter((event) => event instanceof NavigationEnd)
-			.map(() => this.activatedRoute)
-			.map((route) => {
-				while (route.firstChild) {
-					route = route.firstChild;
+			.filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd)
+			.map((event) => ({route: this.activatedRoute, isNavigationStart: event instanceof NavigationStart}))
+			.map((eventRoute) => {
+				while (eventRoute.route.firstChild) {
+					eventRoute.route = eventRoute.route.firstChild;
 				}
-				return route;
+				return eventRoute
 			})
-			.subscribe((event) => {
-				this.notifierService.broadcast({
-					name: 'notificationRouteNavigationEnd',
-					route: event
-				});
-				this.notifierService.broadcast( {
-					name: 'httpRequestCompleted'
-				});
+			.subscribe((eventRoute) => {
+					// As soon as a transition start
+				if (eventRoute.isNavigationStart) {
+					this.notifierService.broadcast({
+						name: 'notificationRouteChange'
+					});
+				} else {
+					// As soon as a transition ends
+					this.notifierService.broadcast({
+						name: 'notificationRouteNavigationEnd',
+						route: eventRoute.route
+					});
+					this.notifierService.broadcast( {
+						name: 'httpRequestCompleted'
+					});
+				}
 			});
 	}
 }

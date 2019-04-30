@@ -267,12 +267,13 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	 */
 	var checkForSelectedRow = function() {
 		var row = -1;
-		if (state.params.recipeId) {
 			// The scope.sortedRows is a separate dataset from the scope.gridData that gets populated when the user sorts the
 			// list. The original scope.gridData does not get remains in the order when retrieved from the server. So if sortedRows
 			// exists then this logic will figure out the selected row index from that dataset otherwise use the gridData list.
 			// Note that the location of the recipeId is in different places within the List<Object>.
 			var datagridSet = scope.sortedRows ? scope.sortedRows : scope.gridData;
+
+		if (state.params.recipeId) {
 			var recipeId = state.params.recipeId;
 			row = (datagridSet.length > 0) ? 0 : -1;
 			for (var i = 0; i < datagridSet.length; i++) {
@@ -582,13 +583,11 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return;
 		}
 
-		var sameEvent = validEventStatus();
-		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null && scope.contexts.selectedEvent != '' && scope.contexts.selectedEvent != null) || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
+		if(!validEventStatus()) {
 			return; // dirty
 		}
 
-		var sameTag = validTagStatus();
-		if(!sameTag) {
+		if(!validTagStatus()) {
 			if (!scope.$$phase) scope.$digest();
 			return; // dirty
 		}
@@ -599,7 +598,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	};
 
 	var validEventStatus = function () {
-		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:0;
+		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:null;
 		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
 	};
 
@@ -623,7 +622,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	 * initial load it should be set to false.
 	 * @param resetSaveAsDefault - set to true to show the Set Default Context otherwise the Clear Default Context is shown.
 	 */
-	scope.contexts.eventSelected = function(resetSaveAsDefault){
+	scope.contexts.eventSelected = function(){
 		scope.contexts.checkValidSelection();
 		if (scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
 			$http.get(utils.url.applyRootPath('/ws/tag/event/' + scope.contexts.selectedEvent.id),
@@ -642,9 +641,11 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 					scope.contexts.checkValidSelection();
 					if (!scope.$$phase) scope.$digest();
 				}
-				if (resetSaveAsDefault) {
-					// The Save Default Context should be enabled when the user changes the event
+
+				if (!validEventStatus() || !validTagStatus()) {
 					scope.contexts.enableClearDefaultContext = false;
+				} else {
+					scope.contexts.enableClearDefaultContext = true;
 				}
 			});
 		}
@@ -718,7 +719,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 			if (scope.editor.selectedRVersion && scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.eventId) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.editor.selectedRVersion.context.eventId);
-				scope.contexts.eventSelected(false);
+				scope.contexts.eventSelected();
 			} else if (scope.contexts.selectedEvent != null) {
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.contexts.selectedEvent.id);
 			}
@@ -1748,19 +1749,19 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		if(scope.editor.originalRecipeType && scope.editor.originalRecipeType == 'release' && scope.editor.selectedRecipe.hasWIP){
 			proceedToSave = confirm("There is already a WIP of this recipe. Press Okay to overwrite the existing WIP with this version of the recipe or Cancel to abort.")
 		}
+
 		if(proceedToSave){
 			var tmpObj = angular.copy(scope.editor.selectedRWip);
 			var selectedId = stateParams.recipeId;
 			var selectedVersion = scope.editor.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
-			cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
-				log.info('Success on Saving WIP');
-				alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-				scope.getRecipeData('wip');
-				rootScope.$broadcast("refreshRecipes");
-			}, function(){
-				log.warn('Error on Saving WIP');
-				alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
+			cookbookService.saveWIP({details:selectedId}, dataToSend, function(result){
+				if (result.status !== 'error') {
+					log.info('Success on Saving WIP');
+					alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+					scope.getRecipeData('wip');
+					rootScope.$broadcast("refreshRecipes");
+				}
 			});
 		}
 

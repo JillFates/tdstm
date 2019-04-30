@@ -16,7 +16,8 @@ export const PREFERENCES_LIST = {
 	DATA_SCRIPT_SIZE: 'DATA_SCRIPT_SIZE',
 	VIEW_UNPUBLISHED: 'VIEW_UNPUBLISHED',
 	IMPORT_BATCH_PREFERENCES: 'IMPORT_BATCH_PREFERENCES',
-	CURR_DT_FORMAT: 'CURR_DT_FORMAT'
+	CURR_DT_FORMAT: 'CURR_DT_FORMAT',
+	CURRENT_MOVE_BUNDLE_ID: 'MOVE_BUNDLE'
 };
 
 export const IMPORT_BATCH_PREFERENCES = {
@@ -150,7 +151,7 @@ export class PreferenceService {
 	 */
 	public getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
 		const unitSizeSeparator = 'x';
-		const defaultWidth = 580;
+		const defaultWidth = 850;
 		const defaultHeight = 680;
 
 		return this.getPreference(PREFERENCES_LIST.DATA_SCRIPT_SIZE)

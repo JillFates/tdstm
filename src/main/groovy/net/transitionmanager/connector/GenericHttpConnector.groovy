@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.service.HttpProducerService
+import net.transitionmanager.action.HttpProducerService
 
 /**
  * This class represents a generic Http Connector for Api Actions that perform actions

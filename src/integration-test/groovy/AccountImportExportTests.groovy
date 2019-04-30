@@ -2,13 +2,13 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.AccountImportExportService
-import net.transitionmanager.service.LogicException
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.imports.AccountImportExportService
+import net.transitionmanager.exception.LogicException
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import spock.lang.Specification
 
 import java.sql.Timestamp

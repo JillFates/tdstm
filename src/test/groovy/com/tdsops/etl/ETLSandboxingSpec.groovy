@@ -1,17 +1,17 @@
 package com.tdsops.etl
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer

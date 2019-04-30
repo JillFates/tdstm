@@ -1,6 +1,6 @@
 package com.tdsops.common.security
 
-import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.exception.ConfigurationException
 import spock.lang.Specification
 
 // TODO : JPM 01/2015 : Fixed the SecurityConfigParserTests test cases

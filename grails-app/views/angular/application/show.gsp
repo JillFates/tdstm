@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.Application"%>
+<%@page import="net.transitionmanager.asset.Application"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 

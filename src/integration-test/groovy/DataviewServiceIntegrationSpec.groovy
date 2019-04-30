@@ -3,12 +3,12 @@ import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.imports.DataviewService
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
@@ -31,7 +31,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, null, dataviewJson)
 		then:
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property project of class net.transitionmanager.domain.Dataview cannot be null.*/
+			e.message ==~ /.*Property project of class net.transitionmanager.imports.Dataview cannot be null.*/
 	}
 
 	void '2. test create dataview with duplicate name within same project throws exception'() {
@@ -45,7 +45,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, project, dataviewJson)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.domain.Dataview with value \[.+\] must be unique.*/
+			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
 	}
 
 	@Ignore
@@ -69,7 +69,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.update(person, project, dataview2.id, dataviewJson1)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.domain.Dataview with value \[.+\] must be unique.*/
+			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
 	}
 
 	void '4. Test that unique name validation with duplicate name within same project returns false'() {

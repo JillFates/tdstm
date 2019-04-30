@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetCableMap"%>
+<%@page import="net.transitionmanager.asset.AssetCableMap"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <script type="text/javascript">
 var app = angular.module("cablingApp${assetId}", ['ui']);
@@ -67,7 +67,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     $scope.getAsset = function(id, asset, type, room){
 	    if(id != assetTemp || room!=roomTemp){
 	    	$http({
-				url : "/rackLayouts/retrieveAssetModelConnectors",
+				url : tdsCommon.createAppURL("/rackLayouts/retrieveAssetModelConnectors"),
 				method: "POST",
 				async: false,
 				data:{'asset': $("#assetEntityId").val(), 'type':type,'roomType':room}

@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.RoleType" %>
+<%@page import="net.transitionmanager.security.RoleType" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -124,7 +124,7 @@
 									<label for="forcePasswordChange">Force password change:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" />
+									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" checked/>
 								</td>
 							</tr>
 							<tr class="prop passwordsEditFields">

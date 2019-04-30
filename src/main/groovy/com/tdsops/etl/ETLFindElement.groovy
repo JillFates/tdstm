@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import groovy.transform.CompileStatic
-
 /**
  * ETL find command implementation.
  * <code>
@@ -16,6 +13,7 @@ import groovy.transform.CompileStatic
  * @return
  */
 class ETLFindElement implements ETLStackableCommand {
+
 
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
@@ -208,7 +206,7 @@ class ETLFindElement implements ETLStackableCommand {
 			results.matchOn = findings.size()
 
 			if (currentFind.objects.size() > 1){
-				currentFind.errors = ['The find/elseFind command(s) found multiple records']
+				currentFind.errors = [DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS]
 			}
 		}
 	}
@@ -227,7 +225,7 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @param conditions a List of {@code FindCondition} used to calculate HQL sentences
 	 * @return a list of results based on findCache results
 	 *          or after querying database using a DomainClassQueryHelper
-	 * @see DomainClassQueryHelper#where(com.tdsops.etl.ETLDomain, net.transitionmanager.domain.Project, java.util.List, java.lang.Boolean)
+	 * @see DomainClassQueryHelper#where(com.tdsops.etl.ETLDomain, net.transitionmanager.project.Project, java.util.List, java.lang.Boolean)
 	 */
 	private List lookupResultsInCache(String domain, List<FindCondition> conditions) {
 

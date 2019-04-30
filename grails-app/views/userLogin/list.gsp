@@ -79,7 +79,7 @@
 					<g:if test="${isActive != 'N'}">
 						<tds:hasPermission permission="${Permission.UserUnlock}">
 							if (cellVal.lockedOutUntil && cellVal.lockedOutTime.charAt(0) != '-')
-								unlockButton += "<img tm-unlock-account src=" + '${assetPath(src:'icons/lock_delete.png')}'+"border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
+								unlockButton += "<img tm-unlock-account src=" + '${assetPath(src:'icons/lock_delete.png')}'+" border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
 						</tds:hasPermission>
 					</g:if>
 					return unlockButton;

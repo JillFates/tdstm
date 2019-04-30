@@ -1,7 +1,7 @@
 
 
 import grails.test.mixin.TestFor
-import net.transitionmanager.service.AssetExportService
+import net.transitionmanager.asset.AssetExportService
 import spock.lang.Specification
 
 /**

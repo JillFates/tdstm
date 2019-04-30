@@ -1,13 +1,11 @@
 package com.tdsops.etl
 
 import com.google.gson.JsonObject
-import com.tdsops.etl.ETLDomain
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.connector.Environment
-import com.tds.asset.AssetEntity
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.Project
 import org.grails.web.json.JSONObject
 
 /**

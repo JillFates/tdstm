@@ -113,7 +113,13 @@ export class TaskColumnModel {
 
 	constructor() {
 		this.columns = [
+			/* For More options button
 			{
+				label: '',
+				property: 'action',
+				type: 'text',
+				width: 20
+			},*/ {
 				label: 'Task',
 				property: 'task',
 				type: 'text',

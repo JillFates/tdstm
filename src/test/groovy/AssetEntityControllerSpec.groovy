@@ -1,4 +1,5 @@
 import grails.test.mixin.TestFor
+import net.transitionmanager.asset.AssetEntityController
 import test.AbstractUnitSpec
 
 /**

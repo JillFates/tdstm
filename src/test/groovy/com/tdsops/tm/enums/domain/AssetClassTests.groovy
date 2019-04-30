@@ -1,9 +1,9 @@
 package com.tdsops.tm.enums.domain
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import spock.lang.Ignore
 import spock.lang.Specification
 

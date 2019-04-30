@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import grails.test.mixin.TestFor
+import net.transitionmanager.person.UserPreferenceService
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
