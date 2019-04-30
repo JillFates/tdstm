@@ -152,7 +152,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 					if (this.defaultValue != null) {
 						this.field.default = this.defaultValue;
 					}
-					this.activeDialog.dismiss();
+					this.activeDialog.close(this.isDirty());
 				}
 			});
 
