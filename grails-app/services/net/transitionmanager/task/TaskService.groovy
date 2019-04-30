@@ -1,22 +1,5 @@
 package net.transitionmanager.task
 
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.asset.Application
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidConfigurationException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
-import net.transitionmanager.exception.RecipeException
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.lang.GStringEval
@@ -37,25 +20,41 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import grails.transaction.NotTransactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
-import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+import net.transitionmanager.command.task.TaskGenerationCommand
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.exception.ApiActionException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.RecipeException
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.imports.TaskBatch
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.tag.Tag
-import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.project.WorkflowTransition
-import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.quartz.Scheduler
@@ -74,6 +73,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -81,7 +81,6 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
  * @author John Martin
  */
 @Transactional
-@Slf4j
 class TaskService implements ServiceMethods {
 
 	ApiActionService           apiActionService
