@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
@@ -175,14 +176,8 @@ class WsReportsController implements ControllerMethods {
      */
     def generateApplicationMigration(Long moveBundleId) {
         Project project = getProjectForWs()
-        render(view: "/reports/generateApplicationMigration" , model: reportsService.generateApplicationMigration(
-                project,
-                request.JSON.moveBundle,
-                request.JSON.sme,
-                request.JSON.startCategory,
-                request.JSON.stopCategory,
-                request.JSON.testing,
-                request.JSON.outageWindow)
-        )
+        ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
+        Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
+        render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
     }
 }

@@ -16,6 +16,7 @@ import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
@@ -1202,54 +1203,55 @@ class ReportsService implements ServiceMethods {
     /**
      * Generates Application Migration Report web output.
      * @param project: Project, the current user project.
-     * @param moveBundle: The id of the move bundle selected value.
-     * @param smeByModel: The id of the SME selected value.
-     * @param startCategory: string.
-     * @param stopCategory: string.
-     * @param workflowTransId: integer - The id of the Workflow.
-     * @param outageWindow: string - The custom field.
-     * @returns the model report to be used on the view gsp rendering.
+     * @param command: ApplicationMigrationCommand instance with the user's selection.
+     * @returns a Map with the model report to be used on the view gsp rendering.
      */
-    def generateApplicationMigration(project, moveBundle, smeByModel, startCategory, stopCategory, workflowTransId, outageWindow) {
-        def applicationList
-        def currentSme
-        def currentBundle
-        def appList = []
-        if(moveBundle == 'useForPlanning'){
-            if(smeByModel!='null'){
-                currentSme = Person.get(smeByModel)
-                applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
-                        [project:project,smes:currentSme])
-            }else {
-                applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
-            }
-        }else{
-            currentBundle = MoveBundle.get(moveBundle)
-            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, moveBundle)
-            if(smeByModel!='null'){
-                currentSme = Person.get(smeByModel)
-                applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle \
-					and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
-            }else {
-                applicationList = Application.findAllByMoveBundle(currentBundle)
-            }
-        }
+    Map generateApplicationMigration(Project project, ApplicationMigrationCommand command) {
+        List<Map> appList = []
+
+	    Person currentSme
+	    if (command.sme != 'null') {
+		    Long smeId = NumberUtil.toPositiveLong(command.sme)
+		    currentSme = Person.get(smeId)
+	    }
+
+	    MoveBundle currentBundle
+	    if (command.moveBundle != 'useForPlanning') {
+		    Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+		    currentBundle = MoveBundle.get(moveBundleId)
+		    userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+	    }
+
+	    List<Application> applicationList = Application.where {
+		    project == project
+
+		    if (currentSme) {
+			    sme == currentSme || sme2 == currentSme
+		    }
+
+		    if (currentBundle) {
+			    moveBundle == currentBundle
+		    } else {
+			    moveBundle in MoveBundle.getUseForPlanningBundlesByProject(project)
+		    }
+	    }.list()
+
 
         applicationList.each {
             Application application = Application.get( it.id )
-            def appComments = application.comments
-            def startTimeList = appComments.findAll{it.category == startCategory}.sort{it.actStart}?.actStart
-            def finishTimeList = appComments.findAll{it.category == stopCategory}.sort{it.actStart}?.actStart
+            Collection<AssetComment> appComments = application.comments
+            List<Date> startTimeList = appComments.findAll{it.category == command.startCategory}.sort{it.actStart}?.actStart
+            List<Date> finishTimeList = appComments.findAll{it.category == command.stopCategory}.sort{it.actFinish}?.actFinish
 
             startTimeList.removeAll([null])
 
-            def finishTime= finishTimeList ? finishTimeList[-1] : null
-            def startTime = startTimeList ? startTimeList[0] : null
+            Date finishTime= finishTimeList ? finishTimeList[-1] : null
+            Date startTime = startTimeList ? startTimeList[0] : null
 
-            def duration = new StringBuilder()
+            StringBuilder duration = new StringBuilder()
             def customParam
-            def windowColor
-            def workflow
+            String windowColor
+            List<AssetComment> workflow
             def durationHours
 
             if(finishTime && startTime){
@@ -1262,17 +1264,18 @@ class ReportsService implements ServiceMethods {
                     duration.append((durationHours?':':'0:')+dayTime.minutes)
                 }
             }
-            if(outageWindow == 'drRtoDesc'){
+            if(command.outageWindow == 'drRtoDesc'){
                 customParam = application.drRtoDesc ? NumberUtils.toInt((application.drRtoDesc).split(" ")[0]) : ''
                 if (duration && customParam) {
                     windowColor = customParam < durationHours ? 'red' : ''
                 }
             } else {
-                customParam = it[outageWindow]
+                customParam = it[command.outageWindow]
             }
 
-            if (workflowTransId) {
-                def workflowTransaction = WorkflowTransition.get(workflowTransId)
+            if (command.testing) {
+	            Long workflowTransitionId = NumberUtil.toPositiveLong(command.testing)
+	            WorkflowTransition workflowTransaction = WorkflowTransition.get(workflowTransitionId)
                 workflow = appComments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
                 workflow.removeAll([null])
             }
