@@ -85,3 +85,8 @@ export enum CUSTOM_FIELD_TYPES {
 	DateTime = 'DateTime',
 	Number = 'Number'
 }
+
+export const YesNoList = [
+	{value: false, name: 'No'},
+	{value: true, name: 'Yes'}
+];

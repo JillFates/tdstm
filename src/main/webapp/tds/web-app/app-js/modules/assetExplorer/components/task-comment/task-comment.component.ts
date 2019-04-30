@@ -13,11 +13,13 @@ import {TaskDetailComponent} from '../../../taskManager/components/detail/task-d
 import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../security/model/user-context.model';
 
 @Component({
 	selector: `task-comment`,
@@ -49,18 +51,25 @@ export class TaskCommentComponent implements OnInit {
 	private showAllComments: boolean;
 	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
+	private userDateFormat;
+
 	constructor(
 		private taskService: TaskCommentService,
 		private dialogService: UIDialogService,
 		public promptService: UIPromptService,
 		public taskManagerService: TaskService,
+		private userContextService: UserContextService,
 		private preferenceService: PreferenceService,
 		private translate: TranslatePipe) {
 		this.getPreferences();
 	}
 
 	ngOnInit(): void {
-		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.userContextService
+			.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.userTimeZone = userContext.timezone;
+			this.userDateFormat = userContext.dateFormat;
+		});
 		this.showAllComments = false;
 		this.showAllTasks = false;
 		this.createDataGrids();
@@ -264,7 +273,7 @@ export class TaskCommentComponent implements OnInit {
 			.subscribe((res) => {
 				let modelHelper = new TaskEditCreateModelHelper(
 					this.userTimeZone,
-					this.preferenceService.getUserCurrentDateFormatOrDefault(),
+					this.userDateFormat,
 					this.taskManagerService, this.dialogService,
 					this.translate);
 				taskDetailModel.detail = res;

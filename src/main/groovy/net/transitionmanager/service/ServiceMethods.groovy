@@ -2,8 +2,12 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import groovy.transform.CompileStatic
-import net.transitionmanager.domain.Project
+import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.Project
 import grails.core.GrailsApplication
+import net.transitionmanager.security.SecurityService
 import  org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
 import org.springframework.context.i18n.LocaleContextHolder
@@ -15,9 +19,9 @@ import javax.servlet.http.HttpSession
 
 trait ServiceMethods {
 
-	GrailsApplication grailsApplication
+	GrailsApplication    grailsApplication
 	MessageSourceService messageSourceService
-	SecurityService securityService
+	SecurityService      securityService
 
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can
@@ -114,7 +118,7 @@ trait ServiceMethods {
 		if (instance == null) return null
 
 		try {
-			instance.save(flush: flush)
+			instance.save(flush: flush, failOnError: false)
 
 			if (instance.hasErrors()) {
 				log.error("save() Validation errors saving ${instance.getClass().simpleName} with id ${instance.id} ${GormUtil.allErrorsString(instance)}")

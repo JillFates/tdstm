@@ -1,7 +1,7 @@
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tdsops.common.exceptions.ServiceException
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -10,16 +10,16 @@ import com.tdssrc.grails.TimeUtil
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
@@ -88,7 +88,7 @@ class TaskServiceIntTests extends Specification{
     private MoveEvent createMoveEvent(Project project) {
         MoveEvent moveEvent = new MoveEvent(
                 name: "Example 1", project: project,
-                inProgress: 'false').save(failOnError: true)
+                inProgress: 'false').save()
         return moveEvent
     }
 
@@ -105,7 +105,7 @@ class TaskServiceIntTests extends Specification{
                     moveBundle: moveBundle,
                     project: project
             )
-            if (!assetEntity.validate() || !assetEntity.save(failOnError: true)) {
+            if (!assetEntity.validate() || !assetEntity.save()) {
                 String etext = "Unable to create assetEntity" +
                         GormUtil.allErrorsString(assetEntity)
                 println etext
@@ -127,7 +127,7 @@ class TaskServiceIntTests extends Specification{
                     comment: "Sample for " + assetEntity.toString(),
                     commentType: AssetCommentType.TASK,
                     assetEntity: assetEntity
-            ).save(failOnError: true)
+            ).save()
 
         when:
             List<AssetComment> tasks = taskService.findAllByAssetEntity(assetEntity)
@@ -159,7 +159,7 @@ class TaskServiceIntTests extends Specification{
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
             description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
-            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
 
             AssetComment task = new AssetComment(
                     project: project,
@@ -167,7 +167,7 @@ class TaskServiceIntTests extends Specification{
                     commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
                     status: 'Ready'
-            ).save(failOnError: true)
+            ).save()
             sessionFactory.getCurrentSession().flush()
 
         when: 'invoking the api action'
@@ -188,7 +188,7 @@ class TaskServiceIntTests extends Specification{
 //            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
 //            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
 //            methodParams: '[]', reactionScripts: '{"SUCCESS": "task.done()","STATUS": "return SUCCESS","ERROR": "task.error( response.error )", "DEFAULT": "task.error( response.error )"}', reactionScriptsValid: 1,
-//            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+//            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
 //
 //            AssetComment task = new AssetComment(
 //                    project: project,
@@ -197,7 +197,7 @@ class TaskServiceIntTests extends Specification{
 //                    commentType: AssetCommentType.TASK,
 //                    apiAction: apiAction,
 //                    status: 'Ready'
-//            ).save(failOnError: true)
+//            ).save()
 //            sessionFactory.getCurrentSession().flush()
 //
 //        when: 'simulating invoking the api action at approximately the same time'
@@ -235,7 +235,7 @@ class TaskServiceIntTests extends Specification{
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId1 = task.id
 
         when: 'assign task to me is call, task gets assigned to current logged in user'
@@ -256,7 +256,7 @@ class TaskServiceIntTests extends Specification{
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING,
                     assignedTo: whom
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId2 = task.id
             taskService.assignToMe(assetCommentId2, AssetCommentStatus.READY)
         then: 'exception is thrown'
@@ -286,7 +286,7 @@ class TaskServiceIntTests extends Specification{
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId1 = task.id
 
         when: 'updating estimated start and finish time'
@@ -303,7 +303,7 @@ class TaskServiceIntTests extends Specification{
                     comment: RandomStringUtils.randomAlphanumeric(10),
                     commentType: AssetCommentType.TASK,
                     status: AssetCommentStatus.PENDING
-            ).save(failOnError: true)
+            ).save()
             final assetCommentId2 = task.id
             assetComment = taskService.changeEstTime(assetCommentId2, 2)
 

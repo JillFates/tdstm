@@ -3,10 +3,10 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
@@ -17,13 +17,11 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 	// IOC
 	@Autowired
 	SecurityService securityService
-
 	@Autowired
 	UserPreferenceService userPreferenceService
 
 	// Shared variables
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private PersonTestHelper personHelper = new PersonTestHelper()
+	private PersonTestHelper personHelper
 	private UserLogin userLogin
 	private Person person
 	private UserPreferenceEnum pref = UserPreferenceEnum.CURR_TZ
@@ -33,6 +31,7 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 	String result
 
 	void setup() {
+		personHelper  = new PersonTestHelper()
 		person = personHelper.createPerson()
 		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"])
 		securityService.assumeUserIdentity(userLogin.username, false)

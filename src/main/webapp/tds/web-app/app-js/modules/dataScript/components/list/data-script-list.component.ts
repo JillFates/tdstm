@@ -1,17 +1,28 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
-import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
-
-import { DataScriptService } from '../../service/data-script.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
-import { DataScriptViewEditComponent } from '../view-edit/data-script-view-edit.component';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+// Angular
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+// Services
+import {UserContextService} from '../../../security/services/user-context.service';
+import {DataScriptService} from '../../service/data-script.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+// Components
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {DataScriptViewEditComponent} from '../view-edit/data-script-view-edit.component';
+// Models
+import {
+	COLUMN_MIN_WIDTH,
+	DataScriptColumnModel,
+	DataScriptModel,
+	DataScriptMode,
+	ActionType
+} from '../../model/data-script.model';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {UserContextModel} from '../../../security/model/user-context.model';
+// Kendo
+import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'data-script-list',
@@ -53,7 +64,7 @@ export class DataScriptListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataScriptService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private userContext: UserContextService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.setDataGrid(this.route.snapshot.data['dataScripts']);
@@ -73,10 +84,10 @@ export class DataScriptListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${dateFormat}}`);
+		this.userContext.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${this.dateFormat}}`);
 				this.gridColumns = this.dataScriptColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}

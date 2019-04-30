@@ -1,6 +1,6 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLDomain
@@ -11,11 +11,13 @@ import com.tdsops.etl.FindCondition
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
+import spock.util.mop.ConfineMetaClassChanges
 
 @Integration
 @Rollback
@@ -66,6 +68,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can find a domain Property Name with loaded Data Value'(){
 
 		given:
@@ -86,8 +89,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.getId() == namedParams.id && it.getProjectId() == namedParams.project.getId() }*.getId()
 			}
 
@@ -150,6 +152,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity, AssetDependency])
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'(){
 
 		given:
@@ -204,15 +207,12 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.getId() == namedParams.id && it.getProjectId() == namedParams.project.id }*.getId()
 			}
 
 		and:
-			GroovyMock(AssetDependency, global: true)
-			AssetDependency.getName() >> { 'com.tds.asset.AssetDependency' }
-			AssetDependency.executeQuery(_, _) >> { String query, Map namedParams ->
+			AssetDependency.metaClass.static.executeQuery = { String query, Map namedParams ->
 				assetDependencies.findAll { it.getId() == namedParams.id }
 			}
 
@@ -283,7 +283,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can grab the reference to the FINDINGS to be used later'(){
 
 		given:
@@ -378,6 +378,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'(){
 
 		given:
@@ -398,8 +399,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -447,6 +447,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'(){
 
 		given:
@@ -467,8 +468,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				applications.findAll {
 					it.assetName == namedParams.assetName && it.project.id == namedParams.project.id
 				}*.getId()
@@ -503,6 +503,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'(){
 
 		given:
@@ -524,8 +525,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
 					applications.findAll {
 						it.getId() == namedParams.id && it.project.id == namedParams.project.id
@@ -606,6 +606,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'(){
 
 		given:
@@ -661,9 +662,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')){
 					return assetEntities.findAll { it.getProjectId() == GMDEMO.id && it.id == namedParams.id }*.getId()
 				} else if (namedParams.containsKey('assetName')){
@@ -711,6 +710,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can create a domain when not found a instance with find command'(){
 
 		given:
@@ -744,8 +744,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -819,7 +818,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenNotFound command defines an update action'(){
 
 		given:
@@ -854,8 +853,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -901,6 +899,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenFound command defines a create action'(){
 
 		given:
@@ -935,8 +934,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -979,6 +977,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '(){
 
 		given:
@@ -1013,8 +1012,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -1061,6 +1059,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can update a domain when found a instance with find command'(){
 
 		given:
@@ -1095,9 +1094,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() { 'AssetEntity' }
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -1161,6 +1158,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can load Rack domain instances and find Rooms associated'(){
 
 		given:

@@ -1,10 +1,10 @@
 package com.tdsops.etl
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -14,15 +14,15 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.junit.Ignore
 import spock.lang.Shared
 /**

@@ -1,13 +1,12 @@
 package com.tdsops.tm.domain
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.SecurityService
 
 /**
  * Provides helper functionality for the AssetEntity domain

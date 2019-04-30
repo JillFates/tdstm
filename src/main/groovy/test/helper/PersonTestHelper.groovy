@@ -4,12 +4,12 @@ package test.helper
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.party.Party
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.party.PartyRelationshipService
 
 /**
  * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other
@@ -20,9 +20,9 @@ import net.transitionmanager.service.PartyRelationshipService
  * that's the idea...
  */
 
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.apache.commons.lang3.RandomStringUtils
 
@@ -75,7 +75,7 @@ class PersonTestHelper {
 
 		Party companyParty = Party.get(company.id)
 		Person person = new Person(personMap)
-		person.save(failOnError: true, flush:true)
+		person.save(flush:true)
 
 		if(project) {
 			personService.addToProjectSecured(project, person)
@@ -110,7 +110,8 @@ class PersonTestHelper {
 		if (email == null) email = "$firstName.$lastName@" + RSU.randomAlphabetic(10) + '.com'
 
 		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email] )
-		person.save(failOnError:true)
+		personService.save(person, true)
+	//	person.save(failOnError:true)
 
 		return person
 	}

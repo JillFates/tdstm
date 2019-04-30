@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.task.AssetComment" %>
 	<g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />
 	<div class="mainbody" id="mainbody">
@@ -82,7 +83,7 @@
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" value="${assetComment.category}"></g:select>
+				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" value="${assetComment.category}"></g:select>
 				<g:if test="${assetComment.moveEvent}">
 		   		  <span style="margin-left:60px;">Move Event:</span>
 		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
@@ -107,12 +108,12 @@
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
 					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).status.inList}" value="${assetComment.status}"
+								  noSelection="['':'please select']" onChange="showResolve()" disabled="true"></g:select>
 					</g:if>
 					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).status.inList}" value="${assetComment.status}"
+								  noSelection="['':'please select']" onChange="showResolve()"></g:select>
 					</g:else>
 				</td>	
 			</tr>				
@@ -337,7 +338,7 @@
 		startprintjob({
 			onSuccess: function(){
 				jQuery.ajax({
-					url: '/task/update',
+					url: tdsCommon.createAppURL('/task/update'),
 					data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
 					type:'POST',
 					success: function(data) {
@@ -377,7 +378,7 @@
 		}
 
 		jQuery.ajax({
-			url: '/task/update',
+			url: tdsCommon.createAppURL('/task/update'),
 			data: params,
 			type:'POST',
 			success: function(data) {
@@ -395,8 +396,7 @@
 					if (status=='Started') {
 						$('#started_'+objId).hide();
 					}
-
-					timerBar.Restart();
+					progressTimer.Restart();
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -419,7 +419,7 @@
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide();
 		$('#detailTdId_'+id).css('display','none');
-		timerBar.Start();
+		progressTimer.Start();
 	}
  </script>
 

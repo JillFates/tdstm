@@ -20,21 +20,19 @@ export class DependenciesColumnModel {
 				label: 'Asset Type',
 				property: 'assetType',
 				type: 'text',
-				width: 120,
-				locked: true
+				width: 120
 			},
 			{
-				label: 'Bundle',
+				label: 'Asset Bundle',
 				property: 'assetBundle',
 				type: 'text',
 				width: 120
 			},
 			{
-				label: 'Tags Asset',
+				label: 'Asset Tags',
 				property: 'tagsAsset',
 				type: 'tags',
-				width: 220,
-				locked: false
+				width: 220
 			},
 			{
 				label: 'Type',
@@ -64,8 +62,7 @@ export class DependenciesColumnModel {
 				label: 'Dep Asset Tags',
 				property: 'tagsDependent',
 				type: 'tags',
-				width: 220,
-				locked: false
+				width: 220
 			},
 			{
 				label: 'Status',

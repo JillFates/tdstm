@@ -1,7 +1,7 @@
 package com.tdsops.common.sql
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.SizeScale
 import net.transitionmanager.search.FieldSearchData
 import spock.lang.Specification
@@ -318,6 +318,30 @@ class SqlUtilTests extends Specification {
 			'@ADMIN'         | false        || '^@ADMIN$'
 			'@ADMIN|@DBA'    | false        || '^(@ADMIN|@DBA)$'
 			'@ADMIN|@DBA'    | true         || '.*(@admin|@dba).*'
+	}
+
+	void 'Test addWhereOrAndToQuery'() {
+		when: 'setting up an empty StringBuilder'
+			StringBuilder sb = new StringBuilder()
+		and: 'calling addWhereOrAndToQuery needing WHERE'
+			Boolean needsWhere = SqlUtil.addWhereOrAndToQuery(sb, true)
+		then: 'needsWhere should always be false'
+			! needsWhere
+		and: 'the StringBuilder should contain WHERE'
+			sb.toString().contains(' WHERE ')
+		and: 'not contain AND'
+			! sb.toString().contains(' AND ')
+
+		when: 'setting up an empty StringBuilder'
+			sb = new StringBuilder()
+		and: 'calling addWhereOrAndToQuery NOT needing a WHERE'
+			needsWhere = SqlUtil.addWhereOrAndToQuery(sb, false)
+		then: 'needsWhere should always be false'
+			! needsWhere
+		and: 'the StringBuilder should NOT contain WHERE'
+			! sb.toString().contains(' WHERE ')
+		and: 'should contain AND'
+			sb.toString().contains(' AND ')
 	}
 
 }

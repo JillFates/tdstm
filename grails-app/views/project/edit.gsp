@@ -1,5 +1,5 @@
 <%@page defaultCodec="none" %>
-<%@page import="net.transitionmanager.domain.Project" %>
+<%@page import="net.transitionmanager.project.Project" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -187,7 +187,7 @@
 
 							<td class="name"><label>Time Zone:</label></td>
 							<td class="valueNW">
-								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
+								<input type="text" id="timezone" name="timezone" value="${timezone ? timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
 								<input type="button" value="Change" indextab="240" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
 

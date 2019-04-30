@@ -1,4 +1,4 @@
-<%@ page import="net.transitionmanager.security.Permission" %>
+<%@ page import="net.transitionmanager.task.AssetComment; net.transitionmanager.security.Permission" %>
 <div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 1000px" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Task':'Create Task'}}</span>
@@ -78,7 +78,7 @@
 								id="category" name="category"
 								required="true"
 								ng-model="ac.category" datasource="ds.categories"
-								from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}"
+								from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}"
 								noSelection="['':'Please select']"
 							/>
 						</td>

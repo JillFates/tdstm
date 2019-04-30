@@ -4,7 +4,7 @@ import grails.plugins.rest.client.RestResponse
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.exception.InvalidSyntaxException
 
 /**
  * Used to parse a Credential Validation Expression string and to perform

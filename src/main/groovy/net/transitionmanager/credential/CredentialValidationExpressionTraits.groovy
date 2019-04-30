@@ -1,6 +1,6 @@
 package net.transitionmanager.credential
 
-import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.exception.InvalidSyntaxException
 
 /**
  * Contains the follow on methods that used by each of the DSL methods

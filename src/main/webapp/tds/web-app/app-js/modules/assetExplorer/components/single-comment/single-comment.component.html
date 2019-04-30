@@ -56,17 +56,22 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" (click)="onSave()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" [disabled]="singleCommentModel.asset?.id === '' || singleCommentModel.comment === ''">
-					<span class="fa fa-fw fa-floppy-o"></span> Save
-				</button>
-				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-					<span class="glyphicon glyphicon-pencil"></span> Edit
-				</button>
-                <button type="button" (click)="onDelete()" class="btn btn-danger" *ngIf="singleCommentModel.modal.type !== modalType.CREATE"><span class="fa fa-fw fa-trash"></span> Delete</button>
-				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>Cancel</span>
-				</button>
+				<tds-button-save (click)="onSave()" class="btn-primary pull-left"
+				                 *ngIf="singleCommentModel.modal.type !== modalType.VIEW"
+				                 [disabled]="singleCommentModel.asset?.id === '' || singleCommentModel.comment === ''">
+				</tds-button-save>
+
+				<tds-button-edit (click)="onEdit()" class="btn-primary pull-left"
+				                 *ngIf="singleCommentModel.modal.type === modalType.VIEW">
+				</tds-button-edit>
+
+                <tds-button-delete (click)="onDelete()"
+                                   class="btn-danger"
+                                   *ngIf="singleCommentModel.modal.type !== modalType.CREATE">
+                </tds-button-delete>
+
+				<tds-button-cancel (click)="cancelCloseDialog()" class="pull-right">
+				</tds-button-cancel>
 			</div>
 		</div>
 	</div>

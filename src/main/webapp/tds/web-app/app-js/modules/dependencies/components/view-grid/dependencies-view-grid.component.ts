@@ -15,7 +15,6 @@ import {
 	map,
 	mergeMap,
 	scan,
-	switchMap,
 	takeUntil,
 	withLatestFrom,
 } from 'rxjs/operators';
@@ -33,7 +32,6 @@ import {
 	DataStateChangeEvent
 } from '@progress/kendo-angular-grid';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-// import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {
 	DependenciesService,
 	DependenciesRequestParams
@@ -347,6 +345,42 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		clonedState.gridState.filter.filters = filters;
 
 		return clonedState;
+	}
+
+	/**
+	 * Update each Filter on a manual way
+	 * @param column
+	 */
+	public onFilter(column: any): void {
+		const filters = pathOr([], ['gridState', 'filter', 'filters'], this.state)
+			.filter((item: any) => item.field !== column.property);
+
+		if (column.filter !== '') {
+			filters.push({
+				field: column.property,
+				operator: 'contains',
+				value: column.filter
+			});
+		}
+
+		const clonedState = clone(this.state);
+		clonedState.gridState.filter.filters = filters;
+		this.componentState.next(clonedState);
+	}
+
+	/**
+	 * Ensure the clean and execute the search again
+	 * @param column
+	 */
+	public onClearValue(column: any): void {
+		column.filter = '';
+
+		const filters = pathOr([], ['gridState', 'filter', 'filters'], this.state)
+			.filter((item: any) => item.field !== column.property);
+
+		const clonedState = clone(this.state);
+		clonedState.gridState.filter.filters = filters;
+		this.componentState.next(clonedState);
 	}
 
 	/**

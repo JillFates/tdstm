@@ -1,0 +1,195 @@
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" id="user-manage-staff-component" class="user-manage-staff-component modal fade in tds-ui-modal-decorator" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content resizable tds-angular-component-content"
+             tds-ui-modal-decorator=""
+             [options]="modalOptions"
+             [style.width.px]="400"
+             [style.height]="'auto'">
+
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Manage Staff</h4>
+            </div>
+            <div class="modal-body">
+                <div id="generalInfoShowId" class="person" >
+                    <form name="personDialogForm" autocomplete="off">
+                        <div class="dialog">
+                            <div>
+                                <table class="personTable">
+                                    <tbody>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Company:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span class="personShow" id="companyId" name="company">{{personModel.company}}</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>First Name:</span></td>
+                                        <td valign="top" class="value" style="width: 40px">
+                                            <span *ngIf="!editing" class="personShow" id="firstNameId" class="asset_details_block_task">{{personModel.firstName}}</span>
+                                            <input *ngIf="editing" name="firstName" [(ngModel)]="personModel.firstName"/>
+                                        </td>
+
+                                        <td rowspan="2"><img [src]="currentImageURL" (error)="currentImageURL = defaultImageURL" height="60" width="60"/></td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Middle Name:</span></td>
+                                        <td valign="top" class="value" colspan="2" width="50%">
+                                            <span *ngIf="!editing" class="personShow" id="middleNameId">{{personModel.middleName}}</span>
+                                            <input *ngIf="editing" name="middleName" [(ngModel)]="personModel.middleName"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Last Name:</span></td>
+                                        <td valign="top" class="value" colspan="2" width="50%">
+                                            <span *ngIf="!editing" class="personShow" id="lastNameId">{{personModel.lastName}}</span>
+                                            <input *ngIf="editing" name="lastName" [(ngModel)]="personModel.lastName"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Title:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="titleId">{{personModel.title}}</span>
+                                            <input *ngIf="editing" name="title" [(ngModel)]="personModel.title"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Email:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="emailId">{{personModel.email}}</span>
+                                            <input *ngIf="editing" name="email" [(ngModel)]="personModel.email"/>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="editing" class="prop">
+                                        <td valign="top" class="name"><span>Image Url:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <input name="imageUrl" [(ngModel)]="personModel.personImageURL" (input)="currentImageURL=personModel.personImageURL"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Work Phone:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="workPhoneId">{{personModel.workPhone}}</span>
+                                            <input *ngIf="editing" name="workPhone" [(ngModel)]="personModel.workPhone"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Mobile Phone:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="mobilePhoneId">{{personModel.mobilePhone}}</span>
+                                            <input *ngIf="editing" name="mobilePhone" [(ngModel)]="personModel.mobilePhone"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>City/State/Zip:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="locationId">{{personModel.location + " " + personModel.stateProv + " " + personModel.country}}</span>
+                                            <div *ngIf="editing"><input style="width:100px" name="location" [(ngModel)]="personModel.location"/><input style="width:25px" name="stateProv" [(ngModel)]="personModel.stateProv"/><input style="width:40px" name="country" [(ngModel)]="personModel.country"/></div>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Active:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="activeId">{{personModel.active}}</span>
+                                            <kendo-dropdownlist
+                                                    *ngIf="editing"
+                                                    name="active"
+                                                    [(ngModel)]="personModel.active"
+                                                    [data]="activeOptions">
+                                            </kendo-dropdownlist>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Keywords:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="keywordsId">{{personModel.keyWords}}</span>
+                                            <input *ngIf="editing" name="keywords" [(ngModel)]="personModel.keyWords"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Comments:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="commentsId">{{personModel.tdsNote}}</span>
+                                            <input *ngIf="editing" name="comments" [(ngModel)]="personModel.tdsNote"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Contact URL:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="urlId">{{personModel.tdsLink}}</span>
+                                            <input *ngIf="editing" name="url" [(ngModel)]="personModel.tdsLink"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Staff Type:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <span *ngIf="!editing" class="personShow" id="staffTypeId">{{personModel.staffType}}</span>
+                                            <kendo-dropdownlist
+                                                    *ngIf="editing"
+                                                    name="staffType"
+                                                    [(ngModel)]="personModel.staffType"
+                                                    [data]="salaryOptions">
+                                            </kendo-dropdownlist>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Can Travel:</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <input type="checkbox" [disabled]="!editing" name="canTravel" [(ngModel)]="personModel.travelOK"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="prop">
+                                        <td valign="top" class="name"><span>Team :</span></td>
+                                        <td valign="top" class="value" colspan="2">
+                                            <table style="border: 0px">
+                                                <tbody id="funcsTbodyId">
+                                                <tr id="team">
+                                                    <td>
+                                                        <div  *ngFor="let team of personModel.teams">
+                                                                <span *ngIf="!editing" class="personShow">
+                                                                    {{team.description}}
+                                                                </span>
+                                                            <div *ngIf="editing">
+                                                                <kendo-dropdownlist
+                                                                        name="{{team.description}}"
+                                                                        (ngModelChange)="updateTeamEntry(team, $event)"
+                                                                        [(ngModel)]="team.description"
+                                                                        [data]="availableTeamNames">
+                                                                </kendo-dropdownlist>
+                                                                <span class="clickable" (click)="removeTeam(team.description)">X</span>
+                                                            </div>
+                                                        </div>
+                                                        <span *ngIf="editing" class="clickable" (click)="addTeam()">Add team</span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="footer_buttons">
+                    <button *ngIf="!editing" class="btn btn-default" role="button" (click)="submitInfo()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+                    <button *ngIf="editing" (click)="submitInfo()" type="button" class="btn btn-primary pull-left">
+                        <span class="fa fa-fw fa-floppy-o"></span>
+                        <span>Update</span>
+                    </button>
+                    <button (click)="handleCancelButton()" class="btn btn-default" role="button"><span class="glyphicon glyphicon-ban-circle"></span> {{editing ? 'Cancel' : 'Close'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

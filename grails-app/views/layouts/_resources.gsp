@@ -22,12 +22,15 @@
 
 <!-- jQuery -->
 <!-- LEGACY AND SUPPORT LEGACY CODE START -->
+<%-- What is this for?  --%>
+<script type="text/javascript">
+	var contextPath = "${request.contextPath}";
+</script>
 
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds-main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'codemirror.css')}"/>
 
-<asset:stylesheet src="angular-support.css" />
 <asset:javascript src="angular-support" />
 
 <script rel="prefetch" src="${resource(dir: 'js/tinymce', file: 'tinymce.min.js')}"></script>

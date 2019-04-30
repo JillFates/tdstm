@@ -1,23 +1,23 @@
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
-import net.transitionmanager.command.PersonCO
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.command.PersonCommand
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -496,8 +496,10 @@ class PersonServiceIntegrationTests extends Specification {
 			result['deleted'] == true
 		and: 'the person and user references should be deleted'
 			// Shouldn't be able to lookup the person
-			! Person.get(newPID)
-			! UserLogin.get(userId)
+			Person.withNewSession {
+				! Person.get(newPID)
+				! UserLogin.get(userId)
+			}
 		and: 'there should be no PartyRelationship references'
 			! PartyRelationship.findAllWhere(partyIdTo: newPerson)
 		and: 'is associated as a SME on an application has been cleared'
@@ -687,11 +689,6 @@ class PersonServiceIntegrationTests extends Specification {
 			result['deleted'] == 1
 	}
 
-
-
-
-
-
 	def "17. Test for TM-6141 - Add an admin new person to a project as client staff, log in with that user, remove and re-attach itself to the project"() {
 
 		setup: 'create a person and user as staff with ADMIN role for the project client so that'
@@ -716,12 +713,14 @@ class PersonServiceIntegrationTests extends Specification {
 		and: 'the person is assigned to the project'
 		personService.isAssignedToProject(project, newPerson)
 
-		when: 'removing the newUser from the project'
+		when: 'removing the newPerson from the project'
 			personService.removeFromProject(project.id.toString(), newPerson.id.toString())
 		then: 'the person should be able to access the project'
 			personService.hasAccessToProject(newPerson, project)
 		and: 'the person is NOT assigned to the project'
-			!personService.isAssignedToProject(project, newPerson)
+			Person.withNewSession {
+				!personService.isAssignedToProject(project, newPerson)
+			}
 
 		when: 'the person re-attach himself to the project'
 			personService.addToProject(adminUser, project.id.toString(), newPerson.id.toString())
@@ -753,7 +752,7 @@ class PersonServiceIntegrationTests extends Specification {
 
 		def params = new GrailsParameterMap(mockRequest)
 		// Perform the merge of the accounts
-		def test = personService.processMergePersonRequest(toUser, new PersonCO(), params)
+		def test = personService.processMergePersonRequest(toUser, new PersonCommand(), params)
 		then: 'the From UserLogin should be switched to the To Person'
         test == "John Jeffrey Doe was merged to Jane Mary Doe"
 	}

@@ -1,11 +1,11 @@
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import spock.lang.Specification
 
 @Integration

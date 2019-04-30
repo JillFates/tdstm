@@ -1,7 +1,7 @@
 package test.helper.mock
 
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Project
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
 import org.quartz.DateBuilder
 
 import static org.quartz.DateBuilder.newDate
@@ -31,7 +31,9 @@ class ProjectMock {
 		Project project = new Project(
 				  name: projectName, projectCode: projectCode,
 				  completionDate: completionDate, description: projectDescription,
-				  client: new PartyGroup(name: projectClientName)
+				  client: new PartyGroup(name: projectClientName),
+				  workflowCode: 'STD_PROCESS',
+				  guid: UUID.randomUUID().toString()
 		)
 
 		project.id = projectId

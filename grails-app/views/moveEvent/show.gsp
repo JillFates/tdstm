@@ -48,8 +48,8 @@
                             <td class="name">Bundles:</td>
                             <td style="text-align:left;" class="valueNW">
                                 <ul>
-                                <g:each var="m" in="${moveEventInstance.moveBundles}">
-                                    <li><g:link controller="moveBundle" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></li>
+                                <g:each var="moveBundle" in="${moveBundles}">
+                                    <li><g:link controller="moveBundle" action="show" id="${moveBundle.id}">${moveBundle?.name}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>
@@ -80,7 +80,11 @@
 				            <td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estStartTime}" /></td>
 						</tr>
 						<tr class="prop">
-							<td  class="name">By-Pass API Actions:</td>
+							<td  class="name">Estimated Completion Time:</td>
+							<td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" /></td>
+						</tr>
+						<tr class="prop">
+							<td  class="name">By-Pass Actions:</td>
 							<td class="valueNW">
 								<tds:yesNo value="${moveEventInstance.apiActionBypass}"/>
 							</td>

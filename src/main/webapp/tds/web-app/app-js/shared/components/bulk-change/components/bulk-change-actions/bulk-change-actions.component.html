@@ -31,14 +31,9 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left" (click)="onNext()">
-					<span class="glyphicon glyphicon-step-forward"></span> Next
-				</button>
-
-				<button type="button" (click)="cancelCloseDialog($event)" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>Cancel</span>
-				</button>
+				<tds-button-custom title="Next" icon="step-forward" class="btn-primary pull-left" (click)="onNext()">
+				</tds-button-custom>
+				<tds-button-cancel (click)="cancelCloseDialog($event)" class="pull-right"></tds-button-cancel>
 			</div>
 		</div>
 	</div>

@@ -1,9 +1,9 @@
 package com.tdsops.etl
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.tm.enums.domain.ValidationType
@@ -15,10 +15,10 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight

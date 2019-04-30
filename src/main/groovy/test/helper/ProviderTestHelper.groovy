@@ -1,8 +1,8 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 
 import org.apache.commons.lang3.RandomStringUtils as RSU
 
@@ -23,7 +23,7 @@ class ProviderTestHelper {
                 comment: 'Test comment',
                 description: 'Test description',
                 project: project
-        ).save(flush: true, failOnError: true)
+        ).save(flush: true)
         return provider
     }
 
@@ -43,7 +43,7 @@ class ProviderTestHelper {
                     comment: providerData.comment ? providerData.comment :'Test comment',
                     description: providerData.description ? providerData.description : 'Test description',
                     project: project
-            ).save(flush: true, failOnError: true)
+            ).save(flush: true)
             return provider
         }
         return existingProvider

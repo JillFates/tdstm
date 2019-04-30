@@ -3,24 +3,24 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.AccountImportExportService
-import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.ApiCatalogService
-import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.imports.AccountImportExportService
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.ApiCatalogService
+import net.transitionmanager.action.AwsService
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.task.TaskService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
 
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_CLIENT_MGR
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_SUPERVISOR
-import static net.transitionmanager.domain.Permissions.Roles.ROLE_USER
+import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
+import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN
+import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.security.Permissions.Roles.ROLE_SUPERVISOR
+import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 
 /*
  * This controller just allows us to do some testing of things until we can move them into an integrated testcase

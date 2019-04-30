@@ -34,11 +34,6 @@
                             <li class="menu-child-item menu-admin-asset-options">
                                 <g:link controller="assetEntity" action="assetOptions">Asset Options</g:link>
                             </li>
-                            <li class="menu-child-item">
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');">help</a>
-                                </tds:hasPermission>
-                            </li>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Manage Clients</li>
                             <li class="menu-child-item menu-list-companies">
@@ -62,20 +57,10 @@
                                     <g:link controller="admin" action="exportAccounts">Export Accounts</g:link>
                                 </tds:hasPermission>
                             </li>
-                            <li class="menu-child-item">
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');">help</a>
-                                </tds:hasPermission>
-                            </li>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Manage Workflows</li>
                             <li class="menu-child-item menu-list-workflows">
                                 <g:link controller="workflow" action="home">List Workflows </g:link>
-                            </li>
-                            <li class="menu-child-item">
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a>
-                                </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Manage Model Library</li>
@@ -87,11 +72,6 @@
                             </li>
                             <li class="menu-child-item menu-sync-libraries">
                                 <g:link controller="model" action="importExport">Export Mfg & Models</g:link>
-                            </li>
-                            <li class="menu-child-item">
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a>
-                                </tds:hasPermission>
                             </li>
                         </ul>
                     </li>
@@ -130,11 +110,6 @@
                         <g:else>
                             <li class="menu-child-warn">No Project Selected</li>
                         </g:else>
-                        <tds:hasPermission permission="${Permission.HelpMenuView}">
-                            <li class="menu-child-item">
-                                <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a>
-                            </li>
-                        </tds:hasPermission>
                         <li class="divider"></li>
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
@@ -170,11 +145,6 @@
                         <tds:hasPermission permission="${Permission.RackView}">
                             <li class="menu-child-item menu-parent-data-centers-rack-elevation">
                                 <g:link controller="rackLayouts" action="create">Rack Elevations</g:link>
-                            </li>
-                        </tds:hasPermission>
-                        <tds:hasPermission permission="${Permission.HelpMenuView}">
-                            <li class="menu-child-item">
-                                <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a>
                             </li>
                         </tds:hasPermission>
                     </ul>
@@ -224,12 +194,12 @@
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Storage - Devices
+                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Physical Storage
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Storage - Logical
+                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Logical Storage
                                 </g:link>
                             </li>
                             <li class="divider"></li>
@@ -258,11 +228,6 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                <li class="menu-child-item">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a>
-                                </li>
-                            </tds:hasPermission>
                             <li class="divider"></li>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
@@ -287,11 +252,6 @@
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-manage-batches">
                                     <g:link controller="dataTransferBatch" action="list">Manage Import Batches (Excel)</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                <li class="menu-child-item">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a>
                                 </li>
                             </tds:hasPermission>
                         </ul>
@@ -325,11 +285,6 @@
                             <li class="menu-child-item menu-parent-planning-export-runbook">
                                 <g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link>
                             </li>
-                            <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                <li class="menu-child-item">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');">help</a>
-                                </li>
-                            </tds:hasPermission>
                             <li class="divider"></li>
                             <li class="menu-parent-item">Bundles</li>
                             <li class="menu-child-item menu-parent-planning-list-bundles">
@@ -340,11 +295,6 @@
                                     <g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link>
                                 </li>
                             </g:if>
-                            <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                <li class="menu-child-item">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a>
-                                </li>
-                            </tds:hasPermission>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -390,12 +340,6 @@
                                     <g:link class="mmlink" controller="assetEntity" action="importTask">Import Tasks</g:link>
                                 </li>
                             </tds:hasPermission>
-
-                            <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                <li class="menu-child-item">
-                                    <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a>
-                                </li>
-                            </tds:hasPermission>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -407,7 +351,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Live Dashboards</li>
                             <li class="menu-child-item menu-parent-dashboard-user-dashboard">
-                                <g:link controller="dashboard" action="userPortal">User Dashboard</g:link>
+                                <g:link class="mmlink" controller="module" action="user" id="dashboard">User Dashboard</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-parent-dashboard-planning-dashboard">
@@ -422,11 +366,6 @@
                                 <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
                             </tds:hasPermission>
                     --%>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -444,14 +383,14 @@
                                 <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
-                                <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
+                                <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
                                 <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
+                                    <g:link controller="module" action="reports" id="taskReport" elementId="taskReport">Task Report</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
@@ -463,13 +402,8 @@
                                 <li class="divider"></li>
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
-                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
+                                    <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
                                 </li>
-                                <tds:hasPermission permission="${Permission.HelpMenuView}">
-                                    <li class="menu-child-item">
-                                        <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a>
-                                    </li>
-                                </tds:hasPermission>
                             </tds:hasPermission>
                         </ul>
                     </li>

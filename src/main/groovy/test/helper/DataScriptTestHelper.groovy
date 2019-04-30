@@ -1,11 +1,11 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataScriptMode
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataScriptMode
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 
 /**
@@ -31,7 +31,7 @@ class DataScriptTestHelper {
                 provider: provider,
                 mode: DataScriptMode.IMPORT,
                 createdBy: createdBy
-        ).save(flush: true, failOnError: true)
+        ).save(flush: true)
         return dataScript
     }
 
@@ -49,7 +49,7 @@ class DataScriptTestHelper {
             existingDs.etlSourceCode = ''
             existingDs.dateCreated = new Date()
             existingDs.lastUpdated = existingDs.dateCreated
-            existingDs.save(flush: true, failOnError: true)
+            existingDs.save(flush: true)
             return existingDs
         } else {
             DataScript dataScript = new DataScript(
@@ -61,7 +61,7 @@ class DataScriptTestHelper {
                     provider: provider,
                     mode: DataScriptMode.IMPORT,
                     createdBy: createdBy
-            ).save(flush: true, failOnError: true)
+            ).save(flush: true)
             return dataScript
         }
     }

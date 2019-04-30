@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {ImportBatchService} from '../../service/import-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {BatchStatus, ImportBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
@@ -21,6 +21,8 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {EnumModel} from '../../../../shared/model/enum.model';
 import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
 import {ActivatedRoute} from '@angular/router';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 @Component({
 	selector: 'import-batch-list',
@@ -64,16 +66,20 @@ export class ImportBatchListComponent implements OnDestroy {
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
 		private userPreferenceService: PreferenceService,
+		private userContextService: UserContextService,
 		private route: ActivatedRoute) {
-			this.onLoad();
+
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.userTimeZone = userContext.timezone;
+				this.onLoad();
+			});
 	}
 
 	/**
 	 * On Page Load.
 	 */
 	private onLoad(): void {
-		// Fetch the user preferences for their TimeZone and DateFormat
-		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 
 		this.columnsModel = new ImportBatchColumnsModel();
 		if ( !this.canRunActions() ) {
@@ -532,6 +538,7 @@ export class ImportBatchListComponent implements OnDestroy {
 					if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
 						batch.status.code = (response.data as ImportBatchModel).status.code;
 						batch.status.label = (response.data as ImportBatchModel).status.label;
+						batch.recordsSummary = response.data.recordsSummary;
 						this.removeBatchFromQueuedLoop(batch);
 						if (batch.status.code === BatchStatus.RUNNING.toString()) {
 							this.addToRunningBatchesLoop(batch);

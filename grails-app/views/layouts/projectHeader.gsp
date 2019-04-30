@@ -403,7 +403,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
 						<ul>
-							<li><g:link class="home mmlink" controller="dashboard" action="userPortal" onclick="hideMegaMenu('dashboardMegaMenu')">User Dashboard</g:link></li>
+							<li><g:link class="home mmlink" controller="modules" action="user" link="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">User Dashboard</g:link></li>
 							<tds:hasPermission permission="${Permission.ReportViewPlanning}">
 							<li><g:link class="home mmlink" controller="moveBundle" action="planningStats" onclick="hideMegaMenu('dashboardMegaMenu')">Planning Dashboard</g:link></li>
 							</tds:hasPermission>

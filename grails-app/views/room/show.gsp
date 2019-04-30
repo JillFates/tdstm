@@ -1,5 +1,5 @@
 <%@page expressionCodec="none" %>
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <body>
@@ -127,7 +127,7 @@
 		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
 			<g:if test="${rack.rackType == 'Rack'}">
 				<a href="#" onclick="getRackLayout(${rack.id })">
-				<g:if test="${rack?.model?.layoutStyle == null}">
+					<g:if test="${ ! rack.model?.layoutStyle }">
 					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front } adjustRack">
 				</g:if>
 				<g:else>
@@ -224,7 +224,7 @@ function updateRackPower(rackId){
 	var moveBundleId = ''
 	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
-		url: "retrieveRackPowerData",
+		url: tdsCommon.createAppURL("retrieveRackPowerData"),
 		data: moveBundleId+"roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType+"&otherBundle="+otherBundle,
 		type:'POST',
 		success: function(data) {
@@ -242,7 +242,7 @@ function capacityView(){
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var roomId = "${roomInstance.id}"
 	jQuery.ajax({
-		url: "retrieveCapacityView",
+		url: tdsCommon.createAppURL("retrieveCapacityView"),
 		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {

@@ -21,8 +21,9 @@
 
 							 <!-- Toolbar Template-->
 							<ng-template kendoGridToolbarTemplate [position]="'top'">
-								<button kendoGridAddCommand type="button" class="btn btn-default add-button pull-right" id="btnAddButton">
-									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate}}</button>
+                                <tds-button-add (click)="addHandler($event)" class="add-button pull-right" 
+                                    [title]="'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate" [id]="'btnAddButton'">
+                                </tds-button-add>
 							</ng-template>
 
 							<!-- Action Buttons Column -->
@@ -33,10 +34,8 @@
 									</div>
 								</ng-template>
 								<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-									<div class="text-center">
-										<button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
-											<i class="fa fa-trash"></i>
-										</button>
+									<div class="tds-action-button-set">
+										<tds-button-delete kendoGridRemoveCommand></tds-button-delete>
 									</div>
 								</ng-template>
 							</kendo-grid-command-column>
@@ -84,6 +83,9 @@
                                                         [name]="'controlNumber' + rowIndex"
                                                         [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                                         [format]="editRows.selectedValues[rowIndex].field.constraints?.format"
+                                                        [allowNegative]="editRows.selectedValues[rowIndex].field.constraints?.allowNegative"
+                                                        [precision]="editRows.selectedValues[rowIndex].field.constraints?.precision"
+                                                        [separator]="editRows.selectedValues[rowIndex].field.constraints?.separator"
                                                         [min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
                                                         [max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
                                     </tds-number-control>
@@ -166,14 +168,10 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left" (click)="onNext()" [disabled]="!form.valid || !isAllInputEntered()">
-					<span class="glyphicon glyphicon-step-forward"></span> Next
-				</button>
-
-				<button type="button" (click)="cancelCloseDialog($event)" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>Cancel</span>
-				</button>
+                <tds-button-custom title="Next" class="btn-primary pull-left" (click)="onNext()" 
+                   icon="step-forward" [disabled]="!form.valid || !isAllInputEntered()">
+				</tds-button-custom>
+				<tds-button-cancel (click)="cancelCloseDialog($event)" class="pull-right"></tds-button-cancel>
 			</div>
 		</div>
 	</div>

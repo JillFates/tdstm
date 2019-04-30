@@ -7,12 +7,16 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
+import net.transitionmanager.action.HttpProducerService
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.SettingService
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
@@ -21,6 +25,8 @@ import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
+import test.helper.ApiCatalogTestHelper
+import test.helper.mock.ProjectMock
 
 class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<HttpProducerService>, DataTest, GrailsWebUnitTest {
 
@@ -127,9 +133,9 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 	}
 
 	def setup() {
-		project = new Project()
-		provider = new Provider(project: project)
-		apiCatalog = new ApiCatalog(project: project, provider: provider)
+		project = new ProjectMock().create()
+		provider = new Provider(name: 'provider-name', project: project)
+		apiCatalog = new ApiCatalog(name: 'api-cat', dictionary: ApiCatalogTestHelper.DICTIONARY, dictionaryTransformed: '{"key": "value"}', project: project, provider: provider)
 
 		action = new ApiAction(
 				name: 'testAction',
@@ -141,18 +147,25 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 				callbackMode: CallbackMode.DIRECT,
 				httpMethod: ApiActionHttpMethod.GET,
 				endpointUrl: 'http://zzz.about.yyy',
-				reactionScripts: '',
+				reactionScripts: '{"STATUS": "// do nothing", "SUCCESS": "// do nothing", "DEFAULT": "// do nothing"}',
+				isRemote: false,
 				provider: provider,
 				project: project
 		)
-		action.save(flush: true)
+
+		if (action.hasErrors()) {
+			println "action has errors: ${GormUtil.allErrorsString(action)}"
+		}
+
+		project.save(failOnError: true, flush: true)
+		action.save(failOnError: true, flush: true)
 	}
 
 	def cleanup() {
 		action.delete()
 		apiCatalog.delete()
 		provider.delete()
-		project.delete()
+		// project.delete()
 	}
 
 	def cleanupSpec() {

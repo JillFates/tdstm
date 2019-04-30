@@ -19,10 +19,8 @@
 				</form>
 			</div>
 			<div class="modal-footer form-group">
-				<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>{{'GLOBAL.CLOSE' | translate }}</span>
-				</button>
+				<tds-button-close (click)="cancelCloseDialog($event)" class="pull-right">
+				</tds-button-close>
 			</div>
 		</div>
 	</div>

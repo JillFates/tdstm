@@ -1,22 +1,22 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.domain.TagEvent
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagAssetService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -131,22 +131,22 @@ class BulkChangeTagIntegrationSpec extends Specification{
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
-		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
-		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
-		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
 
 		event = moveEventTestHelper.createMoveEvent(project)
 		event2 = moveEventTestHelper.createMoveEvent(project)
 
-		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true, failOnError: true)
-		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
-		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
+		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true)
+		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true)
+		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true)
 
 		tagAssetService.securityService = [
 			getUserCurrentProject  : { -> project },
@@ -172,8 +172,8 @@ class BulkChangeTagIntegrationSpec extends Specification{
 
 	void 'test bulkAdd'() {
 		setup: 'Given new tags, not yet assigned to Assets'
-			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true, failOnError: true)
-			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true, failOnError: true)
+			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true)
+			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true)
 		when: 'bulk adding the new tags to a list of assetIds'
 			BulkChangeTag.add(Application.class, [tag4.id, tag5.id], 'tagAssets', [device.id, device2.id])
 			List<TagAsset> tagAssets = tagAssetService.list(project, device.id)
@@ -200,8 +200,8 @@ class BulkChangeTagIntegrationSpec extends Specification{
 
 	void 'test bulkAdd filter query'() {
 		setup: 'Given new tags, not yet assigned to Assets, and an AssetFilterQuery'
-			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true, failOnError: true)
-			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true, failOnError: true)
+			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true)
+			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true)
 
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
@@ -294,8 +294,8 @@ class BulkChangeTagIntegrationSpec extends Specification{
 	void 'test bulkReplace'() {
 
 		setup: 'given new tags, not yet assigned to assets'
-			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true, failOnError: true)
-			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true, failOnError: true)
+			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true)
+			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true)
 		when: 'bulk replacing tags on a list of devices, with the new tags'
 			BulkChangeTag.replace(Application.class, [tag4.id, tag5.id], 'tagAssets', [device.id, device2.id])
 			List<TagAsset> tagAssets = tagAssetService.list(project, device.id)
@@ -317,8 +317,8 @@ class BulkChangeTagIntegrationSpec extends Specification{
 	void 'test bulkReplace filter query'() {
 
 		setup: 'given new tags, not yet assigned to assets, and an AssetFilterQuery'
-			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true, failOnError: true)
-			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true, failOnError: true)
+			Tag tag4 = new Tag(name: 'Cyan tag', description: 'Descriptive is it not', color: Color.Cyan, project: project).save(flush: true)
+			Tag tag5 = new Tag(name: 'Orange tag', description: 'This is not a description', color: Color.Orange, project: project).save(flush: true)
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
 					SELECT AE.id

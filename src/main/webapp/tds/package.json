@@ -5,7 +5,7 @@
   "description": "TDS has upgraded its base code to use Angular 5 Latest,",
   "author": "TransitionManager",
   "scripts": {
-    "compile-css": "node ./node_modules/gulp/bin/gulp.js --gulpfile ./src/main/webapp/tds/gulpfile.js sass-main-style --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-manager-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-manager-compiler --PROD",
+    "compile-css": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-main-style --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-manager-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-manager-compiler --PROD",
     "build-prod": "npm run compile-css & node ./node_modules/webpack/bin/webpack --profile --config ../../webapp/tds/webpack-prod.config.js --env=prod",
     "build-dev": "npm run compile-css & node ./node_modules/webpack/bin/webpack --profile --config ../../webapp/tds/webpack-dev.config.js",
     "karma-unit-test": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js build-test-report"
@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "7.2.4",
     "@angular/router": "7.2.4",
     "@progress/kendo-angular-buttons": "4.3.3",
+    "@progress/kendo-angular-menu": "^1.2.0",
     "@progress/kendo-angular-dateinputs": "3.5.4",
     "@progress/kendo-angular-dialog": "3.10.1",
     "@progress/kendo-angular-dropdowns": "3.4.2",

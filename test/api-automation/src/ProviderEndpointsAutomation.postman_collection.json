@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7eebb1af-a6b8-408b-97b8-5aaf740eee4a",
+		"_postman_id": "48057bfa-61f5-4c6d-a19e-b3b6c8bfa1f8",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -15,7 +15,7 @@
 						"id": "42907336-d108-461e-8c0f-aea4e41c9309",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"    pm.expect(pm.response.text()).to.include(\"TransitionManager\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -150,6 +150,55 @@
 						"ws",
 						"dataingestion",
 						"provider",
+						"{{providerID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b3d55562-0af3-43fc-92c8-a095fe32f56f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Information is retrieved\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"actionCount\"); ",
+							"    pm.expect(pm.response.text()).to.include(\"credentialCount\");",
+							"    pm.expect(pm.response.text()).to.include(\"etlScriptCount\");",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/wsProvider/deleteContext/{{providerID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"wsProvider",
+						"deleteContext",
 						"{{providerID}}"
 					]
 				}

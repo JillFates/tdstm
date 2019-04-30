@@ -1,14 +1,11 @@
 package com.tdsops.tm.asset.graph
 
-import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.project.MoveBundle
 
 /**
  * Struct to maintain an asset dependency graph, that allow operation like group assets by references
  */
 class AssetGraph {
-
-	static final List<String> dependecyBundlingAssetTypesUC = MoveBundle.dependecyBundlingAssetTypes*.toUpperCase()
-
 	def nodes = [:]
 
 	/**
@@ -50,7 +47,7 @@ class AssetGraph {
 		def group = []
 
 		nodes.each { assetId, node ->
-			if (!node.checked && node.assetType && dependecyBundlingAssetTypesUC.contains(node.assetType?.toUpperCase())) {
+			if (!node.checked) {
 				//If the node is not checked, then creates a new group and search for all assets/nodes related to this one
 				group = []
 				groups << group

@@ -1,26 +1,32 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
 import grails.testing.gorm.DataTest
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Provider
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
+import net.transitionmanager.project.Project
 import spock.lang.Specification
 import spock.lang.Title
+import test.helper.ApiCatalogTestHelper
+import test.helper.mock.ProjectMock
 
 @Title('Tests for the ApiAction domain class')
 class ApiActionSpec extends Specification implements DataTest{
 
-	private Project project
-	private Provider provider
-	private ApiCatalog apiCatalog
-	private ApiAction action
+	private Project      project
+	private Provider     provider
+	private ApiCatalog   apiCatalog
+	private ApiAction    action
 	private AssetComment task
-	private AssetEntity asset
+	private AssetEntity  asset
 
 	void setupSpec(){
 		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetEntity, AssetComment
@@ -45,9 +51,9 @@ class ApiActionSpec extends Specification implements DataTest{
 	"""
 
 	void setup() {
-		project = new Project()
-		provider = new Provider(project: project)
-		apiCatalog = new ApiCatalog(project: project, provider: provider)
+		project = new ProjectMock().create()
+		provider = new Provider(name: 'provider-name', project: project)
+		apiCatalog = new ApiCatalog(name: 'api-cat', dictionary: ApiCatalogTestHelper.DICTIONARY, dictionaryTransformed: '{"key": "value"}', project: project, provider: provider)
 
 		action = new ApiAction(
 				name:'testAction',
@@ -60,13 +66,15 @@ class ApiActionSpec extends Specification implements DataTest{
 				callbackMethod: 'updateTaskState',
 				callbackMode: CallbackMode.MESSAGE,
 				httpMethod: ApiActionHttpMethod.GET,
+				reactionScripts: '{"STATUS": "// do nothing", "SUCCESS": "// do nothing", "DEFAULT": "// do nothing"}',
 				isRemote: false,
+				provider: provider,
 				project: project
 		)
 		if (action.hasErrors()) {
 			println "action has errors: ${GormUtil.allErrorsString(action)}"
 		}
-		action.save(flush:true)
+		action.save(failOnError:true, flush:true)
 
 		asset = new AssetEntity(
 				assetName:'fubarsvr01',

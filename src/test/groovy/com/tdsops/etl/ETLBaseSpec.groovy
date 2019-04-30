@@ -9,10 +9,11 @@ import getl.excel.ExcelDataset
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -143,7 +144,8 @@ abstract class ETLBaseSpec extends Specification {
 		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 			XSSFRow currentRow = sheet.createRow(rowNumber)
 			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
+				Cell cell = currentRow.createCell(columnNumber)
+				WorkbookUtil.setCellValue(cell, cellContent)
 			}
 		}
 	}
@@ -163,8 +165,9 @@ abstract class ETLBaseSpec extends Specification {
 			Sheet sheet = workbook.createSheet(sheetName)
 			sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 				XSSFRow currentRow = sheet.createRow(rowNumber)
-				line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-					currentRow.createCell(columnNumber).setCellValue(cellContent)
+				line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+					Cell cell = currentRow.createCell(columnNumber)
+					WorkbookUtil.setCellValue(cell, cellContent)
 				}
 			}
 		}

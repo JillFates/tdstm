@@ -49,7 +49,7 @@ export class ValidationUtils {
 	 * @returns {boolean}
 	 */
 	public static isEmptyObject(object: any): boolean {
-		return Object.keys(object).length === 0 && object.constructor === Object;
+		return object !== null && Object.keys(object).length === 0 && object.constructor === Object;
 	}
 
 	/**

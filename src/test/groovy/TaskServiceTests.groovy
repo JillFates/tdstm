@@ -1,21 +1,21 @@
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tds.asset.CommentNote
-import com.tds.asset.TaskDependency
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.Workflow
-import net.transitionmanager.domain.WorkflowTransition
-import net.transitionmanager.service.SequenceService
-import net.transitionmanager.service.TaskService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.project.WorkflowTransition
+import net.transitionmanager.common.SequenceService
+import net.transitionmanager.task.TaskService
 import org.joda.time.DateTime
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -54,14 +54,14 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				client: new PartyGroup(name: 'client'),
 				workflowCode: '12345',
 				guid: StringUtil.generateGuid()
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			AssetComment task = new AssetComment(
 				comment: 'a comment',
 				commentType: 'comment',
 				project: project,
 				status: 'Planned'
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
 
@@ -475,10 +475,10 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 		setup:
 			service.sequenceService = Mock(SequenceService)
 			Workflow workflow = new Workflow(process: 'process')
-			workflow.save(failOnError: true, flush: true)
+			workflow.save(flush: true)
 
 			RoleType role = new RoleType(id: 'ROLE_SECURITY', type: 'ROLE_SECURITY', level: 0)
-			role.save(failOnError: true, flush: true)
+			role.save(flush: true)
 
 			WorkflowTransition workflowTransition = new WorkflowTransition(
 				category: 'Category',
@@ -493,7 +493,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				duration_scale: TimeScale.D,
 				code: 'code')
 
-			workflowTransition.save(failOnError: true, flush: true)
+			workflowTransition.save(flush: true)
 
 
 		when:
@@ -508,7 +508,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				client: new PartyGroup(name: 'client'),
 				workflowCode: workflowTransition.code,
 				guid: StringUtil.generateGuid()
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 			def taskList = [:]
 			def taskSpec = [:]

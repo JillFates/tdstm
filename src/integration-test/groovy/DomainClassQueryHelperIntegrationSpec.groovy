@@ -1,5 +1,5 @@
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessorException
@@ -9,18 +9,18 @@ import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelAlias
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.imports.DataImportService
+import net.transitionmanager.common.FileSystemService
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -127,7 +127,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomSource = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomSource: device.roomSource.roomName])
@@ -142,7 +142,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomTarget = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomTarget: device.roomTarget.roomName])
@@ -157,7 +157,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomSource = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationSource: device.roomSource.location])
@@ -172,7 +172,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomTarget = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationTarget: device.roomTarget.location])
@@ -269,7 +269,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			device.roomSource = roomTestHelper.createRoom(project)
 			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
 			device.rackSource = rack
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackSource: rack.tag])
@@ -286,7 +286,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			device.roomSource = roomTestHelper.createRoom(project)
 			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
 			device.rackTarget = rack
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackTarget: rack.tag])
@@ -384,7 +384,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			MoveBundle bundle = moveBundleTestHelper.createBundle(project, 'TEST')
 			MoveEvent event = moveEventTestHelper.createMoveEvent(project)
-			bundle.save(failOnError: true, flush: true)
+			bundle.save(flush: true)
 
 		when:
 			DomainClassQueryHelper.where(
@@ -423,7 +423,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomSource = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -443,7 +443,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomTarget = roomTestHelper.createRoom(project)
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -597,7 +597,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.priority = 6
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -621,7 +621,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.priority = 6
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -644,7 +644,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.department = null
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -668,7 +668,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.department = null
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -707,7 +707,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 	void '35. can find Model by a modelName and manufacturer id'() {
 
 		given:
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName: 'BladeCenter HS20',
@@ -718,7 +718,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Model,
@@ -735,7 +735,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 	void '36. can find Model by a modelName and manufacturer id Integer value'() {
 
 		given:
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName: 'BladeCenter HS20',
@@ -746,7 +746,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Model,
@@ -771,7 +771,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName: 'BladeCenter HS20',
@@ -782,11 +782,11 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -810,7 +810,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
 
-			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(flush: true)
 
 			Model model = new Model(
 				modelName: 'BladeCenter HS20',
@@ -821,11 +821,11 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 				type: "Power",
 				connectorPosX: 250,
 				connectorPosY: 90
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
@@ -864,7 +864,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 			List results
 
 		when: "find Device by 'manufacturer' eq 1122l into 'id'"
@@ -959,7 +959,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.model = model
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 			List results
 
 		when: "find Device by 'model' eq model.id into 'id'"
@@ -1193,7 +1193,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.model = model
 			device.manufacturer = manufacturer
-			device.save(failOnError: true, flush: true)
+			device.save(flush: true)
 
 			List results
 
@@ -1270,7 +1270,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 				asset: asset,
 				dependent: dependent,
 				status: AssetDependencyStatus.VALIDATED
-			).save(flush: true, failOnError: true)
+			).save(flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Dependency,
@@ -1301,7 +1301,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			manufacturer = Manufacturer.findOrSaveWhere(name: manufacturerName)
 			new ManufacturerAlias(
 				name: manufacturerAliasName, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return manufacturer
@@ -1324,7 +1324,7 @@ class DomainClassQueryHelperIntegrationSpec extends Specification{
 			model = Model.findOrSaveWhere(modelName: modelName, manufacturer: manufacturer)
 			new ModelAlias(
 				name: modelAliasName, model: model, manufacturer: manufacturer
-			).save(failOnError: true, flush: true)
+			).save(flush: true)
 		}
 
 		return model

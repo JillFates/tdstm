@@ -1,8 +1,8 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
 
 @Transactional
 class TagTestHelper {

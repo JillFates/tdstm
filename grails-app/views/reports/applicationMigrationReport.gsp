@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetComment"%>
+<%@page import="net.transitionmanager.task.AssetComment"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>

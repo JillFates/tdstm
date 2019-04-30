@@ -1,15 +1,15 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetType
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.CloneAssetCommand
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Tag
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.tag.Tag
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.tag.TagAssetService
 import spock.lang.See
 import spock.lang.Specification
 
@@ -227,9 +227,9 @@ class AssetEntityServiceTests extends Specification{
 			Application app = assetHelper.createApplication(person, project)
 			assert app
 		and: 'some tags are added to the asset'
-			Tag tag1 = new Tag(name: 'first tag', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'second tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'third tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
+			Tag tag1 = new Tag(name: 'first tag', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+			Tag tag2 = new Tag(name: 'second tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+			Tag tag3 = new Tag(name: 'third tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
 			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
 			app.refresh() // needed to refresh because of Grails test transaction caching entities
 		and: 'the clone method is called'

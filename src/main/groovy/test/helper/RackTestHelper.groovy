@@ -1,11 +1,11 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 
 @Transactional
 class RackTestHelper {
@@ -33,7 +33,7 @@ class RackTestHelper {
 		rack.powerB = powerB
 		rack.powerC = powerC
 		rack.rackType = rackType
-		rack.save(failOnError: true)
+		rack.save()
 		return rack
 	}
 }

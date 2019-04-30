@@ -3,8 +3,8 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.exception.InvalidParamException
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
@@ -20,7 +20,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 		when: 'calling a file with valid naming'
 			fileSystemService.validateFilename('abc123')
 		then: 'no exception should have been thrown'
-			true == true
+			noExceptionThrown()
 
 		when: 'calling with a file separator in the name'
 			String filename = 'abc' + File.separator + '123'

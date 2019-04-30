@@ -1,21 +1,21 @@
 package com.tdsops.etl
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.NumberUtil
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import spock.lang.See
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
@@ -46,7 +46,6 @@ class ETLFindSpec extends ETLBaseSpec {
 		}
 		fileSystemService(FileSystemService) {
 			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
 		}
 	}
 
@@ -2375,7 +2374,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							originalValue == '152255'
 							value == 152255l
 							init == null
-							errors == ['The find/elseFind command(s) found multiple records']
+							errors == [DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS]
 							warn == false
 							assertWith(find) {
 								matchOn == 0
@@ -3518,7 +3517,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
+			AssetEntity.getName() >> 'net.transitionmanager.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
 			}
@@ -3650,7 +3649,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
+			AssetEntity.getName() >> 'net.transitionmanager.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
 			}

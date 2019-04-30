@@ -6,15 +6,15 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import net.transitionmanager.command.CredentialCommand
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
-import net.transitionmanager.service.CredentialService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectRequiredException
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.action.Credential
+import net.transitionmanager.project.Project
+import net.transitionmanager.action.Provider
+import net.transitionmanager.security.CredentialService
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
+import net.transitionmanager.security.SecurityService
 import org.hibernate.SessionFactory
 import spock.lang.Shared
 import spock.lang.Specification
@@ -81,7 +81,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredential = credentialService.findById(credential.id)
         then:
@@ -94,7 +94,7 @@ class CredentialServiceIntegrationSpec extends Specification{
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredentials = credentialService.findAllByProject(project)
         then:
@@ -109,7 +109,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
         when:
             def foundCredentials = credentialService.findAllByProvider(provider)
         then:
@@ -124,7 +124,7 @@ class CredentialServiceIntegrationSpec extends Specification{
 
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
-            credential.save(flush: true, failOnError: true)
+            credential.save(flush: true)
             final Long id = credential.id
         when: 'the credential is deleted'
             credentialService.delete(id)

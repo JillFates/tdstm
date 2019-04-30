@@ -1,16 +1,12 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetOptions.AssetOptionsType
-import com.tds.asset.AssetType
+
+import net.transitionmanager.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.project.Project
 
 /**
  * DeviceUtils

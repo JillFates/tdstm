@@ -47,9 +47,10 @@
 							<table class="table table-hover table-striped">
 								<thead>
 									<tr>
-										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
+										<th class="text-center no-action">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
 
-										<th (click)="changeSort(column.property)" *ngFor="let column of gridColumns" [ngClass]="{'text-center': column?.property === 'isFavorite'}">
+										<th (click)="changeSort(column.property)" *ngFor="let column of gridColumns"
+										    [ngClass]="column.cellClass || ''">
 											{{ column.label | translate }}
 											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': column?.sort?.isSorting && column.sort.isAscending ,
 												  'k-i-sort-desc-sm': column?.sort?.isSorting && !column.sort.isAscending}"></span>

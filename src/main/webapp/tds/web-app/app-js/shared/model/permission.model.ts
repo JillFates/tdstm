@@ -48,6 +48,7 @@ export class Permission {
 	static DataTransferBatchView = 'DataTransferBatchView';
 	static DepAnalyzerGenerate = 'DepAnalyzerGenerate';
 	static DepAnalyzerView = 'DepAnalyzerView';
+	static EarlyAccessTMR = 'EarlyAccessTMR';
 	static EventChangeStatus = 'EventChangeStatus';
 	static EventCreate = 'EventCreate';
 	static EventDashboardDialOverride = 'EventDashboardDialOverride';

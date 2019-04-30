@@ -12,6 +12,9 @@ import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {PREFERENCES_LIST, IMPORT_BATCH_PREFERENCES, PreferenceService} from '../../../../shared/services/preference.service';
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {UserContextModel} from '../../../security/model/user-context.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UserContextService} from '../../../security/services/user-context.service';
 
 @Component({
 	selector: 'import-batch-detail-dialog',
@@ -57,17 +60,23 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		private importBatchService: ImportBatchService,
 		private activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
-		private userPreferenceService: PreferenceService) {
-			this.batchRecords = [];
-			this.prepareColumnsModel();
-			this.onLoad();
+		private userPreferenceService: PreferenceService,
+		private userContextService: UserContextService) {
+
+		this.userContextService.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				this.dateTimeFormat = userContext.dateFormat + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
+
+				this.batchRecords = [];
+				this.prepareColumnsModel();
+				this.onLoad();
+			});
 	}
 
 	/**
 	 * On Page Load
 	 */
 	private onLoad(): void {
-		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe( res => {
 			if (res) {
 				this.importBatchPreferences = JSON.parse(res);
@@ -129,6 +138,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
 			column.type = 'dynamicValue';
+			column.property = 'dynamicValue';
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);

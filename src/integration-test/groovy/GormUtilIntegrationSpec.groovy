@@ -1,26 +1,30 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import com.tds.test.TestDomain
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
 import grails.test.mixin.integration.Integration
 import grails.validation.Validateable
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Workflow
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
+import net.transitionmanager.action.Credential
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
+import net.transitionmanager.notice.Notice
+import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.Workflow
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
@@ -36,6 +40,7 @@ class GormUtilIntegrationSpec extends Specification {
 	PersonTestHelper personHelper
 	ProjectService projectService
 	ProjectTestHelper projectHelper
+	CustomDomainService customDomainService
 
 	@Shared
 	Project sharedProject
@@ -43,7 +48,35 @@ class GormUtilIntegrationSpec extends Specification {
 	@Shared
 	Person sharedPerson
 
+	// Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
+	// After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
+	// as a resource for the application.
+	private static final String fieldSpecDefinitionJson = 'CustomDomainServiceTests_FieldSpec.json'
+
+	/**
+	 * This will load the JSON file that accompanies this test suite and will return
+	 * it as a JSONObject.
+	 */
+	private JSONObject loadFieldSpecJson() {
+		// Determine where we can write the resource file for testing
+		// this.class.classLoader.rootLoader.URLs.each{ println it }
+		// We'll only load it the first time and cache it into fieldSpecJson
+		JSONObject fieldSpecJson
+		if (!fieldSpecJson) {
+			String jsonText = this.getClass().getResource( fieldSpecDefinitionJson ).text
+			fieldSpecJson = new JSONObject(jsonText)
+			assert fieldSpecJson
+			// println "\n\n$fieldSpecJson\n\n"
+		}
+		return fieldSpecJson
+	}
+
 	def setup() {
+		// Clone the Field Specifications Setting records
+		Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
+		Setting.findAllByProject(defProject)*.delete(flush:true)
+		customDomainService.saveFieldSpecs(defProject, CustomDomainService.ALL_ASSET_CLASSES, loadFieldSpecJson())
+
 		assetHelper = new AssetTestHelper()
 		personHelper = new PersonTestHelper()
 		projectHelper = new ProjectTestHelper()
@@ -401,38 +434,38 @@ class GormUtilIntegrationSpec extends Specification {
 
 	}
 
-	/*
+
 	void '19. testGetDomainPropertiesWithConstraint'() {
 
 		def list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable', true).sort()
-		assertEquals 'Test "nullable" for true', ['age', 'label'], list
+		['age', 'label'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable', false).sort()
-		assertEquals 'Test "nullable" for false', ['color', 'name', 'note', 'score'], list
+		['color', 'name', 'note', 'score'] == list
 
 		// nullable is always set regardless
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'nullable').sort()
-		assertEquals 'Test "nullable" for null', ['age', 'color', 'label', 'name', 'note', 'score'], list
+		['age', 'color', 'label', 'name', 'note', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank', true).sort()
-		assertEquals 'Test "blank" for true', ['color', 'label', 'note'], list
+		['color', 'label', 'note'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank', false).sort()
-		assertEquals 'Test "blank" for false', ['age', 'name', 'score'], list
+		['age', 'name', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank').sort()
-		assertEquals 'Test "blank" for null', ['age', 'color', 'label', 'name', 'note', 'score'], list
+		['age', 'color', 'label', 'name', 'note', 'score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (1..5) ).sort()
-		assertEquals 'Test "range" matching', ['score'], list
+		['score'] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (2..4) )
-		assertEquals 'Test "range" no matching', [], list
+		[] == list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range').sort()
-		assertEquals 'Test "range" for null', ['score'], list
+		['score'] == list
 
 		//
 		// inList functionality doesn't work presently
@@ -450,7 +483,7 @@ class GormUtilIntegrationSpec extends Specification {
 			// note
 			// score inList:[1,2,3,4,5]
 	}
-
+/*
 	// tests the GormUtil.flushAndClearSession and mergeWithSession functionality
 	void '20. testFlushAndClearSession()'' {
 		def session = sessionFactory.getCurrentSession()
@@ -599,11 +632,11 @@ class GormUtilIntegrationSpec extends Specification {
 	void '24. test the getDomainClass'() {
 		// Note that these are duplicated in Unit since this method works differently in Unit vs all other modes
 		when: 'getDomainClass is called for a domain class'
-			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+			def dc = GormUtil.getDomainClass(AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
 			'org.grails.orm.hibernate.cfg.HibernatePersistentEntity' == dc.getClass().getName()
 		and: 'the name should be AssetEntity'
-			'com.tds.asset.AssetEntity' == dc.name
+			'net.transitionmanager.asset.AssetEntity' == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)

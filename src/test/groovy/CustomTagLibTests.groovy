@@ -2,9 +2,9 @@ import asset.pipeline.grails.AssetProcessorService
 import com.tdssrc.grails.TimeUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.person.Person
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserPreference
 import org.grails.web.mapping.DefaultLinkGenerator
 import test.AbstractUnitSpec
 
@@ -23,7 +23,7 @@ class CustomTagLibTests extends AbstractUnitSpec {
 	private Date testDate
 
 	void setup() {
-		testDate = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-20T01:00:00-0000', new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))
+		testDate = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-20T10:00:00-0000', new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))
 
 		login()
 	}
@@ -83,9 +83,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                    | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 01:00 AM'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '08/19/2012 10:00 PM'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '08/19/2012 09:00 PM'
+		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 10:00 AM'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 07:00 AM'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '08/20/2012 06:00 AM'
 	}
 
 	void 'Test tds:convertDateTime tag with LITTLE_ENDIAN'() {
@@ -100,9 +100,9 @@ class CustomTagLibTests extends AbstractUnitSpec {
 
 		where:
 		timezone                            | format                    | expectedValue
-		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 01:00 AM'
-		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '19/08/2012 10:00 PM'
-		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '19/08/2012 09:00 PM'
+		'GMT'                               | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 10:00 AM'
+		'America/Argentina/Buenos_Aires'    | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 07:00 AM'
+		'America/New_York'                  | TimeUtil.FORMAT_DATE_TIME | '20/08/2012 06:00 AM'
 	}
 
 	void testTextAsLink() {

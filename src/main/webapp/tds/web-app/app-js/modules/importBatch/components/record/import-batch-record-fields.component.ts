@@ -1,17 +1,15 @@
 import {
 	Component,
-	ElementRef,
 	EventEmitter,
 	Input,
 	OnInit,
 	Output,
-	ViewChild
 } from '@angular/core';
 import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {DataResult, GroupDescriptor, process, State} from '@progress/kendo-data-query';
+import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -189,6 +187,13 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 
 			// Determine what action should be shown for the Current Value column
 			let currentValueAction: CurrentValueAction;
+			// Fix issues with bad data when expected properties of the field are undefined.
+			fields[fieldName].init = fields[fieldName].init ? fields[fieldName].init : {};
+			fields[fieldName].update = fields[fieldName].update ? fields[fieldName].update : {};
+			fields[fieldName].create = fields[fieldName].create ? fields[fieldName].create : {};
+			fields[fieldName].errors = fields[fieldName].errors ? fields[fieldName].errors : {};
+			fields[fieldName].value = fields[fieldName].value ? fields[fieldName].value : {};
+			fields[fieldName].find = fields[fieldName].find ? fields[fieldName].find : {};
 			if (this.batchRecord.status.code === BatchStatus.PENDING) {
 				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.EditValue : CurrentValueAction.EditInit
 			} else {
@@ -271,10 +276,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
 		for (let field of this.fieldsInfo) {
+			if (!field.importValue) {
+				field.importValue = '';
+			}
 			const newFieldValue = {fieldName: field.name, value: field.importValue};
 			newFieldsValues.push(newFieldValue);
-
-		}
+			}
 		this.importBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
 				this.loadRecordFieldDetails();

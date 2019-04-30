@@ -1,8 +1,8 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.service.ManufacturerService
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
+import net.transitionmanager.asset.ManufacturerService
 import spock.lang.Specification
 
 @Integration

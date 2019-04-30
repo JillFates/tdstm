@@ -430,6 +430,16 @@ class UrlMappings {
 			action = [POST:"addNote"]
 		}
 
+		"/ws/task/$id/changeTime" {
+			controller = "wsTask"
+			action = [POST:"changeEstTime"]
+		}
+
+		"/ws/task/$id/updateStatus" {
+			controller = "wsTask"
+			action = [POST:"updateStatus"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [
@@ -468,6 +478,36 @@ class UrlMappings {
 		"/ws/user/modelForStaffViewEdit/$id" {
 			controller = "wsUser"
 			action = [ GET: "modelForStaffViewEdit" ]
+		}
+
+		"/ws/user/modelForUserDashboard/$id?" {
+			controller = "wsUser"
+			action = [ GET: "modelForUserDashboard" ]
+		}
+
+		"/ws/user/assignedEvents" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedEvents" ]
+		}
+
+		"/ws/user/assignedEventNews" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedEventNews" ]
+		}
+
+		"/ws/user/assignedTasks" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedTasks" ]
+		}
+
+		"/ws/user/assignedApplications" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedApplications" ]
+		}
+
+		"/ws/user/assignedPeople" {
+			controller = "wsUser"
+			action = [ GET: "getAssignedPeople" ]
 		}
 
         "/ws/user/mapAreas" {
@@ -599,7 +639,14 @@ class UrlMappings {
 		"/ws/notices/$id/ack" {
 			controller = "wsNotice"
 			action = [
-					POST: "ack"
+					POST: "acknowledge"
+			]
+		}
+
+		"/ws/notice/fetchPostNotices" {
+			controller = "wsNotice"
+			action = [
+					GET: "fetchPostLoginNotices"
 			]
 		}
 
@@ -618,9 +665,6 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
-			constraints {
-				id(matches:/[0-9]{1,}/)
-			}
 		}
 
 		// Licensing Information
@@ -1209,6 +1253,42 @@ class UrlMappings {
 					POST: "generateCheckList"
 			]
 		}
+
+		"/ws/reports/tasksReport" {
+			controller = "wsReports"
+			action = [
+					POST: "tasksReport"
+			]
+		}
+
+        "/ws/reports/moveBundles" {
+            controller = "wsReports"
+            action = [
+                    GET: "moveBundles"
+            ]
+        }
+
+        "/ws/reports/generateServerConflicts" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateServerConflicts"
+            ]
+        }
+
+        "/ws/reports/smeList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "smeList"
+            ]
+        }
+
+        "/ws/reports/generateApplicationMigration/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "applicationMigrationLists",
+                    POST: "generateApplicationMigration"
+            ]
+        }
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

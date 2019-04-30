@@ -1,10 +1,10 @@
 package test.helper
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional
@@ -19,7 +19,7 @@ class AssetEntityTestHelper {
 				retireDate: new Date()
         )
 
-		assetEntity.save(flush: true, failOnError: true)
+		assetEntity.save(flush: true)
 
         return assetEntity
     }

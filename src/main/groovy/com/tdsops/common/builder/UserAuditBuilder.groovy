@@ -3,10 +3,10 @@ package com.tdsops.common.builder
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.UserAuditClassification
 import com.tdsops.tm.enums.domain.UserAuditSeverity
-import net.transitionmanager.UserAudit
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.UserAudit
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.security.SecurityService
 import org.springframework.web.context.request.RequestContextHolder
 
 import static com.tdsops.tm.enums.domain.UserAuditClassification.ADMIN
