@@ -710,6 +710,7 @@ class ReportsController implements ControllerMethods {
 
 	/**
 	 * Used to generate Application Migration Report.
+     * @deprecated Replace by angular report on WSReportsController
 	 */
 	def generateApplicationMigration() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')

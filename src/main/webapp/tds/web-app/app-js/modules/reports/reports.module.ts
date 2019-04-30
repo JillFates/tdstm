@@ -16,14 +16,16 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
-// Components
-import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
+// Components
+import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
+import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
+import {ReportToggleFiltersComponent} from './components/report-toggle-filters.component';
 
 @NgModule({
 	imports: [
@@ -46,7 +48,9 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 	declarations: [
 		PreEventCheckListSelectorComponent,
 		TaskReportComponent,
-		ServerConflictsReportComponent
+		ServerConflictsReportComponent,
+		ApplicationEventResultsReportComponent,
+		ReportToggleFiltersComponent,
 	],
 	providers: [
 		ReportsService,
