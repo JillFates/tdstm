@@ -1,13 +1,12 @@
 package net.transitionmanager.controller
 
-import spock.lang.Specification
-import spock.lang.Shared
-import spock.lang.Unroll
-import spock.lang.IgnoreRest
-import com.tds.asset.Application
+import net.transitionmanager.asset.Application
 import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.service.InvalidParamException
-import org.codehaus.groovy.grails.exceptions.GrailsDomainException
+import net.transitionmanager.exception.InvalidParamException
+import org.grails.core.exceptions.GrailsDomainException
+import spock.lang.Shared
+import spock.lang.Specification
+import spock.lang.Unroll
 
 class PaginationMethodsUtilSpec extends Specification {
 
