@@ -276,7 +276,7 @@ class Model {
 	}
 
 	// all fields with their labels which are used in model List jqgrid.
-	static final Map<String, String> modelFieldsAndlabels = [
+	static final Map<String, String> modelFieldsAndLabels = [
 		description: 'Description', assetType: 'Asset Type', layoutStyle: 'Layout Style', bladeRows: 'Blade Rows',
 		modelScope: 'Model Scope', bladeCount: 'Blade Count', bladeLabelCount: 'Blade Label Count',
 		bladeHeight: 'Blade Height', usize: 'USize', useImage: 'Use Image', height: 'Height', weight: 'Weight',
