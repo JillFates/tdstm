@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 
 class Room {
@@ -72,9 +73,10 @@ class Room {
 	}
 
 	String getRoomAddress(String forWhom) {
-		(address ? (forWhom == 'link' ? address : address + '<br/>') : '') +
-				(city ?: '') +
-				(stateProv ? ', ' + stateProv : '') +
+		String safeAddress = HtmlUtil.escape(address)
+		return (safeAddress ? (forWhom == 'link' ? safeAddress : safeAddress + '<br/>') : '') +
+				(HtmlUtil.escape(city)) +
+				(stateProv ? ", ${HtmlUtil.escape(stateProv)}" : '') +
 				(postalCode ? '  ' + postalCode : '') +
 				(country ? ' ' + country : '')
 	}
