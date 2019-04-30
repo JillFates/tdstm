@@ -9,7 +9,7 @@ class RolePermissions {
 	static belongsTo = [permission: Permissions]
 
 	static constraints = {
-		role blank: false
+		role blank: false, size: 1..255
 	}
 
 	static mapping = {
