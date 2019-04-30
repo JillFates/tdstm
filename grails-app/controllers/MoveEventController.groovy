@@ -69,10 +69,6 @@ class MoveEventController implements ControllerMethods {
 			if (params.runbookStatus) {
 				ilike('runbookStatus', "%$params.runbookStatus%")
 			}
-			def newsBM = retrieveNewsBMList(params.newsBarMode)
-			if (newsBM) {
-				'in'('newsBarMode', newsBM)
-			}
 			order(params.sord == "desc"? Order.desc(sortIndex).ignoreCase():Order.asc(sortIndex).ignoreCase())
 		}
 
@@ -247,21 +243,19 @@ class MoveEventController implements ControllerMethods {
 				news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
 			}
 
-			// append recent tasks  whose status is completed, moveEvent is newsBarMode
+			// append recent tasks  whose status is completed
 			def transitionComment = new StringBuilder()
-			if (moveEvent.newsBarMode == "on") {
-				def today = new Date()
-				def currentPoolTime = new Timestamp(today.getTime())
-				def tasksCompList = jdbcTemplate.queryForList("""
-					SELECT comment, date_resolved AS dateResolved FROM asset_comment
-					WHERE project_id=?
-					  AND move_event_id=?
-					  AND status='Completed'
-					  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
-				""", moveEvent.project.id, moveEvent.id, currentPoolTime, currentPoolTime)
-				tasksCompList.each {
-					transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
-				}
+			def today = new Date()
+			def currentPoolTime = new Timestamp(today.getTime())
+			def tasksCompList = jdbcTemplate.queryForList("""
+				SELECT comment, date_resolved AS dateResolved FROM asset_comment
+				WHERE project_id=?
+				  AND move_event_id=?
+				  AND status='Completed'
+				  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
+			""", moveEvent.project.id, moveEvent.id, currentPoolTime, currentPoolTime)
+			tasksCompList.each {
+				transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
 			}
 
 			def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
@@ -423,25 +417,5 @@ class MoveEventController implements ControllerMethods {
 		}
 
 		render assetAffected
-	}
-
-	/**
-	 * Filters newsBarMode property]; as we are displaying different label in list so user may search
-	 * according to displayed label but in DB we have different values what we are displaying in label
-	 * e.g. for auto - Auto Start, true - Started ..
-	 * @param newsBarMode with what character user filterd newsBarMode property
-	 * @return matched db property of newsBarMode
-	 */
-	@HasPermission(Permission.EventView)
-	private List<String> retrieveNewsBMList(String newsBarMode) {
-		if (!newsBarMode) return null
-
-		List<String> returnList = []
-		['Auto Start': 'auto', Started: 'on', Stopped: 'off'].each { String key, String value ->
-			if (StringUtils.containsIgnoreCase(key, newsBarMode)) {
-				returnList << value
-			}
-		}
-		return returnList
 	}
 }

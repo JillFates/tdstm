@@ -1489,7 +1489,7 @@ class AdminController implements ControllerMethods {
 
 		MoveEvent.list().each { MoveEvent moveEvent ->
 			Long completion = moveEventService.getEventTimes(moveEvent.id)?.completion?.time
-			if (moveEvent.newsBarMode == 'on' || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
+			if ((completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
 				MoveEventSnapshot snapshot = MoveEventSnapshot.findByMoveEvent(moveEvent, [sort: 'dateCreated', order: 'DESC'])
 				String status = ''
 				if (snapshot) {

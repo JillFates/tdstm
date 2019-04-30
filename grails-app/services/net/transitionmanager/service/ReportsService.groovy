@@ -530,10 +530,7 @@ class ReportsService implements ServiceMethods {
 		}
 
 		String newsBarModeError
-		if (moveEvent.newsBarMode == 'on') {
-			eventErrorList << 'Project'
-			newsBarModeError = redSpan(moveEvent.name + ': MoveEvent In Progress')
-		} else if (moveEventCompletiondate < project.startDate) {
+		if (moveEventCompletiondate < project.startDate) {
 			eventErrorList << 'Project'
 			newsBarModeError = redSpan(moveEvent.name + ': MoveEvent In Past', '', false)
 		} else {
