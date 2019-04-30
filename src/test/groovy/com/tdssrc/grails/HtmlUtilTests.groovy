@@ -34,12 +34,12 @@ class HtmlUtilTests extends Specification {
 	}
 
 	/**
-	 * Test out the safe functionality that will encode text appropriately
+	 * Test out the escape functionality that will encode text appropriately
 	 */
 	@Unroll
-	void 'test out safe HTML'() {
+	void 'test out escape HTML'() {
 		expect:
-			result == HtmlUtil.safe(value)
+			result == HtmlUtil.escape(value)
 
 		where:
 			value 			| result
