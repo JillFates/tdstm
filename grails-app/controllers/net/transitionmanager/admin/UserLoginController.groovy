@@ -83,6 +83,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 			username: params.username,
 			fullname: params.fullname,
 			roles: params.roles,
+			isLocal: params.isLocal,
 			company: params.company,
 			lastLogin: params.lastLogin,
 			dateCreated: params.dateCreated,
