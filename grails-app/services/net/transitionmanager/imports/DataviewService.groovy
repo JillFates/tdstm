@@ -3,40 +3,42 @@
  */
 package net.transitionmanager.imports
 
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.person.FavoriteDataview
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
+import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
@@ -651,9 +653,56 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	private String hqlColumns(DataviewSpec dataviewSpec){
-		return dataviewSpec.columns.collect { Map column ->
+		return dataviewSpec.columns.findAll{ it['property'] != DataviewSpec.CUSTOM_FILTER }.collect { Map column ->
 			"${projectionPropertyFor(column)}"
 		}.join(", ")
+	}
+
+	/**
+	 * Prepares a Custom filter used by UI for filtering assets using business rules about assets.
+	 * For example, filtering by 'physicalServer' or 'storage'
+	 *
+	 * @param column a Column map definition
+	 * @return a Map with 2 values, sqlExpression and sqlParams
+	 * 			to be used in an hql sentence
+	 */
+	private hqlCustomFilters(Map column){
+		String sqlExpression = ''
+		Map<String, ?> sqlParams = [:]
+
+		switch(column.filter) {
+			case 'physical':
+				sqlExpression = " COALESCE(AE.assetType,'') NOT IN (:virtualServerTypes) "
+				sqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				break
+			case 'physicalServer':
+				sqlExpression = " AE.assetType IN (:phyServerTypes) "
+				sqlParams['phyServerTypes'] = AssetType.allServerTypes - AssetType.virtualServerTypes
+				break
+			case 'server':
+				sqlExpression = " AE.assetType IN (:allServerTypes) "
+				sqlParams['allServerTypes'] = AssetType.allServerTypes
+				break
+			case 'storage':
+				sqlExpression = " AE.assetType IN (:storageTypes) "
+				sqlParams['storageTypes'] = AssetType.storageTypes
+				break
+			case 'virtualServer':
+				sqlExpression = " AE.assetType IN (:virtualServerTypes) "
+				sqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				break
+			case 'other':
+				sqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:nonOtherTypes) "
+				sqlParams['nonOtherTypes'] = AssetType.nonOtherTypes
+				break
+			default:
+				throw RuntimeException('Invalid filter definition:' + column.filter)
+		}
+
+		return [
+			sqlExpression: sqlExpression,
+			sqlParams: sqlParams
+		]
 	}
 
     /**
@@ -695,10 +744,15 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec.columns.each { Map column ->
 
 			Class type = typeFor(column)
-			// Check if the user provided a filter expression.
-			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
-			if (StringUtil.isNotBlank(filterFor(column)) && !(type in [Date, Timestamp])) {
+			String filter = filterFor(column)
 
+			// Applied custom filter from TM-14768
+			if (column.property == DataviewSpec.CUSTOM_FILTER) {
+				Map<String,?> hqlCustomFilters = hqlCustomFilters(column)
+				whereConditions << hqlCustomFilters.sqlExpression
+				whereParams += hqlCustomFilters.sqlParams
+			} else if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
+				// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
 						column: propertyFor(column),
@@ -733,7 +787,6 @@ class DataviewService implements ServiceMethods {
 					// If no additional results, then unset the flag as no additional filtering should be required.
 						fieldSearchData.setMixed(false)
 					}
-
 				}
 
 				// Trigger the parsing of the parameter.
