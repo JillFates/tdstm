@@ -60,6 +60,9 @@ trait ControllerMethods {
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
 
+	// TODO : JPM 4/2019 : Message should be in i18N messages
+	static final String INVALID_CSRF_TOKEN = 'Unable to perform action due to missing form token. Please retry form entry.'
+
 	/**
 	 * Renders a list of maps to a CSV file.
 	 *

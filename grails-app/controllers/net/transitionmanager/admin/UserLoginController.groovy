@@ -281,6 +281,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 	def update() {
 		UserLogin userLogin
 		String errMsg
+
 		try {
 			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, false)
 		}
@@ -360,24 +361,26 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		UserLogin newUserLogin
 		String errMsg
 
-		try {
-			newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
-		}
-		catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
-			errMsg = e.message
-		}
-		catch (e) {
-			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = 'An error occurred that prevents creates a user'
-		}
+		withForm {
+			try {
+				newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
+			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+				errMsg = e.message
+			} catch (e) {
+				log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
+				errMsg = 'An error occurred that prevents creates a user'
+			}
 
-		if (errMsg) {
-			flash.message = errMsg
+			if (errMsg) {
+				flash.message = errMsg
+				redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
+			} else {
+				flash.message = "UserLogin $newUserLogin created"
+				redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
+			}
+		}.invalidToken {
+			flash.message = INVALID_CSRF_TOKEN
 			redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
-		}
-		else {
-			flash.message = "UserLogin $newUserLogin created"
-			redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
 		}
 
 	}
