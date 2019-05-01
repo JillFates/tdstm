@@ -60,7 +60,7 @@ export class ApplicationConflictsComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.isDisplayingReport = false;
+		this.isDisplayingReport = null;
 		const commonCalls = [
 			this.reportsService.getDefaults(),
 			this.reportsService.getDefaultsApplicationConflicts(),
@@ -83,6 +83,14 @@ export class ApplicationConflictsComponent implements OnInit {
 				this.applicationConflicts = results;
 				this.isDisplayingReport = true;
 			});
+	}
+
+	// Enable disable the report view
+	toggleFilters(value: any): void {
+		if (this.isDisplayingReport == null) {
+			return;
+		}
+		this.isDisplayingReport = !value;
 	}
 
 }
