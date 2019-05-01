@@ -3,6 +3,7 @@ package net.transitionmanager.application
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.common.CustomDomainService
@@ -18,6 +19,7 @@ import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.command.reports.ApplicationConflictsCommand
 
 
 @Secured("isAuthenticated()")
@@ -207,5 +209,27 @@ class WsReportsController implements ControllerMethods {
             [id: person.id, fullName: person.toString()]
         }
         renderSuccessJson(owners: owners)
+    }
+
+     /**
+     * Find and return the map with the content for the Application Conflicts report.
+     *
+     * @return a map with the content for the Application Conflicts Report.
+     */
+    def getApplicationConflicts() {
+        Project project = getProjectForWs()
+        ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand)
+        boolean useForPlanning = command.moveBundle == 'useForPlanning'
+        if (!useForPlanning) {
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+        }
+
+        Map applicationConflictsMap = reportsService.genApplicationConflicts(project.id, command.moveBundle, command.bundleConflicts,
+            command.unresolvedDependencies, command.missingDependencies, useForPlanning, command.appOwner, command.maxAssets)
+
+        renderSuccessJson(applicationConflictsMap)
+
     }
 }

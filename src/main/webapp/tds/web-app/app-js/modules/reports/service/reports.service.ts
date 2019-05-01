@@ -151,6 +151,15 @@ export class ReportsService {
 	}
 
 	getApplicatioConflicts(): Observable<Array<ApplicationConflict>> {
+		return this.http.get(`${this.baseURL}/reports/applicationConflicts`)
+		.map((response: any) => {
+			console.log('The response is:');
+			console.log(response);
+			return response && response.status === 'success' && response.data;
+		})
+		.catch((error: any) => error);
+
+		/*
 		const data =  [
 			{
 				'application': {
@@ -284,6 +293,7 @@ export class ReportsService {
 		];
 
 		return Observable.of(data);
+		*/
 	}
 
 	getDefaultsApplicationConflicts(): Observable<any> {
