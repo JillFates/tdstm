@@ -1,11 +1,5 @@
 package net.transitionmanager.move
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
@@ -13,20 +7,28 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.event.CreateEventCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
+import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.hibernate.criterion.Order
@@ -35,7 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.sql.Timestamp
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class MoveEventController implements ControllerMethods {
+class MoveEventController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -53,28 +55,31 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def listJson() {
-
-		String sortIndex = params.sidx ?: 'assetName'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		String sortIndex = paginationOrderBy(MoveEvent, 'sidx', 'name')
+		String sortOrder = paginationSortOrder('sord')
 
 		List<MoveEvent> events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", securityService.loadUserCurrentProject())
 			if (params.name) {
-				ilike('name', "%${params.name.trim()}%")
+				String name = StringEscapeUtils.unescapeHtml4(params.name.trim())
+				ilike('name', SqlUtil.formatForLike(name))
 			}
 			if (params.description) {
-				ilike('description', "%$params.description%")
+				String description = StringEscapeUtils.unescapeHtml4(params.description.trim())
+				ilike('description', SqlUtil.formatForLike(description))
 			}
 			if (params.runbookStatus) {
-				ilike('runbookStatus', "%$params.runbookStatus%")
+				String runbookStatus = StringEscapeUtils.unescapeHtml4(params.runbookStatus.trim())
+				ilike('runbookStatus', SqlUtil.formatForLike(runbookStatus))
 			}
 			def newsBM = retrieveNewsBMList(params.newsBarMode)
 			if (newsBM) {
 				'in'('newsBarMode', newsBM)
 			}
-			order(params.sord == "desc"? Order.desc(sortIndex).ignoreCase():Order.asc(sortIndex).ignoreCase())
+			order(sortOrder == 'DESC' ? Order.desc(sortIndex).ignoreCase() : Order.asc(sortIndex).ignoreCase())
 		}
 
 		int totalRows = events.totalCount
