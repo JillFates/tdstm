@@ -88,7 +88,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 					this.model.moveBundleList.unshift(this.planningBundles);
 					console.log(this.model.moveBundleList);
 					this.model.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
-					//  = [this.planningBundles].concat(this.model.moveBundleList);
+					this.updateOwnersList(this.model.bundle);
 				}
 
 				console.log(bundles);
@@ -107,17 +107,18 @@ export class ApplicationConflictsComponent extends ReportComponent {
 
 	}
 
-	onBundleSelected(bundle: any) {
-		console.log('the bundle is');
-		console.log(bundle);
-		this.reportsService.getOwnersByBundle(bundle.id)
+	updateOwnersList(bundle: any) {
+		if (bundle && bundle.id) {
+			this.reportsService.getOwnersByBundle(bundle.id)
 			.subscribe((results) => {
 				console.log('The results for the bundles:');
 				console.log(results);
 				if (results && results.owners) {
 					this.model.appOwnerList = results.owners
 						.map((result: any) => ({id: result.id.toString, name: result.fullName}));
+					this.model.appOwnerList.unshift({id: '', name: 'All' });
 				}
 			});
+		}
 	}
 }

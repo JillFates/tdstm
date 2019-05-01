@@ -10,7 +10,7 @@
 							<div class="section-title">Bundle</div>
 							<div class="section-control">
 								<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
-									(selectionChange)="onBundleSelected($event)"
+									(selectionChange)="updateOwnersList($event)"
 									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
 								</kendo-dropdownlist>
 							</div>
