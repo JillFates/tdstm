@@ -28,7 +28,7 @@ class PermissionsController implements ControllerMethods {
 		withForm {
 			permissionsService.update(params)
 		}.invalidToken {
-			flash.message = INVALID_CSRF_TOKEN
+			flash.message = message(code: 'invalid.csrf.token')
 		}
 
 		redirect(action: "show")
