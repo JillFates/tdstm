@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.FieldSpecsCacheService
 import net.transitionmanager.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
@@ -65,6 +66,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			setting.save()
 		}
 
+		service.fieldSpecsCacheService = Mock(FieldSpecsCacheService)
 		fieldSpecProject = service.createFieldSpecProject(defaultProject)
 	}
 

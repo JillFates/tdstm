@@ -1,6 +1,8 @@
 package net.transitionmanager.common
 
+import grails.converters.JSON
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.FieldSpecsCacheService
 import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
@@ -31,7 +33,10 @@ class CustomDomainService implements ServiceMethods {
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
     SettingService settingService
-
+    /**
+     * Cache for field specs
+     */
+    FieldSpecsCacheService fieldSpecsCacheService
     /**
      * This method retrieves the specs for the standard fields.
      * It's added for consistency with return format of customFieldSpecs
@@ -144,7 +149,14 @@ class CustomDomainService implements ServiceMethods {
      * @return
      */
     Map allFieldSpecs(Project project, String domain, boolean showOnly = false){
-        Map fieldSpec = [:]
+
+        Map fieldSpec = fieldSpecsCacheService.getAllFieldSpecs(project, domain)
+        if (fieldSpec) {
+            return fieldSpec
+        } else {
+            fieldSpec = [:]
+        }
+
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
         for (String assetClassType : assetClassTypes) {
@@ -160,6 +172,7 @@ class CustomDomainService implements ServiceMethods {
             }
         }
 
+        fieldSpecsCacheService.setAllFieldSpecs(project, domain, fieldSpec)
         return fieldSpec
     }
 
@@ -219,6 +232,8 @@ class CustomDomainService implements ServiceMethods {
                 throw new InvalidParamException("Custom field specification not provided for class ${assetClassType}")
             }
         }
+
+        fieldSpecsCacheService.removeFieldSpecs(project, domain)
     }
 
     /**
@@ -439,6 +454,29 @@ class CustomDomainService implements ServiceMethods {
         return fieldSpecs
     }
 
+    /**
+     * Create a COMMON domain from the common fields (belonging to AssetEntity.COMMON_FIELD_LIST or *shared*)
+     * in all the domains returned by allFieldsSpecs.
+     * It returns that content in a JSON string format.
+     *
+     * @param project
+     * @return a String json content with field specs retrieve from database
+     * @see CustomDomainService#allFieldSpecs(net.transitionmanager.project.Project, java.lang.String, boolean)
+     */
+    String jsonFieldSpecsWithCommon(Project project = null){
+
+        String jsonFieldSpec = fieldSpecsCacheService.getJsonFieldSpecs(project)
+        if (jsonFieldSpec) {
+            return jsonFieldSpec
+        } else {
+            jsonFieldSpec = ''
+        }
+        Map fieldSpec = fieldSpecsWithCommon(project)
+        jsonFieldSpec = (fieldSpec as JSON).toString()
+        fieldSpecsCacheService.setJsonFieldSpecs(project, jsonFieldSpec)
+
+        return jsonFieldSpec
+    }
 	/**
 	 * Create a COMMON domain from the common fields (belonging to AssetEntity.COMMON_FIELD_LIST or *shared*)
 	 * in all the domains returned by allFieldsSpecs

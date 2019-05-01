@@ -54,7 +54,8 @@ class WsCustomDomainController implements ControllerMethods {
      */
     def fieldSpecsWithCommon() {
         Project project = getProjectForWs()
-        Map data = customDomainService.fieldSpecsWithCommon(project)
-        renderAsJson(data)
+        String data = customDomainService.jsonFieldSpecsWithCommon(project)
+        response.addHeader('content-type', 'application/json')
+        render(data)
     }
 }
