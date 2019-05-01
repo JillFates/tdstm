@@ -7,6 +7,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
@@ -179,5 +180,32 @@ class WsReportsController implements ControllerMethods {
         ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
         Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
         render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
+    }
+
+    /**
+     * Create and return a map containing all the bundles for the user's current project, along
+     * with the id of the default bundle for the selector -- either the user preference or the
+     * first element in the list of bundles.
+     *
+     * @return a map with all the bundles for the user's project (id and name) and the default bundle.
+     */
+    def getMoveBundles() {
+        Project project = getProjectForWs()
+        List<Map> moveBundles = MoveBundle.findAllByProject(project).collect { MoveBundle bundle ->
+            [id: bundle.id, name: bundle.name]
+        }
+        String moveBundleId = (userPreferenceService.moveBundleId ?: moveBundles[0]?.id).toString()
+        renderSuccessJson(moveBundles: moveBundles, moveBundleId: moveBundleId)
+    }
+
+    /**
+     * Return a list with all the possible App Owners for the given bundle.
+     * @param moveBundleId
+     */
+    def getOwnersForMoveBundle(Long moveBundleId) {
+        List<Map> owners = reportsService.getSmeList(moveBundleId, false).collect { Person person ->
+            [id: person.id, fullName: person.toString()]
+        }
+        renderSuccessJson(owners: owners)
     }
 }
