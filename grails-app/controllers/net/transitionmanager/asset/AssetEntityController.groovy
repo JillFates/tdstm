@@ -1,6 +1,5 @@
 package net.transitionmanager.asset
 
-
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
@@ -22,48 +21,49 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
+import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.action.ApiAction
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.imports.DataTransferBatch
 import net.transitionmanager.imports.DataTransferSet
+import net.transitionmanager.imports.ImportService
+import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.person.UserService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectAssetMap
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.CommentNote
-import net.transitionmanager.task.Recipe
-import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.project.StateEngineService
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.imports.ImportService
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.license.LicenseAdminService
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.common.ProgressService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.project.StateEngineService
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.Recipe
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskImportExportService
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.person.UserService
-import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
@@ -341,10 +341,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
-
-		renderAsJson assetEntityService.getDeviceDataForList(project, session, params)
+		Project project = getProjectForWs()
+		PaginationObject paginationObj = paginationAsObject()
+		renderAsJson assetEntityService.getDeviceDataForList(project, session, params, paginationObj)
 	}
 
 	@HasPermission(Permission.AssetDelete)
