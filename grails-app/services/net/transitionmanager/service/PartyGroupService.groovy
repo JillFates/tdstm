@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Party
@@ -8,6 +9,7 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.LogicException
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -37,10 +39,9 @@ class PartyGroupService implements ServiceMethods {
 	 * @return a map containing [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	 */
 	def list(Map filterParams, String sortIndex, String sortOrder, int maxRows, int currentPage, int rowOffset) {
-		Person whom = securityService.userLoginPerson
 		def queryParams = [:]
 
-		def query = new StringBuilder("""SELECT * FROM (
+		StringBuilder query = new StringBuilder("""SELECT * FROM (
 					SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
 					FROM party_group pg
 					INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
@@ -53,25 +54,27 @@ class PartyGroupService implements ServiceMethods {
 					GROUP BY party_group_id ORDER BY
 				""")
 
-		query.append(" $sortIndex $sortOrder ) as companies")
+		query << ' ' << sortIndex << ' ' << sortOrder << ' ) as companies '
 
-		queryParams.whomCompanyId = whom.company.id
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 
 		filterParams.each {
 			if (it.value) {
-				if (firstWhere) {
-					query.append(" WHERE companies.$it.key LIKE :$it.key")
-					firstWhere = false
-				} else {
-					query.append(" AND companies.$it.key LIKE :$it.key")
-				}
-				queryParams[it.key] = "%$it.value%"
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
+				query.append(' companies.').append(it.key).append(' LIKE :').append(it.key)
+				queryParams[it.key] = SqlUtil.formatForLike(it.value)
 			}
 		}
 
-		def companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		def companies
+
+		try {
+			companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		} catch(e) {
+			log.error "listJson() encountered SQL error : ${e.getMessage()}"
+			throw new LogicException("Unabled to perform query based on parameters and user preferences")
+		}
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = companies.size()
@@ -81,7 +84,7 @@ class PartyGroupService implements ServiceMethods {
 			companies = companies[rowOffset..Math.min(rowOffset + maxRows - 1, totalRows - 1)]
 		}
 
-		String showUrl = grailsLinkGenerator.link(controller: 'partyGroup', action: 'show')
+		def showUrl = grailsLinkGenerator.link(controller: 'partyGroup', action: 'show')
 
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = companies?.collect {
