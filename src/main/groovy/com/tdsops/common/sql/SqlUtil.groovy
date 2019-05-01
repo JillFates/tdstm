@@ -91,6 +91,18 @@ class SqlUtil {
 	}
 
 	/**
+	 * Used to wrap a word with the like/ilike percent markers (e.g. %word%)
+	 * @param word - a word to wrap
+	 * @return the formatted word
+	 */
+	static String formatForLike(String word) {
+		if (StringUtil.isBlank(word)) {
+			return null
+		}
+		return '%' + word + '%'
+	}
+
+	/**
 	 * Used to generate the WHERE expression for a particular property in which based on the criteria will create an EQUALS, IN or LIKE based on
 	 * the criteria value. The options are as such for when criteria is:
 	 *  * An array - it will create an IN clause
