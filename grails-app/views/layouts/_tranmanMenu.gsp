@@ -382,6 +382,9 @@
                             <li class="menu-child-item menu-reports-application-conflicts">
                                 <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
                             </li>
+                            <li class="menu-child-item menu-reports-application-conflicts2">
+                                <a href="/tdstm/module/reports/applicationConflicts">Application Conflicts</a>
+                            </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
                                 <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
