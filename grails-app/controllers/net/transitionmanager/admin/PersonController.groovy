@@ -2,6 +2,7 @@ package net.transitionmanager.admin
 
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.NumberUtil
@@ -10,34 +11,35 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
 import net.transitionmanager.command.PersonCommand
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventStaff
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.party.PartyType
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.common.Timezone
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.Timezone
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.task.TaskService
 import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class PersonController implements ControllerMethods {
+class PersonController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -89,14 +91,14 @@ class PersonController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.PersonStaffList)
-	def listJson() {
+	def listJson(Long id) {
 
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
-		Long companyId
-		def personInstanceList
-		def filterParams = [
+		String sortOrder  = paginationSortOrder('sord')
+		int maxRows = paginationMaxRowValue('rows')
+		int currentPage = paginationPage()
+		int rowOffset = paginationRowOffset(currentPage, maxRows)
+
+		Map<String,String> filterParams = [
 			firstname  : params.firstname,
 			middlename : params.middlename,
 			lastname   : params.lastname,
@@ -108,57 +110,61 @@ class PersonController implements ControllerMethods {
 			modelScore : params.modelScore
 		]
 
+		List personInstanceList
+		Long companyId
+		List queryParams = []
+
 		// Deal with determining the Sort Column
 		String sortIndex = 'lastname'
 		if (filterParams.containsKey(params.sidx)) {
 			sortIndex = params.sidx
 		}
 
-		// Deal with Sort Order
-		String sortOrder = ['asc','desc'].contains(params.sord) ? params.sord : 'asc'
+		StringBuilder query = new StringBuilder("""
+			SELECT * FROM (
+				SELECT p.person_id AS personId, p.first_name AS firstName,
+					IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, p.email as email,
+					pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
+					IFNULL(p.model_score, 0) AS modelScore
+				FROM person p
+				LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+					AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
+				LEFT OUTER JOIN party pa on p.person_id=pa.party_id
+				LEFT OUTER JOIN user_login u on p.person_id=u.person_id
+				LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
+		""")
 
-		StringBuilder query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
-			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, p.email as email,
-			pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
-			IFNULL(p.model_score, 0) AS modelScore
-			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='ROLE_COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
-			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			""")
+		// Handle the request for filtering by company which is the URL /controller/view/$id
+		if (id) {
+			companyId = id
+		} else {
+			// If the request was All then companyId is never set, thereby eliminating the filter
+			if (params.id?.toLowerCase() != 'all') {
+				// Try getting the user's preferred Company ID
+				companyId = NumberUtil.toLong(userPreferenceService.getPreference(PREF.PARTY_GROUP))
 
-		if (params.id && params.id != "All") {
-			// If companyId is requested
-			companyId = params.long('id')
-		}
-		if (!companyId && params.id != "All") {
-			// Still if no companyId found trying to get companyId from the session
-			companyId = userPreferenceService.getPreference(PREF.PARTY_GROUP)
-			if (!companyId) {
-				// Still if no luck setting companyId as logged-in user's companyId .
-				companyId = securityService.userLoginPerson.company.id
+				if (!companyId) {
+					// Default to the user's company
+					companyId = securityService.userLoginPerson.company.id
+				}
 			}
 		}
+
 		if (companyId) {
-			query.append(" WHERE pg.party_group_id = $companyId ")
+			query.append(" WHERE pg.party_group_id = ?\n")
+			queryParams << companyId
 		}
 
-		query.append(" GROUP BY pa.party_id ORDER BY " + sortIndex + " " + sortOrder +
-				", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
+		query.append("""
+			GROUP BY pa.party_id
+			ORDER BY $sortIndex $sortOrder, COALESCE(p.last_name,'') DESC, p.first_name DESC) as people
+		""")
 
 		// Handle the filtering by each column's text field
-		List queryParams = []
 		Boolean firstWhere = true
 		filterParams.each {
 			if (it.value) {
-				if (firstWhere) {
-					query.append(" WHERE ")
-					firstWhere = false
-				} else {
-					query.append(" AND ")
-				}
+				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
 				query.append("people.${it.key} LIKE ?")
 				queryParams << "%${it.value.trim()}%"
 			}
@@ -181,11 +187,22 @@ class PersonController implements ControllerMethods {
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = "$grailsLinkGenerator.serverBaseURL/assets/icons/user_add.png"
 		def results = personInstanceList?.collect {
-			[cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
-			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
-			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
-			genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
-			it.email, it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
+			[
+				cell: [
+					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
+					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
+					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
+					genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
+					it.email,
+					it.company,
+					it.dateCreated,
+					it.lastUpdated,
+					it.modelScore
+				],
+				id  : it.personId
+			]
+		}
+
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
