@@ -25,6 +25,8 @@ import {ReportsService} from '../../service/reports.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UserService} from '../../../security/services/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
+import {ReportComponent} from '../report.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 declare var jQuery: any;
 
@@ -32,7 +34,7 @@ declare var jQuery: any;
 	selector: 'tds-application-conflicts',
 	templateUrl: 'application-conflicts.component.html'
 })
-export class ApplicationConflictsComponent implements OnInit {
+export class ApplicationConflictsComponent extends ReportComponent {
 	invalidStatusList = ['Questioned', 'Unknown'];
 	userContext = null;
 	isDisplayingReport: boolean;
@@ -56,10 +58,13 @@ export class ApplicationConflictsComponent implements OnInit {
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
 		private userService: UserService,
-		private reportsService: ReportsService) {
+		protected dialogService: UIDialogService,
+		protected reportsService: ReportsService) {
+			super(reportsService, dialogService);
+			this.load();
 	}
 
-	ngOnInit() {
+	load() {
 		this.isDisplayingReport = null;
 		const commonCalls = [
 			this.reportsService.getDefaults(),
@@ -82,15 +87,7 @@ export class ApplicationConflictsComponent implements OnInit {
 			.subscribe((results: Array<ApplicationConflict>) => {
 				this.applicationConflicts = results;
 				this.isDisplayingReport = true;
+				this.hideFilters = true;
 			});
 	}
-
-	// Enable disable the report view
-	toggleFilters(value: any): void {
-		if (this.isDisplayingReport == null) {
-			return;
-		}
-		this.isDisplayingReport = !value;
-	}
-
 }
