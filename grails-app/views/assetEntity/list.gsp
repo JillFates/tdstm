@@ -132,7 +132,7 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
-						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
+						moveBundle : moveBundle, assetType:assetType, model :model, sourceLocationName: sourceLocationName,
 						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
 				<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
