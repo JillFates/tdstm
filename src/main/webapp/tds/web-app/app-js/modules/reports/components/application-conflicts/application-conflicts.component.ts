@@ -42,7 +42,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
-		defaultAppOwner: {id: '', name: 'All'},
+		appOwner: null,
 		bundleConflict: true,
 		bundle: null,
 		unresolvedDependencies: true,
@@ -97,7 +97,11 @@ export class ApplicationConflictsComponent extends ReportComponent {
 
 	onGenerateReport(): void {
 		if (this.model.bundle) {
-			this.reportsService.getApplicatioConflicts(this.model.bundle.id.toString())
+			this.reportsService.getApplicationConflicts(
+				this.model.bundle.id.toString(), 
+				(this.model.appOwner && this.model.appOwner.id) || '',
+				true, true, true, 100
+				)
 				.subscribe((results: Array<ApplicationConflict>) => {
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
@@ -115,8 +119,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				console.log(results);
 				if (results && results.owners) {
 					this.model.appOwnerList = results.owners
-						.map((result: any) => ({id: result.id.toString, name: result.fullName}));
+						.map((result: any) => ({id: result.id.toString(), name: result.fullName}));
 					this.model.appOwnerList.unshift({id: '', name: 'All' });
+					this.model.appOwner = {id: ''};
 				}
 			});
 		}

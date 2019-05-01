@@ -150,8 +150,15 @@ export class ReportsService {
 			.catch((error: any) => error);
 	}
 
-	getApplicatioConflicts(moveBundle: string): Observable<Array<ApplicationConflict>> {
-		return this.http.get(`${this.baseURL}/reports/applicationConflicts?moveBundle=${moveBundle}`)
+	getApplicationConflicts(
+		moveBundle: string,
+		appOwner: string,
+		bundleConflicts: boolean,
+		missingDependencies: boolean,
+		unresolvedDependencies: boolean,
+		maxAssets: number
+		): Observable<Array<ApplicationConflict>> {
+		return this.http.get(`${this.baseURL}/reports/applicationConflicts?moveBundle=${moveBundle}&appOwner=${appOwner}&bundleConflicts=${bundleConflicts}&missingDependencies=${missingDependencies}&unresolvedDependencies=${unresolvedDependencies}&maxAssets=${maxAssets}`)
 		.map((response: any) => {
 			console.log('The response is:');
 			console.log(response);

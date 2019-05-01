@@ -20,7 +20,7 @@
 							<div class="section-title">App Owner</div>
 							<div class="section-control">
 								<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.appOwnerList"
-									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.defaultAppOwner">
+									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.appOwner">
 								</kendo-dropdownlist>
 							</div>
 						</div>
@@ -82,7 +82,7 @@
 				
 					<div class="container results" *ngIf="isDisplayingReport">
 						<div class="header">
-							<div class="main-title">Application Conflicts - {{userContext ? userContext.project.name : ''}}: {{model.bundle.name}} and App Owner: {{model.defaultAppOwner.name}}</div>
+							<div class="main-title">Application Conflicts - {{userContext ? userContext.project.name : ''}}: {{model.bundle.name}} and App Owner: {{model.appOwner.name}}</div>
 							<div class="sub-title">This analysis was performed on 04/05/2019 05:09 PM for TDS.</div>
 						</div>
 				
