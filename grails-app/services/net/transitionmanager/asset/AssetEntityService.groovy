@@ -1,14 +1,5 @@
 package net.transitionmanager.asset
 
-
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.LogicException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.domain.AssetEntityHelper
@@ -29,22 +20,31 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.AssetCommand
-import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.command.CloneAssetCommand
+import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.project.AppMoveEvent
+import net.transitionmanager.exception.ConfigurationException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.LogicException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectAssetMap
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
