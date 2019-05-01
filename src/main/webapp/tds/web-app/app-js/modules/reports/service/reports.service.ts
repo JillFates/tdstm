@@ -423,7 +423,7 @@ export class ReportsService {
 	}
 
 	/**
-	 * Get the default values for the events ui
+	 * Get the default bundles
 	 */
 	getBundles(): Observable<any> {
 		return this.http.get(`${this.baseURL}/reports/moveBundles`)
@@ -434,4 +434,19 @@ export class ReportsService {
 			})
 			.catch((error: any) => error);
 	}
+
+	/**
+	 * Get the default bundles
+	 */
+	getOwnersByBundle(moveBundleId: string): Observable<any> {
+		return this.http.get(`${this.baseURL}/reports/appOwnersForBundle/${moveBundleId}`)
+			.map((response: any) => {
+				console.log('The response is:');
+				console.log(response);
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+
 }

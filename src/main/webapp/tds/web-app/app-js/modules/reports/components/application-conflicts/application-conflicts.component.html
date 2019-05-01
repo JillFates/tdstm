@@ -10,7 +10,8 @@
 							<div class="section-title">Bundle</div>
 							<div class="section-control">
 								<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
-									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.defaultBundle">
+									(selectionChange)="onBundleSelected($event)"
+									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
 								</kendo-dropdownlist>
 							</div>
 						</div>
@@ -81,7 +82,7 @@
 				
 					<div class="container results" *ngIf="isDisplayingReport">
 						<div class="header">
-							<div class="main-title">Application Conflicts - {{userContext ? userContext.project.name : ''}}: {{model.defaultBundle.name}} and App Owner: {{model.defaultAppOwner.name}}</div>
+							<div class="main-title">Application Conflicts - {{userContext ? userContext.project.name : ''}}: {{model.bundle.name}} and App Owner: {{model.defaultAppOwner.name}}</div>
 							<div class="sub-title">This analysis was performed on 04/05/2019 05:09 PM for TDS.</div>
 						</div>
 				

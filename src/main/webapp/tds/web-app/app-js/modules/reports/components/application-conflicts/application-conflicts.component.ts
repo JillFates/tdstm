@@ -38,12 +38,13 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	invalidStatusList = ['Questioned', 'Unknown'];
 	userContext = null;
 	isDisplayingReport: boolean;
+	planningBundles: any;
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
-		defaultBundle: {id: 'useForPlanning', name: 'Planning Bundles'},
-		defaultAppOwner: {id: -1, name: 'All'},
+		defaultAppOwner: {id: '', name: 'All'},
 		bundleConflict: true,
+		bundle: null,
 		unresolvedDependencies: true,
 		missingDependencies: true,
 		maxApplications: {value: 100},
@@ -61,6 +62,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		protected dialogService: UIDialogService,
 		protected reportsService: ReportsService) {
 			super(reportsService, dialogService);
+			this.planningBundles =  {id: 'useForPlanning', name: 'Planning Bundles'};
 			this.load();
 	}
 
@@ -78,12 +80,15 @@ export class ApplicationConflictsComponent extends ReportComponent {
 			.subscribe((results) => {
 				const [events, defaultsApplication, userContext, bundles] = results;
 				// this.model.moveBundleList = defaultsApplication.moveBundleList;
-				this.model.appOwnerList = defaultsApplication.appOwnerList;
+				// this.model.appOwnerList = defaultsApplication.appOwnerList;
 				this.userContext = userContext;
 				if (bundles) {
 					this.model.moveBundleList = bundles.moveBundles
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
-					console.log(bundles);
+					this.model.moveBundleList.unshift(this.planningBundles);
+					console.log(this.model.moveBundleList);
+					this.model.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
+					//  = [this.planningBundles].concat(this.model.moveBundleList);
 				}
 
 				console.log(bundles);
@@ -91,11 +96,28 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	}
 
 	onGenerateReport(): void {
-		this.reportsService.getApplicatioConflicts(this.model.defaultBundle.id.toString())
-			.subscribe((results: Array<ApplicationConflict>) => {
-				this.applicationConflicts = results;
-				this.isDisplayingReport = true;
-				this.hideFilters = true;
+		if (this.model.bundle) {
+			this.reportsService.getApplicatioConflicts(this.model.bundle.id.toString())
+				.subscribe((results: Array<ApplicationConflict>) => {
+					this.applicationConflicts = results;
+					this.isDisplayingReport = true;
+					this.hideFilters = true;
+				});
+		}
+
+	}
+
+	onBundleSelected(bundle: any) {
+		console.log('the bundle is');
+		console.log(bundle);
+		this.reportsService.getOwnersByBundle(bundle.id)
+			.subscribe((results) => {
+				console.log('The results for the bundles:');
+				console.log(results);
+				if (results && results.owners) {
+					this.model.appOwnerList = results.owners
+						.map((result: any) => ({id: result.id.toString, name: result.fullName}));
+				}
 			});
 	}
 }
