@@ -40,6 +40,7 @@ class PartyGroupService implements ServiceMethods {
 	 */
 	def list(Map filterParams, String sortIndex, String sortOrder, int maxRows, int currentPage, int rowOffset) {
 		def queryParams = [:]
+		Person whom = securityService.userLoginPerson
 
 		StringBuilder query = new StringBuilder("""SELECT * FROM (
 					SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
@@ -56,6 +57,8 @@ class PartyGroupService implements ServiceMethods {
 
 		query << ' ' << sortIndex << ' ' << sortOrder << ' ) as companies '
 
+		queryParams.whomCompanyId = whom.company.id
+
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 
@@ -68,7 +71,6 @@ class PartyGroupService implements ServiceMethods {
 		}
 
 		def companies
-
 		try {
 			companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} catch(e) {
