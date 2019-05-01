@@ -98,9 +98,12 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	onGenerateReport(): void {
 		if (this.model.bundle) {
 			this.reportsService.getApplicationConflicts(
-				this.model.bundle.id.toString(), 
+				this.model.bundle.id.toString(),
 				(this.model.appOwner && this.model.appOwner.id) || '',
-				true, true, true, 100
+				this.model.bundleConflict,
+				this.model.missingDependencies,
+				this.model.unresolvedDependencies,
+				this.model.maxApplications.value
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
 					this.applicationConflicts = results;

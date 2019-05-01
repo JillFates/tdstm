@@ -151,20 +151,22 @@ export class ReportsService {
 	}
 
 	getApplicationConflicts(
-		moveBundle: string,
-		appOwner: string,
-		bundleConflicts: boolean,
-		missingDependencies: boolean,
-		unresolvedDependencies: boolean,
-		maxAssets: number
+		bundle: string,
+		owner: string,
+		conflicts: boolean,
+		missing: boolean,
+		unresolved: boolean,
+		max: number
 		): Observable<Array<ApplicationConflict>> {
-		return this.http.get(`${this.baseURL}/reports/applicationConflicts?moveBundle=${moveBundle}&appOwner=${appOwner}&bundleConflicts=${bundleConflicts}&missingDependencies=${missingDependencies}&unresolvedDependencies=${unresolvedDependencies}&maxAssets=${maxAssets}`)
-		.map((response: any) => {
-			console.log('The response is:');
-			console.log(response);
-			return response && response.status === 'success' && response.data;
-		})
-		.catch((error: any) => error);
+			const url = `${this.baseURL}/reports/applicationConflicts?`;
+			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
+			return this.http.get(`${url}${params}`)
+			.map((response: any) => {
+				console.log('The response is:');
+				console.log(response);
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
 
 		/*
 		const data =  [
