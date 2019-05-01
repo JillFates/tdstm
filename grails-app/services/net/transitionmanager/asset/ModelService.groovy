@@ -197,7 +197,7 @@ class ModelService implements ServiceMethods {
 		query.append("\nGROUP BY modelId ")
 
 		// Handle the filtering by each column's text field for aggregate columns
-		def firstHaving = true
+		boolean firstHaving = true
 		aliasValuesAggregate.each { k, v ->
 			if (queryParams.containsKey(k)) {
 				// Handle <, >, <= or >= options on the numeric filter
