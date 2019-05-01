@@ -5,6 +5,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.WebUtil
@@ -73,7 +74,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 
-		def moveBundleList
+		List moveBundleList
 		if (params.event?.isNumber()) {
 			MoveEvent moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
