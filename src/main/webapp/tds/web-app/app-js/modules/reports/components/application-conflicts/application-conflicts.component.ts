@@ -41,7 +41,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
-		defaultBundle: {id: -1, name: 'Planning Bundles'},
+		defaultBundle: {id: 'useForPlanning', name: 'Planning Bundles'},
 		defaultAppOwner: {id: -1, name: 'All'},
 		bundleConflict: true,
 		unresolvedDependencies: true,
@@ -69,21 +69,29 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		const commonCalls = [
 			this.reportsService.getDefaults(),
 			this.reportsService.getDefaultsApplicationConflicts(),
-			this.userService.getUserContext()
+			this.userService.getUserContext(),
+			this.reportsService.getBundles()
 		];
 
 		// on init
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
-				const [events, defaultsApplication, userContext] = results;
-				this.model.moveBundleList = defaultsApplication.moveBundleList;
+				const [events, defaultsApplication, userContext, bundles] = results;
+				// this.model.moveBundleList = defaultsApplication.moveBundleList;
 				this.model.appOwnerList = defaultsApplication.appOwnerList;
 				this.userContext = userContext;
+				if (bundles) {
+					this.model.moveBundleList = bundles.moveBundles
+						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
+					console.log(bundles);
+				}
+
+				console.log(bundles);
 			});
 	}
 
 	onGenerateReport(): void {
-		this.reportsService.getApplicatioConflicts()
+		this.reportsService.getApplicatioConflicts(this.model.defaultBundle.id.toString())
 			.subscribe((results: Array<ApplicationConflict>) => {
 				this.applicationConflicts = results;
 				this.isDisplayingReport = true;

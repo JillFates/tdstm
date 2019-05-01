@@ -150,8 +150,8 @@ export class ReportsService {
 			.catch((error: any) => error);
 	}
 
-	getApplicatioConflicts(): Observable<Array<ApplicationConflict>> {
-		return this.http.get(`${this.baseURL}/reports/applicationConflicts`)
+	getApplicatioConflicts(moveBundle: string): Observable<Array<ApplicationConflict>> {
+		return this.http.get(`${this.baseURL}/reports/applicationConflicts?moveBundle=${moveBundle}`)
 		.map((response: any) => {
 			console.log('The response is:');
 			console.log(response);
@@ -420,5 +420,18 @@ export class ReportsService {
 				return error;
 			})
 		)
+	}
+
+	/**
+	 * Get the default values for the events ui
+	 */
+	getBundles(): Observable<any> {
+		return this.http.get(`${this.baseURL}/reports/moveBundles`)
+			.map((response: any) => {
+				console.log('The response is:');
+				console.log(response);
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
 	}
 }
