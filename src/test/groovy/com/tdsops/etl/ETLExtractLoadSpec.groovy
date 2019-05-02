@@ -29,6 +29,7 @@ import net.transitionmanager.common.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -1256,6 +1257,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Room domain instances'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -1270,8 +1272,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.staticexecuteQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
@@ -1302,6 +1304,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Rack domain instances'() {
 
 		given:
@@ -1321,8 +1324,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.static.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
