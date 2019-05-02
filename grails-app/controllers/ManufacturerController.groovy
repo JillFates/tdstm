@@ -1,6 +1,7 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -147,15 +148,16 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ManufacturerCreate)
 	def save() {
 		def manufacturer = new Manufacturer(params)
+
 		try {
 			if (manufacturerService.save(manufacturer, params.list('aka'))) {
-				render(text: "Manufacturer ${manufacturer.name} created")
+				render(text: "Manufacturer ${HtmlUtil.escape(manufacturer.name)} created")
 			} else {
 				render(view: 'create', model: [manufacturerInstance: manufacturer])
 			}
 		} catch (ServiceException e) {
 			//log.error(e.message, e)
-			render(text: e.message)
+			render(text: HtmlUtil.escape(e.message))
 		}
 	}
 
