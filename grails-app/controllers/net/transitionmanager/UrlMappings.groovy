@@ -1275,6 +1275,13 @@ class UrlMappings {
             ]
         }
 
+		"/ws/reports/moveBundlesForSelection" {
+			controller = "wsReports"
+			action = [
+				GET: 'getMoveBundles'
+			]
+		}
+
 		"/ws/reports/appOwnersForBundle/$moveBundleId" {
 			controller = "wsReports"
 			action = [
