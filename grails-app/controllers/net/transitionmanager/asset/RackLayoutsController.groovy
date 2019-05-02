@@ -1,7 +1,5 @@
 package net.transitionmanager.asset
 
-
-import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
