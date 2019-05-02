@@ -200,7 +200,7 @@ class ReportsService implements ServiceMethods {
 			}
 
 			if (showApp) {
-				appList.add(app: it, dependsOnList: dependsOnList, supportsList: supportsList,
+				appList.add(app: it, dependsOnList: dependsOnList*.toMap(), supportsList: supportsList*.toMap(),
 				            dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size())
 			}
 		}

@@ -105,7 +105,9 @@ class AssetDependency {
 		return [
 			id: id,
 			asset: [
-				id: asset.id
+				id: asset.id,
+				name: asset.name,
+				moveBundle: asset.moveBundleName
 			],
 			c1: c1,
 			c2: c2,
@@ -115,7 +117,9 @@ class AssetDependency {
 			dataFlowDirection: dataFlowDirection,
 			dataFlowFreq: dataFlowFreq,
 			dependent: [
-			    id: dependent.id
+				id: dependent.id,
+				name: dependent.name,
+				moveBundle: dependent.moveBundleName
 			],
 			status: status,
 			type: type
