@@ -140,8 +140,8 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			results.records == 4
 			results.total == 2
 
-			results.rows[0].cell[0].split('\\$')[1] == 'Alpha</a>'
-			results.rows[1].cell[0].split('\\$')[1] == 'Delta</a>'
+			results.rows[0].cell[0].split('\\$')[1] == 'Alpha'
+			results.rows[1].cell[0].split('\\$')[1] == 'Delta'
 	}
 
 	void '07. Test list page 2'() {
@@ -157,8 +157,8 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			results.records == 4
 			results.total == 2
 
-			results.rows[0].cell[0].split('\\$')[1] == 'Delta</a>'
-			results.rows[1].cell[0].split('\\$')[1] == 'Alpha</a>'
+			results.rows[0].cell[0].split('\\$')[1] == 'Delta'
+			results.rows[1].cell[0].split('\\$')[1] == 'Alpha'
 	}
 
 	void '08. Test list filter to partners'() {
@@ -174,6 +174,6 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			results.records == 1
 			results.total == 1
 
-			results.rows[0].cell[0].split('\\$')[1] == 'Delta</a>'
+			results.rows[0].cell[0].split('\\$')[1] == 'Delta'
 	}
 }
