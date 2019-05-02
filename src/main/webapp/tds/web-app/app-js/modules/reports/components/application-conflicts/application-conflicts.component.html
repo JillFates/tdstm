@@ -82,8 +82,8 @@
 				
 					<div class="container results" *ngIf="isDisplayingReport">
 						<div class="header">
-							<div class="main-title">Application Conflicts - {{userContext ? userContext.project.name : ''}}: {{model.bundle.name}} and App Owner: {{model.appOwner.name}}</div>
-							<div class="sub-title">This analysis was performed on 04/05/2019 05:09 PM for TDS.</div>
+							<div class="main-title">Application Conflicts - {{reportProject}}: {{reportBundle}} and App Owner: {{reportOwner}}</div>
+							<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
 						</div>
 				
 						<div class="container application-container" *ngFor="let item of applicationConflicts">

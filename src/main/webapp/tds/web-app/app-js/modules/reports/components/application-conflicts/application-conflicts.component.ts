@@ -23,6 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
@@ -38,6 +39,11 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	invalidStatusList = ['Questioned', 'Unknown'];
 	userContext = null;
 	isDisplayingReport: boolean;
+	dateFormatTime = '';
+	reportDate = new Date();
+	reportProject = '';
+	reportBundle = '';
+	reportOwner = '';
 	planningBundles: any;
 	public model = {
 		moveBundleList: [],
@@ -58,6 +64,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		private changeDetectorRef: ChangeDetectorRef,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
+		private preferenceService: PreferenceService,
 		private userService: UserService,
 		protected dialogService: UIDialogService,
 		protected reportsService: ReportsService) {
@@ -79,9 +86,8 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
 				const [events, defaultsApplication, userContext, bundles] = results;
-				// this.model.moveBundleList = defaultsApplication.moveBundleList;
-				// this.model.appOwnerList = defaultsApplication.appOwnerList;
 				this.userContext = userContext;
+				this.dateFormatTime = this.preferenceService.getUserDateTimeFormat();
 				if (bundles) {
 					this.model.moveBundleList = bundles.moveBundles
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
@@ -95,6 +101,20 @@ export class ApplicationConflictsComponent extends ReportComponent {
 			});
 	}
 
+	getReportBundle(): string {
+		const id = this.model.bundle && this.model.bundle.id || '';
+
+		const bundle =  this.model.moveBundleList.find((bundle) => bundle.id === id);
+		return bundle.name || '';
+	}
+
+	getReportOwner(): string {
+		const id = this.model.appOwner && this.model.appOwner.id || '';
+
+		const owner =  this.model.appOwnerList.find((owner) => owner.id === id);
+		return owner.name || '';
+	}
+
 	onGenerateReport(): void {
 		if (this.model.bundle) {
 			this.reportsService.getApplicationConflicts(
@@ -106,6 +126,11 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.maxApplications.value
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
+					this.reportDate = new Date();
+					this.reportProject =  this.userContext.project.name;
+					this.reportBundle = this.getReportBundle();
+					this.reportOwner = this.getReportOwner();
+
 					console.log('RESULTS:');
 					console.log(results);
 					console.log('----------');
