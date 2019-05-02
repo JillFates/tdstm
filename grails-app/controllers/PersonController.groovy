@@ -180,14 +180,16 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
 		def results = personInstanceList?.collect {
-			[cell: [it.firstname, it.middlename,  it.lastname,
+			[
+				cell: [it.firstname, it.middlename,  it.lastname,
 					genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
 					it.email,
 					it.company,
 					it.dateCreated,
 					it.lastUpdated,
 					it.modelScore
-				]
+				],
+				id: it.personId
 			]
 		}
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
