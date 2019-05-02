@@ -286,21 +286,19 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		withForm {
 			try {
 				userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, false)
-			}
-			catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
 				errMsg = e.message
-			}
-			catch (e) {
+			} catch (e) {
 				log.error "update() failed : ${ExceptionUtil.stackTraceToString(e)}"
 				errMsg = 'An error occurred that prevented the update of the user'
 			}
 
 			if (errMsg) {
 				flash.message = errMsg
-				redirect(action: "edit", id: params.id, params: model)
+				redirect(action: "edit", id: id, params: model)
 			} else {
 				flash.message = "UserLogin $userLogin updated"
-				redirect(action: "show", id: userLogin.id, params: [companyId: params.companyId])
+				redirect(action: "show", id: id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
 			flash.message = message(code: 'invalid.csrf.token')
@@ -373,7 +371,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 			}
 			catch (e) {
 				log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-				errMsg = 'An error occurred that prevents creates a user'
+				errMsg = 'An error occurred that prevented creating the user'
 			}
 
 			if (errMsg) {
