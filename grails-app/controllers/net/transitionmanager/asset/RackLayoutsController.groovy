@@ -1,11 +1,11 @@
 package net.transitionmanager.asset
 
-
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -13,16 +13,16 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelConnector
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
