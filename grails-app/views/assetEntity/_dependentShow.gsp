@@ -30,7 +30,8 @@
 									<td class="subAssetLink" style="background-color: lightpink;position:relative;"
                                         data-asset-class="${support?.asset?.assetClass}" data-asset-id="${support?.asset?.id}"
                                         onclick="EntityCrud.showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
-										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+										<div data-asset-class="${support?.asset?.assetClass}" data-asset-id="${support?.asset?.id}"
+                                             style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="/tdstm/assets/icons/error.png" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
@@ -39,7 +40,7 @@
                                         data-asset-class="${support?.asset?.assetClass}" data-asset-id="${support?.asset?.id}"
                                         onclick="EntityCrud.showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 										<b>
-											<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
+											<div data-asset-class="${support?.asset?.assetClass}" data-asset-id="${support?.asset?.id}" style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="/tdstm/assets/icons/error.png" width="17" height="17" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles."/></div>
 										</b>
 									</td>
@@ -99,7 +100,7 @@
                                         class="subAssetLink"
                                         data-asset-class="${dependent.dependent?.assetClass}" data-asset-id="${dependent.dependent?.id}"
                                         onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+										<div data-asset-class="${dependent.dependent?.assetClass}" data-asset-id="${dependent.dependent?.id}" style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="/tdstm/assets/icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." /></div>
 									</td>
 								</g:if>
@@ -108,7 +109,7 @@
                                         data-asset-class="${dependent.dependent?.assetClass}" data-asset-id="${dependent.dependent?.id}"
                                         onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										<b>
-											<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+											<div data-asset-class="${dependent.dependent?.assetClass}" data-asset-id="${dependent.dependent?.id}" style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="/tdstm/assets/icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." /></div>
 										</b>
 									</td>

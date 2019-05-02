@@ -29,7 +29,9 @@ export abstract class ReportComponent {
 	protected onAssetLinkClick(event: any): void {
 		if (event.target) {
 			const {assetClass, assetId} = event.target.dataset;
-			this.onOpenLinkAsset(assetId, assetClass);
+			if (assetClass && assetId) {
+				this.onOpenLinkAsset(assetId, assetClass);
+			}
 		}
 	}
 

@@ -377,7 +377,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
-                                <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
+                                <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-application-conflicts">
                                 <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
