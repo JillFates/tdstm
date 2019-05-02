@@ -220,7 +220,7 @@ class WsReportsController implements ControllerMethods {
         Project project = getProjectForWs()
         ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand)
         boolean useForPlanning = command.moveBundle == 'useForPlanning'
-        if (!useForPlanning) {
+        if (command.moveBundle && command.moveBundle != 'useForPlanning') {
             Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
             GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
             userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
