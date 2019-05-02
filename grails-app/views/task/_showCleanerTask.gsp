@@ -210,7 +210,7 @@
 	               </g:if>
 	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
 						<dt>Database Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
-						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}&nbsp;${assetComment?.assetEntity.scale}</dd>
 						<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	                </g:elseif>
