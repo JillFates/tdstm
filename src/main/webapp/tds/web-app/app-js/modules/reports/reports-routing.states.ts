@@ -11,6 +11,7 @@ import {PreEventCheckListSelectorComponent} from './components/event-checklist/p
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
+import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -31,6 +32,9 @@ export class ReportStates {
 	};
 	public static readonly APPLICATION_EVENT_RESULTS = {
 		url: 'applicationEventResults'
+	};
+	public static readonly APPLICATION_PROFILES = {
+		url: 'applicationProfiles'
 	};
 }
 
@@ -105,6 +109,25 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: ApplicationEventResultsReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.APPLICATION_PROFILES.url,
+		data: {
+			page: {
+				title: 'Application Profiles',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'Application Profiles'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-application-profiles', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ApplicationProfilesReportComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

@@ -9,8 +9,9 @@ export abstract class ReportComponent {
 	// Shared variables
 	hideFilters = false;
 	reportResult: SafeHtml;
+	loadingLists = false;
 
-	constructor(protected reportsService: ReportsService, protected  dialogService: UIDialogService) {
+	constructor(protected reportsService: ReportsService, protected dialogService: UIDialogService) {
 		// Silence is golden.
 	}
 

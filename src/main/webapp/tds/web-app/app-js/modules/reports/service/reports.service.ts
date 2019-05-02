@@ -20,8 +20,10 @@ export class ReportsService {
 	private readonly TASKS_REPORT_URL = `${this.baseURL}/reports/tasksReport`;
 	private readonly SERVER_CONFLICTS_REPORT_URL = `${this.baseURL}/reports/generateServerConflicts`;
 	private readonly SME_LIST_URL = `${this.baseURL}/reports/smeList/{id}`;
+	private readonly APP_OWNER_LIST_URL = `${this.baseURL}/reports/appOwnerList/{id}`;
 	private readonly APP_EVENT_RESULTS_LISTS_URL = `${this.baseURL}/reports/generateApplicationMigration/{id}`;
 	private readonly APP_EVENT_RESULTS_REPORT_URL = `${this.APP_EVENT_RESULTS_LISTS_URL}`;
+	private readonly APPLICATION_PROFILES_REPORT_URL = `${this.baseURL}/reports/generateApplicationProfiles`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -68,10 +70,24 @@ export class ReportsService {
 
 	/**
 	 * GET - Return the list of SME that belongs to a move bundle.
-	 * @param moveBundleId
+	 * @param moveBundleId: number
 	 */
 	getSmeList(moveBundleId: number): Observable<any> {
 		return this.http.get(this.SME_LIST_URL.replace('{id}', moveBundleId.toString())).pipe(
+			map( (response: any) => response && response.data || []),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
+	}
+
+	/**
+	 * GET - Return the list of App Owner that belongs to a move bundle.
+	 * @param moveBundleId: number
+	 */
+	getAppOwnerList(moveBundleId: number): Observable<any> {
+		return this.http.get(this.APP_OWNER_LIST_URL.replace('{id}', moveBundleId.toString())).pipe(
 			map( (response: any) => response && response.data || []),
 			catchError(error => {
 				console.error(error);
@@ -216,6 +232,32 @@ export class ReportsService {
 		};
 		return this.http.post(
 			this.APP_EVENT_RESULTS_REPORT_URL.replace('{id}', moveBundle.toString()),
+			request,
+			{responseType: 'text'}).pipe(
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
+	}
+
+	/**
+	 * POST - Return the list of SME that belongs to a move bundle.
+	 * @param moveBundleId
+	 */
+	generateApplicationProfilesReport(
+		moveBundle: number,
+		sme: number,
+		appOwner: number,
+		reportMaxAssets: number): Observable<any> {
+		const request = {
+			moveBundle: moveBundle,
+			sme: sme === -1 ? 'null' : sme,
+			appOwner: appOwner === -1 ? 'null' : appOwner,
+			reportMaxAssets: reportMaxAssets.toString()
+		};
+		return this.http.post(
+			this.APPLICATION_PROFILES_REPORT_URL,
 			request,
 			{responseType: 'text'}).pipe(
 			catchError(error => {

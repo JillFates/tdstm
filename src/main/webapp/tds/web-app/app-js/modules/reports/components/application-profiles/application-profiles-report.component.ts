@@ -3,9 +3,13 @@ import {Component, ElementRef} from '@angular/core';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {ReportComponent} from '../report.component';
+import {forkJoin} from 'rxjs';
+import {AssetDependencyComponent} from '../../../assetExplorer/components/asset-dependency/asset-dependency.component';
+import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
+declare var jQuery: any;
 
 @Component({
-	selector: 'tds-application-event-results-report',
+	selector: 'tds-application-profiles-report',
 	template: `
 		<div class="content body">
 			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
@@ -41,70 +45,39 @@ import {ReportComponent} from '../report.component';
 												[textField]="'text'"
 												[valueField]="'id'"
 												[(ngModel)]="selectedSme"
-												[loading]="loadingSmeList || loadingLists">
+												[loading]="loadingLists">
 											</kendo-dropdownlist>
 										</div>
 									</div>
 									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="starstWithList">Start of with</label>
+										<label class="col-sm-2 control-label" for="appOwnerList">App Owner</label>
 										<div class="col-sm-3">
 											<kendo-dropdownlist
-												name="startsWithList"
+												name="appOwnerList"
 												class="form-control"
-												[data]="startsWithList"
+												[data]="appOwnerList"
 												[textField]="'text'"
 												[valueField]="'id'"
-												[(ngModel)]="selectedStartWith"
+												[(ngModel)]="selectedAppOwner"
 												[loading]="loadingLists">
 											</kendo-dropdownlist>
 										</div>
 									</div>
 									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="testingList">Testing</label>
+										<label class="col-sm-2 control-label" for="reportMaxAssets">Max Applications to report</label>
 										<div class="col-sm-3">
 											<kendo-dropdownlist
-												name="testingList"
+												name="reportMaxAssets"
 												class="form-control"
-												[data]="testingList"
-												[textField]="'name'"
-												[valueField]="'id'"
-												[(ngModel)]="selectedTesting"
-												[loading]="loadingLists">
-											</kendo-dropdownlist>
-										</div>
-									</div>
-									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="endsWithList">Ends with</label>
-										<div class="col-sm-3">
-											<kendo-dropdownlist
-												name="endsWithList"
-												class="form-control"
-												[data]="endsWithList"
-												[textField]="'text'"
-												[valueField]="'id'"
-												[(ngModel)]="selectedEndWith"
-												[loading]="loadingLists">
-											</kendo-dropdownlist>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 control-label" for="outageWindowList">Outage window</label>
-										<div class="col-sm-3">
-											<kendo-dropdownlist
-												name="outageWindowList"
-												class="form-control"
-												[data]="outageWindowList"
-												[textField]="'label'"
-												[valueField]="'field'"
-												[(ngModel)]="selectedOutage"
-												[loading]="loadingLists">
+												[data]="[100, 250, 500]"
+												[(ngModel)]="maxAssets">
 											</kendo-dropdownlist>
 										</div>
 									</div>
 									<div class="form-group row ">
 										<div class="col-sm-2 col-sm-offset-2 buttons">
 											<tds-button-custom class="btn-primary"
-																				 [disabled]="loadingSmeList || loadingLists"
+																				 [disabled]="loadingLists"
 																				 (click)="onGenerateReport()"
 																				 title="Generate Report"
 																				 tooltip="Generate Report"
@@ -121,21 +94,15 @@ import {ReportComponent} from '../report.component';
 				</div>
 			</section>
 		</div>`})
-export class ApplicationEventResultsReportComponent extends ReportComponent {
+export class ApplicationProfilesReportComponent extends ReportComponent {
 
 	bundleList: Array<any>;
 	selectedBundle: any = null;
 	smeList: Array<any>;
 	selectedSme: any = null;
-	testingList: Array<any>;
-	selectedTesting: any = null;
-	startsWithList: Array<any>;
-	selectedStartWith: any = null;
-	endsWithList: Array<any>;
-	selectedEndWith: any = null;
-	outageWindowList: Array<any>;
-	selectedOutage: any = null;
-	loadingSmeList = false;
+	appOwnerList: Array<any>;
+	selectedAppOwner: any = null;
+	maxAssets = 100;
 
 	private readonly allSmeOption = {id: -1, text: 'All'};
 
@@ -143,7 +110,8 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 		reportsService: ReportsService,
 		dialogService: UIDialogService,
 		private elRef: ElementRef,
-		private userPreferenceService: PreferenceService) {
+		private userPreferenceService: PreferenceService,
+		private assetService: DependecyService) {
 		super(reportsService, dialogService);
 		this.onLoad();
 	}
@@ -164,23 +132,8 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 					this.selectedBundle = this.bundleList[0];
 					moveBundleId = this.selectedBundle.id;
 				}
-				// Load all lists
-				this.reportsService.getApplicationEventReportLists(moveBundleId).subscribe(lists => {
-					this.smeList = lists.smeList.map(item => {
-						return {id: item.id, text: `${item.lastName}, ${item.firstName}`}
-					});
-					this.smeList = [this.allSmeOption].concat(this.smeList);
-					this.selectedSme = this.allSmeOption;
-					this.startsWithList = lists.categories;
-					this.selectedStartWith = this.startsWithList.find(item => item.id === 'shutdown');
-					this.endsWithList = lists.categories;
-					this.selectedEndWith = this.endsWithList.find(item => item.id === 'startup');
-					this.testingList = lists.testingList;
-					this.selectedTesting = this.testingList[0];
-					this.outageWindowList = lists.outageList;
-					this.selectedOutage = this.outageWindowList.find(item => item.field === 'drRtoDesc');
-					this.loadingLists = false;
-				});
+				// Load SME List
+				this.onBundleListChange({id: moveBundleId});
 			});
 		});
 	}
@@ -191,14 +144,29 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 	 */
 	onBundleListChange($event: any): void {
 		if ($event && $event.id) {
-			this.loadingSmeList = true;
-			this.reportsService.getSmeList($event.id).subscribe(smeList => {
-				this.smeList = smeList.map(item => {
-					return {id: item.id, text: `${item.lastName}, ${item.firstName}`}
-				});
-				this.smeList = [this.allSmeOption].concat(this.smeList);
-				this.selectedSme = this.allSmeOption;
-				this.loadingSmeList = false;
+			this.loadingLists = true;
+			const observables = forkJoin(
+				this.reportsService.getSmeList($event.id),
+				this.reportsService.getAppOwnerList($event.id)
+			);
+			observables.subscribe({
+				next: value => {
+					// SME List
+					this.smeList = value[0].map(item => {
+						return {id: item.id, text: `${item.lastName}, ${item.firstName}`}
+					});
+					this.smeList = [this.allSmeOption].concat(this.smeList);
+					this.selectedSme = this.allSmeOption;
+					// App Owner List
+					this.appOwnerList = value[1].map(item => {
+						return {id: item.id, text: `${item.lastName}, ${item.firstName}`}
+					});
+					this.appOwnerList = [this.allSmeOption].concat(this.appOwnerList);
+					this.selectedAppOwner = this.allSmeOption;
+				},
+				complete: () => {
+					this.loadingLists = false;
+				}
 			});
 		}
 	}
@@ -207,22 +175,56 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 	 * Call endpoint to Generate Report based on UI options.
 	 */
 	onGenerateReport(): void {
-		this.reportsService.getApplicationEventReport(
-			this.selectedBundle.id,
-			this.selectedSme.id,
-			this.selectedStartWith.id,
-			this.selectedEndWith.id,
-			this.selectedTesting.id,
-			this.selectedOutage.field).subscribe(result => {
+		this.reportsService.generateApplicationProfilesReport(this.selectedBundle.id, this.selectedSme.id,
+			this.selectedAppOwner.id, this.maxAssets).subscribe(result => {
 				this.hideFilters = true;
 				this.reportResult = this.reportsService.getSafeHtml(result);
 				setTimeout(() => {
+					jQuery('[data-toggle="popover"]').popover();
 					const assetLinks = this.elRef.nativeElement.querySelectorAll('.inlineLink');
 					assetLinks.forEach(item => {
 						item.addEventListener('click', event => this.onAssetLinkClick(event));
-					})
+					});
+					const subAssetLinks = this.elRef.nativeElement.querySelectorAll('.subAssetLink');
+					subAssetLinks.forEach(item => {
+						item.removeAttribute('onclick');
+						item.addEventListener('click', event => this.onAssetLinkClick(event));
+					});
+					const assetDepLinks = this.elRef.nativeElement.querySelectorAll('.assetDepLink');
+					assetDepLinks.forEach(item => {
+						item.removeAttribute('onclick');
+						item.addEventListener('click', event => this.onAssetDepLinkClick(event));
+					});
 				}, 300);
 		})
+	}
+
+	/**
+	 * Asset name link handler
+	 * @param event: any
+	 */
+	protected onAssetDepLinkClick(event: any): void {
+		if (event.target) {
+			const {assetId, depId} = event.target.dataset;
+			if (assetId && depId) {
+				this.assetService.getDependencies(assetId, depId)
+					.subscribe((result) => {
+						this.showDependencyView(result);
+					});
+			}
+		}
+	}
+
+	/**
+	 * Show the asset dependencies popup.
+	 * @param assetId: number
+	 * @param assetClass: string
+	 */
+	showDependencyView(assetDependencies: any): void {
+		this.dialogService.extra(AssetDependencyComponent, [
+			{ provide: 'ASSET_DEP_MODEL', useValue: assetDependencies }])
+			.then(res => console.log(res))
+			.catch(res => console.log(res));
 	}
 
 }

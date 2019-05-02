@@ -93,6 +93,14 @@ class WsReportsController implements ControllerMethods {
         renderSuccessJson(reportsService.getSmeList(moveBundleId, true).sort({it.lastName}))
     }
 
+    def appOwnerList(Long moveBundleId) {
+        if ( !moveBundleId ) {
+            log.warn "moveBundleId param missing"
+            throw new InvalidParamException("moveBundleId param missing")
+        }
+        renderSuccessJson(reportsService.getSmeList(moveBundleId, false).sort({it.lastName}))
+    }
+
     /**
      * Retunrs the UI options lists for the Application Migration Report.
      * @param moveBundleId: Id of the move bundle.
@@ -179,5 +187,19 @@ class WsReportsController implements ControllerMethods {
         ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
         Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
         render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
+    }
+
+    /**
+     * Generates Application Profiles Report web output.
+     * @param moveBundle: The id of the move bundle selected value.
+     * @param sme: The id of the SME selected value.
+     * @param appOwner: The id of the SME selected value.
+     * @returns The rendered gsp view.
+     */
+    def generateApplicationProfiles() {
+        Project project = getProjectForWs()
+        ApplicationProfilesCommand command = populateCommandObject(ApplicationProfilesCommand)
+        Map model = reportsService.generateApplicationProfiles(project, command)
+        render(view: "/reports/generateApplicationProfiles" , model: model)
     }
 }
