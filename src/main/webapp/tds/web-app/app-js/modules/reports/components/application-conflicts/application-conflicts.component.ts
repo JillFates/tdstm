@@ -76,8 +76,6 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	load() {
 		this.isDisplayingReport = null;
 		const commonCalls = [
-			this.reportsService.getDefaults(),
-			this.reportsService.getDefaultsApplicationConflicts(),
 			this.userService.getUserContext(),
 			this.reportsService.getBundles()
 		];
@@ -85,7 +83,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		// on init
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
-				const [events, defaultsApplication, userContext, bundles] = results;
+				const [userContext, bundles] = results;
 				this.userContext = userContext;
 				this.dateFormatTime = this.preferenceService.getUserDateTimeFormat();
 				if (bundles) {
