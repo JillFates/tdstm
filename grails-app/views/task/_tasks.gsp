@@ -1,5 +1,4 @@
 <%@page defaultCodec="none" %>
-<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
 <%@page import="net.transitionmanager.task.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
