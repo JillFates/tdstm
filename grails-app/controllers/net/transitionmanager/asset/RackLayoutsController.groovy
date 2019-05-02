@@ -2,27 +2,29 @@ package net.transitionmanager.asset
 
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
+import net.transitionmanager.common.ControllerService
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelConnector
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -345,20 +347,36 @@ class RackLayoutsController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.RackView)
+	/**
+	 * Used to retrieve the list of racks
+	 * @param bundleIds - set to 'all' or comma separated list of ids to filter racks to specific bundles
+	 * @return Map of List<Map>sourceRackList and List<Map>targetRackList as JSON
+	 */
 	def retrieveRackDetails() {
-		def bundleIds = params.bundles
-		def moveBundles = []
-		if (bundleIds.contains('all')) {
-			moveBundles = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
-		}
-		else if (bundleIds) {
-			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundleIds.split(',').toList())
+		Project project = getProjectForWs()
 
-			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($moveBundleIds)")
+		// Get the bundle IDs and if not 'all'
+		List bundleIds = params.list('bundles')
+		Boolean showAllBundles = bundleIds.contains('all')
+		if (!showAllBundles) {
+			bundleIds = bundleIds.collect { NumberUtil.toPositiveLong(it, 0) }
 		}
 
-		def sourceRacks = []
-		def targetRacks = []
+		List moveBundles = []
+		try {
+			moveBundles = MoveBundle.where {
+				project == project
+				if (! showAllBundles ) {
+					id in bundleIds
+				}
+			}.list()
+		} catch (e) {
+			log.error "retrieveRackDetails failed query with params ${params}, ${e.message}"
+			throw new InvalidParamException('Invalid filter parameter(s) specified')
+		}
+
+		List sourceRacks = []
+		List targetRacks = []
 
 		moveBundles.each { moveBundle ->
 			moveBundle.sourceRacks.each {
