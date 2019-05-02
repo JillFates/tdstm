@@ -179,10 +179,10 @@ export class ReportsService {
 								.map((support: any) => {
 									return {
 										'type': support.type,
-										'class': 'PENDING',
-										'name': 'PENDING',
+										'class': support.asset.assetClass,
+										'name': support.asset.name,
 										'frequency': support.dataFlowFreq,
-										'bundle': 'PENDING',
+										'bundle':  support.asset.moveBundle,
 										'status': support.status
 									};
 								}),
@@ -190,10 +190,10 @@ export class ReportsService {
 							.map((dependency: any) => {
 								return {
 									'type': dependency.type,
-									'class': 'PENDING',
-									'name': 'PENDING',
+									'class': dependency.asset.assetClass,
+									'name': dependency.asset.name,
 									'frequency': dependency.dataFlowFreq,
-									'bundle': 'PENDING',
+									'bundle': dependency.asset.moveBundle,
 									'status': dependency.status
 								};
 							})
