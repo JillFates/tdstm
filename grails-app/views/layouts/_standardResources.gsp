@@ -11,21 +11,7 @@
 <g:javascript src="prototype/prototype.js" />
 <asset:javascript src="resources" />
 
-<%
-def moveEvent = tds.currentMoveEvent()
-/*Date date = new Date()
-def showCrawler = false
-if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
-	if((moveEvent.newsBarMode != 'off') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
-		showCrawler = true
-	}
-}
-*/
-%>
 
-<g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
-	<g:javascript src="crawler.js" />
-</g:if>
 
 <script type="text/javascript">
 	var currentURL='';

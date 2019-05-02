@@ -105,7 +105,6 @@ class MoveEventService implements ServiceMethods {
 			runbookBridge1: event.runbookBridge1,
 			runbookBridge2: event.runbookBridge2,
 			videolink: event.videolink,
-			newsBarMode: event.newsBarMode,
 			estStartTime: event.estStartTime,
 			estCompletionTime: event.estCompletionTime,
 			apiActionBypass: event.apiActionBypass

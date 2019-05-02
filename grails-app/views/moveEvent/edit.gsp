@@ -150,19 +150,6 @@
 				                  </g:hasErrors>
 				                </td>
 			              	</tr>
-                        	<tr class="prop">
-				                <td class="name">
-				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
-				                </td>
-				                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'newsBarMode','errors')}">
-				                  <g:select id="newsBarMode" name="newsBarMode" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(moveEventInstance.class).newsBarMode.inList}" value="${moveEventInstance.newsBarMode}" valueMessagePrefix="event.newsBarMode"></g:select>
-				                  <g:hasErrors bean="${moveEventInstance}" field="newsBarMode">
-				                    <div class="errors">
-				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="newsBarMode"/>
-				                    </div>
-				                  </g:hasErrors>
-				                </td>
-			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
