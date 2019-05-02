@@ -412,6 +412,54 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column name is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 'model name'
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
+	}
+
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column position is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 1
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
+	}
+
 	void 'test can throw an Exception if a column name is invalid'() {
 
 		given:
