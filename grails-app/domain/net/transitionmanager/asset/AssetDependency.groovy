@@ -1,5 +1,6 @@
 package net.transitionmanager.asset
 
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.Person
@@ -106,8 +107,9 @@ class AssetDependency {
 			id: id,
 			asset: [
 				id: asset.id,
-				name: asset.assetName,
-				moveBundle: asset.moveBundleName
+				assetClass: AssetClass.getClassOptionValueForAsset(asset),
+				moveBundle: asset.moveBundleName,
+				name: asset.assetName
 			],
 			c1: c1,
 			c2: c2,
@@ -118,8 +120,9 @@ class AssetDependency {
 			dataFlowFreq: dataFlowFreq,
 			dependent: [
 				id: dependent.id,
-				name: dependent.assetName,
-				moveBundle: dependent.moveBundleName
+				assetClass: AssetClass.getClassOptionValueForAsset(dependent),
+				moveBundle: dependent.moveBundleName,
+				name: dependent.assetName
 			],
 			status: status,
 			type: type
