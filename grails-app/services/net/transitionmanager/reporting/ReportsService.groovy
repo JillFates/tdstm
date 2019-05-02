@@ -96,7 +96,7 @@ class ReportsService implements ServiceMethods {
         def taskAnalysisInfo = getTaskAnalysisInfo(moveEvent, eventErrorList, viewUnpublished)
 
         [time                : eventsProjectInfo.time, moveEvent: moveEvent, userLoginError: eventsProjectInfo.userLoginError,
-         errorForEventTime   : eventsProjectInfo.errorForEventTime, newsBarModeError: eventsProjectInfo.newsBarModeError,
+         errorForEventTime   : eventsProjectInfo.errorForEventTime,
          project             : project, clientAccess: eventsProjectInfo.clientAccess, list: eventsProjectInfo.list,
          workFlowCodeSelected: eventBundleInfo.workFlowCodeSelected, steps: eventBundleInfo.steps,
          moveBundleSize      : moveBundles.size(), moveBundles: moveBundles, summaryOk: assetsInfo.summaryOk,
@@ -509,7 +509,7 @@ class ReportsService implements ServiceMethods {
     }
 
     /**
-     * @return time,moveEvent,errorForEventTime,newsBarModeError,userLoginError,clientAccess,list
+     * @return time,moveEvent,errorForEventTime, userLoginError,clientAccess,list
      */
     def getEventsProjectInfo(MoveEvent moveEvent, Project project, currProj, moveBundles, List<String> eventErrorList) {
 
@@ -542,14 +542,6 @@ class ReportsService implements ServiceMethods {
         def moveEventCompletiondate
         if (lastMoveBundleDateSize > 0) {
             moveEventCompletiondate = lastMoveBundleDate[-1]
-        }
-
-        String newsBarModeError
-        if (moveEventCompletiondate < project.startDate) {
-            eventErrorList << 'Project'
-            newsBarModeError = redSpan(moveEvent.name + ': MoveEvent In Past', '', false)
-        } else {
-            newsBarModeError = greenSpan(moveEvent.name + ': OK', '', false)
         }
 
         List<Map> list = partyRelationshipService.getProjectStaff(currProj)
@@ -594,7 +586,7 @@ class ReportsService implements ServiceMethods {
             clientAccess = greenSpan('Client Access:&nbsp;' + persons, '', false)
         }
 
-        [time          : time, moveEvent: moveEvent, errorForEventTime: errorForEventTime, newsBarModeError: newsBarModeError,
+        [time          : time, moveEvent: moveEvent, errorForEventTime: errorForEventTime,
          userLoginError: userLoginError, clientAccess: clientAccess, list: list, eventErrorList: eventErrorList]
     }
 
