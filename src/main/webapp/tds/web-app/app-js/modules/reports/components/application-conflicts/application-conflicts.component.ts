@@ -1,35 +1,17 @@
 import {
-	ChangeDetectorRef,
-	Component,
-	OnInit
+	Component
 } from '@angular/core';
-
-import {AlertType} from '../../../../shared/model/alert.model';
-
-import {
-	DomSanitizer,
-	SafeHtml
-} from '@angular/platform-browser';
 
 import {
 	Observable,
 } from 'rxjs';
 
-import {
-	pathOr,
-} from 'ramda';
-
-import {ActivatedRoute} from '@angular/router';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-
-declare var jQuery: any;
 
 @Component({
 	selector: 'tds-application-conflicts',
@@ -59,11 +41,6 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	applicationConflicts: Array<ApplicationConflict> = [];
 
 	constructor(
-		private sanitizer: DomSanitizer,
-		private route: ActivatedRoute,
-		private changeDetectorRef: ChangeDetectorRef,
-		private translatePipe: TranslatePipe,
-		private notifierService: NotifierService,
 		private preferenceService: PreferenceService,
 		private userService: UserService,
 		protected dialogService: UIDialogService,
@@ -90,12 +67,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 					this.model.moveBundleList = bundles.moveBundles
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
 					this.model.moveBundleList.unshift(this.planningBundles);
-					console.log(this.model.moveBundleList);
 					this.model.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
 					this.updateOwnersList(this.model.bundle);
 				}
-
-				console.log(bundles);
 			});
 	}
 
@@ -129,9 +103,6 @@ export class ApplicationConflictsComponent extends ReportComponent {
 					this.reportBundle = this.getReportBundle();
 					this.reportOwner = this.getReportOwner();
 
-					console.log('RESULTS:');
-					console.log(results);
-					console.log('----------');
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
 					this.hideFilters = true;
@@ -144,8 +115,6 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		if (bundle && bundle.id) {
 			this.reportsService.getOwnersByBundle(bundle.id)
 			.subscribe((results) => {
-				console.log('The results for the bundles:');
-				console.log(results);
 				if (results && results.owners) {
 					this.model.appOwnerList = results.owners
 						.map((result: any) => ({id: result.id.toString(), name: result.fullName}));
