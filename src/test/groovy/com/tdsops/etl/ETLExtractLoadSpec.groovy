@@ -29,6 +29,7 @@ import net.transitionmanager.common.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -410,6 +411,54 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				value == "Slideaway"
 				originalValue == "Slideaway"
 			}
+	}
+
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column name is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 'model name'
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
+	}
+
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column position is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 1
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
 	}
 
 	void 'test can throw an Exception if a column name is invalid'() {
@@ -1208,6 +1257,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Room domain instances'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -1222,8 +1272,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.staticexecuteQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
@@ -1254,6 +1304,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Rack domain instances'() {
 
 		given:
@@ -1273,8 +1324,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.static.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
