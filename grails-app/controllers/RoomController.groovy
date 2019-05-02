@@ -5,7 +5,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
