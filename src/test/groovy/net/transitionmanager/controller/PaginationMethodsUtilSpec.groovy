@@ -92,7 +92,6 @@ class PaginationMethodsUtilSpec extends Specification {
 			ex = thrown(GrailsDomainException)
 	}
 
-
 	void 'test paginationOrderBy for missing sort param'() {
 		when: 'a valid domain and default property are supplied to paginationOrderBy'
 			String sortByParam = 'sorder'
@@ -108,6 +107,16 @@ class PaginationMethodsUtilSpec extends Specification {
 
 	}
 
+	void 'test paginationAsObject'() {
+		given: 'the controller has a Map'
+			testController.params = [sord: 'desc', sidx: 'description']
+		and: 'a PaginationObject is created'
+			PaginationObject po = testController.paginationAsObject()
+		expect: 'calling paginationSortOrder on the object should return value from the params.sord'
+			'DESC' == po.paginationSortOrder('sord', 'ASC')
+		and: 'calling paginationOrderBy on the object should return value from the params.idx'
+			'description' == po.paginationOrderBy(Application, 'sidx', 'assetName')
+	}
 
 	/**
 	 * Used by test cases to set params appropriately in the Test Controller Object which returns a blank string so that it
