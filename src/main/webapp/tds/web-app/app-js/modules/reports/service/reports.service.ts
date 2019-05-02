@@ -469,7 +469,7 @@ export class ReportsService {
 	 * Get the default bundles
 	 */
 	getBundles(): Observable<any> {
-		return this.http.get(`${this.baseURL}/reports/moveBundles`)
+		return this.http.get(`${this.baseURL}/reports/moveBundlesForSelection`)
 			.map((response: any) => {
 				console.log('The response is:');
 				console.log(response);
