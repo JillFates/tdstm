@@ -14,12 +14,8 @@ import org.grails.web.json.JSONObject
 
 class DataviewSpec {
 
-	/**
-	 * Defines a custom filter name used from the UI
-	 * for adding custom filters like 'physicalServer' or 'virtualServer'
-	 */
-	static final String CUSTOM_FILTER = '_filter'
-    static final String COMMON = 'common'
+
+	static final String COMMON = 'common'
     static final String ASCENDING = 'a'
     static final String DECENDING = 'd'
 

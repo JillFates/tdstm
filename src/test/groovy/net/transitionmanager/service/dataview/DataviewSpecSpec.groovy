@@ -10,6 +10,7 @@ import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.service.DataviewCustomFilterHQLBuilder
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -105,7 +106,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.spec.columns.findAll { it.property == DataviewSpec.CUSTOM_FILTER }*.filter == ['physicalServer']
+			dataviewSpec.spec.columns.findAll { it.property == DataviewCustomFilterHQLBuilder.CUSTOM_FILTER }*.filter == ['physicalServer']
 	}
 
 	@Shared
