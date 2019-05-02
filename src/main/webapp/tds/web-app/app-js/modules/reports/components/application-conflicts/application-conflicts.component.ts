@@ -106,6 +106,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.maxApplications.value
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
+					console.log('RESULTS:');
+					console.log(results);
+					console.log('----------');
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
 					this.hideFilters = true;

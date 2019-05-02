@@ -162,9 +162,43 @@ export class ReportsService {
 			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
 			return this.http.get(`${url}${params}`)
 			.map((response: any) => {
-				console.log('The response is:');
-				console.log(response);
-				return response && response.status === 'success' && response.data;
+				const data =  (response && response.status === 'success' && response.data || null);
+
+				return data == null ? [] : data.appList
+					.map((appItem: any) => {
+						return {
+							'application': {
+								'id': appItem.app.id,
+								'name': appItem.app.assetName
+							},
+							'bundle': {
+								'id': data.moveBundle.id,
+								'name': data.moveBundle.name
+							},
+							supports: appItem.supportsList
+								.map((support: any) => {
+									return {
+										'type': support.type,
+										'class': 'PENDING',
+										'name': 'PENDING',
+										'frequency': support.dataFlowFreq,
+										'bundle': 'PENDING',
+										'status': support.status
+									};
+								}),
+							dependencies: appItem.dependsOnList
+							.map((dependency: any) => {
+								return {
+									'type': dependency.type,
+									'class': 'PENDING',
+									'name': 'PENDING',
+									'frequency': dependency.dataFlowFreq,
+									'bundle': 'PENDING',
+									'status': dependency.status
+								};
+							})
+						}
+					})
 			})
 			.catch((error: any) => error);
 
@@ -456,6 +490,4 @@ export class ReportsService {
 			})
 			.catch((error: any) => error);
 	}
-
-
 }
