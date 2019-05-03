@@ -38,6 +38,9 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
+import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.web.util.HtmlUtils
+
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PersonController implements ControllerMethods, PaginationMethods {
 
@@ -187,22 +190,9 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = "$grailsLinkGenerator.serverBaseURL/assets/icons/user_add.png"
 		def results = personInstanceList?.collect {
-			[
-				cell: [
-					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
-					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
-					'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
-					genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
-					it.email,
-					it.company,
-					it.dateCreated,
-					it.lastUpdated,
-					it.modelScore
-				],
-				id  : it.personId
-			]
-		}
-
+			[cell: [it.firstname, it.middlename,  it.lastname,
+			genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
+			it.email, it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 
@@ -226,7 +216,7 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		String element
 		if (personData.userLoginId) {
 			if (haveUserEditPerm) {
-				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + personData.userLogin + '</a>'
+				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + HtmlUtils.htmlEscape(personData.userLogin) + '</a>'
 			} else {
 				element = personData.userLogin
 			}
