@@ -96,7 +96,7 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'assets/images'
 
 	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 

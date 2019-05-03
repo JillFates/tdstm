@@ -17,7 +17,7 @@
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
 	<asset:stylesheet href="css/tds-style.css" />
-	<asset:link rel="shortcut icon" type="image/png" href="images/TMFavicon_v4.7.png" />
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 	<asset:stylesheet href="css/spinner.css" />
 
 	<!-- jQuery -->
