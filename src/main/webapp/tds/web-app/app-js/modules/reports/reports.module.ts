@@ -20,8 +20,10 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import { TagsResolveService } from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
+import { TagService } from '../assetTags/service/tag.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
@@ -56,9 +58,12 @@ import {ReportToggleFiltersComponent} from './components/report-toggle-filters.c
 		ReportToggleFiltersComponent,
 	],
 	providers: [
-		ReportsService,
 		// Resolve
+		TagsResolveService,
 		ModuleResolveService,
+		// Services
+		ReportsService,
+		TagService,
 		TranslatePipe
 	],
 	exports: [

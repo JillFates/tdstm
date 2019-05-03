@@ -169,7 +169,8 @@ export class ReportsService {
 						return {
 							'application': {
 								'id': appItem.app.id,
-								'name': appItem.app.assetName
+								'name': appItem.app.assetName,
+								'assetClass': appItem.app.assetClass.name
 							},
 							'bundle': {
 								'id': data.moveBundle.id,

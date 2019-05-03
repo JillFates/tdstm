@@ -4,6 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
+import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -71,6 +72,13 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: ApplicationConflictsComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService],
+		resolve: {
+			tagList: TagsResolveService
+		},
+		runGuardsAndResolvers: 'always'
 	},
 	{
 		path: ReportStates.TASK_REPORT.url,

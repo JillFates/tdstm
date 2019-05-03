@@ -12,6 +12,10 @@ import {UserService} from '../../../security/services/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {
+	DIALOG_SIZE,
+} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'tds-application-conflicts',
@@ -123,5 +127,17 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				}
 			});
 		}
+	}
+
+	onApplicationSelected(application: any): void {
+		this.dialogService.open(AssetShowComponent, [
+			{ provide: 'ID', useValue: application.id },
+			{ provide: 'ASSET', useValue: application.assetClass }],
+			DIALOG_SIZE.LG, false)
+			.then(asset => {
+				console.log('Done');
+			}).catch(error => {
+				console.log('Error:', error);
+			});
 	}
 }

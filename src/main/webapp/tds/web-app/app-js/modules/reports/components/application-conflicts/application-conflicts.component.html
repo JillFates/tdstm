@@ -89,7 +89,7 @@
 						<div class="container application-container" *ngFor="let item of applicationConflicts">
 							<div class="row application-header" >
 								<div class="col-sm-12 pull-left">
-									{{item.application.name}} ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+									<a (click)="onApplicationSelected(item.application)" class="inlineLink">{{item.application.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
 								</div>
 							</div>
 				
