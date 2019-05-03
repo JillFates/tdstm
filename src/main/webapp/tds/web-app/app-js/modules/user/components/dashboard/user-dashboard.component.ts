@@ -166,7 +166,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public fetchTasksForGrid(): void {
-		if(this.taskList) {
+		if (this.taskList) {
 			for (let i = 0; i < this.taskList.length; i++) {
 				this.taskGrid.collapseRow(i);
 			}

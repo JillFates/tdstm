@@ -16,7 +16,6 @@ class MoveEvent {
 	Project project
 	String name
 	String description
-	String newsBarMode = 'off'
 	String calcMethod = METHOD_LINEAR
 	String runbookStatus
 	Integer runbookVersion = 1
@@ -55,7 +54,6 @@ class MoveEvent {
 		estCompletionTime nullable: true
 		estStartTime nullable: true
 		name blank: false, size: 0..255
-		newsBarMode blank: false, inList: ['auto', 'on', 'off']
 		revisedCompletionTime nullable: true
 		runbookBridge1 nullable: true, size: 0..255
 		runbookBridge2 nullable: true, size: 0..255

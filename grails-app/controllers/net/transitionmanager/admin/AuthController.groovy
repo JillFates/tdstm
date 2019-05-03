@@ -158,7 +158,7 @@ class AuthController implements ControllerMethods {
 			Date eventStart = eventTimes.start
 			Date eventCompletion = eventTimes.completion
 			Long completion = eventCompletion?.time
-			if (moveEvent.newsBarMode == 'on' || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
+			if ((completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
 				MoveEventSnapshot snapshot = MoveEventSnapshot.findByMoveEvent(MoveEvent.list()[3], [sort: 'dateCreated', order: 'desc'])
 				String status = ''
 				Integer dialInd = snapshot?.dialIndicator

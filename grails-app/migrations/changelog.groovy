@@ -55,4 +55,5 @@ databaseChangeLog = {
 //	include file: 'version/v4_7_0/20190326-Updating-recipe-size.groovy'
 	include file: 'version/v4_7_0/20190327-Change-scale-field-control-type-to-inList.groovy'
 	include file: 'version/v4_7_0/20190328-usability-and-style-changes-to-system-views-part2.groovy'
+	include file: 'version/v4_7_0/20190502-move-event-table-drop-column-news-bar-mode.groovy'
 }

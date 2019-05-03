@@ -1,11 +1,5 @@
 package net.transitionmanager.move
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
@@ -13,20 +7,28 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.event.CreateEventCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
+import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.ss.usermodel.Workbook
 import org.hibernate.criterion.Order
@@ -35,7 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.sql.Timestamp
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class MoveEventController implements ControllerMethods {
+class MoveEventController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -53,35 +55,31 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def listJson() {
-
-		String sortIndex = params.sidx ?: 'assetName'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		String sortIndex = paginationOrderBy(MoveEvent, 'sidx', 'name')
+		String sortOrder = paginationSortOrder('sord')
 
 		List<MoveEvent> events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", securityService.loadUserCurrentProject())
 			if (params.name) {
-				ilike('name', "%${params.name.trim()}%")
+				ilike('name', SqlUtil.formatForLike(params.name.trim()))
 			}
 			if (params.description) {
-				ilike('description', "%$params.description%")
+				ilike('description', SqlUtil.formatForLike(params.description.trim()))
 			}
 			if (params.runbookStatus) {
-				ilike('runbookStatus', "%$params.runbookStatus%")
+				ilike('runbookStatus', SqlUtil.formatForLike(params.runbookStatus.trim()))
 			}
-			def newsBM = retrieveNewsBMList(params.newsBarMode)
-			if (newsBM) {
-				'in'('newsBarMode', newsBM)
-			}
-			order(params.sord == "desc"? Order.desc(sortIndex).ignoreCase():Order.asc(sortIndex).ignoreCase())
+			order(sortOrder == 'DESC' ? Order.desc(sortIndex).ignoreCase() : Order.asc(sortIndex).ignoreCase())
 		}
 
 		int totalRows = events.totalCount
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = events.collect {
-			[cell: [it.name, it.estStartTime, it.estCompletionTime, it.description, message(code: 'event.newsBarMode.' + it.newsBarMode),
+			[cell: [it.name, it.estStartTime, it.estCompletionTime, it.description,
 			        it.runbookStatus, it.moveBundlesString], id: it.id]
 		}
 
@@ -252,21 +250,19 @@ class MoveEventController implements ControllerMethods {
 				news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
 			}
 
-			// append recent tasks  whose status is completed, moveEvent is newsBarMode
+			// append recent tasks  whose status is completed
 			def transitionComment = new StringBuilder()
-			if (moveEvent.newsBarMode == "on") {
-				def today = new Date()
-				def currentPoolTime = new Timestamp(today.getTime())
-				def tasksCompList = jdbcTemplate.queryForList("""
-					SELECT comment, date_resolved AS dateResolved FROM asset_comment
-					WHERE project_id=?
-					  AND move_event_id=?
-					  AND status='Completed'
-					  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
-				""", moveEvent.project.id, moveEvent.id, currentPoolTime, currentPoolTime)
-				tasksCompList.each {
-					transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
-				}
+			def today = new Date()
+			def currentPoolTime = new Timestamp(today.getTime())
+			def tasksCompList = jdbcTemplate.queryForList("""
+				SELECT comment, date_resolved AS dateResolved FROM asset_comment
+				WHERE project_id=?
+				  AND move_event_id=?
+				  AND status='Completed'
+				  AND (date_resolved BETWEEN SUBTIME(?, '00:15:00') AND ?)
+			""", moveEvent.project.id, moveEvent.id, currentPoolTime, currentPoolTime)
+			tasksCompList.each {
+				transitionComment << it.comment << ":&nbsp;&nbsp;" << TimeUtil.formatDateTime(it.dateResolved) << ".&nbsp;&nbsp;"
 			}
 
 			def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
@@ -428,25 +424,5 @@ class MoveEventController implements ControllerMethods {
 		}
 
 		render assetAffected
-	}
-
-	/**
-	 * Filters newsBarMode property]; as we are displaying different label in list so user may search
-	 * according to displayed label but in DB we have different values what we are displaying in label
-	 * e.g. for auto - Auto Start, true - Started ..
-	 * @param newsBarMode with what character user filterd newsBarMode property
-	 * @return matched db property of newsBarMode
-	 */
-	@HasPermission(Permission.EventView)
-	private List<String> retrieveNewsBMList(String newsBarMode) {
-		if (!newsBarMode) return null
-
-		List<String> returnList = []
-		['Auto Start': 'auto', Started: 'on', Stopped: 'off'].each { String key, String value ->
-			if (StringUtils.containsIgnoreCase(key, newsBarMode)) {
-				returnList << value
-			}
-		}
-		return returnList
 	}
 }
