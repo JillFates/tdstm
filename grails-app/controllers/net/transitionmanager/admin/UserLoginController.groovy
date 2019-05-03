@@ -5,6 +5,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -172,9 +173,9 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
 			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.hence(it.locked, indefinitelyThreshold), failedLoginAttempts: it.failedAttempts],
-			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
-			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
-			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
+			        '<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + HtmlUtil.escape(it.username) + '</a>',
+			        '<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + HtmlUtil.escape(it.fullname) + '</a>',
+			        it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
