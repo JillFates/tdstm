@@ -67,7 +67,7 @@ export const ReportsRoute: Routes = [
 				title: 'REPORTS.APPLICATION_CONFLICTS',
 				instruction: '',
 				menu: ['REPORTS.REPORTS', 'REPORTS.APPLICATION_CONFLICTS'],
-				topMenu: { parent: 'menu-parent-reports', child: 'menu-reports-application-conflicts2', subMenu: true }
+				topMenu: { parent: 'menu-parent-reports', child: 'menu-reports-application-conflicts', subMenu: true }
 			},
 			requiresAuth: true,
 		},

@@ -116,7 +116,7 @@
 									<div class="col-sm-1 data-item">{{support.class}}</div>
 									<div class="col-sm-3 data-item">{{support.name}}</div>
 									<div class="col-sm-2 data-item">{{support.frequency}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name || support.bundle === reportBundle}">{{support.bundle}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
 									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
 							</div>
 				
@@ -142,7 +142,7 @@
 									<div class="col-sm-1 data-item">{{dependency.class}}</div>
 									<div class="col-sm-3 data-item">{{dependency.name}}</div>
 									<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name || dependency.bundle === reportBundle}">{{dependency.bundle}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
 									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
 							</div>
 						</div>
