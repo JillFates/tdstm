@@ -5,6 +5,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -39,7 +40,6 @@ import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
-import org.springframework.web.util.HtmlUtils
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PersonController implements ControllerMethods, PaginationMethods {
@@ -216,7 +216,7 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		String element
 		if (personData.userLoginId) {
 			if (haveUserEditPerm) {
-				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + HtmlUtils.htmlEscape(personData.userLogin) + '</a>'
+				element = '<a href="' + editUrl + '/' + personData.userLoginId + '">' + HtmlUtil.escape(personData.userLogin) + '</a>'
 			} else {
 				element = personData.userLogin
 			}
