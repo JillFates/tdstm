@@ -304,7 +304,7 @@ export class ReportsService {
 									'class': dependency.asset.assetClass,
 									'name': dependency.asset.name,
 									'frequency': dependency.dataFlowFreq,
-									'bundle': dependency.asset.moveBundle,
+									'bundle': dependency.dependent.moveBundle,
 									'status': dependency.status
 								};
 							})
