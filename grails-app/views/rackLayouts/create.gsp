@@ -213,7 +213,7 @@
                 }
 
                 reqLoadRack = jQuery.ajax({
-                    url: tdsCommon.createAppURL("$(form).attr('action')"),
+                    url: tdsCommon.createAppURL('/rackLayouts/generateElevations'),
                     data: $(form).serialize(),
                     type: 'POST',
                     success: function (data) {
