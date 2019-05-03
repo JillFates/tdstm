@@ -5,6 +5,8 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -12,7 +14,6 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
 import net.transitionmanager.common.ControllerService
-import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.model.Model

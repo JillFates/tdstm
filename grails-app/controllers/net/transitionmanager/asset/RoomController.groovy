@@ -19,6 +19,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.asset.RackService
 import net.transitionmanager.asset.RoomService
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
