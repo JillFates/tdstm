@@ -18,9 +18,10 @@ import org.springframework.beans.factory.annotation.Value
  * <p>To check a value in cache and save in cache, use the following:</p>
  * <pre>
  *   Map fieldSpec = fieldSpecsCacheService.getAllFieldSpecs(project, domain)
- *   if (!fieldSpec) {*   	...
+ *   if (!fieldSpec) {
+ *   	...
  *   	fieldSpecsCacheService.setAllFieldSpecs(project, domain, fieldSpec)
- *}* </pre>
+ * } </pre>
  * <p>To remove all field specs from cache, use the following:</p>
  * <pre>
  * 	fieldSpecsCacheService.removeFieldSpecs(project, domain)
@@ -75,23 +76,29 @@ class FieldSpecsCacheService implements InitializingBean {
 
 	/**
 	 * <p>Creates an String value with the key used to map Field Specs in
-	 * {@code FieldSpecsCacheService#cache} cache </p>
+	 * {@code FieldSpecsCacheService#cache} cache with a Map value</p>
+	 * <pre>
+	 *     cacheKeyForMapObject(project, 'ASSET') == 'project-2554-asset-fieldspec-map'
+	 * </pre>
 	 * @param project an instance of {@code Project}
 	 * @param domain a String value represents an Asset name
 	 * @return a String value used as a key in {@code FieldSpecsCacheService#cache} cache
 	 */
-	private static String cacheKey(Project project, String domain) {
-		return "project-${project.id}-${domain}"
+	private String cacheKeyForMapObject(Project project, String domain) {
+		return "project-${project.id}-${domain.toLowerCase()}-fieldspec-map"
 	}
 
 	/**
 	 * <p>Creates an String value with the key used to map Field Specs in
-	 * {@code FieldSpecsCacheService#cache} cache </p>
+	 * {@code FieldSpecsCacheService#cache} cache in JSON string content</p>
+	 * <pre>
+	 *     cacheKeyForJSON(project) == 'project-2554-fieldspec-json'
+	 * </pre>
 	 * @param project an instance of {@code Project}
 	 * @return a String value used as a key in {@code FieldSpecsCacheService#cache} cache
 	 */
-	private static String cacheKey(Project project) {
-		return "project-${project.id}"
+	private String cacheKeyForJSON(Project project) {
+		return "project-${project.id}-fieldspec-json"
 	}
 
 	/**
@@ -102,7 +109,7 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * 			does not contains a value for project and domain params.
 	 */
 	private Map getElementValueFromCache(Project project, String domain) {
-		Element element = fieldSpecsCache?.get(cacheKey(project, domain))
+		Element element = fieldSpecsCache?.get(cacheKeyForMapObject(project, domain))
 		return (Map) element?.value
 	}
 	/**
@@ -127,7 +134,7 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * 			does not contains a value for project param.
 	 */
 	String getJsonFieldSpecs(Project project) {
-		Element element = fieldSpecsCache?.get(cacheKey(project))
+		Element element = fieldSpecsCache?.get(cacheKeyForJSON(project))
 		return element?.getObjectValue()
 	}
 
@@ -137,7 +144,7 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @param fieldSpecs a String of field specs definitions
 	 */
 	void setJsonFieldSpecs(Project project, String jsonFieldSpecs) {
-		fieldSpecsCache.put(new Element(cacheKey(project), jsonFieldSpecs))
+		fieldSpecsCache.put(new Element(cacheKeyForJSON(project), jsonFieldSpecs))
 	}
 
 	/**
@@ -147,7 +154,7 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @param fieldSpecs a Map of field specs definitions
 	 */
 	void setAllFieldSpecs(Project project, String domain, Map fieldSpecs) {
-		fieldSpecsCache.put(new Element(cacheKey(project, domain), deepCopy(fieldSpecs)))
+		fieldSpecsCache.put(new Element(cacheKeyForMapObject(project, domain), deepCopy(fieldSpecs)))
 	}
 
 	/**
@@ -156,8 +163,8 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @param domain a String value represents an Asset name
 	 */
 	void removeFieldSpecs(Project project, String domain) {
-		fieldSpecsCache.remove(cacheKey(project))
-		fieldSpecsCache.remove(cacheKey(project, domain))
+		fieldSpecsCache.remove(cacheKeyForJSON(project))
+		fieldSpecsCache.remove(cacheKeyForMapObject(project, domain))
 	}
 
 	/**
