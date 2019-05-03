@@ -20,6 +20,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DashboardService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
@@ -138,7 +139,17 @@ class DashboardController implements ControllerMethods {
 	def retrieveEventsList() {
 		Person currentPerson = securityService.loadCurrentPerson()
 		Long projectId = NumberUtil.toPositiveLong(params.project)
-		List<MoveEvent> events = moveEventService.getAssignedEventsForDashboard(currentPerson, projectId)
+		Project project
+
+		if (projectId) {
+			if (securityService.hasAccessToProject(projectId)) {
+				project = Project.read(projectId)
+			} else {
+				throw new InvalidParamException('Invalid project id for filtering events.')
+			}
+		}
+
+		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson, project, TimeUtil.nowGMT())
 		Date now = TimeUtil.nowGMT()
 
 		List<Map> eventsMap = events.collect { MoveEvent moveEvent ->
