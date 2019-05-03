@@ -54,6 +54,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 			this.load();
 	}
 
+	/**
+	 * Load the user context and list bundles
+	 */
 	load() {
 		this.isDisplayingReport = null;
 		const commonCalls = [
@@ -61,7 +64,6 @@ export class ApplicationConflictsComponent extends ReportComponent {
 			this.reportsService.getBundles()
 		];
 
-		// on init
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
 				const [userContext, bundles] = results;
@@ -77,20 +79,29 @@ export class ApplicationConflictsComponent extends ReportComponent {
 			});
 	}
 
-	getReportBundle(): string {
+	/**
+	 * Get the name of the current bundle selected
+	*/
+	getReportBundleName(): string {
 		const id = this.model.bundle && this.model.bundle.id || '';
 
 		const bundle =  this.model.moveBundleList.find((bundle) => bundle.id === id);
 		return bundle.name || '';
 	}
 
-	getReportOwner(): string {
+	/**
+	 * Get the name of the current owner selected
+	*/
+	getReportOwnerName(): string {
 		const id = this.model.appOwner && this.model.appOwner.id || '';
 
 		const owner =  this.model.appOwnerList.find((owner) => owner.id === id);
 		return owner.name || '';
 	}
 
+	/**
+	 * Get the conflicts to feed the report
+	*/
 	onGenerateReport(): void {
 		if (this.model.bundle) {
 			this.reportsService.getApplicationConflicts(
@@ -104,8 +115,8 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				.subscribe((results: Array<ApplicationConflict>) => {
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
-					this.reportBundle = this.getReportBundle();
-					this.reportOwner = this.getReportOwner();
+					this.reportBundle = this.getReportBundleName();
+					this.reportOwner = this.getReportOwnerName();
 
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
@@ -115,6 +126,10 @@ export class ApplicationConflictsComponent extends ReportComponent {
 
 	}
 
+	/**
+	 * Get the owners whom belong to the current bundle
+	 * @param bundle: any
+	 */
 	updateOwnersList(bundle: any) {
 		if (bundle && bundle.id) {
 			this.reportsService.getOwnersByBundle(bundle.id)
@@ -129,6 +144,10 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		}
 	}
 
+	/**
+	 * Open the asset show view of the current application selected
+	 * @param application: any
+	 */
 	onApplicationSelected(application: any): void {
 		this.dialogService.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: application.id },
