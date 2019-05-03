@@ -302,7 +302,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				redirect(action: "show", id: id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
-			flash.message = INVALID_CSRF_TOKEN
+			flash.message = message(code: 'invalid.csrf.token')
 
 			if (id) {
 				// Make sure the user exists before sending to edit otherwise the CSRF message gets lost
@@ -366,9 +366,11 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		withForm {
 			try {
 				newUserLogin = securityService.createOrUpdateUserLoginAndPermissions(params, true)
-			} catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
+			}
+			catch (UnauthorizedException | InvalidParamException | DomainUpdateException e) {
 				errMsg = e.message
-			} catch (e) {
+			}
+			catch (e) {
 				log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 				errMsg = 'An error occurred that prevented creating the user'
 			}
@@ -381,7 +383,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 				redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
 			}
 		}.invalidToken {
-			flash.message = INVALID_CSRF_TOKEN
+			flash.message = message(code: 'invalid.csrf.token')
 			redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
 		}
 
