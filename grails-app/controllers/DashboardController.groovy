@@ -5,6 +5,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -139,6 +140,7 @@ class DashboardController implements ControllerMethods {
 	def retrieveEventsList() {
 		Person currentPerson = securityService.loadCurrentPerson()
 		Long projectId = NumberUtil.toPositiveLong(params.project)
+		Boolean active = StringUtil.toBoolean(params.active)
 		Project project
 
 		if (projectId) {
@@ -149,7 +151,7 @@ class DashboardController implements ControllerMethods {
 			}
 		}
 
-		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson, project, TimeUtil.nowGMT())
+		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson, project, active)
 		Date now = TimeUtil.nowGMT()
 
 		List<Map> eventsMap = events.collect { MoveEvent moveEvent ->
