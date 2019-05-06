@@ -85,6 +85,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/summaryTable" {
+			controller = "wsAsset"
+			action = [
+			    GET: "getSummaryTable"
+			]
+		}
+
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
