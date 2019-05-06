@@ -2285,7 +2285,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		SetImportPreferencesCommand command = populateCommandObject(SetImportPreferencesCommand)
 		validateCommandObject(command)
 
-		userPreferenceService.setPreference(command.key, command.value)
+		userPreferenceService.setPreference(command.preference, command.value)
 		render true
 	}
 

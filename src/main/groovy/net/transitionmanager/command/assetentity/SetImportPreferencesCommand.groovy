@@ -1,6 +1,7 @@
 package net.transitionmanager.command.assetentity
 
 import net.transitionmanager.command.CommandObject
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 
 /**
  *
@@ -14,5 +15,7 @@ class SetImportPreferencesCommand implements CommandObject {
     String preference
     String value
 
-    static constraints = {}
+    static constraints = {
+        preference inList: UserPreferenceEnum.importPreferenceKeys*.toString()
+    }
 }
