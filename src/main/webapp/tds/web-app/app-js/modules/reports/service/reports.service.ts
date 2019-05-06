@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import { ApplicationConflict } from '../model/application-conflicts.model';
 import {catchError, map} from 'rxjs/operators';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -184,7 +185,7 @@ export class ReportsService {
 	/**
 	 * GET - Return the list of SME that belongs to a move bundle.
 	 * @param moveBundleId
-	 */
+	*/
 	getApplicationEventReportLists(moveBundleId: number): Observable<any> {
 		return this.http.get(this.APP_EVENT_RESULTS_LISTS_URL.replace('{id}', moveBundleId.toString())).pipe(
 			map( (response: any) => response && response.data || null),
@@ -223,5 +224,93 @@ export class ReportsService {
 				return error;
 			})
 		)
+	}
+
+	/**
+	 * GET - Return the list of default bundles
+	 */
+	getBundles(): Observable<any> {
+		return this.http.get(`${this.baseURL}/reports/moveBundlesForSelection`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * GET - Return the owners filtered by bundle
+	 * @param {string} moveBundleId Bundle id to filter
+	 */
+	getOwnersByBundle(moveBundleId: string): Observable<any> {
+		return this.http.get(`${this.baseURL}/reports/appOwnersForBundle/${moveBundleId}`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * GET - Return the list of application conflicts
+	 * @param bundle: string
+	 * @param owner: string
+	 * @param conflicts: boolean
+	 * @param missing: boolean
+	 * @param unresolved: boolean
+	 * @param max: number
+	*/
+	getApplicationConflicts(
+		bundle: string,
+		owner: string,
+		conflicts: boolean,
+		missing: boolean,
+		unresolved: boolean,
+		max: number
+		): Observable<Array<ApplicationConflict>> {
+			const url = `${this.baseURL}/reports/applicationConflicts?`;
+			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
+			`&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
+
+			return this.http.get(`${url}${params}`)
+			.map((response: any) => {
+				const data =  (response && response.status === 'success' && response.data || null);
+
+				return data == null ? [] : data.appList
+					.map((appItem: any) => {
+						return {
+							'application': {
+								'id': appItem.app.id,
+								'name': appItem.app.assetName,
+								'assetClass': appItem.app.assetClass.name
+							},
+							'bundle': {
+								'id': data.moveBundle.id,
+								'name': data.moveBundle.name
+							},
+							supports: appItem.supportsList
+								.map((support: any) => {
+									return {
+										'type': support.type,
+										'class': support.asset.assetClass,
+										'name': support.asset.name,
+										'frequency': support.dataFlowFreq,
+										'bundle':  support.asset.moveBundle,
+										'status': support.status
+									};
+								}),
+							dependencies: appItem.dependsOnList
+							.map((dependency: any) => {
+								return {
+									'type': dependency.type,
+									'class': dependency.asset.assetClass,
+									'name': dependency.asset.name,
+									'frequency': dependency.dataFlowFreq,
+									'bundle': dependency.dependent.moveBundle,
+									'status': dependency.status
+								};
+							})
+						}
+					})
+			})
+			.catch((error: any) => error);
 	}
 }

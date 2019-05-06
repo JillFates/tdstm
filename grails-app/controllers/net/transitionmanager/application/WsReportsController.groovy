@@ -3,10 +3,12 @@ package net.transitionmanager.application
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
@@ -17,6 +19,7 @@ import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.command.reports.ApplicationConflictsCommand
 
 
 @Secured("isAuthenticated()")
@@ -179,5 +182,54 @@ class WsReportsController implements ControllerMethods {
         ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
         Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
         render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
+    }
+
+    /**
+     * Create and return a map containing all the bundles for the user's current project, along
+     * with the id of the default bundle for the selector -- either the user preference or the
+     * first element in the list of bundles.
+     *
+     * @return a map with all the bundles for the user's project (id and name) and the default bundle.
+     */
+    def getMoveBundles() {
+        Project project = getProjectForWs()
+        List<Map> moveBundles = MoveBundle.findAllByProject(project).collect { MoveBundle bundle ->
+            [id: bundle.id, name: bundle.name]
+        }
+        String moveBundleId = (userPreferenceService.moveBundleId ?: moveBundles[0]?.id).toString()
+        renderSuccessJson(moveBundles: moveBundles, moveBundleId: moveBundleId)
+    }
+
+    /**
+     * Return a list with all the possible App Owners for the given bundle.
+     * @param moveBundleId
+     */
+    def getOwnersForMoveBundle(Long moveBundleId) {
+        List<Map> owners = reportsService.getSmeList(moveBundleId, false).collect { Person person ->
+            [id: person.id, fullName: person.toString()]
+        }
+        renderSuccessJson(owners: owners)
+    }
+
+     /**
+     * Find and return the map with the content for the Application Conflicts report.
+     *
+     * @return a map with the content for the Application Conflicts Report.
+     */
+    def getApplicationConflicts() {
+        Project project = getProjectForWs()
+        ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand)
+        boolean useForPlanning = command.moveBundle == 'useForPlanning'
+        if (command.moveBundle && command.moveBundle != 'useForPlanning') {
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+        }
+
+        Map applicationConflictsMap = reportsService.genApplicationConflicts(project.id, command.moveBundle, command.bundleConflicts,
+            command.unresolvedDependencies, command.missingDependencies, useForPlanning, command.appOwner, command.maxAssets)
+
+        renderSuccessJson(applicationConflictsMap)
+
     }
 }

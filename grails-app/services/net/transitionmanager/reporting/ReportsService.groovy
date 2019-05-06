@@ -4,7 +4,12 @@ import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.*
+import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
@@ -18,7 +23,14 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.*
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveBundleStep
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -192,11 +204,11 @@ class ReportsService implements ServiceMethods {
                 }
             }
 
-            if (showApp) {
-                appList.add(app: it, dependsOnList: dependsOnList, supportsList: supportsList,
-                        dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size())
-            }
-        }
+			if (showApp) {
+				appList.add(app: it, dependsOnList: dependsOnList*.toMap(), supportsList: supportsList*.toMap(),
+				            dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size())
+			}
+		}
 
         [project   : project, appList: appList, columns: 9, currAppOwner: currAppOwner ?: 'All',
          moveBundle: moveBundleId.isNumber() ? MoveBundle.get(moveBundleId) : moveBundleId]
@@ -1262,4 +1274,3 @@ class ReportsService implements ServiceMethods {
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
     }
 }
-
