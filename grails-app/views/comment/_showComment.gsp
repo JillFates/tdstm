@@ -31,8 +31,15 @@
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" class="name"><label for="isResolved"></label></td>
-						<td valign="top" class="value" id="isResolved" colspan="3"><input type="checkbox" name="isResolved" value="1" ng-model="ac.isResolved" ng-true-value="1" ng-false-value="0" ng-disabled="true" />&nbsp;<label for="asset">Archived</label></td>
+						<td valign="top" class="name"><label for="isResolved">Status:</label></td>
+						<td valign="top" class="value" id="isResolved" colspan="3">
+							<div ng-if="ac.isResolved == 0">
+								Not resolved
+							</div>
+							<div ng-if="ac.isResolved == 1">
+								Archived
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
