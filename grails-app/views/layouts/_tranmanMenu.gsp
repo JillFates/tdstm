@@ -386,7 +386,7 @@
                                 <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
-                                <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
+                                <a href="/tdstm/module/reports/databaseConflicts">Database Conflicts</a>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
