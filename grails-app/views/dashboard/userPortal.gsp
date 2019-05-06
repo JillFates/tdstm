@@ -100,7 +100,8 @@
             margin-left: 20px;
         }
         .event-status-toolbar input[type='radio'] {
-            vertical-align: sub;
+            margin: 4px 4px 0;
+            vertical-align: top;
         }
         .event-status-toolbar #event-status-completed {
             margin-left: 12px;
