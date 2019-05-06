@@ -16,10 +16,14 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+// Components
+import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import { TagsResolveService } from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
+import { TagService } from '../assetTags/service/tag.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
@@ -47,6 +51,7 @@ import {ApplicationProfilesReportComponent} from './components/application-profi
 		ReportsRouteModule
 	],
 	declarations: [
+		ApplicationConflictsComponent,
 		PreEventCheckListSelectorComponent,
 		TaskReportComponent,
 		ServerConflictsReportComponent,
@@ -55,12 +60,18 @@ import {ApplicationProfilesReportComponent} from './components/application-profi
 		ReportToggleFiltersComponent,
 	],
 	providers: [
-		ReportsService,
 		// Resolve
+		TagsResolveService,
 		ModuleResolveService,
+		// Services
+		ReportsService,
+		TagService,
 		TranslatePipe
 	],
-	exports: [PreEventCheckListSelectorComponent],
+	exports: [
+		ApplicationConflictsComponent,
+		PreEventCheckListSelectorComponent
+	],
 	entryComponents: []
 })
 

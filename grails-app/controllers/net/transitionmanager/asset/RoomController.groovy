@@ -5,7 +5,8 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.RoomCommand
@@ -18,6 +19,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.asset.RackService
 import net.transitionmanager.asset.RoomService
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
@@ -432,7 +434,7 @@ class RoomController implements ControllerMethods {
 		if (rack) {
 			op += """
 					<tr>
-						<td colspan=2 class='powertable_L'><b>Rack : ${rack?.tag ?:""}</b></td>
+						<td colspan=2 class='powertable_L'><b>Rack : ${HtmlUtil.escape(rack?.tag)}</b></td>
 						<td colspan=3 class='powertable_L' nowrap>$spaceString</td>
 					</tr>
 					<tr>

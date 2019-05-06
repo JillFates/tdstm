@@ -5,7 +5,12 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.*
+import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
@@ -23,7 +28,6 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.*
 import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
@@ -208,11 +212,11 @@ class ReportsService implements ServiceMethods {
                 }
             }
 
-            if (showApp) {
-                appList.add(app: it, dependsOnList: dependsOnList, supportsList: supportsList,
-                        dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size())
-            }
-        }
+			if (showApp) {
+				appList.add(app: it, dependsOnList: dependsOnList*.toMap(), supportsList: supportsList*.toMap(),
+				            dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size())
+			}
+		}
 
         [project   : project, appList: appList, columns: 9, currAppOwner: currAppOwner ?: 'All',
          moveBundle: moveBundleId.isNumber() ? MoveBundle.get(moveBundleId) : moveBundleId]
@@ -1391,4 +1395,3 @@ class ReportsService implements ServiceMethods {
 		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
 	}
 }
-

@@ -95,14 +95,14 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <g:if test="${isLicenseManagerEnabled}">
-                        <asset:image id="logo-header" src="images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />
+                        <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
                     </g:if>
                     <g:else>
                         <g:if test="${setImage}">
                             <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
                         </g:if>
                         <g:else>
-                            <asset:image id="logo-header" src="images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
+                            <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
                         </g:else>
                     </g:else>
                 </div>

@@ -17,7 +17,7 @@
 			var listCaption ="Companies: <span class='capBtn'><input type='button' value='Create Company' onClick=\"window.location.href=\'"+contextPath+"/partyGroup/create\'\"/></span>"
 			<jqgrid:grid id="companyId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Name', 'Partner', 'Date Created', 'Last Updated'"
-				colModel="{name:'companyName', index: 'companyName', width:'150'},
+				colModel="{name:'companyName', index: 'companyName', width:'150', formatter: myLinkFormatter},
 					{name:'partner', width:'30'},
 					{name:'dateCreated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter},
 					{name:'lastUpdated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
@@ -32,6 +32,10 @@
 			TDS.jqGridFilterToolbar('companyId');
 
 			$.jgrid.formatter.integer.thousandsSeparator='';
+			function myLinkFormatter (cellvalue, options, rowObjcet) {
+				var value = cellvalue ? _.escape(cellvalue) : ''
+				return "<a href="+contextPath+"/partyGroup/show/"+options.rowId+">"+value+"</a>"
+			}
 		});
 		</script>
 	</head>

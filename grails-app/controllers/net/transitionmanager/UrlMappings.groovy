@@ -1254,6 +1254,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/applicationConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getApplicationConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [
@@ -1267,6 +1274,20 @@ class UrlMappings {
                     GET: "moveBundles"
             ]
         }
+
+		"/ws/reports/moveBundlesForSelection" {
+			controller = "wsReports"
+			action = [
+				GET: 'getMoveBundles'
+			]
+		}
+
+		"/ws/reports/appOwnersForBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+				GET: 'getOwnersForMoveBundle'
+			]
+		}
 
         "/ws/reports/generateServerConflicts" {
             controller = "wsReports"

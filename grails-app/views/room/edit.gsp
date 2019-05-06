@@ -469,7 +469,7 @@ function submitForm(form){
  		alert("Please enter room")
  	} else {
 		jQuery.ajax({
-			url: tdsCommon.createAppURL("$(form).attr('action')"),
+			url: tdsCommon.createAppURL('/room/update'),
 			data: $(form).serialize(),
 			type:'POST',
 			success: function(data) {
