@@ -244,6 +244,7 @@ export class CredentialViewEditComponent {
 	 */
 	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.modalTitle = 'Credential Edit';
 		this.focusForm();
 	}
 
