@@ -14,6 +14,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -50,13 +51,18 @@ import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import javax.servlet.http.HttpServletResponse
+import java.sql.ResultSet
+import java.sql.SQLException
 
 @Transactional
 class ReportsService implements ServiceMethods {
 
     JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
     RunbookService runbookService
     TaskService taskService
@@ -1287,35 +1293,38 @@ class ReportsService implements ServiceMethods {
 	 * @return list of applications
 	 */
 	def generateApplicationProfiles(Project project, ApplicationProfilesCommand command) {
-		def currentBundle
-		def currentSme
-		def applicationOwner
+		MoveBundle currentBundle
+		Person currentSme
+		Person applicationOwner
 
-		def query = new StringBuilder(""" SELECT a.app_id AS id
+		StringBuilder query = new StringBuilder(""" SELECT a.app_id AS id
 			FROM application a
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 			LEFT OUTER JOIN person p ON p.person_id=a.sme_id
 			LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
 			LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
-			WHERE ae.project_id = $project.id """)
+			WHERE ae.project_id = :projectId """)
+
+		Map queryParams = [projectId: project.id]
 
 		if(command.moveBundle == 'useForPlanning'){
-			def bundleIds = MoveBundle.getUseForPlanningBundlesByProject(project)?.id
-			query.append(" AND mb.move_bundle_id in (${WebUtil.listAsMultiValueString(bundleIds)}) ")
+			query.append(" AND mb.use_for_planning = true ")
 		}else{
-			currentBundle = MoveBundle.get(command.moveBundle)
-			query.append(" AND mb.move_bundle_id=$command.moveBundle ")
+			query.append(" AND mb.move_bundle_id= :currentBundle ")
+			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
 		}
 
 		if(command.sme!='null'){
 			currentSme = Person.get(command.sme)
-			query.append(" AND (p.person_id=$command.sme or p1.person_id=$command.sme) ")
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+			queryParams.smeId = currentSme.id
+			queryParams.sme2Id = currentSme.id
 		}
 
 		if(command.appOwner!='null'){
-			applicationOwner = Person.get(command.appOwner)
-			query.append(" AND p2.person_id=$command.appOwner ")
+			query.append(" AND p2.person_id= :appOwner")
+			queryParams.appOwner = Person.get(command.appOwner).id
 		}
 
 		int assetCap = 100 // default value
@@ -1331,7 +1340,7 @@ class ReportsService implements ServiceMethods {
 
 		log.info "query = $query"
 
-		def applicationList = jdbcTemplate.queryForList(query.toString())
+		List applicationList = namedParameterJdbcTemplate.query(query.toString(), queryParams, new ApplicationProfileRowMapper())
 
 		// TODO: we'd like to flush the session.
 		List appList = []
@@ -1393,5 +1402,16 @@ class ReportsService implements ServiceMethods {
 
 		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
 		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
+	}
+
+	/**
+	 * RowMapper that maps each result from the query for the Event News list
+	 * into a map column -> value that can be sent back to the UI.
+	 */
+	@CompileStatic
+	private class ApplicationProfileRowMapper implements RowMapper {
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {[
+			id: rs.getInt('id'),
+		]}
 	}
 }
