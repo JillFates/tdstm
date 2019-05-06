@@ -125,6 +125,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 				this.sortItems();
 			}
 		}
+		this.items = this.items.slice(0);
 	}
 
 	/**
@@ -135,6 +136,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		if (item.deletable) {
 			this.items.splice(this.items.indexOf(item), 1);
 		}
+		this.items = this.items.slice(0);
 	}
 
 	/**
@@ -155,7 +157,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 					this.activeDialog.dismiss();
 				}
 			});
-
 	}
 
 	/**
@@ -169,6 +170,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 			this.sortType = this.DESCENDING_ORDER;
 		}
 		this.sortItems();
+		this.items = this.items.slice(0);
 	}
 
 	/**
@@ -178,6 +180,9 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		this.items.sort(this.sortType === this.ASCENDING_ORDER ? ascendingSort : descendingSort);
 
 		function ascendingSort(a, b) {
+			if(a.value === null || b.value === null) {
+				return -1;
+			}
 			if (a.value.toUpperCase() < b.value.toUpperCase()) {
 				return -1;
 			}
@@ -188,6 +193,9 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		}
 
 		function descendingSort(a, b) {
+			if(a.value === null || b.value === null) {
+				return -1;
+			}
 			if (a.value.toUpperCase() > b.value.toUpperCase()) {
 				return -1;
 			}
