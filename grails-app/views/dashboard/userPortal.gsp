@@ -321,6 +321,7 @@
         function loadEventTable(id) {
 
             var projectId = id ? id : $("#userProjectId").val();
+            var activeStatus = ($( 'input[name=event-status]:checked' ).val()? $( 'input[name=event-status]:checked' ).val(): true);
 
             var grid = $("#gridEvents").data("kendoGrid");
             if(grid) {
@@ -340,7 +341,7 @@
                     transport: {
                         read: {
                             url: contextPath + '/dashboard/retrieveEventsList',
-                            data: { project:  projectId, active: $( 'input[name=event-status]:checked' ).val() }
+                            data: { project:  projectId, active: activeStatus }
                         }
                     },
                     schema: {
