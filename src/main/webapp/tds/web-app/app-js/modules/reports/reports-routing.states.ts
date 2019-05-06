@@ -13,6 +13,7 @@ import {ApplicationConflictsComponent} from './components/application-conflicts/
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
+import { DatabaseConflictsComponent } from './components/database-conflicts/database-conflicts.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -36,6 +37,9 @@ export class ReportStates {
 	};
 	public static readonly APPLICATION_EVENT_RESULTS = {
 		url: 'applicationEventResults'
+	};
+	public static readonly DATABASE_CONFLICTS_REPORT = {
+		url: 'databaseConflicts'
 	};
 }
 
@@ -136,7 +140,26 @@ export const ReportsRoute: Routes = [
 		],
 		resolve: {},
 		runGuardsAndResolvers: 'always'
-	}
+	},
+	{
+		path: ReportStates.DATABASE_CONFLICTS_REPORT.url,
+		data: {
+			page: {
+				title: 'REPORTS.DATABASE_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.DATABASE_CONFLICTS'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-database-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: DatabaseConflictsComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
 ];
 
 @NgModule({

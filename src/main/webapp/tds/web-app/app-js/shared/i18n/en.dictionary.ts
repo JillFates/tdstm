@@ -201,6 +201,7 @@ export const en_DICTIONARY: Object = {
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
+		'DATABASE_CONFLICTS': 'Database Conflicts',
 		'REPORT': 'Report',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'TASK_REPORT': 'Task Report',
