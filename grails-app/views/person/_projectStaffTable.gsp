@@ -1,4 +1,4 @@
-<%@page import="net.transitionmanager.domain.Person" %>
+<%@page import="net.transitionmanager.person.Person" %>
 <table id="staffingTable">
 	<thead>
 		<tr id="headerRowId">

@@ -1,5 +1,5 @@
-<%@page import="net.transitionmanager.domain.MoveEvent" %>
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.project.MoveEvent" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -149,19 +149,6 @@
                                     <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
                                 </td>
                             </tr>
-                        	<tr class="prop">
-				                <td class="name">
-				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
-				                </td>
-				                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'newsBarMode','errors')}">
-				                  <g:select id="newsBarMode" name="newsBarMode" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(moveEventInstance.class).newsBarMode.inList}" value="${moveEventInstance.newsBarMode}" valueMessagePrefix="event.newsBarMode"></g:select>
-				                  <g:hasErrors bean="${moveEventInstance}" field="newsBarMode">
-				                    <div class="errors">
-				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="newsBarMode"/>
-				                    </div>
-				                  </g:hasErrors>
-				                </td>
-			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
@@ -175,6 +162,20 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
+                            </tr>
+							<tr class="prop">
+								<td class="name">
+                                    <label for="description">Estimated Completion Time:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estCompletionTime','errors')}">
+                                    <input type="text" class="dateRange" size="15" style="width: 210px;" id="kendoEstCompletionTime"/>
+                                    <input type="hidden" id="estCompletionTime" name="estCompletionTime" />
+                                    <g:hasErrors bean="${moveEventInstance}" field="estCompletionTime">
+                                        <div class="errors">
+                                            <g:renderErrors bean="${moveEventInstance}" as="list" field="estCompletionTime"/>
+                                        </div>
+                                    </g:hasErrors>
+                                </td>
                             </tr>
 							<tr class="prop">
 								<td class="name">
@@ -207,16 +208,30 @@
 
     $(document).ready(function(){
 		$("#kendoEstStartTime").kendoDateTimePicker({ animation: false, change: onEstStartTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />'  });
-    	function onEstStartTimeChange() {
-        	if ($('#kendoEstStartTime').data("kendoDateTimePicker")) {
-                var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
+		$("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, change: onEstCompletionTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />'  });
+
+		/**
+		 * Process the Start and Completion time
+		 */
+		function changeTime(kendoInput, timeInput) {
+			if ($('#' + kendoInput).data("kendoDateTimePicker")) {
+				var userDateInput = $('#' + kendoInput).data("kendoDateTimePicker").value();
                 var dateTZ = '';
                 if (userDateInput !== null) {
                     dateTZ = tdsCommon.getISOString(userDateInput)
                 }
-                $('#estStartTime').val(dateTZ);
+				$('#' + timeInput).val(dateTZ);
 			}
+		}
+
+		function onEstStartTimeChange() {
+			changeTime('kendoEstStartTime', 'estStartTime');
+			}
+
+		function onEstCompletionTimeChange() {
+    		changeTime('kendoEstCompletionTime', 'estCompletionTime');
         }
+
     });
 
 </script>

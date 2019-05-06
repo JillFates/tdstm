@@ -4,10 +4,10 @@ import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import net.transitionmanager.connector.CallbackMode
-import net.transitionmanager.domain.ApiCatalog
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Credential
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.action.Provider
 /**
 * Command Object for handling API Action endpoints
 */

@@ -37,7 +37,8 @@ export class AssetCommentColumnModel {
 				label: 'Description',
 				property: 'comment',
 				type: 'text',
-				width: 574
+				width: 574,
+				locked: true
 			},
 			{
 				label: 'Asset',
@@ -46,7 +47,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'AssetType',
+				label: 'Asset Type',
 				property: 'assetType',
 				type: 'text',
 				width: 170
@@ -71,7 +72,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'CreatedBy',
+				label: 'Created By',
 				property: 'createdBy.name',
 				type: 'text',
 				width: 170

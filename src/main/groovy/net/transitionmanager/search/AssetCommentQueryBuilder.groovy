@@ -1,6 +1,6 @@
 package net.transitionmanager.search
 
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -8,13 +8,12 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.BooleanUtils
-import org.springframework.util.StringUtils
 
 class AssetCommentQueryBuilder {
 

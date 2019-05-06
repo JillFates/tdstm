@@ -27,6 +27,7 @@ apply plugin: "org.grails.grails-gsp"
 
 war {
     archiveName = "tdstm-${version}.war"
+	exclude '*/node_modules/*'
 }
 
 repositories {
@@ -154,6 +155,7 @@ dependencies {
 
 	profile "org.grails.profiles:web"
 
+	runtime 'org.grails.plugins:grails-console:2.1.1'
 	runtime "org.glassfish.web:el-impl:2.1.2-b03"
 	runtime "com.h2database:h2"
 	runtime "org.apache.tomcat:tomcat-jdbc"
@@ -187,7 +189,7 @@ assets {
 	minifyCss = true
 }
 
-[bootRun, test, integrationTest, runScript, dbmUpdate].each { runTask ->
+[bootRun, test, integrationTest, runScript, dbmUpdate, console].each { runTask ->
 	configure(runTask) {
 		systemProperties System.properties
 	}

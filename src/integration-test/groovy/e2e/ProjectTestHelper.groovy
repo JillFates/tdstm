@@ -1,10 +1,10 @@
 package e2e
 
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Timezone
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyType
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Timezone
 
 /**
  * Fetches, creates and does other helpful data preparation in the e2e project integration test *

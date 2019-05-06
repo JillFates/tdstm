@@ -1,5 +1,5 @@
-<%@page import="net.transitionmanager.domain.Permissions" %>
-<%@page import="net.transitionmanager.domain.RolePermissions" %>
+<%@page import="net.transitionmanager.security.Permissions" %>
+<%@page import="net.transitionmanager.security.RolePermissions" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 <head>
@@ -9,14 +9,14 @@
 	<g:javascript src="jqgrid-support.js" />
 </head>
 <body>
-	
+
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<tds:hasPermission permission="${Permission.AdminMenuView}">
 		<tds:subHeader title="Role Permissions" crumbs="['Admin','Roles','Edit']"/><br/>
 		<div class="body">
-			<g:form action="update">
+			<g:form action="update" useToken="true">
 				<div class="list" id="updateShow">
 					<table id="editPermissionsTableId">
 						<thead class="needHeaderBorder">

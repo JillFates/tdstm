@@ -76,12 +76,12 @@
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
 						</tr>
                         <tr class="prop">
-				            <td  class="name">News Bar Mode:</td>
-				            <td class="valueNW"><g:message code="event.newsBarMode.${moveEventInstance?.newsBarMode}" /></td>
-						</tr>
-                        <tr class="prop">
 				            <td  class="name">Estimated Start:</td>
 				            <td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estStartTime}" /></td>
+						</tr>
+						<tr class="prop">
+							<td  class="name">Estimated Completion Time:</td>
+							<td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" /></td>
 						</tr>
 						<tr class="prop">
 							<td  class="name">By-Pass Actions:</td>

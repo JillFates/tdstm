@@ -1,6 +1,6 @@
 <%@page defaultCodec="none" %>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
-<%@page import="com.tds.asset.AssetComment" %>
+<%@page import="net.transitionmanager.task.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
 <%@page import="net.transitionmanager.security.Permission"%>
@@ -47,11 +47,11 @@
 						<td id="comment_${item?.id}" class="actionBar asset_details_block_task"
 							data-itemId="${item?.id}" data-status="${item?.status}">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
-							${item?.comment}
+							${HtmlUtil.escape(item?.comment)}
 						</td>
 						<td id="asset_${item?.id}" class="asset_details_block"
 						${item?.assetName ? 'onclick="EntityCrud.showAssetDetailView(\''+item?.assetClass+'\',\''+item?.assetId+'\')"' : ''}>
-							${item?.assetName}
+							${HtmlUtil.escape(item?.assetName)}
 						</td>
 						<td id="lastUpdated_${item?.id}" class="actionBar asset_details_block"
 							data-itemId="${item?.id}" data-status="${item?.status}">

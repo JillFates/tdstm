@@ -194,12 +194,12 @@
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Storage - Devices
+                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Physical Storage
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Storage - Logical
+                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Logical Storage
                                 </g:link>
                             </li>
                             <li class="divider"></li>
@@ -383,14 +383,14 @@
                                 <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
-                                <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
+                                <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
                                 <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
-                                    <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a>
+                                    <g:link controller="module" action="reports" id="taskReport" elementId="taskReport">Task Report</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
@@ -402,7 +402,7 @@
                                 <li class="divider"></li>
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
-                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
+                                    <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>

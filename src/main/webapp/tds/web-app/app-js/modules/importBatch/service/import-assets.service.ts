@@ -41,14 +41,10 @@ export class ImportAssetsService {
 	 */
 	public getFileContent(filename: string): Observable<any> {
 		let url = this.importEndpointURL + 'viewData?filename=' + filename;
-		return this.http.get(url, {responseType: 'text'})
+		return this.http.get(url)
 			.map((response: any) => {
 				let fileExtension = filename.split('.').pop();
-				if (fileExtension === 'json') {
-					return response;
-				} else {
-					return response;
-				}
+				return response;
 			}).catch((error: any) => error);
 	}
 

@@ -3,7 +3,7 @@ package net.transitionmanager.dataview
 import com.tdsops.tm.enums.domain.AssetClass
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 /**
  * This class converts {@code customDomainService.fieldSpecsWithCommon ( project )}
  * in a fieldsSpecMap like this:

@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
@@ -9,10 +9,10 @@ import groovy.json.internal.LazyMap
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 
 import java.util.Map.Entry
 
@@ -66,6 +66,10 @@ class DomainClassQueryHelper {
 			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
 		],
 	]
+	/**
+	 * Defines find results message in a constant variable.
+	 */
+	public static final String	FIND_RESULTS_MULTIPLE_RECORDS = 'The find/elseFind command(s) found multiple records'
 
 	/**
 	 * Executes the HQL query related to the domain defined.

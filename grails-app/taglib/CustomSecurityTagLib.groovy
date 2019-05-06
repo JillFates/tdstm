@@ -1,4 +1,4 @@
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.security.SecurityService
 
 class CustomSecurityTagLib {
 

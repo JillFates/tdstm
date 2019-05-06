@@ -22,16 +22,11 @@ export class NoticeColumnModel {
 			}, {
 				label: 'Active',
 				property: 'active',
-				type: 'text',
+				type: 'boolean',
 				width: 160,
 			}
 		];
 	}
-}
-
-export enum NoticeType {
-	PreLogin,
-	PostLogin
 }
 
 export class NoticeModel {
@@ -47,7 +42,10 @@ export class NoticeModel {
 	typeId: any;
 }
 
+export const NOTICE_TYPE_PRE_LOGIN = 'PRE_LOGIN';
+export const NOTICE_TYPE_POST_LOGIN = 'POST_LOGIN';
+
 export const NoticeTypes = [
-	{typeId: '1', name: 'Prelogin'},
-	{typeId: '2', name: 'Postlogin'}
+	{typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin'},
+	{typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin'}
 ];

@@ -1,7 +1,7 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.Database
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
@@ -17,14 +17,16 @@ import getl.excel.ExcelDataset
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.SettingService
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.project.Project
+import net.transitionmanager.common.Setting
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.SettingService
+import net.transitionmanager.imports.ScriptProcessorService
+import org.apache.poi.ss.usermodel.Cell
+import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -53,8 +55,12 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
 			}
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+			}
 			fileSystemService(FileSystemService) {
 				coreService = ref('coreService')
+				securityService = ref('securityService')
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
@@ -714,7 +720,8 @@ application id,vendor name,technology,location
 		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 			XSSFRow currentRow = sheet.createRow(rowNumber)
 			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
+				Cell cell = currentRow.createCell(columnNumber)
+				WorkbookUtil.setCellValue(cell, cellContent)
 			}
 		}
 

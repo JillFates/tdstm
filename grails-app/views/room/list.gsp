@@ -1,10 +1,10 @@
-<%@page import="com.tds.asset.AssetCableMap" %>
-<%@page import="com.tds.asset.AssetDependency" %>
-<%@page import="com.tds.asset.AssetEntity" %>
-<%@page import="com.tds.asset.Application" %>
-<%@page import="com.tds.asset.Database" %>
-<%@page import="com.tds.asset.Files" %>
-<%@page import="net.transitionmanager.domain.Room" %>
+<%@page import="net.transitionmanager.asset.AssetCableMap" %>
+<%@page import="net.transitionmanager.asset.AssetDependency" %>
+<%@page import="net.transitionmanager.asset.AssetEntity" %>
+<%@page import="net.transitionmanager.asset.Application" %>
+<%@page import="net.transitionmanager.asset.Database" %>
+<%@page import="net.transitionmanager.asset.Files" %>
+<%@page import="net.transitionmanager.asset.Room" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
@@ -320,7 +320,7 @@
 				$("#rack_"+rackId).addClass("objectSelected")
 
 				var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-				new Ajax.Request('/rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
+				new Ajax.Request(tdsCommon.createAppURL('/rackLayouts/generateElevations'),{asynchronous:true,evalScripts:true,
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
@@ -349,5 +349,6 @@
 
 	</script>
 		<g:render template="/assetEntity/initAssetEntityData"/>
+	    <div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	</body>
 </html>

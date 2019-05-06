@@ -1,9 +1,9 @@
-import com.tds.asset.AssetComment
+import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Specification
 import test.helper.AssetCommentTestHelper

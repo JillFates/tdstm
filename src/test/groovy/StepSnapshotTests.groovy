@@ -1,7 +1,7 @@
 import grails.test.mixin.Mock
 import groovy.time.TimeCategory
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.StepSnapshot
+import net.transitionmanager.project.MoveBundleStep
+import net.transitionmanager.project.StepSnapshot
 import spock.lang.Specification
 
 @Mock(StepSnapshot)

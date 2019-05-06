@@ -1,11 +1,11 @@
 package com.tdsops.etl
 
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetOptions
-import com.tds.asset.Database
-import com.tds.asset.Files
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.TimeUtil
@@ -17,18 +17,19 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -410,6 +411,54 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				value == "Slideaway"
 				originalValue == "Slideaway"
 			}
+	}
+
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column name is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 'model name'
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
+	}
+
+	@See('TM-13617')
+	void 'test can can throw an exception if extract command with column position is used without a previous read labels command'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				domain Device
+				iterate {
+					extract 1
+				}
+
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.extractRequiresNameReadLabelsFirst().message
 	}
 
 	void 'test can throw an Exception if a column name is invalid'() {
@@ -1208,6 +1257,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Room domain instances'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -1222,8 +1272,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.staticexecuteQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
@@ -1254,6 +1304,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
+	@ConfineMetaClassChanges([Room])
 	void 'test can load Rack domain instances'() {
 
 		given:
@@ -1273,8 +1324,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			])
 
 		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
+			mockDomain(Room)
+			Room.metaClass.static.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 

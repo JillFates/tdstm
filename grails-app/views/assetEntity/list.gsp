@@ -1,8 +1,8 @@
-<%@page import="com.tds.asset.AssetComment" %>
-<%@page import="com.tds.asset.AssetEntity" %>
-<%@page import="com.tds.asset.Application" %>
-<%@page import="com.tds.asset.Database" %>
-<%@page import="com.tds.asset.Files" %>
+<%@page import="net.transitionmanager.task.AssetComment" %>
+<%@page import="net.transitionmanager.asset.AssetEntity" %>
+<%@page import="net.transitionmanager.asset.Application" %>
+<%@page import="net.transitionmanager.asset.Database" %>
+<%@page import="net.transitionmanager.asset.Files" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new AssetEntity()).assetClass}" />
@@ -32,12 +32,12 @@
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
 			$(document).on('entityAssetUpdated',function (e,obj) {
-				$("#messageId").html(obj.asset.assetName + ' Updated').show();
+				$("#messageId").html(_.escape(obj.asset.assetName) + ' Updated').show();
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
 			$(document).on('entityAssetCreated',function (e,obj) {
                 if(obj != null) {
-                    $("#messageId").html(obj.asset.assetName + ' Created').show();
+                    $("#messageId").html(_.escape(obj.asset.assetName) + ' Created').show();
                 }
 				$('#assetListIdGrid').trigger("reloadGrid");
 			});
@@ -132,7 +132,7 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
-						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
+						moveBundle : moveBundle, assetType:assetType, model :model, sourceLocationName: sourceLocationName,
 						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
 				<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />

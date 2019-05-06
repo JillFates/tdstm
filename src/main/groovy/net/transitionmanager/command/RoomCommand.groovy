@@ -1,7 +1,7 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Room
+import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Room
 
 /**
  * RoomCommand is to be used with the creation and editing of Room domain

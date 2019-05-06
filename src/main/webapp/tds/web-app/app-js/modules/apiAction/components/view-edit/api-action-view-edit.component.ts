@@ -25,7 +25,7 @@ import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 
@@ -159,6 +159,7 @@ export class APIActionViewEditComponent implements OnInit {
 		scriptForm: { isConfiguredValidators: false },
 	};
 	protected hasEarlyAccessTMRPermission = false;
+	loadingLists = true;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -170,6 +171,7 @@ export class APIActionViewEditComponent implements OnInit {
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
 		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
+		this.getModalTitle();
 	}
 
 	ngOnInit(): void {
@@ -189,12 +191,23 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
 
-		this.getProviders();
-		this.getAgents();
-		this.getCommonFieldSpecs();
-		this.getModalTitle();
-
-		this.prepareFormListener();
+		// Fork Join load list api calls.
+		const observables = forkJoin<any>(
+			this.apiActionService.getProviders(),
+			this.apiActionService.getAPIActionEnums(),
+			this.customDomainService.getCommonFieldSpecsWithShared()
+		);
+		/**
+		 * Note!! with this fork joined api calls, now the last api call load list should always be getDataScripts()
+		 */
+		observables.subscribe({
+			next: result => {
+				this.getProviders(result[0]);
+				this.getAgents(result[1]);
+				this.getCommonFieldSpecs(result[2]);
+			},
+			complete: () => this.prepareFormListener(),
+		});
 	}
 
 	private getModalTitle(): void {
@@ -220,73 +233,64 @@ export class APIActionViewEditComponent implements OnInit {
 
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
-		}, 100);
+		}, 0);
 	}
 
 	/**
 	 * Get the List of Providers
 	 */
-	getProviders(): void {
-		this.apiActionService.getProviders().subscribe(
-			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
-					this.providerList.push({ id: 0, name: this.PLEASE_SELECT });
-					this.apiActionModel.provider = this.providerList[0];
-					this.modifySignatureByProperty('provider');
-				}
-				this.providerList.push(...result);
+	getProviders(result): void {
+		if (this.modalType === ActionType.CREATE) {
+			this.providerList.push({ id: 0, name: this.PLEASE_SELECT });
+			this.apiActionModel.provider = this.providerList[0];
+			this.modifySignatureByProperty('provider');
+		}
+		this.providerList.push(...result);
 
-				this.getCredentials();
-			},
-			(err) => console.log(err));
+		this.getCredentials();
 	}
 
 	/**
 	 * Get the list of possible Agents
 	 */
-	getAgents(): void {
-		this.apiActionService.getAPIActionEnums().subscribe(
-			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
-					this.dictionaryList.push({ id: 0, name: this.PLEASE_SELECT });
-					this.apiActionModel.dictionary = this.dictionaryList[0];
-					this.modifySignatureByProperty('dictionary');
-				}
-				this.dictionaryList.push(...result.data.agentNames);
-				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
-					this.onDictionaryValueChange(this.apiActionModel.dictionary);
-				} else {
-					this.agentMethodList.push({ id: '0', name: this.PLEASE_SELECT });
-					this.apiActionModel.agentMethod = this.agentMethodList[0];
-					this.modifySignatureByProperty('agentMethod');
-				}
-				this.httpMethodList.push(this.PLEASE_SELECT);
-				this.httpMethodList.push(...result.data.httpMethod);
-				if (!this.apiActionModel.httpMethod) {
-					this.apiActionModel.httpMethod = this.httpMethodList[0];
-				}
+	getAgents(result: any): void {
+		if (this.modalType === ActionType.CREATE) {
+			this.dictionaryList.push({ id: 0, name: this.PLEASE_SELECT });
+			this.apiActionModel.dictionary = this.dictionaryList[0];
+			this.modifySignatureByProperty('dictionary');
+		}
+		this.dictionaryList.push(...result.data.agentNames);
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
+			this.onDictionaryValueChange(this.apiActionModel.dictionary);
+		} else {
+			this.agentMethodList.push({ id: '0', name: this.PLEASE_SELECT });
+			this.apiActionModel.agentMethod = this.agentMethodList[0];
+			this.modifySignatureByProperty('agentMethod');
+		}
+		this.httpMethodList.push(this.PLEASE_SELECT);
+		this.httpMethodList.push(...result.data.httpMethod);
+		if (!this.apiActionModel.httpMethod) {
+			this.apiActionModel.httpMethod = this.httpMethodList[0];
+		}
 
-				if (result && result.data.actionTypes) {
-					this.actionTypesList = [];
-					const keys = Object.keys(result.data.actionTypes);
-					keys.forEach((key: string) => {
-						this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
-					});
-					if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
-						this.apiActionModel.actionType = { id: this.WEB_API};
-					}
-				}
+		if (result && result.data.actionTypes) {
+			this.actionTypesList = [];
+			const keys = Object.keys(result.data.actionTypes);
+			keys.forEach((key: string) => {
+				this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
+			});
+			if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
+				this.apiActionModel.actionType = { id: this.WEB_API};
+			}
+		}
 
-				if (result && result.data.remoteCredentialMethods) {
-					this.remoteCredentials = [];
-					const keys = Object.keys(result.data.remoteCredentialMethods);
-					keys.forEach((key: string) => {
-						this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
-					});
-				}
-
-			},
-			(err) => console.log(err));
+		if (result && result.data.remoteCredentialMethods) {
+			this.remoteCredentials = [];
+			const keys = Object.keys(result.data.remoteCredentialMethods);
+			keys.forEach((key: string) => {
+				this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+			});
+		}
 	}
 
 	/**
@@ -301,6 +305,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('credential');
 				}
 				this.agentCredentialList.push(...result);
+				// Important this should be at this point the last call of ALL loading lists since now we forkJoin all.
 				this.getDataScripts();
 			},
 			(err) => console.log(err));
@@ -322,6 +327,7 @@ export class APIActionViewEditComponent implements OnInit {
 				if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
 					this.onProviderValueChange(this.apiActionModel.provider, true);
 				}
+				this.loadingLists = false;
 			},
 			(err) => console.log(err));
 	}
@@ -346,15 +352,11 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Preload the list of Common Fields Specs
 	 */
-	getCommonFieldSpecs(): void {
-		this.customDomainService.getCommonFieldSpecsWithShared().subscribe(
-			(result: any) => {
-				this.commonFieldSpecs = result;
-				if (this.modalType !== ActionType.CREATE) {
-					this.getParameters();
-				}
-			},
-			(err) => console.log(err));
+	getCommonFieldSpecs(result): void {
+		this.commonFieldSpecs = result;
+		if (this.modalType !== ActionType.CREATE) {
+			this.getParameters();
+		}
 	}
 
 	/**
@@ -401,7 +403,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		if (this.isDirty() || this.isParameterListDirty()) {
+		// Prevent exit if everything hasn't been loaded yet.
+		if (this.loadingLists) {
+			return;
+		}
+		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',

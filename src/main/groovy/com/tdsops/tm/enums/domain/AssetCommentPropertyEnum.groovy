@@ -1,7 +1,7 @@
 package com.tdsops.tm.enums.domain
 
 import groovy.transform.CompileStatic
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.exception.InvalidParamException
 
 /**
  * This enum represents the AssetComment properties exposed to the API Action operations

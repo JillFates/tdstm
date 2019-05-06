@@ -5,7 +5,7 @@ import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.action.Provider
 /**
  * Command object to handle credential form data binding upon creation
  */

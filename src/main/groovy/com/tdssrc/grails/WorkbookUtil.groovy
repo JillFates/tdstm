@@ -255,7 +255,11 @@ class WorkbookUtil {
 				break
 
 			default :
-				def stringValue = value.toString()
+				String stringValue = value.toString()
+				if (stringValue?.matches("(=|-|\\+|@).*")) {
+					// See TM-14767: cell.setQuotePrefixed(true) won't produce a result accepted across all versions of Excel.
+					stringValue = "'$stringValue"
+				}
 				// Prevent the cell from exceeding the maximum allowed length for XLS.
 				cell.setCellValue(trucanteXlsCell(stringValue))
 		}
@@ -472,6 +476,9 @@ class WorkbookUtil {
 					break
 				case Cell.CELL_TYPE_STRING:
 					result = Integer.parseInt(cell.getStringCellValue())
+					break
+				case Cell.CELL_TYPE_BLANK:
+					result = null
 					break
 				default:
 					throw new NumberFormatException("Invalid cell number.")

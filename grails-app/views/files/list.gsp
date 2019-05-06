@@ -1,7 +1,7 @@
-<%@page import="com.tds.asset.AssetEntity"%>
-<%@page import="com.tds.asset.Application"%>
-<%@page import="com.tds.asset.Database"%>
-<%@page import="com.tds.asset.Files"%>
+<%@page import="net.transitionmanager.asset.AssetEntity"%>
+<%@page import="net.transitionmanager.asset.Application"%>
+<%@page import="net.transitionmanager.asset.Database"%>
+<%@page import="net.transitionmanager.asset.Files"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
 <g:set var="assetClass" value="${(new Files()).assetClass}" />
@@ -26,12 +26,12 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
                 $(document).on('entityAssetUpdated',function (e,obj) {
-                    $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                    $("#messageId").html(_.escape(obj.asset.assetName) + ' Updated').show();
                     $('#storageIdGrid').trigger("reloadGrid")
                 });
                 $(document).on('entityAssetCreated',function (e,obj) {
                     if(obj != null) {
-                    	$("#messageId").html(obj.asset.assetName + ' Created').show();
+                    	$("#messageId").html(_.escape(obj.asset.assetName) + ' Created').show();
                     }
                     $('#storageIdGrid').trigger("reloadGrid")
                 });

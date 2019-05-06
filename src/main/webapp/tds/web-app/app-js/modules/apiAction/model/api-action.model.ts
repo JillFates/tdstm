@@ -39,7 +39,7 @@ export class APIActionColumnModel {
 			},
 			{
 				label: 'Method',
-				property: 'agentMethod.name',
+				property: 'connectorMethod',
 				type: 'text',
 				width: 125
 			}, {

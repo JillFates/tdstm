@@ -29,7 +29,6 @@ export class NoticeService {
 			.map((response: any) => {
 				response.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
-					notice.active = notice.active ? 'Yes' : 'No';
 				});
 				return response && response.notices;
 			})
@@ -48,7 +47,7 @@ export class NoticeService {
 			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
-	deleteNotice(noticeId: NoticeModel): Observable<NoticeModel[]> {
+	deleteNotice(noticeId: string): Observable<NoticeModel[]> {
 		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
 			.map((response: any) => response)
 			.catch((error: any) => Observable.throw(error || 'Server error'));
@@ -65,11 +64,11 @@ export class NoticeService {
 
 		let [filter] = Flatten(root).filter(item => item.field === column.property);
 
-		if (!column.filter) {
-			column.filter = '';
-		}
-
 		if (column.type === 'text') {
+			if (!column.filter) {
+				column.filter = '';
+			}
+
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
@@ -82,6 +81,23 @@ export class NoticeService {
 					return r['field'] === column.property;
 				});
 				filter.value = column.filter;
+			}
+		}
+
+		if (column.type === 'boolean') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: column.filter
+				});
+			} else {
+				if (column.filter !== null) {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = column.filter
+				}
 			}
 		}
 

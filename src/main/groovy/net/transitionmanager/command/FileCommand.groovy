@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.common.FileSystemService
 
 trait FileCommand implements CommandObject{
 

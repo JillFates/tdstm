@@ -2,7 +2,7 @@ package net.transitionmanager.controller
 
 import au.com.bytecode.opencsv.CSVWriter
 import com.google.gson.JsonSyntaxException
-import com.tdsops.common.exceptions.InvalidLicenseException
+import net.transitionmanager.exception.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
@@ -10,21 +10,21 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.ErrorHandlerService
-import net.transitionmanager.service.InvalidConfigurationException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.InvalidSyntaxException
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.LogicException
-import net.transitionmanager.service.ProjectRequiredException
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.common.ErrorHandlerService
+import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.InvalidSyntaxException
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.exception.LogicException
+import net.transitionmanager.exception.ProjectRequiredException
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.exception.UnauthorizedException
 import org.grails.web.databinding.bindingsource.InvalidRequestBodyException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
@@ -59,6 +59,9 @@ trait ControllerMethods {
 	ProjectService projectService
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
+
+	// TODO : JPM 4/2019 : Message should be in i18N messages
+	static final String INVALID_CSRF_TOKEN = 'Unable to perform action due to missing form token. Please retry form entry.'
 
 	/**
 	 * Renders a list of maps to a CSV file.
@@ -127,11 +130,11 @@ trait ControllerMethods {
 	}
 
 	Map errors(errorStringOrList) {
-		[status: 'error', errors: CollectionUtils.asList(errorStringOrList)]
+		[status: 'error', errors: CollectionUtils.asHTMLSanitizedList(errorStringOrList)]
 	}
 
 	Map warnings(warnStringOrList) {
-		[status: 'warning', warnings: CollectionUtils.asList(warnStringOrList)]
+		[status: 'warning', warnings: CollectionUtils.asHTMLSanitizedList(warnStringOrList)]
 	}
 
 //	void respondAsJson(File file) {

@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tds.asset.AssetEntity
+
 import com.tdssrc.grails.GormUtil
 
 /**

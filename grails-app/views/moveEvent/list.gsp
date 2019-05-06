@@ -12,13 +12,13 @@
 				var listCaption ="Event List: <tds:hasPermission permission="${Permission.EventEdit}"><span class='capBtn'>"+
 					"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span></tds:hasPermission>"
 				<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
-					colNames="'Name','Estimated Start', 'Description','News Bar Mode', 'Runbook Status', 'Bundles'"
+					colNames="'Name','Estimated Start', 'Estimated Completion', 'Description', 'Runbook Status', 'Bundles'"
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
 						{name:'estStartTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
-						{name:'description'},
-						{name:'newsBarMode'},
-						{name:'runbookStatus'},
-						{name:'moveBundlesString', search:false, sortable:false}"
+						{name:'estCompletionTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
+						{name:'description', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'runbookStatus', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'moveBundlesString', search:false, sortable:false, formatter: tdsCommon.jqgridTextCellFormatter}"
 					sortname="'name'"
 					caption="listCaption"
 					width="'100%'"
@@ -32,7 +32,7 @@
 			})
 
 			function linkFormatter (cellvalue, options, rowObjcet) {
-				var value = cellvalue ? cellvalue : ''
+				var value = cellvalue ? _.escape(cellvalue) : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
 

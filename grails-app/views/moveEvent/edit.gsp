@@ -150,19 +150,6 @@
 				                  </g:hasErrors>
 				                </td>
 			              	</tr>
-                        	<tr class="prop">
-				                <td class="name">
-				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
-				                </td>
-				                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'newsBarMode','errors')}">
-				                  <g:select id="newsBarMode" name="newsBarMode" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(moveEventInstance.class).newsBarMode.inList}" value="${moveEventInstance.newsBarMode}" valueMessagePrefix="event.newsBarMode"></g:select>
-				                  <g:hasErrors bean="${moveEventInstance}" field="newsBarMode">
-				                    <div class="errors">
-				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="newsBarMode"/>
-				                    </div>
-				                  </g:hasErrors>
-				                </td>
-			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
@@ -181,6 +168,25 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
+                            </tr>
+							<tr class="prop">
+								<td class="name">
+                                    <label for="description">Estimated Completion Time:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estCompletionTime','errors')}">
+                                    <script type="text/javascript">
+                                        $(document).ready(function(){
+                                            $("#kendoEstCompletionTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estCompletionTime}" />' });
+                                        });
+                                    </script>
+                                    <input type="text" id="kendoEstCompletionTime" class="dateRange" size="15" style="width: 210px;" />
+                                    <input type="hidden" id="estCompletionTime" name="estCompletionTime" />
+                                    <g:hasErrors bean="${moveEventInstance}" field="estCompletionTime">
+                                        <div class="errors">
+                                            <g:renderErrors bean="${moveEventInstance}" as="list" field="estCompletionTime"/>
+                                        </div>
+                                    </g:hasErrors>
+                                </td>
                             </tr>
 							<tr class="prop">
 								<td class="name">

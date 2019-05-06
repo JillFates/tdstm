@@ -1,13 +1,13 @@
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.event.CreateEventCommand
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.Project
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.MoveEventService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.SecurityService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import grails.validation.ValidationException
 import spock.lang.Specification
@@ -22,10 +22,11 @@ class MoveEventServiceSpec extends Specification {
 	ProjectService projectService
 
 	// Initialized by setup()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private Project           project
+	private ProjectTestHelper projectHelper
+	private Project project
 
 	void setup() {
+		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 	}
 
@@ -34,14 +35,12 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
 		then: 'move event is saved to db'
 			moveEvent
 			moveEvent.id
-			moveEvent.newsBarMode == 'off'
 			moveEvent.runbookStatus == 'Pending'
 	}
 
@@ -51,7 +50,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
@@ -60,7 +58,6 @@ class MoveEventServiceSpec extends Specification {
 		then: 'Move event is retrieved from db'
 			foundMoveEvent
 			foundMoveEvent.id
-			foundMoveEvent.newsBarMode == 'off'
 			foundMoveEvent.runbookStatus == 'Pending'
 		when: 'Finding a non existing move event'
 			moveEventService.findById(-1l, true)
@@ -74,7 +71,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
@@ -82,14 +78,12 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand updateCommand = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent updatedMoveEvent = moveEventService.update(moveEvent.id, updateCommand)
 		then: 'Move event is updated in db'
 			updatedMoveEvent
 			updatedMoveEvent.id
-			updatedMoveEvent.newsBarMode == 'off'
 			updatedMoveEvent.runbookStatus == 'Pending'
 		when: 'Updating a move event missing constraints DomainUpdateException is thrown'
 			updateCommand.name = ''
@@ -113,7 +107,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)

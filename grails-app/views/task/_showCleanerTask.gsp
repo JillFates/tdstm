@@ -1,3 +1,5 @@
+<%@ page import="net.transitionmanager.task.AssetComment" %>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 	<g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />
 	<div class="mainbody" id="mainbody">
@@ -82,7 +84,7 @@
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).category.inList}" value="${assetComment.category}"></g:select>
+				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" value="${assetComment.category}"></g:select>
 				<g:if test="${assetComment.moveEvent}">
 		   		  <span style="margin-left:60px;">Move Event:</span>
 		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
@@ -92,7 +94,7 @@
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
@@ -107,12 +109,12 @@
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
 					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).status.inList}" value="${assetComment.status}"
+								  noSelection="['':'please select']" onChange="showResolve()" disabled="true"></g:select>
 					</g:if>
 					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(com.tds.asset.AssetComment).status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).status.inList}" value="${assetComment.status}"
+								  noSelection="['':'please select']" onChange="showResolve()"></g:select>
 					</g:else>
 				</td>	
 			</tr>				
@@ -202,26 +204,26 @@
 				<tr><td colspan=2>
 				<dl>
 	               <g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
-		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+		                <dt>Application Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
 						<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
 						<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	               </g:if>
 	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
-	                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+	                    <dt>Database Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
+						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}&nbsp;${assetComment?.assetEntity.scale}</dd>
 						<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	                </g:elseif>
 	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Files'}">
-	                    <dt>Storage Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+	                    <dt>Storage Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</dd>
 						<dt>Storage Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}</dd>
 						<dt>Storage Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
 						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
 	                </g:elseif>
 	                <g:else>
-						<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetTag}</dd>
-						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
+						<dt>Asset Tag:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity?.assetTag)}</dd>
+						<dt>Asset Name:</dt><dd>&nbsp;${HtmlUtil.escape(assetComment?.assetEntity?.assetName)}</dd>
 						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
 						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
 		                <g:if test="${assetComment?.assetEntity.hasProperty('sourceRackName')}"><dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRackName}/${assetComment?.assetEntity.sourceRackPosition}</dd></g:if>
@@ -337,7 +339,7 @@
 		startprintjob({
 			onSuccess: function(){
 				jQuery.ajax({
-					url: '/task/update',
+					url: tdsCommon.createAppURL('/task/update'),
 					data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
 					type:'POST',
 					success: function(data) {
@@ -377,7 +379,7 @@
 		}
 
 		jQuery.ajax({
-			url: '/task/update',
+			url: tdsCommon.createAppURL('/task/update'),
 			data: params,
 			type:'POST',
 			success: function(data) {
@@ -395,8 +397,7 @@
 					if (status=='Started') {
 						$('#started_'+objId).hide();
 					}
-
-					timerBar.Restart();
+					progressTimer.Restart();
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -419,7 +420,7 @@
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide();
 		$('#detailTdId_'+id).css('display','none');
-		timerBar.Start();
+		progressTimer.Start();
 	}
  </script>
 

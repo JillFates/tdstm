@@ -1,6 +1,7 @@
 <%@page expressionCodec="none" %>
-<%@page import="net.transitionmanager.domain.Rack" %>
+<%@page import="net.transitionmanager.asset.Rack" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <html>
 <body>
 <div class="body" style="width:98%;">
@@ -134,7 +135,7 @@
 					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}_${rack.front}">
 				</g:else>
 						<span id="cap_count_${rack.id}" class="capCount" >&nbsp;</span>
-						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(${rack.id})">${rack.tag}</div>
+						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(${rack.id})">${HtmlUtil.escape(rack.tag)}</div>
 					</div>
 				</a>
 			</g:if>
@@ -224,7 +225,7 @@ function updateRackPower(rackId){
 	var moveBundleId = ''
 	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
-		url: "retrieveRackPowerData",
+		url: tdsCommon.createAppURL("/room/retrieveRackPowerData"),
 		data: moveBundleId+"roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType+"&otherBundle="+otherBundle,
 		type:'POST',
 		success: function(data) {
@@ -242,7 +243,7 @@ function capacityView(){
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var roomId = "${roomInstance.id}"
 	jQuery.ajax({
-		url: "retrieveCapacityView",
+		url: tdsCommon.createAppURL("/room/retrieveCapacityView"),
 		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {
