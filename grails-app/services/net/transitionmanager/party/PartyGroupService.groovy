@@ -1,10 +1,8 @@
 package net.transitionmanager.party
 
-import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
-import net.transitionmanager.exception.LogicException
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
@@ -12,7 +10,6 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 /**
  * This service support CRUD operations or PartyGroup(companies) for the PartyGroupController
  */
@@ -42,39 +39,49 @@ class PartyGroupService implements ServiceMethods {
 		Person whom = securityService.userLoginPerson
 
 		StringBuilder query = new StringBuilder("""
-			SELECT * FROM (
-				SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
-				FROM party_group pg
-				INNER JOIN party p ON party_type_id = 'COMPANY' AND p.party_id = pg.party_group_id
-				LEFT JOIN party_relationship pr ON pr.party_relationship_type_id = 'PARTNERS' AND pr.role_type_code_from_id = 'ROLE_COMPANY' and pr.role_type_code_to_id = 'ROLE_PARTNER' and pr.party_id_to_id = pg.party_group_id
-				WHERE party_group_id in (
-					SELECT party_id_to_id FROM party_relationship
-					WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id = 'ROLE_COMPANY'
-					AND role_type_code_to_id = 'ROLE_CLIENT' AND party_id_from_id = ${whom.company.id}
-				) OR party_group_id = ${whom.company.id}
-			GROUP BY party_group_id ORDER BY
+					SELECT new map(pg.name as companyName, pg.id as companyId, p.dateCreated as dateCreated, p.lastUpdated AS lastUpdated, (CASE WHEN pr.partyIdFrom.id is NULL THEN '' ELSE 'Yes' END)as partner)
+					FROM PartyGroup pg
+					INNER JOIN Party p ON p.partyType.id='COMPANY' AND p.id=pg.id
+					LEFT JOIN PartyRelationship pr ON pr.partyRelationshipType.id = 'PARTNERS' AND pr.roleTypeCodeFrom.id = 'ROLE_COMPANY' and pr.roleTypeCodeTo.id = 'ROLE_PARTNER' and pr.partyIdTo.id = pg.id
+					WHERE pg.id in (
+						SELECT partyIdTo.id FROM PartyRelationship
+						WHERE partyRelationshipType.id = 'CLIENTS' AND roleTypeCodeFrom.id='ROLE_COMPANY'
+						AND roleTypeCodeTo.id='ROLE_CLIENT' AND partyIdFrom.id=:whomCompanyId
+						) OR pg.id =:whomCompanyId
+					GROUP BY pg.id, pr.id 
 		""")
 
-		query << ' ' << sortIndex << ' ' << sortOrder << ' ) as companies '
+		queryParams.whomCompanyId = whom.company.id
 
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 
-		filterParams.each {
-			if (it.value) {
-				firstWhere = SqlUtil.addWhereOrAndToQuery(query, firstWhere)
-				query.append(' companies.').append(it.key).append(' LIKE :').append(it.key)
-				queryParams[it.key] = SqlUtil.formatForLike(it.value)
+		filterParams.each { LinkedHashMap.Entry<String, String> param ->
+			if (param.value) {
+				if (firstWhere) {
+					query.append(" HAVING ")
+					firstWhere = false
+				} else {
+					query.append(" AND ")
+				}
+
+				if (param.key == 'partner') {
+					if (param.value.toLowerCase() in ['y', 'ye', 'yes']) {
+						query.append('pr.partyIdFrom.id IS NOT NULL')
+					} else {
+						query.append('pr.partyIdFrom.id IS NULL')
+					}
+				} else {
+					query.append("pg.$param.key LIKE :$param.key")
+					queryParams[param.key] = "%$param.value%"
+				}
 			}
 		}
 
-		def companies
-		try {
-			companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
-		} catch(e) {
-			log.error "listJson() encountered SQL error : ${e.getMessage()}"
-			throw new LogicException("Unabled to perform query based on parameters and user preferences")
-		}
+		query.append(" Order by $sortIndex $sortOrder")
+
+		//def companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		def companies = PartyGroup.executeQuery(query, queryParams)
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = companies.size()
