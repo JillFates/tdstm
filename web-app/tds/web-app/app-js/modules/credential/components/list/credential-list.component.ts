@@ -114,7 +114,7 @@ export class CredentialListComponent implements OnInit {
 	protected onEdit(dataItem: any): void {
 		let credential: CredentialModel = dataItem;
 		this.credentialService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
-			this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
+			this.openCredentialDialogViewEdit(response, ActionType.EDIT, credential);
 		}, err => console.log(err));
 	}
 
