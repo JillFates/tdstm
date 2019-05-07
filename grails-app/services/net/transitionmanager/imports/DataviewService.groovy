@@ -767,16 +767,16 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec.namedFilters.each { String namedFilter ->
 			Map<String, ?> hqlNamedFilters = builder.buildQueryNamedFilters(namedFilter)
 			if (hqlNamedFilters) {
-				whereConditions << hqlNamedFilters.sqlExpression
-				whereParams += hqlNamedFilters.sqlParams
+				whereConditions << hqlNamedFilters.hqlExpression
+				whereParams += hqlNamedFilters.hqlParams
 			}
 		}
 
 		dataviewSpec.extraFilters?.each { Map extraFilter ->
 			Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
 			if (hqlExtraFilters) {
-				whereConditions << hqlExtraFilters.sqlExpression
-				whereParams += hqlExtraFilters.sqlParams
+				whereConditions << hqlExtraFilters.hqlExpression
+				whereParams += hqlExtraFilters.hqlParams
 			}
 		}
 

@@ -30,37 +30,41 @@ class DataviewCustomFilterHQLBuilder {
 		String hqlExpression
 		Map<String, ?> hqlParams
 
-		if (extraFilter.containsKey('domain')
-			&& extraFilter.containsKey('property')) {
+		String domain = extraFilter['domain']
+		String property = extraFilter['property']
+		Object filter = extraFilter['filter']
+
+		if (domain == 'common' && property == 'assetName') {
+
+			hqlExpression = " AE.assetName like :extraFilterAssetName "
+			hqlParams = [extraFilterAssetName: "%$filter%"]
 
 		} else {
 
-			String filterProperty = extraFilter['property']
-			String filterValue = extraFilter['filter']
-
-			switch (filterProperty) {
+			switch (property) {
 				case 'ufp':
-					hqlExpression = " AE.moveBundle in (:moveBundles) "
+					hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
 					hqlParams = [
-						moveBundles: MoveBundle.where {
-							project == queryProject && useForPlanning == filterValue
+						extraFilterMoveBundles: MoveBundle.where {
+							project == queryProject && useForPlanning == filter
 						}.list()
 					]
 					break
 				default:
-					throw RuntimeException('Invalid filter definition:' + filterProperty)
+					throw new RuntimeException('Invalid filter definition:' + property)
 			}
 
 
 			return [
-				sqlExpression: hqlExpression,
-				sqlParams    : hqlParams
+				hqlExpression: hqlExpression,
+				hqlParams    : hqlParams
 			]
-
 		}
 
-
-		return queryFilters
+		return [
+			hqlExpression: hqlExpression,
+			hqlParams    : hqlParams
+		]
 	}
 
 	/**
@@ -73,40 +77,44 @@ class DataviewCustomFilterHQLBuilder {
 	 */
 	public Map<String, ?> buildQueryNamedFilters(String namedFilter) {
 		String hqlExpression
-		Map<String, ?> hqlParams = [:]
+		Map<String, ?> hqlParams
 
 		switch (namedFilter) {
 			case 'physical':
-				hqlExpression = " COALESCE(AE.assetType,'') NOT IN (:virtualServerTypes) "
-				hqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				hqlExpression = " COALESCE(AE.assetType,'') NOT IN (:namedFilterVirtualServerTypes) "
+				hqlParams = ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
 				break
 			case 'physicalServer':
-				hqlExpression = " AE.assetType IN (:phyServerTypes) "
-				hqlParams['phyServerTypes'] = AssetType.allServerTypes - AssetType.virtualServerTypes
+				hqlExpression = " AE.assetType IN (:namedFilterPhyServerTypes) "
+				hqlParams = ['namedFilterPhyServerTypes': AssetType.allServerTypes - AssetType.virtualServerTypes]
 				break
 			case 'server':
-				hqlExpression = " AE.assetType IN (:allServerTypes) "
-				hqlParams['allServerTypes'] = AssetType.allServerTypes
+				hqlExpression = " AE.assetType IN (:namedAllServerTypes) "
+				hqlParams = ['namedAllServerTypes': AssetType.allServerTypes]
 				break
 			case 'storage':
-				hqlExpression = " AE.assetType IN (:storageTypes) "
-				hqlParams['storageTypes'] = AssetType.storageTypes
+				hqlExpression = " AE.assetType IN (:namedStorageTypes) "
+				hqlParams = ['namedStorageTypes': AssetType.storageTypes]
 				break
 			case 'virtualServer':
-				hqlExpression = " AE.assetType IN (:virtualServerTypes) "
-				hqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				hqlExpression = " AE.assetType IN (:namedFilterVirtualServerTypes) "
+				hqlParams = ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
 				break
 			case 'other':
-				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:nonOtherTypes) "
-				hqlParams['nonOtherTypes'] = AssetType.nonOtherTypes
+				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "
+				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
+				break
+			case 'runbook':
+				hqlExpression = " AE.moveBundle.runbookStatus = :namedFilterRunBookStatus "
+				hqlParams = [namedFilterRunBookStatus: 'Done']
 				break
 			default:
-				throw RuntimeException('Invalid filter definition:' + namedFilter)
+				throw new RuntimeException('Invalid filter definition:' + namedFilter)
 		}
 
 		return [
-			sqlExpression: hqlExpression,
-			sqlParams    : hqlParams
+			hqlExpression: hqlExpression,
+			hqlParams    : hqlParams
 		]
 	}
 }

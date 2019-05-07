@@ -8,6 +8,7 @@ import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -47,23 +48,23 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 
 		expect:
 			builder.buildQueryNamedFilters(namedFilter) == [
-				sqlExpression: sqlExpression,
-				sqlParams    : sqlParams
+				hqlExpression: hqlExpression,
+				hqlParams    : hqlParams
 			]
 
 		where:
-			namedFilter      || sqlExpression                                              | sqlParams
-			'physical'       || " COALESCE(AE.assetType,'') NOT IN (:virtualServerTypes) " | ['virtualServerTypes': AssetType.virtualServerTypes]
-			'physicalServer' || " AE.assetType IN (:phyServerTypes) "                      | ['phyServerTypes': AssetType.allServerTypes - AssetType.virtualServerTypes]
-			'server'         || " AE.assetType IN (:allServerTypes) "                      | ['allServerTypes': AssetType.allServerTypes]
-			'storage'        || " AE.assetType IN (:storageTypes) "                        | ['storageTypes': AssetType.storageTypes]
-			'virtualServer'  || " AE.assetType IN (:virtualServerTypes) "                  | ['virtualServerTypes': AssetType.virtualServerTypes]
-			'other'          || " COALESCE(ae.assetType,'') NOT IN  (:nonOtherTypes) "     | ['nonOtherTypes': AssetType.nonOtherTypes]
+			namedFilter      || hqlExpression                                                         | hqlParams
+			'physical'       || " COALESCE(AE.assetType,'') NOT IN (:namedFilterVirtualServerTypes) " | ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
+			'physicalServer' || " AE.assetType IN (:namedFilterPhyServerTypes) "                      | ['namedFilterPhyServerTypes': AssetType.allServerTypes - AssetType.virtualServerTypes]
+			'server'         || " AE.assetType IN (:namedAllServerTypes) "                            | ['namedAllServerTypes': AssetType.allServerTypes]
+			'storage'        || " AE.assetType IN (:namedStorageTypes) "                              | ['namedStorageTypes': AssetType.storageTypes]
+			'virtualServer'  || " AE.assetType IN (:namedFilterVirtualServerTypes) "                  | ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
+			'other'          || " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "     | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
+			'runbook'        || " AE.moveBundle.runbookStatus = :namedFilterRunBookStatus "           | ['namedFilterRunBookStatus': 'Done']
 
 	}
 
-	@IgnoreRest
-	void 'test can prepare hql where statement and params for extra filters using a non property'() {
+	void 'test can prepare hql where statement and params for extra filters using property ufp'() {
 
 		given: 'and instance of DataviewCustomFilterHQLBuilder'
 			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
@@ -78,11 +79,32 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilters)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " AE.moveBundle in (:moveBundles) "
-			results.hqlParams == [moveBundles:[]]
+			results.hqlExpression == " AE.moveBundle in (:extraFilterMoveBundles) "
+			results.hqlParams == [extraFilterMoveBundles: []]
+	}
+
+	void 'test can prepare hql where statement and params for extra filters using assetName property'() {
+
+		given: 'and instance of DataviewCustomFilterHQLBuilder'
+			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
+
+		and: 'a Map with extra fields defined by ?runbook= url params'
+			Map<String, String> extraFilters = [
+				filter  : 'FOO',
+				property: 'assetName',
+				domain  : 'common'
+			]
+
+		when: 'builds results for extra filters'
+			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilters)
+
+		then: 'an hql sentence is created'
+			results.hqlExpression == " AE.assetName like :extraFilterAssetName "
+			results.hqlParams == [extraFilterAssetName: '%FOO%']
 
 	}
 
+	@Ignore
 	void 'test can prepare hql where statement and params for extra filters using asset fields'() {
 
 		given: 'and instance of DataviewCustomFilterHQLBuilder'
