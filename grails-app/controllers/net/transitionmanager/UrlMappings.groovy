@@ -1303,11 +1303,25 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/appOwnerList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "appOwnerList"
+            ]
+        }
+
         "/ws/reports/generateApplicationMigration/$moveBundleId" {
             controller = "wsReports"
             action = [
                     GET: "applicationMigrationLists",
                     POST: "generateApplicationMigration"
+            ]
+        }
+
+        "/ws/reports/generateApplicationProfiles" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateApplicationProfiles"
             ]
         }
 

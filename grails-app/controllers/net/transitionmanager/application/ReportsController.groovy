@@ -271,6 +271,7 @@ class ReportsController implements ControllerMethods {
 	/**
 	 * Used to generate Application Profiles
 	 * @return list of applications
+     * @deprecated Migrated to angular report, please refer to #ReportsService.generateApplicationProfiles()
 	 */
 	def generateApplicationProfiles() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')

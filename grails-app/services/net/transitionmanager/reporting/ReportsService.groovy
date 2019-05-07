@@ -1,6 +1,7 @@
 package net.transitionmanager.reporting
 
 import com.tdsops.tm.enums.FilenameFormat
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -13,16 +14,22 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
+import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveBundleStep
@@ -44,19 +51,26 @@ import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import javax.servlet.http.HttpServletResponse
+import java.sql.ResultSet
+import java.sql.SQLException
 
 @Transactional
 class ReportsService implements ServiceMethods {
 
     JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
     RunbookService runbookService
     TaskService taskService
     MoveBundleService moveBundleService
     UserPreferenceService userPreferenceService
     MoveEventService moveEventService
+    CustomDomainService customDomainService
+    AssetEntityService assetEntityService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -1273,4 +1287,131 @@ class ReportsService implements ServiceMethods {
 
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
     }
+
+    /**
+	 * Used to generate Application Profiles model
+	 * @return list of applications
+	 */
+	def generateApplicationProfiles(Project project, ApplicationProfilesCommand command) {
+		MoveBundle currentBundle
+		Person currentSme
+		Person applicationOwner
+
+		StringBuilder query = new StringBuilder(""" SELECT a.app_id AS id
+			FROM application a
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+			LEFT OUTER JOIN person p ON p.person_id=a.sme_id
+			LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
+			LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
+			WHERE ae.project_id = :projectId """)
+
+		Map queryParams = [projectId: project.id]
+
+		if(command.moveBundle == 'useForPlanning'){
+			query.append(" AND mb.use_for_planning = true ")
+		}else{
+			query.append(" AND mb.move_bundle_id= :currentBundle ")
+			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
+		}
+
+		if(command.sme!='null'){
+			currentSme = Person.get(command.sme)
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+			queryParams.smeId = currentSme.id
+			queryParams.sme2Id = currentSme.id
+		}
+
+		if(command.appOwner!='null'){
+			query.append(" AND p2.person_id= :appOwner")
+			queryParams.appOwner = Person.get(command.appOwner).id
+		}
+
+		int assetCap = 100 // default value
+		if(command.reportMaxAssets){
+			try{
+				assetCap = command.reportMaxAssets.toInteger()
+			}catch(Exception e){
+				log.info("Invalid value given for assetCap: $assetCap")
+			}
+		}
+
+		query.append(" LIMIT $assetCap")
+
+		log.info "query = $query"
+
+		List applicationList = namedParameterJdbcTemplate.query(query.toString(), queryParams, new ApplicationProfileRowMapper())
+
+		// TODO: we'd like to flush the session.
+		List appList = []
+		//TODO:need to write a service method since the code used below is almost similar to application show.
+		applicationList.eachWithIndex { app, idx ->
+			def assetEntity = AssetEntity.get(app.id)
+			Application application = Application.get(app.id)
+
+			// assert assetEntity != null  //TODO: oluna should I add an assertion here?
+
+			def assetComment
+			List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
+			List<AssetDependency> supportAssets =  assetEntity.supportedDependencies()
+			if (AssetComment.countByAssetEntityAndCommentTypeAndDateResolved(application, 'issue', null)) {
+				assetComment = "issue"
+			} else if (AssetComment.countByAssetEntity(application)) {
+				assetComment = "comment"
+			} else {
+				assetComment = "blank"
+			}
+			def prefValue= userPreferenceService.getPreference(UserPreferenceEnum.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			def appMoveEvent = AppMoveEvent.findAllByApplication(application)
+			def moveEventList = MoveEvent.findAllByProject(project, [sort: 'name'])
+			def appMoveEventlist = AppMoveEvent.findAllByApplication(application).value
+
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+
+			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
+
+			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
+			def startupById = startupBy instanceof Person ? startupBy.id : -1
+			def testingById = testingBy instanceof Person ? testingBy.id : -1
+
+			// TODO: we'd like to flush the session
+			// GormUtil.flushAndClearSession(idx)
+			appList.add([
+				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
+				assetComment: assetComment, assetCommentList: assetCommentList,
+				appMoveEvent: appMoveEvent,
+				moveEventList: moveEventList,
+				appMoveEvent: appMoveEventlist,
+				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
+				project: project, prefValue: prefValue,
+				shutdownById: shutdownById,
+				startupById: startupById,
+				testingById: testingById,
+				shutdownBy: shutdownBy,
+				startupBy: startupBy,
+				testingBy: testingBy
+			])
+		}
+
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
+		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
+
+		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
+		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
+	}
+
+	/**
+	 * RowMapper that maps each result from the query for the Event News list
+	 * into a map column -> value that can be sent back to the UI.
+	 */
+	@CompileStatic
+	private class ApplicationProfileRowMapper implements RowMapper {
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {[
+			id: rs.getInt('id'),
+		]}
+	}
 }
