@@ -1,0 +1,76 @@
+<div class="database-section">
+	<div class="section-title">Bundle</div>
+	<div class="section-control">
+		<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
+			[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
+		</kendo-dropdownlist>
+	</div>
+</div>
+
+<div class="database-section">
+	<div class="section-title">
+		<input [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict"
+			id="bundleConflict" name="bundleConflict" type="checkbox">
+		<label for="bundleConflict">Bundle Conflict</label>
+	</div>
+	<div class="section-control">
+		<label>Having dependency references to assets assigned to unrelated bundles</label>
+	</div>
+</div>
+
+<div class="database-section">
+	<div class="section-title">
+		<input [checked]="model.unresolvedDependencies"
+			(change)="model.unresolvedDependencies = !model.unresolvedDependencies" id="unresolvedDependencies"
+			name="unresolvedDependencies" type="checkbox">
+		<label for="unresolvedDependencies">Unresolved Dependencies</label>
+	</div>
+	<div class="section-control">
+		<label>Having dependencies with status Unknown or Questioned</label>
+	</div>
+</div>
+
+<div class="database-section">
+	<div class="section-title">
+		<input [checked]="model.missingApplications"
+			(change)="model.missingApplications = !model.missingApplications" id="missingApplications"
+			name="missingApplications" type="checkbox">
+		<label for="missingApplications">Missing Applications</label>
+	</div>
+	<div class="section-control">
+		<label>Having no Supports dependency to application(s)</label>
+	</div>
+</div>
+
+<div class="database-section">
+	<div class="section-title">
+		<input [checked]="model.unsupported"
+			(change)="model.unsupported = !model.unsupported" id="unsupported"
+			name="unsupported" type="checkbox">
+		<label for="unsupported">Unsupported</label>
+	</div>
+	<div class="section-control">
+		<label>Having no Requires dependency indication where database resides</label>
+	</div>
+</div>
+
+<div class="database-section">
+	<div class="section-title">
+		<div>Maximum Databases to report</div>
+	</div>
+	<div class="section-control">
+		<kendo-dropdownlist name="maxDatabases" class="form-control" [data]="model.maxDatabasesList"
+			[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxDatabases">
+		</kendo-dropdownlist>
+	</div>
+</div>
+<div class="database-section">
+	<div class="section-title"></div>
+	<div class="section-control">
+		<tds-button-custom class="btn-primary" title="Generate Report" tooltip="Generate report"
+			(click)="onGenerateReport()" icon="check-square">
+		</tds-button-custom>
+	</div>
+</div>
+			
+	
