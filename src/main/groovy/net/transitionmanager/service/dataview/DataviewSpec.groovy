@@ -62,6 +62,23 @@ class DataviewSpec {
     private Map<String, Integer> args
     private Map<String, String> order
     private Boolean justPlanning
+	/**
+	 * Named filers are used by All Assets for custom filtering from Planing dashboard
+	 */
+	List<String> namedFilters
+	/*
+		Extra Filters are used by All Assets for custom filtering from Planing dashboard
+		"extra": [ {
+        	"domain": "common",
+        	"filter": "FOO",
+        	"property": "assetName"
+      	}]
+	 */
+	private List<Map<String, ?>> extraFilters
+	/**
+	 * Character separator used for named filters
+	 */
+	public static final String NAMED_FILTER_SEPARATOR = ','
 
 	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview, FieldSpecProject fieldSpecProject = null) {
 
@@ -79,6 +96,7 @@ class DataviewSpec {
 		order = [property: jsonDataview.sort.property, sort: jsonDataview.sort.sortOrder == ASCENDING ? 'asc' : 'desc']
 		spec.domains = jsonDataview.domains.collect { it.toLowerCase() }
 		spec.columns = jsonDataview.columns
+
 
 		apiParamsCommand?.filterParams.each { DataviewApiFilterParam filter ->
 
@@ -109,6 +127,11 @@ class DataviewSpec {
 		if(command.limit != 0){
 			args.max = command.limit
 		}
+		if (command.filters.named) {
+			namedFilters = command.filters.named.split(NAMED_FILTER_SEPARATOR).toList()
+		}
+
+		extraFilters = command.filters.extra
 
 		if (dataview) {
 			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
@@ -238,4 +261,24 @@ class DataviewSpec {
     Boolean getJustPlanning() {
         justPlanning
     }
+
+	/**
+	 * Used to determine if there are named filters for a DataviewSpec request
+	 *
+	 * @return null if the variable wasn't set or a String value if DataviewSpec is prepared for filtering using named filters
+	 * @See DataviewSpec#namedFilters
+	 */
+	List<String> getNamedFilters() {
+		return namedFilters
+	}
+
+	/**
+	 * Used to determine if there is extra filters for a DataviewSpec request
+	 *
+	 * @return null if the variable wasn't set or a List value if DataviewSpec is prepared for filtering using extra filters
+	 * @See DataviewSpec#extraFilters
+	 */
+	List<Map<String, ?>> getExtraFilters() {
+		return extraFilters
+	}
 }

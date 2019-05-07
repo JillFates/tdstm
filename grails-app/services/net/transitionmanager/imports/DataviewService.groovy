@@ -651,7 +651,7 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	private String hqlColumns(DataviewSpec dataviewSpec){
-		return dataviewSpec.columns.findAll{ it['property'] != DataviewCustomFilterHQLBuilder.CUSTOM_FILTER }.collect { Map column ->
+		return dataviewSpec.columns.collect { Map column ->
 			"${projectionPropertyFor(column)}"
 		}.join(", ")
 	}
@@ -698,16 +698,7 @@ class DataviewService implements ServiceMethods {
 			Class type = typeFor(column)
 			String filter = filterFor(column)
 
-			// Applied custom filter from TM-14768
-			if (column.property == DataviewCustomFilterHQLBuilder.CUSTOM_FILTER) {
-				DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(column)
-				Map<String,?> hqlCustomFilters = builder.buildQueryFilters()
-				if (hqlCustomFilters) {
-					whereConditions << hqlCustomFilters.sqlExpression
-					whereParams += hqlCustomFilters.sqlParams
-				}
-
-			} else if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
+			if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
 				// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -767,6 +758,25 @@ class DataviewService implements ServiceMethods {
 					// Keep a copy of this results for later use.
 					mixedFieldsInfo[property] = additionalResults
 				}
+			}
+		}
+
+		// Applied named and extra filters from TM-14768
+		DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(project)
+
+		dataviewSpec.namedFilters.each { String namedFilter ->
+			Map<String, ?> hqlNamedFilters = builder.buildQueryNamedFilters(namedFilter)
+			if (hqlNamedFilters) {
+				whereConditions << hqlNamedFilters.sqlExpression
+				whereParams += hqlNamedFilters.sqlParams
+			}
+		}
+
+		dataviewSpec.extraFilters?.each { Map extraFilter ->
+			Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
+			if (hqlExtraFilters) {
+				whereConditions << hqlExtraFilters.sqlExpression
+				whereParams += hqlExtraFilters.sqlParams
 			}
 		}
 

@@ -1,6 +1,8 @@
 package net.transitionmanager.service
 
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.Project
 
 /**
  * TM-14768. It builds custom filters for Planning Dashboard defined by
@@ -8,76 +10,103 @@ import net.transitionmanager.asset.AssetType
  */
 class DataviewCustomFilterHQLBuilder {
 
+	private Project queryProject
+
+	DataviewCustomFilterHQLBuilder(Project project) {
+		this.queryProject = project
+	}
+
 	/**
 	 * Defines a custom filter name used from the UI
 	 * for adding custom filters like 'physicalServer' or 'virtualServer'
 	 */
 	public static final String CUSTOM_FILTER = '_filter'
 
-	private Map column
-
-	DataviewCustomFilterHQLBuilder(Map column) {
-		this.column = column
-	}
-
 	/**
 	 *
-	 * @return
+	 * @param extraFilter * @return
 	 */
-	Map buildQueryFilters() {
+	Map buildQueryExtraFilters(Map extraFilter) {
+		String hqlExpression
+		Map<String, ?> hqlParams
 
-		Map<String, ?> queryFilters = [:]
-		if (column.label == CUSTOM_FILTER) {
-			queryFilters = hqlCustomFilters()
+		if (extraFilter.containsKey('domain')
+			&& extraFilter.containsKey('property')) {
+
+		} else {
+
+			String filterProperty = extraFilter['property']
+			String filterValue = extraFilter['filter']
+
+			switch (filterProperty) {
+				case 'ufp':
+					hqlExpression = " AE.moveBundle in (:moveBundles) "
+					hqlParams = [
+						moveBundles: MoveBundle.where {
+							project == queryProject && useForPlanning == filterValue
+						}.list()
+					]
+					break
+				default:
+					throw RuntimeException('Invalid filter definition:' + filterProperty)
+			}
+
+
+			return [
+				sqlExpression: hqlExpression,
+				sqlParams    : hqlParams
+			]
+
 		}
+
 
 		return queryFilters
 	}
 
 	/**
-	 * Prepares a Custom filter used by UI for filtering assets using business rules about assets.
-	 * For example, filtering by 'physicalServer' or 'storage'
+	 * <p>Prepares a named filter used by UI for filtering assets using business rules about assets.
+	 * For example, filtering by 'physicalServer' or 'storage' in asset types.</p>
 	 *
-	 * @param column a Column map definition
+	 * @param namedFilter a String value used as a named filter
 	 * @return a Map with 2 values, sqlExpression and sqlParams
 	 * 			to be used in an hql sentence
 	 */
-	private hqlCustomFilters() {
-		String sqlExpression = ''
-		Map<String, ?> sqlParams = [:]
+	public Map<String, ?> buildQueryNamedFilters(String namedFilter) {
+		String hqlExpression
+		Map<String, ?> hqlParams = [:]
 
-		switch (column.filter) {
+		switch (namedFilter) {
 			case 'physical':
-				sqlExpression = " COALESCE(AE.assetType,'') NOT IN (:virtualServerTypes) "
-				sqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				hqlExpression = " COALESCE(AE.assetType,'') NOT IN (:virtualServerTypes) "
+				hqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
 				break
 			case 'physicalServer':
-				sqlExpression = " AE.assetType IN (:phyServerTypes) "
-				sqlParams['phyServerTypes'] = AssetType.allServerTypes - AssetType.virtualServerTypes
+				hqlExpression = " AE.assetType IN (:phyServerTypes) "
+				hqlParams['phyServerTypes'] = AssetType.allServerTypes - AssetType.virtualServerTypes
 				break
 			case 'server':
-				sqlExpression = " AE.assetType IN (:allServerTypes) "
-				sqlParams['allServerTypes'] = AssetType.allServerTypes
+				hqlExpression = " AE.assetType IN (:allServerTypes) "
+				hqlParams['allServerTypes'] = AssetType.allServerTypes
 				break
 			case 'storage':
-				sqlExpression = " AE.assetType IN (:storageTypes) "
-				sqlParams['storageTypes'] = AssetType.storageTypes
+				hqlExpression = " AE.assetType IN (:storageTypes) "
+				hqlParams['storageTypes'] = AssetType.storageTypes
 				break
 			case 'virtualServer':
-				sqlExpression = " AE.assetType IN (:virtualServerTypes) "
-				sqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
+				hqlExpression = " AE.assetType IN (:virtualServerTypes) "
+				hqlParams['virtualServerTypes'] = AssetType.virtualServerTypes
 				break
 			case 'other':
-				sqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:nonOtherTypes) "
-				sqlParams['nonOtherTypes'] = AssetType.nonOtherTypes
+				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:nonOtherTypes) "
+				hqlParams['nonOtherTypes'] = AssetType.nonOtherTypes
 				break
 			default:
-				throw RuntimeException('Invalid filter definition:' + column.filter)
+				throw RuntimeException('Invalid filter definition:' + namedFilter)
 		}
 
 		return [
-			sqlExpression: sqlExpression,
-			sqlParams    : sqlParams
+			sqlExpression: hqlExpression,
+			sqlParams    : hqlParams
 		]
 	}
 }

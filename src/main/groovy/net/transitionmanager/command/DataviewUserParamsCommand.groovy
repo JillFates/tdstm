@@ -16,21 +16,40 @@ class DataviewUserParamsCommand implements CommandObject {
     int offset = 0
     int limit = 25
 
-    Map<String, List> filters
-    /* 
-        [
-              [
-                domain: 'application',
-                property: 'sme',
-                filter: 'joe'
+    /*
+        {
+          "filters": {
+            "domains": [
+              "common",
+              "application",
+              "database",
+              "device",
+              "storage"
             ],
-            [
-                domain: 'common',
-                property: 'environment',
-                filter: 'dev'
+            "columns": [
+              {
+                "domain": "common",
+                "edit": false,
+                "filter": "",
+                "label": "Name",
+                "locked": true,
+                "property": "assetName",
+                "width": 220
+              }
+            ],
+            "named": "physicalServer,toValidate",
+            "extra": [
+              {
+                "domain": "common",
+                "filter": "FOO",
+                "property": "assetName"
+              }
             ]
-        ]
-    */
+          }
+        }
+     */
+    // TODO: improve filters using a more complex command object.
+    Map<String, List> filters
 
     static constraints = {
         sortDomain blank: false, inList: ['common', 'application', 'database', 'device', 'storage']

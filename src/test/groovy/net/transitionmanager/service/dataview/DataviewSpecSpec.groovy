@@ -10,7 +10,6 @@ import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.DataviewCustomFilterHQLBuilder
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -78,19 +77,12 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 	}
 
-	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding custom UI filters'() {
+	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters'() {
 
-		given: 'an instance of DataviewUserParamsCommand'
+		given: 'an instance of DataviewUserParamsCommand with named filters added'
 			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
-			command.filters.columns.add([
-				"domain"  : "database",
-				"edit"    : false,
-				"filter"  : "physicalServer",
-				"label"   : "_filters",
-				"locked"  : true,
-				"property": "_filters",
-				"width"   : 220
-			])
+			// Filter on UI like this: ?_filter=physicalServer
+			command.filters.named = 'physicalServer,validateTo'
 
 		and: 'an instance of Dataview'
 			Dataview dataview = new Dataview(
@@ -106,7 +98,44 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.spec.columns.findAll { it.property == DataviewCustomFilterHQLBuilder.CUSTOM_FILTER }*.filter == ['physicalServer']
+			dataviewSpec.namedFilters == 'physicalServer,validateTo'
+	}
+
+	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters and extra filters'() {
+
+		given: 'an instance of DataviewUserParamsCommand with named filters and extra filters added'
+			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
+			command.filters.named = 'physicalServer'
+			command.filters.extra = [
+				[
+					domain  : 'common',
+					filter  : 'FOO',
+					property: 'assetName'
+				]
+			]
+
+		and: 'an instance of Dataview'
+			Dataview dataview = new Dataview(
+				project: defaultProject,
+				name: 'ALL ASSETS',
+				isSystem: false,
+				isShared: false,
+				reportSchema: allAssets
+			)
+
+		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
+			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
+
+		then: 'dataviewSpec is created correctly'
+			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
+			dataviewSpec.namedFilters == 'physicalServer,validateTo'
+			dataviewSpec.extraFilters == [
+				[
+					domain  : 'common',
+					filter  : 'FOO',
+					property: 'assetName'
+				]
+			]
 	}
 
 	@Shared
