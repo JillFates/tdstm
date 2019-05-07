@@ -24,6 +24,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
+import net.transitionmanager.command.assetentity.SetImportPreferencesCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
@@ -2281,28 +2282,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetImport)
 	def setImportPreferences() {
-		Map preferencesMap
+		SetImportPreferencesCommand command = populateCommandObject(SetImportPreferencesCommand)
+		validateCommandObject(command)
 
-		withForm {
-			js {
-				preferencesMap = request.JSON
-
-			}
-
-			html {
-				preferencesMap = [:]
-				def key = params.preference
-				def value = params.value
-				if (value) {
-					preferencesMap[key] = value
-				}
-			}
-		}
-
-		preferencesMap.each { key, value ->
-			userPreferenceService.setPreference(key, value)
-		}
-
+		userPreferenceService.setPreference(command.preference, command.value)
 		render true
 	}
 
