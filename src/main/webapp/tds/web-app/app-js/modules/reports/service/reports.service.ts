@@ -25,6 +25,8 @@ export class ReportsService {
 	private readonly APP_EVENT_RESULTS_LISTS_URL = `${this.baseURL}/reports/generateApplicationMigration/{id}`;
 	private readonly APP_EVENT_RESULTS_REPORT_URL = `${this.APP_EVENT_RESULTS_LISTS_URL}`;
 	private readonly APPLICATION_PROFILES_REPORT_URL = `${this.baseURL}/reports/generateApplicationProfiles`;
+	private readonly PROJECT_METRICS_LISTS_URL = `${this.baseURL}/reports/projectMetricsLists`;
+	private readonly PROJECT_METRICS_REPORT_URL = `${this.baseURL}/reports/generateProjectMetrics`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -254,6 +256,17 @@ export class ReportsService {
 	}
 
 	/**
+	 * GET - Return the options lists of Project Metrics Report.
+	 */
+	getProjectMetricsLists(): Observable<any> {
+		return this.http.get(`${this.PROJECT_METRICS_LISTS_URL}`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
 	 * GET - Return the owners filtered by bundle
 	 * @param {string} moveBundleId Bundle id to filter
 	 */
@@ -354,5 +367,39 @@ export class ReportsService {
 				return error;
 			})
 		)
+	}
+
+	/**
+	 * POST - Returns the excel spreadsheet file.
+	 * @param projectIds: Array<string>
+	 * @param startDate: Date
+	 * @param endDate: Date
+	 * @param includeNonPlanning: boolean
+	 */
+	generateActivityMetricsReport(projectIds: Array<string>, startDate: Date, endDate: Date, includeNonPlanning: boolean): Observable<any> {
+		if (projectIds.length === 1 && projectIds[0] === '-1') {
+			projectIds = ['all'];
+		}
+		const request = {
+			projectIds: projectIds,
+			startDate: `${startDate.getMonth() + 1}/${startDate.getDate()}/${startDate.getFullYear()}`,
+			endDate: `${endDate.getMonth() + 1}/${endDate.getDate()}/${endDate.getFullYear()}`,
+			includeNonPlanning: includeNonPlanning
+		};
+		return this.http.post(this.PROJECT_METRICS_REPORT_URL, request, {observe: 'response', responseType: 'blob'}).pipe(
+			map((result: any) => {
+				let filename: string = result.headers.get('content-disposition');
+				filename = filename.replace('attachment; filename=', '');
+				filename = filename.replace(new RegExp('"', 'g'), '');
+				return {
+					blob: new Blob([result.body], { type: result.body.type }),
+					filename: filename
+				}
+			}),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
 	}
 }

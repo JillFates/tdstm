@@ -1,9 +1,11 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.HtmlUtil
@@ -15,6 +17,7 @@ import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
+import net.transitionmanager.application.ActivityMetricsCommand
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -23,6 +26,7 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
@@ -36,6 +40,7 @@ import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -50,6 +55,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -71,6 +77,8 @@ class ReportsService implements ServiceMethods {
     MoveEventService moveEventService
     CustomDomainService customDomainService
     AssetEntityService assetEntityService
+    ControllerService controllerService
+    ProjectService projectService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -1414,4 +1422,136 @@ class ReportsService implements ServiceMethods {
 			id: rs.getInt('id'),
 		]}
 	}
+
+    /**
+     * Used to generate project activity metrics excel file.
+     */
+    @HasPermission(Permission.ReportViewProjectDailyMetrics)
+    def generateProjectActivityMetrics(ActivityMetricsCommand command, HttpServletResponse response) {
+
+        Project project = controllerService.getProjectForPage(this)
+        if (!project) return
+
+        List projectIds = command.projectIds
+        Date startDate
+        Date endDate
+        def includeNonPlanning = command.includeNonPlanning
+
+        def validDates = true
+        try {
+            startDate = TimeUtil.parseDate(command.startDate)
+            endDate = TimeUtil.parseDate(command.endDate)
+        } catch (e) {
+            validDates = false
+        }
+
+        if (projectIds && validDates) {
+            boolean allProjects = projectIds.find { it == 'all' }
+            boolean badProjectIds = false
+            List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+            Map<Long, Project> userProjectsMap = [:]
+            List<Long> invalidProjectIds = []
+            List<Long> allProjectIds = []
+
+            for (Project p in userProjects) {
+                userProjectsMap[p.id] = p
+                allProjectIds << p.id
+            }
+
+            if ( allProjects ) {
+                projectIds = allProjectIds
+            } else {
+                projectIds = projectIds.collect { NumberUtil.toLong(it) }
+                // Verify that the user can accesss the proj
+                projectIds.each { id ->
+                    if (!userProjectsMap[id]) {
+                        invalidProjectIds << id
+                        badProjectIds = true
+                    }
+                }
+            }
+
+            //if found any bad id returning to the user
+            if( badProjectIds ){
+                throw new InvalidParamException("Project ids $invalidProjectIds are not associated with current user.")
+            }
+
+            List<Map<String, Object>> activityMetrics = projectService.searchProjectActivityMetrics(projectIds, startDate, endDate)
+            exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning, response)
+
+        }
+    }
+
+    /**
+     * Export task report in XLS format
+     * @param activityMetrics: activity metrics
+     * @param includeNonPlanning: display or not non planning information
+     * @return : will generate a XLS file
+     */
+    private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, includeNonPlanning, HttpServletResponse response) {
+        File file = grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
+        String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_ISO8601)
+        String filename = 'ActivityMetrics-' + fileDate + '-Report'
+
+        //set MIME TYPE as Excel
+        response.setContentType("application/vnd.ms-excel")
+        response.setHeader("Content-Disposition", 'attachment; filename="' + filename + '.xls"')
+
+        def book = new HSSFWorkbook(new FileInputStream( file ))
+        def metricsSheet = book.getSheet("metrics")
+
+        def projectNameFont = book.createFont()
+        projectNameFont.setFontHeightInPoints((short)12)
+        projectNameFont.setFontName("Arial")
+        projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+
+        def projectNameCellStyle
+        projectNameCellStyle = book.createCellStyle()
+        projectNameCellStyle.setFont(projectNameFont)
+
+        def rowNum = 5
+        def project_code
+
+        activityMetrics.each { Map<String, Object> am ->
+
+            if (project_code != am['project_code']) {
+                rowNum++
+                project_code = am['project_code']
+                WorkbookUtil.addCell(metricsSheet, 0, rowNum, am['project_code'])
+                WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
+            }
+
+            WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
+            WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
+            WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
+            WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['planning_applications'])
+            WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['planning_databases'])
+            WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['planning_network_devices'])
+            WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['planning_physical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['planning_logical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['planning_other_devices'])
+            WorkbookUtil.addCell(metricsSheet, 10, rowNum, am['dependency_mappings'])
+            WorkbookUtil.addCell(metricsSheet, 11, rowNum, am['tasks_all'])
+            WorkbookUtil.addCell(metricsSheet, 12, rowNum, am['tasks_done'])
+            WorkbookUtil.addCell(metricsSheet, 13, rowNum, am['total_persons'])
+            WorkbookUtil.addCell(metricsSheet, 14, rowNum, am['total_user_logins'])
+            WorkbookUtil.addCell(metricsSheet, 15, rowNum, am['active_user_logins'])
+
+            rowNum++
+
+            if (includeNonPlanning) {
+                WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Non Planning')
+                WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['non_planning_servers'])
+                WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['non_planning_applications'])
+                WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['non_planning_databases'])
+                WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['non_planning_network_devices'])
+                WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['non_planning_physical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['non_planning_logical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['non_planning_other_devices'])
+                rowNum++
+            }
+        }
+
+        book.write(response.getOutputStream())
+    }
 }
