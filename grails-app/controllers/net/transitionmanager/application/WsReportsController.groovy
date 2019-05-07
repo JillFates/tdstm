@@ -7,6 +7,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.person.Person

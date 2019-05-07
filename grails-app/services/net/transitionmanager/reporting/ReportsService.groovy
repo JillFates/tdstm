@@ -17,7 +17,7 @@ import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
-import net.transitionmanager.application.ActivityMetricsCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -1427,7 +1427,7 @@ class ReportsService implements ServiceMethods {
      * Used to generate project activity metrics excel file.
      */
     @HasPermission(Permission.ReportViewProjectDailyMetrics)
-    def generateProjectActivityMetrics(ActivityMetricsCommand command, HttpServletResponse response) {
+    void generateProjectActivityMetrics(ActivityMetricsCommand command, HttpServletResponse response) {
 
         Project project = controllerService.getProjectForPage(this)
         if (!project) return
@@ -1435,9 +1435,8 @@ class ReportsService implements ServiceMethods {
         List projectIds = command.projectIds
         Date startDate
         Date endDate
-        def includeNonPlanning = command.includeNonPlanning
 
-        def validDates = true
+        boolean validDates = true
         try {
             startDate = TimeUtil.parseDate(command.startDate)
             endDate = TimeUtil.parseDate(command.endDate)
@@ -1462,7 +1461,7 @@ class ReportsService implements ServiceMethods {
                 projectIds = allProjectIds
             } else {
                 projectIds = projectIds.collect { NumberUtil.toLong(it) }
-                // Verify that the user can accesss the proj
+                // Verify that the user can access the project.
                 projectIds.each { id ->
                     if (!userProjectsMap[id]) {
                         invalidProjectIds << id
@@ -1477,7 +1476,7 @@ class ReportsService implements ServiceMethods {
             }
 
             List<Map<String, Object>> activityMetrics = projectService.searchProjectActivityMetrics(projectIds, startDate, endDate)
-            exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning, response)
+            exportProjectActivityMetricsExcel(activityMetrics, command.includeNonPlanning, response)
 
         }
     }
@@ -1488,7 +1487,7 @@ class ReportsService implements ServiceMethods {
      * @param includeNonPlanning: display or not non planning information
      * @return : will generate a XLS file
      */
-    private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, includeNonPlanning, HttpServletResponse response) {
+    private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, boolean includeNonPlanning, HttpServletResponse response) {
         File file = grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
         String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_ISO8601)
         String filename = 'ActivityMetrics-' + fileDate + '-Report'

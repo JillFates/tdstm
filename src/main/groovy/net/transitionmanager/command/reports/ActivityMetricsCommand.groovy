@@ -1,6 +1,8 @@
-package net.transitionmanager.application
+package net.transitionmanager.command.reports
 
-class ActivityMetricsCommand {
+import net.transitionmanager.command.CommandObject
+
+class ActivityMetricsCommand implements CommandObject{
 
     /**
      * Project ID.
