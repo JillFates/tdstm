@@ -4,28 +4,18 @@
 		<div class="box box-primary">
 			<div class="box-header"></div>
 			<div class="box-body">
-				<div class="application-conflicts">
+				<div class="database-conflicts">
 					<div class="filters-wrapper settings" [hidden]="hideFilters">
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title">Bundle</div>
 							<div class="section-control">
 								<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
-									(selectionChange)="updateOwnersList($event)"
 									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
 								</kendo-dropdownlist>
 							</div>
 						</div>
 				
-						<div class="application-section">
-							<div class="section-title">App Owner</div>
-							<div class="section-control">
-								<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.appOwnerList"
-									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.appOwner">
-								</kendo-dropdownlist>
-							</div>
-						</div>
-				
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title">
 								<input [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict"
 									id="bundleConflict" name="bundleConflict" type="checkbox">
@@ -36,7 +26,7 @@
 							</div>
 						</div>
 				
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title">
 								<input [checked]="model.unresolvedDependencies"
 									(change)="model.unresolvedDependencies = !model.unresolvedDependencies" id="unresolvedDependencies"
@@ -48,29 +38,41 @@
 							</div>
 						</div>
 				
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title">
-								<input [checked]="model.missingDependencies"
-									(change)="model.missingDependencies = !model.missingDependencies" id="missingDependencies"
-									name="missingDependencies" type="checkbox">
-								<label for="missingDependencies">Missing Dependencies</label>
+								<input [checked]="model.missingApplications"
+									(change)="model.missingApplications = !model.missingApplications" id="missingApplications"
+									name="missingApplications" type="checkbox">
+								<label for="missingApplications">Missing Applications</label>
 							</div>
 							<div class="section-control">
-								<label>Having no defined Supports or Requires dependencies</label>
+								<label>Having no Supports dependency to application(s)</label>
+							</div>
+						</div>
+
+						<div class="database-section">
+							<div class="section-title">
+								<input [checked]="model.unsupported"
+									(change)="model.unsupported = !model.unsupported" id="unsupported"
+									name="unsupported" type="checkbox">
+								<label for="unsupported">Unsupported</label>
+							</div>
+							<div class="section-control">
+								<label>Having no Requires dependency indication where database resides</label>
 							</div>
 						</div>
 				
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title">
-								<div>Maximum Applications to report</div>
+								<div>Maximum Databases to report</div>
 							</div>
 							<div class="section-control">
-								<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.maxApplicationsList"
-									[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxApplications">
+								<kendo-dropdownlist name="maxDatabases" class="form-control" [data]="model.maxDatabasesList"
+									[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxDatabases">
 								</kendo-dropdownlist>
 							</div>
 						</div>
-						<div class="application-section">
+						<div class="database-section">
 							<div class="section-title"></div>
 							<div class="section-control">
 								<tds-button-custom class="btn-primary" title="Generate Report" tooltip="Generate report"
@@ -82,12 +84,12 @@
 				
 					<div class="container results" *ngIf="isDisplayingReport">
 						<div class="header">
-							<div class="main-title">Application Conflicts - {{reportProject}}: {{reportBundle}} and App Owner: {{reportOwner}}</div>
+							<div class="main-title">{{reportProject}}: {{reportBundle}} - Includes databases matching: {{reportTitle}}</div>
 							<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
 						</div>
 				
-						<div class="container application-container" *ngFor="let item of applicationConflicts">
-							<div class="row application-header" >
+						<div class="container database-container" *ngFor="let item of applicationConflicts">
+							<div class="row database-header" >
 								<div class="col-sm-12 pull-left">
 									<a (click)="onApplicationSelected(item.application)" class="inlineLink">{{item.application.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
 								</div>

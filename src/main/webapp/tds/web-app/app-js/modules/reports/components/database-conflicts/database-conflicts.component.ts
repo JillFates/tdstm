@@ -22,6 +22,7 @@ import {
 	templateUrl: 'database-conflicts.component.html'
 })
 export class DatabaseConflictsComponent extends ReportComponent {
+	reportTitle: any;
 	invalidStatusList = ['Questioned', 'Unknown'];
 	userContext = null;
 	isDisplayingReport: boolean;
@@ -33,14 +34,13 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	planningBundles: any;
 	public model = {
 		moveBundleList: [],
-		appOwnerList: [],
-		appOwner: null,
 		bundleConflict: true,
 		bundle: null,
 		unresolvedDependencies: true,
-		missingDependencies: true,
-		maxApplications: {value: 100},
-		maxApplicationsList: [{value: 100}, {value: 250}, {value: 500}]
+		missingApplications: true,
+		unsupported: true,
+		maxDatabases: {value: 100},
+		maxDatabasesList: [{value: 100}, {value: 250}, {value: 500}]
 	};
 	applicationConflicts: Array<ApplicationConflict> = [];
 
@@ -74,7 +74,6 @@ export class DatabaseConflictsComponent extends ReportComponent {
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
 					this.model.moveBundleList.unshift(this.planningBundles);
 					this.model.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
-					this.updateOwnersList(this.model.bundle);
 				}
 			});
 	}
@@ -90,33 +89,40 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	}
 
 	/**
-	 * Get the name of the current owner selected
-	*/
-	getReportOwnerName(): string {
-		const id = this.model.appOwner && this.model.appOwner.id || '';
-
-		const owner =  this.model.appOwnerList.find((owner) => owner.id === id);
-		return owner.name || '';
-	}
-
-	/**
 	 * Get the conflicts to feed the report
 	*/
 	onGenerateReport(): void {
 		if (this.model.bundle) {
 			this.reportsService.getApplicationConflicts(
 				this.model.bundle.id.toString(),
-				(this.model.appOwner && this.model.appOwner.id) || '',
+				'',
 				this.model.bundleConflict,
-				this.model.missingDependencies,
+				this.model.missingApplications,
 				this.model.unresolvedDependencies,
-				this.model.maxApplications.value
+				this.model.maxDatabases.value
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
+					const titles = [];
+					this.reportTitle = '';
+					if (this.model.bundleConflict) {
+						titles.push('Bundle Conflicts');
+					}
+					if (this.model.unresolvedDependencies) {
+						titles.push('Unresolved Dependencies');
+					}
+					if (this.model.missingApplications) {
+						titles.push('No Applications');
+					}
+					if (this.model.unsupported) {
+						titles.push('DB With NO support');
+					}
+					if (titles.length) {
+						this.reportTitle = titles.join(',').toString();
+					}
+
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
 					this.reportBundle = this.getReportBundleName();
-					this.reportOwner = this.getReportOwnerName();
 
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
@@ -124,24 +130,6 @@ export class DatabaseConflictsComponent extends ReportComponent {
 				});
 		}
 
-	}
-
-	/**
-	 * Get the owners whom belong to the current bundle
-	 * @param bundle: any
-	 */
-	updateOwnersList(bundle: any) {
-		if (bundle && bundle.id) {
-			this.reportsService.getOwnersByBundle(bundle.id)
-			.subscribe((results) => {
-				if (results && results.owners) {
-					this.model.appOwnerList = results.owners
-						.map((result: any) => ({id: result.id.toString(), name: result.fullName}));
-					this.model.appOwnerList.unshift({id: '', name: 'All' });
-					this.model.appOwner = {id: ''};
-				}
-			});
-		}
 	}
 
 	/**
