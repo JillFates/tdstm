@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
@@ -17,7 +18,9 @@ import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
@@ -838,6 +841,136 @@ class ReportsService implements ServiceMethods {
          moveBundleId          : params.moveBundle, appCount: appCount]
     }
 
+    /**
+     * Create and return a map with the information that should populates the Database Conflict Report.
+     * @param project - a given project. If null, the user's current project will be used.
+     * @param command - a DatabaseConflictsCommand instance with the parameters selection.
+     * @return a map containing the corresponding database, the project, bundle and other data for the report.
+     */
+    Map generateDatabaseConflictsMap(Project project, DatabaseConflictsCommand command) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
+
+        List<String> titleParts = []
+        if (command.bundleConflicts) {
+            titleParts.add('Bundle Conflicts')
+        }
+        if (command.unresolvedDependencies) {
+            titleParts.add('Unresolved Dependencies')
+        }
+        if (command.missingApplications) {
+            titleParts.add('No Applications')
+        }
+        if (command.unsupportedDependencies) {
+            titleParts.add('DB With NO support')
+        }
+
+        // No checkbox has been checked?
+        boolean noProblemsSelected = titleParts.size() == 0
+
+        if (noProblemsSelected) {
+            titleParts.add('All')
+        }
+
+        MoveBundle moveBundle
+        List<MoveBundle> bundles
+        if (command.moveBundle == 'useForPlanning') {
+            bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
+        } else {
+            Long moveBundleId = NumberUtil.toLong(command.moveBundle)
+            moveBundle = GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+            bundles = [moveBundle]
+        }
+
+        List<Database> databasesInBundles = []
+        if (bundles) {
+            databasesInBundles = Database.where {
+                moveBundle in (bundles)
+            }.order('assetName').max(command.maxAssets).list()
+        }
+
+
+        List<String> conflictingStatus = ['Validated', 'Questioned', 'Unknown']
+        List<String> unresolvedStatus = ['Questioned', 'Unknown']
+
+        List<Map> databaseList = []
+
+        databasesInBundles.each { Database database ->
+            List<AssetDependency> dependsOnList = AssetDependency.findAllByAsset(database)
+            List<AssetDependency> supportsList = AssetDependency.findAllByDependent(database)
+            boolean noAppSupport = !supportsList.asset.assetType.contains(AssetType.APPLICATION.toString())
+
+            // skip the asset if there is no deps and support
+            if (!dependsOnList && !supportsList) {
+                return
+            }
+
+            String header = ''
+
+            if (!supportsList) {
+                header += ' No DB support?'
+            }
+            if (noAppSupport) {
+                header += ' No applications?'
+            }
+
+            boolean showDb = noProblemsSelected
+
+            if (!showDb) {
+                // Check for vm No support if showDb is true
+                if (!supportsList && command.unsupportedDependencies) {
+                    showDb = true
+                }
+                // Check for bundleConflicts if showDb is false
+                if (!showDb && command.bundleConflicts) {
+                    AssetDependency conflictIssue = dependsOnList.find {
+                        (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && (it.status in conflictingStatus)
+                    }
+                    if (!conflictIssue) {
+                        conflictIssue = supportsList.find {
+                            (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && (it.status in conflictingStatus)
+                        }
+                    }
+                    if (conflictIssue) {
+                        showDb = true
+                    }
+                }
+                // Check for unResolved Dependencies if showDb is false
+                if (!showDb && command.unresolvedDependencies) {
+                    def statusIssue = dependsOnList.find { it.status in unresolvedStatus }
+                    if (!statusIssue) {
+                        statusIssue = supportsList.find { it.status in unresolvedStatus }
+                    }
+                    if (statusIssue) {
+                        showDb = true
+                    }
+                }
+
+                // Check for Run On if showDb is false
+                if (!showDb && command.missingApplications) {
+                    if (!supportsList.find { it.type == 'DB' }) {
+                        showDb = true
+                    }
+                }
+            }
+            if (showDb)
+                databaseList.add([db: database, dependsOnList: dependsOnList, supportsList: supportsList, header: header,
+                    dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size()])
+        }
+
+        return [project: project,
+                dbList: databaseList,
+                title: titleParts.join(', '),
+                moveBundle: moveBundle ?: "Planning Bundles",
+                columns: 9] // Not sure what's the purpose of this.
+
+
+    }
+
+    /**
+     * @Deprecated on 4.7 (TM-13137)
+     */
     def genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDep, noApps, dbSupport, planning, int assetCap) {
         Project project = securityService.userCurrentProject
         List assetList = []
