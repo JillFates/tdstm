@@ -13,6 +13,7 @@ import { ApplicationConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {DatabaseFiltersModel} from '../../model/database-filters.model';
 import {
 	DIALOG_SIZE,
 } from '../../../../shared/model/constants';
@@ -32,6 +33,14 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	reportBundle = '';
 	reportOwner = '';
 	planningBundles: any;
+	filters: DatabaseFiltersModel = {
+		bundle: null,
+		bundleConflict: true,
+		unresolvedDependencies: true,
+		missingApplications: true,
+		unsupported: true,
+		maxDatabases: {value: 100}
+	}
 	public model = {
 		moveBundleList: [],
 		bundleConflict: true,
@@ -81,39 +90,46 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	/**
 	 * Get the name of the current bundle selected
 	*/
+	/*
 	getReportBundleName(): string {
 		const id = this.model.bundle && this.model.bundle.id || '';
 
 		const bundle =  this.model.moveBundleList.find((bundle) => bundle.id === id);
 		return bundle.name || '';
 	}
+	*/
 
+	openReport(params: any) {
+		this.reportBundle = params.bundleName;
+
+		this.onGenerateReport();
+	}
 	/**
 	 * Get the conflicts to feed the report
 	*/
 	onGenerateReport(): void {
 		if (this.model.bundle) {
 			this.reportsService.getApplicationConflicts(
-				this.model.bundle.id.toString(),
+				this.filters.bundle.id.toString(),
 				'',
-				this.model.bundleConflict,
-				this.model.missingApplications,
-				this.model.unresolvedDependencies,
-				this.model.maxDatabases.value
+				this.filters.bundleConflict,
+				this.filters.missingApplications,
+				this.filters.unresolvedDependencies,
+				this.filters.maxDatabases.value
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
 					const titles = [];
 					this.reportTitle = '';
-					if (this.model.bundleConflict) {
+					if (this.filters.bundleConflict) {
 						titles.push('Bundle Conflicts');
 					}
-					if (this.model.unresolvedDependencies) {
+					if (this.filters.unresolvedDependencies) {
 						titles.push('Unresolved Dependencies');
 					}
-					if (this.model.missingApplications) {
+					if (this.filters.missingApplications) {
 						titles.push('No Applications');
 					}
-					if (this.model.unsupported) {
+					if (this.filters.unsupported) {
 						titles.push('DB With NO support');
 					}
 					if (titles.length) {
@@ -122,7 +138,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
-					this.reportBundle = this.getReportBundleName();
+					// this.reportBundle = this.getReportBundleName();
 
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;

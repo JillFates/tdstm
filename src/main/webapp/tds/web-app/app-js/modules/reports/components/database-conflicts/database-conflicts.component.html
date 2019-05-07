@@ -6,6 +6,8 @@
 			<div class="box-body">
 				<div class="database-conflicts">
 					<div class="filters-wrapper settings" [hidden]="hideFilters">
+						<tds-database-filters [filters]="filters" (generateReport)="openReport($event)"></tds-database-filters>
+						<!--
 						<div class="database-section">
 							<div class="section-title">Bundle</div>
 							<div class="section-control">
@@ -80,6 +82,7 @@
 								</tds-button-custom>
 							</div>
 						</div>
+					-->
 					</div>
 				
 					<div class="container results" *ngIf="isDisplayingReport">

@@ -1,15 +1,15 @@
 <div class="database-section">
 	<div class="section-title">Bundle</div>
 	<div class="section-control">
-		<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
-			[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
+		<kendo-dropdownlist name="bundleList" class="form-control" [data]="moveBundleList"
+			[textField]="'name'" [valueField]="'id'" [(ngModel)]="filters.bundle">
 		</kendo-dropdownlist>
 	</div>
 </div>
 
 <div class="database-section">
 	<div class="section-title">
-		<input [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict"
+		<input [checked]="filters.bundleConflict" (change)="filters.bundleConflict = !filters.bundleConflict"
 			id="bundleConflict" name="bundleConflict" type="checkbox">
 		<label for="bundleConflict">Bundle Conflict</label>
 	</div>
@@ -20,8 +20,8 @@
 
 <div class="database-section">
 	<div class="section-title">
-		<input [checked]="model.unresolvedDependencies"
-			(change)="model.unresolvedDependencies = !model.unresolvedDependencies" id="unresolvedDependencies"
+		<input [checked]="filters.unresolvedDependencies"
+			(change)="filters.unresolvedDependencies = !filters.unresolvedDependencies" id="unresolvedDependencies"
 			name="unresolvedDependencies" type="checkbox">
 		<label for="unresolvedDependencies">Unresolved Dependencies</label>
 	</div>
@@ -32,8 +32,8 @@
 
 <div class="database-section">
 	<div class="section-title">
-		<input [checked]="model.missingApplications"
-			(change)="model.missingApplications = !model.missingApplications" id="missingApplications"
+		<input [checked]="filters.missingApplications"
+			(change)="filters.missingApplications = !filters.missingApplications" id="missingApplications"
 			name="missingApplications" type="checkbox">
 		<label for="missingApplications">Missing Applications</label>
 	</div>
@@ -44,8 +44,8 @@
 
 <div class="database-section">
 	<div class="section-title">
-		<input [checked]="model.unsupported"
-			(change)="model.unsupported = !model.unsupported" id="unsupported"
+		<input [checked]="filters.unsupported"
+			(change)="filters.unsupported = !filters.unsupported" id="unsupported"
 			name="unsupported" type="checkbox">
 		<label for="unsupported">Unsupported</label>
 	</div>
@@ -59,8 +59,8 @@
 		<div>Maximum Databases to report</div>
 	</div>
 	<div class="section-control">
-		<kendo-dropdownlist name="maxDatabases" class="form-control" [data]="model.maxDatabasesList"
-			[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxDatabases">
+		<kendo-dropdownlist name="maxDatabases" class="form-control" [data]="maxDatabasesList"
+			[textField]="'value'" [valueField]="'value'" [(ngModel)]="filters.maxDatabases">
 		</kendo-dropdownlist>
 	</div>
 </div>

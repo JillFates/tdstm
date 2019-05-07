@@ -1,6 +1,9 @@
 import {
 	Input,
-	Component
+	Output,
+	EventEmitter,
+	Component,
+	OnInit,
 } from '@angular/core';
 
 import {
@@ -14,43 +17,33 @@ import {DatabaseFiltersModel} from '../../../model/database-filters.model';
 	selector: 'tds-database-filters',
 	templateUrl: 'database-filters.component.html'
 })
-export class DatabaseFiltersComponent {
+export class DatabaseFiltersComponent implements OnInit {
+	@Output() generateReport = new EventEmitter<any>();
 	@Input() filters: DatabaseFiltersModel;
-	planningBundles: any;
-
-	public model = {
-		bundle: null,
-		bundleConflict: true,
-		unresolvedDependencies: true,
-		missingApplications: true,
-		unsupported: true,
-		maxDatabases: {value: 100},
-
-		moveBundleList: [],
-		maxDatabasesList: [{value: 100}, {value: 250}, {value: 500}]
-	};
+	planningBundles =  {id: 'useForPlanning', name: 'Planning Bundles'};
+	moveBundleList: Array<any> = [];
+	maxDatabasesList: Array<any> = [];
 
 	constructor(private reportsService: ReportsService) {
-			this.planningBundles =  {id: 'useForPlanning', name: 'Planning Bundles'};
-			this.load();
+		this.load();
+	}
+
+	ngOnInit() {
+		this.maxDatabasesList = [{value: 100}, {value: 250}, {value: 500}];
 	}
 
 	/**
 	 * Load the bundle list
 	 */
 	load() {
-		const commonCalls = [
-			this.reportsService.getBundles()
-		];
 
-		Observable.forkJoin(commonCalls)
-			.subscribe((results) => {
-				const [bundles] = results;
+		this.reportsService.getBundles()
+			.subscribe((bundles) => {
 				if (bundles) {
-					this.model.moveBundleList = bundles.moveBundles
+					this.moveBundleList = bundles.moveBundles
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));
-					this.model.moveBundleList.unshift(this.planningBundles);
-					this.model.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
+					this.moveBundleList.unshift(this.planningBundles);
+					this.filters.bundle = (bundles.moveBundleId) ? {id: bundles.moveBundleId} : this.planningBundles;
 				}
 			});
 	}
@@ -59,10 +52,19 @@ export class DatabaseFiltersComponent {
 	 * Get the name of the current bundle selected
 	*/
 	getReportBundleName(): string {
-		const id = this.model.bundle && this.model.bundle.id || '';
+		const id = this.filters.bundle && this.filters.bundle.id || '';
 
-		const bundle =  this.model.moveBundleList.find((bundle) => bundle.id === id);
+		const bundle =  this.moveBundleList.find((bundle) => bundle.id === id);
 		return bundle.name || '';
+	}
+
+	/**
+	 * Report to host component the generate report event
+	*/
+	onGenerateReport(): void {
+		this.generateReport.emit({
+			bundleName: this.getReportBundleName()
+		});
 	}
 
 }
