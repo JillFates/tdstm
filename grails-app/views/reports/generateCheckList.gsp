@@ -431,7 +431,7 @@
 					<g:if test="${taskerrMsg}">
 						<span style="color: green;"><b><h2>${taskerrMsg}</h2></b></span>
 					</g:if>
-					${cyclicalsError}
+					${raw(cyclicalsError)}
 					<div style="margin-left: 50px">
 						${cyclicalsRef.toString()}
 					</div>
@@ -440,25 +440,25 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${startsError}
+					${raw(startsError)}
 					<div style="margin-left: 50px">
-						${startsRef.toString()}
+						${raw(startsRef.toString())}
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${sinksError}
+					${raw(sinksError)}
 					<div style="margin-left: 50px">
-						${sinksRef.toString()}
+						${raw(sinksRef.toString())}
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${personAssignErr}
+					${raw(personAssignErr)}
 					<g:if test="${personTasks && personTasks.size()>0}">
 						<table style="width: auto; margin-left: 100px;">
 							<tr>
