@@ -9,7 +9,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 // Model
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {AssetSummaryColumnModel} from '../../model/asset-summary-column.model';
-import {WindowService} from '../../../../shared/services/window.service';
+import {AssetSummaryService} from '../../service/asset-summary.service';
 
 @Component({
 	selector: `tds-asset-summary-list`,
@@ -19,61 +19,7 @@ export class AssetSummaryListComponent implements OnInit {
 
 	public assetSummaryColumnModel = new AssetSummaryColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public gridData: any[] = [
-		{
-			bundle: {
-				id: 3239,
-				name: 'Buildout'
-			},
-			application: {
-				id: 7,
-				count: 226
-			},
-			server: {
-				id: 4,
-				count: 26
-			},
-			device: {
-				id: 3,
-				count: 15
-			},
-			database: {
-				id: 2,
-				count: 0
-			},
-			storage: {
-				id: 6,
-				count: 0
-			}
-		},
-		{
-			bundle: {
-				id: 5689,
-				name: 'Bundle - Moving Devices from Here to there'
-			},
-			application: {
-				id: 7,
-				count: 1
-			},
-			server: {
-				id: 4,
-				count: 0
-			},
-			device: {
-				id: 3,
-				count: 0
-			},
-			database: {
-				id: 2,
-				count: 0
-			},
-			storage: {
-				id: 6,
-				count: 1
-			}
-		}
-	];
-
+	public gridData: any[] = [];
 	public total = {
 		application: 0,
 		server: 0,
@@ -89,17 +35,21 @@ export class AssetSummaryListComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private router: Router,
-		private windowsService: WindowService) {
+		private assetSummaryService: AssetSummaryService) {
 	}
 
 	ngOnInit() {
-		// Get the list
-		this.gridData.forEach((item: any) => {
-			this.total.application += item.application.count;
-			this.total.server += item.server.count;
-			this.total.device += item.device.count;
-			this.total.database += item.database.count;
-			this.total.storage += item.storage.count;
+		this.assetSummaryService.getSummaryTable().subscribe((data: any) => {
+			this.gridData = data;
+
+			// Get the list
+			this.gridData.forEach((item: any) => {
+				this.total.application += item.application.count;
+				this.total.server += item.server.count;
+				this.total.device += item.device.count;
+				this.total.database += item.database.count;
+				this.total.storage += item.storage.count;
+			});
 		});
 	}
 

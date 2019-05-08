@@ -16,7 +16,7 @@
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'bundle'" let-dataItem>
-                            <a href="../moveBundle/show/{{dataItem[column.property].id}}"> {{dataItem[column.property].name}} </a>
+                            <a href="../moveBundle/show/{{dataItem['bundle'].id}}"> {{dataItem['bundle'].name}} </a>
                         </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.property !== 'bundle'" let-dataItem>
                             <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
