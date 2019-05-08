@@ -251,12 +251,12 @@ export class ReportsService {
 
 	/**
 	 * GET - Return the list of application conflicts
-	 * @param bundle: string
-	 * @param owner: string
-	 * @param conflicts: boolean
-	 * @param missing: boolean
-	 * @param unresolved: boolean
-	 * @param max: number
+	 * @param {string} bundle: Bundle related
+	 * @param {string} owner: Owner ID
+	 * @param {boolean} conflicts: Flag to get assets asigned to unrelated bundles
+	 * @param {boolean} missing: Flag to get dependencies with not defined support
+	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questined
+	 * @param {number} max: Max number of items to retrive
 	*/
 	getApplicationConflicts(
 		bundle: string,
@@ -315,12 +315,12 @@ export class ReportsService {
 	}
 
 	/**
-	 * GET - Return the list of application conflicts
-	 * @param bundle: string
-	 * @param conflicts: boolean
-	 * @param missing: boolean
-	 * @param unresolved: boolean
-	 * @param max: number
+	 * GET - Return the list of database conflicts
+	 * @param {string} bundle: Bundle ID related
+	 * @param {boolean} conflicts: Flag to get references to assets assigned to unrelated bundles
+	 * @param {boolean} missing: Flag to get missing applications
+	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questioned
+	 * @param {number} max: Max number of records to retrive
 	*/
 	getDatabaseConflicts(
 		bundle: string,

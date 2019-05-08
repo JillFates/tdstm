@@ -88,17 +88,9 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	}
 
 	/**
-	 * Get the name of the current bundle selected
+	 * Set up the parameters selected in the filter component and open up the report
+	 * @param params: any
 	*/
-	/*
-	getReportBundleName(): string {
-		const id = this.model.bundle && this.model.bundle.id || '';
-
-		const bundle =  this.model.moveBundleList.find((bundle) => bundle.id === id);
-		return bundle.name || '';
-	}
-	*/
-
 	openReport(params: any) {
 		this.reportBundle = params.bundleName;
 
