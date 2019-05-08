@@ -1262,4 +1262,3 @@ class ReportsService implements ServiceMethods {
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
     }
 }
-
