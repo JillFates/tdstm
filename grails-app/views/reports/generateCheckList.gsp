@@ -1,7 +1,6 @@
-<%@page expressionCodec="none" %>
 <div class="generated-check-list">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>${project.name} : ${moveEvent.name }</b>
+			<b>${project.name} : ${moveEvent.name}</b>
 		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
@@ -84,7 +83,7 @@
 			<tr>
 				<td></td>
 				<td><span style="color: green;"><b>Bundles: OK
-							&nbsp;&nbsp; ${moveBundleSize} Bundles;&nbsp;${moveBundles.toString().replace('[','').replace(']','')}
+							&nbsp;&nbsp; ${moveBundleSize} Bundles;&nbsp;${moveBundles.toString().replace('[', '').replace(']', '')}
 					</b></span></td>
 			</tr>
 			<tr>
@@ -326,7 +325,7 @@
 				<td></td>
 				<td><span style="color: green;"><b>Summary OK: <g:each
 								in="${bundleMap}" var="bundle">
-								${bundle.name}: ${bundle.size} teams.</g:each></b></span></td>
+								${cbundle.name}: ${bundle.size} teams.</g:each></b></span></td>
 			</tr>
 			</g:if>
 			<tr>
