@@ -518,7 +518,7 @@ class ReportsService implements ServiceMethods {
 					projectEndTime  = TimeUtil.formatDateTime(it.completionTime, TimeUtil.FORMAT_DATE_TIME_8)
 				}
 
-				errorForEventTime += """<span style="color:green"><b>Event Time Period $it.name: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
+				errorForEventTime += """<span style="color:green"><b>Event Time Period ${HtmlUtil.escape(it.name)}: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
 			}
 		}
 
