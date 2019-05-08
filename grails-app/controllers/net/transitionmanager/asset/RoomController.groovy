@@ -414,12 +414,12 @@ class RoomController implements ControllerMethods {
 			powerB = convertPower(powerB, powerType)
 			powerC = convertPower(powerC, powerType)
 			powerX = convertPower(powerX, powerType)
-			
+
 			rackPowerA = convertPower(rack.powerA, powerType)
 			rackPowerB = convertPower(rack.powerB, powerType)
 			rackPowerC = convertPower(rack.powerC, powerType)
 		}
-		
+
 		def redTBD = false
 		if ((powerA +powerB+ powerC+ powerX) > (rackPowerA+ rackPowerB + rackPowerC)) {
 			redTBD = true
@@ -454,10 +454,10 @@ class RoomController implements ControllerMethods {
 		} else {
 			op += "</table>"
 		}
-		
+
 		render  op
 	}
-	
+
 	/**
 	 *  Return assets list as html row format to assign racks
 	 */
@@ -476,7 +476,7 @@ class RoomController implements ControllerMethods {
 		order = order == 'asc' ? 'desc' : 'asc'
 		query += " order by $sort $order"
 		def entities = AssetEntity.findAll(query,[project:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
-		
+
 		def html = new StringBuilder()
 		html.append("""
 			<div class="dialog" >
@@ -493,35 +493,35 @@ class RoomController implements ControllerMethods {
 		if (entities) {
 			entities.eachWithIndex{ obj, i ->
 				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position', false, closeAssignAssetListDialog);">
-					<td>$obj.assetName</td>
-					<td>$obj.assetTag</td>
-					<td>${obj.model ? obj.model.modelName : ''}</td>
+					<td>${HtmlUtil.escape(obj.assetName)}</td>
+					<td>${HtmlUtil.escape(obj.assetTag)}</td>
+					<td>${obj.model ? HtmlUtil.escape(obj.model.modelName) : ''}</td>
 				</tr>""")
 			}
 		} else {
 			html.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
 		}
 		html.append("</tbody></table></div>")
-		
+
 		render html.toString()
 	}
-	
+
 	/**
 	 *  Return blades list as html row format to assign blade chassis
 	 */
 	@HasPermission(Permission.RoomView)
 	def retrieveBladeAssetsListToAddRack() {
 		def source = params.source
-		
+
 		String middle = ''
 		if (params.assign == 'assign') {
 			middle = (source == '1' ? 'source' : 'target') + 'Chassis is null and '
 		}
 		String hql = 'from AssetEntity where ' + middle + "project=:projectId and assetType = 'Blade'"
 		List<AssetEntity> entities = AssetEntity.executeQuery(hql, [projectId: securityService.userCurrentProjectId])
-		
+
 		def html = new StringBuilder()
-		
+
 		def bladeAsset = AssetEntity.get(params.blade)
 		def bladeAssetId = bladeAsset?.id
 		def bundleId = bladeAsset?.moveBundleId
@@ -533,9 +533,9 @@ class RoomController implements ControllerMethods {
 		if (entities) {
 			entities.eachWithIndex{ obj, i ->
 				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('$obj.assetClass',$obj.id,'$source','$bladeAssetId','$params.roomName','$params.location','$params.position')">
-											<td>$obj.assetName</td>
-											<td>$obj.assetTag</td>
-											<td>${obj.model ? obj.model.modelName : ''}</td>
+											<td>${HtmlUtil.escape(obj.assetName)}</td>
+											<td>${HtmlUtil.escape(obj.assetTag)}</td>
+											<td>${obj.model ? HtmlUtil.escape(obj.model.modelName) : ''}</td>
 										</tr>""")
 			}
 		} else {
