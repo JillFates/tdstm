@@ -9,7 +9,7 @@ import {
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
-import { ApplicationConflict } from '../../model/application-conflicts.model';
+import { ApplicationConflict, DatabaseConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -51,7 +51,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 		maxDatabases: {value: 100},
 		maxDatabasesList: [{value: 100}, {value: 250}, {value: 500}]
 	};
-	applicationConflicts: Array<ApplicationConflict> = [];
+	databaseConflicts: Array<DatabaseConflict> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -109,15 +109,14 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	*/
 	onGenerateReport(): void {
 		if (this.model.bundle) {
-			this.reportsService.getApplicationConflicts(
+			this.reportsService.getDatabaseConflicts(
 				this.filters.bundle.id.toString(),
-				'',
 				this.filters.bundleConflict,
 				this.filters.missingApplications,
 				this.filters.unresolvedDependencies,
 				this.filters.maxDatabases.value
 				)
-				.subscribe((results: Array<ApplicationConflict>) => {
+				.subscribe((results: Array<DatabaseConflict>) => {
 					const titles = [];
 					this.reportTitle = '';
 					if (this.filters.bundleConflict) {
@@ -140,7 +139,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 					this.reportProject =  this.userContext.project.name;
 					// this.reportBundle = this.getReportBundleName();
 
-					this.applicationConflicts = results;
+					this.databaseConflicts = results;
 					this.isDisplayingReport = true;
 					this.hideFilters = true;
 				});
@@ -149,13 +148,13 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	}
 
 	/**
-	 * Open the asset show view of the current application selected
-	 * @param application: any
+	 * Open the asset show view of the current database selected
+	 * @param database: any
 	 */
-	onApplicationSelected(application: any): void {
+	onDatabaseSelected(database: any): void {
 		this.dialogService.open(AssetShowComponent, [
-			{ provide: 'ID', useValue: application.id },
-			{ provide: 'ASSET', useValue: application.assetClass }],
+			{ provide: 'ID', useValue: database.id },
+			{ provide: 'ASSET', useValue: database.assetClass }],
 			DIALOG_SIZE.LG, false)
 			.then(asset => {
 				console.log('Done');

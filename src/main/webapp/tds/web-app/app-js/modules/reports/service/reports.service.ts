@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import { ApplicationConflict } from '../model/application-conflicts.model';
+import { ApplicationConflict, DatabaseConflict } from '../model/application-conflicts.model';
 import {catchError, map} from 'rxjs/operators';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -312,5 +312,69 @@ export class ReportsService {
 					})
 			})
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * GET - Return the list of application conflicts
+	 * @param bundle: string
+	 * @param conflicts: boolean
+	 * @param missing: boolean
+	 * @param unresolved: boolean
+	 * @param max: number
+	*/
+	getDatabaseConflicts(
+		bundle: string,
+		conflicts: boolean,
+		missing: boolean,
+		unsupported: boolean,
+		max: number
+		): Observable<Array<DatabaseConflict>> {
+			const url = `${this.baseURL}/reports/databaseConflicts?`;
+			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
+			`&missingApplications=${missing}&unsupportedDependencies=${unsupported}&maxAssets=${max}`;
+
+			return this.http.get(`${url}${params}`)
+				.map((response: any) => {
+					const data =  (response && response.status === 'success' && response.data || null);
+
+					return data == null ? [] : data.dbList
+						.map((dbItem: any) => {
+							return {
+								'database': {
+									'id': dbItem.db.id,
+									'name': dbItem.db.assetName,
+									'assetClass': dbItem.db.assetClass.name
+								},
+								'header': dbItem.header ? ` - ${dbItem.header}` : '',
+								'bundle': {
+									'id': data.moveBundle.id,
+									'name': data.moveBundle.name
+								},
+								supports: dbItem.supportsList
+									.map((support: any) => {
+										return {
+											'type': support.type,
+											'class': support.asset.assetClass || 'NOT-DEFINED',
+											'name': support.asset.name || 'NOT-DEFINED',
+											'frequency': support.dataFlowFreq,
+											'bundle':  support.asset.moveBundle || 'NOT-DEFINED',
+											'status': support.status
+										};
+									}),
+								dependencies: dbItem.dependsOnList
+								.map((dependency: any) => {
+									return {
+										'type': dependency.type,
+										'class': dependency.asset.assetClass || 'NOT-DEFINED',
+										'name': dependency.asset.name || 'NOT-DEFINED',
+										'frequency': dependency.dataFlowFreq,
+										'bundle': dependency.dependent.moveBundle || 'NOT-DEFINED',
+										'status': dependency.status
+									};
+								})
+							}
+						})
+				})
+				.catch((error: any) => error);
 	}
 }

@@ -28,3 +28,17 @@ export interface ApplicationConflict {
 	supports: Array<Support>;
 	dependencies: Array<Dependency>;
 }
+
+export interface DatabaseConflict {
+	database: {
+		id: number;
+		name: string;
+	};
+	header: string;
+	bundle: {
+		id: number;
+		name: string;
+	};
+	supports: Array<Support>;
+	dependencies: Array<Dependency>;
+}
