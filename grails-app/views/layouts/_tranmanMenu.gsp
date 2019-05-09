@@ -377,13 +377,13 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
-                                <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
+                                <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-application-conflicts">
-                                <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
+                                <a href="/tdstm/module/reports/applicationConflicts">Application Conflicts</a>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
-                                <a href="/tdstm/reports/serverConflicts">Server Conflicts</a>
+                                <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
                                 <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
@@ -402,7 +402,7 @@
                                 <li class="divider"></li>
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
-                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
+                                    <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>

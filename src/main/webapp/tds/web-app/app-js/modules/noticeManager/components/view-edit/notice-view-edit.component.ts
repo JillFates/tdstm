@@ -12,7 +12,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes, NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {ModalType} from '../../../../shared/model/constants';
 
@@ -30,10 +30,8 @@ export class NoticeViewEditComponent {
 	public defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-	public typeDataSource: Array<any> = [
-		{typeId: 1, name: 'Prelogin'},
-		{typeId: 2, name: 'Postlogin'}
-	];
+
+	public typeDataSource = [...NoticeTypes];
 	public model: NoticeModel;
 
 	constructor(
@@ -46,7 +44,7 @@ export class NoticeViewEditComponent {
 		private permissionService: PermissionService) {
 
 		this.model = {...model};
-		this.model.typeId = (this.model.typeId) ? parseInt(this.model.typeId, 10) : null;
+		this.model.typeId = this.model.typeId || null;
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
@@ -68,23 +66,30 @@ export class NoticeViewEditComponent {
 	}
 
 	protected deleteNotice(): void {
-		this.noticeService.deleteNotice(this.model)
-			.subscribe(
-				res => this.activeDialog.close(),
-				error => this.activeDialog.dismiss(error));
+		this.promptService.open('Confirmation Required', 'You are about to delete the selected notice. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.noticeService.deleteNotice(this.model.id.toString())
+						.subscribe(
+							res => this.activeDialog.close(),
+							error => this.activeDialog.dismiss(error));
+				}
+			});
 	}
 
 	/**
 	 * Save the current status fo the Notice
 	 */
 	public saveNotice(): void {
-		if (this.model.id) {
-			this.noticeService.editNotice(this.model)
+		const payload = {...this.model};
+
+		if (payload.id) {
+			this.noticeService.editNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
 		} else {
-			this.noticeService.createNotice(this.model)
+			this.noticeService.createNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
@@ -121,5 +126,19 @@ export class NoticeViewEditComponent {
 	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
+	}
+
+	/**
+	 * Grab the current html value emitted by rich text editor
+	 */
+	public onValueChange(value: string) {
+		this.model.htmlText = value;
+	}
+
+	/**
+	 * Grab the current raw value emitted by rich text editor
+	 */
+	public onRawValueChange(value: string) {
+		this.model.rawText = value;
 	}
 }

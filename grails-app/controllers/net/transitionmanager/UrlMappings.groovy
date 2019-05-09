@@ -639,7 +639,7 @@ class UrlMappings {
 		"/ws/notices/$id/ack" {
 			controller = "wsNotice"
 			action = [
-					POST: "ack"
+					POST: "acknowledge"
 			]
 		}
 
@@ -1254,12 +1254,76 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/applicationConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getApplicationConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [
 					POST: "tasksReport"
 			]
 		}
+
+        "/ws/reports/moveBundles" {
+            controller = "wsReports"
+            action = [
+                    GET: "moveBundles"
+            ]
+        }
+
+		"/ws/reports/moveBundlesForSelection" {
+			controller = "wsReports"
+			action = [
+				GET: 'getMoveBundles'
+			]
+		}
+
+		"/ws/reports/appOwnersForBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+				GET: 'getOwnersForMoveBundle'
+			]
+		}
+
+        "/ws/reports/generateServerConflicts" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateServerConflicts"
+            ]
+        }
+
+        "/ws/reports/smeList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "smeList"
+            ]
+        }
+
+        "/ws/reports/appOwnerList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "appOwnerList"
+            ]
+        }
+
+        "/ws/reports/generateApplicationMigration/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "applicationMigrationLists",
+                    POST: "generateApplicationMigration"
+            ]
+        }
+
+        "/ws/reports/generateApplicationProfiles" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateApplicationProfiles"
+            ]
+        }
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

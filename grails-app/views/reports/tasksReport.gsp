@@ -39,7 +39,9 @@
                     ${task.taskNumber}
                 </td>
                 <td>
-                    ${task.comment}
+                    <div style="max-height: 100px; max-width: 150px; overflow: scroll;">
+                        ${task.comment}
+                    </div>
                 </td>
                 <td>
                     ${task.assetEntity?.assetName}

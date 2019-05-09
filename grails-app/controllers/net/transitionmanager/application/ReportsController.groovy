@@ -271,6 +271,7 @@ class ReportsController implements ControllerMethods {
 	/**
 	 * Used to generate Application Profiles
 	 * @return list of applications
+     * @deprecated Migrated to angular report, please refer to #ReportsService.generateApplicationProfiles()
 	 */
 	def generateApplicationProfiles() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')
@@ -643,6 +644,8 @@ class ReportsController implements ControllerMethods {
 
 	/**
 	 * Used to generate server Conflicts.
+     * @deprecated Moved this report to angular
+     * @see WsReportsController#generateServerConflicts()
 	 */
 	def generateServerConflicts() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')
@@ -708,6 +711,7 @@ class ReportsController implements ControllerMethods {
 
 	/**
 	 * Used to generate Application Migration Report.
+     * @deprecated Replace by angular report on WSReportsController
 	 */
 	def generateApplicationMigration() {
 		Project project = controllerService.getProjectForPage(this, 'to view Reports')

@@ -14,6 +14,7 @@ package com.tdsops.etl
  */
 class ETLFindElement implements ETLStackableCommand {
 
+
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
 	 * @see ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex)
@@ -205,7 +206,7 @@ class ETLFindElement implements ETLStackableCommand {
 			results.matchOn = findings.size()
 
 			if (currentFind.objects.size() > 1){
-				currentFind.errors = ['The find/elseFind command(s) found multiple records']
+				currentFind.errors = [DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS]
 			}
 		}
 	}

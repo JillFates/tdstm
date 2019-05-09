@@ -276,11 +276,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
 		for (let field of this.fieldsInfo) {
-			if (field.importValue) {
+			if (!field.importValue) {
+				field.importValue = '';
+			}
 			const newFieldValue = {fieldName: field.name, value: field.importValue};
 			newFieldsValues.push(newFieldValue);
 			}
-		}
 		this.importBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
 				this.loadRecordFieldDetails();

@@ -96,11 +96,11 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'assets/images'
 
-	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
-	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1864,7 +1864,7 @@ class ProjectService implements ServiceMethods {
 			origFileName = origFileName.substring(slashIndex + 1)
 		}
 
-		ProjectLogo pl = findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
+		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
 		pl.setData file.inputStream
 
 		return pl.save(flush: true)

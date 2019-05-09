@@ -27,12 +27,6 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td>
-					${raw(newsBarModeError)}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
 				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']',''))}
 				</td>
 			</tr>

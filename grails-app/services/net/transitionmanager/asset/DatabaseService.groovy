@@ -1,11 +1,11 @@
 package net.transitionmanager.asset
 
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods

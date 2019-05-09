@@ -2374,7 +2374,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							originalValue == '152255'
 							value == 152255l
 							init == null
-							errors == ['The find/elseFind command(s) found multiple records']
+							errors == [DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS]
 							warn == false
 							assertWith(find) {
 								matchOn == 0

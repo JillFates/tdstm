@@ -1,67 +1,78 @@
 import {Component, OnInit} from '@angular/core';
 import {ReportsService} from '../../service/reports.service';
-import {SafeHtml} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
+import {ReportComponent} from '../report.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'tds-task-report',
 	template: `
 		<div class="content body">
-			<section>
+			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
 						<div class="box box-primary">
 							<div class="box-header">
 							</div>
 							<div class="box-body">
-								<div class="form-group row">
-									<label class="col-sm-1 control-label" for="fetch">Events</label>
-									<div class="col-sm-11">
-										<kendo-multiselect
-											name="event"
-											class="form-control event-multiselect"
-											[data]="eventList"
-											[textField]="'name'"
-											[valueField]="'id'"
-											[(ngModel)]="selectedEvents"
-											(valueChange)="onValueChange($event)">
-										</kendo-multiselect>
+								<div class="filters-wrapper" [hidden]="hideFilters">
+									<div class="form-group row">
+										<label class="col-sm-2 control-label" for="fetch">Events</label>
+										<div class="col-sm-3">
+											<kendo-multiselect
+												name="event"
+												class="form-control event-multiselect"
+												[data]="eventList"
+												[textField]="'name'"
+												[valueField]="'id'"
+												[(ngModel)]="selectedEvents"
+												(valueChange)="onValueChange($event)">
+											</kendo-multiselect>
+										</div>
 									</div>
-								</div>
-								<div class="form-group row checkboxes">
-									<span class="col-sm-1"></span>
-									<div class="col-sm-11">
-										<label for="one">
-											<input type="checkbox" name="one" id="one" [(ngModel)]="includeComments">
-											Include comments in report
-										</label>
-										<label for="two">
-											<input type="checkbox" name="two" id="two" [(ngModel)]="includeOnlyRemaining">
-											Include only remaining tasks in report
-										</label>
-										<label for="three">
-											<input type="checkbox" name="three" id="three" [(ngModel)]="includeUnpublished">
-											Include Unpublished Tasks
-										</label>
+									<div class="form-group row checkboxes">
+										<div class="col-sm-5 col-sm-offset-2">
+											<label for="one">
+												<input type="checkbox" name="one" id="one" [(ngModel)]="includeComments">
+												Include comments in report
+											</label>
+										</div>
 									</div>
-								</div>
-								<div class="form-group row ">
-									<div class="col-sm-12 buttons">
-										<tds-button-custom class="btn-primary"
-																			 (click)="onGenerateWebReport()"
-																			 title="Generate Report"
-																			 tooltip="Generate Report"
-																			 icon="check-square">
-										</tds-button-custom>
-										<tds-button-export
-											class="btn-primary"
-											(click)="onGenerateXLSReport()"
-											title="Export to Excel"
-											tooltip="Export to Excel">
-										</tds-button-export>
+									<div class="form-group row checkboxes">
+										<div class="col-sm-5 col-sm-offset-2">
+											<label for="two">
+												<input type="checkbox" name="two" id="two" [(ngModel)]="includeOnlyRemaining">
+												Include only remaining tasks in report
+											</label>
+										</div>
 									</div>
+									<div class="form-group row">
+										<div class="col-sm-5 col-sm-offset-2">
+											<label for="three">
+												<input type="checkbox" name="three" id="three" [(ngModel)]="includeUnpublished">
+												Include Unpublished Tasks
+											</label>
+										</div>
+									</div>
+									<div class="form-group row ">
+										<div class="col-sm-4 col-sm-offset-2 buttons">
+											<tds-button-custom class="btn-primary"
+																				 (click)="onGenerateReport()"
+																				 title="Generate Report"
+																				 tooltip="Generate Report"
+																				 icon="check-square">
+											</tds-button-custom>
+											<tds-button-export
+												class="btn-primary"
+												(click)="onGenerateXLSReport()"
+												title="Export to Excel"
+												tooltip="Export to Excel">
+											</tds-button-export>
+										</div>
+									</div>
+									<hr/>
 								</div>
-								<hr/>
 								<div class="report-content" [innerHTML]="reportResult"></div>
 							</div>
 						</div>
@@ -71,17 +82,17 @@ import {Observable} from 'rxjs';
 		</div>
 	`
 	})
-export class TaskReportComponent {
+export class TaskReportComponent extends ReportComponent {
 
 	eventList: any;
 	selectedEvents: Array<any>;
 	includeComments = true;
 	includeOnlyRemaining = true;
 	includeUnpublished = true;
-	reportResult: SafeHtml;
 	private readonly allEventsOption = {id: -1, name: 'All Events'};
 
-	constructor(private reportsService: ReportsService) {
+	constructor(reportsService: ReportsService, dialogService: UIDialogService) {
+		super(reportsService, dialogService);
 		this.selectedEvents = [this.allEventsOption];
 		this.onLoad();
 	}
@@ -114,8 +125,9 @@ export class TaskReportComponent {
 	/**
 	 * On Generate Web Report type.
 	 */
-	onGenerateWebReport(): void {
+	onGenerateReport(): void {
 		this.generateReport('Generate Web').subscribe(result => {
+			this.hideFilters = true;
 			this.reportResult = this.reportsService.getSafeHtml(result);
 		});
 	}
@@ -125,8 +137,11 @@ export class TaskReportComponent {
 	 */
 	onGenerateXLSReport(): void {
 		this.generateReport('Generate Xls').subscribe(result => {
-			const url = window.URL.createObjectURL(result);
-			window.open(url, '_self');
+			const element = document.createElement('a');
+			element.href = URL.createObjectURL(result.blob);
+			element.download = result.filename;
+			document.body.appendChild(element);
+			element.click();
 		});
 	}
 

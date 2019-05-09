@@ -17,3 +17,5 @@ CREATE FUNCTION `tdstm_sequencer`(context_id BIGINT, name VARCHAR(16)) RETURNS b
 	END//
 	
 DELIMITER ;
+
+SET @@group_concat_max_len = 100000;

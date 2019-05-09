@@ -43,9 +43,6 @@ def moveEvent = tds.currentMoveEvent() ?: null
 
 <!-- -->
 
-<g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
-    <g:javascript src="crawler.js" />
-</g:if>
 
 <%-- What is this for?  --%>
 <script type="text/javascript">

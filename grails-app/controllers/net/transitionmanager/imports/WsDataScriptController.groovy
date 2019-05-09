@@ -4,21 +4,18 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataScriptNameValidationCommand
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.ScriptProcessorService
-
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.Permission
 /**
  * Provide the endpoints for working with DataScripts.
  */
 @Secured("isAuthenticated()")
-@Slf4j(value = 'logger', category = 'grails.app.controllers.WsDataScriptController')
 class WsDataScriptController implements ControllerMethods, PaginationMethods {
 
     private final static DELETE_OK_MESSAGE = "DataScript deleted successfully.";

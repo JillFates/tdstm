@@ -90,7 +90,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			if (hasUnacknowledgedNotices) {
 				redirectStrategy.sendRedirect request, response, unacknowledgedNoticesUri
 			} else {
-			redirectStrategy.sendRedirect request, response, redirectUri
+				redirectStrategy.sendRedirect request, response, redirectUri
 			}
 		} finally {
 			// always remove the saved request

@@ -113,4 +113,14 @@ databaseChangeLog = {
 		)
 	}
 
+	changeSet(author: 'slopez', id: '20190311 TM-14671-1') {
+		comment("Remove last_modified not null constraint on notice table")
+
+		dropNotNullConstraint(
+				columnDataType: 'DATE',
+				columnName: 'last_modified',
+				tableName: 'notice'
+		)
+	}
+
 }

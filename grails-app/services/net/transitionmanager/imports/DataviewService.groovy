@@ -1166,7 +1166,7 @@ class DataviewService implements ServiceMethods {
     }
 
 	/**
-	 * Mutate DataViewSpec to add the requiered Columns when querying the DB
+	 * Mutate DataViewSpec to add the required Columns when querying the DB
 	 * This mutates the original Object
 	 * @param dataviewSpec Original DataViewSpec
 	 * @return the mutated dataViewSpec

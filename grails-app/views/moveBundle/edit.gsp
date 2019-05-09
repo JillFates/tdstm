@@ -113,7 +113,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="startTime"><b>Start Time:&nbsp;<span style="color: red">*</span></b></label>
+                  <label for="startTime"><b>Start Time:&nbsp;</b></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
@@ -134,7 +134,7 @@
 
     	        <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="completionTime"><b>Completion Time:&nbsp;<span style="color: red">*</span></b></label>
+                  <label for="completionTime"><b>Completion Time:&nbsp;</b></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
@@ -536,18 +536,12 @@
 		var uncheckedSteps = new Array()
 		var bundleStart = $("#startTime").val()
 		var bundleStartTime = null
-		if (bundleStart == "") {
-			checked = false;
-			message = "Start date is mandatory\n";
-		} else {
+		if (bundleStart != "") {
 			bundleStartTime = tdsCommon.parseDateTimeString(bundleStart);
 		}
 		var bundleCompletion = $("#completionTime").val()
 		var bundleCompletionTime = null
-		if (bundleCompletion == "") {
-			checked = false;
-			message += "Completion date is mandatory";
-		} else {
+		if (bundleCompletion != "") {
 			bundleCompletionTime = tdsCommon.parseDateTimeString(bundleCompletion);
 		}
 

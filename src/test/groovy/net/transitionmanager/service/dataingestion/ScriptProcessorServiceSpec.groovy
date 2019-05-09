@@ -25,6 +25,8 @@ import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.imports.ScriptProcessorService
+import org.apache.poi.ss.usermodel.Cell
+import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
@@ -53,8 +55,12 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
 			}
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+			}
 			fileSystemService(FileSystemService) {
 				coreService = ref('coreService')
+				securityService = ref('securityService')
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
@@ -714,7 +720,8 @@ application id,vendor name,technology,location
 		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 			XSSFRow currentRow = sheet.createRow(rowNumber)
 			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
+				Cell cell = currentRow.createCell(columnNumber)
+				WorkbookUtil.setCellValue(cell, cellContent)
 			}
 		}
 

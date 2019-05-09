@@ -26,7 +26,7 @@ export const TDSAppRoute: Routes = [
 @NgModule({
 	exports: [RouterModule],
 	providers: [{provide: LocationStrategy, useClass: PathLocationStrategy}],
-	imports: [RouterModule.forRoot(TDSAppRoute, {enableTracing: true, onSameUrlNavigation: 'reload'})]
+	imports: [RouterModule.forRoot(TDSAppRoute, {enableTracing: false, onSameUrlNavigation: 'reload'})]
 })
 
 export class TDSAppRouteModule {

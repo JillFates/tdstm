@@ -1,11 +1,11 @@
 package net.transitionmanager.asset
 
-
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -13,16 +13,17 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.mapping.LinkGenerator
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelConnector
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -327,6 +328,7 @@ class RackLayoutsController implements ControllerMethods {
 				paramsMap.remove('backView')
 				frontViewRows = retrieveRackLayout(paramsMap)
 			}
+
 			rackLayout << [assetDetails : assetDetails, rack: rack.tag, room: rack.room,
 			               frontViewRows: frontViewRows, backViewRows: backViewRows, rackId: rack.id]
 		}
@@ -345,31 +347,56 @@ class RackLayoutsController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.RackView)
+	/**
+	 * Used to retrieve the list of racks
+	 * @param bundleIds - set to 'all' or comma separated list of ids to filter racks to specific bundles
+	 * @return Map of List<Map>sourceRackList and List<Map>targetRackList as JSON
+	 */
 	def retrieveRackDetails() {
-		def bundleIds = params.bundles
-		def moveBundles = []
-		if (bundleIds.contains('all')) {
-			moveBundles = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
-		}
-		else if (bundleIds) {
-			List<Long> moveBundleIds = NumberUtil.toPositiveLongList(bundleIds.split(',').toList())
+		Project project = getProjectForWs()
 
-			moveBundles = MoveBundle.findAll("from MoveBundle m where m.id in ($moveBundleIds)")
+		// Get the bundle IDs and if not 'all'
+		List bundleIds = params.list('bundles')
+		Boolean showAllBundles = bundleIds.contains('all')
+		if (!showAllBundles) {
+			bundleIds = bundleIds.collect { NumberUtil.toPositiveLong(it, 0) }
 		}
 
-		def sourceRacks = []
-		def targetRacks = []
+		List moveBundles = []
+		try {
+			moveBundles = MoveBundle.where {
+				project == project
+				if (! showAllBundles ) {
+					id in bundleIds
+				}
+			}.list()
+		} catch (e) {
+			log.error "retrieveRackDetails failed query with params ${params}, ${e.message}"
+			throw new InvalidParamException('Invalid filter parameter(s) specified')
+		}
+
+		List sourceRacks = []
+		List targetRacks = []
+
+		// Helper closure to add a Rack into a list HTML sanitized
+		def addRackToList = { Rack rack, List list ->
+			Long id = rack.id
+			String location = HtmlUtil.escape(rack.location)
+			String roomName = HtmlUtil.escape(rack.room?.roomName)
+			String tag = HtmlUtil.escape(rack.tag)
+
+			if (!list.contains([id: id, location: location, room: roomName, tag: tag])) {
+				list.add([id: id, location: location, room: roomName, tag: tag])
+			}
+		}
 
 		moveBundles.each { moveBundle ->
 			moveBundle.sourceRacks.each {
-				if (!sourceRacks.contains([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])) {
-					sourceRacks.add([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])
-				}
+				addRackToList(it, sourceRacks)
 			}
+
 			moveBundle.targetRacks.each {
-				if (!targetRacks.contains([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])) {
-					targetRacks.add([id: it.id, location: it.location, room: it.room?.roomName, tag: it.tag])
-				}
+				addRackToList(it, targetRacks)
 			}
 		}
 
@@ -469,10 +496,10 @@ class RackLayoutsController implements ControllerMethods {
 
 							String title = "Tag: ${overlapAsset.assetTag}\nName: ${overlapAsset.assetName}"
 							if (overlapAsset.model) {
-								title += "\nModel: ${overlapAsset.model.modelName}"
+								title += "\nModel: ${HtmlUtil.escape(overlapAsset.model.modelName)}"
 							}
 
-							moveBundle += (overlapAsset?.moveBundle?.name ?: "") + "<br/>"
+							moveBundle += HtmlUtil.escape(overlapAsset?.moveBundle?.name) + "<br/>"
 							if (overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')) {
 								hasBlades = true
 								bladeLayoutMap << ['overlappedAsset': overlapAsset]
@@ -486,14 +513,14 @@ class RackLayoutsController implements ControllerMethods {
 								assetTag.append(StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 22))
 							}
 							else {
-								assetTag.append('<a title="' + title + '" href="javascript:')
+								assetTag.append('<a title="' + HtmlUtil.escape(title) + '" href="javascript:')
 								if (forWhom) {
 									assetTag.append("editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})")
 								}
 								else {
 									assetTag.append("EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})")
 								}
-								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 22) + '</a>')
+								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-', '-'), 15) + '</a>')
 							}
 
 							if (hasBlades) {

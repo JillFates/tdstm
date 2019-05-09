@@ -1,0 +1,155 @@
+<div class="content body">
+	<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+	<div class="box-body">
+		<div class="box box-primary">
+			<div class="box-header"></div>
+			<div class="box-body">
+				<div class="application-conflicts">
+					<div class="filters-wrapper settings" [hidden]="hideFilters">
+						<div class="application-section">
+							<div class="section-title">Bundle</div>
+							<div class="section-control">
+								<kendo-dropdownlist name="bundleList" class="form-control" [data]="model.moveBundleList"
+									(selectionChange)="updateOwnersList($event)"
+									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.bundle">
+								</kendo-dropdownlist>
+							</div>
+						</div>
+				
+						<div class="application-section">
+							<div class="section-title">App Owner</div>
+							<div class="section-control">
+								<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.appOwnerList"
+									[textField]="'name'" [valueField]="'id'" [(ngModel)]="model.appOwner">
+								</kendo-dropdownlist>
+							</div>
+						</div>
+				
+						<div class="application-section">
+							<div class="section-title">
+								<input [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict"
+									id="bundleConflict" name="bundleConflict" type="checkbox">
+								<label for="bundleConflict">Bundle Conflict</label>
+							</div>
+							<div class="section-control">
+								<label>Having dependency references to assets assigned to unrelated bundles</label>
+							</div>
+						</div>
+				
+						<div class="application-section">
+							<div class="section-title">
+								<input [checked]="model.unresolvedDependencies"
+									(change)="model.unresolvedDependencies = !model.unresolvedDependencies" id="unresolvedDependencies"
+									name="unresolvedDependencies" type="checkbox">
+								<label for="unresolvedDependencies">Unresolved Dependencies</label>
+							</div>
+							<div class="section-control">
+								<label>Having dependencies with status Unknown or Questioned</label>
+							</div>
+						</div>
+				
+						<div class="application-section">
+							<div class="section-title">
+								<input [checked]="model.missingDependencies"
+									(change)="model.missingDependencies = !model.missingDependencies" id="missingDependencies"
+									name="missingDependencies" type="checkbox">
+								<label for="missingDependencies">Missing Dependencies</label>
+							</div>
+							<div class="section-control">
+								<label>Having no defined Supports or Requires dependencies</label>
+							</div>
+						</div>
+				
+						<div class="application-section">
+							<div class="section-title">
+								<div>Maximum Applications to report</div>
+							</div>
+							<div class="section-control">
+								<kendo-dropdownlist name="appOwner" class="form-control" [data]="model.maxApplicationsList"
+									[textField]="'value'" [valueField]="'value'" [(ngModel)]="model.maxApplications">
+								</kendo-dropdownlist>
+							</div>
+						</div>
+						<div class="application-section">
+							<div class="section-title"></div>
+							<div class="section-control">
+								<tds-button-custom class="btn-primary" title="Generate Report" tooltip="Generate report"
+									(click)="onGenerateReport()" icon="check-square">
+								</tds-button-custom>
+							</div>
+						</div>
+					</div>
+				
+					<div class="container results" *ngIf="isDisplayingReport">
+						<div class="header">
+							<div class="main-title">Application Conflicts - {{reportProject}}: {{reportBundle}} and App Owner: {{reportOwner}}</div>
+							<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
+						</div>
+				
+						<div class="container application-container" *ngFor="let item of applicationConflicts">
+							<div class="row application-header" >
+								<div class="col-sm-12 pull-left">
+									<a (click)="onApplicationSelected(item.application)" class="inlineLink">{{item.application.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+								</div>
+							</div>
+				
+							<div class="row support-header" *ngIf="item.supports.length">
+								<div class="col-sm-2 title">Supports ({{item.supports.length}} issues)</div>
+								<div class="col-sm-10"></div>
+							</div>
+				
+							<div class="row item-header" *ngIf="item.supports.length">
+									<div class="col-sm-1"></div>
+									<div class="col-sm-1">Type</div>
+									<div class="col-sm-1">Class</div>
+									<div class="col-sm-3">Name</div>
+									<div class="col-sm-2">Frequency</div>
+									<div class="col-sm-2">Bundle</div>
+									<div class="col-sm-2">Status</div>
+							</div>
+				
+							<div class="row" 
+								*ngFor="let support of item.supports; let even = even; let odd = odd;"
+								[ngClass]="{ odd: odd, even: even }">
+									<div class="col-sm-1"></div>
+									<div class="col-sm-1 data-item">{{support.type}}</div>
+									<div class="col-sm-1 data-item">{{support.class}}</div>
+									<div class="col-sm-3 data-item">{{support.name}}</div>
+									<div class="col-sm-2 data-item">{{support.frequency}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
+							</div>
+				
+							<div class="row dependency-header" *ngIf="item.dependencies.length">
+									<div class="col-sm-2 title">Dependencies ({{item.dependencies.length}} issues)</div>
+									<div class="col-sm-10"></div>
+							</div>
+				
+							<div class="row item-header" *ngIf="item.dependencies.length">
+									<div class="col-sm-1"></div>
+									<div class="col-sm-1">Type</div>
+									<div class="col-sm-1">Class</div>
+									<div class="col-sm-3">Name</div>
+									<div class="col-sm-2">Frequency</div>
+									<div class="col-sm-2">Bundle</div>
+									<div class="col-sm-2">Status</div>
+							</div>
+				
+							<div class="row" *ngFor="let dependency of item.dependencies; let even = even; let odd = odd;" 
+								[ngClass]="{ odd: odd, even: even }">
+									<div class="col-sm-1"></div>
+									<div class="col-sm-1 data-item">{{dependency.type}}</div>
+									<div class="col-sm-1 data-item">{{dependency.class}}</div>
+									<div class="col-sm-3 data-item">{{dependency.name}}</div>
+									<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
+									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

@@ -66,6 +66,10 @@ class DomainClassQueryHelper {
 			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
 		],
 	]
+	/**
+	 * Defines find results message in a constant variable.
+	 */
+	public static final String	FIND_RESULTS_MULTIPLE_RECORDS = 'The find/elseFind command(s) found multiple records'
 
 	/**
 	 * Executes the HQL query related to the domain defined.

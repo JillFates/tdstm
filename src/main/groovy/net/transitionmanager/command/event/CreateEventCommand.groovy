@@ -28,7 +28,6 @@ class CreateEventCommand implements CommandObject{
 	String  runbookBridge1
 	String  runbookBridge2
 	String  videolink
-	String  newsBarMode  = 'off'
 	Date estCompletionTime = null
 	Date    estStartTime = null
 	Boolean apiActionBypass  = true
@@ -38,7 +37,6 @@ class CreateEventCommand implements CommandObject{
 		estCompletionTime nullable: true
 		estStartTime nullable: true
 		name blank: false
-		newsBarMode blank: false, inList: ['auto', 'on', 'off']
 		runbookBridge1 nullable: true
 		runbookBridge2 nullable: true
 		runbookStatus nullable: true, inList: ['Pending', 'Draft', 'Final', 'Done']

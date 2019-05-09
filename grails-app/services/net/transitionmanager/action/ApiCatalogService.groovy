@@ -3,21 +3,19 @@ package net.transitionmanager.action
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
-import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Provider
+import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
 import net.transitionmanager.project.ProviderService
 import net.transitionmanager.service.ServiceMethods
 import org.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
 
-@Slf4j
 @Transactional
 class ApiCatalogService implements ServiceMethods {
 	ProviderService providerService

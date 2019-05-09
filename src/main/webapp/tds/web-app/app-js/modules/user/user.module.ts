@@ -18,7 +18,8 @@ import {SortableModule} from '@progress/kendo-angular-sortable';
 import {IntlModule} from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {PopupModule} from '@progress/kendo-angular-popup';
-import {InputsModule} from '@progress/kendo-angular-inputs';
+import {InputsModule} from '@progress/kendo-angular-inputs'
+import {ContextMenuModule} from '@progress/kendo-angular-menu';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
@@ -43,6 +44,7 @@ import {UserService} from './service/user.service';
 		IntlModule,
 		InputsModule,
 		DateInputsModule,
+		ContextMenuModule,
 		// Route
 		UserRouteModule
 	],

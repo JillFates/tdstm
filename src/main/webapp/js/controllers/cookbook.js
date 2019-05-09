@@ -267,12 +267,13 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	 */
 	var checkForSelectedRow = function() {
 		var row = -1;
-		if (state.params.recipeId) {
 			// The scope.sortedRows is a separate dataset from the scope.gridData that gets populated when the user sorts the
 			// list. The original scope.gridData does not get remains in the order when retrieved from the server. So if sortedRows
 			// exists then this logic will figure out the selected row index from that dataset otherwise use the gridData list.
 			// Note that the location of the recipeId is in different places within the List<Object>.
 			var datagridSet = scope.sortedRows ? scope.sortedRows : scope.gridData;
+
+		if (state.params.recipeId) {
 			var recipeId = state.params.recipeId;
 			row = (datagridSet.length > 0) ? 0 : -1;
 			for (var i = 0; i < datagridSet.length; i++) {

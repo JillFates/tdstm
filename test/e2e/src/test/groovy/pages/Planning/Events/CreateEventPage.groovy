@@ -29,7 +29,6 @@ class CreateEventPage extends Page {
         tagSelector {$("div.k-multiselect-wrap")}
         saveBtn {$("input", class:"save")}
         cancelBtn {$("input", class:"cancel")}
-        newsBarMode {$(".newsBarMode")}
         runbookBdg1 {$("#runbookBridge1")}
         runbookBdg2 {$("#runbookBridge2")}
         runBookStatus {$("#runbookStatus")}

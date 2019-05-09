@@ -2,7 +2,6 @@ import {Component, ViewChild, OnInit} from '@angular/core';
 import {State} from '@progress/kendo-data-query';
 
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
@@ -21,6 +20,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
 import {clone} from 'ramda';
+import {AssetViewShowComponent} from '../asset-view-show/asset-view-show.component';
 
 declare var jQuery: any;
 @Component({
@@ -330,7 +330,12 @@ export class AssetViewConfigComponent implements OnInit {
 
 	public onExport(): void {
 		let assetExportModel: AssetExportModel = {
-			assetQueryParams: this.getQueryParams(),
+			assetQueryParams: AssetViewShowComponent.getQueryParamsForExport(
+				this.data,
+				this.gridState,
+				this.model,
+				this.justPlanning
+			),
 			domains: this.domains,
 			viewName: this.model.name
 		};

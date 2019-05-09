@@ -368,6 +368,7 @@ class UserPreferenceService {
 		}
 
 		userLogin = resolveUserLogin(userLogin)
+		UserLogin currentUser = resolveUserLogin()
 		PREF userPreferenceEnum = PREF.valueOfName(preferenceCode)
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
@@ -376,7 +377,7 @@ class UserPreferenceService {
 			preferenceCode = userPreferenceEnum.name()
 
 			// Note that session does not exist for Quartz jobs so we should check for a session object
-			if (session) {
+			if (session && userLogin.username == currentUser.username) {
 				// Set or update the session with the new value
 				def previousValue = session.getAttribute(preferenceCode)
 				if (previousValue == null || previousValue != userPreference.value) {
