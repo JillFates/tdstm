@@ -343,11 +343,30 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
         }.list()
 
         Person currentPerson = securityService.userLoginPerson
-
-		[userLoginInstance: createUser, personInstance: person, companyId: params.companyId,
-		 roleList: roleList, projectList: partyRelationshipService.companyProjects(currentPerson.company),
-		 minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
-		 project: securityService.userCurrentProject, maxLevel: securityService.getMaxAssignedRole(currentPerson).level]
+		[
+			userLoginInstance: createUser,
+			personInstance: person,
+			companyId: params.companyId ?: "",
+			username: params.username ?: "",
+			email: params.email ?: "",
+			isLocal: params.isLocal ?: createUser.isLocal.toString(),
+			forcePasswordChange: params.forcePasswordChange ?: false,
+			passwordNeverExpires: params.passwordNeverExpires ?: false,
+			expiryDate: params.expiryDate ?: "",
+			passwordExpirationDate: params.passwordExpirationDate ?: "",
+			active: params.active ?: "Y",
+			projectId: params.projectId ?: "",
+			ADMIN: params.ADMIN ?: false,
+			CLIENTADMIN: params.CLIENTADMIN ?: false,
+			CLIENTMGR: params.CLIENTMGR ?: false,
+			EDITOR: params.EDITOR ?: false,
+			SUPERVISOR: params.SUPERVISOR ?: false,
+			USER: params.USER ?: false,
+		 	roleList: roleList,
+			projectList: partyRelationshipService.companyProjects(currentPerson.company),
+		 	minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
+		 	project: securityService.userCurrentProject,
+			maxLevel: securityService.getMaxAssignedRole(currentPerson).level]
 	}
 
 	/*
