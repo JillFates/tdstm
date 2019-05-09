@@ -1,25 +1,25 @@
-import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.metric.ProjectDailyMetric
-import net.transitionmanager.imports.Dataview
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 import net.transitionmanager.common.Setting
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
+import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.metric.ProjectDailyMetric
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.springframework.transaction.annotation.Transactional
-import spock.lang.Ignore
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 import test.helper.DataviewTestHelper
 
 @Integration
@@ -408,12 +408,13 @@ class ProjectServiceIntegrationSpec extends Specification {
 			4 == projectService.getAssociatedStaffIds(project).size()
 	}
 
-	@Ignore
+	@ConfineMetaClassChanges([ProjectService])
 	def '16. Test activitySnapshot method'() {
 		setup: 'Delete the metrics ran for today'
 			Date today = new Date().clearTime()
 			List metrics = ProjectDailyMetric.findAllByMetricDate(today)
 			metrics*.delete(flush: true)
+			projectService.metaClass.findProjectDailyMetricsLastRunDay = {-> today - 1}
 		expect: 'There are no ProjectDailyMetrics for today'
 			ProjectDailyMetric.findAllByMetricDate(today).isEmpty()
 
