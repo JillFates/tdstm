@@ -158,7 +158,7 @@ The License Accepts any value in the projectId (String) maybe we need to fix it 
             result == false
     }
 
-    @Ignore
+    @Ignore // TODO: oluna - This class ignored to start with a Green build for 4.7.0 we will fix them in another ticket
     // TODO: OLUNA - Even when this is an itegration test should we use an actual SMTP server for the test?
     void "04. resubmit request" () {
 

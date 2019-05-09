@@ -40,7 +40,7 @@ import test.helper.SettingTestHelper
 import test.helper.TagTestHelper
 import org.apache.commons.lang3.RandomStringUtils
 
-@Ignore
+@Ignore  // TODO: oluna - This class ignored to start with a Green build for 4.7.0 we will fix them in another ticket
 @Integration
 @Rollback
 class E2EProjectSpec extends Specification {

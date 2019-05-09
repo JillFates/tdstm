@@ -216,7 +216,7 @@ class AssetEntityServiceTests extends Specification{
 			queries["joinQuery"] == ""
 	}
 
-	@Ignore
+	@Ignore // TODO: oluna - This class ignored to start with a Green build for 4.7.0 we will fix them in another ticket
 	@See('TM-11480')
 	void '6. Test cloning of assets'() {
 		setup: 'Create a test project and person'
