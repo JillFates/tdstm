@@ -107,7 +107,7 @@
 								</td>
 								<td valign="top" class="value">
 									<input class="requiredInput" type="text" id="emailInputId" name="email" value="${email ? email : personInstance?.email}" autocomplete="off" />
-									<span id="emailDisplayId" style="display:none;">${personInstance?.email ? personInstance.email : email}</span>
+									<span id="emailDisplayId" style="display:none;">${email ? emails : personInstance?.email}</span>
 								</td>
 							</tr>
 							<tr>
@@ -149,15 +149,10 @@
 									<g:if test="${expiryDate}">
 										<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
 											   value="${URLDecoder.decode(expiryDate,'UTF-8')}"/>
-										<g:hasErrors bean="${params}" field="expiryDate">
-											<div class="errors">
-												<g:renderErrors bean="${params}" as="list" field="expiryDate"/>
-											</div>
-										</g:hasErrors>
 									</g:if>
 									<g:else>
 										<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-											   value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
+											   value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  format="12hrs" timeZone="${tds.timeZone()}"/>"/>
 										<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
 											<div class="errors">
 												<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
@@ -180,7 +175,7 @@
 									</g:if>
 									<g:else>
 										<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
-											   value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
+											   value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}"  format="12hrs"/>"/>
 										<g:hasErrors bean="${userLoginInstance}" field="passwordExpirationDate">
 											<div class="errors">
 												<g:renderErrors bean="${userLoginInstance}" as="list" field="passwordExpirationDate"/>
@@ -195,7 +190,7 @@
 									<label for="active">Active:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
-									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${active ? params.active : userLoginInstance?.active}" ></g:select>
+									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${active ? active : userLoginInstance?.active}" ></g:select>
 									<g:hasErrors bean="${userLoginInstance}" field="active">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
@@ -221,7 +216,13 @@
 										<label for="role_${role.id}">${role}:</label>
 									</td>
 									<td valign="top" class="value" >
-										<input type="checkbox" name="assignedRole"  value="${role.id}" id="role_${role.id}" <g:if test="${role.level > maxLevel}">disabled</g:if> <g:else>${params[role.id.replaceAll('_','')] == 'true' ? 'checked="checked"' : ''}</g:else> />
+										<input type="checkbox" name="assignedRole"  value="${role.id}" id="role_${role.id}"
+											   <g:if test="${role.level > maxLevel}">
+												   disabled
+											   </g:if>
+											   <g:else>
+												   ${params[role.id.replaceAll('_','')] == 'true' ? 'checked="checked"' : ''}
+											   </g:else>/>
 										<label for="role_${role.id}">&nbsp; ${role.help ? role.help : ''} &nbsp;</label>
 									</td>
 								</tr>
