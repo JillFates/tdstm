@@ -470,6 +470,11 @@ class UrlMappings {
 			]
 		}
 
+		"/auth/loginInfo" {
+			controller = "auth"
+			action = [GET: "getLoginInfo"]
+		}
+
 		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
 			action = [ GET: "modelForPreferenceManager" ]
