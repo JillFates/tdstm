@@ -21,6 +21,7 @@ export const LoginRoute: Routes = [
 		path: AuthRouteStates.LOGIN.url,
 		data: {
 			page: {
+				hideTopNav: true,
 				title: '', instruction: '', menu: []
 			}
 		},

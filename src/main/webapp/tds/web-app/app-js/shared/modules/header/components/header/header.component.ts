@@ -12,6 +12,8 @@ import {UserContextModel} from '../../../../../modules/security/model/user-conte
 import {PersonModel} from '../../../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {DIALOG_SIZE} from '../../../../model/constants';
+import {NotifierService} from '../../../../services/notifier.service';
+import {PageMetadataModel} from '../../model/page-metadata.model';
 
 declare var jQuery: any;
 
@@ -23,11 +25,14 @@ declare var jQuery: any;
 export class HeaderComponent implements OnInit {
 
 	public userContext: UserContextModel;
+	public pageMetaData: PageMetadataModel = new PageMetadataModel();
 
 	constructor(
 		private userContextService: UserContextService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private notifierService: NotifierService) {
 		this.getUserContext();
+		this.headerListeners();
 	}
 
 	ngOnInit(): void {
@@ -38,6 +43,18 @@ export class HeaderComponent implements OnInit {
 			jQuery.AdminLTE.layout.fix();
 		}
 		jQuery('.main-footer').show();
+	}
+
+	/**
+	 * Create the Lister for any changes made to the Routing that affects the Header Component
+	 * Includes breadcrumbs, tiles, and other menu changes
+	 */
+	private headerListeners(): void {
+		this.notifierService.on('notificationRouteChange', event => {
+			if (event.event.url.indexOf('/auth/') >= 0) {
+				this.pageMetaData.hideTopNav = true;
+			}
+		});
 	}
 
 	protected getUserContext(): void {

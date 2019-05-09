@@ -4,13 +4,19 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationStart, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
+import {
+	ActivatedRoute,
+	NavigationStart,
+	NavigationEnd,
+	Router,
+	RoutesRecognized
+} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
 	selector: 'tds-app',
 	template: `
-		<tds-header></tds-header>
+        <tds-header></tds-header>
         <!-- Full Width Column -->
         <div class="content-wrapper">
             <div class="container">
@@ -49,8 +55,15 @@ export class TDSAppComponent implements OnInit {
 	private handleTransitions(): void {
 		// Specific filter to get the information from the current Page of the latest request event
 		this.router.events
-			.filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd)
-			.map((event) => ({route: this.activatedRoute, isNavigationStart: event instanceof NavigationStart}))
+			.filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof RoutesRecognized)
+			.map((event) => (
+				{
+					route: this.activatedRoute,
+					event: event,
+					isNavigationStart: event instanceof NavigationStart,
+					isNavigationEnd: event instanceof NavigationEnd,
+					isRoutesRecognized: event instanceof RoutesRecognized
+				}))
 			.map((eventRoute) => {
 				while (eventRoute.route.firstChild) {
 					eventRoute.route = eventRoute.route.firstChild;
@@ -58,18 +71,19 @@ export class TDSAppComponent implements OnInit {
 				return eventRoute
 			})
 			.subscribe((eventRoute) => {
-					// As soon as a transition start
+				// As soon as a transition start
 				if (eventRoute.isNavigationStart) {
 					this.notifierService.broadcast({
-						name: 'notificationRouteChange'
+						name: 'notificationRouteChange',
+						event: eventRoute.event
 					});
-				} else {
+				} else if (eventRoute.isNavigationEnd) {
 					// As soon as a transition ends
 					this.notifierService.broadcast({
 						name: 'notificationRouteNavigationEnd',
 						route: eventRoute.route
 					});
-					this.notifierService.broadcast( {
+					this.notifierService.broadcast({
 						name: 'httpRequestCompleted'
 					});
 				}

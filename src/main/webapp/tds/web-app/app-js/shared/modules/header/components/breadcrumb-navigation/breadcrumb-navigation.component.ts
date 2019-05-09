@@ -12,6 +12,7 @@ import {UserContextModel} from '../../../../../modules/security/model/user-conte
 // Other
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {PageMetadataModel} from '../../model/page-metadata.model';
 
 declare var jQuery: any;
 
@@ -19,7 +20,7 @@ declare var jQuery: any;
 	selector: 'tds-breadcrumb-navigation',
 	template: `
         <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <section class="content-header" *ngIf="!pageMetaData.hideTopNav">
             <ng-container *ngIf="pageMetaData">
                 <h1>
                     {{pageMetaData.title | translate}}
@@ -55,13 +56,7 @@ declare var jQuery: any;
 export class BreadcrumbNavigationComponent {
 
 	protected userContext: UserContextModel;
-	public pageMetaData: {
-		id: any,
-		title: string,
-		instruction: string,
-		menu: Array<string>,
-		topMenu: any
-	};
+	public pageMetaData: PageMetadataModel = new PageMetadataModel();
 
 	constructor(
 		private taskService: TaskService,
@@ -109,6 +104,13 @@ export class BreadcrumbNavigationComponent {
 	 * Includes breadcrumbs, tiles, and other menu changes
 	 */
 	private headerListeners(): void {
+
+		this.notifierService.on('notificationRouteChange', event => {
+			if (event.event.url.indexOf('/auth/') >= 0) {
+				this.pageMetaData.hideTopNav = true;
+			}
+		});
+
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
 				this.pageMetaData = event.route.snapshot.data.page;

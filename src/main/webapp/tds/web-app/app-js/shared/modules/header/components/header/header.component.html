@@ -1,4 +1,4 @@
-<header class="main-header header-component">
+<header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav">
     <nav class="navbar navbar-static-top">
         <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseInfo.license.isManager}">
             <div class="navbar-header">
