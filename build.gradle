@@ -215,10 +215,13 @@ grails {
 }
 
 test {
-    if (project.hasProperty('maxParallelForks'))
+    if (project.hasProperty('maxParallelForks')) {
         maxParallelForks = project.maxParallelForks as int
-    if (project.hasProperty('forkEvery'))
+    }
+    if (project.hasProperty('forkEvery')) {
         forkEvery = project.forkEvery as int
+    }
+	
 }
 
 test.reports.html.destination = file("target/test-unit/test-reports/html")
@@ -226,3 +229,5 @@ test.reports.junitXml.destination = file("target/test-reports/")
 integrationTest.reports.html.enabled = true
 integrationTest.reports.html.destination = file("target/test-integration/test-reports/html")
 integrationTest.reports.junitXml.destination = file("target/test-reports/")
+
+
