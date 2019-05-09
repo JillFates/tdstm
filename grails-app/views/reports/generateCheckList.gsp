@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']',''))}
+				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']','').replace('"',"'"))}
 				</td>
 			</tr>
 			<tr>
