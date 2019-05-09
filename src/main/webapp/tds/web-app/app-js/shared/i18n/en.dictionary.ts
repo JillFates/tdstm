@@ -278,6 +278,9 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
+	'LOGIN': {
+		'LOGIN': 'Login'
+	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',

@@ -53,6 +53,9 @@ export class HeaderComponent implements OnInit {
 		this.notifierService.on('notificationRouteChange', event => {
 			if (event.event.url.indexOf('/auth/') >= 0) {
 				this.pageMetaData.hideTopNav = true;
+				jQuery('div.content-wrapper').addClass('content-login-wrapper');
+			} else {
+				jQuery('div.content-wrapper').removeClass('content-login-wrapper');
 			}
 		});
 	}

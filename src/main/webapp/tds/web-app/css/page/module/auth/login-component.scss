@@ -1,0 +1,66 @@
+.content-login-wrapper {
+  background: $color--darkgray2 !important;
+}
+
+div.login-component {
+  .login-box-body {
+    border: 1px solid gray;
+
+    .instructions {
+      text-align: justify;
+    }
+
+    div.pre-login-message {
+      border: 1px solid $color-font-disabled--gray;
+      border-left: 3px solid $color-warning--yellow;
+      padding: 0px 14px 26px 13px;
+    }
+
+    h1.message {
+      color: $color-message-error--red !important
+    }
+
+    .login-box-msg {
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .emailStatus {
+      padding: 8px 0px;
+      margin: 0em;
+    }
+
+    form.login-form {
+      .btn.submit-button {
+        font-size: 14px;
+      }
+      div.message {
+        color: $color-message-error--red;
+      }
+    }
+
+    div.login-iframe {
+      margin-top: 14px;
+    }
+
+    div.build-info {
+      font-size: 11px;
+    }
+
+    div.loginErrorMsg {
+      margin: 2px;
+    }
+
+    div#postLoginMessages {
+      div.modal-footer {
+        margin-top: 15px;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    div.login-box.login-notice {
+      min-width: 540px;
+    }
+  }
+}

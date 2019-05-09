@@ -22,7 +22,7 @@ export const LoginRoute: Routes = [
 		data: {
 			page: {
 				hideTopNav: true,
-				title: '', instruction: '', menu: []
+				title: 'LOGIN.LOGIN', instruction: '', menu: []
 			}
 		},
 		component: LoginComponent
