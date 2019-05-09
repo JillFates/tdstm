@@ -1836,9 +1836,9 @@ class ProjectService implements ServiceMethods {
 		} else {
 			String filename
 			if (licenseCommonService.isManagerEnabled()) {
-				filename = DEFAULT_TRANSITIONMANAGER_LOGO
-			} else {
 				filename = DEFAULT_LIC_MANAGER_LOGO
+			} else {
+				filename = DEFAULT_TRANSITIONMANAGER_LOGO
 			}
 			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}
