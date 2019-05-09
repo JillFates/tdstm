@@ -9,6 +9,7 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.party.PartyGroupService
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -148,6 +149,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			!testPartyGroup
 	}
 
+	@Ignore
 	void '06. Test list'() {
 		setup: 'given a set of companies'
 			partyGroupService.save('TestCompany$Alpha', 'a comment', 'N', company)
@@ -165,6 +167,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			results.rows[1].cell[0].split('\\$')[1] == 'Delta'
 	}
 
+	@Ignore
 	void '07. Test list page 2'() {
 		setup: 'given a set of companies'
 			partyGroupService.save('TestCompany$Alpha', 'a comment', 'N', company)
@@ -182,6 +185,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			results.rows[1].cell[0].split('\\$')[1] == 'Alpha'
 	}
 
+	@Ignore
 	void '08. Test list filter to partners'() {
 		setup: 'given a set of companies'
 			partyGroupService.save('TestCompany$Alpha', 'a comment', 'N', company)
