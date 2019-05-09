@@ -269,4 +269,15 @@ class AuthController implements ControllerMethods {
 			resetPassword()
 		}
 	}
+
+	/**
+	 * Fetch the info necessary for the login page (active notices and build version).
+	 * @return
+	 */
+	def getLoginInfo() {
+		renderSuccessJson([
+			notices: noticeService.getPreLoginNotices(),
+			buildVersion: environmentService.getVersionText()
+		])
+	}
 }

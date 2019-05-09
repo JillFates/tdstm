@@ -58,6 +58,17 @@ class NoticeService implements ServiceMethods {
 		type ? Notice.findAllByTypeId(type) : Notice.list()
 	}
 
+	/**
+	 * Create and return a list of the Notices that should be displayed
+	 * in the Login form.
+	 * @return a list of active notices for the login page.
+	 */
+	List<Notice> getPreLoginNotices() {
+		return Notice.where {
+			typeId == NoticeType.PRE_LOGIN && active
+		}.list()
+	}
+
 	Notice get(Long id) {
 		Notice.get(id)
 	}
