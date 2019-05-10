@@ -37,7 +37,7 @@ declare var jQuery: any;
 						<div class="box-body">
 							<div class="filters-wrapper" [hidden]="hideFilters">
 								<div class="form-group row">
-									<label class="col-sm-1 control-label">Events</label>
+									<label class="col-sm-2 control-label">Events</label>
 									<div class="col-sm-3">
 										<kendo-dropdownlist
 											name="event"
@@ -50,7 +50,7 @@ declare var jQuery: any;
 									</div>
 								</div>
 								<div class="form-group row">
-									<div class="col-sm-offset-1 col-sm-3">
+									<div class="col-sm-offset-2 col-sm-3">
 										<tds-button-custom
 												class="btn-primary"
 												(click)="onGenerateReport()"
