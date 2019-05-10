@@ -73,11 +73,11 @@
 			<tr>
 				<td><g:if test="${allErrors.contains('EventsBundle')}">
 						<span style="color: red;"><h2>
-								<b>Event/Bundle</b>
+								<h2>Event/Bundle</h2>
 							</h2></span>
 					</g:if> <g:else>
 						<span style="color: green;"><h2>
-								<b>Event/Bundle</b>
+								<h2>Event/Bundle</h2>
 							</h2></span>
 					</g:else></td>
 			</tr>

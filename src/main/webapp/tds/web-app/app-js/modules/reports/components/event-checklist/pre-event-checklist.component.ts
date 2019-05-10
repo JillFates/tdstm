@@ -28,13 +28,14 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-event-checklist',
 	template: `
-		<section class="box-body">
-			<form class="formly form-horizontal">
-				<div class="box box-primary">
-					<div class="box-header"></div>
-					<div class="box-body">
-						<div class="filters-wrapper">
-							<div *ngIf="!html || isReportFailing">
+		<div class="content body">
+			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<section class="box-body">
+				<form class="formly form-horizontal">
+					<div class="box box-primary">
+						<div class="box-header"></div>
+						<div class="box-body">
+							<div class="filters-wrapper" [hidden]="hideFilters">
 								<div class="form-group row">
 									<label class="col-sm-1 control-label">Events</label>
 									<div class="col-sm-3">
@@ -59,15 +60,16 @@ declare var jQuery: any;
 										</tds-button-custom>
 									</div>
 								</div>
+								<hr />
+							</div>
+							<div class="pre-event-checklist">
+								<div [innerHTML]="html"></div>
 							</div>
 						</div>
-						<div class="report-content">
-							<div [innerHTML]="html"></div>
-						</div>
 					</div>
-				</div>
-			</form>
-		</section>
+				</form>
+			</section>
+		</div>
 	`
 })
 export class PreEventCheckListSelectorComponent extends ReportComponent implements OnInit {
@@ -89,7 +91,6 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 	ngOnInit() {
 		const commonCalls = [this.reportsService.getEvents(), this.reportsService.getDefaults()];
 
-		// on init
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
 				const [events, defaults] = results;
@@ -103,7 +104,6 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 
 	/**
 	 * Call the endpoint to generate the pre-event-checklist report
-	 * @param {string} eventId Report id to generate
 	 */
 	onGenerateReport(): void {
 		this.isReportFailing = false;
@@ -111,6 +111,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
+				this.hideFilters = true;
 				try {
 					const errorResponse = JSON.parse(content);
 					if (errorResponse && errorResponse.errors && errorResponse.errors.length) {
