@@ -78,7 +78,6 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		defaultEvent: {id: null, text: ''}
 	};
 	html: SafeHtml;
-	isReportFailing: boolean;
 
 	constructor(
 		dialogService: UIDialogService,
@@ -106,7 +105,6 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 	 * Call the endpoint to generate the pre-event-checklist report
 	 */
 	onGenerateReport(): void {
-		this.isReportFailing = false;
 
 		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id)
 			.subscribe((content) => {
@@ -118,7 +116,6 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 						errorMessage = errorResponse.errors.shift();
 					}
 
-					this.isReportFailing = true;
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: errorMessage
