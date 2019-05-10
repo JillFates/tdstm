@@ -2,6 +2,7 @@
 <%@page import="net.transitionmanager.domain.Manufacturer" %>
 <%@page import="net.transitionmanager.domain.ModelConnector" %>
 <%@page import="net.transitionmanager.security.Permission"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -27,7 +28,7 @@
 			<td>Manufacturer:</td>
 			<td><g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer.id}" onchange="akaUtil.handleParentPropChange('model')"/></td>
 			<td>Model Name:</td>
-			<td><input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}" onchange="akaUtil.handleParentPropChange('model')">
+			<td><input type="text" name="modelName" id="modelNameId" value="${HtmlUtil.escape(modelInstance?.modelName)}" onchange="akaUtil.handleParentPropChange('model')">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelName" /></div>
 				</g:hasErrors>
@@ -40,7 +41,7 @@
 					<tbody id="addAkaTableId">
 						<g:each in="${modelAliases}" var="alias">
 							<tr id="aka_${alias.id}" js-is-unique="true"><td nowrap="nowrap">
-								<input type="text" class="akaValidate" id="aka_${alias.id}" name="aka_${alias.id}" value="${alias.name}" onchange="akaUtil.handleAkaChange(this, 'model', '${modelInstance?.id}')"/>
+								<input type="text" class="akaValidate" id="aka_${alias.id}" name="aka_${alias.id}" value="${HtmlUtil.escape(alias.name)}" onchange="akaUtil.handleAkaChange(this, 'model', '${modelInstance?.id}')"/>
 								<a href="javascript:akaUtil.deleteAkaRow('aka_${alias.id}', true, 'model')"><span class='clear_filter'><u>X</u></span></a>
 								<br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
 							</td></tr>
@@ -81,7 +82,7 @@
 				</g:hasErrors>
 			</td>
 			<td>Layout Style:</td>
-			<td><input type="text" name="layoutStyle" id="layoutStyleId" value="${modelInstance?.layoutStyle}">
+			<td><input type="text" name="layoutStyle" id="layoutStyleId" value="${HtmlUtil.escape(modelInstance?.layoutStyle)}">
 				<g:hasErrors bean="${modelInstance}" field="layoutStyle">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="layoutStyle" /></div>
 				</g:hasErrors>
@@ -89,13 +90,13 @@
 		</tr>
 		<tr>
 			<td>Product Line:</td>
-			<td><input type="text" name="productLine" id="productLineId" value="${modelInstance?.productLine}">
+			<td><input type="text" name="productLine" id="productLineId" value="${HtmlUtil.escape(modelInstance?.productLine)}">
 				<g:hasErrors bean="${modelInstance}" field="layoutStyle">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="productLine" /></div>
 				</g:hasErrors>
 			</td>
 			<td>Model Family:</td>
-			<td><input type="text" name="modelFamily" id="modelFamilyId" value="${modelInstance?.modelFamily}">
+			<td><input type="text" name="modelFamily" id="modelFamilyId" value="${HtmlUtil.escape(modelInstance?.modelFamily)}">
 				<g:hasErrors bean="${modelInstance}" field="layoutStyle">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelFamily" /></div>
 				</g:hasErrors>
@@ -114,7 +115,7 @@
 				</g:hasErrors>
 			</td>
 			<td>End of Life Status:</td>
-			<td><input type="text" name="endOfLifeStatus" id="endOfLifeStatusId" value="${modelInstance?.endOfLifeStatus}">
+			<td><input type="text" name="endOfLifeStatus" id="endOfLifeStatusId" value="${HtmlUtil.escape(modelInstance?.endOfLifeStatus)}">
 				<g:hasErrors bean="${modelInstance}" field="endOfLifeStatus">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeStatus" /></div>
 				</g:hasErrors>
@@ -134,7 +135,7 @@
 			</td>
 			<td>Notes:</td>
 			<td>
-				<input type="text" name="description" id="descriptionId" value="${modelInstance.description}">
+				<input type="text" name="description" id="descriptionId" value="${HtmlUtil.escape(modelInstance.description)}">
 			</td>
 		</tr>
 
@@ -164,7 +165,7 @@
 		</tr>
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
-			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
+			<td><input type="text" name="bladeRows" value="${HtmlUtil.escape(modelInstance.bladeRows)}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeRows" /></div>
 				</g:hasErrors>
@@ -172,7 +173,7 @@
 		</tr>
 		<tr id="bladeCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Count:</td>
-			<td><input type="text" name="bladeCount" value="${modelInstance.bladeCount}" >
+			<td><input type="text" name="bladeCount" value="${HtmlUtil.escape(modelInstance.bladeCount)}" >
 			<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeCount" /></div>
 				</g:hasErrors>
@@ -180,7 +181,7 @@
 		</tr>
 		<tr id="bladeLabelCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Label Count:</td>
-			<td><input type="text" name="bladeLabelCount" value="${modelInstance.bladeLabelCount}" >
+			<td><input type="text" name="bladeLabelCount" value="${HtmlUtil.escape(modelInstance.bladeLabelCount)}" >
 			<g:hasErrors bean="${modelInstance}" field="bladeRows">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeLabelCount" /></div>
 				</g:hasErrors>
@@ -209,7 +210,7 @@
 			<td>Updated By :</td>
 			<td>${modelInstance?.updatedBy}</td>
 			<td>Source URL :</td>
-			<td><input type="text" name="sourceURL" id="sourceURLId" value="${modelInstance?.sourceURL}">
+			<td><input type="text" name="sourceURL" id="sourceURLId" value="${HtmlUtil.escape(modelInstance?.sourceURL)}">
 				<g:hasErrors bean="${modelInstance}" field="sourceURL">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="sourceURL" /></div>
 				</g:hasErrors>
@@ -259,7 +260,7 @@
 					</div>
 					--%>
 					<div id="labelPositionDiv${modelConnector.connector}" style="position: relative;">
-						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
+						<span id='connectorLabelText${modelConnector.connector}'>${HtmlUtil.escape(modelConnector.label)}</span>
 					</div>
 
 				</div>
@@ -288,7 +289,7 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 			<tr id="connectorTr${modelConnector.connector}">
 					<td><a href="javascript:verifyAndDeleteConnector(${modelConnector.connector})"><span class="clear_filter"><u>X</u></span></a>&nbsp;<g:select id="typeId${modelConnector.connector}" name="type${modelConnector.connector}" from="${ModelConnector.constraints.type.inList}" value="${modelConnector.type}"></g:select></td>
-					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${modelConnector.label}" onchange="changeLabel(${modelConnector.connector}, this.value)"></td>
+					<td><input id="labelId${modelConnector.connector}" name="label${modelConnector.connector}" type="text" value="${HtmlUtil.escape(modelConnector.label)}" onchange="changeLabel(${modelConnector.connector}, _.escape(this.value))"></td>
 					<td><g:select id="labelPositionId${modelConnector.connector}" name="labelPosition${modelConnector.connector}" from="${['Right','Left','Top','Bottom']}" value="${modelConnector.labelPosition}" onchange="changeLabelPosition(${modelConnector.connector}, this.value)"></g:select></td>
 					<td><input id="connectorPosXId${modelConnector.connector}" name="connectorPosX${modelConnector.connector}" maxlength="3" style="width:35px;" type="number" min="0" value="${modelConnector.connectorPosX}"></td>
 					<td>
