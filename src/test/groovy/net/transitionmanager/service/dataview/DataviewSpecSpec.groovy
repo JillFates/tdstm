@@ -14,7 +14,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
-class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest {
+class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest {
 
 	@Shared
 	Project defaultProject
@@ -46,7 +46,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
-			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
 			DataviewSpec dataviewSpec = new DataviewSpec(command, null, fieldSpecProject)
@@ -58,7 +58,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
-			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
 
 		and: 'an instance of Dataview'
 			Dataview dataview = new Dataview(
@@ -66,7 +66,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssets
+				reportSchema: allAssetsFilterJsonContent
 			)
 			//dataview.save()
 
@@ -80,7 +80,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
-			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
 			// Filter on UI like this: ?_filter=physicalServer
 			command.filters.named = 'physicalServer,validateTo'
 
@@ -90,7 +90,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssets
+				reportSchema: allAssetsFilterJsonContent
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
@@ -98,14 +98,14 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.namedFilters == 'physicalServer,validateTo'
+			dataviewSpec.namedFilters ==  ['physicalServer', 'validateTo']
 	}
 
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters and extra filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters and extra filters added'
-			DataviewUserParamsCommand command = allAssetDataviewDefinition as DataviewUserParamsCommand
-			command.filters.named = 'physicalServer'
+			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
+			command.filters.named =  'physicalServer,validateTo'
 			command.filters.extra = [
 				[
 					domain  : 'common',
@@ -120,7 +120,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssets
+				reportSchema: allAssetsFilterJsonContent
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
@@ -128,7 +128,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.namedFilters == 'physicalServer,validateTo'
+			dataviewSpec.namedFilters == ['physicalServer', 'validateTo']
 			dataviewSpec.extraFilters == [
 				[
 					domain  : 'common',
@@ -138,148 +138,4 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			]
 	}
 
-	@Shared
-	String allAssets = """
-		{
-		   "offset":0,
-		   "limit":25,
-		   "sortDomain":"common",
-		   "sortProperty":"assetName",
-		   "sortOrder":"a",
-		   "filters":{
-			  "domains":[
-				 "common",
-				 "application",
-				 "database",
-				 "device",
-				 "storage"
-			  ],
-			  "columns":[
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Name",
-					"locked":true,
-					"property":"assetName",
-					"width":220
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Asset Class",
-					"locked":true,
-					"property":"assetClass",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Description",
-					"locked":false,
-					"property":"description",
-					"width":220
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Environment",
-					"locked":false,
-					"property":"environment",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Bundle",
-					"locked":false,
-					"property":"moveBundle",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Tags",
-					"locked":false,
-					"property":"tagAssets",
-					"width":220
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Validation",
-					"locked":false,
-					"property":"validation",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Plan Status",
-					"locked":false,
-					"property":"planStatus",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Support",
-					"locked":false,
-					"property":"supportType",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"External Ref Id",
-					"locked":false,
-					"property":"externalRefId",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Modified Date",
-					"locked":false,
-					"property":"lastUpdated",
-					"width":140
-				 }
-			  ]
-		   }
-		}"""
-
-	@Shared
-	Map<String, ?> allAssetDataviewDefinition = [
-		"offset"      : 0,
-		"limit"       : 25,
-		"sortDomain"  : "common",
-		"sortProperty": "assetName",
-		"sortOrder"   : "a",
-		"filters"     : [
-			"domains": ["common", "application", "database", "device", "storage"],
-			"columns": [
-				["domain": "common", "edit": false, "filter": "", "label": "Name", "locked": true, "property": "assetName", "width": 220],
-				["domain": "common", "edit": false, "filter": "", "label": "Asset Class", "locked": true, "property": "assetClass", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Description", "locked": false, "property": "description", "width": 220],
-				["domain": "common", "edit": false, "filter": "", "label": "Environment", "locked": false, "property": "environment", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Bundle", "locked": false, "property": "moveBundle", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Tags", "locked": false, "property": "tagAssets", "width": 220],
-				["domain": "common", "edit": false, "filter": "", "label": "Validation", "locked": false, "property": "validation", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Plan Status", "locked": false, "property": "planStatus", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Support", "locked": false, "property": "supportType", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "External Ref Id", "locked": false, "property": "externalRefId", "width": 140],
-				["domain": "common", "edit": false, "filter": "", "label": "Modified Date", "locked": false, "property": "lastUpdated", "width": 140]
-			]
-		]
-	]
 }

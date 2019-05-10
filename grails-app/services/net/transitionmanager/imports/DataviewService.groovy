@@ -772,7 +772,7 @@ class DataviewService implements ServiceMethods {
 			}
 		}
 
-		dataviewSpec.extraFilters?.each { Map extraFilter ->
+		dataviewSpec.extraFilters?.each { Map<String, ?> extraFilter ->
 			Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
 			if (hqlExtraFilters) {
 				whereConditions << hqlExtraFilters.hqlExpression

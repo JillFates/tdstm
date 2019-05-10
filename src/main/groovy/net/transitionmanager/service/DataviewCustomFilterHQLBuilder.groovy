@@ -39,6 +39,12 @@ class DataviewCustomFilterHQLBuilder {
 			hqlExpression = " AE.assetName like :extraFilterAssetName "
 			hqlParams = [extraFilterAssetName: "%$filter%"]
 
+		} else if (domain == 'common' && property == 'validation') {
+
+			hqlExpression = " AE.assetName like :extraFilterAssetName "
+
+			hqlParams = [extraFilterAssetName: "%$filter%"]
+
 		} else {
 
 			switch (property) {
@@ -103,10 +109,6 @@ class DataviewCustomFilterHQLBuilder {
 			case 'other':
 				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
-				break
-			case 'runbook':
-				hqlExpression = " AE.moveBundle.runbookStatus = :namedFilterRunBookStatus "
-				hqlParams = [namedFilterRunBookStatus: 'Done']
 				break
 			default:
 				throw new RuntimeException('Invalid filter definition:' + namedFilter)
