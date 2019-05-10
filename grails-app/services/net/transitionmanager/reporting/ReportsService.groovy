@@ -955,7 +955,7 @@ class ReportsService implements ServiceMethods {
                 }
             }
             if (showDb)
-                databaseList.add([db: database, dependsOnList: dependsOnList, supportsList: supportsList, header: header,
+                databaseList.add([db: database, dependsOnList: dependsOnList*.toMap(), supportsList: supportsList*.toMap(), header: header,
                     dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size()])
         }
 
