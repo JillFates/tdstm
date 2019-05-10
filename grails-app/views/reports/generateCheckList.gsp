@@ -325,7 +325,7 @@
 				<td></td>
 				<td><span style="color: green;"><b>Summary OK: <g:each
 								in="${bundleMap}" var="bundle">
-								${cbundle.name}: ${bundle.size} teams.</g:each></b></span></td>
+								${bundle.name}: ${bundle.size} teams.</g:each></b></span></td>
 			</tr>
 			</g:if>
 			<tr>
