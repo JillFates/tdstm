@@ -4,6 +4,7 @@ import grails.util.Metadata
 import net.transitionmanager.common.CoreService
 import org.grails.config.NavigableMap
 import org.grails.core.exceptions.GrailsConfigurationException
+import spock.lang.Ignore
 import spock.lang.Specification
 @Integration
 @Rollback
@@ -16,6 +17,7 @@ class CoreServiceTests extends Specification {
 			coreService.getAppName() == Metadata.current.getApplicationName()
 	}
 
+	@Ignore
 	void "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
 		coreService.getAppConfig('tdstm') != null
