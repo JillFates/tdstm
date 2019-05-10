@@ -1325,6 +1325,20 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/projectMetricsLists" {
+            controller = "wsReports"
+            action = [
+                    GET: "projectMetricsLists"
+            ]
+        }
+
+        "/ws/reports/generateProjectMetrics" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateProjectMetrics"
+            ]
+        }
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
