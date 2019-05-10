@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "ace0cbeb-fef0-4195-b4d0-c78261031324",
+		"_postman_id": "f5544356-248a-4885-85af-05086121c9ee",
 		"name": "DataBaseDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "TranMan Login",
+			"name": "Login - DataBase Dependency Edit",
 			"event": [
 				{
 					"listen": "test",
@@ -171,7 +171,7 @@
 			"response": []
 		},
 		{
-			"name": "Dependency List",
+			"name": "Dependency List Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -185,11 +185,11 @@
 							"pm.test(\"Save Asset info\", function () {",
 							"//We get the attributes of an Asset to use them as another asset's dependency and support",
 							"var jsonObject = JSON.parse(responseBody);",
-							"var assetName = jsonObject.rows[0].cell[0]; ",
-							"var type = jsonObject.rows[0].cell[3]; ",
-							"var assetStatus = jsonObject.rows[0].cell[9]; ",
-							"var assetId = jsonObject.rows[0].cell[10]; ",
-							"var assetClass = jsonObject.rows[0].cell[12]; ",
+							"var assetName = jsonObject.data.dependencies[0].assetName; ",
+							"var type = jsonObject.data.dependencies[0].type; ",
+							"var assetStatus = jsonObject.data.dependencies[0].status; ",
+							"var assetId = jsonObject.data.dependencies[0].assetId; ",
+							"var assetClass = jsonObject.data.dependencies[0].assetClass; ",
 							"",
 							"pm.environment.set(\"assetName\", assetName);",
 							"pm.environment.set(\"type\", type);",
@@ -203,27 +203,23 @@
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/listDepJson?sidx=assetName",
+					"raw": "{{host}}/tdstm/ws//asset/listDependencies",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"assetEntity",
-						"listDepJson"
-					],
-					"query": [
-						{
-							"key": "sidx",
-							"value": "assetName"
-						}
+						"ws",
+						"",
+						"asset",
+						"listDependencies"
 					]
 				}
 			},
