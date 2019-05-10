@@ -491,8 +491,9 @@ class MetricReportingService {
 	Map generateDailyMetrics() {
 		List<Long> projectIds = projectIdsForMetrics()
 		List definitions = getMetricDefinitions().definitions ?: []
-		int errors = 0
+		int errorCount = 0
 		int metrics = 0
+		StringBuilder errors = new StringBuilder('')
 		StopWatch stopwatch = new StopWatch()
 
 		log.info 'generateDailyMetrics started'
@@ -508,15 +509,16 @@ class MetricReportingService {
 						metrics++
 					}
 				} catch (Exception e) {
-					errors++
+					errorCount++
+					errors.append("$definition.metricCode failed $e.message ${System.getProperty("line.separator")}")
 					log.error("$definition.metricCode failed", e)
 				}
 			}
 
 		}
 
-		log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
-		return [metrics: metrics, errors: errors]
+		log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errorCount")
+		return [metrics: metrics, errorCount: errorCount, errors: errors.toString() ]
 	}
 
 	/**
