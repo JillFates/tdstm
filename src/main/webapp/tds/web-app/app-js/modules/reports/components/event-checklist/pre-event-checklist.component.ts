@@ -1,5 +1,4 @@
 import {
-	ChangeDetectorRef,
 	Component,
 	OnInit
 } from '@angular/core';
@@ -18,67 +17,73 @@ import {
 	pathOr,
 } from 'ramda';
 
-import {ActivatedRoute} from '@angular/router';
+import {ReportComponent} from '../report.component';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-event-checklist',
 	template: `
-		<div class="pre-event-checklist">
-			<div *ngIf="!html || isReportFailing" class="report-controls">
-				<div class="event-selector">
-					<div>
-						<kendo-dropdownlist
-								name="event"
-								class="form-control"
-								[data]="model.events"
-								[textField]="'text'"
-								[valueField]="'id'"
-								[(ngModel)]="model.defaultEvent">
-						</kendo-dropdownlist>
-					</div>
-					<div class="actions">
-						<div>
-							<div>Output:</div>
-							<div>
-								<input type="radio" id="output" name="output" checked>
-								<label for="output">Web</label>
+		<section class="box-body">
+			<form class="formly form-horizontal">
+				<div class="box box-primary">
+					<div class="box-header"></div>
+					<div class="box-body">
+						<div class="filters-wrapper">
+							<div *ngIf="!html || isReportFailing">
+								<div class="form-group row">
+									<label class="col-sm-1 control-label">Events</label>
+									<div class="col-sm-3">
+										<kendo-dropdownlist
+											name="event"
+											class="form-control"
+											[data]="model.events"
+											[textField]="'text'"
+											[valueField]="'id'"
+											[(ngModel)]="model.defaultEvent">
+										</kendo-dropdownlist>
+									</div>
+								</div>
+								<div class="form-group row">
+									<div class="col-sm-offset-1 col-sm-3">
+										<tds-button-custom
+												class="btn-primary"
+												(click)="onGenerateReport()"
+												title="Generate"
+												tooltip="Generate report"
+												[icon]="'table'">
+										</tds-button-custom>
+									</div>
+								</div>
 							</div>
 						</div>
-						<div>
-							<tds-button-custom
-									class="btn-primary"
-									(click)="onGenerateReport(model.defaultEvent.id)"
-									title="Generate"
-									tooltip="Generate report"
-									icon="check-square">
-							</tds-button-custom>
+						<div class="report-content">
+							<div [innerHTML]="html"></div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div [innerHTML]="html"></div>
-		</div>
+			</form>
+		</section>
 	`
 })
-export class PreEventCheckListSelectorComponent implements OnInit {
-	public model = {
+export class PreEventCheckListSelectorComponent extends ReportComponent implements OnInit {
+	model = {
 		events: [],
 		defaultEvent: {id: null, text: ''}
 	};
-	public html: SafeHtml;
-	private isReportFailing: boolean;
+	html: SafeHtml;
+	isReportFailing: boolean;
 
 	constructor(
-		private route: ActivatedRoute,
-		private changeDetectorRef: ChangeDetectorRef,
-		private translatePipe: TranslatePipe,
+		dialogService: UIDialogService,
+		reportsService: ReportsService,
 		private notifierService: NotifierService,
-		private reportsService: ReportsService) {
+		private translatePipe: TranslatePipe) {
+			super(reportsService, dialogService);
 	}
 
 	ngOnInit() {
@@ -100,10 +105,10 @@ export class PreEventCheckListSelectorComponent implements OnInit {
 	 * Call the endpoint to generate the pre-event-checklist report
 	 * @param {string} eventId Report id to generate
 	 */
-	onGenerateReport(eventId: string): void {
+	onGenerateReport(): void {
 		this.isReportFailing = false;
 
-		this.reportsService.getPreventsCheckList(eventId)
+		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
 				try {
