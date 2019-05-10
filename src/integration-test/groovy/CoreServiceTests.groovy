@@ -44,6 +44,7 @@ class CoreServiceTests extends Specification {
 		setting instanceof String
 	}
 
+	@Ignore
 	void "getAppConfigSetting"() {
 		when:
 		def setting = coreService.getAppConfigSetting('testing.foo.intVal', 'tdstm')
