@@ -1,8 +1,11 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
@@ -14,24 +17,33 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
+import groovy.transform.CompileStatic
+import net.transitionmanager.command.reports.ActivityMetricsCommand
+import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -46,20 +58,30 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import javax.servlet.http.HttpServletResponse
+import java.sql.ResultSet
+import java.sql.SQLException
 
 @Transactional
 class ReportsService implements ServiceMethods {
 
     JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
     RunbookService runbookService
     TaskService taskService
     MoveBundleService moveBundleService
     UserPreferenceService userPreferenceService
     MoveEventService moveEventService
+    CustomDomainService customDomainService
+    AssetEntityService assetEntityService
+    ControllerService controllerService
+    ProjectService projectService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -396,7 +418,7 @@ class ReportsService implements ServiceMethods {
         String dependenciesNotValid
         if (assetsWithOutDep) {
             dependenciesNotValid = redSpan('Assets without dependency: ' + assetsWithOutDep.size() + ' Assets:') +
-                    '<div style="margin-left:50px;"> ' + WebUtil.listAsMultiValueString(assetsWithOutDep.assetName) + '</div>'
+                    '<div style="margin-left:50px;"> ' + HtmlUtil.escape(WebUtil.listAsMultiValueString(assetsWithOutDep.assetName)) + '</div>'
         } else {
             dependenciesNotValid = redSpan('Assets without dependency: 0 Assets')
         }
@@ -1405,5 +1427,263 @@ class ReportsService implements ServiceMethods {
         }
 
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]
+    }
+
+    /**
+	 * Used to generate Application Profiles model
+	 * @return list of applications
+	 */
+	def generateApplicationProfiles(Project project, ApplicationProfilesCommand command) {
+		MoveBundle currentBundle
+		Person currentSme
+		Person applicationOwner
+
+		StringBuilder query = new StringBuilder(""" SELECT a.app_id AS id
+			FROM application a
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+			LEFT OUTER JOIN person p ON p.person_id=a.sme_id
+			LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
+			LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
+			WHERE ae.project_id = :projectId """)
+
+		Map queryParams = [projectId: project.id]
+
+		if(command.moveBundle == 'useForPlanning'){
+			query.append(" AND mb.use_for_planning = true ")
+		}else{
+			query.append(" AND mb.move_bundle_id= :currentBundle ")
+			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
+		}
+
+		if(command.sme!='null'){
+			currentSme = Person.get(command.sme)
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+			queryParams.smeId = currentSme.id
+			queryParams.sme2Id = currentSme.id
+		}
+
+		if(command.appOwner!='null'){
+			query.append(" AND p2.person_id= :appOwner")
+			queryParams.appOwner = Person.get(command.appOwner).id
+		}
+
+		int assetCap = 100 // default value
+		if(command.reportMaxAssets){
+			try{
+				assetCap = command.reportMaxAssets.toInteger()
+			}catch(Exception e){
+				log.info("Invalid value given for assetCap: $assetCap")
+			}
+		}
+
+		query.append(" LIMIT $assetCap")
+
+		log.info "query = $query"
+
+		List applicationList = namedParameterJdbcTemplate.query(query.toString(), queryParams, new ApplicationProfileRowMapper())
+
+		// TODO: we'd like to flush the session.
+		List appList = []
+		//TODO:need to write a service method since the code used below is almost similar to application show.
+		applicationList.eachWithIndex { app, idx ->
+			def assetEntity = AssetEntity.get(app.id)
+			Application application = Application.get(app.id)
+
+			// assert assetEntity != null  //TODO: oluna should I add an assertion here?
+
+			def assetComment
+			List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
+			List<AssetDependency> supportAssets =  assetEntity.supportedDependencies()
+			if (AssetComment.countByAssetEntityAndCommentTypeAndDateResolved(application, 'issue', null)) {
+				assetComment = "issue"
+			} else if (AssetComment.countByAssetEntity(application)) {
+				assetComment = "comment"
+			} else {
+				assetComment = "blank"
+			}
+			def prefValue= userPreferenceService.getPreference(UserPreferenceEnum.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			def appMoveEvent = AppMoveEvent.findAllByApplication(application)
+			def moveEventList = MoveEvent.findAllByProject(project, [sort: 'name'])
+			def appMoveEventlist = AppMoveEvent.findAllByApplication(application).value
+
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+
+			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
+
+			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
+			def startupById = startupBy instanceof Person ? startupBy.id : -1
+			def testingById = testingBy instanceof Person ? testingBy.id : -1
+
+			// TODO: we'd like to flush the session
+			// GormUtil.flushAndClearSession(idx)
+			appList.add([
+				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
+				assetComment: assetComment, assetCommentList: assetCommentList,
+				appMoveEvent: appMoveEvent,
+				moveEventList: moveEventList,
+				appMoveEvent: appMoveEventlist,
+				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
+				project: project, prefValue: prefValue,
+				shutdownById: shutdownById,
+				startupById: startupById,
+				testingById: testingById,
+				shutdownBy: shutdownBy,
+				startupBy: startupBy,
+				testingBy: testingBy
+			])
+		}
+
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
+		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
+
+		[applicationList: appList, moveBundle: currentBundle ?: 'Planning Bundles', sme: currentSme ?: 'All',
+		 appOwner: applicationOwner ?: 'All', project: project, standardFieldSpecs: standardFieldSpecs, customs: customFields]
+	}
+
+	/**
+	 * RowMapper that maps each result from the query for the Event News list
+	 * into a map column -> value that can be sent back to the UI.
+	 */
+	@CompileStatic
+	private class ApplicationProfileRowMapper implements RowMapper {
+		def mapRow(ResultSet rs, int rowNum) throws SQLException {[
+			id: rs.getInt('id'),
+		]}
+	}
+
+    /**
+     * Used to generate project activity metrics excel file.
+     */
+    @HasPermission(Permission.ReportViewProjectDailyMetrics)
+    void generateProjectActivityMetrics(ActivityMetricsCommand command, HttpServletResponse response) {
+
+        Project project = controllerService.getProjectForPage(this)
+        if (!project) return
+
+        List projectIds = command.projectIds
+        Date startDate
+        Date endDate
+
+        boolean validDates = true
+        try {
+            startDate = TimeUtil.parseDate(command.startDate)
+            endDate = TimeUtil.parseDate(command.endDate)
+        } catch (e) {
+            validDates = false
+        }
+
+        if (projectIds && validDates) {
+            boolean allProjects = projectIds.find { it == 'all' }
+            boolean badProjectIds = false
+            List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+            Map<Long, Project> userProjectsMap = [:]
+            List<Long> invalidProjectIds = []
+            List<Long> allProjectIds = []
+
+            for (Project p in userProjects) {
+                userProjectsMap[p.id] = p
+                allProjectIds << p.id
+            }
+
+            if ( allProjects ) {
+                projectIds = allProjectIds
+            } else {
+                projectIds = projectIds.collect { NumberUtil.toLong(it) }
+                // Verify that the user can access the project.
+                projectIds.each { id ->
+                    if (!userProjectsMap[id]) {
+                        invalidProjectIds << id
+                        badProjectIds = true
+                    }
+                }
+            }
+
+            //if found any bad id returning to the user
+            if( badProjectIds ){
+                throw new InvalidParamException("Project ids $invalidProjectIds are not associated with current user.")
+            }
+
+            List<Map<String, Object>> activityMetrics = projectService.searchProjectActivityMetrics(projectIds, startDate, endDate)
+            exportProjectActivityMetricsExcel(activityMetrics, command.includeNonPlanning, response)
+
+        }
+    }
+
+    /**
+     * Export task report in XLS format
+     * @param activityMetrics: activity metrics
+     * @param includeNonPlanning: display or not non planning information
+     * @return : will generate a XLS file
+     */
+    private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, boolean includeNonPlanning, HttpServletResponse response) {
+        File file = grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
+        String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_ISO8601)
+        String filename = 'ActivityMetrics-' + fileDate + '-Report'
+
+        //set MIME TYPE as Excel
+        response.setContentType("application/vnd.ms-excel")
+        response.setHeader("Content-Disposition", 'attachment; filename="' + filename + '.xls"')
+
+        def book = new HSSFWorkbook(new FileInputStream( file ))
+        def metricsSheet = book.getSheet("metrics")
+
+        def projectNameFont = book.createFont()
+        projectNameFont.setFontHeightInPoints((short)12)
+        projectNameFont.setFontName("Arial")
+        projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+
+        def projectNameCellStyle
+        projectNameCellStyle = book.createCellStyle()
+        projectNameCellStyle.setFont(projectNameFont)
+
+        def rowNum = 5
+        def project_code
+
+        activityMetrics.each { Map<String, Object> am ->
+
+            if (project_code != am['project_code']) {
+                rowNum++
+                project_code = am['project_code']
+                WorkbookUtil.addCell(metricsSheet, 0, rowNum, am['project_code'])
+                WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
+            }
+
+            WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
+            WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
+            WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
+            WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['planning_applications'])
+            WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['planning_databases'])
+            WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['planning_network_devices'])
+            WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['planning_physical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['planning_logical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['planning_other_devices'])
+            WorkbookUtil.addCell(metricsSheet, 10, rowNum, am['dependency_mappings'])
+            WorkbookUtil.addCell(metricsSheet, 11, rowNum, am['tasks_all'])
+            WorkbookUtil.addCell(metricsSheet, 12, rowNum, am['tasks_done'])
+            WorkbookUtil.addCell(metricsSheet, 13, rowNum, am['total_persons'])
+            WorkbookUtil.addCell(metricsSheet, 14, rowNum, am['total_user_logins'])
+            WorkbookUtil.addCell(metricsSheet, 15, rowNum, am['active_user_logins'])
+
+            rowNum++
+
+            if (includeNonPlanning) {
+                WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Non Planning')
+                WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['non_planning_servers'])
+                WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['non_planning_applications'])
+                WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['non_planning_databases'])
+                WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['non_planning_network_devices'])
+                WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['non_planning_physical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['non_planning_logical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['non_planning_other_devices'])
+                rowNum++
+            }
+        }
+
+        book.write(response.getOutputStream())
     }
 }

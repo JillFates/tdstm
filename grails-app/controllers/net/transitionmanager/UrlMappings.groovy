@@ -1310,11 +1310,39 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/appOwnerList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "appOwnerList"
+            ]
+        }
+
         "/ws/reports/generateApplicationMigration/$moveBundleId" {
             controller = "wsReports"
             action = [
                     GET: "applicationMigrationLists",
                     POST: "generateApplicationMigration"
+            ]
+        }
+
+        "/ws/reports/generateApplicationProfiles" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateApplicationProfiles"
+            ]
+        }
+
+        "/ws/reports/projectMetricsLists" {
+            controller = "wsReports"
+            action = [
+                    GET: "projectMetricsLists"
+            ]
+        }
+
+        "/ws/reports/generateProjectMetrics" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateProjectMetrics"
             ]
         }
 

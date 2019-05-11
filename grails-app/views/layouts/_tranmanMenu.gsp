@@ -377,7 +377,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
-                                <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
+                                <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-application-conflicts">
                                 <a href="/tdstm/module/reports/applicationConflicts">Application Conflicts</a>
@@ -395,7 +395,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
                                 <li class="menu-child-item menu-reports-activity-metrics">
-                                    <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
+                                    <g:link controller="module" action="reports" id="projectActivityMetrics" elementId="projectActivityMetrics">Activity Metrics</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">

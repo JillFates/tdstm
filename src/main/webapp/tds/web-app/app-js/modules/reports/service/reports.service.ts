@@ -21,8 +21,12 @@ export class ReportsService {
 	private readonly TASKS_REPORT_URL = `${this.baseURL}/reports/tasksReport`;
 	private readonly SERVER_CONFLICTS_REPORT_URL = `${this.baseURL}/reports/generateServerConflicts`;
 	private readonly SME_LIST_URL = `${this.baseURL}/reports/smeList/{id}`;
+	private readonly APP_OWNER_LIST_URL = `${this.baseURL}/reports/appOwnerList/{id}`;
 	private readonly APP_EVENT_RESULTS_LISTS_URL = `${this.baseURL}/reports/generateApplicationMigration/{id}`;
 	private readonly APP_EVENT_RESULTS_REPORT_URL = `${this.APP_EVENT_RESULTS_LISTS_URL}`;
+	private readonly APPLICATION_PROFILES_REPORT_URL = `${this.baseURL}/reports/generateApplicationProfiles`;
+	private readonly PROJECT_METRICS_LISTS_URL = `${this.baseURL}/reports/projectMetricsLists`;
+	private readonly PROJECT_METRICS_REPORT_URL = `${this.baseURL}/reports/generateProjectMetrics`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -69,10 +73,24 @@ export class ReportsService {
 
 	/**
 	 * GET - Return the list of SME that belongs to a move bundle.
-	 * @param moveBundleId
+	 * @param moveBundleId: number
 	 */
 	getSmeList(moveBundleId: number): Observable<any> {
 		return this.http.get(this.SME_LIST_URL.replace('{id}', moveBundleId.toString())).pipe(
+			map( (response: any) => response && response.data || []),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
+	}
+
+	/**
+	 * GET - Return the list of App Owner that belongs to a move bundle.
+	 * @param moveBundleId: number
+	 */
+	getAppOwnerList(moveBundleId: number): Observable<any> {
+		return this.http.get(this.APP_OWNER_LIST_URL.replace('{id}', moveBundleId.toString())).pipe(
 			map( (response: any) => response && response.data || []),
 			catchError(error => {
 				console.error(error);
@@ -238,6 +256,17 @@ export class ReportsService {
 	}
 
 	/**
+	 * GET - Return the options lists of Project Metrics Report.
+	 */
+	getProjectMetricsLists(): Observable<any> {
+		return this.http.get(`${this.PROJECT_METRICS_LISTS_URL}`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
 	 * GET - Return the owners filtered by bundle
 	 * @param {string} moveBundleId Bundle id to filter
 	 */
@@ -251,12 +280,12 @@ export class ReportsService {
 
 	/**
 	 * GET - Return the list of application conflicts
-	 * @param {string} bundle: Bundle related
-	 * @param {string} owner: Owner ID
-	 * @param {boolean} conflicts: Flag to get assets asigned to unrelated bundles
-	 * @param {boolean} missing: Flag to get dependencies with not defined support
-	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questined
-	 * @param {number} max: Max number of items to retrive
+	 * @param bundle: string
+	 * @param owner: string
+	 * @param conflicts: boolean
+	 * @param missing: boolean
+	 * @param unresolved: boolean
+	 * @param max: number
 	*/
 	getApplicationConflicts(
 		bundle: string,
@@ -312,6 +341,66 @@ export class ReportsService {
 					})
 			})
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * POST - Return the list of SME that belongs to a move bundle.
+	 * @param moveBundleId
+	 */
+	generateApplicationProfilesReport(
+		moveBundle: number,
+		sme: number,
+		appOwner: number,
+		reportMaxAssets: number): Observable<any> {
+		const request = {
+			moveBundle: moveBundle,
+			sme: sme === -1 ? 'null' : sme,
+			appOwner: appOwner === -1 ? 'null' : appOwner,
+			reportMaxAssets: reportMaxAssets.toString()
+		};
+		return this.http.post(
+			this.APPLICATION_PROFILES_REPORT_URL,
+			request,
+			{responseType: 'text'}).pipe(
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		)
+	}
+
+	/**
+	 * POST - Returns the excel spreadsheet file.
+	 * @param projectIds: Array<string>
+	 * @param startDate: Date
+	 * @param endDate: Date
+	 * @param includeNonPlanning: boolean
+	 */
+	generateActivityMetricsReport(projectIds: Array<string>, startDate: Date, endDate: Date, includeNonPlanning: boolean): Observable<any> {
+		if (projectIds.length === 1 && projectIds[0] === '-1') {
+			projectIds = ['all'];
+		}
+		const request = {
+			projectIds: projectIds,
+			startDate: `${startDate.getMonth() + 1}/${startDate.getDate()}/${startDate.getFullYear()}`,
+			endDate: `${endDate.getMonth() + 1}/${endDate.getDate()}/${endDate.getFullYear()}`,
+			includeNonPlanning: includeNonPlanning
+		};
+		return this.http.post(this.PROJECT_METRICS_REPORT_URL, request, {observe: 'response', responseType: 'blob'}).pipe(
+			map((result: any) => {
+				let filename: string = result.headers.get('content-disposition');
+				filename = filename.replace('attachment; filename=', '');
+				filename = filename.replace(new RegExp('"', 'g'), '');
+				return {
+					blob: new Blob([result.body], { type: result.body.type }),
+					filename: filename
+				}
+			}),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
 	}
 
 	/**
@@ -376,5 +465,5 @@ export class ReportsService {
 						})
 				})
 				.catch((error: any) => error);
-	}
+		}
 }

@@ -1,12 +1,14 @@
 package net.transitionmanager.application
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.person.Person
@@ -19,6 +21,7 @@ import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.command.reports.ApplicationConflictsCommand
 
@@ -95,6 +98,14 @@ class WsReportsController implements ControllerMethods {
             throw new InvalidParamException("moveBundleId param missing")
         }
         renderSuccessJson(reportsService.getSmeList(moveBundleId, true).sort({it.lastName}))
+    }
+
+    def appOwnerList(Long moveBundleId) {
+        if ( !moveBundleId ) {
+            log.warn "moveBundleId param missing"
+            throw new InvalidParamException("moveBundleId param missing")
+        }
+        renderSuccessJson(reportsService.getSmeList(moveBundleId, false).sort({it.lastName}))
     }
 
     /**
@@ -248,5 +259,49 @@ class WsReportsController implements ControllerMethods {
             }
         }
         renderSuccessJson(reportsService.generateDatabaseConflictsMap(project, command))
+    }
+
+    /**
+     * Generates Application Profiles Report web output.
+     * @param moveBundle: The id of the move bundle selected value.
+     * @param sme: The id of the SME selected value.
+     * @param appOwner: The id of the SME selected value.
+     * @returns The rendered gsp view.
+     */
+    def generateApplicationProfiles() {
+        Project project = getProjectForWs()
+        ApplicationProfilesCommand command = populateCommandObject(ApplicationProfilesCommand)
+        Map model = reportsService.generateApplicationProfiles(project, command)
+        render(view: "/reports/generateApplicationProfiles" , model: model)
+    }
+
+    /**
+     * Returns the options lists of the Project Metrics Report.
+     * @return Returns the options lists of the Project Metrics Report.
+     */
+    def projectMetricsLists() {
+        List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+        Calendar start = Calendar.instance
+        start.set(Calendar.DATE, 1)
+        start.add(Calendar.MONTH, -2)
+        Date startDate = start.time
+        Date endDate = new Date()
+        renderSuccessJson(projects: userProjects.collect { entry -> [
+                id: entry.id,
+                name: entry.name
+        ]}, startDate: startDate, endDate: endDate)
+    }
+
+    /**
+     * Generates and returns the Project Activity Metrics report excel file.
+     * @param reportIds: The list of project ids.
+     * @param startDate: The start date range.
+     * @param endDate: The end date range.
+     * @param includeNonPlanning: Include NonPlanning flag.
+     * @returns The rendered gsp view.
+     */
+    def generateProjectMetrics() {
+        ActivityMetricsCommand command = populateCommandObject(ActivityMetricsCommand)
+        reportsService.generateProjectActivityMetrics(command, response)
     }
 }
