@@ -418,7 +418,8 @@ export class ReportsService {
 		missing: boolean,
 		unresolved: boolean,
 		unsupported: boolean,
-		max: number
+		max: number,
+		moveBundleList: any[]
 		): Observable<Array<DatabaseConflict>> {
 			const url = `${this.baseURL}/reports/databaseConflicts?`;
 			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
@@ -430,6 +431,12 @@ export class ReportsService {
 
 					return data == null ? [] : data.dbList
 						.map((dbItem: any) => {
+							let bundleName = data.moveBundle.name;
+							if (!bundleName) {
+								let currentBundle = moveBundleList.find((current) => current.id === dbItem.db.moveBundle.id.toString());
+								bundleName = (currentBundle) ? currentBundle.name : '';
+							}
+
 							return {
 								'database': {
 									'id': dbItem.db.id,
@@ -439,7 +446,7 @@ export class ReportsService {
 								'header': dbItem.header ? ` - ${dbItem.header}` : '',
 								'bundle': {
 									'id': data.moveBundle.id,
-									'name': data.moveBundle.name
+									'name': bundleName
 								},
 								supports: dbItem.supportsList
 									.map((support: any) => {

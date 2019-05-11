@@ -107,7 +107,8 @@ export class DatabaseConflictsComponent extends ReportComponent {
 				this.filters.missingApplications,
 				this.filters.unresolvedDependencies,
 				this.filters.unsupportedDependencies,
-				this.filters.maxAssets.value
+				this.filters.maxAssets.value,
+				this.model.moveBundleList,
 				)
 				.subscribe((results: Array<DatabaseConflict>) => {
 					const titles = [];
