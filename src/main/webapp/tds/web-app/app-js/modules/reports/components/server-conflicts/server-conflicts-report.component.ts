@@ -76,9 +76,9 @@ import {ReportComponent} from '../report.component';
 										<div class="col-sm-2 col-sm-offset-2 buttons">
 											<tds-button-custom class="btn-primary"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 										</div>
 									</div>

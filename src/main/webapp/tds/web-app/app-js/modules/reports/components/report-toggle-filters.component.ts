@@ -7,7 +7,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 			<div class="col-sm-12 text-right">
 				<tds-button-custom
 					isIconButton="true"
-					icon="cog"
+					icon="filter"
 					tooltip="Show/Hide Filters"
 					(click)="onToggle()">
 				</tds-button-custom>

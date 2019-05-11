@@ -59,9 +59,9 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 										<div class="col-sm-4 col-sm-offset-2 buttons">
 											<tds-button-custom class="btn-primary"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 											<tds-button-export
 												class="btn-primary"
