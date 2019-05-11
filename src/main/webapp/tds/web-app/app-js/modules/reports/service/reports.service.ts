@@ -293,7 +293,8 @@ export class ReportsService {
 		conflicts: boolean,
 		missing: boolean,
 		unresolved: boolean,
-		max: number
+		max: number,
+		moveBundleList: any[]
 		): Observable<Array<ApplicationConflict>> {
 			const url = `${this.baseURL}/reports/applicationConflicts?`;
 			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
@@ -305,6 +306,12 @@ export class ReportsService {
 
 				return data == null ? [] : data.appList
 					.map((appItem: any) => {
+						let bundleName = data.moveBundle.name;
+						if (!bundleName) {
+							let currentBundle = moveBundleList.find((current) => current.id === appItem.app.moveBundle.id.toString());
+							bundleName = (currentBundle) ? currentBundle.name : '';
+						}
+
 						return {
 							'application': {
 								'id': appItem.app.id,
@@ -313,7 +320,7 @@ export class ReportsService {
 							},
 							'bundle': {
 								'id': data.moveBundle.id,
-								'name': data.moveBundle.name
+								'name': bundleName
 							},
 							supports: appItem.supportsList
 								.map((support: any) => {

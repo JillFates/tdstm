@@ -31,7 +31,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	reportBundle = '';
 	reportOwner = '';
 	planningBundles: any;
-	public model = {
+	model = {
 		moveBundleList: [],
 		appOwnerList: [],
 		appOwner: null,
@@ -110,7 +110,8 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.bundleConflict,
 				this.model.missingDependencies,
 				this.model.unresolvedDependencies,
-				this.model.maxApplications.value
+				this.model.maxApplications.value,
+				this.model.moveBundleList
 				)
 				.subscribe((results: Array<ApplicationConflict>) => {
 					this.reportDate = new Date();
