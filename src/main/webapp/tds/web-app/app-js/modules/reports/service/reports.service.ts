@@ -330,8 +330,8 @@ export class ReportsService {
 							.map((dependency: any) => {
 								return {
 									'type': dependency.type,
-									'class': dependency.asset.assetClass,
-									'name': dependency.asset.name,
+									'class': dependency.dependent.assetClass,
+									'name': dependency.dependent.name,
 									'frequency': dependency.dataFlowFreq,
 									'bundle': dependency.dependent.moveBundle,
 									'status': dependency.status
