@@ -10,6 +10,7 @@ export abstract class ReportComponent {
 	hideFilters = false;
 	reportResult: SafeHtml;
 	loadingLists = false;
+	generatedReport = false;
 
 	constructor(protected reportsService: ReportsService, protected dialogService: UIDialogService) {
 		// Silence is golden.

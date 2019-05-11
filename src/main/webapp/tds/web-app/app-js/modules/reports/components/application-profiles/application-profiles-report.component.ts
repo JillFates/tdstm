@@ -12,7 +12,9 @@ declare var jQuery: any;
 	selector: 'tds-application-profiles-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
+																 (toggle)="toggleFilters($event)"
+																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -196,6 +198,7 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 						item.addEventListener('click', event => this.onAssetDepLinkClick(event));
 					});
 				}, 300);
+				this.generatedReport = true;
 		})
 	}
 

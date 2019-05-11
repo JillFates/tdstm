@@ -121,6 +121,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
 					this.hideFilters = true;
+					this.generatedReport = true;
 				});
 		}
 
