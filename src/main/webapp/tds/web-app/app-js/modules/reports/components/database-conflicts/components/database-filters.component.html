@@ -9,9 +9,9 @@
 
 <div class="form-group row checkboxes">
 	<div class="col-sm-6 col-sm-offset-2">
-		<label for="bundleConflict">
-			<input [checked]="filters.bundleConflict" (change)="filters.bundleConflict = !filters.bundleConflict"
-				id="bundleConflict" name="bundleConflict" type="checkbox">
+		<label for="bundleConflicts">
+			<input [checked]="filters.bundleConflicts" (change)="filters.bundleConflicts = !filters.bundleConflicts"
+				id="bundleConflicts" name="bundleConflicts" type="checkbox">
 			Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
 		</label>
 	</div>
@@ -42,7 +42,7 @@
 <div class="form-group row checkboxes">
 	<div class="col-sm-5 col-sm-offset-2">
 		<label for="unsupported">		
-			<input [checked]="filters.unsupported"
+			<input [checked]="filters.unsupportedDependencies"
 				(change)="filters.unsupported = !filters.unsupported" id="unsupported"
 				name="unsupported" type="checkbox">
 			Unsupported - Having no Requires dependency indication where database resides
@@ -55,8 +55,8 @@
 		<label>Maximum Databases to report</label>
 	</div>
 	<div class="col-sm-3">
-		<kendo-dropdownlist name="maxDatabases" class="form-control" [data]="maxDatabasesList"
-			[textField]="'value'" [valueField]="'value'" [(ngModel)]="filters.maxDatabases">
+		<kendo-dropdownlist name="maxAssets" class="form-control" [data]="maxDatabasesList"
+			[textField]="'value'" [valueField]="'value'" [(ngModel)]="filters.maxAssets">
 		</kendo-dropdownlist>
 	</div>
 </div>

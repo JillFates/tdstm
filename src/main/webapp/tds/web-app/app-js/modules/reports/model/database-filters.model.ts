@@ -1,8 +1,8 @@
 export interface DatabaseFiltersModel {
 	bundle: any;
-	bundleConflict: boolean;
+	bundleConflicts: boolean;
 	unresolvedDependencies: boolean;
 	missingApplications: boolean;
-	unsupported: boolean;
-	maxDatabases: any;
+	unsupportedDependencies: boolean;
+	maxAssets: any;
 }

@@ -35,11 +35,11 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	planningBundles: any;
 	filters: DatabaseFiltersModel = {
 		bundle: null,
-		bundleConflict: true,
+		bundleConflicts: true,
 		unresolvedDependencies: true,
 		missingApplications: true,
-		unsupported: true,
-		maxDatabases: {value: 100}
+		unsupportedDependencies: true,
+		maxAssets: {value: 100}
 	}
 	public model = {
 		moveBundleList: [],
@@ -103,15 +103,16 @@ export class DatabaseConflictsComponent extends ReportComponent {
 		if (this.model.bundle) {
 			this.reportsService.getDatabaseConflicts(
 				this.filters.bundle.id.toString(),
-				this.filters.bundleConflict,
+				this.filters.bundleConflicts,
 				this.filters.missingApplications,
 				this.filters.unresolvedDependencies,
-				this.filters.maxDatabases.value
+				this.filters.unsupportedDependencies,
+				this.filters.maxAssets.value
 				)
 				.subscribe((results: Array<DatabaseConflict>) => {
 					const titles = [];
 					this.reportTitle = '';
-					if (this.filters.bundleConflict) {
+					if (this.filters.bundleConflicts) {
 						titles.push('Bundle Conflicts');
 					}
 					if (this.filters.unresolvedDependencies) {
@@ -120,7 +121,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 					if (this.filters.missingApplications) {
 						titles.push('No Applications');
 					}
-					if (this.filters.unsupported) {
+					if (this.filters.unsupportedDependencies) {
 						titles.push('DB With NO support');
 					}
 					if (titles.length) {

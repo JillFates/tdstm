@@ -409,18 +409,20 @@ export class ReportsService {
 	 * @param {boolean} conflicts: Flag to get references to assets assigned to unrelated bundles
 	 * @param {boolean} missing: Flag to get missing applications
 	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questioned
+	 * @param {boolean} unsupported: Flag to get having no Requires dependency indication where database resides
 	 * @param {number} max: Max number of records to retrive
 	*/
 	getDatabaseConflicts(
 		bundle: string,
 		conflicts: boolean,
 		missing: boolean,
+		unresolved: boolean,
 		unsupported: boolean,
 		max: number
 		): Observable<Array<DatabaseConflict>> {
 			const url = `${this.baseURL}/reports/databaseConflicts?`;
 			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
-			`&missingApplications=${missing}&unsupportedDependencies=${unsupported}&maxAssets=${max}`;
+			`&missingApplications=${missing}&unresolvedDependencies=${unresolved}&unsupportedDependencies=${unsupported}&maxAssets=${max}`;
 
 			return this.http.get(`${url}${params}`)
 				.map((response: any) => {
@@ -454,10 +456,10 @@ export class ReportsService {
 								.map((dependency: any) => {
 									return {
 										'type': dependency.type,
-										'class': dependency.asset.assetClass || 'NOT-DEFINED',
-										'name': dependency.asset.name || 'NOT-DEFINED',
+										'class': dependency.dependent.assetClass,
+										'name': dependency.dependent.name,
 										'frequency': dependency.dataFlowFreq,
-										'bundle': dependency.dependent.moveBundle || 'NOT-DEFINED',
+										'bundle': dependency.dependent.moveBundle,
 										'status': dependency.status
 									};
 								})
