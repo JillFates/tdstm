@@ -4,7 +4,9 @@ import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.Dataview
 import org.grails.web.json.JSONObject
 
@@ -170,10 +172,16 @@ class DataviewSpec {
 			fieldSpec: fieldSpecProject?.getFieldSpec(command.sortDomain, command.sortProperty)
 		]
 
-		this.spec.columns = this.spec.columns.collect {
-			Map map = it as Map
-			map.put('fieldSpec', fieldSpecProject?.getFieldSpec(map.domain, map.property))
-			map
+		this.spec.columns.each { Map<String, ?> column ->
+			column.fieldSpec = fieldSpecProject?.getFieldSpec(column.domain, column.property)
+		}
+
+		this.extraFilters.each { Map<String, ?> extraFilter ->
+			// Extra filter could be a valid field spec or other options.
+			// For more details take a look {@code DataviewCustomFilterHQLBuilder} implementation
+			if (extraFilter.domain && extraFilter.property){
+				extraFilter.fieldSpec = fieldSpecProject?.getFieldSpec(extraFilter.domain, extraFilter.property)
+			}
 		}
 	}
 

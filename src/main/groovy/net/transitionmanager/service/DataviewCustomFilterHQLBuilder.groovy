@@ -34,37 +34,17 @@ class DataviewCustomFilterHQLBuilder {
 		String property = extraFilter['property']
 		Object filter = extraFilter['filter']
 
-		if (domain == 'common' && property == 'assetName') {
-
-			hqlExpression = " AE.assetName like :extraFilterAssetName "
-			hqlParams = [extraFilterAssetName: "%$filter%"]
-
-		} else if (domain == 'common' && property == 'validation') {
-
-			hqlExpression = " AE.assetName like :extraFilterAssetName "
-
-			hqlParams = [extraFilterAssetName: "%$filter%"]
-
-		} else {
-
-			switch (property) {
-				case 'ufp':
-					hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
-					hqlParams = [
-						extraFilterMoveBundles: MoveBundle.where {
-							project == queryProject && useForPlanning == filter
-						}.list()
-					]
-					break
-				default:
-					throw new RuntimeException('Invalid filter definition:' + property)
-			}
-
-
-			return [
-				hqlExpression: hqlExpression,
-				hqlParams    : hqlParams
-			]
+		switch (property) {
+			case 'ufp':
+				hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
+				hqlParams = [
+					extraFilterMoveBundles: MoveBundle.where {
+						project == queryProject && useForPlanning == filter
+					}.list()
+				]
+				break
+			default:
+				throw new RuntimeException('Invalid filter definition:' + property)
 		}
 
 		return [

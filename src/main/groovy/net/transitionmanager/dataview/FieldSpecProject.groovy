@@ -64,15 +64,15 @@ class FieldSpecProject {
 	 * @return
 	 */
 	FieldSpec getFieldSpec(String assetClassName, String fieldName) {
-		FieldSpec fieldSpec = null
+
 		String key = assetClassName.toUpperCase()
 		if (! fieldsSpecMap.containsKey(key)) {
 			throw new InvalidParamException("Domain $assetClassName not found in cache")
 		}
-		if (fieldsSpecMap[key].containsKey(fieldName)) {
-			fieldSpec = fieldsSpecMap[key][fieldName]
+		if (!fieldsSpecMap[key].containsKey(fieldName)) {
+			throw new InvalidParamException("Domain $assetClassName and field $fieldName not found in cache")
 		}
-		return fieldSpec
+		return fieldsSpecMap[key][fieldName]
 	}
 
 	/**
