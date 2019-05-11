@@ -310,7 +310,7 @@
 												<a [routerLink]="['reports','taskReport']" >Task Report</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewProjectDailyMetrics)" class="menu-child-item menu-reports-activity-metrics">
-                        <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
+											<a [routerLink]="['reports','projectActivityMetrics']" >Activity Metrics</a>
                     </li>
                     <ng-template [ngIf]="hasPermission(permission.ReportViewEventDay)">
                         <li class="divider"></li>

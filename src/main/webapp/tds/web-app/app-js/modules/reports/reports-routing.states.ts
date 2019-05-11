@@ -3,7 +3,6 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
@@ -14,6 +13,7 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
+import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -40,6 +40,9 @@ export class ReportStates {
 	};
 	public static readonly APPLICATION_PROFILES = {
 		url: 'applicationProfiles'
+	};
+	public static readonly ACTIVITY_METRICS = {
+		url: 'projectActivityMetrics'
 	};
 }
 
@@ -158,6 +161,24 @@ export const ReportsRoute: Routes = [
 			ModuleResolveService
 		],
 		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.ACTIVITY_METRICS.url,
+		data: {
+			page: {
+				title: 'Activity Metrics Report',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'Activity Metrics'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-activity-metrics', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ActivityMetricsReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
 		runGuardsAndResolvers: 'always'
 	}
 ];
