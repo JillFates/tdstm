@@ -317,7 +317,7 @@ export class ReportsService {
 	 * @param moveBundleId
 	 */
 	generateApplicationProfilesReport(
-		moveBundle: number,
+		moveBundle: any,
 		sme: number,
 		appOwner: number,
 		reportMaxAssets: number): Observable<any> {

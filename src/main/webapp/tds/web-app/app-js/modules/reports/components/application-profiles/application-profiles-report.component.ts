@@ -12,7 +12,9 @@ declare var jQuery: any;
 	selector: 'tds-application-profiles-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
+																 (toggle)="toggleFilters($event)"
+																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -30,6 +32,7 @@ declare var jQuery: any;
 												[data]="bundleList"
 												[textField]="'name'"
 												[valueField]="'id'"
+												[itemDisabled]="itemDisabled"
 												[(ngModel)]="selectedBundle"
 												(ngModelChange)="onBundleListChange($event)">
 											</kendo-dropdownlist>
@@ -79,9 +82,9 @@ declare var jQuery: any;
 											<tds-button-custom class="btn-primary"
 																				 [disabled]="loadingLists"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 										</div>
 									</div>
@@ -97,6 +100,10 @@ declare var jQuery: any;
 export class ApplicationProfilesReportComponent extends ReportComponent {
 
 	bundleList: Array<any>;
+	useForPlanningOptions = [
+		{id: 'useForPlanning', name: 'Planning Bundles'},
+		{id: '_separator', name: '----------------------------'}
+		];
 	selectedBundle: any = null;
 	smeList: Array<any>;
 	selectedSme: any = null;
@@ -116,6 +123,10 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 		this.onLoad();
 	}
 
+	itemDisabled(itemArgs: { dataItem: any, index: number }): boolean {
+		return itemArgs.dataItem.id === '_separator';
+	}
+
 	/**
 	 * Load the data to populate report UI options.
 	 */
@@ -132,6 +143,7 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 					this.selectedBundle = this.bundleList[0];
 					moveBundleId = this.selectedBundle.id;
 				}
+				this.bundleList = [...this.useForPlanningOptions, ...this.bundleList];
 				// Load SME List
 				this.onBundleListChange({id: moveBundleId});
 			});
@@ -196,6 +208,7 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 						item.addEventListener('click', event => this.onAssetDepLinkClick(event));
 					});
 				}, 300);
+				this.generatedReport = true;
 		})
 	}
 

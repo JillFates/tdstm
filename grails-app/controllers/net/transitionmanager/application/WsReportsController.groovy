@@ -92,20 +92,36 @@ class WsReportsController implements ControllerMethods {
         renderSuccessJson(moveBundleService.moveBundlesByProject(project))
     }
 
-    def smeList(Long moveBundleId) {
+    def smeList(String moveBundleId) {
         if ( !moveBundleId ) {
             log.warn "moveBundleId param missing"
             throw new InvalidParamException("moveBundleId param missing")
         }
-        renderSuccessJson(reportsService.getSmeList(moveBundleId, true).sort({it.lastName}))
+        renderSuccessJson(
+                reportsService.getSmeList(moveBundleId, true)
+                        .sort({it.lastName})
+                        .collect { entry -> [
+                            id: entry.id,
+                            firstName: entry.firstName,
+                            lastName: entry.lastName
+                        ]}
+        )
     }
 
-    def appOwnerList(Long moveBundleId) {
+    def appOwnerList(String moveBundleId) {
         if ( !moveBundleId ) {
             log.warn "moveBundleId param missing"
             throw new InvalidParamException("moveBundleId param missing")
         }
-        renderSuccessJson(reportsService.getSmeList(moveBundleId, false).sort({it.lastName}))
+        renderSuccessJson(
+                reportsService.getSmeList(moveBundleId, false)
+                        .sort({it.lastName})
+                        .collect { entry -> [
+                            id: entry.id,
+                            firstName: entry.firstName,
+                            lastName: entry.lastName
+                        ]}
+        )
     }
 
     /**

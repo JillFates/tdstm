@@ -7,7 +7,11 @@ import {ReportComponent} from '../report.component';
 	selector: 'tds-activity-metrics-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters
+				[hideFilters]="hideFilters"
+				(toggle)="toggleFilters($event)"
+				[disabled]="!generatedReport">
+			</tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -70,8 +74,8 @@ import {ReportComponent} from '../report.component';
 												class="btn-primary"
 												[disabled]="loadingLists"
 												(click)="onGenerateReport()"
-												title="Generate XLS"
-												tooltip="Generate XLS">
+												title="Export to Excel"
+												tooltip="Export to Excel">
 											</tds-button-export>
 										</div>
 									</div>
@@ -146,6 +150,7 @@ export class ActivityMetricsReportComponent extends ReportComponent {
 				element.download = result.filename;
 				document.body.appendChild(element);
 				element.click();
+				this.generatedReport = true;
 		});
 	}
 }
