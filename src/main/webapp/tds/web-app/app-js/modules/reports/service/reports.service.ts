@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
@@ -295,11 +295,16 @@ export class ReportsService {
 		max: number,
 		bundleList: any[]
 		): Observable<any> {
-			const url = `${this.baseURL}/reports/applicationConflicts?`;
-			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
-			`&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
+			const url = `${this.baseURL}/reports/applicationConflicts`;
+			const params = new HttpParams()
+			.set('moveBundle', bundle)
+			.set('appOwner', owner)
+			.set('bundleConflicts', conflicts.toString())
+			.set('missingDependencies', missing.toString())
+			.set('unresolvedDependencies', unresolved.toString())
+			.set('maxAssets', max.toString())
 
-			return this.http.get(`${url}${params}`)
+			return this.http.get(`${url}`, {params})
 			.map((response: any) => {
 				const data =  (response && response.status === 'success' && response.data || null);
 				return this.mapConflictsResults(data, 'app', bundleList);
@@ -385,11 +390,16 @@ export class ReportsService {
 		max: number,
 		bundleList: any[]
 		): Observable<any> {
-			const url = `${this.baseURL}/reports/databaseConflicts?`;
-			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
-			`&missingApplications=${missing}&unresolvedDependencies=${unresolved}&unsupportedDependencies=${unsupported}&maxAssets=${max}`;
+			const url = `${this.baseURL}/reports/databaseConflicts`;
+			const params = new HttpParams()
+				.set('moveBundle', bundle)
+				.set('bundleConflicts', conflicts.toString())
+				.set('missingApplications', missing.toString())
+				.set('unresolvedDependencies', unresolved.toString())
+				.set('unsupportedDependencies', unsupported.toString())
+				.set('maxAssets', max.toString());
 
-			return this.http.get(`${url}${params}`)
+			return this.http.get(`${url}`, {params})
 				.map((response: any) => {
 					const data =  (response && response.status === 'success' && response.data || null);
 					return this.mapConflictsResults(data, 'db', bundleList);
