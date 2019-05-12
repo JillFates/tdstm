@@ -21,7 +21,7 @@
 							<div class="container database-container" *ngFor="let item of databaseConflicts">
 								<div class="row database-header" >
 									<div class="col-sm-12 pull-left">
-										<a (click)="onDatabaseSelected(item.database)" class="inlineLink">{{item.database.name}}</a> ({{item.bundle.name}}) - Supports {{item.supports.length}}, Depends on {{item.dependencies.length}} <span class="field-error">{{item.header}}</span>
+										<a (click)="onDatabaseSelected(item.entity)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) - Supports {{item.supports.length}}, Depends on {{item.dependencies.length}} <span class="field-error">{{item.header}}</span>
 									</div>
 								</div>
 					

@@ -9,7 +9,7 @@ import {
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
-import { ApplicationConflict, DatabaseConflict } from '../../model/application-conflicts.model';
+import { EntityConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -51,7 +51,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 		maxDatabases: {value: 100},
 		maxDatabasesList: [{value: 100}, {value: 250}, {value: 500}]
 	};
-	databaseConflicts: Array<DatabaseConflict> = [];
+	databaseConflicts: Array<EntityConflict> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -108,9 +108,9 @@ export class DatabaseConflictsComponent extends ReportComponent {
 				this.filters.unresolvedDependencies,
 				this.filters.unsupportedDependencies,
 				this.filters.maxAssets.value,
-				this.model.moveBundleList,
 				)
-				.subscribe((results: Array<DatabaseConflict>) => {
+				.subscribe((results: any) => {
+					results = this.mapConflictsResults(results, 'db', this.model.moveBundleList);
 					const titles = [];
 					this.reportTitle = '';
 					if (this.filters.bundleConflicts) {

@@ -42,3 +42,16 @@ export interface DatabaseConflict {
 	supports: Array<Support>;
 	dependencies: Array<Dependency>;
 }
+
+export interface EntityConflict {
+	entity: {
+		id: number;
+		name: string;
+	};
+	bundle: {
+		id: number;
+		name: string;
+	};
+	supports: Array<Support>;
+	dependencies: Array<Dependency>;
+}

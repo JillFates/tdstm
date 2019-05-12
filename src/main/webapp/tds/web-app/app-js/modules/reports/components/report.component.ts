@@ -55,4 +55,49 @@ export abstract class ReportComponent {
 
 	abstract onGenerateReport();
 
+	mapConflictsResults(data: any, entity: string,  bundleList: any[]): any {
+		return data == null ? [] : data[`${entity}List`]
+		.map((item: any) => {
+			let bundleName = data.moveBundle.name;
+			if (!bundleName) {
+				let currentBundle = bundleList.find((current) => current.id === item[entity].moveBundle.id.toString());
+				bundleName = (currentBundle) ? currentBundle.name : '';
+			}
+
+			return {
+				entity: {
+					id: item[entity].id,
+					name: item[entity].assetName,
+					assetClass: item[entity].assetClass.name
+				},
+				header: item.header ? ` - ${item.header}` : '',
+				bundle: {
+					id: data.moveBundle.id,
+					name: bundleName
+				},
+				supports: item.supportsList
+					.map((support: any) => {
+						return {
+							type: support.type,
+							class: support.asset.assetClass,
+							name: support.asset.name ,
+							frequency: support.dataFlowFreq,
+							bundle:  support.asset.moveBundle,
+							status: support.status
+						};
+					}),
+				dependencies: item.dependsOnList
+				.map((dependency: any) => {
+					return {
+						type: dependency.type,
+						class: dependency.dependent.assetClass,
+						name: dependency.dependent.name,
+						frequency: dependency.dataFlowFreq,
+						bundle: dependency.dependent.moveBundle,
+						status: dependency.status
+					};
+				})
+			}
+		});
+	}
 }

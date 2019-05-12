@@ -303,7 +303,9 @@ export class ReportsService {
 			return this.http.get(`${url}${params}`)
 			.map((response: any) => {
 				const data =  (response && response.status === 'success' && response.data || null);
+				return data;
 
+				/*
 				return data == null ? [] : data.appList
 					.map((appItem: any) => {
 						let bundleName = data.moveBundle.name;
@@ -346,6 +348,7 @@ export class ReportsService {
 							})
 						}
 					})
+					*/
 			})
 			.catch((error: any) => error);
 	}
@@ -426,8 +429,7 @@ export class ReportsService {
 		unresolved: boolean,
 		unsupported: boolean,
 		max: number,
-		moveBundleList: any[]
-		): Observable<Array<DatabaseConflict>> {
+		): Observable<any> {
 			const url = `${this.baseURL}/reports/databaseConflicts?`;
 			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
 			`&missingApplications=${missing}&unresolvedDependencies=${unresolved}&unsupportedDependencies=${unsupported}&maxAssets=${max}`;
@@ -435,50 +437,7 @@ export class ReportsService {
 			return this.http.get(`${url}${params}`)
 				.map((response: any) => {
 					const data =  (response && response.status === 'success' && response.data || null);
-
-					return data == null ? [] : data.dbList
-						.map((dbItem: any) => {
-							let bundleName = data.moveBundle.name;
-							if (!bundleName) {
-								let currentBundle = moveBundleList.find((current) => current.id === dbItem.db.moveBundle.id.toString());
-								bundleName = (currentBundle) ? currentBundle.name : '';
-							}
-
-							return {
-								'database': {
-									'id': dbItem.db.id,
-									'name': dbItem.db.assetName,
-									'assetClass': dbItem.db.assetClass.name
-								},
-								'header': dbItem.header ? ` - ${dbItem.header}` : '',
-								'bundle': {
-									'id': data.moveBundle.id,
-									'name': bundleName
-								},
-								supports: dbItem.supportsList
-									.map((support: any) => {
-										return {
-											'type': support.type,
-											'class': support.asset.assetClass || 'NOT-DEFINED',
-											'name': support.asset.name || 'NOT-DEFINED',
-											'frequency': support.dataFlowFreq,
-											'bundle':  support.asset.moveBundle || 'NOT-DEFINED',
-											'status': support.status
-										};
-									}),
-								dependencies: dbItem.dependsOnList
-								.map((dependency: any) => {
-									return {
-										'type': dependency.type,
-										'class': dependency.dependent.assetClass,
-										'name': dependency.dependent.name,
-										'frequency': dependency.dataFlowFreq,
-										'bundle': dependency.dependent.moveBundle,
-										'status': dependency.status
-									};
-								})
-							}
-						})
+					return data;
 				})
 				.catch((error: any) => error);
 		}
