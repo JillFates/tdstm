@@ -293,6 +293,7 @@ export class ReportsService {
 		missing: boolean,
 		unresolved: boolean,
 		max: number,
+		bundleList: any[]
 		): Observable<any> {
 			const url = `${this.baseURL}/reports/applicationConflicts?`;
 			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
@@ -301,7 +302,7 @@ export class ReportsService {
 			return this.http.get(`${url}${params}`)
 			.map((response: any) => {
 				const data =  (response && response.status === 'success' && response.data || null);
-				return data;
+				return this.mapConflictsResults(data, 'app', bundleList);
 			})
 			.catch((error: any) => error);
 	}
@@ -382,6 +383,7 @@ export class ReportsService {
 		unresolved: boolean,
 		unsupported: boolean,
 		max: number,
+		bundleList: any[]
 		): Observable<any> {
 			const url = `${this.baseURL}/reports/databaseConflicts?`;
 			const params = `moveBundle=${bundle}&bundleConflicts=${conflicts}` +
@@ -390,8 +392,60 @@ export class ReportsService {
 			return this.http.get(`${url}${params}`)
 				.map((response: any) => {
 					const data =  (response && response.status === 'success' && response.data || null);
-					return data;
+					return this.mapConflictsResults(data, 'db', bundleList);
 				})
 				.catch((error: any) => error);
-		}
+	}
+
+	/**
+	 * Map the resuls provided for the endpoint to get the conflicts, to the correspondint db or app reports
+	 * @param data Endpoint results
+	 * @param entity Name of the entity, it could be (app or db)
+	 * @param bundleList List of bundles related to the report
+	 */
+	private mapConflictsResults(data: any, entity: string,  bundleList: any[]): any {
+		return data == null ? [] : data[`${entity}List`]
+		.map((item: any) => {
+			let bundleName = data.moveBundle.name;
+			if (!bundleName) {
+				let currentBundle = bundleList.find((current) => current.id === item[entity].moveBundle.id.toString());
+				bundleName = (currentBundle) ? currentBundle.name : '';
+			}
+
+			return {
+				entity: {
+					id: item[entity].id,
+					name: item[entity].assetName,
+					assetClass: item[entity].assetClass.name
+				},
+				header: item.header ? ` - ${item.header}` : '',
+				bundle: {
+					id: data.moveBundle.id,
+					name: bundleName
+				},
+				supports: item.supportsList
+					.map((support: any) => {
+						return {
+							type: support.type,
+							class: support.asset.assetClass,
+							name: support.asset.name ,
+							frequency: support.dataFlowFreq,
+							bundle:  support.asset.moveBundle,
+							status: support.status
+						};
+					}),
+				dependencies: item.dependsOnList
+				.map((dependency: any) => {
+					return {
+						type: dependency.type,
+						class: dependency.dependent.assetClass,
+						name: dependency.dependent.name,
+						frequency: dependency.dataFlowFreq,
+						bundle: dependency.dependent.moveBundle,
+						status: dependency.status
+					};
+				})
+			}
+		});
+	}
 }

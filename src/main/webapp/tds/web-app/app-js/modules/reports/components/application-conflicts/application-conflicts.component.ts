@@ -111,9 +111,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.missingDependencies,
 				this.model.unresolvedDependencies,
 				this.model.maxApplications.value,
+				this.model.moveBundleList
 				)
 				.subscribe((results: any) => {
-					results = this.mapConflictsResults(results, 'app', this.model.moveBundleList);
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
 					this.reportBundle = this.getReportBundleName();

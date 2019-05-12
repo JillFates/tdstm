@@ -108,9 +108,9 @@ export class DatabaseConflictsComponent extends ReportComponent {
 				this.filters.unresolvedDependencies,
 				this.filters.unsupportedDependencies,
 				this.filters.maxAssets.value,
+				this.model.moveBundleList
 				)
 				.subscribe((results: any) => {
-					results = this.mapConflictsResults(results, 'db', this.model.moveBundleList);
 					const titles = [];
 					this.reportTitle = '';
 					if (this.filters.bundleConflicts) {
