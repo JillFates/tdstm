@@ -4,7 +4,6 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import { ApplicationConflict, DatabaseConflict } from '../model/application-conflicts.model';
 import {catchError, map} from 'rxjs/operators';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -294,8 +293,7 @@ export class ReportsService {
 		missing: boolean,
 		unresolved: boolean,
 		max: number,
-		moveBundleList: any[]
-		): Observable<Array<ApplicationConflict>> {
+		): Observable<any> {
 			const url = `${this.baseURL}/reports/applicationConflicts?`;
 			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
 			`&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
@@ -304,51 +302,6 @@ export class ReportsService {
 			.map((response: any) => {
 				const data =  (response && response.status === 'success' && response.data || null);
 				return data;
-
-				/*
-				return data == null ? [] : data.appList
-					.map((appItem: any) => {
-						let bundleName = data.moveBundle.name;
-						if (!bundleName) {
-							let currentBundle = moveBundleList.find((current) => current.id === appItem.app.moveBundle.id.toString());
-							bundleName = (currentBundle) ? currentBundle.name : '';
-						}
-
-						return {
-							'application': {
-								'id': appItem.app.id,
-								'name': appItem.app.assetName,
-								'assetClass': appItem.app.assetClass.name
-							},
-							'bundle': {
-								'id': data.moveBundle.id,
-								'name': bundleName
-							},
-							supports: appItem.supportsList
-								.map((support: any) => {
-									return {
-										'type': support.type,
-										'class': support.asset.assetClass,
-										'name': support.asset.name,
-										'frequency': support.dataFlowFreq,
-										'bundle':  support.asset.moveBundle,
-										'status': support.status
-									};
-								}),
-							dependencies: appItem.dependsOnList
-							.map((dependency: any) => {
-								return {
-									'type': dependency.type,
-									'class': dependency.dependent.assetClass,
-									'name': dependency.dependent.name,
-									'frequency': dependency.dataFlowFreq,
-									'bundle': dependency.dependent.moveBundle,
-									'status': dependency.status
-								};
-							})
-						}
-					})
-					*/
 			})
 			.catch((error: any) => error);
 	}

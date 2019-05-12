@@ -16,33 +16,6 @@ interface Dependency {
 	status: string;
 }
 
-export interface ApplicationConflict {
-	application: {
-		id: number;
-		name: string;
-	};
-	bundle: {
-		id: number;
-		name: string;
-	};
-	supports: Array<Support>;
-	dependencies: Array<Dependency>;
-}
-
-export interface DatabaseConflict {
-	database: {
-		id: number;
-		name: string;
-	};
-	header: string;
-	bundle: {
-		id: number;
-		name: string;
-	};
-	supports: Array<Support>;
-	dependencies: Array<Dependency>;
-}
-
 export interface EntityConflict {
 	entity: {
 		id: number;

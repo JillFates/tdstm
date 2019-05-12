@@ -9,7 +9,7 @@ import {
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
-import { ApplicationConflict } from '../../model/application-conflicts.model';
+import { EntityConflict } from '../../model/conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -42,7 +42,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		maxApplications: {value: 100},
 		maxApplicationsList: [{value: 100}, {value: 250}, {value: 500}]
 	};
-	applicationConflicts: Array<ApplicationConflict> = [];
+	applicationConflicts: Array<EntityConflict> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -111,9 +111,9 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.missingDependencies,
 				this.model.unresolvedDependencies,
 				this.model.maxApplications.value,
-				this.model.moveBundleList
 				)
-				.subscribe((results: Array<ApplicationConflict>) => {
+				.subscribe((results: any) => {
+					results = this.mapConflictsResults(results, 'app', this.model.moveBundleList);
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
 					this.reportBundle = this.getReportBundleName();

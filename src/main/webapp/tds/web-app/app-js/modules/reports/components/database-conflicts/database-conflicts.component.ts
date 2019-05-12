@@ -9,7 +9,7 @@ import {
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../security/services/user.service';
-import { EntityConflict } from '../../model/application-conflicts.model';
+import { EntityConflict } from '../../model/conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
