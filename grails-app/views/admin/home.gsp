@@ -150,23 +150,31 @@ a:hover {
 						</tr>
 						<tr class="even">
 							<td>
+								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess}">
+									<g:link controller="reports" action="generateDailyMetrics" style="color:black">Generate Daily Metrics</g:link>
+								</tds:hasPermission>
+							</td>
+							<td>Manage queries used in generating daily metrics</td>
+						</tr>
+						<tr class="odd">
+							<td>
 								<g:link controller="roleType" style="color:black">Teams</g:link>
 							</td>
 							<td>Used to add/modify the Team labels for all projects on instance</td>
 						</tr>
-						<tr class="odd">
+						<tr class="even">
 							<td>
 								<g:link controller="admin" action="orphanSummary" style="color:black">Manage Orphan Records</g:link>
 							</td>
 							<td>Checks for orphaned records like assets without a project</td>
 						</tr>
-						<tr class="even">
+						<tr class="odd">
 							<td>
 								<a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a>
 							</td>
 							<td>This process will update assets' assetType property to match the value stored in the associated model</td>
 						</tr>
-						<tr class="odd">
+						<tr class="even">
 							<td>
 								<tds:hasPermission permission="${Permission.ModelEdit}">
 									<g:link controller="admin" action="modelConflicts" style="color:black">Model / Alias Conflicts</g:link>
@@ -174,13 +182,13 @@ a:hover {
 							</td>
 							<td>A report that identifies any Model / Alias naming conflicts</td>
 						</tr>
-						<tr class="even">
+						<tr class="odd">
 							<td>
 								<a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
 							</td>
 							<td>Cleans out the database from old import batches (you can select all or older than a specific date)</td>
 						</tr>
-						<tr class="odd">
+						<tr class="even">
 							<td>
 								<a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a>
 							</td>
