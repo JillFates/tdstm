@@ -29,7 +29,9 @@ declare var jQuery: any;
 	selector: 'tds-event-checklist',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters" 
+				[disabled]="!generatedReport"
+				(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
 			<section class="box-body">
 				<form class="formly form-horizontal">
 					<div class="box box-primary">
@@ -109,6 +111,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
+				this.generatedReport = true;
 				this.hideFilters = true;
 				try {
 					const errorResponse = JSON.parse(content);
