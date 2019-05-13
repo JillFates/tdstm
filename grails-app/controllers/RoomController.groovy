@@ -233,7 +233,7 @@ class RoomController implements ControllerMethods {
 			msg = 'An unexpected error occurred during the update'
 		}
 
-		flash.error = msg
+		flash.error = HtmlUtil.escape(msg)
 		chain(action: "show", id: params.id)
 	}
 
