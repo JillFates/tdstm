@@ -446,7 +446,6 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		def now = TimeUtil.nowGMT()
 		PasswordReset.executeUpdate("UPDATE PasswordReset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' AND expiresAfter < :date", [date:new Date()])
-		//jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
 		log.info('Cleanup Password Reset: Finished.')
 	}
