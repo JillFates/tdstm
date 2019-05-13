@@ -180,7 +180,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		this.items.sort(this.sortType === this.ASCENDING_ORDER ? ascendingSort : descendingSort);
 
 		function ascendingSort(a, b) {
-			if(a.value === null || b.value === null) {
+			if (a.value === null || b.value === null) {
 				return -1;
 			}
 			if (a.value.toUpperCase() < b.value.toUpperCase()) {
@@ -193,7 +193,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		}
 
 		function descendingSort(a, b) {
-			if(a.value === null || b.value === null) {
+			if (a.value === null || b.value === null) {
 				return -1;
 			}
 			if (a.value.toUpperCase() > b.value.toUpperCase()) {

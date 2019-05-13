@@ -29,7 +29,7 @@ declare var jQuery: any;
 	selector: 'tds-event-checklist',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" 
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
 				[disabled]="!generatedReport"
 				(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
 			<section class="box-body">
