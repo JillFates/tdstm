@@ -496,6 +496,16 @@ class MoveEventService implements ServiceMethods {
 	 */
 	List<MoveEvent> getAssignedEvents(Person person, Project currentProject = null, boolean active) {
 		Date now = TimeUtil.nowGMT()
+		String sortProperty
+		String sortOrder
+
+		if (active) {
+			sortProperty = 'estCompletionTime'
+			sortOrder = 'asc'
+		} else {
+			sortProperty = 'actualCompletionTime'
+			sortOrder = 'desc'
+		}
 		return MoveEvent.where {
 			if (currentProject) {
 				project == currentProject
@@ -507,7 +517,7 @@ class MoveEventService implements ServiceMethods {
 			} else {
 				estCompletionTime < now
 			}
-		}.order('estCompletionTime', 'desc').list()
+		}.order(sortProperty, sortOrder).list()
 	}
 
 }
