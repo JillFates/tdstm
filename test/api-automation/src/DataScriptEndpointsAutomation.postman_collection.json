@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "18a57705-0ea7-481a-9985-15bfb57ef1c7",
+		"_postman_id": "1f727cbc-114b-40d5-9633-1b22bfa4ca84",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login - DataScript",
+			"name": "Login - Datascript",
 			"event": [
 				{
 					"listen": "test",
@@ -17,13 +17,6 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
-							"});",
-							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
-							"}); ",
 							"",
 							"pm.test(\"User Menu is displayed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
@@ -89,73 +82,44 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e7c1e1df-9ff3-43ee-ac8d-9eeebe5dc11e",
+						"id": "8e560fa2-dc69-4d21-9aba-f0384411fe0c",
+						"type": "text/javascript",
 						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"var firstID = jsonObject.data[0].id; ",
+							"",
+							"//sets variable value from result.",
+							"pm.environment.set(\"datascriptID\", firstID);",
+							"",
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
-							"});",
-							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
-							"}); ",
-							"",
-							"pm.test(\"User Menu is displayed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
-							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
-							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
-							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
-							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
-							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
-							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
-							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
-							"    ",
-							"});",
-							""
-						],
-						"type": "text/javascript"
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
 					}
 				}
 			],
 			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					},
-					{
-						"key": "Accept",
-						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-					}
-				],
+				"method": "GET",
+				"header": [],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "tdsadmin",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "zelda123!",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/auth/signIn",
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/list",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"auth",
-						"signIn"
+						"ws",
+						"dataingestion",
+						"datascript",
+						"list"
 					]
 				},
 				"description": "List all available DataScripts"
