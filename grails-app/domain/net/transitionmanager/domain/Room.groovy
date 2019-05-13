@@ -77,8 +77,8 @@ class Room {
 		return (safeAddress ? (forWhom == 'link' ? safeAddress : safeAddress + '<br/>') : '') +
 				(HtmlUtil.escape(city)) +
 				(stateProv ? ", ${HtmlUtil.escape(stateProv)}" : '') +
-				(postalCode ? '  ' + postalCode : '') +
-				(country ? ' ' + country : '')
+				(postalCode ? '  ' + HtmlUtil.escape(postalCode) : '') +
+				(country ? ' ' + HtmlUtil.escape(country) : '')
 	}
 
 	private static final String[] BEFORE_DELETE_HQL = [
