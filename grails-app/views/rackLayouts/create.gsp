@@ -300,5 +300,6 @@
         $(".menu-parent-data-centers").addClass('active');
     </script>
 </div>
+    <div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 </body>
 </html>
