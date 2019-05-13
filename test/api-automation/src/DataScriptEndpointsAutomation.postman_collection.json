@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "b4d7a5ba-8679-4f7c-bb26-d8cfe5863624",
+		"_postman_id": "18a57705-0ea7-481a-9985-15bfb57ef1c7",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login - DataScript EP",
+			"name": "Login - DataScript",
 			"event": [
 				{
 					"listen": "test",
