@@ -551,8 +551,7 @@ class SqlUtil {
 		Object paramValue
 		boolean isNumber = false
 
-		if (isNumericField(fieldSearchData)) {
-			if (fieldSearchData.filter.isNumber()) {
+		if (isNumericField(fieldSearchData) && fieldSearchData.filter.isNumber()) {
 				isNumber = true
 				/* TM-13420  If the filter is numeric and of the form "x." we should treat it as string, to preserve the dot
 				and end up with a paramValue of the form "x." and not just "x" (parseNumberParameter eliminates the dot) */
@@ -561,7 +560,6 @@ class SqlUtil {
 				} else {
 					paramValue = parseNumberParameter(fieldSearchData)
 				}
-			}
 		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
