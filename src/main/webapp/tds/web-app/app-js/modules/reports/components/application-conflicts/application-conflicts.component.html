@@ -27,7 +27,7 @@
 								</div>
 							</div>
 							<div class="form-group row checkboxes">
-								<div class="col-sm-5 col-sm-offset-2">
+								<div class="col-sm-6 col-sm-offset-2">
 									<label for="one">
 										<input type="checkbox" name="one" id="one" [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict">
 										Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
@@ -35,7 +35,7 @@
 								</div>
 							</div>
 							<div class="form-group row checkboxes">
-								<div class="col-sm-5 col-sm-offset-2">
+								<div class="col-sm-6 col-sm-offset-2">
 									<label for="two">
 										<input type="checkbox" name="two" id="two" [checked]="model.unresolvedDependencies"
 													 (change)="model.unresolvedDependencies = !model.unresolvedDependencies">
@@ -44,7 +44,7 @@
 								</div>
 							</div>
 							<div class="form-group row ">
-								<div class="col-sm-5 col-sm-offset-2">
+								<div class="col-sm-6 col-sm-offset-2">
 									<label for="three">
 										<input type="checkbox" name="three" id="three" [checked]="model.missingDependencies"
 													 (change)="model.missingDependencies = !model.missingDependencies" >
@@ -73,70 +73,72 @@
 							<hr>
 						</div>
 
-						<div class="container results" *ngIf="isDisplayingReport">
+						<div class="container" *ngIf="isDisplayingReport">
 							<div class="header">
 								<div class="main-title">Application Conflicts - {{reportProject}}: {{reportBundle}} and App Owner: {{reportOwner}}</div>
 								<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
 							</div>
 
-							<div class="container application-container" *ngFor="let item of applicationConflicts">
-								<div class="row application-header" >
-									<div class="col-sm-12 pull-left">
-										<a (click)="onApplicationSelected(item.entity)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+							<div class="results">
+								<div class="container application-container" *ngFor="let item of applicationConflicts">
+									<div class="row application-header" >
+										<div class="col-sm-12 pull-left">
+											<a (click)="onApplicationSelected(item.entity)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+										</div>
 									</div>
-								</div>
 
-								<div class="row support-header" *ngIf="item.supports.length">
-									<div class="col-sm-2 title">Supports ({{item.supports.length}} issues)</div>
-									<div class="col-sm-10"></div>
-								</div>
+									<div class="row support-header" *ngIf="item.supports.length">
+										<div class="col-sm-2 title">Supports ({{item.supports.length}} issues)</div>
+										<div class="col-sm-10"></div>
+									</div>
 
-								<div class="row item-header" *ngIf="item.supports.length">
-									<div class="col-sm-1"></div>
-									<div class="col-sm-1">Type</div>
-									<div class="col-sm-1">Class</div>
-									<div class="col-sm-3">Name</div>
-									<div class="col-sm-2">Frequency</div>
-									<div class="col-sm-2">Bundle</div>
-									<div class="col-sm-2">Status</div>
-								</div>
+									<div class="row item-header" *ngIf="item.supports.length">
+										<div class="col-sm-1"></div>
+										<div class="col-sm-1">Type</div>
+										<div class="col-sm-1">Class</div>
+										<div class="col-sm-3">Name</div>
+										<div class="col-sm-2">Frequency</div>
+										<div class="col-sm-2">Bundle</div>
+										<div class="col-sm-2">Status</div>
+									</div>
 
-								<div class="row"
-										 *ngFor="let support of item.supports; let even = even; let odd = odd;"
-										 [ngClass]="{ odd: odd, even: even }">
-									<div class="col-sm-1"></div>
-									<div class="col-sm-1 data-item">{{support.type}}</div>
-									<div class="col-sm-1 data-item">{{support.class}}</div>
-									<div class="col-sm-3 data-item">{{support.name}}</div>
-									<div class="col-sm-2 data-item">{{support.frequency}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
-								</div>
+									<div class="row"
+											*ngFor="let support of item.supports; let even = even; let odd = odd;"
+											[ngClass]="{ odd: odd, even: even }">
+										<div class="col-sm-1"></div>
+										<div class="col-sm-1 data-item">{{support.type}}</div>
+										<div class="col-sm-1 data-item">{{support.class}}</div>
+										<div class="col-sm-3 data-item">{{support.name}}</div>
+										<div class="col-sm-2 data-item">{{support.frequency}}</div>
+										<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
+										<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
+									</div>
 
-								<div class="row dependency-header" *ngIf="item.dependencies.length">
-									<div class="col-sm-2 title">Dependencies ({{item.dependencies.length}} issues)</div>
-									<div class="col-sm-10"></div>
-								</div>
+									<div class="row dependency-header" *ngIf="item.dependencies.length">
+										<div class="col-sm-2 title">Dependencies ({{item.dependencies.length}} issues)</div>
+										<div class="col-sm-10"></div>
+									</div>
 
-								<div class="row item-header" *ngIf="item.dependencies.length">
-									<div class="col-sm-1"></div>
-									<div class="col-sm-1">Type</div>
-									<div class="col-sm-1">Class</div>
-									<div class="col-sm-3">Name</div>
-									<div class="col-sm-2">Frequency</div>
-									<div class="col-sm-2">Bundle</div>
-									<div class="col-sm-2">Status</div>
-								</div>
+									<div class="row item-header" *ngIf="item.dependencies.length">
+										<div class="col-sm-1"></div>
+										<div class="col-sm-1">Type</div>
+										<div class="col-sm-1">Class</div>
+										<div class="col-sm-3">Name</div>
+										<div class="col-sm-2">Frequency</div>
+										<div class="col-sm-2">Bundle</div>
+										<div class="col-sm-2">Status</div>
+									</div>
 
-								<div class="row" *ngFor="let dependency of item.dependencies; let even = even; let odd = odd;"
-										 [ngClass]="{ odd: odd, even: even }">
-									<div class="col-sm-1"></div>
-									<div class="col-sm-1 data-item">{{dependency.type}}</div>
-									<div class="col-sm-1 data-item">{{dependency.class}}</div>
-									<div class="col-sm-3 data-item">{{dependency.name}}</div>
-									<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
-									<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
+									<div class="row" *ngFor="let dependency of item.dependencies; let even = even; let odd = odd;"
+											[ngClass]="{ odd: odd, even: even }">
+										<div class="col-sm-1"></div>
+										<div class="col-sm-1 data-item">{{dependency.type}}</div>
+										<div class="col-sm-1 data-item">{{dependency.class}}</div>
+										<div class="col-sm-3 data-item">{{dependency.name}}</div>
+										<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
+										<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
+										<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
+									</div>
 								</div>
 							</div>
 						</div>

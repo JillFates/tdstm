@@ -3,9 +3,10 @@ tds-application-conflicts
     margin-bottom: 0px
 
 .application-conflicts
+  .container
+    padding: 0
   .inlineLink
     cursor: pointer
-  padding: 0 30px
   .field-error
     color: red
     font-weight: bold
@@ -14,39 +15,47 @@ tds-application-conflicts
   .results
     font-size: 13px
     background: white
+    padding: 25px 5px
     border: 1px solid #63a242
-    .header
-      display: flex
-      justify-content: center
-      align-items: center
-      flex-direction: column
-      font-size: 20px
-      padding: 20px
-      .main-title
-        font-weight: bold
-  .odd
-    padding: 5px
+  .header
     display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    font-size: 20px
+    margin-top: 10px
+    .main-title
+      font-weight: bold
+  .odd, 
+  .even
+    display: flex
+    margin-right: 5px
+    margin-left: 5px
+    div.data-item
+      padding: 4px 2px
+      border-right: 2px solid white
+  .odd
     div.data-item
       background: white
-      border-right: 2px solid white
   .even
-    padding: 5px
-    display: flex
     div.data-item
-      background: lightgray
-      border-right: 2px solid white
+      background: #e0e0e0 
   .application-header
-    background: lightgray
+    background: #cccccc 
     font-weight: bold
+    padding: 2px 6px
   .item-header
-    padding: 0
+    margin-left: 5px
+    margin-right: 5px
     div
+      padding-left: 2px
       text-decoration: underline
   .application-header,
   .support-header,
   .dependency-header
-    padding: 5px
+    margin-left: 5px
+    margin-right: 5px
+    padding: 4px 0
   .settings
     width: 40%
   .support-header,
