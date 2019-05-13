@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
@@ -1392,19 +1393,29 @@ class ReportsService implements ServiceMethods {
 			query.append(" AND mb.use_for_planning = true ")
 		}else{
 			query.append(" AND mb.move_bundle_id= :currentBundle ")
-			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+			queryParams.currentBundle = moveBundle.id
 		}
 
 		if(command.sme!='null'){
 			currentSme = Person.get(command.sme)
-			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+            if (!currentSme) {
+                throw new InvalidParamException("Invalid SME1 given.")
+            }
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id)")
 			queryParams.smeId = currentSme.id
 			queryParams.sme2Id = currentSme.id
 		}
 
 		if(command.appOwner!='null'){
 			query.append(" AND p2.person_id= :appOwner")
-			queryParams.appOwner = Person.get(command.appOwner).id
+            Long ownerId = NumberUtil.toPositiveLong(command.appOwner)
+            Person owner = Person.get(ownerId)
+            if (!owner) {
+                throw new InvalidParamException("Invalid owner id given.")
+            }
+			queryParams.appOwner = GormUtil.findInProject(ownerId)
 		}
 
 		int assetCap = 100 // default value
