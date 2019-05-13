@@ -12,11 +12,7 @@ import {UserService} from '../../../security/services/user.service';
 import { EntityConflict } from '../../model/conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {DatabaseFiltersModel} from '../../model/database-filters.model';
-import {
-	DIALOG_SIZE,
-} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'tds-database-conflicts',
@@ -140,21 +136,5 @@ export class DatabaseConflictsComponent extends ReportComponent {
 				});
 		}
 
-	}
-
-	/**
-	 * Open the asset show view of the current database selected
-	 * @param database: any
-	 */
-	onDatabaseSelected(database: any): void {
-		this.dialogService.open(AssetShowComponent, [
-			{ provide: 'ID', useValue: database.id },
-			{ provide: 'ASSET', useValue: database.assetClass }],
-			DIALOG_SIZE.LG, false)
-			.then(asset => {
-				console.log('Done');
-			}).catch(error => {
-				console.log('Error:', error);
-			});
 	}
 }

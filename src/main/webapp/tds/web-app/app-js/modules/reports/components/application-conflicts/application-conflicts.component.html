@@ -83,7 +83,7 @@
 								<div class="container application-container" *ngFor="let item of applicationConflicts">
 									<div class="row application-header" >
 										<div class="col-sm-12 pull-left">
-											<a (click)="onApplicationSelected(item.entity)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
+											<a (click)="onOpenLinkAsset(item.entity.id, item.entity.assetClass)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) Supports {{item.supports.length}} Depends on {{item.dependencies.length}}
 										</div>
 									</div>
 
