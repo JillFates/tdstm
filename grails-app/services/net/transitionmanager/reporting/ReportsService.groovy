@@ -132,30 +132,65 @@ class ReportsService implements ServiceMethods {
 
         def taskAnalysisInfo = getTaskAnalysisInfo(moveEvent, eventErrorList, viewUnpublished)
 
-        [time                : eventsProjectInfo.time, moveEvent: moveEvent, userLoginError: eventsProjectInfo.userLoginError,
-         errorForEventTime   : eventsProjectInfo.errorForEventTime,
-         project             : project, clientAccess: eventsProjectInfo.clientAccess, list: eventsProjectInfo.list,
-         workFlowCodeSelected: eventBundleInfo.workFlowCodeSelected, steps: eventBundleInfo.steps,
-         moveBundleSize      : moveBundles.size(), moveBundles: moveBundles, summaryOk: assetsInfo.summaryOk,
-         duplicatesAssetNames: assetsInfo.duplicatesAssetNames, duplicates: assetsInfo.duplicates,
-         duplicatesTag       : assetsInfo.duplicatesTag, duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
-         missedRacks         : assetsInfo.missedRacks, missingRacks: assetsInfo.missingRacks,
-         dependenciesOk      : assetsInfo.dependenciesOk, issue: assetsInfo.issue, issueMap: assetsInfo.issues,
-         bundleMap           : moveBundleTeamInfo.bundleMap, notAssignedToTeam: moveBundleTeamInfo.notAssignedToTeam,
-         teamAssignment      : moveBundleTeamInfo.teamAssignment, inValidUsers: moveBundleTeamInfo.inValidUsers,
-         userLogin           : moveBundleTeamInfo.userLogin, truckError: transportInfo.truckError, truck: transportInfo.truck,
-         cartError           : transportInfo.cartError, cart: transportInfo.cart, shelf: transportInfo.shelf,
-         shelfError          : transportInfo.shelfError, nullAssetname: assetsInfo.nullAssetname, questioned: assetsInfo.questioned,
-         blankAssets         : assetsInfo.blankAssets, questionedDependency: assetsInfo.questionedDependency,
-         specialInstruction  : assetsInfo.specialInstruction, importantInstruction: assetsInfo.importantInstruction,
-         eventErrorString    : eventErrorString, dashBoardOk: eventBundleInfo.dashBoardOk, allErrors: allErrors,
-         nullAssetTag        : assetsInfo.nullAssetTag, blankAssetTag: assetsInfo.blankAssetTag, modelList: modelInfo.modelList,
-         modelError          : modelInfo.modelError, eventIssues: assetsInfo.eventIssues, nonAssetIssue: assetsInfo.nonAssetIssue,
-         dependenciesNotValid: assetsInfo.dependenciesNotValid, cyclicalsError: taskAnalysisInfo.cyclicalsError,
-         cyclicalsRef        : taskAnalysisInfo.cyclicalsRef, startsError: taskAnalysisInfo.startsError,
-         startsRef           : taskAnalysisInfo.startsRef, sinksError: taskAnalysisInfo.sinksError,
-         sinksRef            : taskAnalysisInfo.sinksRef, personAssignErr: taskAnalysisInfo.personAssignErr,
-         personTasks         : taskAnalysisInfo.personTasks, taskerrMsg: taskAnalysisInfo.exceptionString]
+        [
+            time                   : eventsProjectInfo.time,
+            moveEvent              : moveEvent,
+            userLoginError         : eventsProjectInfo.userLoginError,
+            errorForEventTime      : eventsProjectInfo.errorForEventTime,
+            project                : project,
+            clientAccess           : eventsProjectInfo.clientAccess,
+            list                   : eventsProjectInfo.list,
+            workFlowCodeSelected   : eventBundleInfo.workFlowCodeSelected,
+            steps                  : eventBundleInfo.steps,
+            moveBundleSize         : moveBundles.size(),
+            moveBundles            : moveBundles,
+            summaryOk              : assetsInfo.summaryOk,
+            duplicatesAssetNames   : assetsInfo.duplicatesAssetNames,
+            duplicates             : assetsInfo.duplicates,
+            duplicatesTag          : assetsInfo.duplicatesTag,
+            duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
+            missedRacks            : assetsInfo.missedRacks,
+            missingRacks           : assetsInfo.missingRacks,
+            dependenciesOk         : assetsInfo.dependenciesOk,
+            issue                  : assetsInfo.issue,
+            issueMap               : assetsInfo.issues,
+            bundleMap              : moveBundleTeamInfo.bundleMap,
+            notAssignedToTeam      : moveBundleTeamInfo.notAssignedToTeam,
+            teamAssignment         : moveBundleTeamInfo.teamAssignment,
+            inValidUsers           : moveBundleTeamInfo.inValidUsers,
+            userLogin              : moveBundleTeamInfo.userLogin,
+            truckError             : transportInfo.truckError,
+            truck                  : transportInfo.truck,
+            cartError              : transportInfo.cartError,
+            cart                   : transportInfo.cart,
+            shelf                  : transportInfo.shelf,
+            shelfError             : transportInfo.shelfError,
+            nullAssetname          : assetsInfo.nullAssetname,
+            questioned             : assetsInfo.questioned,
+            blankAssets            : assetsInfo.blankAssets,
+            questionedDependency   : assetsInfo.questionedDependency,
+            specialInstruction     : assetsInfo.specialInstruction,
+            importantInstruction   : assetsInfo.importantInstruction,
+            eventErrorString       : eventErrorString,
+            dashBoardOk            : eventBundleInfo.dashBoardOk,
+            allErrors              : allErrors,
+            nullAssetTag           : assetsInfo.nullAssetTag,
+            blankAssetTag          : assetsInfo.blankAssetTag,
+            modelList              : modelInfo.modelList,
+            modelError             : modelInfo.modelError,
+            eventIssues            : assetsInfo.eventIssues,
+            nonAssetIssue          : assetsInfo.nonAssetIssue,
+            dependenciesNotValid   : assetsInfo.dependenciesNotValid,
+            cyclicalsError         : taskAnalysisInfo.cyclicalsError,
+            cyclicalsRef           : taskAnalysisInfo.cyclicalsRef,
+            startsError            : taskAnalysisInfo.startsError,
+            startsRef              : taskAnalysisInfo.startsRef,
+            sinksError             : taskAnalysisInfo.sinksError,
+            sinksRef               : taskAnalysisInfo.sinksRef,
+            personAssignErr        : taskAnalysisInfo.personAssignErr,
+            personTasks            : taskAnalysisInfo.personTasks,
+            taskerrMsg             : taskAnalysisInfo.exceptionString
+        ]
     }
 
     /**
@@ -295,8 +330,14 @@ class ReportsService implements ServiceMethods {
             userLogin = greenSpan('Team Details Check: OK')
         }
 
-        [bundleMap        : bundleMap, inValidUsers: inValidUsers, teamAssignment: teamAssignment,
-         notAssignedToTeam: notAssignedToTeam, userLogin: userLogin, eventErrorList: eventErrorList]
+        [
+            bundleMap        : bundleMap,
+            inValidUsers     : inValidUsers,
+            teamAssignment   : teamAssignment,
+            notAssignedToTeam: notAssignedToTeam,
+            userLogin        : userLogin,
+            eventErrorList   : eventErrorList
+        ]
     }
 
     /**
@@ -500,13 +541,30 @@ class ReportsService implements ServiceMethods {
             eventIssues = greenSpan('Event Tasks: OK')
         }
 
-        [summaryOk              : summaryOk, issue: issue, issues: issues, dependenciesOk: dependenciesOk, dependencies: dependencies,
-         missingRacks           : missingRacks, missedRacks: missedRacks, duplicatesTag: duplicatesTag, duplicates: duplicates,
-         duplicatesAssetTagNames: duplicatesAssetTagNames, duplicatesAssetNames: duplicatesAssetNames,
-         nullAssetname          : nullAssetname, blankAssets: blankAssets, questioned: questioned, eventIssues: eventIssues,
-         questionedDependency   : questionedDependency, specialInstruction: specialInstruction, nullAssetTag: nullAssetTag,
-         importantInstruction   : importantInstruction, eventErrorList: eventErrorList, blankAssetTag: blankAssetTag,
-         nonAssetIssue          : nonAssetIssue, dependenciesNotValid: dependenciesNotValid]
+        [
+            summaryOk              : summaryOk,
+            issue                  : issue, issues: issues,
+            dependenciesOk         : dependenciesOk,
+            dependencies           : dependencies,
+            missingRacks           : missingRacks,
+            missedRacks            : missedRacks,
+            duplicatesTag          : duplicatesTag,
+            duplicates             : duplicates,
+            duplicatesAssetTagNames: duplicatesAssetTagNames,
+            duplicatesAssetNames   : duplicatesAssetNames,
+            nullAssetname          : nullAssetname,
+            blankAssets            : blankAssets,
+            questioned             : questioned,
+            eventIssues            : eventIssues,
+            questionedDependency   : questionedDependency,
+            specialInstruction     : specialInstruction,
+            nullAssetTag           : nullAssetTag,
+            importantInstruction   : importantInstruction,
+            eventErrorList         : eventErrorList,
+            blankAssetTag          : blankAssetTag,
+            nonAssetIssue          : nonAssetIssue,
+            dependenciesNotValid   : dependenciesNotValid
+        ]
     }
 
     def getEventsBundelsInfo(moveBundles, MoveEvent moveEvent, eventErrorList) {
@@ -569,7 +627,7 @@ class ReportsService implements ServiceMethods {
                     projectEndTime = TimeUtil.formatDateTime(it.completionTime, TimeUtil.FORMAT_DATE_TIME_8)
                 }
 
-                errorForEventTime += """<span style="color:green"><b>Event Time Period $it.name: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
+                errorForEventTime += """<span style="color:green"><b>Event Time Period ${HtmlUtil.escape(it.name)}: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
             }
         }
 
@@ -598,10 +656,10 @@ class ReportsService implements ServiceMethods {
 
             if (!user) {
                 eventErrorList << 'Project'
-                userLoginError += redSpan(person.toString() + ' login disabled', 'margin-left:50px;')
+                userLoginError += redSpan(HtmlUtil.escape(person.toString()) + ' login disabled', 'margin-left:50px;')
             } else if (user.active == 'N') {
                 eventErrorList << 'Project'
-                userLoginError += greenSpan(user.toString() + ' login inactive', 'margin-left:50px;')
+                userLoginError += greenSpan(HtmlUtil.escape(user.toString()) + ' login inactive', 'margin-left:50px;')
             }
         }
 
@@ -620,11 +678,18 @@ class ReportsService implements ServiceMethods {
             clientAccess = redSpan('No Client Access', '', false)
             eventErrorList << 'Project'
         } else {
-            clientAccess = greenSpan('Client Access:&nbsp;' + persons, '', false)
+            clientAccess = greenSpan('Client Access:&nbsp;' + HtmlUtil.escape(persons.toString()), '', false)
         }
 
-        [time          : time, moveEvent: moveEvent, errorForEventTime: errorForEventTime,
-         userLoginError: userLoginError, clientAccess: clientAccess, list: list, eventErrorList: eventErrorList]
+        [
+            time             : time,
+            moveEvent        : moveEvent,
+            errorForEventTime: errorForEventTime,
+            userLoginError   : userLoginError,
+            clientAccess     : clientAccess,
+            list             : list,
+            eventErrorList   : eventErrorList
+        ]
     }
 
     def getTransportInfo(assetEntityList, List<String> eventErrorList) {
@@ -635,8 +700,15 @@ class ReportsService implements ServiceMethods {
         Set shelves = []
         String shelfError = transportError(assetEntityList, 'shelf', eventErrorList, 'Shelves', shelves)
 
-        [truckError: truckError, truck: trucks, cartError: cartError, cart: carts,
-         shelf     : shelves, shelfError: shelfError, eventErrorList: eventErrorList]
+        [
+            truckError    : truckError,
+            truck         : trucks,
+            cartError     : cartError,
+            cart          : carts,
+            shelf         : shelves,
+            shelfError    : shelfError,
+            eventErrorList: eventErrorList
+        ]
     }
 
     private String transportError(assetEntityList, String propertyName, List<String> eventErrorList, String type, Set instances) {
@@ -1453,19 +1525,29 @@ class ReportsService implements ServiceMethods {
 			query.append(" AND mb.use_for_planning = true ")
 		}else{
 			query.append(" AND mb.move_bundle_id= :currentBundle ")
-			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+			queryParams.currentBundle = moveBundle.id
 		}
 
 		if(command.sme!='null'){
 			currentSme = Person.get(command.sme)
-			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+            if (!currentSme) {
+                throw new InvalidParamException("Invalid SME1 given.")
+            }
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id)")
 			queryParams.smeId = currentSme.id
 			queryParams.sme2Id = currentSme.id
 		}
 
 		if(command.appOwner!='null'){
 			query.append(" AND p2.person_id= :appOwner")
-			queryParams.appOwner = Person.get(command.appOwner).id
+            Long ownerId = NumberUtil.toPositiveLong(command.appOwner)
+            Person owner = Person.get(ownerId)
+            if (!owner) {
+                throw new InvalidParamException("Invalid owner id given.")
+            }
+			queryParams.appOwner = GormUtil.findInProject(ownerId)
 		}
 
 		int assetCap = 100 // default value
