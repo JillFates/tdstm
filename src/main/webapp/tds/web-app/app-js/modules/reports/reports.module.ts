@@ -31,6 +31,7 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 import {ReportToggleFiltersComponent} from './components/report-toggle-filters.component';
 import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
+import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
 
 @NgModule({
 	imports: [
@@ -58,6 +59,7 @@ import {ApplicationProfilesReportComponent} from './components/application-profi
 		ApplicationEventResultsReportComponent,
 		ApplicationProfilesReportComponent,
 		ReportToggleFiltersComponent,
+		ActivityMetricsReportComponent
 	],
 	providers: [
 		// Resolve

@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "dacac277-2caa-4a95-9f04-e02b2ec8d255",
-		"name": "New Tags Events",
+		"_postman_id": "6da987e9-459a-495f-9925-3772559c3112",
+		"name": "Tag Event CRUD",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Sign In - Tag Event CRUD",
 			"event": [
 				{
 					"listen": "test",

@@ -853,6 +853,7 @@ class ReportsController implements ControllerMethods {
 
 	/**
 	 * Used to generate project activity metrics excel file.
+     * @deprecated This was refactored and moved to #ReportsService.projectActivityMetricsExport()
 	 */
 	@HasPermission(Permission.ReportViewProjectDailyMetrics)
 	def projectActivityMetricsExport() {

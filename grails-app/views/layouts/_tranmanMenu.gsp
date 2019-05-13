@@ -395,7 +395,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
                                 <li class="menu-child-item menu-reports-activity-metrics">
-                                    <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
+                                    <g:link controller="module" action="reports" id="projectActivityMetrics" elementId="projectActivityMetrics">Activity Metrics</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">

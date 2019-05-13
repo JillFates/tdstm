@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "49a8bcae-609e-4edd-ba33-9160b18593bd",
+		"_postman_id": "78ddf418-1468-4a21-ae71-2f6872227305",
 		"name": "DeviceEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "TranMan Login",
+			"name": "Login - Device Edit",
 			"event": [
 				{
 					"listen": "test",

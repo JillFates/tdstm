@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "1a31c131-eda0-40d3-b649-2aacee47a242",
+		"_postman_id": "23c2931e-af3d-4ae4-acf8-81a0512f9856",
 		"name": "Set task context",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Sign In - Set Task Context",
 			"event": [
 				{
 					"listen": "test",
@@ -146,7 +146,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
@@ -257,9 +257,12 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list?",
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list",
 					"host": [
 						"{{host}}"
 					],
@@ -308,7 +311,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
@@ -357,9 +360,12 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/event/listEventsAndBundles?",
+					"raw": "{{host}}/tdstm/ws/event/listEventsAndBundles",
 					"host": [
 						"{{host}}"
 					],
@@ -481,7 +487,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
@@ -600,7 +606,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
