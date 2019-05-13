@@ -1,5 +1,8 @@
 <div class="content body">
-	<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+	<tds-report-toggle-filters 
+		[hideFilters]="hideFilters" 
+		[disabled]="!generatedReport"
+		(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
 	<div class="box-body">
 		<div class="box box-primary">
 			<div class="box-header"></div>

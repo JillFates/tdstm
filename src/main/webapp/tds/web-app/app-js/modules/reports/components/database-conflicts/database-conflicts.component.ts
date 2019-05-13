@@ -135,6 +135,7 @@ export class DatabaseConflictsComponent extends ReportComponent {
 
 					this.databaseConflicts = results;
 					this.isDisplayingReport = true;
+					this.generatedReport = true;
 					this.hideFilters = true;
 				});
 		}
