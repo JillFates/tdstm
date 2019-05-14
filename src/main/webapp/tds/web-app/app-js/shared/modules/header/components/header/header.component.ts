@@ -5,10 +5,10 @@ import {UserPreferencesComponent} from '../preferences/user-preferences.componen
 import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
 import {UserDateTimezoneComponent} from '../date-timezone/user-date-timezone.component';
 // Service
-import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
 // Model
-import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {PersonModel} from '../../../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {DIALOG_SIZE} from '../../../../model/constants';
@@ -39,7 +39,7 @@ export class HeaderComponent implements OnInit {
 		/**
 		 * AdminLTE is main js that handles the layout, this could me removed later when implementing the footer
 		 */
-		if (jQuery.AdminLTE) {
+		if (jQuery.AdminLTE && jQuery.AdminLTE.layout) {
 			jQuery.AdminLTE.layout.fix();
 		}
 		jQuery('.main-footer').show();
@@ -62,6 +62,9 @@ export class HeaderComponent implements OnInit {
 
 	protected getUserContext(): void {
 		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
+			if (!userContext.user) {
+				this.pageMetaData.hideTopNav = true;
+			}
 			this.userContext = userContext;
 		});
 	}

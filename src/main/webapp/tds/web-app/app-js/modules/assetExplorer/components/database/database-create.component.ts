@@ -13,7 +13,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 export function DatabaseCreateComponent(template, model: any, metadata: any) {
 

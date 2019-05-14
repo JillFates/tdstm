@@ -84,16 +84,21 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 				if (error && error.status === 404) {
 					errorMessage = 'The requested resource was not found';
 				} else if (error.headers && error.headers.get('x-login-url')) {
-					errorMessage = 'Your Session expired';
-					window.location.href = error.headers.get('x-login-url');
+					if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0) {
+						errorMessage = 'Your Session expired';
+						window.location.href = error.headers.get('x-login-url');
+					}
 				} else {
 					errorMessage = 'Bad Request';
 				}
 
-				this.notifierService.broadcast({
-					name: AlertType.DANGER,
-					message: errorMessage
-				});
+				if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0) {
+					this.notifierService.broadcast({
+						name: AlertType.DANGER,
+						message: errorMessage
+					});
+				}
+
 				return throwError(error);
 			}), finalize(() => {
 				this.notifierService.broadcast({

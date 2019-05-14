@@ -8,15 +8,13 @@ import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, APP_INITIALIZER
 import {HttpClientModule} from '@angular/common/http';
 import {TDSAppComponent} from './tds-app.component';
 // Service
-import {AuthGuardService} from '../modules/security/services/auth.guard.service';
-import {UserService} from '../modules/security/services/user.service';
-import {UserContextService} from '../modules/security/services/user-context.service';
+import {UserContextService} from '../modules/auth/service/user-context.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
-import {UserModule} from '../modules/user/user.module';
+import {AuthModule} from '../modules/auth/auth.module';
 
 @NgModule({
 	imports: [
@@ -25,6 +23,7 @@ import {UserModule} from '../modules/user/user.module';
 		HttpClientModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
+		AuthModule,
 		TaskManagerModule,
 		SharedModule.forRoot()
 	],
@@ -32,9 +31,6 @@ import {UserModule} from '../modules/user/user.module';
 		TDSAppComponent,
 	],
 	providers: [
-		AuthGuardService,
-		UserService,
-		UserContextService,
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
 		{
 			provide: APP_INITIALIZER,

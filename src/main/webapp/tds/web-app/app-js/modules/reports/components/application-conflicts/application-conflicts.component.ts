@@ -8,7 +8,7 @@ import {
 
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UserService} from '../../../security/services/user.service';
+import {UserService} from '../../../auth/service/user.service';
 import { ApplicationConflict } from '../../model/application-conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';

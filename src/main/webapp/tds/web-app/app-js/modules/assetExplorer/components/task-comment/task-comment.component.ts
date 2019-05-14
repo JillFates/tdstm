@@ -18,8 +18,8 @@ import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: `task-comment`,

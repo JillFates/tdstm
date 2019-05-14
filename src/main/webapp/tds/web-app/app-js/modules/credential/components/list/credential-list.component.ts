@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {CredentialService} from '../../service/credential.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 // Components
 import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
@@ -13,7 +13,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Models
 import {Permission} from '../../../../shared/model/permission.model';
 import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {

@@ -2,7 +2,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DataScriptService} from '../../service/data-script.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -19,7 +19,7 @@ import {
 	ActionType
 } from '../../model/data-script.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';

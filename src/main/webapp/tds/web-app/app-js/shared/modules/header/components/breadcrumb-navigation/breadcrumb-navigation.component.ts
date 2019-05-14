@@ -5,10 +5,10 @@ import {Title} from '@angular/platform-browser';
 // Service
 import {NotifierService} from '../../../../services/notifier.service';
 import {TaskService} from '../../../../../modules/taskManager/service/task.service';
-import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 // Models
 import {ASSET_MENU_CSS_TREE} from '../../model/asset-menu.model';
-import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 // Other
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
@@ -169,6 +169,9 @@ export class BreadcrumbNavigationComponent {
 
 	protected getUserContext(): void {
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			if (!userContext.user) {
+				this.pageMetaData.hideTopNav = true;
+			}
 			this.userContext = userContext;
 		});
 	}

@@ -14,7 +14,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 export function DeviceEditComponent(template, editModel, metadata: any) {
 

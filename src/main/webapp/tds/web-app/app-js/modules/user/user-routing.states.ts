@@ -4,7 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';

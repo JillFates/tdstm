@@ -6,6 +6,12 @@ import {FormsModule} from '@angular/forms';
 import {SharedModule} from '../../shared/shared.module';
 // Route Module
 import {AuthRouteModule} from './auth-route.module';
+// Services
+import {CookieService} from 'ngx-cookie-service';
+import {AuthService} from './service/auth.service';
+import {UserContextService} from './service/user-context.service';
+import {UserService} from './service/user.service';
+import {AuthGuardService} from './service/auth.guard.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
 
@@ -17,6 +23,13 @@ import {LoginComponent} from './components/login/login.component';
 		FormsModule,
 		// Route
 		AuthRouteModule
+	],
+	providers: [
+		CookieService,
+		AuthService,
+		UserService,
+		UserContextService,
+		AuthGuardService
 	],
 	declarations: [
 		LoginComponent

@@ -11,12 +11,11 @@ import {LoginComponent} from './components/login/login.component';
  */
 export class AuthRouteStates {
 	public static readonly LOGIN = {
-		url: 'login'
+		url: 'auth/login'
 	};
 }
 
 export const LoginRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: AuthRouteStates.LOGIN.url},
 	{
 		path: AuthRouteStates.LOGIN.url,
 		data: {
