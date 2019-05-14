@@ -1,0 +1,142 @@
+#!/bin/sh
+
+#
+# Usage
+# ./runapp.sh
+# ./runapp.sh test-app -unit RunbookService
+# ./runapp.sh test-app -integration GormUtil
+# ./runapp.sh dev-ui
+# ./runapp.sh build-ui
+# ./runapp.sh update-ui
+# ./runapp.sh dbm-update
+#
+
+# Configuration Settings
+SDK_INIT=~/.sdkman/bin/sdkman-init.sh
+GRAILS_VERSION=2.5.4
+JVM_MAX_MEMORY=2048m
+
+# Determine if the UI commands use npm or yarn command
+NPM_YARN_BUILD_COMMAND="npm run build-prod"
+NPM_YARN_UPDATE_COMMAND="npm install"
+if [ "`which xxxyarn`" != "" ]; then
+    NPM_YARN_BUILD_COMMAND="yarn build-prod"
+    NPM_YARN_UPDATE_COMMAND="yarn"
+fi
+
+if [ "$1" == "build-ui" ]; then
+   # npm run build-prod
+   # yarn build-prod
+   $NPM_YARN_BUILD_COMMAND
+   echo Build of Legacy complete
+   pushd ./web-app/tds > /dev/null
+   # npm run build-prod
+   $NPM_YARN_BUILD_COMMAND
+   echo Build of Angular complete
+   echo 
+   popd > /dev/null
+   exit 0
+fi 
+
+if [ "$1" == "update-ui" ]; then
+   echo Starting npm update of packages
+   pushd ./web-app/tds > /dev/null
+   if [ -d node_modules ]; then 
+       $NPM_YARN_UPDATE_COMMAND
+   else 
+       npm install
+   fi
+   RC=$?
+   if [ "$RC" == "1" ]; then
+      echo An error occurred while updating npm packages
+   else
+      echo All npm packages have been updated
+   fi
+   popd > /dev/null
+   exit $RC
+fi
+
+if [ "$1" == "dev-ui" ]; then
+   echo Starting npm in development mode
+   pushd ./web-app/tds > /dev/null
+   # This is going to hang here due to the NPM listener
+   npm run build-dev
+   popd > /dev/null
+   exit 0
+fi
+
+if [ ! -f $SDK_INIT ]; then
+   echo "Please install the SDKMan! before trying to use this script (see http://sdkman.io/)"
+   exit 1
+fi
+
+source $SDK_INIT
+if [ $? -ne 0 ]; then
+   echo Failed to initialize GVM
+   exit 1
+fi
+
+sdk use grails $GRAILS_VERSION
+if [ $? -ne 0 ]; then
+   echo "Failed to select Grails $GRAILS_VERSION, please use the 'sdk install grails $GRAILS_VERSION' command before continuing"
+   exit 1
+fi
+
+# -------------------
+# The follow are the JVM switch settings for the application
+# -------------------
+
+# A number of default runtime settings
+GRAILS_OPTS="-Xdebug -server -XX:+UseParallelGC -Djava.net.preferIPv4Stack=true"
+
+# Memory Settings
+GRAILS_OPTS="$GRAILS_OPTS -XX:MetaspaceSize=$JVM_MAX_MEMORY -Xmx$JVM_MAX_MEMORY"
+
+# Set the JNI inflation to high value to limit only methods call excessively
+#    see https://blogs.oracle.com/buck/entry/inflation_system_properties
+GRAILS_OPTS="$GRAILS_OPTS -Dsun.reflect.inflationThreshold=100000"
+
+# Set the Timezone to Zulu/GMT so system TZ doesn't impact the application
+GRAILS_OPTS="$GRAILS_OPTS -Duser.timezone=GMT"
+
+# Set the encryption salt prefix
+GRAILS_OPTS="$GRAILS_OPTS -Dcom.tdsops.tm.skp=B3c00l"
+
+
+# Configuration to allow to attach to JVM for debugger/profiler
+#GRAILS_OPTS="$GRAILS_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+
+export GRAILS_OPTS
+
+# -------------------
+# The following are commandline options to pass into Grails directly
+# -------------------
+
+# This has to be the first setting if it is to be used
+OPTS="-reloading"
+
+# Configuration to point to our own tdstm-config.groovy file
+OPT="$OPTS -Dtdstm.config.location=/etc/tdstm-config.groovy"
+# OPT="$OPTS -Dtdstm.config.location=/etc/tdstm-config-4.3.groovy"
+
+# Set Grails to disable recompile and reloading to improve performance (QA Only)
+#OPTS="$OPTS -Ddisable.auto.recompile=true -Dgrails.gsp.enable.reload=false -noreloading"
+
+# Set environment to production
+#OPT="$OPT -Dgrails.env=production"
+
+if [ "$1" == "" ]; then
+   CMD="run-app"
+else
+   if [ "$1" == "test-app" ]; then
+      CMD="$1 --echoOut --echoErr"
+      shift
+   fi
+   while [ "$1" != "" ]; do
+      CMD="$CMD $1"
+      shift
+   done
+fi
+
+grails $OPT $CMD
+
