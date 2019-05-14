@@ -25,11 +25,11 @@
 				<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Model Name','Manufacturer', '${columnLabelpref['1']}','${columnLabelpref['2']}', '${columnLabelpref['3']}','${columnLabelpref['4']}','Assets ','Version','Source TDS','Model Status'"
 					colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
-						{name:'manufacturer', width:'100'},
-						{name:'${modelPref['1']}',width:'100'},
-						{name:'${modelPref['2']}', width:'100'},
-						{name:'${modelPref['3']}',width:'100'},
-						{name:'${modelPref['4']}',width:'100'},
+						{name:'manufacturer', width:'100', formatter: tdsCommon.jqgridTextCellFormatter},
+						{name:'${modelPref['1']}',width:'100', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${modelPref['2']}', width:'100', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${modelPref['3']}',width:'100', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${modelPref['4']}',width:'100', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'assetsCount',width:'50'},
 						{name:'sourceTDSVersion',width:'50'},
 						{name:'sourceTDS',width:'60'},
@@ -54,7 +54,7 @@
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
-					var value = cellvalue ? cellvalue : ''
+					var value = cellvalue ? _.escape(cellvalue) : ''
 					return '<a href="javascript:showOrEditModelManuDetails(\'model\','+options.rowId+',\'Model\',\'show\',\'Show\')">'+value+'</a>'
 				}
 				function validateModelCount() {

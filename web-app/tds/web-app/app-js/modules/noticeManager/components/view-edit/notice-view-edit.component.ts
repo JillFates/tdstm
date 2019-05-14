@@ -12,14 +12,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
+// import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tds-notice-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
 })
-export class NoticeViewEditComponent implements OnInit {
+export class NoticeViewEditComponent {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 	@ViewChild('noticeForm') noticeForm: FormControl;
@@ -29,11 +30,13 @@ export class NoticeViewEditComponent implements OnInit {
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
+/*
 	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
 	protected EnumNoticeType = NoticeType;
 	protected noticeType: any;
 	noticeIsLocked: boolean;
-
+*/
+	typeDataSource = [...NoticeTypes];
 	constructor(
 		model: NoticeModel,
 		public action: Number,
@@ -43,8 +46,11 @@ export class NoticeViewEditComponent implements OnInit {
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
 		this.model = {...model};
+		this.model.typeId = this.model.typeId;
+		this.dataSignature = JSON.stringify(this.model);
 	}
 
+	/*
 	ngOnInit() {
 		this.noticeIsLocked = this.model.locked;
 
@@ -55,8 +61,8 @@ export class NoticeViewEditComponent implements OnInit {
 			this.model.typeId = NoticeType.Mandatory;
 		}
 		this.noticeType = {typeId: this.model.typeId};
-		this.dataSignature = JSON.stringify(this.model);
-	}
+		}
+	*/
 
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
@@ -76,16 +82,22 @@ export class NoticeViewEditComponent implements OnInit {
 	}
 
 	protected deleteNotice(): void {
-		this.noticeService.deleteNotice(this.model)
-			.subscribe(
-				res => this.activeDialog.close(),
-				error => this.activeDialog.dismiss(error));
+		this.promptService.open('Confirmation Required', 'You are about to delete the selected notice. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.noticeService.deleteNotice(this.model.id.toString())
+						.subscribe(
+							res => this.activeDialog.close(),
+							error => this.activeDialog.dismiss(error));
+				}
+			});
 	}
 
 	/**
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
+		/*
 		this.model.typeId = (this.noticeType && this.noticeType.typeId);
 
 		const model = {...this.model};
@@ -105,9 +117,8 @@ export class NoticeViewEditComponent implements OnInit {
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
-
 		}
-
+		*/
 	}
 
 	/**
@@ -124,6 +135,7 @@ export class NoticeViewEditComponent implements OnInit {
 	}
 
 	protected formValid(): boolean {
+/*
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =  this.model.title &&
 				(this.htmlText.value && this.htmlText.value.trim())  &&
@@ -132,6 +144,10 @@ export class NoticeViewEditComponent implements OnInit {
 		const returnValue =  (noticeType === NoticeType.Mandatory) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
 
 		return returnValue;
+*/
+		console.log('TypeId:', !!this.model.typeId);
+		console.log('Html', this.htmlText.valid());
+		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
 	}
 
 	protected isCreateEditAvailable(): boolean {
@@ -162,5 +178,18 @@ export class NoticeViewEditComponent implements OnInit {
 		}
 
 		return active;
+	}
+	/**
+	 * Grab the current html value emitted by rich text editor
+	 */
+	onValueChange(value: string) {
+		this.model.htmlText = value;
+	}
+
+	/**
+	 * Grab the current raw value emitted by rich text editor
+	 */
+	onRawValueChange(value: string) {
+		this.model.rawText = value;
 	}
 }

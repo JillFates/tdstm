@@ -4,6 +4,7 @@ import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.partygroup.ListCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.security.Permission
@@ -15,7 +16,7 @@ import net.transitionmanager.service.UserPreferenceService
  * This Controller handles CRUD operations for PartyGroups(Companies).
  */
 @Secured('isAuthenticated()')
-class PartyGroupController implements ControllerMethods {
+class PartyGroupController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction  = 'list'
@@ -36,9 +37,10 @@ class PartyGroupController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.CompanyView)
 	def listJson() {
-
 		ListCommand list = populateCommandObject(ListCommand)
-		int rowOffset = (list.page - 1) * list.rows
+		Integer maxRows = paginationMaxRowValue('rows', null, false)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Map filterParams = [
 			companyName: list.companyName,
@@ -49,8 +51,9 @@ class PartyGroupController implements ControllerMethods {
 
 		// Validate that the user is sorting by a valid column
 		String sortIndex = list.sidx in filterParams ? list.sidx : 'companyName'
+		String sortOrder = paginationSortOrder('sord')
 
-		renderAsJson(partyGroupService.list(filterParams, sortIndex, list.sord, list.rows, list.page, rowOffset))
+		renderAsJson(partyGroupService.list(filterParams, sortIndex, sortOrder, list.rows, list.page, rowOffset))
 	}
 
 	/**

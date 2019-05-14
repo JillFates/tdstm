@@ -1,12 +1,12 @@
 package net.transitionmanager.domain
 
-
+import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import org.codehaus.groovy.grails.web.json.JSONObject
 import net.transitionmanager.dataImport.SearchQueryHelper
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * ImportBatchRecord
@@ -206,11 +206,38 @@ class ImportBatchRecord {
 					domainClassName: importBatch.domainClassName.name(),
 					project: importBatch.project
 				]
+
+				// Deletes previous error messages from find command in an ETL execution time.
+				if (domainMap.fieldsInfo['id']?.errors?.contains(DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS)) {
+					domainMap.errorCount = (!domainMap.errorCount) ? 0 : (domainMap.errorCount - 1)
+					domainMap.fieldsInfo['id']?.errors.removeAll(DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS)
+				}
+
 				Object entity = SearchQueryHelper.findEntityByMetaData('id', domainMap.fieldsInfo, context)
 				if (entity && GormUtil.isDomainClass(entity.getClass())) {
+					/**
+					 * If applying again 'find' command found a single result,
+					 * then this ImportBatchRecord is for UPDATE an existing
+					 * domain instance (Application, Room, Person, AssetDependency, etc)
+					 */
 					domainMap.existingRecord = getMapOfFieldsFromEntity(domainMap.fieldsInfo, entity)
 					domainMap.operation = ImportOperationEnum.UPDATE.name()
+				} else if (context.searchQueryHelperErrors){
+					/**
+					 * If applying again 'find' command found errors
+					 * Then fieldsInfo['id']?.errors is updated to show these results
+					 * when UI renders this ImportBatchRecord  instance
+					 */
+					domainMap.fieldsInfo['id']?.errors?.addAll(context.searchQueryHelperErrors)
+					domainMap.errorCount = (domainMap.errorCount) ? 1 : (domainMap.errorCount + context.searchQueryHelperErrors.size())
+					domainMap.operation = ImportOperationEnum.TBD.name()
 				} else {
+					/**
+					 * If applying again 'find' did not found a single result
+					 * and did not found errors it means this ImportBatchRecord  instance
+					 * could be used to create a new domain instance
+					 * (Application, Room, Person, AssetDependency, etc)
+					 */
 					domainMap.operation = ImportOperationEnum.INSERT.name()
 				}
 			}

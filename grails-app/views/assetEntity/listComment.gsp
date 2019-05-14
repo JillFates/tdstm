@@ -5,7 +5,7 @@
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 	<meta name="layout" content="topNav" />
-		<title>Asset Comment</title>
+		<title>Comments</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 
@@ -83,7 +83,7 @@
 		</script>
 	</head>
 	<body>
-		<tds:subHeader title="Asset Comment" crumbs="['Assets','Comments']"/>
+		<tds:subHeader title="Comments" crumbs="['Assets','Comments']"/>
 		<div id="commentScopeId" class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 
 			<g:if test="${flash.message}">

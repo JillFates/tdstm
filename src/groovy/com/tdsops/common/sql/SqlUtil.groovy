@@ -39,6 +39,21 @@ class SqlUtil {
 	}
 
 	/**
+	 * Used to add the WHERE or AND to a criteria
+	 * @param criteria - the buffer that the appropriate clause is added to
+	 * @param needToAddWhere - flag to indicate that the WHERE is needed vs AND
+	 * @return false - all the time indicating needing to add the WHERE to the criteria
+	 */
+	static Boolean addWhereOrAndToQuery(StringBuilder criteria, Boolean needToAddWhere) {
+		if (needToAddWhere) {
+			criteria.append(' WHERE ')
+		} else {
+			criteria.append(' AND ')
+		}
+		return false
+	}
+
+	/**
 	 * Used to do a multiple word match against a particular field
 	 * @param property - the property to query on
 	 * @param words - a list of words to search on
@@ -73,6 +88,18 @@ class SqlUtil {
 	 */
 	static List<String> formatForLike(List words) {
 		words.collect { '%' + it + '%' }
+	}
+
+	/**
+	 * Used to wrap a word with the like/ilike percent markers (e.g. %word%)
+	 * @param word - a word to wrap
+	 * @return the formatted word
+	 */
+	static String formatForLike(String word) {
+		if (StringUtil.isBlank(word)) {
+			return null
+		}
+		return '%' + word + '%'
 	}
 
 	/**
@@ -754,7 +781,7 @@ class SqlUtil {
 		}
 
 		return """
-				CONCAT( 
+				CONCAT(
 					COALESCE(${propertyName}firstName, ''),
 					CASE WHEN COALESCE(${propertyName}middleName, '') = '' THEN '' ELSE ' ' END,
 					COALESCE(${propertyName}middleName,''),

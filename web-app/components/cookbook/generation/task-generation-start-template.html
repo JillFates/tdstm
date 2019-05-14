@@ -6,7 +6,7 @@
 			<div class="col-sm-6 col-md-3 col-lg-3">
 				<div class="form-group">
 					<label class="col-title" for="eventSelect">Event:</label>
-					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected(true)" ng-options="item as item.name for item in contexts.eventsArray">
+					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
 						<option value="">Please select</option>
 					</select>
 				</div>

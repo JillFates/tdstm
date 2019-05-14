@@ -18,7 +18,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 		when: 'calling a file with valid naming'
 			fileSystemService.validateFilename('abc123')
 		then: 'no exception should have been thrown'
-			true == true
+			noExceptionThrown()
 
 		when: 'calling with a file separator in the name'
 			String filename = 'abc' + File.separator + '123'

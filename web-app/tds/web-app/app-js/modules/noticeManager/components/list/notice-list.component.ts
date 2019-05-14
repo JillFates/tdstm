@@ -11,11 +11,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
+/*
 import {
 	NoticeColumnModel, NoticeModel, NoticeTypes,
 	PostNoticeResponse, StandardNotices, NoticeType
 } from '../../model/notice.model';
+*/
+import {NoticeColumnModel, NoticeModel, StandardNotices, NoticeTypes, NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
+import {YesNoList} from '../../../../shared/model/constants';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
@@ -47,7 +51,13 @@ export class NoticeListComponent implements OnInit {
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	protected noticeTypes = [{typeId: null, name: ''}].concat(NoticeTypes);
+	/* protected noticeTypes = [{typeId: null, name: ''}].concat(NoticeTypes); */
+	protected noticeTypes = NoticeTypes;
+	protected yesNoList = [...YesNoList];
+	protected defaultNoticeType = {typeId: '', name: 'Please Select'};
+	protected defaultYesNoList = {value: null, name: 'Please Select'};
+
+	protected PRE_LOGIN = NOTICE_TYPE_PRE_LOGIN;
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];
@@ -85,7 +95,8 @@ export class NoticeListComponent implements OnInit {
 					}
 					// notice.needAcknowledgement = true;
 					if (notice.needAcknowledgement) {
-						notice.typeId = NoticeType.Mandatory;
+						// @@
+						// notice.typeId = NoticeType.Mandatory;
 					}
 
 					return notice;
@@ -206,8 +217,9 @@ export class NoticeListComponent implements OnInit {
 
 	async showMandatoryMessages(): Promise<boolean> {
 		// this.availableFields = this.availableFields.sort( (a, b) => SortUtils.compareByProperty(a, b, 'text'));
+		/*
 		const noticesMandatory = this.postNotices
-			.filter((notice: NoticeModel) =>  notice.typeId === NoticeType.Mandatory)
+			.filter((notice: NoticeModel) =>  notice.typeId === NOTICE_TYPE_POST_LOGIN && true)
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 		let keepGoing = true;
 
@@ -220,12 +232,13 @@ export class NoticeListComponent implements OnInit {
 			}
 		}
 
-		return Promise.resolve(keepGoing);
+		*/
+		return Promise.resolve(true);
 	}
 
 	showDefaultMessages() {
 		const notices = this.postNotices
-			.filter((notice: NoticeModel) =>  notice.typeId === NoticeType.PostLogin)
+			.filter((notice: NoticeModel) =>  notice.typeId === NOTICE_TYPE_POST_LOGIN)
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
 		if (notices && notices.length) {
@@ -275,5 +288,4 @@ export class NoticeListComponent implements OnInit {
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeCreate);
 	}
-
 }

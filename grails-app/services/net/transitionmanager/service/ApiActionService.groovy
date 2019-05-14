@@ -716,7 +716,7 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		// Blank out the apiCatalog if not selected for scripts
-		if (cmdObj.actionType != ActionType.WEB_API.name()) {
+		if (cmdObj.actionType != ActionType.WEB_API) {
 			cmdObj.apiCatalog?.discard()
 			cmdObj.apiCatalog = null
 		}

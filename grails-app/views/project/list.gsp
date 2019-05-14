@@ -24,10 +24,10 @@
 				<jqgrid:grid id="projectGridId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Project Code','Name', 'Start Date','Completion Date', 'Comment'"
 					colModel="{name:'projectCode', index: 'projectCode', width:'150',formatter: myLinkFormatter},
-								  {name:'name', width:'150'},
+								  {name:'name', width:'150', formatter: tdsCommon.jqgridTextCellFormatter},
 								  {name:'startDate',width:'150'},
 								  {name:'completionDate', width:'150'},
-								  {name:'comment',width:'100'}"
+								  {name:'comment',width:'100', formatter: tdsCommon.jqgridTextCellFormatter}"
 					sortname="'projectCode'"
 					caption="listCaption"
 					height="'100%'"
@@ -42,8 +42,8 @@
 
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
-					var value = cellvalue ? cellvalue : ''
-					return '<a href="'+contextPath+'/project/addUserPreference/'+options.rowId+'">'+value+'</a>'
+					var value = cellvalue ? _.escape(cellvalue) : ''
+					return "<a href="+contextPath+"/project/addUserPreference/"+options.rowId+">"+value+"</a>"
 				}
 			});
 		</script>

@@ -24,8 +24,8 @@ class Permissions {
 	static hasMany = [rolePermissions: RolePermissions]
 
 	static constraints = {
-		description nullable: true
-		permissionItem blank: false, unique: true
+		description nullable: true, size:0..255
+		permissionItem blank: false, unique: true, size:1..255
 		rolePermissions cascade: 'all-delete-orphan'
 	}
 

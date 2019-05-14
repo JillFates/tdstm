@@ -1,8 +1,6 @@
-import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
+import {Component, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
-import { Observable } from 'rxjs';
 import {State} from '@progress/kendo-data-query';
-
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import {ViewGroupModel, ViewModel} from '../../model/view.model';
@@ -11,14 +9,12 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
-import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { AssetQueryParams } from '../../model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { AssetExportModel } from '../../model/asset-export-model';
-import {TagModel} from '../../../assetTags/model/tag.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
@@ -179,7 +175,12 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
-			assetQueryParams: this.getQueryParamsForExport(),
+			assetQueryParams: AssetExplorerViewShowComponent.getQueryParamsForExport(
+				this.data,
+				this.gridState,
+				this.model,
+				this.justPlanning
+			),
 			domains: this.domains,
 			queryId: this.model.id,
 			viewName: this.model.name
@@ -223,21 +224,21 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	 * the configured pagination results.
 	 * @returns {AssetQueryParams}
 	 */
-	private getQueryParamsForExport(): AssetQueryParams {
+	public static getQueryParamsForExport(data: any, gridState: State, model: ViewModel, justPlanning: boolean): AssetQueryParams {
 		let assetQueryParams: AssetQueryParams = {
-			offset: this.data ? 0 : this.gridState.skip,
-			limit: this.data ? this.data.pagination.total : this.gridState.take,
+			offset: data ? 0 : gridState.skip,
+			limit: data ? data.pagination.total : gridState.take,
 			forExport: true,
-			sortDomain: this.model.schema.sort.domain,
-			sortProperty: this.model.schema.sort.property,
-			sortOrder: this.model.schema.sort.order,
+			sortDomain: model.schema.sort.domain,
+			sortProperty: model.schema.sort.property,
+			sortOrder: model.schema.sort.order,
 			filters: {
-				domains: this.model.schema.domains,
-				columns: this.model.schema.columns
+				domains: model.schema.domains,
+				columns: model.schema.columns
 			}
 		};
-		if (this.justPlanning) {
-			assetQueryParams['justPlanning'] = this.justPlanning;
+		if (justPlanning) {
+			assetQueryParams['justPlanning'] = justPlanning;
 		}
 
 		return assetQueryParams;

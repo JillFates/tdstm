@@ -8,6 +8,8 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.ImportBatchRecordFieldUpdateCommand
+
 import java.text.DateFormat
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
@@ -412,20 +414,50 @@ class ImportBatchService implements ServiceMethods {
 		Map labelsToFieldName = [:]
 		fieldNameToLabels.each { field, label -> labelsToFieldName.put(label, field) }
 
-		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
-		for (field in command.fieldsInfo) {
-			// Check that the fieldName provided is in the list of fields defined for the batch
+		Closure calculateFieldName = { ImportBatchRecordFieldUpdateCommand field ->
 			String fieldName = ( field.fieldName in validFields ? field.fieldName : null)
 			if (!fieldName) {
 				fieldName = ( field.fieldName in labelsToFieldName ? labelsToFieldName[field.fieldName] : null)
 			}
-
-			if (fieldName != null) {
-			// if (field.fieldName in validFields) {
-				// The field for the id has a different structure
-				fieldsMap[fieldName]["value"] = field.value
-			} else {
+			if (!fieldName){
 				throw new InvalidParamException("Encountered unspecified field name (${field.fieldName}) for batch")
+			}
+			return fieldName
+		}
+		Map<String, ImportBatchRecordFieldUpdateCommand> importBatchRecordMap = command.fieldsInfo.collectEntries { [( calculateFieldName(it)): it] }
+
+		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
+		for (field in command.fieldsInfo) {
+			// Check that the fieldName provided is in the list of fields defined for the batch
+			String fieldName = calculateFieldName(field)
+			Map fieldMap = fieldsMap[fieldName]
+			fieldMap["value"] = field.value
+
+			// Updates find command values
+			for (query in fieldMap.find?.query) {
+
+				for (criteria in query.criteria){
+					ImportBatchRecordFieldUpdateCommand importBatchRecordFieldUpdateCommand = importBatchRecordMap[criteria.propertyName]
+					if (importBatchRecordFieldUpdateCommand){
+						criteria.value = importBatchRecordFieldUpdateCommand.value
+					}
+				}
+			}
+
+			//create whenNotFound values
+			for (createMap in fieldMap.create){
+				ImportBatchRecordFieldUpdateCommand importBatchRecordFieldUpdateCommand = importBatchRecordMap[createMap.key]
+				if (importBatchRecordFieldUpdateCommand) {
+					createMap.value = importBatchRecordFieldUpdateCommand.value
+				}
+			}
+
+			//updates whenFound values
+			for (updateMap in fieldMap.update){
+				ImportBatchRecordFieldUpdateCommand importBatchRecordFieldUpdateCommand = importBatchRecordMap[updateMap.key]
+				if (importBatchRecordFieldUpdateCommand) {
+					updateMap.value = importBatchRecordFieldUpdateCommand.value
+				}
 			}
 		}
 

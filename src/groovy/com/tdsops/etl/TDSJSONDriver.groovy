@@ -204,7 +204,7 @@ class TDSJSONDriver extends JSONDriver {
 			dataset.field.each { Field d ->
 				if (listFields.isEmpty() || listFields.find { it == d.name }) {
 					String path = GenerationUtils.Field2Alias(d, false)
-					row[d.name.toLowerCase()] = JsonUtil.gpathAt(struct, path)
+					row[d.name] = JsonUtil.gpathAt(struct, path)
 				}
 			}
 			code(row)

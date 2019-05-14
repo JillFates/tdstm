@@ -33,6 +33,7 @@
                         <ng-template kendoGridFilterCellTemplate let-filter>
                             <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
 
+<!--
                                 <div *ngIf="column.type === 'boolean'">
                                     <kendo-dropdownlist
 		                                    (valueChange)="onFilter(column)"
@@ -51,6 +52,9 @@
                                            [(ngModel)]="column.filter"
                                            placeholder="Filter {{column.label}}"
                                            value="">
+-->
+                                <div *ngIf="column.type === 'text' && column.property !== 'typeId' && column.property !== 'active'">
+                                    <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
                                     <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
@@ -61,9 +65,11 @@
                                         [valueField]="'typeId'"
                                         [valuePrimitive]="true"
                                         [(ngModel)]="column.filter"
+                                        [defaultItem]="defaultNoticeType"
                                         (valueChange)="onFilter(column)"
                                         class="form-control">
                                     </kendo-dropdownlist>
+<!--
                                     <span *ngIf="column.filter"
                                           (click)="resetTypeFilter(column);"
                                           style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;"
@@ -75,7 +81,26 @@
                                 <div *ngIf="column.type === 'date'">
                                     <kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
                                     <span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+-->
+                                    <span *ngIf="column.filter" (click)="resetTypeFilter(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
+
+
+                                <div *ngIf="column.property === 'active'">
+                                    <kendo-dropdownlist
+                                        [data]="yesNoList"
+                                        [textField]="'name'"
+                                        [valueField]="'value'"
+                                        [valuePrimitive]="true"
+                                        [(ngModel)]="column.filter"
+                                        [defaultItem]="defaultYesNoList"
+                                        (valueChange)="onFilter(column)"
+                                        class="form-control">
+                                    </kendo-dropdownlist>
+                                    {{column.filter | json}}
+                                    <span *ngIf="column.filter == true || column.filter == false" (click)="resetTypeFilter(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                </div>
+
                             </div>
                         </ng-template>
 
@@ -87,7 +112,12 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'typeId'" let-dataItem>
-                            {{notices[dataItem.typeId]}}
+      <!--                      {{notices[dataItem.typeId]}}  -->
+                            {{((dataItem.typeId === PRE_LOGIN)? noticeTypes[0].name : noticeTypes[1].name)}}
+                        </ng-template>
+
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'active'" let-dataItem>
+                            {{((dataItem.active)? 'Yes': 'No')}}
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.type === 'date'">

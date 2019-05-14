@@ -55,12 +55,13 @@ export class NoticeColumnModel {
 	}
 }
 
+/*
 export enum NoticeType {
 	PreLogin = 1,
 	PostLogin,
 	Mandatory
 }
-
+*/
 export class NoticeModel {
 	acknowledgeable: boolean;
 	active: boolean;
@@ -101,8 +102,16 @@ export class StandardNotices {
 	notices: NoticeModel[];
 }
 
+export const NOTICE_TYPE_PRE_LOGIN = 'PRE_LOGIN';
+export const NOTICE_TYPE_POST_LOGIN = 'POST_LOGIN';
+
 export const NoticeTypes = [
+/*
 	{typeId: NoticeType.PreLogin, name: 'Pre Login'},
 	{typeId: NoticeType.PostLogin, name: 'Post Login'},
 	{typeId: NoticeType.Mandatory, name: 'Mandatory Acknowledgement'}
+];
+*/
+	{typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin'},
+	{typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin'}
 ];

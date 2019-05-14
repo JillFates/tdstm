@@ -22,7 +22,6 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -69,6 +68,11 @@ class MoveEventService implements ServiceMethods {
 														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
 														'actStart', 'actFinish', 'workflow']
+
+	/**
+	 * Number of days to use as a cutoff for events in the user dashboard.
+	 */
+	private static final Integer COMPLETION_DATE_CUTOFF = 14
 
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
@@ -503,9 +507,24 @@ class MoveEventService implements ServiceMethods {
 				project.id in securityService.getUserProjectIds(null, person.userLogin)
 			}
 			if (completionCutoff) {
-				estCompletionTime > completionCutoff || estCompletionTime == null
+				estCompletionTime < completionCutoff || estCompletionTime == null
 			}
 		}.list()
 
+	}
+
+	/**
+	 * Query and return the events the given person has access to.
+	 * @param person - the person for whom the assigned events are retrieved.
+	 * @param projectId - if a project is specified, use that id to narrow down results.
+	 * @return a list of events the person has access to.
+	 */
+	List<MoveEvent> getAssignedEventsForDashboard(Person person, Long projectId) {
+		Project project
+		if (projectId > 0) {
+			project = Project.read(projectId)
+		}
+		Date completionCutoff = TimeUtil.nowGMT().minus(COMPLETION_DATE_CUTOFF)
+		return getAssignedEvents(person, project, completionCutoff)
 	}
 }

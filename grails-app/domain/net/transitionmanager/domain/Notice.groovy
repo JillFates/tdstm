@@ -67,6 +67,7 @@ class Notice {
 		acknowledgeLabel blank: true, nullable: false, size: 1..255
 		sequence nullable: false
 		locked nullable: false
+		lastModified nullable: true
 	}
 
 	static mapping = {
@@ -98,7 +99,9 @@ class Notice {
 		project:         Project,
 		rawText:         Object,
 		title:           Object,
-		typeId:          NoticeType
+		typeId:          NoticeType,
+		activationDate:  Date,
+		expirationDate:  Date
 	]
 
 	static void registerObjectMarshaller() {
@@ -111,7 +114,7 @@ class Notice {
 				if (value != null) {
 					switch (type) {
 						case NoticeType:
-							value = value.id
+							value = value.toString()
 							break
 
 						case Person:

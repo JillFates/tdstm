@@ -58,6 +58,8 @@ class CustomDomainServiceSpec extends Specification {
 			setting.save(failOnError: true)
 		}
 
+		service.fieldSpecsCacheService = Mock(FieldSpecsCacheService)
+
 		fieldSpecProject = service.createFieldSpecProject(defaultProject)
 	}
 

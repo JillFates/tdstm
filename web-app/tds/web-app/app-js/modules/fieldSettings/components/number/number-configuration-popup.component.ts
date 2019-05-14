@@ -16,6 +16,7 @@ export class NumberConfigurationPopupComponent {
 	protected model: NumberConfigurationConstraintsModel;
 	protected localMinRange: number;
 	protected exampleValue: number;
+	private hasChanged: boolean;
 
 	constructor(
 		public field: FieldSettingsModel,
@@ -46,6 +47,7 @@ export class NumberConfigurationPopupComponent {
 	 * When any configuration changes, recalculate the number format.
 	 */
 	protected onFormatChange(): void {
+		this.hasChanged = true;
 		if (this.localMinRange !== null || this.model.maxRange !== null) {
 			this.model.allowNegative = false;
 		}
@@ -76,7 +78,7 @@ export class NumberConfigurationPopupComponent {
 	protected onSave(): void {
 		delete this.model.isDefaultConfig;
 		this.field.constraints = { ...this.model } as any;
-		this.activeDialog.dismiss();
+		this.activeDialog.close(this.hasChanged);
 	}
 
 	/**

@@ -504,7 +504,10 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
-					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+
+					setTimeout(() => {
+						child.setDisabled(this.modalType === ActionType.VIEW);
+					}, 100);
 				});
 			});
 		}

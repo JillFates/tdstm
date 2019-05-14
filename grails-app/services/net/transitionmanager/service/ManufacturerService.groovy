@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.CollectionUtils
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Manufacturer
@@ -194,8 +193,11 @@ class ManufacturerService implements ServiceMethods {
 				}
 				.projections { property 'id' }
 						.list()
-		// update Model references in all assets to null
-		AssetEntity.executeUpdate("update AssetEntity ae set ae.model=null where ae.model.id in (:moId)", [moId: modelIds])
+
+		if(modelIds) {
+			// update Model references in all assets to null
+			AssetEntity.executeUpdate("update AssetEntity ae set ae.model=null where ae.model.id in(:moId)", [moId: modelIds])
+		}
 		// finally, delete the Manufacturer
 		manufacturer.delete(flush:true) // Note that here associated models will also be deleted by cascade
 	}

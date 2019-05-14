@@ -598,7 +598,7 @@ class UrlMappings {
 		"/ws/notices/$id/ack" {
 			controller = "wsNotice"
 			action = [
-					POST: "ack"
+					POST: "acknowledge"
 			]
 		}
 
