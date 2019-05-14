@@ -23,27 +23,17 @@ class NoticeService implements ServiceMethods {
 	PersonService personService
 
 	/**
-	 * Set Acknowledment of a Note for a User
-	 * TODO: (oluna) What Happen if the user doesn't have a Person associated should we change this to UserLogin Type?
+	 * Used to record when a user has acknowledged a notice
+	 * @param id - the ID of the notice to be acknowledged
+	 * @param person - the person whom is acknowledging the notice
+	 * @return void
 	 */
 	@Transactional
-	boolean ack(Long id, String username) {
-		log.info('User: {}, is acknowledging notice: {}', username, id)
-
-		Notice notice = get(id)
-		if (!notice) {
-			return false
-		}
-
-		Person person = personService.findByUsername(username)
-		if (!person) {
-			return false
-		}
-
-		NoticeAcknowledgement notack = new NoticeAcknowledgement(notice: notice, person: person)
-		notack.save(failOnError: true)
-
-		return !notack.hasErrors()
+	void acknowledge(Long id, Person person) {
+		log.info 'User: {}, is acknowledging notice: {}', username, id 
+		Notice notice = doGet(Notice, id, true)
+		NoticeAcknowledgement acknowledgement = new NoticeAcknowledgement(notice: notice, person: person)
+		acknowledgement.save(failOnError: true)
 	}
 
 	/**
@@ -62,7 +52,11 @@ class NoticeService implements ServiceMethods {
 	 * @return - a list of notices filtered by type or all if filter is null
 	 */
 	List<Notice> fetch(Notice.NoticeType type = null) {
-		type ? Notice.findAllByTypeId(type) : Notice.list()
+		Notice.where {
+			if (type) {
+				type == type
+			}
+		}.list()
 	}
 
 	/**

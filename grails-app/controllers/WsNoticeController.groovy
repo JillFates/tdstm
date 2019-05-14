@@ -101,20 +101,12 @@ class WsNoticeController implements ControllerMethods {
 
 	/**
 	 * Mark a Note Acknowledged by a User
-	 * TODO: (oluna) Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
+	 * @param id - the id of the notice that the current user is acknowledging
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
-	def acknowledge(Long id, String username) {
-		try {
-			boolean result = noticeService.ack(id, username)
-			if (!result) {
-				response.status = 404
-			}
-			render("")
-		}
-		catch (e) {
-			renderError500 e
-		}
+	def acknowledge(Long id) {
+		boolean result = noticeService.acknowledge(id, currentPerson() )
+		renderSuccessJson()
 	}
 
 	/**
