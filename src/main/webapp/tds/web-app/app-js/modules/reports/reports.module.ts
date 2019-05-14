@@ -18,6 +18,9 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
+import {DatabaseConflictsComponent} from './components/database-conflicts/database-conflicts.component';
+import {DatabaseFiltersComponent} from './components/database-conflicts/components/database-filters.component';
+
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import { TagsResolveService } from '../assetManager/resolve/tags-resolve.service';
@@ -53,6 +56,8 @@ import {ActivityMetricsReportComponent} from './components/activity-metrics/acti
 	],
 	declarations: [
 		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
+		DatabaseFiltersComponent,
 		PreEventCheckListSelectorComponent,
 		TaskReportComponent,
 		ServerConflictsReportComponent,
@@ -72,6 +77,7 @@ import {ActivityMetricsReportComponent} from './components/activity-metrics/acti
 	],
 	exports: [
 		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
 		PreEventCheckListSelectorComponent
 	],
 	entryComponents: []

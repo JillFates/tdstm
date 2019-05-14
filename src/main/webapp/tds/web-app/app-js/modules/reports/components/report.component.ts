@@ -55,5 +55,4 @@ export abstract class ReportComponent {
 	}
 
 	abstract onGenerateReport();
-
 }

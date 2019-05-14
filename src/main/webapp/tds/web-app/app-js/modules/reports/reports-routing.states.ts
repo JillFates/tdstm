@@ -14,6 +14,7 @@ import {TaskReportComponent} from './components/task-report/task-report.componen
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
 import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
+import { DatabaseConflictsComponent } from './components/database-conflicts/database-conflicts.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -37,6 +38,9 @@ export class ReportStates {
 	};
 	public static readonly APPLICATION_EVENT_RESULTS = {
 		url: 'applicationEventResults'
+	};
+	public static readonly DATABASE_CONFLICTS_REPORT = {
+		url: 'databaseConflicts'
 	};
 	public static readonly APPLICATION_PROFILES = {
 		url: 'applicationProfiles'
@@ -137,6 +141,25 @@ export const ReportsRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: ApplicationEventResultsReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.DATABASE_CONFLICTS_REPORT.url,
+		data: {
+			page: {
+				title: 'REPORTS.DATABASE_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.DATABASE_CONFLICTS'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-database-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: DatabaseConflictsComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

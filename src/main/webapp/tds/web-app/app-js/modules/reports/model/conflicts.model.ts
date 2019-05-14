@@ -16,8 +16,8 @@ interface Dependency {
 	status: string;
 }
 
-export interface ApplicationConflict {
-	application: {
+export interface EntityConflict {
+	entity: {
 		id: number;
 		name: string;
 	};

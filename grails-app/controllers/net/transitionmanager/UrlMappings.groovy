@@ -1261,6 +1261,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/databaseConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getDatabaseConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [

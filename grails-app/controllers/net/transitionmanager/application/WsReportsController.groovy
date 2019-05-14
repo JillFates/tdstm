@@ -7,6 +7,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
@@ -258,6 +259,22 @@ class WsReportsController implements ControllerMethods {
 
         renderSuccessJson(applicationConflictsMap)
 
+    }
+
+    /**
+     * Fetch and return the information for the Database Conflicts Report.
+     * @return a map with the information for populating the report.
+     */
+    def getDatabaseConflicts() {
+        Project project = getProjectForWs()
+        DatabaseConflictsCommand command = populateCommandObject(DatabaseConflictsCommand)
+        if (command.moveBundle.isNumber()) {
+            MoveBundle moveBundle = fetchDomain(MoveBundle, [id: command.moveBundle], project)
+            if (moveBundle) {
+                userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+            }
+        }
+        renderSuccessJson(reportsService.generateDatabaseConflictsMap(project, command))
     }
 
     /**

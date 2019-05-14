@@ -380,13 +380,13 @@
                                 <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-application-conflicts">
-                                <a href="/tdstm/module/reports/applicationConflicts">Application Conflicts</a>
+                                <g:link controller="module" action="reports" id="applicationConflicts" elementId="applicationConflicts">Application Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
                                 <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
-                                <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
+                                <g:link controller="module" action="reports" id="databaseConflicts" elementId="databaseConflicts">Database Conflicts</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">

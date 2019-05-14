@@ -1,0 +1,73 @@
+<div class="form-group row">
+	<div class="col-sm-2 control-label"><label>Bundle</label></div>
+	<div class="col-sm-3">
+		<kendo-dropdownlist name="bundleList" class="form-control" [data]="moveBundleList"
+			[textField]="'name'" [valueField]="'id'" [(ngModel)]="filters.bundle">
+		</kendo-dropdownlist>
+	</div>
+</div>
+
+<div class="form-group row checkboxes">
+	<div class="col-sm-6 col-sm-offset-2">
+		<label for="bundleConflicts">
+			<input [checked]="filters.bundleConflicts" (change)="filters.bundleConflicts = !filters.bundleConflicts"
+				id="bundleConflicts" name="bundleConflicts" type="checkbox">
+			Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
+		</label>
+	</div>
+</div>
+
+<div class="form-group row checkboxes">
+	<div class="col-sm-6 col-sm-offset-2">
+		<label for="unresolvedDependencies">
+			<input [checked]="filters.unresolvedDependencies"
+			(change)="filters.unresolvedDependencies = !filters.unresolvedDependencies" id="unresolvedDependencies"
+			name="unresolvedDependencies" type="checkbox">
+			Unresolved Dependencies - Having dependencies with status Unknown or Questioned
+		</label>
+	</div>
+</div>
+
+<div class="form-group row checkboxes">
+	<div class="col-sm-5 col-sm-offset-2">
+		<label for="missingApplications">
+			<input [checked]="filters.missingApplications"
+				(change)="filters.missingApplications = !filters.missingApplications" id="missingApplications"
+				name="missingApplications" type="checkbox">
+			Missing Applications - Having no Supports dependency to application(s)
+		</label>
+	</div>
+</div>
+
+<div class="form-group row">
+	<div class="col-sm-5 col-sm-offset-2">
+		<label for="unsupported">		
+			<input [checked]="filters.unsupportedDependencies"
+				(change)="filters.unsupported = !filters.unsupported" id="unsupported"
+				name="unsupported" type="checkbox">
+			Unsupported - Having no Requires dependency indication where database resides
+		</label>
+	</div>
+</div>
+
+<div class="form-group row">
+	<div class="col-sm-2 control-label">
+		<label>Maximum databases to report</label>
+	</div>
+	<div class="col-sm-3">
+		<kendo-dropdownlist name="maxAssets" class="form-control" [data]="maxDatabasesList"
+			[textField]="'value'" [valueField]="'value'" [(ngModel)]="filters.maxAssets">
+		</kendo-dropdownlist>
+	</div>
+</div>
+<div class="form-group row">
+	<div class="col-sm-2 col-sm-offset-2 buttons">
+		<tds-button-custom class="btn-primary" title="Generate" 
+			(click)="onGenerateReport()" icon="table">
+		</tds-button-custom>
+	</div>
+
+</div>	
+<div>
+	<hr>
+</div>
