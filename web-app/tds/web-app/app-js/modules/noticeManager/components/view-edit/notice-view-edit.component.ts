@@ -13,7 +13,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 // import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
-import {NoticeModel, NoticeTypes} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes, NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -30,10 +30,11 @@ export class NoticeViewEditComponent {
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
+	MANDATORY = NOTICE_TYPE_MANDATORY;
+	noticeType: any;
 /*
 	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
 	protected EnumNoticeType = NoticeType;
-	protected noticeType: any;
 	noticeIsLocked: boolean;
 */
 	typeDataSource = [...NoticeTypes];
@@ -97,15 +98,17 @@ export class NoticeViewEditComponent {
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
-		/*
+		console.log('Saving notice');
+
 		this.model.typeId = (this.noticeType && this.noticeType.typeId);
 
 		const model = {...this.model};
 
-		if (model.typeId === NoticeType.Mandatory) {
-			model.typeId = NoticeType.PostLogin;
+		if (model.typeId === this.MANDATORY) {
+			model.typeId = NOTICE_TYPE_POST_LOGIN;
 			model.needAcknowledgement = true;
 		}
+		model.locked = model.locked || false;
 
 		if (model.id) {
 			this.noticeService.editNotice(model)
@@ -118,7 +121,6 @@ export class NoticeViewEditComponent {
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
 		}
-		*/
 	}
 
 	/**
@@ -135,19 +137,19 @@ export class NoticeViewEditComponent {
 	}
 
 	protected formValid(): boolean {
-/*
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =  this.model.title &&
 				(this.htmlText.value && this.htmlText.value.trim())  &&
 				this.htmlText.valid() && (noticeType || noticeType === 0);
 
-		const returnValue =  (noticeType === NoticeType.Mandatory) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
+		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
 
 		return returnValue;
-*/
+		/*
 		console.log('TypeId:', !!this.model.typeId);
 		console.log('Html', this.htmlText.valid());
 		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
+		*/
 	}
 
 	protected isCreateEditAvailable(): boolean {
