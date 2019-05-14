@@ -1008,7 +1008,8 @@ class ProjectService implements ServiceMethods {
 			fillUsersMetrics(metrics, projects, sqlSearchDate)
 
 			// Deletes any existing record
-			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
+			ProjectDailyMetric.where{metricDate == searchDate}.deleteAll()
+			//jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
 
 			metrics.each { metric ->
 				metric.save(flush:true)
@@ -1024,7 +1025,7 @@ class ProjectService implements ServiceMethods {
 	 * Search for the last date that the process had been executed.
 	 * If no date is found then it returns current date.
 	 */
-	private Date findProjectDailyMetricsLastRunDay() {
+	Date findProjectDailyMetricsLastRunDay() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList('SELECT max(metric_date) as last_date FROM project_daily_metric')
 		if (rows[0]['last_date'] == null) {
 			new Date()

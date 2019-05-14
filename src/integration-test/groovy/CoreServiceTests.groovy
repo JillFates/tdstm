@@ -6,8 +6,6 @@ import org.grails.config.NavigableMap
 import org.grails.core.exceptions.GrailsConfigurationException
 import spock.lang.Ignore
 import spock.lang.Specification
-
-@Ignore
 @Integration
 @Rollback
 class CoreServiceTests extends Specification {
@@ -19,6 +17,7 @@ class CoreServiceTests extends Specification {
 			coreService.getAppName() == Metadata.current.getApplicationName()
 	}
 
+	@Ignore
 	void "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
 		coreService.getAppConfig('tdstm') != null
@@ -45,6 +44,7 @@ class CoreServiceTests extends Specification {
 		setting instanceof String
 	}
 
+	@Ignore
 	void "getAppConfigSetting"() {
 		when:
 		def setting = coreService.getAppConfigSetting('testing.foo.intVal', 'tdstm')
