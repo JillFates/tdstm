@@ -17,7 +17,8 @@ import {
 	PostNoticeResponse, StandardNotices, NoticeType
 } from '../../model/notice.model';
 */
-import {NoticeColumnModel, NoticeModel, StandardNotices, NoticeTypes, NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse} from '../../model/notice.model';
+import {NoticeColumnModel, NoticeModel, StandardNotices, NoticeTypes,
+		NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse, NOTICE_TYPE_MANDATORY} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {YesNoList} from '../../../../shared/model/constants';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
@@ -52,7 +53,7 @@ export class NoticeListComponent implements OnInit {
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	/* protected noticeTypes = [{typeId: null, name: ''}].concat(NoticeTypes); */
-	protected noticeTypes = NoticeTypes;
+	protected noticeTypes = [];
 	protected yesNoList = [...YesNoList];
 	protected defaultNoticeType = {typeId: '', name: 'Please Select'};
 	protected defaultYesNoList = {value: null, name: 'Please Select'};
@@ -78,6 +79,8 @@ export class NoticeListComponent implements OnInit {
 		private route: ActivatedRoute) {
 		this.resultSet = this.route.snapshot.data['notices'];
 		this.gridData = process(this.resultSet, this.state);
+		this.noticeTypes = NoticeTypes.filter((noticeType) => noticeType.typeId !== NOTICE_TYPE_MANDATORY);
+
 	}
 
 	ngOnInit() {
@@ -170,7 +173,8 @@ export class NoticeListComponent implements OnInit {
 	 * Reload the list with the latest created/edited license
 	 */
 	protected reloadData(): void {
-		this.noticeService.getNoticesList().subscribe(
+		this.noticeService.getNoticesList()
+			.subscribe(
 			(result: any) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);

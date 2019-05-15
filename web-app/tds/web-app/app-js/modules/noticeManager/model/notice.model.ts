@@ -18,13 +18,20 @@ export class NoticeColumnModel {
 				label: 'Type',
 				property: 'typeId',
 				type: 'text',
-				width: 220,
+				width: 260,
 			}, {
 				label: 'Active',
 				property: 'active',
 				type: 'boolean',
 				width: 160,
 			},
+			{
+				label: 'Need acknowledgement',
+				property: 'needAcknowledgement',
+				type: 'boolean',
+				width: 160,
+			}
+			/*,
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
@@ -51,6 +58,7 @@ export class NoticeColumnModel {
 				type: 'boolean',
 				width: 160
 			}
+			*/
 		];
 	}
 }
