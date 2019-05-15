@@ -154,7 +154,7 @@ a:hover {
 									<g:link controller="reports" action="generateDailyMetrics" style="color:black">Generate Daily Metrics</g:link>
 								</tds:hasPermission>
 							</td>
-							<td>Generates the  daily metrics, on demand.</td>
+							<td>Generates the  daily metrics, on demand</td>
 						</tr>
 						<tr class="odd">
 							<td>
