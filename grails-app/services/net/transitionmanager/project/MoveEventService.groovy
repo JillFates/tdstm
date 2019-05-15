@@ -535,4 +535,18 @@ class MoveEventService implements ServiceMethods {
 		Date completionCutoff = TimeUtil.nowGMT().minus(COMPLETION_DATE_CUTOFF)
 		return getAssignedEvents(person, project, completionCutoff)
 	}
+
+	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
+		List<MoveBundleStep> moveBundleSteps = []
+
+		moveBundleList.each { MoveBundle moveBundle ->
+			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle} ORDER BY mbs.transitionId")
+
+			if (step) {
+				moveBundleSteps.addAll(step)
+			}
+		}
+
+		return moveBundleSteps
+	}
 }
