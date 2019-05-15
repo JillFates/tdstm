@@ -76,7 +76,7 @@ if [ $? -ne 0 ]; then
    exit 1
 fi
 
-sdk use grails $GRAILS_VERSION
+# sdk use grails $GRAILS_VERSION
 if [ $? -ne 0 ]; then
    echo "Failed to select Grails $GRAILS_VERSION, please use the 'sdk install grails $GRAILS_VERSION' command before continuing"
    exit 1
@@ -116,7 +116,7 @@ export GRAILS_OPTS
 OPTS="-reloading"
 
 # Configuration to point to our own tdstm-config.groovy file
-OPT="$OPTS -Dtdstm.config.location=/etc/tdstm-config.groovy"
+OPT="$OPTS -Dtdstm.config.location=/etc/tdstm-config-4.1.groovy"
 # OPT="$OPTS -Dtdstm.config.location=/etc/tdstm-config-4.3.groovy"
 
 # Set Grails to disable recompile and reloading to improve performance (QA Only)
