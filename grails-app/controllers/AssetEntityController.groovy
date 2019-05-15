@@ -2888,8 +2888,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			        it.dependentName,
 			        it.dependentType,
 			        it.dependentBundle,
-			        (depPref['1']!='comment') ? escapedPref1Value : (it[depPref['1']]? "<div class='commentEllip'>$escapedPref1Value</div>" : ''),
-			        (depPref['2']!='comment') ? escapedPref2Value : (it[depPref['2']]? "<div class='commentEllip'>$escapedPref2Value</div>" : ''),
+			        (depPref['1']!='comment') ? escapedPref1Value : (it.pref1Value ? "<div class='commentEllip'>$escapedPref1Value</div>" : ''),
+			        (depPref['2']!='comment') ? escapedPref2Value : (it.pref2Value ? "<div class='commentEllip'>$escapedPref2Value</div>" : ''),
 			        it.status,
 			        it.assetId, // 10
 			        it.dependentId, // 11
