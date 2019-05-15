@@ -55,6 +55,8 @@ class Notice {
 	Date dateCreated
 	Date lastModified
 
+	Collection noticeAcknowledgements
+
 	static hasMany = [noticeAcknowledgements: NoticeAcknowledgement]
 
 	static constraints = {
