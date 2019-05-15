@@ -11,17 +11,12 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
-// import org.springframework.context.MessageSource
-
 
 /**
  * @author octavio
  */
 @Slf4j
 class NoticeService implements ServiceMethods {
-
-	// MessageSource messageSource
-	PersonService personService
 
 	/**
 	 * Used to record when a user has acknowledged a notice
@@ -36,7 +31,6 @@ class NoticeService implements ServiceMethods {
 		if (!notice) {
 			throw new EmptyResultException()
 		}
-		//  Notice notice = doGet(Notice.class, id, true)
 		NoticeAcknowledgement acknowledgement = new NoticeAcknowledgement(notice: notice, person: person)
 		acknowledgement.save(failOnError: true)
 	}
@@ -110,30 +104,6 @@ class NoticeService implements ServiceMethods {
 	 * @return
 	 */
 	Boolean hasUnacknowledgedNotices(Person person, Project project) {
-		// Date now = TimeUtil.nowGMT()
-		// log.info('Check if person: [{}] has unacknowledged notices.', person.id)
-
-		// def result = Notice.withCriteria {
-		// 	createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ack.person", person))
-		// 	eq('active', true)
-		// 	eq('project', securityService.userCurrentProject)
-		// 	and {
-		// 		or {
-		// 			isNull('activationDate')
-		// 			lt('activationDate', now)
-		// 		}
-		// 		or {
-		// 			isNull('expirationDate')
-		// 			gt('expirationDate', now)
-		// 		}
-		// 	}
-		// 	isNull('ack.person')
-
-		// 	projections {
-		// 		count()
-		// 	}
-		// }
-
 		Closure criteriaClosure = {
 			unacknowledgedNoticesCriteriaClosure.delegate = delegate
         	unacknowledgedNoticesCriteriaClosure(person, project, new Date())
@@ -141,12 +111,8 @@ class NoticeService implements ServiceMethods {
 			projections { count () }
 		}
 
-		def result = Notice.createCriteria().list(criteriaClosure)
-		if (!result) {
-			return false
-		}
-
-		return result[0] > 0
+		List result = Notice.createCriteria().list(criteriaClosure)
+		return result ? (result[0] > 0) : false
 	}
 
 	/**
