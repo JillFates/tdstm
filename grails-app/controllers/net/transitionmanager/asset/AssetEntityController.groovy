@@ -957,6 +957,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		try {
 			// Flag if the request contained any params that should enable the "Clear Filters" button.
 			boolean filteredRequest = false
+			MoveBundle bundle = null
+
+			if(params.bundle){
+				bundle = MoveBundle.get(NumberUtil.toLong(params.bundle))
+			}
 
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
@@ -986,6 +991,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (params.containsKey("justRemaining")) {
 				userPreferenceService.setPreference(PREF.JUST_REMAINING, params.justRemaining)
 			}
+
 			if (params.moveEvent) {
 				// zero (0) = All events
 				// log.info "listCommentsOrTasks: Handling MoveEvent based on params $params.moveEvent"
@@ -1027,42 +1033,44 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 
 			return [
-					timeToUpdate: timeToRefresh ?: 60,
-					servers: entities.servers,
-					applications: entities.applications,
-			        dbs: entities.dbs,
-					files: entities.files,
-					networks: entities.networks,
-					moveEvents:moveEvents,
-			        dependencyType: entities.dependencyType,
-					dependencyStatus: entities.dependencyStatus,
-			        assetDependency: new AssetDependency(),
-					filterEvent: filterEvent,
-					justRemaining: justRemaining,
-			        justMyTasks: justMyTasks,
-					filter: params.filter,
-					comment: filters?.comment ?:'',
-					role: role,
-			        taskNumber: filters?.taskNumber ?:'',
-					assetName: filters?.assetEntity ?:'',
-					modelPref: modelPref,
-			        assetType: filters?.assetType ?:'',
-					dueDate: filters?.dueDate ?:'',
-					status: status,
-			        assignedTo: filters?.assignedTo ?:'',
-					category: filters?.category ?:'',
-					moveEvent: moveEvent,
-			        moveBundleList: moveBundleList,
-					viewUnpublished: viewUnpublished,
-					taskPref: taskPref,
-					formatterMap: formatterMap,
-			        staffRoles: taskService.getTeamRolesForTasks(),
-					assetCommentFields: assetCommentFields.sort { it.value },
-			        sizePref: userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
-			        partyGroupList: companiesList,
-					company: project.client,
-					step: params.step,
-					filteredRequest: filteredRequest]
+				bundleName        : bundle?.name ?: '',
+				timeToUpdate      : timeToRefresh ?: 60,
+				servers           : entities.servers,
+				applications      : entities.applications,
+				dbs               : entities.dbs,
+				files             : entities.files,
+				networks          : entities.networks,
+				moveEvents        : moveEvents,
+				dependencyType    : entities.dependencyType,
+				dependencyStatus  : entities.dependencyStatus,
+				assetDependency   : new AssetDependency(),
+				filterEvent       : filterEvent,
+				justRemaining     : justRemaining,
+				justMyTasks       : justMyTasks,
+				filter            : params.filter,
+				comment           : filters?.comment ?: '',
+				role              : role,
+				taskNumber        : filters?.taskNumber ?: '',
+				assetName         : filters?.assetEntity ?: '',
+				modelPref         : modelPref,
+				assetType         : filters?.assetType ?: '',
+				dueDate           : filters?.dueDate ?: '',
+				status            : status,
+				assignedTo        : filters?.assignedTo ?: '',
+				category          : filters?.category ?: '',
+				moveEvent         : moveEvent,
+				moveBundleList    : moveBundleList,
+				viewUnpublished   : viewUnpublished,
+				taskPref          : taskPref,
+				formatterMap      : formatterMap,
+				staffRoles        : taskService.getTeamRolesForTasks(),
+				assetCommentFields: assetCommentFields.sort { it.value },
+				sizePref          : userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
+				partyGroupList    : companiesList,
+				company           : project.client,
+				workflowTransition: NumberUtil.toLong(params.step),
+				filteredRequest   : filteredRequest
+			]
 		} catch (RuntimeException e) {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")
@@ -1102,6 +1110,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 
 		params['viewUnpublished'] = viewUnpublished
+
+		if(params['workflowTransition']){
+			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
+		}
 
 		// Fetch the tasks and the total count.
 		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder, maxRows, rowOffset)
