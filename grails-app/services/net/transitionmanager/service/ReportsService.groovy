@@ -72,30 +72,66 @@ class ReportsService implements ServiceMethods {
 
 		def taskAnalysisInfo = getTaskAnalysisInfo(moveEvent, eventErrorList, viewUnpublished)
 
-		[time: eventsProjectInfo.time, moveEvent: moveEvent, userLoginError: eventsProjectInfo.userLoginError,
-		 errorForEventTime: eventsProjectInfo.errorForEventTime, newsBarModeError: eventsProjectInfo.newsBarModeError,
-		 project: project, clientAccess: eventsProjectInfo.clientAccess, list: eventsProjectInfo.list,
-		 workFlowCodeSelected: eventBundleInfo.workFlowCodeSelected, steps: eventBundleInfo.steps,
-		 moveBundleSize: moveBundles.size(), moveBundles: moveBundles, summaryOk: assetsInfo.summaryOk,
-		 duplicatesAssetNames: assetsInfo.duplicatesAssetNames, duplicates: assetsInfo.duplicates,
-		 duplicatesTag: assetsInfo.duplicatesTag, duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
-		 missedRacks: assetsInfo.missedRacks, missingRacks: assetsInfo.missingRacks,
-		 dependenciesOk: assetsInfo.dependenciesOk, issue: assetsInfo.issue, issueMap: assetsInfo.issues,
-		 bundleMap: moveBundleTeamInfo.bundleMap, notAssignedToTeam: moveBundleTeamInfo.notAssignedToTeam,
-		 teamAssignment: moveBundleTeamInfo.teamAssignment, inValidUsers: moveBundleTeamInfo.inValidUsers,
-		 userLogin: moveBundleTeamInfo.userLogin, truckError: transportInfo.truckError, truck: transportInfo.truck,
-		 cartError: transportInfo.cartError, cart: transportInfo.cart, shelf: transportInfo.shelf,
-		 shelfError: transportInfo.shelfError, nullAssetname: assetsInfo.nullAssetname, questioned: assetsInfo.questioned,
-		 blankAssets: assetsInfo.blankAssets, questionedDependency: assetsInfo.questionedDependency,
-		 specialInstruction: assetsInfo.specialInstruction, importantInstruction: assetsInfo.importantInstruction,
-		 eventErrorString: eventErrorString, dashBoardOk: eventBundleInfo.dashBoardOk, allErrors: allErrors,
-		 nullAssetTag: assetsInfo.nullAssetTag, blankAssetTag: assetsInfo.blankAssetTag, modelList: modelInfo.modelList,
-		 modelError: modelInfo.modelError, eventIssues: assetsInfo.eventIssues, nonAssetIssue: assetsInfo.nonAssetIssue,
-		 dependenciesNotValid: assetsInfo.dependenciesNotValid, cyclicalsError: taskAnalysisInfo.cyclicalsError,
-		 cyclicalsRef: taskAnalysisInfo.cyclicalsRef, startsError: taskAnalysisInfo.startsError,
-		 startsRef: taskAnalysisInfo.startsRef, sinksError: taskAnalysisInfo.sinksError,
-		 sinksRef: taskAnalysisInfo.sinksRef, personAssignErr: taskAnalysisInfo.personAssignErr,
-		 personTasks: taskAnalysisInfo.personTasks, taskerrMsg: taskAnalysisInfo.exceptionString]
+		[
+			time: eventsProjectInfo.time,
+			moveEvent: moveEvent,
+			userLoginError: eventsProjectInfo.userLoginError,
+			errorForEventTime: eventsProjectInfo.errorForEventTime,
+			newsBarModeError: eventsProjectInfo.newsBarModeError,
+			project: project,
+			clientAccess: eventsProjectInfo.clientAccess,
+			projectStaffList: eventsProjectInfo.projectStaffList,
+			workFlowCodeSelected: eventBundleInfo.workFlowCodeSelected,
+			steps: eventBundleInfo.steps,
+			moveBundleSize: moveBundles.size(),
+			moveBundles: moveBundles,
+			summaryOk: assetsInfo.summaryOk,
+			duplicatesAssetNames: assetsInfo.duplicatesAssetNames,
+			duplicates: assetsInfo.duplicates,
+			duplicatesTag: assetsInfo.duplicatesTag,
+			duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
+			missedRacks: assetsInfo.missedRacks,
+			missingRacks: assetsInfo.missingRacks,
+			dependenciesOk: assetsInfo.dependenciesOk,
+			issue: assetsInfo.issue,
+			issueMap: assetsInfo.issues,
+			bundleMap: moveBundleTeamInfo.bundleMap,
+			notAssignedToTeam: moveBundleTeamInfo.notAssignedToTeam,
+			teamAssignment: moveBundleTeamInfo.teamAssignment,
+			inValidUsers: moveBundleTeamInfo.inValidUsers,
+			userLogin: moveBundleTeamInfo.userLogin,
+			truckError: transportInfo.truckError,
+			truck: transportInfo.truck,
+			cartError: transportInfo.cartError,
+			cart: transportInfo.cart,
+			shelf: transportInfo.shelf,
+			shelfError: transportInfo.shelfError,
+			nullAssetname: assetsInfo.nullAssetname,
+			questioned: assetsInfo.questioned,
+			blankAssets: assetsInfo.blankAssets,
+			questionedDependency: assetsInfo.questionedDependency,
+			specialInstruction: assetsInfo.specialInstruction,
+			importantInstruction: assetsInfo.importantInstruction,
+			eventErrorString: eventErrorString,
+			dashBoardOk: eventBundleInfo.dashBoardOk,
+			allErrors: allErrors,
+			nullAssetTag: assetsInfo.nullAssetTag,
+			blankAssetTag: assetsInfo.blankAssetTag,
+			modelList: modelInfo.modelList,
+			modelError: modelInfo.modelError,
+			eventIssues: assetsInfo.eventIssues,
+			nonAssetIssue: assetsInfo.nonAssetIssue,
+			dependenciesNotValid: assetsInfo.dependenciesNotValid,
+			cyclicalsError: taskAnalysisInfo.cyclicalsError,
+			cyclicalsRef: taskAnalysisInfo.cyclicalsRef,
+			startsError: taskAnalysisInfo.startsError,
+			startsRef: taskAnalysisInfo.startsRef,
+			sinksError: taskAnalysisInfo.sinksError,
+			sinksRef: taskAnalysisInfo.sinksRef,
+			personAssignErr: taskAnalysisInfo.personAssignErr,
+			personTasks: taskAnalysisInfo.personTasks,
+			taskerrMsg: taskAnalysisInfo.exceptionString
+		]
 	}
 
 	/**
@@ -541,28 +577,35 @@ class ReportsService implements ServiceMethods {
 			newsBarModeError = greenSpan(HtmlUtil.escape(moveEvent.name) + ': OK', '', false)
 		}
 
-		List<Map> list = partyRelationshipService.getProjectStaff(currProj)
-		list.sort { a, b -> a.company?.toString() <=> b.company?.toString() ?: a.role?.toString() <=> b.role?.toString() }
+		// Get the list of staff assigned to the Event and sort it by company/role/name
+		List<Map> projectStaffList = partyRelationshipService.getProjectStaff(currProj)
+		projectStaffList.sort {
+			a, b -> a.company?.toString() <=> b.company?.toString() ?:
+			a.role?.toString() <=> b.role?.toString() ?:
+			a.name?.toString() <=> b.name?.toString()
+		}
 
 		def projectStaff = PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id=?
 			  and roleTypeCodeFrom = 'PROJECT'
+			  and roleTypeCodeTo = 'STAFF'
 		''', [currProj.toLong()])
 
 		String userLoginError = ''
+
 		projectStaff.each { staff ->
 			Person person = staff.partyIdTo
 			UserLogin user = person.userLogin
 
 			if (!user) {
 				eventErrorList << 'Project'
-				userLoginError += redSpan(person.toString() + ' login disabled', 'margin-left:50px;')
+				userLoginError += redSpan(HtmlUtil.escape(person.toString()) + ' no login', 'margin-left:50px;')
 			}
 			else if (user.active=='N') {
 				eventErrorList << 'Project'
-				userLoginError += greenSpan(user.toString() + ' login inactive', 'margin-left:50px;')
+				userLoginError += greenSpan(HtmlUtil.escape(user.toString()) + ' login inactive', 'margin-left:50px;')
 			}
 		}
 
@@ -582,11 +625,21 @@ class ReportsService implements ServiceMethods {
 			eventErrorList << 'Project'
 		}
 		else {
-			clientAccess = greenSpan('Client Access:&nbsp;' + persons, '', false)
+			clientAccess = greenSpan(
+				'Client Access:&nbsp;' + persons.collect{ HtmlUtil.escape(it.toString()) }.join(', ')
+				, '', false)
 		}
 
-		[time: time, moveEvent: moveEvent, errorForEventTime: errorForEventTime, newsBarModeError: newsBarModeError,
-		 userLoginError: userLoginError, clientAccess: clientAccess, list: list, eventErrorList: eventErrorList]
+		[
+			time: time,
+			moveEvent: moveEvent,
+			errorForEventTime: errorForEventTime,
+			newsBarModeError: newsBarModeError,
+		 	userLoginError: userLoginError,
+			clientAccess: clientAccess,
+			projectStaffList: projectStaffList,
+			eventErrorList: eventErrorList
+		]
 	}
 
 	def getTransportInfo(assetEntityList, List<String> eventErrorList) {
