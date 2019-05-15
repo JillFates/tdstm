@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {LoginService} from '../../service/login.service';
+import {LoginInfoModel} from '../../model/login-info.model';
 
 @Component({
 	selector: 'tds-login',
@@ -6,5 +8,17 @@ import { Component } from '@angular/core';
 })
 
 export class LoginComponent {
-	// content-login-wrapper
+
+	public loginInfo: LoginInfoModel = new LoginInfoModel();
+
+	constructor(private loginService: LoginService) {
+		this.getLoginInfo();
+	}
+
+	private getLoginInfo(): void {
+		this.loginService.getLoginInfo().subscribe((response: any) => {
+			this.loginInfo = response;
+		});
+	}
+
 }

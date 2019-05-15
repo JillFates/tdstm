@@ -12,6 +12,7 @@ import {AuthService} from './service/auth.service';
 import {UserContextService} from './service/user-context.service';
 import {UserService} from './service/user.service';
 import {AuthGuardService} from './service/auth.guard.service';
+import {LoginService} from './service/login.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
 
@@ -29,7 +30,8 @@ import {LoginComponent} from './components/login/login.component';
 		AuthService,
 		UserService,
 		UserContextService,
-		AuthGuardService
+		AuthGuardService,
+		LoginService
 	],
 	declarations: [
 		LoginComponent
