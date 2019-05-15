@@ -417,7 +417,7 @@ grails {
 	}
 }
 
-if (System.getProperty("gconsole")) {
+if (System.getProperty("tdstm.gconsole")) {
 	grails {
 		plugin {
 			springsecurity {
