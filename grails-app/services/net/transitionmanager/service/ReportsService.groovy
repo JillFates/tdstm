@@ -396,7 +396,7 @@ class ReportsService implements ServiceMethods {
 		String dependenciesNotValid
 		if (assetsWithOutDep) {
 			dependenciesNotValid = redSpan('Assets without dependency: ' + assetsWithOutDep.size() + ' Assets:') +
-				'<div style="margin-left:50px;"> ' + WebUtil.listAsMultiValueString(assetsWithOutDep.assetName) + '</div>'
+				'<div style="margin-left:50px;"> ' + HtmlUtil.escape(WebUtil.listAsMultiValueString(assetsWithOutDep.assetName)) + '</div>'
 		}
 		else {
 			dependenciesNotValid = redSpan('Assets without dependency: 0 Assets')
