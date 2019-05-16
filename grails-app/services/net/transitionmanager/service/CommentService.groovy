@@ -371,7 +371,7 @@ class CommentService implements ServiceMethods {
 			}
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
-			boolean addingNote = assetComment.isaTask() && params.note
+			boolean addingNote = isaTask && params.note
 
 			// Note that shouldSendNotification has to be called before calling save on the object
 			boolean shouldSendNotification = shouldSendNotification(assetComment, currentPerson, isNew, addingNote)
@@ -385,11 +385,11 @@ class CommentService implements ServiceMethods {
 				}
 
 				// Deal with Notes if there are any
-				if (isaTask && params.note) {
+				if (addingNote) {
 					// TODO The adding of commentNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.
 					def commentNote = new CommentNote(createdBy: currentPerson, dateCreated: date, note: params.note,
 					                                  isAudit: 0, assetComment: assetComment)
-					if (commentNote.hasErrors() || !commentNote.save(flush: true)) {
+					if (!commentNote.save(flush: true)) {
 						// TODO error won't bubble up to the user
 						log.error "saveUpdateCommentAndNotes: Saving comment notes faild - ${GormUtil.allErrorsString(commentNote)}"
 						errorMsg = 'An unexpected error occurred while saving your comment'
