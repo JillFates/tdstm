@@ -105,6 +105,7 @@ export class NoticeViewEditComponent {
 			model.needAcknowledgement = true;
 		}
 		model.locked = model.locked || false;
+		model.htmlText = model.htmlText.replace(new RegExp('\\n', 'g'), '');
 
 		if (model.id) {
 			this.noticeService.editNotice(model)
