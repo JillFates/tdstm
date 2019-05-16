@@ -1204,10 +1204,10 @@
 		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn-danger">
 		</tds-button-delete>
 
-		<div *ngIf="loadingLists" class="text-right">
+		<div *ngIf="loadingLists" style="display: inline" class="loading-lists pull-right text-right">
 			<i>Loading Lists...</i>
 		</div>
-		<div *ngIf="!loadingLists">
+		<span *ngIf="!loadingLists">
 			<tds-button-close *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())"
 												(click)="cancelCloseDialog()" tabindex="24" class="pull-right">
 			</tds-button-close>
@@ -1215,6 +1215,6 @@
 			<tds-button-cancel *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())"
 												 (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
 			</tds-button-cancel>
-		</div>
+		</span>
 	</div>
 </div>
