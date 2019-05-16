@@ -83,7 +83,8 @@ export class FieldSettingsService {
 		// NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
 		// when the label compares to itself.
 		return fields.filter(
-		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()).length > 1;
+		item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
+			&& item.label.trim() !=='').length > 1;
 	}
 
 	/**
@@ -98,7 +99,8 @@ export class FieldSettingsService {
 	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
 		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
 		return fields.filter(
-				item => item.field.toLowerCase().trim() === cleanLabel).length > 0;
+				item => item.field.toLowerCase().trim() === cleanLabel
+				&& item.label.trim() !=='').length > 0;
 	}
 
 	/**
