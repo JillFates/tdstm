@@ -149,134 +149,14 @@ export class NoticeService {
 		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
 			.map((res: Response) => {
 				let result = res.json();
+				let notices = result.data && result.data.notices || [];
+				notices.forEach( (notice: any) => {
+					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
+				});
 
 				return result && result.data || [];
 			})
 			.catch((error: any) => error.json());
-
-		/*
-		const mockResponse = {
-			redirectUri: '/tdstm/notices',
-			notices: [
-				{
-					id: 5,
-					title: 'EULA Aggreement 2018-19 version 1.0',
-					htmlText: `
-					<p>Last updated: (add date)</p>
-					<p>
-					Please read this End­User License Agreement ("Agreement") carefully before clicking the "I Agree"
-					button, downloading or using My Application (change this) ("Application").
-					By clicking the "I Agree" button, downloading or using the Application, you are agreeing to be bound
-					by the terms and conditions of this Agreement.
-					If you do not agree to the terms of this Agreement, do not click on the "I Agree" button and do not
-					download or use the Application.
-					</p>
-					<h5>License</h5>
-					<p>
-					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
-					to download, install and use the Application solely for your personal, non­commercial purposes
-					strictly in accordance with the terms of this Agreement.
-					</p>
-					<h5>Restrictions</h5>
-					<p>
-					You agree not to, and you will not permit others to:
-					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
-					commercially exploit the Application or make the Application available to any third party.
-					</p>
-					<h5>License</h5>
-					<p>
-					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
-					to download, install and use the Application solely for your personal, non­commercial purposes
-					strictly in accordance with the terms of this Agreement.
-					</p>
-					<h5>Restrictions</h5>
-					<p>
-					You agree not to, and you will not permit others to:
-					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
-					commercially exploit the Application or make the Application available to any third party.
-					</p>
-					<h5>License</h5>
-					<p>
-					My Company (change this) grants you a revocable, non­exclusive, non­transferable, limited license
-					to download, install and use the Application solely for your personal, non­commercial purposes
-					strictly in accordance with the terms of this Agreement.
-					</p>
-					<h5>Restrictions</h5>
-					<p>
-					You agree not to, and you will not permit others to:
-					a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise
-					commercially exploit the Application or make the Application available to any third party.
-					</p>
-					`,
-					acknowledgeable: true,
-					active: true,
-					createdBy: null,
-					lastModified: null,
-					rawText: null,
-					typeId: 2,
-					activationDate: null,
-					expirationDate: null,
-					sequence: 2,
-					locked: false,
-					postMessageText: '',
-					dateCreated: ''
-				},
-				{
-					id: 7,
-					title: 'Pizza to night in lobby',
-					htmlText: 'Come one come all for some greasy pizza 1',
-					acknowledgeable: false,
-					active: true,
-					createdBy: null,
-					lastModified: null,
-					rawText: null,
-					typeId: 1,
-					activationDate: null,
-					expirationDate: null,
-					sequence: 2,
-					locked: false,
-					postMessageText: '',
-					dateCreated: ''
-				},
-				{
-					id: 8,
-					title: 'Another message',
-					htmlText: 'Come one come all for some greasy pizza 2',
-					acknowledgeable: false,
-					active: true,
-					createdBy: null,
-					lastModified: null,
-					rawText: null,
-					typeId: 1,
-					activationDate: null,
-					expirationDate: null,
-					sequence: 4,
-					locked: false,
-					postMessageText: '',
-					dateCreated: ''
-				},
-				{
-					id: 12,
-					title: 'Maintenance Outage',
-					htmlText: 'We will be updating the system at 11:00pm EST this evening - you have been warned!',
-					acknowledgeable: false,
-					active: true,
-					createdBy: null,
-					lastModified: null,
-					rawText: null,
-					typeId: 1,
-					activationDate: null,
-					expirationDate: null,
-					sequence: 3,
-					locked: false,
-					postMessageText: '',
-					dateCreated: ''
-				}
-			]
-		};
-
-		return Observable.of(mockResponse);
-		*/
 	}
 
 	/**

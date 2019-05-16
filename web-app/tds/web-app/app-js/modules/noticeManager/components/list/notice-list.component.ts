@@ -220,7 +220,6 @@ export class NoticeListComponent implements OnInit {
 		if (notices && notices.length) {
 			this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
 				.then((response: any) => {
-					console.log('The response is:');
 					console.log(response);
 				})
 				.catch((error) => {
