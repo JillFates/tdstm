@@ -1,6 +1,8 @@
 package net.transitionmanager.admin
 
 import com.tdsops.common.builder.UserAuditBuilder
+import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.StartPageEnum
@@ -271,13 +273,15 @@ class AuthController implements ControllerMethods {
 	}
 
 	/**
-	 * Fetch the info necessary for the login page (active notices and build version).
-	 * @return
+	 * Fetch the info necessary for the login page
+	 * @return build version, pre login notices and session expired and account locked out flags.
 	 */
 	def getLoginInfo() {
 		renderSuccessJson([
+			buildVersion: environmentService.getVersionText(),
 			notices: noticeService.getPreLoginNotices(),
-			buildVersion: environmentService.getVersionText()
+			sessionExpired: session.getAttribute(TdsHttpSessionRequestCache.SESSION_EXPIRED),
+			accountLockedOut: session.getAttribute(SecurityUtil.ACCOUNT_LOCKED_OUT)
 		])
 	}
 }
