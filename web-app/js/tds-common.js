@@ -161,7 +161,11 @@ var tdsCommon = {
 		var data = false;
 
 		if (response.status != 200) {
-			this.displayWsError(response, errorMsg, alerts);
+            if (response.errors) {
+                alert(response.errors);
+            } else {
+                this.displayWsError(response, errorMsg, alerts);
+            }
 		} else {
 			data = eval("(" + response.responseText + ")");
 			// See if we have a result that has 'status'
@@ -201,7 +205,11 @@ var tdsCommon = {
         var data = false;
 
         if (response.status != 200 && response.status !== 'success') {
-            this.displayWsError(response, errorMsg, alerts);
+            if (response.errors) {
+                alert(response.errors);
+            } else {
+                this.displayWsError(response, errorMsg, alerts);
+            }
         } else {
             isValid = (response.status == 'success');
             if (isValid) {
