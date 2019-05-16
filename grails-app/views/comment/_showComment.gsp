@@ -31,13 +31,13 @@
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" class="name"><label for="isResolved">Status:</label></td>
+						<td valign="top" class="name"><label for="isResolved">Archived:</label></td>
 						<td valign="top" class="value" id="isResolved" colspan="3">
 							<div ng-if="ac.isResolved == 0">
-								Not resolved
+								<input type="checkbox" disabled>
 							</div>
 							<div ng-if="ac.isResolved == 1">
-								Archived
+								<input type="checkbox" checked disabled>
 							</div>
 						</td>
 					</tr>

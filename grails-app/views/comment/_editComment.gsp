@@ -41,9 +41,9 @@
 						</td>
 					</tr>
 					<tr ng-show="isEdit">
-						<td valign="top" class="name"><label for="isResolved">Status:</label></td>
+						<td valign="top" class="name"><label for="isResolved">Archived:</label></td>
 						<td valign="top">
-							<input type="checkbox" id="isResolved" name="isResolved" value="1" ng-model="ac.isResolved" ng-true-value="1" ng-false-value="0" />&nbsp;<label for="isResolved">Archived</label>
+							<input type="checkbox" id="isResolved" name="isResolved" value="1" ng-model="ac.isResolved" ng-true-value="1" ng-false-value="0" />
 						</td>
 					</tr>
 					<tr ng-show="isEdit">
