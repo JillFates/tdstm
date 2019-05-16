@@ -1,46 +1,46 @@
 <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()"
      class="modal-content notice-eula-html-content">
     <div class="modal-header">
-        <h4 class="modal-title">{{'NOTICE.NOTICE' | translate }}</h4>
+        <h4 class="modal-title">{{'NOTICE.NOTICES' | translate }}</h4>
     </div>
     <div class="modal-body">
         <form name="form"
               role="form"
               data-toggle="validator"
               class="form-horizontal"
-              #form='ngForm'>
-	        <div *ngIf="getCurrentNotice(); let notice">
-		        <h4>{{notice.name}}</h4>
-		        <div class="form-group">
-			        <div class="col-sm-12 html-container">
-				        <div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
-			        </div>
-				</div>
+			  #form='ngForm'>
+			<div class="notices-container">
+				<div *ngFor="let notice of notices"  class="standard-notice-card">	
+					<div class="form-group">
+						<div class="col-sm-12">
+							<div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
+						</div>
+					</div>
 
-				<div class="form-group agreement-container">
-						<input type="checkbox" 
-								name="agreement" 
-								id="agreement" 
-								[(ngModel)]="acceptAgreement">
-						<label for="agreement"> 
-							{{ (notice.needAcknowledgement ? (notice.postMessageText || 'NOTICE.AGREEMENT') : 'NOTICE.DO_NOT_SHOW_AGAIN') | translate }}
-						</label>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<label for="agreement" class="pull-right"> 
+								<input type="checkbox" 
+									style="cursor: pointer"
+									name="agreement" 
+									id="agreement" 
+									[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
+							</label>
+						</div>
+					</div>
 				</div>
-	        </div>
+			</div>
         </form>
     </div>
 
     <div class="modal-footer form-group-center">
-		<div *ngIf="getCurrentNotice(); let notice">
-			<tds-button-custom  (click)="onAccept()" 
-								[disabled]="notice.needAcknowledgement && !acceptAgreement" 
-								icon="check" 
-								title="Accept" 
-								class="btn-primary pull-left">
-			</tds-button-custom>
-			<tds-button-cancel (click)="onCancel()" 
-				class="pull-right"> 
-			</tds-button-cancel> 
-		</div>
+		<tds-button-custom  (click)="onAccept()" 
+							icon="check" 
+							title="Accept" 
+							class="btn-primary pull-left">
+		</tds-button-custom>
+		<tds-button-cancel (click)="onCancel()" 
+			class="pull-right"> 
+		</tds-button-cancel> 
 	</div>
 </div>

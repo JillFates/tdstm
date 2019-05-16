@@ -210,11 +210,15 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	onShowEULA(): void {
-		this.showNotices();
+		this.showStandardNotices();
 	}
 
-	showNotices() {
+	showStandardNotices() {
 		const notices = this.postNotices
+			.filter((notice) => !notice.needAcknowledgement)
+			.map((notice: NoticeModel) => {
+				return {...notice, notShowAgain: false};
+			})
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
 		if (notices && notices.length) {

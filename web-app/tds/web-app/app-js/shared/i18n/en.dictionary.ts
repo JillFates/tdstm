@@ -268,6 +268,7 @@ export const en_DICTIONARY: Object = {
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'NOTICES': 'Notices',
 		'VIEW_HTML': 'View HTML',
 		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again'

@@ -1,6 +1,7 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
+import {Observable} from 'rxjs';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -13,7 +14,7 @@ import {NoticeModel, StandardNotices} from '../../model/notice.model';
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/standard-notices/standard-notices.component.html'
 })
 export class StandardNoticesComponent implements OnInit {
-	private modelNotices: NoticeModel[];
+	private notices: NoticeModel[];
 	private currentNoticeIndex: number;
 	acceptAgreement: boolean;
 
@@ -25,12 +26,8 @@ export class StandardNoticesComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		const mandatory = this.model.notices.filter((notice) => notice.needAcknowledgement);
-		const regular = this.model.notices.map((notice: NoticeModel) => {
-			return {...notice, notShowAgain: false};
-		});
+		this.notices = this.model.notices;
 
-		this.modelNotices = mandatory.concat(regular) ;
 		this.currentNoticeIndex = 0;
 	}
 
@@ -38,45 +35,23 @@ export class StandardNoticesComponent implements OnInit {
 		this.activeDialog.dismiss();
 	}
 
-	getCurrentNotice() {
-		return this.modelNotices[this.currentNoticeIndex];
-	}
-
+	// TODO move to base
 	protected onCancel() {
 		this.activeDialog.dismiss();
 	}
 
-	private resetAgreements() {
-		this.acceptAgreement = false;
-		this.getCurrentNotice().notShowAgain = false;
-	}
-
+	// TODO move to base
 	sanitizeHTML(html: string) {
 		return this.sanitizer.bypassSecurityTrustHtml(html);
 	}
 
 	protected onAccept() {
-		/*
-		this.noticeService.setAcknowledge(this.modelNotices[this.currentNoticeIndex].id)
-		.subscribe(() => this.activeDialog.close(true),
-			(err) => console.error(err));
-		*/
+		const updates = this.notices
+			.filter((notice) => notice.notShowAgain)
+			.map((notice) => this.noticeService.setAcknowledge(notice.id));
 
-		/*
-		// handle save don't show again
-		if ((this.currentNoticeIndex + 1) >= this.modelNotices.length) {
-			// this.activeDialog.close(true);
-			this.noticeService.setAcknowledge(this.modelNotices[this.currentNoticeIndex].id)
-			.subscribe(() => this.activeDialog.close(true),
-				(err) => console.error(err));
-		}
-		*/
-
-		if ((this.currentNoticeIndex + 1) >= this.modelNotices.length) {
-			this.activeDialog.dismiss();
-		} else {
-			this.resetAgreements();
-			this.currentNoticeIndex += 1;
-		}
+		Observable.forkJoin(updates)
+			.subscribe((results) => this.activeDialog.dismiss());
 	}
+
 }

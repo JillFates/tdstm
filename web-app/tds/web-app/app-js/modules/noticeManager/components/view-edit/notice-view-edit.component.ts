@@ -94,8 +94,6 @@ export class NoticeViewEditComponent {
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
-		console.log('Saving notice');
-
 		this.model.typeId = (this.noticeType && this.noticeType.typeId);
 
 		const model = {...this.model};
@@ -103,8 +101,11 @@ export class NoticeViewEditComponent {
 		if (model.typeId === this.MANDATORY) {
 			model.typeId = NOTICE_TYPE_POST_LOGIN;
 			model.needAcknowledgement = true;
+		} else {
+			model.needAcknowledgement = false;
 		}
 		model.locked = model.locked || false;
+		// remove esc sequences
 		model.htmlText = model.htmlText.replace(new RegExp('\\n', 'g'), '');
 
 		if (model.id) {
