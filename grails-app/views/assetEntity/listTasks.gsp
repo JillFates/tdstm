@@ -112,7 +112,7 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			var workflowTransition = ${workflowTransition}
+			<g:if test="${workflowTransition}">var workflowTransition = ${workflowTransition}</g:if><g:else>var workflowTransition = null</g:else>
 			var bundle = "${bundleName}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks";
