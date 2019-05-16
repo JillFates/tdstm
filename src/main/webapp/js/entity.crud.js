@@ -1852,7 +1852,7 @@ function reloadDependencyGroupsSection() {
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
             setTimeout( function () {
-                $('#dependencyDivId').css('overflow-x', 'scroll');
+                $('#dependencyTableWrapperId').css('overflow-x', 'scroll');
             }, 200);
 		}
 	});
