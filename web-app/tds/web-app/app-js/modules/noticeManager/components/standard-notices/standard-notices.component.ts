@@ -13,68 +13,70 @@ import {NoticeModel, StandardNotices} from '../../model/notice.model';
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/standard-notices/standard-notices.component.html'
 })
 export class StandardNoticesComponent implements OnInit {
-	private dataSignature: string;
-	protected modelNotices: NoticeModel[];
-	protected currentNoticeIndex: number;
+	private modelNotices: NoticeModel[];
+	private currentNoticeIndex: number;
+	acceptAgreement: boolean;
 
 	constructor(
-		model: StandardNotices,
-		public activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService,
+		private model: StandardNotices,
+		private activeDialog: UIActiveDialogService,
 		private noticeService: NoticeService,
-		private promptService: UIPromptService,
-		protected sanitizer: DomSanitizer) {
-
-		this.modelNotices = model.notices.concat([])
-			.map((notice: NoticeModel) => {
-				return {...notice, notShowAgain: false};
-			});
-
-		this.dataSignature = JSON.stringify(this.modelNotices);
+		private sanitizer: DomSanitizer) {
 	}
 
 	ngOnInit() {
+		const mandatory = this.model.notices.filter((notice) => notice.needAcknowledgement);
+		const regular = this.model.notices.map((notice: NoticeModel) => {
+			return {...notice, notShowAgain: false};
+		});
+
+		this.modelNotices = mandatory.concat(regular) ;
 		this.currentNoticeIndex = 0;
 	}
 
 	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
-			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.activeDialog.dismiss();
-		}
+		this.activeDialog.dismiss();
 	}
 
-	/**
-	 * Verify the Object has not changed
-	 * @returns {boolean}
-	 */
-	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.modelNotices);
+	getCurrentNotice() {
+		return this.modelNotices[this.currentNoticeIndex];
 	}
 
-	protected onBack() {
-		if (this.currentNoticeIndex > 0) {
-			this.currentNoticeIndex -= 1;
-		}
-		// this.activeDialog.dismiss();
+	protected onCancel() {
+		this.activeDialog.dismiss();
 	}
 
-	protected onNext() {
+	private resetAgreements() {
+		this.acceptAgreement = false;
+		this.getCurrentNotice().notShowAgain = false;
+	}
+
+	sanitizeHTML(html: string) {
+		return this.sanitizer.bypassSecurityTrustHtml(html);
+	}
+
+	protected onAccept() {
+		/*
+		this.noticeService.setAcknowledge(this.modelNotices[this.currentNoticeIndex].id)
+		.subscribe(() => this.activeDialog.close(true),
+			(err) => console.error(err));
+		*/
+
+		/*
 		// handle save don't show again
 		if ((this.currentNoticeIndex + 1) >= this.modelNotices.length) {
-			this.activeDialog.close(true);
+			// this.activeDialog.close(true);
+			this.noticeService.setAcknowledge(this.modelNotices[this.currentNoticeIndex].id)
+			.subscribe(() => this.activeDialog.close(true),
+				(err) => console.error(err));
 		}
+		*/
 
-		this.currentNoticeIndex += 1;
+		if ((this.currentNoticeIndex + 1) >= this.modelNotices.length) {
+			this.activeDialog.dismiss();
+		} else {
+			this.resetAgreements();
+			this.currentNoticeIndex += 1;
+		}
 	}
 }

@@ -20,7 +20,7 @@ export class NoticeService {
 
 	// private instance variable to hold base url
 	private noticeListUrl = '../ws/notices';
-	private singleNoticeUrl = '/tdstm/ws/notice';
+	private singleNoticeUrl = '/tdstm/ws/notices';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
@@ -37,6 +37,7 @@ export class NoticeService {
 				result.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
 					notice.active = notice.active;
+					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
 				});
 				return result && result.notices;
 			})
@@ -145,7 +146,7 @@ export class NoticeService {
 	 * @returns any
 	 */
 	getPostNotices(): Observable<PostNoticeResponse> {
-		return this.http.get(`${this.singleNoticeUrl}/fetchPostNotices`)
+		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
 			.map((res: Response) => {
 				let result = res.json();
 
@@ -284,7 +285,7 @@ export class NoticeService {
 	 * @returns NoticeModel
 	 */
 	setAcknowledge(id: number): Observable<NoticeModel> {
-		return this.http.patch(`${this.singleNoticeUrl}/acknowledge/${id}`, JSON.stringify({id: id}))
+		return this.http.post(`${this.singleNoticeUrl}/${id}/acknowledge`, '')
 			.map((res: Response) =>  {
 				return res.json();
 			})

@@ -27,7 +27,6 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {EULAComponent} from '../eula/eula.component';
 import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
 
 @Component({
@@ -211,38 +210,11 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	onShowEULA(): void {
-		this.showMandatoryMessages()
-			.then((result) => {
-				if (result) {
-					setTimeout(() => this.showDefaultMessages(), 500);
-				}
-			});
+		this.showNotices();
 	}
 
-	async showMandatoryMessages(): Promise<boolean> {
-		// this.availableFields = this.availableFields.sort( (a, b) => SortUtils.compareByProperty(a, b, 'text'));
-		/*
-		const noticesMandatory = this.postNotices
-			.filter((notice: NoticeModel) =>  notice.typeId === NOTICE_TYPE_POST_LOGIN && true)
-			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
-		let keepGoing = true;
-
-		while (keepGoing && noticesMandatory.length) {
-			try {
-				await this.openDialogWithDelay(noticesMandatory.shift());
-			} catch (error) {
-				console.log('Error:', error.message || error);
-				keepGoing = false;
-			}
-		}
-
-		*/
-		return Promise.resolve(true);
-	}
-
-	showDefaultMessages() {
+	showNotices() {
 		const notices = this.postNotices
-			.filter((notice: NoticeModel) =>  notice.typeId === NOTICE_TYPE_POST_LOGIN)
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
 		if (notices && notices.length) {
@@ -252,22 +224,9 @@ export class NoticeListComponent implements OnInit {
 					console.log(response);
 				})
 				.catch((error) => {
-					console.error('Error:', error.message || error);
+					console.log('Error:', error && error.message);
 				});
 		}
-	}
-
-	openDialogWithDelay(notice: NoticeModel) {
-		return new Promise((resolve, reject) => {
-			setTimeout(async() => {
-				try {
-					await this.dialogService.open(EULAComponent, [ {provide: NoticeModel, useValue: notice}]);
-					return resolve(true);
-				} catch (error) {
-					return reject(error || 'User cancelled');
-				}
-			}, 500);
-		});
 	}
 
 	/**

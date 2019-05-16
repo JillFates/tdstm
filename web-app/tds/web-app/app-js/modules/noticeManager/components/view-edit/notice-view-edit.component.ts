@@ -32,10 +32,10 @@ export class NoticeViewEditComponent {
 	};
 	MANDATORY = NOTICE_TYPE_MANDATORY;
 	noticeType: any;
+	noticeIsLocked: boolean;
 /*
 	protected typeDataSource: Array<any> = [].concat(NoticeTypes);
 	protected EnumNoticeType = NoticeType;
-	noticeIsLocked: boolean;
 */
 	typeDataSource = [...NoticeTypes];
 	constructor(
@@ -51,19 +51,15 @@ export class NoticeViewEditComponent {
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
-	/*
 	ngOnInit() {
 		this.noticeIsLocked = this.model.locked;
-
-		this.model.typeId = this.model.typeId ?  parseInt(this.model.typeId, 10) : null;
 		this.model.active = this.mapActiveField(this.model.active);
 
 		if (this.model.needAcknowledgement) {
-			this.model.typeId = NoticeType.Mandatory;
+			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
 		this.noticeType = {typeId: this.model.typeId};
-		}
-	*/
+	}
 
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
