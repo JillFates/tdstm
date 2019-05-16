@@ -168,8 +168,10 @@ class NoticeService implements ServiceMethods {
      * @return a list of active notices for the login page.
      */
     List<Notice> getPreLoginNotices() {
+	    Date now = TimeUtil.nowGMT()
         return Notice.where {
             typeId == NoticeType.PRE_LOGIN && active
+	        (activationDate == null || activationDate < now) && (expirationDate == null || expirationDate > now)
         }.list()
     }
 }
