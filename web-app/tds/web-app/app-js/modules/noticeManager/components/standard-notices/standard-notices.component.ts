@@ -8,50 +8,39 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {NoticeModel, StandardNotices} from '../../model/notice.model';
+import {NoticeCommonComponent} from './../notice-common'
 
 @Component({
 	selector: 'tds-standard-notices',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/standard-notices/standard-notices.component.html'
 })
-export class StandardNoticesComponent implements OnInit {
+export class StandardNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
-	private currentNoticeIndex: number;
 	acceptAgreement: boolean;
 
 	constructor(
-		private model: StandardNotices,
-		private activeDialog: UIActiveDialogService,
-		private noticeService: NoticeService,
-		private sanitizer: DomSanitizer) {
+		protected model: StandardNotices,
+		protected activeDialog: UIActiveDialogService,
+		protected noticeService: NoticeService,
+		protected sanitizer: DomSanitizer) {
+			super(activeDialog, sanitizer);
 	}
 
 	ngOnInit() {
 		this.notices = this.model.notices;
-
-		this.currentNoticeIndex = 0;
 	}
 
-	protected cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
-	}
-
-	// TODO move to base
-	protected onCancel() {
-		this.activeDialog.dismiss();
-	}
-
-	// TODO move to base
-	sanitizeHTML(html: string) {
-		return this.sanitizer.bypassSecurityTrustHtml(html);
-	}
-
-	protected onAccept() {
+	onAccept() {
 		const updates = this.notices
 			.filter((notice) => notice.notShowAgain)
 			.map((notice) => this.noticeService.setAcknowledge(notice.id));
 
-		Observable.forkJoin(updates)
-			.subscribe((results) => this.activeDialog.dismiss());
+		if (updates.length) {
+			Observable.forkJoin(updates)
+				.subscribe((results) => this.activeDialog.dismiss());
+		} else {
+			this.activeDialog.dismiss();
+		}
 	}
 
 }
