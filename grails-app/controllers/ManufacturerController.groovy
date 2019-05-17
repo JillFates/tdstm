@@ -56,7 +56,7 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 				ilike('website', "%$params.website%")
 			}
 
-			order((sortOrder == 'ASC' ? Order.asc(sortIndex) : Order.desc(sortIndex)).ignoreCase())
+			order(new Order(sortIndex, sortOrder == 'asc').ignoreCase())
 		}
 
 		int totalRows = manufacturers.totalCount
