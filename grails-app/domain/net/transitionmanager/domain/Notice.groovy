@@ -89,27 +89,27 @@ class Notice {
 	}
 
 	private static final Map<String, Class> MARSHALLER_TYPES = [
+		acknowledgeLabel:	Object,
+		activationDate:  	Date,
+		active:          	Object,
+		createdBy:       	Person,
+		dateCreated:     	Object,
+		expirationDate:  	Date,
+		htmlText:        	Object,
+		id:              	Object,
+		lastModified:    	Object,
+		locked:			 	Object,
 		needAcknowledgement: Object,
-		active:          Object,
-		createdBy:       Person,
-		dateCreated:     Object,
-		activationDate:  Object,
-		expirationDate:  Object,
-		htmlText:        Object,
-		id:              Object,
-		lastModified:    Object,
-		project:         Project,
-		rawText:         Object,
-		title:           Object,
-		typeId:          NoticeType,
-		activationDate:  Date,
-		expirationDate:  Date
+		project:         	Project,
+		rawText:         	Object,
+		sequence:		 	Object,
+		title:           	Object,
+		typeId:          	NoticeType
 	]
 
 	static void registerObjectMarshaller() {
 		JSON.registerObjectMarshaller(Notice) { Notice notice ->
 			Map jsonData = [:]
-
 			MARSHALLER_TYPES.each { String name, Class type ->
 				def value = notice[name]
 
