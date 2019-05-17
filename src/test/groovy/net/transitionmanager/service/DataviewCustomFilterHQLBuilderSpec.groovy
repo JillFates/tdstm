@@ -104,7 +104,6 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 
 	}
 
-	@Ignore
 	void 'test can prepare hql where statement and params for extra filters using asset fields'() {
 
 		given: 'and instance of DataviewCustomFilterHQLBuilder'

@@ -3,8 +3,9 @@ package net.transitionmanager.command
 import com.tdsops.tm.enums.domain.AssetClass
 
 /**
- * The DataviewUserParamsCommand represents the various parameters that make up the properties
+ * The {@code DataviewUserParamsCommand} represents the various parameters that make up the properties
  * that the user can override in the view.
+ * It is defined by a nested {@code CommandObject} to refer validations of input data.
  */
 
 class DataviewUserParamsCommand implements CommandObject {

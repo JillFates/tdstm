@@ -1,8 +1,14 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.sql.SqlUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.imports.DataviewHqlWhereCollector
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
+import net.transitionmanager.search.FieldSearchData
+
+import java.sql.Timestamp
 
 /**
  * TM-14768. It builds custom filters for Planning Dashboard defined by
@@ -90,6 +96,15 @@ class DataviewCustomFilterHQLBuilder {
 				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 				break
+			case 'justPlanning':
+				hqlExpression = " AE.moveBundle in (:namedFilterMoveBundles) "
+				hqlParams = [
+					namedFilterMoveBundles: MoveBundle.where {
+						project == queryProject && useForPlanning == true
+					}.list()
+				]
+				break
+
 			default:
 				throw new RuntimeException('Invalid filter definition:' + namedFilter)
 		}
@@ -98,5 +113,90 @@ class DataviewCustomFilterHQLBuilder {
 			hqlExpression: hqlExpression,
 			hqlParams    : hqlParams
 		]
+	}
+
+	/**
+	 * <p>Add a column filter results in HSQL sentence.</p>
+	 * <p>It uses {@code DataviewHqlWhereCollector} </p>
+	 * @param column
+	 * @param project
+	 * @param whereCollector
+	 * @param mixedKeys
+	 * @param mixedFieldsInfo
+	 */
+	private void addColumnFilter(Map<String, ?> column,
+								 Project project,
+								 DataviewHqlWhereCollector whereCollector,
+								 Map<String, List> mixedFieldsInfo) {
+
+		// The keys for all the declared mixed fields.
+		Set mixedKeys = mixedFields.keySet()
+
+		Class type = typeFor(column)
+		String filter = filterFor(column)
+
+		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
+			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
+			// Create a basic FieldSearchData with the info for filtering an individual field.
+			FieldSearchData fieldSearchData = new FieldSearchData([
+				column           : propertyFor(column),
+				columnAlias      : namedParameterFor(column),
+				domain           : domainFor(column),
+				filter           : filterFor(column),
+				type             : type,
+				whereProperty    : wherePropertyFor(column),
+				manyToManyQueries: manyToManyQueriesFor(column),
+				fieldSpec        : column.fieldSpec
+			])
+
+			String property = propertyFor(column)
+			// Check if the current column requires special treatment (e.g. startupBy, etc.)
+
+			if (property in mixedKeys) {
+				// Flag the fieldSearchData as mixed.
+				fieldSearchData.setMixed(true)
+				// Retrieve the additional results (e.g: persons matching the filter).
+				Closure sourceForField = sourceFor(property)
+				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
+				if (additionalResults) {
+					// Keep a copy of this results for later use.
+					mixedFieldsInfo[property] = additionalResults
+					// Add additional information for the query (e.g: the staff ids for IN clause).
+					Closure paramsInjector = injectWhereParamsFor(property)
+					paramsInjector(fieldSearchData, property, additionalResults)
+					// Add the sql where clause for including the additional fields in the query
+					Closure whereInjector = injectWhereClauseFor(property)
+					whereInjector(fieldSearchData, property)
+				} else {
+					// If no additional results, then unset the flag as no additional filtering should be required.
+					fieldSearchData.setMixed(false)
+				}
+			}
+
+			// Trigger the parsing of the parameter.
+			SqlUtil.parseParameter(fieldSearchData)
+
+			if (fieldSearchData.sqlSearchExpression) {
+				// Append the where clause to the list of conditions.
+				// hqlWhereConditions << fieldSearchData.sqlSearchExpression
+				whereCollector.addCondition(fieldSearchData.sqlSearchExpression)
+			}
+
+			if (fieldSearchData.sqlSearchParameters) {
+				// Add the parameters required for this field.
+				// hqlWhereParams += fieldSearchData.sqlSearchParameters
+				whereCollector.addParams(fieldSearchData.sqlSearchParameters)
+			}
+
+			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
+		} else {
+			String property = propertyFor(column)
+			if (property in mixedKeys) {
+				Closure sourceForField = sourceFor(property)
+				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
+				// Keep a copy of this results for later use.
+				mixedFieldsInfo[property] = additionalResults
+			}
+		}
 	}
 }

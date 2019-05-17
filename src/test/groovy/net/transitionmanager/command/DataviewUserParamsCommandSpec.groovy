@@ -2,6 +2,7 @@ package net.transitionmanager.command
 
 import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFilterUnitTest {
 
@@ -9,7 +10,29 @@ class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFi
 
 		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
 			DataviewUserParamsCommand command = new DataviewUserParamsCommand(
-				allAssetsFilterMap
+				allAssetsDataviewMap
+			)
+
+		then: 'command is valid'
+			command.validate()
+	}
+
+	void 'test can create a all devices command object content'() {
+
+		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
+			DataviewUserParamsCommand command = new DataviewUserParamsCommand(
+				devicesDataviewMap
+			)
+
+		then: 'command is valid'
+			command.validate()
+	}
+
+	void 'test can create a all applications command object content'() {
+
+		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
+			DataviewUserParamsCommand command = new DataviewUserParamsCommand(
+				applicationsDataviewMap
 			)
 
 		then: 'command is valid'
@@ -19,10 +42,10 @@ class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFi
 	void 'test can create a all assets command object content with named filters'() {
 
 		given: 'All Assets Map filter content'
-			allAssetsFilterMap.filters.named = 'server,toValidate'
+			allAssetsDataviewMap.filters.named = 'server,toValidate'
 
 		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
-			DataviewUserParamsCommand command = new DataviewUserParamsCommand(allAssetsFilterMap)
+			DataviewUserParamsCommand command = new DataviewUserParamsCommand(allAssetsDataviewMap)
 
 		then: 'command is valid'
 			command.validate()
@@ -31,24 +54,31 @@ class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFi
 			command.filters.namedFilterList == ['server', 'toValidate']
 	}
 
-	void 'test can create a all assets command object content with extra filters'() {
+	@Unroll
+	void 'test can create a all assets command object content with extra filters #domain, #property and #filter'() {
 
-		given: 'All Assets Map filter content'
-			allAssetsFilterMap.filters.extra = [
-				[domain: 'common', property: 'assetName', filter: 'ACME-WB-84'],
-				[property: 'ufp', filter: 'true']
+		setup: 'All Assets Map filter content'
+			allAssetsDataviewMap.filters.extra = [
+				[
+					domain  : domain,
+					property: property,
+					filter  : filter
+				]
 			]
 
-		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
-			DataviewUserParamsCommand command = new DataviewUserParamsCommand(allAssetsFilterMap)
+		and: 'an instance of DataviewUserParamsCommand with "All Assets" filters Map'
+			DataviewUserParamsCommand command = new DataviewUserParamsCommand(allAssetsDataviewMap)
 
-		then: 'command is valid'
-			command.validate()
+		expect: 'command is valid'
+			command.validate() == valid
 
-		and: 'and extra filters where correctly parsed'
-			command.filters.extra.size() == 2
-			command.filters.extra.find { it.domain } == [domain: 'common', property: 'assetName', filter: 'ACME-WB-84']
-			command.filters.extra.find { !it.domain } == [property: 'ufp', filter: 'true']
+		where: 'it defines domain, property and filter'
+			domain        | property    | filter   || valid
+			'common'      | 'assetName' | 'FOOBAR' || true
+			'application' | 'appTech'   | 'Apple'  || true
+			'application' | 'appTech'   | ''       || true
+			'application' | 'appTech'   | null     || false
+			'application' | null        | 'Apple'  || false
 	}
 
 

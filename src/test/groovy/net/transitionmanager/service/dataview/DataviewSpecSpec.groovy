@@ -46,7 +46,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
-			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
 			DataviewSpec dataviewSpec = new DataviewSpec(command, null, fieldSpecProject)
@@ -58,7 +58,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
-			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
 
 		and: 'an instance of Dataview'
 			Dataview dataview = new Dataview(
@@ -66,7 +66,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsFilterJsonContent
+				reportSchema: allAssetsDataviewJsonContent
 			)
 			//dataview.save()
 
@@ -80,7 +80,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
-			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
 			// Filter on UI like this: ?_filter=physicalServer
 			command.filters.named = 'physicalServer,validateTo'
 
@@ -90,7 +90,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsFilterJsonContent
+				reportSchema: allAssetsDataviewJsonContent
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
@@ -98,14 +98,14 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.namedFilters ==  ['physicalServer', 'validateTo']
+			dataviewSpec.namedFilters == ['physicalServer', 'validateTo']
 	}
 
 	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters and extra filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters and extra filters added'
-			DataviewUserParamsCommand command = allAssetsFilterMap as DataviewUserParamsCommand
-			command.filters.named =  'physicalServer,validateTo'
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
+			command.filters.named = 'physicalServer,validateTo'
 			command.filters.extra = [
 				[
 					domain  : 'common',
@@ -120,7 +120,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsFilterJsonContent
+				reportSchema: allAssetsDataviewJsonContent
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'

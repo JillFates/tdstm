@@ -13,12 +13,16 @@ class DataviewHqlWhereCollector {
 
 
 	DataviewHqlWhereCollector addCondition(String condition) {
-		this.conditions.add(condition)
+		if (condition) {
+			this.conditions.add(condition)
+		}
 		return this
 	}
 
 	DataviewHqlWhereCollector addParams(Map<String, ?> params) {
-		this.params.putAll(params)
+		if (params) {
+			this.params.putAll(params)
+		}
 		return this
 	}
 }

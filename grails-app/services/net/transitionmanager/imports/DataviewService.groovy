@@ -8,6 +8,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -415,7 +416,8 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $conditions
+             where AE.project = :project 
+			   and $conditions
 		  group by AE.id
           order by $hqlOrder
         """
@@ -424,7 +426,8 @@ class DataviewService implements ServiceMethods {
             select count(DISTINCT AE)
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $conditions
+             where AE.project = :project 
+			   and $conditions
         """
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
@@ -633,13 +636,20 @@ class DataviewService implements ServiceMethods {
 	}
 
     /**
-	 * Used to prepare the left outer join sentence based on
-	 * columns of a dataview Spec and transformations for HQL query
+	 * <p>Used to prepare the left outer join sentence based on
+	 * columns of a dataview Spec columns and extra filters and
+	 * transformations for HQL query.</p>
+	 * <p>It adds joins for columns and it also adds joins for extra filters.
+	 * Those are necessary when extra filters add a column that requieres a join.</p>
      * @param dataviewSpec
      * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
-		return dataviewSpec.columns.collect { Map column ->
+		List<?> columsAndExtraFilters = dataviewSpec.columns + dataviewSpec.extraFilters
+		columsAndExtraFilters = columsAndExtraFilters.unique { Map a, Map b ->
+			return a['domain'] <=> b['domain'] ?: a['property'] <=> b['property']
+		}
+		return columsAndExtraFilters.collect { Map column ->
             "${joinFor(column)}"
         }.join(" ")
     }
@@ -675,24 +685,26 @@ class DataviewService implements ServiceMethods {
 			])
 		}
 
-		if (dataviewSpec.justPlanning != null) {
+		String justPlanning = dataviewSpec.justPlanning
+		if (justPlanning == null) {
+			justPlanning = userPreferenceService.getPreference(null, UserPreferenceEnum.ASSET_JUST_PLANNING, null)
+		}
+
+		if (justPlanning != null) {
 			whereCollector.addCondition("AE.moveBundle in (:moveBundles)")
 				.addParams([
 				moveBundles: MoveBundle.where {
-					project == project && useForPlanning == dataviewSpec.justPlanning
+					project == project && useForPlanning == justPlanning
 				}.list()
 			])
 		}
 
 		// Populate this list with the mix fields that the user is using for filtering.
 		Map<String, List> mixedFieldsInfo = [:]
-		// The keys for all the declared mixed fields.
-		Set mixedKeys = mixedFields.keySet()
-		Map additionalInfo = [:]
 
 		// Iterate over each column
 		dataviewSpec.columns.each { Map column ->
-			addColumnFilter(column, project, whereCollector, mixedKeys, mixedFieldsInfo)
+			addColumnFilter(column, project, whereCollector, mixedFieldsInfo)
 		}
 
 		// Applied named and extra filters from TM-14768
@@ -708,7 +720,7 @@ class DataviewService implements ServiceMethods {
 		// 2) More complex and well defined extra filters resolved in {@code DataviewCustomFilterHQLBuilder} class
 		dataviewSpec.extraFilters?.each { Map<String, ?> extraFilter ->
 			if (extraFilter.fieldSpec) {
-				addColumnFilter(extraFilter, project, whereCollector, mixedKeys, mixedFieldsInfo)
+				addColumnFilter(extraFilter, project, whereCollector, mixedFieldsInfo)
 			} else {
 				Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
 				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
@@ -716,7 +728,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		return [
-			conditions: whereCollector.conditions.join(" AND \n"),
+			conditions: whereCollector.conditions.join("\n\t\t\t   and "),
 			params: whereCollector.params,
 			mixedFields: mixedFieldsInfo
 		]
@@ -734,8 +746,10 @@ class DataviewService implements ServiceMethods {
 	private void addColumnFilter(Map<String, ?> column,
 								 Project project,
 								DataviewHqlWhereCollector whereCollector,
-								Set mixedKeys,
 								Map<String, List> mixedFieldsInfo) {
+
+		// The keys for all the declared mixed fields.
+		Set mixedKeys = mixedFields.keySet()
 
 		Class type = typeFor(column)
 		String filter = filterFor(column)
