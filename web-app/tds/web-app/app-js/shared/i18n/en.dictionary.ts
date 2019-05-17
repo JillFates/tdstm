@@ -271,7 +271,8 @@ export const en_DICTIONARY: Object = {
 		'NOTICES': 'Notices',
 		'VIEW_HTML': 'View HTML',
 		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
-		'DO_NOT_SHOW_AGAIN': 'Don\'t show again'
+		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
+		'POST_NOTICES': 'Post Notices'
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

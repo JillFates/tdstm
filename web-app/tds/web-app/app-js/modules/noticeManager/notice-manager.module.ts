@@ -17,6 +17,7 @@ import {NoticeViewEditComponent} from './components/view-edit/notice-view-edit.c
 import {ViewHtmlComponent} from './components/view-html/view-html.component';
 import {StandardNoticesComponent} from './components/standard-notices/standard-notices.component';
 import {MandatoryNoticesComponent} from './components/mandatory-notices/mandatory-notices.component';
+import {PostNoticesComponent} from './components/post-notices/post-notices.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {NoticeResolveService} from './resolve/notice-resolve.service';
@@ -42,7 +43,8 @@ import {NoticeService} from './service/notice.service';
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		PostNoticesComponent
 	],
 	providers: [
 		// Resolve
@@ -56,13 +58,15 @@ import {NoticeService} from './service/notice.service';
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		PostNoticesComponent
 	],
 	entryComponents: [
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		PostNoticesComponent
 	]
 })
 

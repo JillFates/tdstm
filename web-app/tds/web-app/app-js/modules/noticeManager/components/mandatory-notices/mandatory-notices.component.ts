@@ -22,7 +22,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
 		protected sanitizer: DomSanitizer) {
-			super(activeDialog, sanitizer);
+			super(sanitizer);
 	}
 
 	ngOnInit() {
@@ -32,6 +32,10 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 
 	getCurrentNotice() {
 		return this.notices[this.currentNoticeIndex];
+	}
+
+	onCancel() {
+		this.activeDialog.dismiss();
 	}
 
 	onAccept() {

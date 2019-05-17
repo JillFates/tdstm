@@ -23,7 +23,7 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
 		protected sanitizer: DomSanitizer) {
-			super(activeDialog, sanitizer);
+			super(sanitizer);
 	}
 
 	ngOnInit() {
@@ -37,10 +37,14 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 
 		if (updates.length) {
 			Observable.forkJoin(updates)
-				.subscribe((results) => this.activeDialog.dismiss());
+				.subscribe((results) => this.activeDialog.close());
 		} else {
-			this.activeDialog.dismiss();
+			this.activeDialog.close();
 		}
+	}
+
+	onCancel() {
+		this.activeDialog.close();
 	}
 
 }
