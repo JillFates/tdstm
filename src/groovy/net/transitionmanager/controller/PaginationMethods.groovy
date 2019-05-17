@@ -148,7 +148,8 @@ trait PaginationMethods {
 		if (orderValue) {
 			String value = orderValue.toUpperCase()
 			if (PAGINATION_SORT_ORDER_VALUES.contains(value)) {
-				result = value.startsWith('A') ? 'ASC' : 'DESC'
+				// TM-15085 Hibernate criteria NEEDS the sort order to be in *lowercase*
+				result = value.startsWith('A') ? 'asc' : 'desc'
 			}
 		}
 		if ( result == '' && (errorOnBlank || orderValue != '' ) ) {
