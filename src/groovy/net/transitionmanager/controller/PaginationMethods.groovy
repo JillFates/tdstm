@@ -115,7 +115,8 @@ trait PaginationMethods {
 	 * Used to retrieve the sort order for the data query
 	 * @param orderParamName - the parameter name that is used to indicate the user's selection (default sord)
 	 * @param orderDefault - the order to sort by (default ASC)
-	 * @return ASC or DESC based on the parameter passed to the request with default behavior
+	 * @return "asc" or "desc" based on the parameter passed to the request with default behavior
+	 * @see http://gorm.grails.org/5.0.x/api/org/grails/orm/hibernate/query/AbstractHibernateCriteriaBuilder.html#order(java.lang.String,%20java.lang.String)
 	 */
 	String paginationSortOrder(String orderParamName = 'sorder', String orderDefault='ASC') {
 		if (orderParamName) {
@@ -140,7 +141,8 @@ trait PaginationMethods {
 	 * or the errorOnBlank is true then if blank or bad value the InvalidParamException parameter is thrown.
 	 * @param orderValue - the value is evaluated for ASC|DESC|A|D
 	 * @param errorOnBlank - a flag to throw the exception when blank
-	 * @return the sort order normalized to ASC|DESC
+	 * @return the sort order normalized to asc|desc
+	 * @see http://gorm.grails.org/5.0.x/api/org/grails/orm/hibernate/query/AbstractHibernateCriteriaBuilder.html#order(java.lang.String,%20java.lang.String)
 	 * @throws InvalidParamException
 	 */
 	private String _validatePaginationSortOrderParam(String orderValue, Boolean errorOnBlank=false) {
@@ -148,7 +150,11 @@ trait PaginationMethods {
 		if (orderValue) {
 			String value = orderValue.toUpperCase()
 			if (PAGINATION_SORT_ORDER_VALUES.contains(value)) {
-				result = value.startsWith('A') ? 'ASC' : 'DESC'
+				/*
+				 * TM-15085 AbstractHibernateCriteriaBuilder.order  NEEDS the sort order to be in *lowercase*
+				 * @see http://gorm.grails.org/5.0.x/api/org/grails/orm/hibernate/query/AbstractHibernateCriteriaBuilder.html#order(java.lang.String,%20java.lang.String)
+				 */
+				result = value.startsWith('A') ? 'asc' : 'desc'
 			}
 		}
 		if ( result == '' && (errorOnBlank || orderValue != '' ) ) {
