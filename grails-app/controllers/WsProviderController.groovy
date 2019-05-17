@@ -58,7 +58,7 @@ class WsProviderController implements ControllerMethods{
     @HasPermission(Permission.ProviderView)
     def validateUniqueName(String name) {
         Long providerId = NumberUtil.toLong(request.JSON.providerId)
-        boolean isUnique = providerService.validateUniqueName(name, providerId)
+        boolean isUnique = providerService.validateUniqueName(request.JSON.name, providerId)
         renderSuccessJson([isUnique: isUnique])
     }
 

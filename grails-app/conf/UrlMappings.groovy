@@ -986,7 +986,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateUnique/$name" {
+		"/ws/dataingestion/provider/validateUnique" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
