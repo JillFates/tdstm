@@ -75,12 +75,15 @@ class CommentService implements ServiceMethods {
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project project = securityService.userCurrentProject
 
-		def date = new Date()
-		def assetEntity
-		def assetComment
-		def commentProject
-		def map = [:]
-		def errorMsg
+		Date date = new Date()
+		AssetEntity assetEntity
+		AssetComment assetComment
+		Project commentProject
+		Map map = [:]
+		String errorMsg
+
+		boolean isaTask = params.commentType == AssetCommentType.TASK
+		boolean isaComment = ! isaTask
 
 		// Wrap the whole routine so that we can break out when we hit fatal situations
 		while (true) {
@@ -94,44 +97,45 @@ class CommentService implements ServiceMethods {
 			if (params.assetEntity && params.assetEntity != 'NaN') {
 				if (params.assetEntity != 'null' &&  !params.assetEntity.isNumber()) {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id ($params.assetEntity)"
-					errorMsg = "An unexpected asset id was received"
+					errorMsg = "Invalid asset id format"
 					break
 				}
-				// Now see if it exists and belongs to the project
-				if (params.containsKey("assetEntity")) {
-					assetEntity = params.assetEntity != 'null' ? AssetEntity.read(params.assetEntity) : null
-				}
 
-				if (assetEntity) {
-					def assetProject = assetEntity.project
-					if (assetProject.id != project.id) {
-						log.error "saveUpdateCommentAndNotes: Asset($assetEntity.id/$assetProject) not associated with user($currentUsername) project ($project)"
-						errorMsg = "It appears that you do not have permission to view the specified task"
-						break
-					}
+				assetEntity = params.assetEntity != 'null' ? AssetEntity.read(params.assetEntity) : null
+
+				// Now see if it exists and belongs to the project
+				if (assetEntity && assetEntity.project.id != project.id) {
+					log.error "saveUpdateCommentAndNotes: Asset(${assetEntity.id}) not associated with user($currentUsername) project ($project)"
+					errorMsg = "Invalid asset id"
+					break
 				}
 			}
 
-			// Create or load the assetComment object appropriately
 			if (isNew) {
-				// Only tasks can be created that are not associated with an Asset
-				if (!assetEntity && params.commentType != AssetCommentType.TASK) {
+				// Check if the user can create Comments
+				if (isaComment && !securityService.hasPermission(Permission.CommentCreate)) {
+					errorMsg = "You do not have required permission to create comments"
+					securityService.reportViolation("User attempted to create comment without necessary permission")
+					break
+				}
+
+				// Check if the user can create Tasks
+				if (isaTask && !securityService.hasPermission(Permission.TaskCreate)) {
+					errorMsg = "You do not have required permission to create tasks"
+					securityService.reportViolation("User attempted to create task without necessary permission")
+					break
+				}
+
+				// Comments can only be created when associated to an asset
+				if ( isaComment && !assetEntity ) {
 					log.error "saveUpdateCommentAndNotes: Asset id was not properly supplied to add or update a comment"
 					errorMsg = 'The asset id was missing in the request'
 					break
 				}
 
-				// Check if the user can create comments
-				if ((params.commentType != AssetCommentType.TASK) && !securityService.hasPermission(Permission.CommentCreate)) {
-					log.error "saveUpdateCommentAndNotes: User don't have permission to create comments"
-					errorMsg = "User don't have permission to create comments"
-					securityService.reportViolation("User don't have permission to create comments")
-					break
-				}
-
 				// Let's create a new Comment/Task
-				assetComment = new AssetComment(createdBy: currentPerson, project: project)
-				if (params.commentType == AssetCommentType.TASK) {
+				assetComment = new AssetComment(createdBy: currentPerson, project: project, commentType: params.commentType)
+				if ( isaTask ) {
 					assetComment.taskNumber = sequenceService.next(project.client.id, 'TaskNumber')
 				}
 				if (assetEntity) {
@@ -145,21 +149,26 @@ class CommentService implements ServiceMethods {
 				if (!assetComment) {
 					// TODO : handle failure for invalid comment id
 					log.error "saveUpdateCommentAndNotes: Specified comment [id:$params.id] was not found"
-					errorMsg = 'Was unable to find the task for the specified id'
+					errorMsg = "Invalid ${isaTask ? 'task' : 'comment'} id"
 					break
 				}
 
-				// Check if the user can edit comments
-				if ((assetComment.commentType != AssetCommentType.TASK) && !canEditAsset) {
-					log.error "saveUpdateCommentAndNotes: User don't have permission to edit comments"
-					errorMsg = "User don't have permission to edit comments"
-					securityService.reportViolation("User don't have permission to edit comments")
+				if ( isaComment && !securityService.hasPermission(Permission.CommentEdit) ) {
+					errorMsg = "You do not have required permission to edit comments"
+					securityService.reportViolation("User attempted to edit comment without necessary permission")
+					break
+				}
+
+				// Check if the user can edit Tasks
+				if ( isaTask && !securityService.hasPermission(Permission.TaskEdit) ) {
+					errorMsg = "You do not have required permission to edit tasks"
+					securityService.reportViolation("User attempted to edit without necessary permission")
 					break
 				}
 
 				// If params.currentStatus is passed along, the form is expecting the status to be in this state so if it has changed
 				// then someone else beat the user to changing the status so we are going to stop and warn the user.
-				if (params.currentStatus) {
+				if (isaTask && params.currentStatus) {
 					if (assetComment.status != params.currentStatus) {
 						log.warn "saveUpdateCommentAndNotes() user $currentUsername attempted to change task ($assetComment.id) status but was already changed"
 						// TODO - assignedTo may be changing at the same time, which is assigned below. Need to review this as it is a potential edge case.
@@ -196,6 +205,7 @@ class CommentService implements ServiceMethods {
 				if (params.containsKey("assetEntity")) {
 					assetComment.assetEntity = assetEntity
 				}
+
 				// Make sure that the comment about to be updated is associated to the user's current project
 				if (commentProject.id != project.id) {
 					log.error "saveUpdateCommentAndNotes: The comment ($params.id/$commentProject.id) is not associated with user's current project [$project.id]"
@@ -217,21 +227,22 @@ class CommentService implements ServiceMethods {
 			// setting the assignedTo automatically with a blank Person object even though it was excluded.
 			// TODO : should only set properties base on the commentType
 
-			if(!session.hasProperty('assetCommentDef')){
-				session.assetCommentDef = [:]
+			if (params.comment) {
+				assetComment.comment = params.comment
 			}
 
-			if (params.commentType) assetComment.commentType = params.commentType
-			if (params.comment) assetComment.comment = params.comment
 			if (params.category){
 				assetComment.category = params.category
-				if (isNew) {
-					userPreferenceService.setPreference(PREF.TASK_CREATE_CATEGORY, params.category)
-				}
 			}
 
-			if (params.displayOption) assetComment.displayOption = params.displayOption
-			if (params.attribute) assetComment.attribute = params.attribute
+			if (params.displayOption) {
+				assetComment.displayOption = params.displayOption
+			}
+
+			if (params.attribute) {
+				assetComment.attribute = params.attribute
+			}
+
 			assetComment.resolution = params.resolution
 			if (params.containsKey('estStart')) {
 				// log.info "saveUpdateCommentAndNotes: estStart=[$params.estStart]"
@@ -297,9 +308,6 @@ class CommentService implements ServiceMethods {
 						if (params.moveEvent == "0") {
 							assetComment.moveEvent = null
 						} else {
-							if (isNew) {
-								userPreferenceService.setPreference(PREF.TASK_CREATE_EVENT, params.moveEvent)
-							}
 							def moveEvent = MoveEvent.get(params.moveEvent)
 							if (moveEvent) {
 								// Validate that this is a legit moveEvent for this project
@@ -358,25 +366,30 @@ class CommentService implements ServiceMethods {
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
 			// should be the last update to Task properties before saving.
-			//store default value for the status
-			if (isNew) {
-				userPreferenceService.setPreference(PREF.TASK_CREATE_STATUS, params.status)
+			if (assetComment.isaTask()) {
+				taskService.setTaskStatus(assetComment, params.status)
 			}
-			taskService.setTaskStatus(assetComment, params.status)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
-			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note
+			boolean addingNote = isaTask && params.note
 
 			// Note that shouldSendNotification has to be called before calling save on the object
 			boolean shouldSendNotification = shouldSendNotification(assetComment, currentPerson, isNew, addingNote)
 
 			if (!assetComment.hasErrors() && assetComment.save(flush: true)) {
+				// Save Category, Event and Status default for next task create
+				if (isNew && isaTask) {
+					userPreferenceService.setPreference(PREF.TASK_CREATE_CATEGORY, params.category)
+					userPreferenceService.setPreference(PREF.TASK_CREATE_EVENT, params.moveEvent)
+					userPreferenceService.setPreference(PREF.TASK_CREATE_STATUS, params.status)
+				}
+
 				// Deal with Notes if there are any
-				if (assetComment.commentType == AssetCommentType.TASK && params.note) {
+				if (addingNote) {
 					// TODO The adding of commentNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.
 					def commentNote = new CommentNote(createdBy: currentPerson, dateCreated: date, note: params.note,
 					                                  isAudit: 0, assetComment: assetComment)
-					if (commentNote.hasErrors() || !commentNote.save(flush: true)) {
+					if (!commentNote.save(flush: true)) {
 						// TODO error won't bubble up to the user
 						log.error "saveUpdateCommentAndNotes: Saving comment notes faild - ${GormUtil.allErrorsString(commentNote)}"
 						errorMsg = 'An unexpected error occurred while saving your comment'
@@ -740,9 +753,13 @@ class CommentService implements ServiceMethods {
 		return commentList
 	}
 
+	/**
+	 * This retrieves a Map of various fields that have default values based on the user's recent activity
+	 * in the task create so that future tasks created will have the same values
+	 */
 	Map getTaskCreateDefaults() {
 		return TASK_CREATE_DEFAULTS.collectEntries { PREF pref, ref ->
-			if(ref instanceof PREF){
+			if (ref instanceof PREF) {
 				ref = userPreferenceService.getPreference(ref)
 			}
 			String defaultVal = String.valueOf(ref)

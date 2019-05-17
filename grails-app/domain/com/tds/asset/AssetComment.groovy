@@ -2,6 +2,7 @@ package com.tds.asset
 
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
@@ -222,9 +223,10 @@ class AssetComment {
 			(6 - priority) * 5"
 	}
 
-	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
-	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
-	                     'tmpIsFunnellingTask', 'isActionable']
+	static transients = [
+		'actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
+		'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
+		'tmpIsFunnellingTask', 'isActionable']
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
@@ -255,6 +257,20 @@ class AssetComment {
 
 	boolean isOnHold() {
 		status == HOLD
+	}
+
+	/**
+	 * Used to determine if record is a Task
+	 */
+	boolean isaTask() {
+		commentType == AssetCommentType.TASK
+	}
+
+	/**
+	 * Used to determine if record is a Comment
+	 */
+	boolean isaComment() {
+		commentType != AssetCommentType.TASK
 	}
 
 	boolean isRunbookTask() {
