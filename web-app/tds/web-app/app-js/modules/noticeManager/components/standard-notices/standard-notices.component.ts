@@ -7,7 +7,7 @@ import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
-import {NoticeModel, StandardNotices} from '../../model/notice.model';
+import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
 
 @Component({
@@ -19,7 +19,7 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 	acceptAgreement: boolean;
 
 	constructor(
-		protected model: StandardNotices,
+		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
 		protected sanitizer: DomSanitizer) {

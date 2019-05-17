@@ -14,10 +14,10 @@ import {Permission} from '../../../../shared/model/permission.model';
 /*
 import {
 	NoticeColumnModel, NoticeModel, NoticeTypes,
-	PostNoticeResponse, StandardNotices, NoticeType
+	PostNoticeResponse,  NoticeType
 } from '../../model/notice.model';
 */
-import {NoticeColumnModel, NoticeModel, StandardNotices, NoticeTypes,
+import {NoticeColumnModel, NoticeModel, Notices, NoticeTypes,
 		NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse, NOTICE_TYPE_MANDATORY} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {YesNoList} from '../../../../shared/model/constants';
@@ -28,6 +28,7 @@ import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
+import {MandatoryNoticesComponent} from '../mandatory-notices/mandatory-notices.component';
 
 @Component({
 	selector: 'tds-notice-list',
@@ -209,27 +210,43 @@ export class NoticeListComponent implements OnInit {
 		console.log('Clicked on create notice');
 	}
 
-	onShowEULA(): void {
-		this.showStandardNotices();
+	onShowNotices(): void {
+		this.showMandatoryNotices()
+			.then(() => {
+				setTimeout(() => {
+					this.showStandardNotices()
+						.catch((error) => console.log(error));
+				}, 1000);
+			})
+			.catch(() => alert('Redirecint to logout'));
 	}
 
-	showStandardNotices() {
-		const notices = this.postNotices
-			.filter((notice) => !notice.needAcknowledgement)
+	filterPostNotices(mandatory: boolean): any[] {
+		return this.postNotices
+			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};
 			})
 			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 
-		if (notices && notices.length) {
-			this.dialogService.open(StandardNoticesComponent, [ {provide: StandardNotices, useValue: {notices: notices}}])
-				.then((response: any) => {
-					console.log(response);
-				})
-				.catch((error) => {
-					console.log('Error:', error && error.message);
-				});
-		}
+	}
+
+	showStandardNotices() {
+		const notices = this.filterPostNotices(false);
+
+		return notices.length ? this.dialogService
+				.open(StandardNoticesComponent, [ {provide: Notices, useValue: {notices: notices}}])
+				:
+				Promise.resolve(true);
+	}
+
+	showMandatoryNotices() {
+		const notices = this.filterPostNotices(true);
+
+		return notices.length ? this.dialogService
+				.open(MandatoryNoticesComponent, [ {provide: Notices, useValue: {notices: notices}}])
+				:
+				Promise.resolve(true);
 	}
 
 	/**

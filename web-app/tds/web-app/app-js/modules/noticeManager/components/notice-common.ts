@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 // Service
 import {UIActiveDialogService, } from '../../../shared/services/ui-dialog.service';
 // Model
-import {NoticeModel, StandardNotices} from '../model/notice.model';
+import {NoticeModel, Notices} from '../model/notice.model';
 
 export abstract class NoticeCommonComponent {
 	constructor(

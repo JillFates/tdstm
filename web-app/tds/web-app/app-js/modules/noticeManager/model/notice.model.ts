@@ -106,7 +106,7 @@ export class PostNoticeModel {
 }
 */
 
-export class StandardNotices {
+export class Notices {
 	notices: NoticeModel[];
 }
 
