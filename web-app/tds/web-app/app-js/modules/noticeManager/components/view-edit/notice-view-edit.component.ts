@@ -85,31 +85,37 @@ export class NoticeViewEditComponent {
 			});
 	}
 
+	private getPayloadFromModel(): any {
+		this.model.typeId = (this.noticeType && this.noticeType.typeId);
+
+		const payload = {...this.model};
+
+		if (payload.typeId === this.MANDATORY) {
+			payload.typeId = NOTICE_TYPE_POST_LOGIN;
+			payload.needAcknowledgement = true;
+		} else {
+			payload.needAcknowledgement = false;
+		}
+		payload.locked = payload.locked || false;
+		// remove esc sequences
+		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
+
+		return payload;
+	}
+
 	/**
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
-		this.model.typeId = (this.noticeType && this.noticeType.typeId);
+		const payload = this.getPayloadFromModel();
 
-		const model = {...this.model};
-
-		if (model.typeId === this.MANDATORY) {
-			model.typeId = NOTICE_TYPE_POST_LOGIN;
-			model.needAcknowledgement = true;
-		} else {
-			model.needAcknowledgement = false;
-		}
-		model.locked = model.locked || false;
-		// remove esc sequences
-		model.htmlText = model.htmlText.replace(new RegExp('\\n', 'g'), '');
-
-		if (model.id) {
-			this.noticeService.editNotice(model)
+		if (payload.id) {
+			this.noticeService.editNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
 		} else {
-			this.noticeService.createNotice(model)
+			this.noticeService.createNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
 					error => this.activeDialog.dismiss(error));
@@ -169,18 +175,13 @@ export class NoticeViewEditComponent {
 	 * Grab the current html value emitted by rich text editor
 	 */
 	onValueChange(value: string) {
-		// avoiding just blur events
-		if (this.model.htmlText !== value) {
-			this.model.htmlText = value;
-		}
+		this.model.htmlText = value;
 	}
 
 	/**
 	 * Grab the current raw value emitted by rich text editor
 	 */
 	onRawValueChange(value: string) {
-		if (this.model.rawText !== value) {
-			this.model.rawText = value;
-		}
+		this.model.rawText = value;
 	}
 }

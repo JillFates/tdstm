@@ -79,7 +79,8 @@
 	                </div>
 	                <div class="col-sm-6 locked-container">
 		                <label for="locked" class="control-label">Locked:</label>
-		                <input [disabled]="noticeIsLocked" id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
+                        <input [disabled]="noticeIsLocked" [ngClass]="{'is-disabled': noticeIsLocked}" 
+                            id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
 	                </div>
                 </div>
 

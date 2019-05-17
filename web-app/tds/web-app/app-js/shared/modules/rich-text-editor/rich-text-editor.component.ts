@@ -39,6 +39,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			statusbar: false,
 			menu: {},
 			height: 250,
+			content_style: this.readonly ? 'body#tinymce {background-color: #eee; cursor: not-allowed}' : '',
 			readonly: this.readonly,
 			skin_url: '../../dist/js/vendors/tinymce/lightgray',
 			setup: editor => {

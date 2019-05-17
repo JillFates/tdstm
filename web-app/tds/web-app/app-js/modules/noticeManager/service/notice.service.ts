@@ -40,7 +40,7 @@ export class NoticeService {
 					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
 
 					// TODO remove mock data when fields are coming from the BE
-					notice.locked = false;
+					notice.locked = true;
 					notice.postMessageText = 'This is the post message text';
 					notice.sequence = 0;
 					// -------------------------------------------------------
