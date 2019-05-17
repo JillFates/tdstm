@@ -2382,7 +2382,7 @@ class AssetEntityService implements ServiceMethods {
 					joinQuery.append("\nLEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id ")
 					break
 				case 'os':
-					altColumns.append(",\nae.hinfo AS os")
+					altColumns.append(",\nae.os AS os")
 					break
 				case ~/custom\d{1,}/:
 					altColumns.append(",\nae.$value AS $value")
