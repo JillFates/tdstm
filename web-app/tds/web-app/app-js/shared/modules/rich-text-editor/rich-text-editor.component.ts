@@ -28,6 +28,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 
 	@Input() rawValue: any;
 	@Output() rawValueChange = new EventEmitter<any>();
+	@Output() escHandler = new EventEmitter<void>();
 
 	editor;
 
@@ -42,8 +43,18 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			skin_url: '../../dist/js/vendors/tinymce/lightgray',
 			setup: editor => {
 				this.editor = editor;
-				editor.on('keyup', () => this.saveContent());
-				editor.on('blur', () => this.saveContent());
+				editor.on('keyup', (keyEvent) => {
+					// avoid that just moving beetween controls using the tab key throws the change state event
+					if (['Tab'].includes(keyEvent.key)) {
+						return;
+					}
+					// fix the issue that prevents closing the window pressing esc key if this control has the focus
+					if (keyEvent.key === 'Escape') {
+						return this.escHandler.emit();
+					}
+
+					this.saveContent();
+				});
 			},
 		});
 	}

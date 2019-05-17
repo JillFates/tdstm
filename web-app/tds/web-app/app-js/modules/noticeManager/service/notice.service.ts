@@ -38,6 +38,12 @@ export class NoticeService {
 					notice.typeId = notice.typeId.toString();
 					notice.active = notice.active;
 					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
+
+					// TODO remove mock data when fields are coming from the BE
+					notice.locked = false;
+					notice.postMessageText = 'This is the post message text';
+					notice.sequence = 0;
+					// -------------------------------------------------------
 				});
 				return result && result.notices;
 			})

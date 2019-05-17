@@ -4,7 +4,7 @@
         <h4 class="modal-title">{{ (action === 0 ? 'NOTICE.CREATE_NOTICE':'NOTICE.EDIT_NOTICE') | translate }}</h4>
     </div>
     <div class="modal-body">
-        <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
+        <form novalidate role="form" class="form-horizontal left-alignment">
             <div class="box-body">
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-3 control-label required-field">Title:</label>
@@ -88,19 +88,20 @@
                     <div class="col-sm-12">
                         <rich-text-editor
                             [readonly]="noticeIsLocked"
-                            #htmlTextField="richTextEditor"
+                            #htmlTextField
                             [elementId]="'htmlText'"
                             [required]="true"
                             [name]="'htmlText'"
                             (valueChange)="onValueChange($event)"
                             (rawValueChange)="onRawValueChange($event)"
+                            (escHandler)="cancelCloseDialog()"
                             [rawValue]="model.rawText"
                             [value]="model.htmlText">
                         </rich-text-editor>
                     </div>
                 </div>
                 <div class="form-group"
-                     *ngIf="noticeType && noticeType.typeId == MANDATORY">
+                     *ngIf="noticeType && noticeType.typeId === MANDATORY">
                     <label for="postMessageText" class="col-sm-12 control-label required-field">Post Message Text:</label>
 	                <div class="col-sm-12">
                         <input type="text"

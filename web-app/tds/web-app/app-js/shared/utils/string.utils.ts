@@ -19,4 +19,28 @@ export class StringUtils {
 		}
 		return result;
 	}
+
+	/**
+	 * Cast the strings Yes/No or any value to boolean
+	 * Any other kind of value is casted to boolean
+	 * @param {any} value
+	 * @param {boolean} Resulting cast convertion
+	 * @returns {boolean}
+	 */
+	public static stringToBoolean(value: any): any {
+		if (value === true || value === false) {
+			return value;
+		}
+
+		if (['yes', 'true'].includes(value.toLowercase())) {
+			return true;
+		}
+
+		if (['no', 'false'].includes(value.toLowerCase())) {
+			return false;
+		}
+
+		// cast any kind of object to boolean
+		return ++value;
+	}
 }
