@@ -54,8 +54,8 @@ export class PostNoticesComponent implements OnInit {
 						.then(() => {
 							this.navigateTo(this.redirectUri);
 						})
-						.catch((error) => console.log(error));
-				}, 200);
+						.catch((error) => this.navigateTo(this.redirectUri));
+				}, 600);
 			})
 			.catch(() => {
 				// throught the window service because the route is not handled

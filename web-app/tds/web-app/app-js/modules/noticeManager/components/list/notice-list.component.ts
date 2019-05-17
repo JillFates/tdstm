@@ -12,12 +12,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
-/*
-import {
-	NoticeColumnModel, NoticeModel, NoticeTypes,
-	PostNoticeResponse,  NoticeType
-} from '../../model/notice.model';
-*/
 import {NoticeColumnModel, NoticeModel, Notices, NoticeTypes,
 		NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse, NOTICE_TYPE_MANDATORY} from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
@@ -28,8 +22,6 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
-import {MandatoryNoticesComponent} from '../mandatory-notices/mandatory-notices.component';
 
 @Component({
 	selector: 'tds-notice-list',
@@ -53,7 +45,6 @@ export class NoticeListComponent implements OnInit {
 	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	/* protected noticeTypes = [{typeId: null, name: ''}].concat(NoticeTypes); */
 	protected noticeTypes = [];
 	protected yesNoList = [...YesNoList];
 	protected defaultNoticeType = {typeId: '', name: 'Please Select'};
@@ -64,7 +55,6 @@ export class NoticeListComponent implements OnInit {
 	private gridData: GridDataResult;
 	protected resultSet: any[];
 	protected dateFormat: string;
-	protected postNotices: NoticeModel[] = [];
 	protected notices = [];
 
 	/**
@@ -91,22 +81,6 @@ export class NoticeListComponent implements OnInit {
 
 		this.dateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 		this.noticeColumnModel = new NoticeColumnModel(this.dateFormat);
-
-		this.noticeService.getPostNotices()
-			.subscribe((response: PostNoticeResponse) => {
-				this.postNotices = response.notices.map((notice: NoticeModel) => {
-					if (!notice.sequence) {
-						notice.sequence = 0;
-					}
-					// notice.needAcknowledgement = true;
-					if (notice.needAcknowledgement) {
-						// @@
-						// notice.typeId = NoticeType.Mandatory;
-					}
-
-					return notice;
-				});
-			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -210,49 +184,6 @@ export class NoticeListComponent implements OnInit {
 			console.log(error);
 		});
 		console.log('Clicked on create notice');
-	}
-
-	onShowNotices(): void {
-		this.showMandatoryNotices()
-			.then(() => {
-				setTimeout(() => {
-					this.showStandardNotices()
-						.catch((error) => console.log(error));
-				}, 200);
-			})
-			.catch(() => {
-				// throught the window service because the route is not handled
-				// by the angular router
-				this.windowService.getWindow().location.assign('/tdstm/auth/signOut');
-			});
-	}
-
-	filterPostNotices(mandatory: boolean): any[] {
-		return this.postNotices
-			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
-			.map((notice: NoticeModel) => {
-				return {...notice, notShowAgain: false};
-			})
-			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
-
-	}
-
-	showStandardNotices() {
-		const notices = this.filterPostNotices(false);
-
-		return notices.length ? this.dialogService
-				.open(StandardNoticesComponent, [ {provide: Notices, useValue: {notices: notices}}])
-				:
-				Promise.resolve(true);
-	}
-
-	showMandatoryNotices() {
-		const notices = this.filterPostNotices(true);
-
-		return notices.length ? this.dialogService
-				.open(MandatoryNoticesComponent, [ {provide: Notices, useValue: {notices: notices}}])
-				:
-				Promise.resolve(true);
 	}
 
 	/**

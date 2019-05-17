@@ -16,14 +16,13 @@ export class NoticeManagerStates {
 		url: 'list'
 	};
 	public static readonly NOTICE_POST = {
-		url: 'post-notices'
+		url: ''
 	};
 }
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
 
 export const NoticeManagerRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: NoticeManagerStates.NOTICE_POST.url},
 	{
 		path: NoticeManagerStates.NOTICE_LIST.url,
 		data: {
@@ -45,10 +44,9 @@ export const NoticeManagerRoute: Routes = [
 		path: NoticeManagerStates.NOTICE_POST.url,
 		data: {
 			page: {
-				title: 'NOTICE.POST_NOTICES',
+				title: '',
 				instruction: '',
 				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'NOTICE.POST_NOTICES'],
-				// topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-notice-manager', subMenu: true }
 			},
 			requiresAuth: true,
 		},

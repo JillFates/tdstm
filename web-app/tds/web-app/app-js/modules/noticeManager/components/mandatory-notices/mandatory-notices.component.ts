@@ -39,14 +39,6 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	}
 
 	onAccept() {
-		/*
-		if ((this.currentNoticeIndex + 1) >= this.notices.length) {
-			this.activeDialog.close();
-		} else {
-			this.currentNoticeIndex += 1;
-		}
-		*/
-
 		this.noticeService
 		.setAcknowledge(this.notices[this.currentNoticeIndex].id)
 			.subscribe(() => {
