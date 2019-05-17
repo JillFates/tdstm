@@ -1547,7 +1547,7 @@ class ReportsService implements ServiceMethods {
             if (!owner) {
                 throw new InvalidParamException("Invalid owner id given.")
             }
-			queryParams.appOwner = GormUtil.findInProject(ownerId)
+			queryParams.appOwner = GormUtil.findInProject(project, Person, ownerId, true).id
 		}
 
 		int assetCap = 100 // default value
