@@ -183,7 +183,6 @@ export class NoticeListComponent implements OnInit {
 		}, error => {
 			console.log(error);
 		});
-		console.log('Clicked on create notice');
 	}
 
 	/**

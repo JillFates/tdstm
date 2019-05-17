@@ -31,6 +31,9 @@ export class StringUtils {
 		if (value === true || value === false) {
 			return value;
 		}
+		if (typeof value === 'undefined' || value === null) {
+			return false;
+		}
 
 		if (['yes', 'true'].includes(value.toLowercase())) {
 			return true;

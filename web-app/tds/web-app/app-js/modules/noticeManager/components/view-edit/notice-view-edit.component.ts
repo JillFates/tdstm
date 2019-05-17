@@ -130,17 +130,21 @@ export class NoticeViewEditComponent {
 	}
 
 	protected formValid(): boolean {
-		return true;
-		/*
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =  this.model && this.model.title &&
-				(this.htmlText && this.htmlText.value && this.htmlText.value.trim())  &&
-				this.htmlText.valid() && (noticeType || noticeType === 0);
+				this.isValidHtmlText() && (noticeType || noticeType === 0);
 
 		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
 
 		return returnValue;
-		*/
+	}
+
+	private isValidHtmlText(): boolean {
+		return this.htmlText &&
+				this.htmlText.value &&
+				this.htmlText.value.trim()  &&
+				this.htmlText.valid();
+
 	}
 
 	protected isCreateEditAvailable(): boolean {
