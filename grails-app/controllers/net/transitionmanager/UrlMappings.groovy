@@ -485,7 +485,7 @@ class UrlMappings {
 			action = [ GET: "modelForUserDashboard" ]
 		}
 
-		"/ws/user/assignedEvents" {
+		"/ws/user/assignedEvents/$showActive" {
 			controller = "wsUser"
 			action = [ GET: "getAssignedEvents" ]
 		}

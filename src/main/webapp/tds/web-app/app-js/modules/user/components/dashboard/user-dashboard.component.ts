@@ -40,6 +40,7 @@ export class UserDashboardComponent implements OnInit {
 	public activePersonList;
 	public activePersonColumnModel;
 	public eventList;
+	public showActiveEvents = true;
 	public eventColumnModel;
 	public eventNewsList;
 	public eventNewsColumnModel;
@@ -152,7 +153,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public fetchEventsForGrid(): void {
-		this.userService.getAssignedEvents()
+		this.userService.getAssignedEvents(this.showActiveEvents)
 			.subscribe((result) => {
 				this.eventList = result.events;
 			});
