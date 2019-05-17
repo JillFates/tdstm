@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']','').replace('"',"'"))}
+				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess)}
 				</td>
 			</tr>
 			<tr>
@@ -64,8 +64,8 @@
 							<th>Team</th>
 						</thead>
 						<tbody>
-							<g:each in="${list}" var="staff" status="i">
-								<g:if test="${ list.size()>0}">
+							<g:each in="${projectStaffList}" var="staff" status="i">
+								<g:if test="${ projectStaffList.size()>0}">
 									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 										<td>
 											${staff.name}
