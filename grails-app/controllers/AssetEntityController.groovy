@@ -1219,6 +1219,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			'assignedTo': 'assignedTo',
 			'instructionsLink': 'instructionsLink',
 			'category': 'category',
+		   'role': 'role',
 			'score': 'score'
 		].withDefault { key -> session.TASK?.JQ_FILTERS?.sidx }
 
