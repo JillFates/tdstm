@@ -50,6 +50,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskService
@@ -82,6 +83,7 @@ class ReportsService implements ServiceMethods {
     AssetEntityService assetEntityService
     ControllerService controllerService
     ProjectService projectService
+    TagAssetService tagAssetService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -1601,6 +1603,9 @@ class ReportsService implements ServiceMethods {
 			def startupById = startupBy instanceof Person ? startupBy.id : -1
 			def testingById = testingBy instanceof Person ? testingBy.id : -1
 
+            // Load asset tags.
+            def tagAssetList = tagAssetService.list(project, app.id)*.toMap()
+
 			// TODO: we'd like to flush the session
 			// GormUtil.flushAndClearSession(idx)
 			appList.add([
@@ -1616,8 +1621,9 @@ class ReportsService implements ServiceMethods {
 				testingById: testingById,
 				shutdownBy: shutdownBy,
 				startupBy: startupBy,
-				testingBy: testingBy
-			])
+				testingBy: testingBy,
+                tagAssetList: tagAssetList ? tagAssetList : []
+            ])
 		}
 
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
