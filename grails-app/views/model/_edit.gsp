@@ -415,7 +415,7 @@
 				$("#labelId"+j).removeClass("field_error")
 			}
 		}
-		$("#connectorLabelText"+id).html(value)
+		$("#connectorLabelText"+id).html(_.escape(value))
 		if($("#labelPositionId"+id).val() == "Left"){
 			$("#labelPositionDiv"+id).attr("style","margin-left:-"+$('#connectorLabelText'+id).outerWidth()+"px")
 		}
