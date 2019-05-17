@@ -12,6 +12,10 @@
                     <ng-template kendoGridToolbarTemplate>
                         <img src="/tdstm/assets/icons/calendar.png"/>
                         <strong>Events</strong> <span> - Your assigned events and your team</span>
+                        <div class="event-status-toolbar">
+                            <input type="radio" name="event-status" [value]="true"  [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Active</span>
+                            <input type="radio" name="event-status" [value]="false" [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Completed</span>
+                        </div>
                         <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
 
@@ -24,6 +28,11 @@
                             <div>
                                 <label>{{column.label}}</label>
                             </div>
+                        </ng-template>
+
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                            <span *ngIf="column.property=='name'"><a [href]="'/tdstm/dashboard/index?moveEvent=' + dataItem.eventId">{{dataItem[column.property]}}</a></span>
+                            <span *ngIf="column.property!='name'">{{dataItem[column.property]}}</span>
                         </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
