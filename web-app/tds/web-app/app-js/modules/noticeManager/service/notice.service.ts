@@ -41,7 +41,7 @@ export class NoticeService {
 
 					// TODO remove mock data when fields are coming from the BE
 					notice.locked = true;
-					notice.postMessageText = 'This is the post message text';
+					notice.acknowledgeLabel  = 'This is the post message text';
 					notice.sequence = 0;
 					// -------------------------------------------------------
 				});

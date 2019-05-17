@@ -85,7 +85,7 @@ export class NoticeModel {
 	expirationDate: any;
 	sequence: number;
 	locked: boolean;
-	postMessageText: string;
+	acknowledgeLabel: string;
 	notShowAgain?: boolean;
 	needAcknowledgement?: boolean;
 }
