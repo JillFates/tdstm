@@ -2,6 +2,7 @@ package net.transitionmanager.domain
 
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.service.InvalidParamException
 import grails.converters.JSON
 
 class Notice {
@@ -81,11 +82,13 @@ class Notice {
 		}
 	}
 
-	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.nowGMT()
+		// Prevent users from unlocking a record
+		if ( this.isDirty('locked') && this.locked == false ) {
+			if ( this.getPersistentValue('locked') == true ) {
+				throw new InvalidParamException('Previous locked Notices can not be unlocked')
+			}
+		}
 	}
 
 	private static final Map<String, Class> MARSHALLER_TYPES = [
