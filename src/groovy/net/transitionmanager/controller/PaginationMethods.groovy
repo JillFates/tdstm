@@ -148,7 +148,10 @@ trait PaginationMethods {
 		if (orderValue) {
 			String value = orderValue.toUpperCase()
 			if (PAGINATION_SORT_ORDER_VALUES.contains(value)) {
-				// TM-15085 Hibernate criteria NEEDS the sort order to be in *lowercase*
+				/*
+				 * TM-15085 AbstractHibernateCriteriaBuilder.order  NEEDS the sort order to be in *lowercase*
+				 * @see http://gorm.grails.org/5.0.x/api/org/grails/orm/hibernate/query/AbstractHibernateCriteriaBuilder.html#order(java.lang.String,%20java.lang.String)
+				 */
 				result = value.startsWith('A') ? 'asc' : 'desc'
 			}
 		}

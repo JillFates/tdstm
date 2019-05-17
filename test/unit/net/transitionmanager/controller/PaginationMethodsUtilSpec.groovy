@@ -28,21 +28,21 @@ class PaginationMethodsUtilSpec extends Specification {
 			result == setParamsInTestCtrl(paramName, paramValue) + testController.paginationSortOrder(paramName, defaultSort)
 
 		where:
-			paramName	| paramValue	| defaultSort	| result
-			'sord'		| 'DESC'		| 'ASC'			| 'DESC'
-			'sord'		| 'ASC'			| 'DESC'		| 'ASC'
-			'sord'		| 'desc'		| 'ASC'			| 'DESC'
-			'sord'		| 'aSc'			| 'DESC'		| 'ASC'
-			'sord'		| 'A'			| 'D'			| 'ASC'
-			'sord'		| 'D'			| 'A'			| 'DESC'
-			'sord'		| 'a'			| 'D'			| 'ASC'
-			'sord'		| 'd'			| 'A'			| 'DESC'
-			'sord'		| ''			| 'A'			| 'ASC'
-			'sord'		| null			| 'A'			| 'ASC'
-			null		| null			| 'ASC'			| 'ASC'
-			null		| null			| 'DESC'		| 'DESC'
-			null		| null			| 'A'			| 'ASC'
-			null		| null			| 'D'			| 'DESC'
+			paramName   | paramValue   | defaultSort  | result
+			'sord'      | 'DESC'       | 'ASC'        | 'desc'
+			'sord'      | 'ASC'        | 'DESC'       | 'asc'
+			'sord'      | 'desc'       | 'ASC'        | 'desc'
+			'sord'      | 'aSc'        | 'DESC'       | 'asc'
+			'sord'      | 'A'          | 'D'          | 'asc'
+			'sord'      | 'D'          | 'A'          | 'desc'
+			'sord'      | 'a'          | 'D'          | 'asc'
+			'sord'      | 'd'          | 'A'          | 'desc'
+			'sord'      | ''           | 'A'          | 'asc'
+			'sord'      | null         | 'A'          | 'asc'
+			null        | null         | 'ASC'        | 'asc'
+			null        | null         | 'DESC'       | 'desc'
+			null        | null         | 'A'          | 'asc'
+			null        | null         | 'D'          | 'desc'
 	}
 
 	@Unroll
@@ -58,9 +58,9 @@ class PaginationMethodsUtilSpec extends Specification {
 
 		where:
 			paramName	| paramValue	| defaultSort
-			'sorder'	| 'FUBAR'		| 'ASC'
-			null		| null			| 'FUBAR'
-			null		| 'FUBAR'		| 'ASC'
+			'sorder'	   | 'FUBAR'		| 'ASC'
+			null		   | null			| 'FUBAR'
+			null		   | 'FUBAR'		| 'ASC'
 	}
 
 	void 'test paginationOrderBy'() {
@@ -114,7 +114,7 @@ class PaginationMethodsUtilSpec extends Specification {
 		and: 'a PaginationObject is created'
 			PaginationObject po = testController.paginationAsObject()
 		expect: 'calling paginationSortOrder on the object should return value from the params.sord'
-			'DESC' == po.paginationSortOrder('sord', 'ASC')
+			'desc' == po.paginationSortOrder('sord', 'ASC')
 		and: 'calling paginationOrderBy on the object should return value from the params.idx'
 			'description' == po.paginationOrderBy(Application, 'sidx', 'assetName')
 	}
