@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -76,7 +77,8 @@ export class NoticeListComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
 		private prompt: UIPromptService,
-		private route: ActivatedRoute) {
+		private route: ActivatedRoute,
+		private windowService: WindowService) {
 		this.resultSet = this.route.snapshot.data['notices'];
 		this.gridData = process(this.resultSet, this.state);
 		this.noticeTypes = NoticeTypes.filter((noticeType) => noticeType.typeId !== NOTICE_TYPE_MANDATORY);
@@ -216,9 +218,13 @@ export class NoticeListComponent implements OnInit {
 				setTimeout(() => {
 					this.showStandardNotices()
 						.catch((error) => console.log(error));
-				}, 1000);
+				}, 200);
 			})
-			.catch(() => alert('Redirecint to logout'));
+			.catch(() => {
+				// throught the window service because the route is not handled
+				// by the angular router
+				this.windowService.getWindow().location.assign('/tdstm/auth/signOut');
+			});
 	}
 
 	filterPostNotices(mandatory: boolean): any[] {
