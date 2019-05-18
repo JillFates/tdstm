@@ -273,7 +273,7 @@ export const en_DICTIONARY: Object = {
 		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
 		'POST_NOTICES': 'Post Notices',
-		'TOOLTIP_TITLE': 'Notice title.',
+		'TOOLTIP_TITLE': 'Notice title',
 		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
 Post Login: Used for general notices after Login
 Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
