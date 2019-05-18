@@ -106,6 +106,19 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		// remove esc sequences
 		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
 
+		// remove nulls in case
+		if (payload.sequence === null) {
+			delete payload['sequence'];
+		}
+
+		if (payload.activationDate === null) {
+			delete payload['activationDate'];
+		}
+
+		if (payload.expirationDate === null) {
+			delete payload['expirationDate'];
+		}
+
 		return payload;
 	}
 
