@@ -11,7 +11,7 @@ import {UserService} from '../../modules/user/service/user.service';
 import {Paths} from '../tds-routing.states';
 
 @Injectable()
-export class MandatoryNoticesCheckService {
+export class MandatoryNoticesValidatorService {
 	private baseUri = '/tdstm'
 	private signOutUri = `${this.baseUri}/auth/signOut`
 

@@ -7,6 +7,7 @@ import {APIActionService} from '../../service/api-action.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel} from '../../model/api-action.model';
@@ -97,7 +98,7 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.apiActionService.filterColumn(column, this.state);
+		const root = GridColumnModel.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 

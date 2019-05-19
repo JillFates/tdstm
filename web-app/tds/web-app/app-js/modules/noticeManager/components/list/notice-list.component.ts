@@ -9,7 +9,7 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
 import {NoticeColumnModel, NoticeModel, Notices, NoticeTypes,
@@ -54,7 +54,7 @@ export class NoticeListComponent implements OnInit {
 	protected actionType = ActionType;
 	private gridData: GridDataResult;
 	protected resultSet: any[];
-	protected dateFormat: string;
+	protected dateFormat = '';
 	protected notices = [];
 
 	/**
@@ -79,8 +79,12 @@ export class NoticeListComponent implements OnInit {
 		this.notices = this.noticeTypes
 			.map((notice) => notice.name);
 
-		this.dateFormat = this.preferenceService.getUserDateFormatForMomentJS();
-		this.noticeColumnModel = new NoticeColumnModel(this.dateFormat);
+		// this.dateFormat = this.preferenceService.getUserDateFormatForMomentJS();
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+		.subscribe((dateFormat) => {
+			this.dateFormat = dateFormat;
+			this.noticeColumnModel = new NoticeColumnModel(`{0:${dateFormat}}`);
+		});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -94,7 +98,7 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.noticeService.filterColumn(column, this.state);
+		const root = GridColumnModel.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 

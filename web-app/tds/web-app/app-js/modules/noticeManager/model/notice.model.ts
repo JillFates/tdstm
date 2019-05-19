@@ -13,63 +13,55 @@ export class NoticeColumnModel {
 				label: 'Title',
 				property: 'title',
 				type: 'text',
-				width: 160,
+				width: 200,
 			}, {
 				label: 'Type',
 				property: 'typeId',
 				type: 'text',
-				width: 260,
+				width: 160,
 			}, {
 				label: 'Active',
 				property: 'active',
 				type: 'boolean',
-				width: 160,
+				width: 100,
 			},
 			{
 				label: 'Need acknowledgement',
 				property: 'needAcknowledgement',
 				type: 'boolean',
-				width: 160,
+				width: 180,
 			}
-			/*,
+			,
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 160
+				width: 140
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 160
+				width: 140
 			},
 			{
 				label: 'Sequence',
 				property: 'sequence',
-				type: 'text',
-				width: 160
+				type: 'number',
+				width: 120
 			},
 			{
 				label: 'Locked',
 				property: 'locked',
 				type: 'boolean',
-				width: 160
+				width: 100
 			}
-			*/
 		];
 	}
 }
 
-/*
-export enum NoticeType {
-	PreLogin = 1,
-	PostLogin,
-	Mandatory
-}
-*/
 export class NoticeModel {
 	acknowledgeable: boolean;
 	active: boolean;
@@ -94,17 +86,6 @@ export class PostNoticeResponse {
 	redirectUri: string;
 	notices: NoticeModel[];
 }
-
-/*
-export class PostNoticeModel {
-	htmlText: string;
-	id: number;
-	name: string;
-	acknowledgeable: number;
-	notShowAgain?: boolean;
-	sequence?: number;
-}
-*/
 
 export class Notices {
 	notices: NoticeModel[];
