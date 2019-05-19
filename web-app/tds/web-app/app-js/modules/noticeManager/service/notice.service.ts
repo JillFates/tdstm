@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Response, Headers, RequestOptions} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {NotifierService} from '../../../shared/services/notifier.service';
+import {StringUtils} from '../../../shared/utils/string.utils';
 import {Observable} from 'rxjs/Observable';
 
 import {NoticeModel, PostNoticeResponse} from '../model/notice.model';
@@ -37,7 +37,7 @@ export class NoticeService {
 				result.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
 					notice.active = notice.active;
-					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
+					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
 				});
 				return result && result.notices;
 			})
@@ -151,7 +151,7 @@ export class NoticeService {
 				let result = res.json();
 				let notices = result.data && result.data.notices || [];
 				notices.forEach( (notice: any) => {
-					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
+					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
 				});
 
 				return result && result.data || [];

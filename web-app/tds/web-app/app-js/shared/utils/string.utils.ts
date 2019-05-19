@@ -46,4 +46,16 @@ export class StringUtils {
 		// cast any kind of object to boolean
 		return ++value;
 	}
+
+	/**
+	 * Remove scape sequences such as \' \"
+	 * @param {string} value Input string value
+	 * @returns {boolean}
+	 */
+	public static removeScapeSequences(value: string): string {
+		return value
+				.replace(new RegExp('\\\\/', 'g'), '/')
+				.replace(new RegExp('\\\\\'', 'g'), '\'')
+				.replace(new RegExp('\\\\\"', 'g'), '\'');
+	}
 }
