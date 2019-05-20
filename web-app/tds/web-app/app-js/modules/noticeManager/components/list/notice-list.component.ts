@@ -75,11 +75,13 @@ export class NoticeListComponent implements OnInit {
 
 	}
 
+	/**
+	 * Get the notices list, the date format and based on it creates the column model
+	 */
 	ngOnInit() {
 		this.notices = this.noticeTypes
 			.map((notice) => notice.name);
 
-		// this.dateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 		.subscribe((dateFormat) => {
 			this.dateFormat = dateFormat;
@@ -87,26 +89,43 @@ export class NoticeListComponent implements OnInit {
 		});
 	}
 
+	/**
+	 *  On filter change grab the current filter value and process the notices list
+	 */
 	protected filterChange(filter: CompositeFilterDescriptor): void {
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 *  On sort change grab the current sort value and process the notices list
+	 */
 	protected sortChange(sort): void {
 		this.state.sort = sort;
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Get the reference to the column that was filtered and throws the filter event
+	*/
 	protected onFilter(column: any): void {
 		const root = GridColumnModel.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
+	/**
+	 * Clear the column filter value currently selected
+	 * @param {Any} column Column to clear out filter
+	*/
 	protected clearValue(column: any): void {
 		this.noticeService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
+	/**
+	 * Reset the filter type to the original value
+	 * @param {Any} column Column to reset the filter
+	*/
 	protected resetTypeFilter(column: any): void {
 		this.clearValue(column);
 		column.filter = null;

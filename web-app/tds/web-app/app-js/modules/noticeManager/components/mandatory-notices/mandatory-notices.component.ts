@@ -30,14 +30,23 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 		this.currentNoticeIndex = 0;
 	}
 
+	/**
+	 * Get the notice which the current index is pointing out
+	*/
 	getCurrentNotice() {
 		return this.notices[this.currentNoticeIndex];
 	}
 
+	/**
+	 * On cancel dismiss the active dialog
+	*/
 	onCancel() {
 		this.activeDialog.dismiss();
 	}
 
+	/**
+	 * On accept call the endpoint to marck the notice to not be shown again
+	*/
 	onAccept() {
 		this.noticeService
 		.setAcknowledge(this.notices[this.currentNoticeIndex].id)

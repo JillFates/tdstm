@@ -33,6 +33,9 @@ export class PostNoticesComponent implements OnInit {
 		private router: Router) {
 	}
 
+	/**
+	 * Get the post notices and extract the redirectUri value
+	*/
 	ngOnInit() {
 		this.noticeService.getPostNotices()
 			.subscribe((response: PostNoticeResponse) => {
@@ -48,6 +51,10 @@ export class PostNoticesComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * First show the standard notices, then show the mandatory
+	 * Because the bootstrap modal is necessary a delay among them
+	*/
 	showNotices(): void {
 		this.showMandatoryNotices()
 			.then(() => {
@@ -66,6 +73,10 @@ export class PostNoticesComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Filter post notices
+	 * @param {Boolean} mandatory True for get mandatory, False for get Standard
+	*/
 	filterPostNotices(mandatory: boolean): any[] {
 		return this.postNotices
 			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
@@ -76,6 +87,9 @@ export class PostNoticesComponent implements OnInit {
 
 	}
 
+	/**
+	 * Open the view to show standard notices
+	*/
 	showStandardNotices() {
 		const notices = this.filterPostNotices(false);
 
@@ -85,6 +99,9 @@ export class PostNoticesComponent implements OnInit {
 				Promise.resolve(true);
 	}
 
+	/**
+	 * Open the view to show mandatory notices
+	*/
 	showMandatoryNotices() {
 		const notices = this.filterPostNotices(true);
 
@@ -93,9 +110,12 @@ export class PostNoticesComponent implements OnInit {
 				:
 				Promise.resolve(true);
 	}
+
+	/**
+	 *  Navigate to specific url
+	 * Because it could be a grails route not handled by Angular the navigation should be done through window service
+	*/
 	private navigateTo(uri: string) {
-		// Navigate throught the window service because that routes are not handled
-		// by the angular router
 		this.windowService.navigateTo(uri);
 	}
 }

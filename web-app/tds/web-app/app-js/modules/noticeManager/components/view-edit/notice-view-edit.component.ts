@@ -91,6 +91,9 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			});
 	}
 
+	/**
+	 * Get and clean the payload to be sent to the server to create or edit a notice
+	*/
 	private getPayloadFromModel(): any {
 		this.model.typeId = (this.noticeType && this.noticeType.typeId);
 
@@ -148,6 +151,9 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			.catch(error => console.log('View HTML Closed'));
 	}
 
+	/**
+	 * Determines if all the field forms comply with the validation rules
+	*/
 	protected formValid(): boolean {
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =  this.model && this.model.title &&

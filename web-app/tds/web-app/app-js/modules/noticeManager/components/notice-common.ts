@@ -6,12 +6,21 @@ export abstract class NoticeCommonComponent {
 		protected sanitizer: DomSanitizer) {
 	}
 
+	/**
+	 * needs to be defined by the instance
+	*/
 	abstract onCancel(): void;
 
+	/**
+	 * Sanitize the html value to be displayed
+	*/
 	protected sanitizeHTML(html: string) {
 		return this.sanitizer.bypassSecurityTrustHtml(html);
 	}
 
+	/**
+	 * needs to be defined by the instance
+	*/
 	abstract  onAccept(): void;
 
 }

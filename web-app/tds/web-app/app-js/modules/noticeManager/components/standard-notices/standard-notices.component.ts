@@ -30,6 +30,9 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 		this.notices = this.model.notices;
 	}
 
+	/**
+	 * Set the flag to dont show the notice any more
+	*/
 	onAccept() {
 		const updates = this.notices
 			.filter((notice) => notice.notShowAgain)
@@ -43,6 +46,9 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 		}
 	}
 
+	/**
+	 * Close the current active dialog
+	*/
 	onCancel() {
 		this.activeDialog.close();
 	}

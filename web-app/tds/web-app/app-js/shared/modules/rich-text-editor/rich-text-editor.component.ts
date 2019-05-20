@@ -45,12 +45,6 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			setup: editor => {
 				this.editor = editor;
 				editor.on('keyup', (keyEvent) => {
-					// avoid that just moving beetween controls using the tab key throws the change state event
-					/*
-					if (['Tab'].includes(keyEvent.key)) {
-						return;
-					}
-					*/
 					// fix the issue that prevents closing the window pressing esc key if this control has the focus
 					if (keyEvent.key === 'Escape') {
 						return this.escHandler.emit();
