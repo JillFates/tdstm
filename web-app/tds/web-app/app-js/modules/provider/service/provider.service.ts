@@ -67,10 +67,11 @@ export class ProviderService {
 		}
 
 		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique`, JSON.stringify(postRequest))
-			.map((response: any) => {
-				return response && response.status === 'success' && response.data;
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
-			.catch((error: any) => error);
+			.catch((error: any) => error.json());
 	}
 
 	deleteProvider(id: number): Observable<string> {
