@@ -377,7 +377,25 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 
 			if (errMsg) {
 				flash.message = errMsg
-				redirect(action: "create", id: params.personId, params: [companyId: params.companyId])
+				def returnParams = [
+						username: params.username,
+						email: params.email,
+						isLocal: params.isLocal ? true : false,
+						forcePasswordChange: params.forcePasswordChange ? true : false,
+						passwordNeverExpires: params.passwordNeverExpires ? true : false,
+						expiryDate: params.expiryDate,
+						passwordExpirationDate: params.passwordExpirationDate,
+						active: params.active,
+						projectId: params.projectId,
+						companyId: params.companyId,
+						ADMIN: params.assignedRole && params.assignedRole.contains('ADMIN'),
+						CLIENTADMIN: params.assignedRole && params.assignedRole.contains('CLIENT_ADMIN'),
+						CLIENTMGR: params.assignedRole && params.assignedRole.contains('CLIENT_MGR'),
+						EDITOR: params.assignedRole && params.assignedRole.contains('EDITOR'),
+						SUPERVISOR: params.assignedRole && params.assignedRole.contains('SUPERVISOR'),
+						USER: params.assignedRole && params.assignedRole.contains('USER')
+				]
+				redirect(action: "create", id: params.personId, params: returnParams)
 			} else {
 				flash.message = "UserLogin $newUserLogin created"
 				redirect(action: "show", id: newUserLogin.id, params: [companyId: params.companyId])
