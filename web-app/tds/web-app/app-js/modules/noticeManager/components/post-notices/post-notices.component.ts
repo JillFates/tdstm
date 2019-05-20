@@ -36,7 +36,7 @@ export class PostNoticesComponent implements OnInit {
 	ngOnInit() {
 		this.noticeService.getPostNotices()
 			.subscribe((response: PostNoticeResponse) => {
-				this.redirectUri = `${this.baseUri}${response.redirectUri}`;
+				this.redirectUri = `${this.baseUri}/${response.redirectUri}`;
 				this.postNotices = response.notices.map((notice: NoticeModel) => {
 					notice.sequence = notice.sequence || 0;
 					return notice;
@@ -58,7 +58,7 @@ export class PostNoticesComponent implements OnInit {
 				}, 600);
 			})
 			.catch(() => {
-				// throught the window service because the route is not handled
+				// navigate throught the window service because the route is not handled
 				// by the angular router
 				this.navigateTo(this.signOutUri);
 			});
@@ -94,6 +94,6 @@ export class PostNoticesComponent implements OnInit {
 	private navigateTo(uri: string) {
 		// Navigate throught the window service because that routes are not handled
 		// by the angular router
-		this.windowService.getWindow().location.assign(uri);
+		this.windowService.navigateTo(uri);
 	}
 }

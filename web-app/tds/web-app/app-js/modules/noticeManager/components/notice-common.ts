@@ -6,10 +6,8 @@ export abstract class NoticeCommonComponent {
 		protected sanitizer: DomSanitizer) {
 	}
 
-	// TODO move to base
 	abstract onCancel(): void;
 
-	// TODO move to base
 	protected sanitizeHTML(html: string) {
 		return this.sanitizer.bypassSecurityTrustHtml(html);
 	}

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Response, Headers, RequestOptions} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {NotifierService} from '../../../shared/services/notifier.service';
+import {StringUtils} from '../../../shared/utils/string.utils';
 import {Observable} from 'rxjs/Observable';
 
 import {NoticeModel, PostNoticeResponse} from '../model/notice.model';
@@ -37,13 +37,9 @@ export class NoticeService {
 				result.notices.forEach( (notice: any) => {
 					notice.typeId = notice.typeId.toString();
 					notice.active = notice.active;
-					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
-
-					// TODO remove mock data when fields are coming from the BE
-					notice.locked = true;
-					notice.postMessageText = 'This is the post message text';
-					notice.sequence = 0;
-					// -------------------------------------------------------
+					notice.expirationDate = notice.expirationDate ? new Date(notice.expirationDate) : '';
+					notice.activationDate = notice.activationDate ? new Date(notice.activationDate) : '';
+					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
 				});
 				return result && result.notices;
 			})
@@ -66,63 +62,6 @@ export class NoticeService {
 		return this.http.delete(`${this.noticeListUrl}/${id}`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
-	}
-
-	/**
-	 * Based on provided column, update the structure which holds the current selected filters
-	 * @param {any} column: Column to filter
-	 * @param {any} state: Current filters state
-	 * @returns {any} Filter structure updated
-	 */
-	filterColumn(column: any, state: any): any {
-		let root = state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(item => item.field === column.property);
-
-		/*
-		if (!column.filter) {
-			column.filter = '';
-		}
-
-		if (column.type === 'text' || column.type === 'boolean') {
-		*/
-		if (column.type === 'text') {
-			if (!column.filter) {
-				column.filter = '';
-			}
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'boolean') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'eq',
-					value: column.filter
-				});
-			} else {
-				if (column.filter !== null) {
-					filter = root.filters.find((r) => {
-						return r['field'] === column.property;
-					});
-					filter.value = column.filter
-				}
-			}
-		}
-
-		return root;
 	}
 
 	/**
@@ -157,7 +96,7 @@ export class NoticeService {
 				let result = res.json();
 				let notices = result.data && result.data.notices || [];
 				notices.forEach( (notice: any) => {
-					notice.htmlText = notice.htmlText.replace(new RegExp('\\\\/', 'g'), '/')
+					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
 				});
 
 				return result && result.data || [];

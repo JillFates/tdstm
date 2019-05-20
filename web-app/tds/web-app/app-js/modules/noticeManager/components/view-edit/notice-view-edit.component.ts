@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild, OnInit} from '@angular/core';
+import {Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -8,6 +8,7 @@ import {ViewHtmlComponent} from '../view-html/view-html.component';
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Kendo
@@ -20,7 +21,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 	selector: 'tds-notice-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
 })
-export class NoticeViewEditComponent {
+export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 
@@ -34,6 +35,7 @@ export class NoticeViewEditComponent {
 	noticeIsLocked: boolean;
 	typeDataSource = [...NoticeTypes];
 	constructor(
+		private translate: TranslatePipe,
 		private originalModel: NoticeModel,
 		public action: Number,
 		public activeDialog: UIActiveDialogService,
@@ -54,6 +56,10 @@ export class NoticeViewEditComponent {
 		}
 		this.noticeType = {typeId: this.model.typeId};
 		this.dataSignature = JSON.stringify(this.model);
+	}
+
+	ngAfterViewInit() {
+		setTimeout(() => this.htmlText.editor.editorContainer.title = this.translate.transform('NOTICE.TOOLTIP_MESSAGE'));
 	}
 
 	protected cancelCloseDialog(): void {
@@ -100,6 +106,19 @@ export class NoticeViewEditComponent {
 		// remove esc sequences
 		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
 
+		// remove nulls in case
+		if (payload.sequence === null) {
+			delete payload['sequence'];
+		}
+
+		if (payload.activationDate === null) {
+			delete payload['activationDate'];
+		}
+
+		if (payload.expirationDate === null) {
+			delete payload['expirationDate'];
+		}
+
 		return payload;
 	}
 
@@ -140,7 +159,7 @@ export class NoticeViewEditComponent {
 		const isValid =  this.model && this.model.title &&
 				this.isValidHtmlText() && (noticeType || noticeType === 0);
 
-		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.postMessageText && this.model.postMessageText.trim() !== '')) : isValid;
+		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.acknowledgeLabel && this.model.acknowledgeLabel.trim() !== '')) : isValid;
 
 		return returnValue;
 	}

@@ -21,7 +21,6 @@
 						<div class="col-sm-12">
 							<label for="agreement" class="pull-right"> 
 								<input type="checkbox" 
-									style="cursor: pointer"
 									name="agreement" 
 									id="agreement" 
 									[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
@@ -40,7 +39,6 @@
 				title="Accept" 
 				class="btn-primary pull-left">
 			</tds-button-custom>
-			<tds-button-cancel (click)="onCancel()" class="pull-right"> </tds-button-cancel> 
 		</div>
 	</div>
 </div>

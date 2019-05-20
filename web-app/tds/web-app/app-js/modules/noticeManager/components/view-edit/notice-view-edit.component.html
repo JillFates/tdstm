@@ -10,16 +10,17 @@
                     <label for="inputTitle" class="col-sm-3 control-label required-field">Title:</label>
                     <div class="col-sm-9">
                         <input type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title"
-                               [(ngModel)]="model.title"
+                            title="{{'NOTICE.TOOLTIP_TITLE' | translate}}"
+                            [(ngModel)]="model.title"
                             required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="selectType" class="col-sm-3 control-label required-field">Type:</label>
                     <div class="col-sm-9">
-                        <!--[valuePrimitive]="true"-->
                         <kendo-dropdownlist
                                 name="noticeType"
+                                title="{{'NOTICE.TOOLTIP_NOTICE_TYPES' | translate}}"
 		                        #typeIdField="kendoDropDownList"
                                 [defaultItem]="defaultItem"
                                 [data]="typeDataSource"
@@ -36,7 +37,8 @@
                     <label for="checkActive" class="col-sm-3 control-label">Active:</label>
                     <div class="col-sm-9 checkbox">
                         <label>
-                            <input id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
+                            <input title="{{'NOTICE.TOOLTIP_ACTIVE' | translate}}" 
+                            id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
                         </label>
                     </div>
                 </div>
@@ -44,10 +46,11 @@
                     <label for="activationDate" class="col-sm-3 control-label">Activation Date:</label>
                     <div class="col-sm-9">
                         <tds-date-control
-                               id="activationDate"
-                               name="activationDate"
-                               [value]="model.activationDate"
-                               [(ngModel)]="model.activationDate">
+                            title="{{'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate}}"
+                            id="activationDate"
+                            name="activationDate"
+                            [value]="model.activationDate"
+                            [(ngModel)]="model.activationDate">
                         </tds-date-control>
                     </div>
                 </div>
@@ -55,10 +58,11 @@
                     <label for="expirationDate" class="col-sm-3 control-label">Expiration Date:</label>
                     <div class="col-sm-9">
                         <tds-date-control
-		                        id="expirationDate"
-                               name="expirationDate"
-                                [value]="model.expirationDate"
-                               [(ngModel)]="model.expirationDate">
+                            title="{{'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate}}"
+		                    id="expirationDate"
+                            name="expirationDate"
+                            [value]="model.expirationDate"
+                            [(ngModel)]="model.expirationDate">
                         </tds-date-control>
                     </div>
                 </div>
@@ -67,25 +71,32 @@
                     <label for="sequence" class="col-sm-3 control-label">Sequence:</label>
                     <div class="col-sm-1">
                         <kendo-numerictextbox
-                                [spinners]="false"
-                                name="sequence"
-                                [(ngModel)]="model.sequence"
-                                [format]="'n0'"
-                                [min]="0"
-                                [autoCorrect]="true">
+                            title="{{'NOTICE.TOOLTIP_SEQUENCE' | translate}}"
+                            [spinners]="false"
+                            name="sequence"
+                            [(ngModel)]="model.sequence"
+                            [format]="'n0'"
+                            [min]="0"
+                            [autoCorrect]="true">
                         </kendo-numerictextbox>
                     </div>
 	                <div class="col-sm-2">
 	                </div>
 	                <div class="col-sm-6 locked-container">
 		                <label for="locked" class="control-label">Locked:</label>
-                        <input [disabled]="noticeIsLocked" [ngClass]="{'is-disabled': noticeIsLocked}" 
-                            id="locked" name="locked" type="checkbox" [(ngModel)]="model.locked">
+                        <input 
+                           [disabled]="noticeIsLocked" 
+                           [ngClass]="{'is-disabled': noticeIsLocked}" 
+                           title="{{'NOTICE.TOOLTIP_LOCKED' | translate}}"
+                           id="locked" 
+                           name="locked" 
+                           type="checkbox" 
+                           [(ngModel)]="model.locked">
 	                </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-12 control-label required-field">Message:</label>
+                    <label class="col-sm-12 control-label required-field vertical-label">Message:</label>
                     <div class="col-sm-12">
                         <rich-text-editor
                             [readonly]="noticeIsLocked"
@@ -103,13 +114,13 @@
                 </div>
                 <div class="form-group"
                      *ngIf="noticeType && noticeType.typeId === MANDATORY">
-                    <label for="postMessageText" class="col-sm-12 control-label required-field">Post Message Text:</label>
+                    <label for="acknowledgeLabel" class="col-sm-12 control-label required-field vertical-label">Post Message Text:</label>
 	                <div class="col-sm-12">
                         <input type="text"
                             [disabled]="noticeIsLocked"
                             class="form-control"
-                            name="postMessageText" id="postMessageText"
-                            [(ngModel)]="model.postMessageText">
+                            name="acknowledgeLabel" id="acknowledgeLabel"
+                            [(ngModel)]="model.acknowledgeLabel">
                     </div>
                 </div>
             </div>
