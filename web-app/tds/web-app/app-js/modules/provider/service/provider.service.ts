@@ -57,15 +57,20 @@ export class ProviderService {
 
 	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
 		let postRequest = {};
+
 		if (model.id) {
 			postRequest['providerId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
+
+		if (model.name) {
+			postRequest['name'] = model.name;
+		}
+
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique`, JSON.stringify(postRequest))
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	deleteProvider(id: number): Observable<string> {
