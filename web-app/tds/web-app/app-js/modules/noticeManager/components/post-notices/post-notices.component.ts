@@ -36,7 +36,9 @@ export class PostNoticesComponent implements OnInit {
 	ngOnInit() {
 		this.noticeService.getPostNotices()
 			.subscribe((response: PostNoticeResponse) => {
-				this.redirectUri = `${this.baseUri}/${response.redirectUri}`;
+				const redirect = (response && response.redirectUri) || '';
+				this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
+
 				this.postNotices = response.notices.map((notice: NoticeModel) => {
 					notice.sequence = notice.sequence || 0;
 					return notice;
