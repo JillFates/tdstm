@@ -9,25 +9,21 @@
               data-toggle="validator"
               class="form-horizontal"
               #form='ngForm'>
-	        <div >
-		        <div class="form-group">
+		        <div class="form-group agreement">
 			        <div class="col-sm-12 mandatory-container">
 				        <div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
 			        </div>
 				</div>
-
-				<div class="form-group agreement">
-					<div class="col-sm-12">
-						<label> 
-							{{ (notice.acknowledgeLabel  || 'NOTICE.AGREEMENT') | translate }}
-						</label>
-					</div>
-				</div>
-	        </div>
         </form>
     </div>
 
     <div class="modal-footer form-group-center">
+		<div class="col-sm-12">
+			<label class="pull-left agreement-checkbox"> 
+				{{ (notice.acknowledgeLabel  || 'NOTICE.AGREEMENT') | translate }}
+			</label>
+		</div>
+
 		<div class="col-sm-12">
 			<tds-button-custom  (click)="onAccept()" 
 								icon="check" 

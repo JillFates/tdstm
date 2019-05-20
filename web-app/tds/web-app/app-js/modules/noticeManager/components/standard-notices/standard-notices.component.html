@@ -10,22 +10,24 @@
               class="form-horizontal"
 			  #form='ngForm'>
 			<div class="notices-container">
-				<div *ngFor="let notice of notices"  class="standard-notice-card">	
-					<div class="form-group">
-						<div class="col-sm-12">
-							<div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
-						</div>
-					</div>
+				<div *ngFor="let notice of notices">
 
-					<div class="form-group">
-						<div class="col-sm-12">
-							<label for="agreement" class="pull-left dontshow-again"> 
-								<input type="checkbox" 
-									name="agreement" 
-									id="agreement" 
-									[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
-							</label>
-						</div>
+					<div class="standard-notice-card">	
+							<div class="form-group">
+								<div class="col-sm-12">
+									<div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
+								</div>
+							</div>
+					</div>
+					<div class="form-group container-dontshow-again">
+							<div class="col-sm-12">
+								<label for="agreement" class="pull-left dontshow-again"> 
+									<input type="checkbox" 
+										name="agreement" 
+										id="agreement" 
+										[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
+								</label>
+							</div>
 					</div>
 				</div>
 			</div>
