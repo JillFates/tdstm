@@ -93,7 +93,7 @@
 									<label for="username">Username (use email):</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-									<input class="requiredInput" type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${params?.username ? params?.username : personInstance?.email}" autocomplete="off" />
+									<input class="requiredInput" type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${username ? username : personInstance?.email}" autocomplete="off" />
 									<g:hasErrors bean="${userLoginInstance}" field="username">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -106,8 +106,8 @@
 									<label for="email">Email:</label>
 								</td>
 								<td valign="top" class="value">
-									<input class="requiredInput" type="text" id="emailInputId" name="email" value="${params?.email ? params?.email : personInstance?.email}" autocomplete="off" />
-									<span id="emailDisplayId" style="display:none;">${personInstance?.email ? personInstance.email : params?.email}</span>
+									<input class="requiredInput" type="text" id="emailInputId" name="email" value="${email ? email : personInstance?.email}" autocomplete="off" />
+									<span id="emailDisplayId" style="display:none;">${personInstance?.email ? personInstance.email : email}</span>
 								</td>
 							</tr>
 							<tr>
@@ -115,7 +115,7 @@
 									<label for="isLocal">Local Account:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${params?.isLocal != null ? (params?.isLocal == 'true' ? 'checked="checked"' : '') : userLoginInstance?.isLocal ? 'checked="checked"' : ''}
+									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${isLocal == "true"? 'checked="checked"' : ''}
 										onchange="togglePasswordEditFields( $(this) )"/>
 								</td>
 							</tr>
@@ -123,8 +123,8 @@
 								<td valign="top" class="name">
 									<label for="forcePasswordChange">Force password change:</label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}>
-									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="true" ${params?.forcePasswordChange == 'true' ? 'checked="checked"' : ''} />
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="true" ${forcePasswordChange == 'true' ? 'checked="checked"' : ''} />
 								</td>
 							</tr>
 							<tr class="prop passwordsEditFields">
@@ -132,7 +132,7 @@
 									<label for="passwordNeverExpiresId">Password never expires:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'passwordNeverExpires','errors')}">
-									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" ${params?.passwordNeverExpires == 'true' ? 'checked="checked"' : ''} />
+									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" ${passwordNeverExpires == 'true' ? 'checked="checked"' : ''} />
 								</td>
 							</tr>
 
@@ -146,9 +146,9 @@
 									<script type="text/javascript">
 										jQuery(function($){ $("#expiryDate").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
-									<g:if test="${params?.expiryDate}">
+									<g:if test="${expiryDate}">
 										<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-											   value="${URLDecoder.decode(params?.expiryDate,'UTF-8')}"/>
+											   value="${URLDecoder.decode(expiryDate,'UTF-8')}"/>
 										<g:hasErrors bean="${params}" field="expiryDate">
 											<div class="errors">
 												<g:renderErrors bean="${params}" as="list" field="expiryDate"/>
@@ -174,14 +174,9 @@
 									<script type="text/javascript">
 										jQuery(function($){ $("#passwordExpirationDateId").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
-									<g:if test="${params?.passwordExpirationDate}">
+									<g:if test="${passwordExpirationDate}">
 										<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
-											   value="${URLDecoder.decode(params?.passwordExpirationDate,'UTF-8')}"/>
-										<g:hasErrors bean="${params}" field="passwordExpirationDate">
-											<div class="errors">
-												<g:renderErrors bean="${params}" as="list" field="passwordExpirationDate"/>
-											</div>
-										</g:hasErrors>
+											   value="${URLDecoder.decode(passwordExpirationDate,'UTF-8')}"/>
 									</g:if>
 									<g:else>
 										<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
@@ -200,7 +195,7 @@
 									<label for="active">Active:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
-									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${params?.active ? params.active : userLoginInstance?.active}" ></g:select>
+									<g:select id="active" name="active" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(userLoginInstance.class).active.inList}" value="${active ? params.active : userLoginInstance?.active}" ></g:select>
 									<g:hasErrors bean="${userLoginInstance}" field="active">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
@@ -215,7 +210,7 @@
 								</td>
 								<td valign="top" class="value">
 									<g:select class="requiredInput" id="projectId" name="projectId" from="${projectList}"
-										value="${params?.projectId}"
+										value="${projectId}"
 										noSelection="${['':'Select a project...']}"
 										optionKey="id" optionValue="name"/>
 								</td>

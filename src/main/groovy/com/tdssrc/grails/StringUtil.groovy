@@ -2,13 +2,9 @@ package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
-import groovy.transform.CompileStatic
 import net.transitionmanager.exception.InvalidParamException
-import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
-import org.owasp.html.HtmlPolicyBuilder
-import org.owasp.html.PolicyFactory
 
 import java.util.regex.Matcher
 
@@ -183,51 +179,6 @@ class StringUtil {
 	}
 
 	/**
-	 * Escape the character, return null if no replacement has to be made
-	 *
-	 * @param ch the character to escape
-	 * @param previousChar  the previous char
-	 * @return the replacement string, null if no replacement has to be made
-	 */
-	static String escapeCharacter(char ch, char previousChar) {
-		switch (ch) {
-			case '"':
-				return "\\\""
-			case '\\':
-				return "\\\\"
-			case '\t':
-				return "\\t"
-			case '\n':
-				return "\\n"
-			case '\r':
-				return "\\r"
-			case '\f':
-				return "\\f"
-			case '\b':
-				return "\\b"
-			case '\u000B': // vertical tab: http://bclary.com/2004/11/07/#a-7.8.4
-				return "\\v"
-			case '\u2028':
-				return "\\u2028" // Line separator
-			case '\u2029':
-				return "\\u2029" // Paragraph separator
-			case '/':
-				// preserve special handling that exists in JSONObject.quote to improve security if JSON is embedded in HTML document
-				// prevents outputting "</" gets outputted with unicode escaping for the slash
-				if (previousChar == '<') {
-					return "\\u002f"
-				}
-				break
-		}
-		if(ch < ' ') {
-			// escape all other control characters
-			return ch
-			//return "\\u" + StringGroovyMethods.padLeft(Integer.toHexString(ch), 4, "0")
-		}
-		return null
-	}
-
-	/**
 	 * Convert a variable to a long IF the variable is a String/GString otherwise it returns the original variable
 	 * @param v - a variable to examine
 	 * @return the original variable or the Long value if the variable was a String
@@ -293,12 +244,12 @@ class StringUtil {
 	 * Sanitize the String with StringUtil.sanitize
 	 * and then replace all white spaces with a '+'
 	 */
-	 static String sanitizeAndStripSpaces(String str){
-		 if (str) {
-			 str = sanitize(str).replaceAll(/\s/, "+")
-		 }
-		 return str
-	 }
+	static String sanitizeAndStripSpaces(String str) {
+		if (str) {
+			str = sanitize(str).replaceAll(/\s/, "+")
+		}
+		return str
+	}
 
 	/**
 	 * Escape string being used in Dot graphs to avoid unterminated strings
@@ -344,7 +295,7 @@ class StringUtil {
 			}
 			if (falseList.contains(match)) {
 				return false
- 			}
+			}
 		} else if  (NumberUtil.isaNumber(value)) {
 			return value == 0 ? false : true
 		}
@@ -544,42 +495,5 @@ class StringUtil {
 	static String generateGuid() {
 		return UUID.randomUUID()
 	}
-
-	/**
-	 * check Unsafe HTML String, returns a list of HTML elements that contains non-compliance code
-	 * @param unsafeHtmlString
-	 * @return
-	 */
-	static List<String> checkHTML(String unsafeHtmlString) {
-
-		List<String> results = []
-		HTML_POLICY_DEFINITION.sanitize(unsafeHtmlString, new HtmlChangeListener(), results)
-		return results
-	}
-
-	/**
-	 * Class that collects the discarded elements when sanitizing HTML
-	 */
-	@CompileStatic
-	private static class HtmlChangeListener implements org.owasp.html.HtmlChangeListener<List<String>> {
-
-		void discardedTag(List<String> context, String elementName) {
-			context << elementName
-		}
-
-		void discardedAttributes(List<String> context, String tagName, String... attributeNames) {
-			context << tagName
-		}
-	}
-
-	/**
-	 * A policy that can be used to produce policies that sanitize to HTML sinks
-	 * via {@link PolicyFactory#apply}.
-	 */
-	public static final PolicyFactory HTML_POLICY_DEFINITION = new HtmlPolicyBuilder()
-			.allowCommonBlockElements()
-			.allowCommonInlineFormattingElements()
-			.allowStyling()
-			.toFactory()
 
 }

@@ -349,10 +349,31 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 
         Person currentPerson = securityService.userLoginPerson
 
-		[userLoginInstance: createUser, personInstance: person, companyId: params.companyId,
-		 roleList: roleList, projectList: partyRelationshipService.companyProjects(currentPerson.company),
-		 minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
-		 project: securityService.userCurrentProject, maxLevel: securityService.getMaxAssignedRole(currentPerson).level]
+		[
+				userLoginInstance: createUser,
+				personInstance: person,
+				companyId: params.companyId ?: "",
+				username: params.username ?: "",
+				email: params.email ?: "",
+				isLocal: params.isLocal ?: createUser.isLocal.toString(),
+				forcePasswordChange: params.forcePasswordChange ?: false,
+				passwordNeverExpires: params.passwordNeverExpires ?: false,
+				expiryDate: params.expiryDate ?: "",
+				passwordExpirationDate: params.passwordExpirationDate ?: "",
+				active: params.active ?: "Y",
+				projectId: params.projectId ?: "",
+				ROLEADMIN: params.ROLEADMIN ?: false,
+				ROLECLIENTADMIN: params.ROLECLIENTADMIN ?: false,
+				ROLECLIENTMGR: params.ROLECLIENTMGR ?: false,
+				ROLEEDITOR: params.ROLEEDITOR ?: false,
+				ROLESUPERVISOR: params.ROLESUPERVISOR ?: false,
+				ROLEUSER: params.ROLEUSER ?: false,
+				roleList: roleList,
+				projectList: partyRelationshipService.companyProjects(currentPerson.company),
+				minPasswordLength: securityService.userLocalConfig.minPasswordLength ?: 8,
+				project: securityService.userCurrentProject,
+				maxLevel: securityService.getMaxAssignedRole(currentPerson).level
+		]
 	}
 
 	/*
@@ -388,12 +409,12 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 						active: params.active,
 						projectId: params.projectId,
 						companyId: params.companyId,
-						ADMIN: params.assignedRole && params.assignedRole.contains('ADMIN'),
-						CLIENTADMIN: params.assignedRole && params.assignedRole.contains('CLIENT_ADMIN'),
-						CLIENTMGR: params.assignedRole && params.assignedRole.contains('CLIENT_MGR'),
-						EDITOR: params.assignedRole && params.assignedRole.contains('EDITOR'),
-						SUPERVISOR: params.assignedRole && params.assignedRole.contains('SUPERVISOR'),
-						USER: params.assignedRole && params.assignedRole.contains('USER')
+						ROLEADMIN: params.assignedRole && params.assignedRole.contains('ROLE_ADMIN'),
+						ROLECLIENTADMIN: params.assignedRole && params.assignedRole.contains('ROLE_CLIENT_ADMIN'),
+						ROLECLIENTMGR: params.assignedRole && params.assignedRole.contains('ROLE_CLIENT_MGR'),
+						ROLEEDITOR: params.assignedRole && params.assignedRole.contains('ROLE_EDITOR'),
+						ROLESUPERVISOR: params.assignedRole && params.assignedRole.contains('ROLE_SUPERVISOR'),
+						ROLEUSER: params.assignedRole && params.assignedRole.contains('ROLE_USER')
 				]
 				redirect(action: "create", id: params.personId, params: returnParams)
 			} else {
