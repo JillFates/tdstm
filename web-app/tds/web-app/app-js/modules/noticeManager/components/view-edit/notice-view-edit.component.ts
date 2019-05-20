@@ -101,6 +101,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			payload.needAcknowledgement = true;
 		} else {
 			payload.needAcknowledgement = false;
+			delete payload['acknowledgeLabel'];
 		}
 		payload.locked = payload.locked || false;
 		// remove esc sequences

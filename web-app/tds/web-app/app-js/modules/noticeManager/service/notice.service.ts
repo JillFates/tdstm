@@ -35,13 +35,22 @@ export class NoticeService {
 			.map((res: Response) => {
 				let result = res.json();
 				result.notices.forEach( (notice: any) => {
-					notice.typeId = notice.typeId.toString();
-					notice.active = notice.active;
-					notice.expirationDate = notice.expirationDate ? new Date(notice.expirationDate) : '';
-					notice.activationDate = notice.activationDate ? new Date(notice.activationDate) : '';
-					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+					notice = this.cleanNotice(notice);
 				});
 				return result && result.notices;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get a specific notice
+	 * @returns {Observable<R>}
+	 * @param {number} id: Notice id to fetch
+	 */
+	getNotice(id: number): Observable<NoticeModel> {
+		return this.http.get(`${this.noticeListUrl}/${id}`)
+			.map((res: Response) => {
+				return this.cleanNotice(res.json());
 			})
 			.catch((error: any) => error.json());
 	}
@@ -130,6 +139,20 @@ export class NoticeService {
 		} else {
 			return result
 		}
+	}
+
+	/**
+	 * Set the default values for empty fields, and clean html coming with escape sequences
+	 * @param {NoticeModel} notice:  Notice received
+	 * @returns any : Notice with the default values and html content in place
+	 */
+	private cleanNotice(notice: NoticeModel): any {
+		notice.typeId = notice.typeId.toString();
+		notice.expirationDate = notice.expirationDate ? new Date(notice.expirationDate) : '';
+		notice.activationDate = notice.activationDate ? new Date(notice.activationDate) : '';
+		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+
+		return notice;
 	}
 
 }

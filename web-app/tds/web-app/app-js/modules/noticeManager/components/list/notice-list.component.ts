@@ -194,14 +194,17 @@ export class NoticeListComponent implements OnInit {
 	 * @param {NoticeModel} dataItem
 	 */
 	public openNoticeViewEdit(dataItem: NoticeModel): void {
-		this.dialogService.open(NoticeViewEditComponent, [
-			{provide: NoticeModel, useValue: dataItem as NoticeModel},
-			{provide: Number, useValue: ActionType.Edit}
-		]).then(result => {
-			this.reloadData();
-		}, error => {
-			console.log(error);
-		});
+		this.noticeService.getNotice(dataItem.id)
+			.subscribe((notice: NoticeModel) => {
+				this.dialogService.open(NoticeViewEditComponent, [
+					{provide: NoticeModel, useValue: notice as NoticeModel},
+					{provide: Number, useValue: ActionType.Edit}
+				]).then(result => {
+					this.reloadData();
+				}, error => {
+					console.error(error);
+				});
+			})
 	}
 
 	protected isEditAvailable(): boolean {
