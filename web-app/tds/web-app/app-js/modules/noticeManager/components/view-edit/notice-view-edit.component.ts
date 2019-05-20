@@ -106,18 +106,11 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		// remove esc sequences
 		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
 
-		// remove nulls in case
-		if (payload.sequence === null) {
-			delete payload['sequence'];
-		}
-
-		if (payload.activationDate === null) {
-			delete payload['activationDate'];
-		}
-
-		if (payload.expirationDate === null) {
-			delete payload['expirationDate'];
-		}
+		// use zero for empty sequences
+		payload.sequence = payload.sequence === null || typeof payload.sequence === 'undefined' ? 0 : payload.sequence;
+		// don't send '' for empty dates, instead use null
+		payload.activationDate = payload.activationDate === '' ? null : payload.activationDate;
+		payload.expirationDate = payload.expirationDate === '' ? null : payload.expirationDate;
 
 		return payload;
 	}
