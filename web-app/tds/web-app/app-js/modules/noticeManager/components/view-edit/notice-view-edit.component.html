@@ -82,16 +82,20 @@
                     </div>
 	                <div class="col-sm-2">
 	                </div>
-	                <div class="col-sm-6 locked-container">
-		                <label for="locked" class="control-label">Locked:</label>
-                        <input 
-                           [disabled]="noticeIsLocked" 
-                           [ngClass]="{'is-disabled': noticeIsLocked}" 
-                           title="{{'NOTICE.TOOLTIP_LOCKED' | translate}}"
-                           id="locked" 
-                           name="locked" 
-                           type="checkbox" 
-                           [(ngModel)]="model.locked">
+                </div>
+                <div class="form-group">
+		            <label for="locked" class="col-sm-3 control-label">Locked:</label>
+                    <div class="col-sm-9 checkbox">
+                        <label>
+                            <input 
+                                [disabled]="noticeIsLocked" 
+                                [ngClass]="{'is-disabled': noticeIsLocked}" 
+                                title="{{'NOTICE.TOOLTIP_LOCKED' | translate}}"
+                                id="locked" 
+                                name="locked" 
+                                type="checkbox" 
+                                [(ngModel)]="model.locked">
+                        </label>
 	                </div>
                 </div>
 
