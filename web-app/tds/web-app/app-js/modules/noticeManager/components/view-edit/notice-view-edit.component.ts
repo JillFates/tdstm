@@ -86,7 +86,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 					this.noticeService.deleteNotice(this.model.id.toString())
 						.subscribe(
 							res => this.activeDialog.close(),
-							error => this.activeDialog.dismiss(error));
+							error => console.error(error));
 				}
 			});
 	}
@@ -132,12 +132,12 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			this.noticeService.editNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
+					error => console.error(error));
 		} else {
 			this.noticeService.createNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
+					error => console.error(error));
 		}
 	}
 

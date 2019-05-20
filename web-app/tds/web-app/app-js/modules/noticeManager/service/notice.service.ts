@@ -48,19 +48,19 @@ export class NoticeService {
 
 	createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
-			.map((res: Response) => res.json())
+			.map((res: Response) => this.handleJSONError(res))
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 	editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
-			.map((res: Response) => res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((res: Response) => this.handleJSONError(res))
+			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
 	deleteNotice(id: string): Observable<NoticeModel[]> {
 		return this.http.delete(`${this.noticeListUrl}/${id}`)
-			.map((res: Response) => res.json())
+			.map((res: Response) => this.handleJSONError(res))
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
@@ -115,6 +115,21 @@ export class NoticeService {
 				return res.json();
 			})
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+	}
+
+	/**
+	 * Check the response, in case this is an JSON error coming from the server, respond appripately
+	 * @param {Respone} res:  Service Response
+	 * @returns any : Response in JSON format / or error
+	 */
+	private handleJSONError(res: Response): any {
+		const result = res.json();
+
+		if (result && result.status === 'error') {
+			throw new Error(result);
+		} else {
+			return result
+		}
 	}
 
 }
