@@ -4,17 +4,16 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import net.transitionmanager.project.Project
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.SettingService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.common.SettingService
+import net.transitionmanager.project.Project
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Specification
-import spock.lang.Stepwise
 
-@Stepwise
+//@Stepwise
 @Integration
 @Rollback
 class SettingServiceTests extends Specification {

@@ -1,16 +1,15 @@
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.CloneAssetCommand
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.tag.Tag
-import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.tag.TagAssetService
-import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Specification
 
@@ -216,7 +215,6 @@ class AssetEntityServiceTests extends Specification{
 			queries["joinQuery"] == ""
 	}
 
-	@Ignore // TODO: oluna - This class ignored to start with a Green build for 4.7.0 we will fix them in another ticket
 	@See('TM-11480')
 	void '6. Test cloning of assets'() {
 		setup: 'Create a test project and person'
