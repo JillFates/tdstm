@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.security.SecurityUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -33,6 +34,11 @@ class NoticeService implements ServiceMethods {
 		}
 		NoticeAcknowledgement acknowledgement = new NoticeAcknowledgement(notice: notice, person: person)
 		acknowledgement.save(failOnError: true)
+
+		if (!hasUnacknowledgedNotices(person)) {
+			session.removeAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES)
+			session.removeAttribute(SecurityUtil.REDIRECT_URI)
+		}
 	}
 
 	/**
@@ -90,23 +96,34 @@ class NoticeService implements ServiceMethods {
 	/**
 	 * Check for any unacknowledged notices for a user using their current project context
 	 * @param person
+	 * @param requiredNoticesOnly - defaulted to false, this flag signals if only required notices are needed.
 	 * @return true if there are any unacknowledged notices
 	 */
-	Boolean hasUnacknowledgedNotices(Person person) {
+	Boolean hasUnacknowledgedNotices(Person person, boolean requiredNoticesOnly = false) {
 		Project project = securityService.userCurrentProject
-		return  hasUnacknowledgedNotices(person, project)
+		return  hasUnacknowledgedNotices(person, project, requiredNoticesOnly)
 	}
 
 	/**
 	 * Check for any unacknowledged notices
 	 * @param person
 	 * @param project - the project currently selected in the user's context
+	 * @param requiredNoticesOnly - defaulted to false, this flag signals if only required notices are needed.
 	 * @return
 	 */
-	Boolean hasUnacknowledgedNotices(Person person, Project project) {
+	Boolean hasUnacknowledgedNotices(Person person, Project project, boolean requiredNoticesOnly = false) {
+		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return false.
+		if (session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+			return false
+		}
+
 		Closure criteriaClosure = {
 			unacknowledgedNoticesCriteriaClosure.delegate = delegate
         	unacknowledgedNoticesCriteriaClosure(person, project, new Date())
+
+			if (requiredNoticesOnly) {
+				eq('needAcknowledgement', true)
+			}
 
 			projections { count () }
 		}
@@ -123,6 +140,12 @@ class NoticeService implements ServiceMethods {
 	 * @return
 	 */
 	List<Notice> fetchPostLoginNotices(Person person, Project project) {
+
+		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return an empty list.
+		if (session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+			return []
+		}
+
 		Closure criteriaClosure = {
 			unacknowledgedNoticesCriteriaClosure.delegate = delegate
         	unacknowledgedNoticesCriteriaClosure(person, project, new Date())

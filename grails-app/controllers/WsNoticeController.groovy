@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.command.NoticeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Notice
+import net.transitionmanager.domain.Person
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.NoticeService
 import net.transitionmanager.service.EmptyResultException
@@ -108,5 +109,22 @@ class WsNoticeController implements ControllerMethods {
 		]
 
 		renderSuccessJson(result)
+	}
+
+	/**
+	 * Return whether or not the current user has unaccepted mandatory notices. If this is not the case,
+	 * the following session variables are cleared:
+	 * - SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES
+	 * - SecurityUtil.REDIRECT_URI
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def hasMandatoryUnacknowledgedNotices() {
+		Person currentPerson = securityService.loadCurrentPerson()
+		boolean hasMandatoryUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(currentPerson, true)
+		if (!hasMandatoryUnacknowledgedNotices) {
+			session.removeAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES)
+			session.removeAttribute(SecurityUtil.REDIRECT_URI)
+		}
+		renderSuccessJson([unacknowledgedNotices: hasMandatoryUnacknowledgedNotices])
 	}
 }
