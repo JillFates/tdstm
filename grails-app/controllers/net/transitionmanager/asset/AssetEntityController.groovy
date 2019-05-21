@@ -75,6 +75,7 @@ import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -121,6 +122,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	DeviceService deviceService
 	def filterService
 	JdbcTemplate jdbcTemplate
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	MoveBundleService moveBundleService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
