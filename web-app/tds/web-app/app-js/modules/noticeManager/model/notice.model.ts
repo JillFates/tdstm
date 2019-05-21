@@ -13,38 +13,31 @@ export class NoticeColumnModel {
 				label: 'Title',
 				property: 'title',
 				type: 'text',
-				width: 200,
+				width: 250,
 			}, {
 				label: 'Type',
 				property: 'typeId',
 				type: 'text',
-				width: 160,
+				width: 270,
 			}, {
 				label: 'Active',
 				property: 'active',
 				type: 'boolean',
-				width: 100,
+				width: 120,
 			},
-			{
-				label: 'Need acknowledgement',
-				property: 'needAcknowledgement',
-				type: 'boolean',
-				width: 180,
-			}
-			,
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 140
+				width: 130
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 140
+				width: 130
 			},
 			{
 				label: 'Sequence',
@@ -56,7 +49,7 @@ export class NoticeColumnModel {
 				label: 'Locked',
 				property: 'locked',
 				type: 'boolean',
-				width: 100
+				width: 120
 			}
 		];
 	}

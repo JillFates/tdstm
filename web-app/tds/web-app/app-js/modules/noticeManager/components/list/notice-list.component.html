@@ -90,21 +90,12 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'typeId'" let-dataItem>
-                            {{((dataItem.typeId === PRE_LOGIN)? noticeTypes[0].name : noticeTypes[1].name)}}
+                            {{noticesTypeDescriptions[dataItem.typeId]}}
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
                             <div>{{((dataItem[column.property] === true)? 'Yes': 'No')}}</div>
                         </ng-template>
-
-                        <!--
-                        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.type === 'date'">
-                            <div>
-	                            {{dataItem[column.property] | tdsDate : dateFormat}}
-                            </div>
-                        </ng-template>
-                        -->
-
 
                     </kendo-grid-column>
                 </kendo-grid>

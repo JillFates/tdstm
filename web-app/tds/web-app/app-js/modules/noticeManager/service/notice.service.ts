@@ -4,7 +4,7 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {Observable} from 'rxjs/Observable';
 
-import {NoticeModel, PostNoticeResponse} from '../model/notice.model';
+import {NoticeModel, PostNoticeResponse, NOTICE_TYPE_POST_LOGIN, NOTICE_TYPE_MANDATORY} from '../model/notice.model';
 
 import 'rxjs/add/operator/map';
 
@@ -36,6 +36,9 @@ export class NoticeService {
 				let result = res.json();
 				result.notices.forEach( (notice: any) => {
 					notice = this.cleanNotice(notice);
+					if (notice.typeId === NOTICE_TYPE_POST_LOGIN && notice.needAcknowledgement) {
+						notice.typeId = NOTICE_TYPE_MANDATORY;
+					}
 				});
 				return result && result.notices;
 			})
