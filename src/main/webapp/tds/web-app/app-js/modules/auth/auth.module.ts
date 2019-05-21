@@ -4,6 +4,8 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
+// Kendo
+import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 // Route Module
 import {AuthRouteModule} from './auth-route.module';
 // Services
@@ -15,6 +17,7 @@ import {AuthGuardService} from './service/auth.guard.service';
 import {LoginService} from './service/login.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
+import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
 
 @NgModule({
 	imports: [
@@ -22,6 +25,8 @@ import {LoginComponent} from './components/login/login.component';
 		CommonModule,
 		SharedModule,
 		FormsModule,
+		// Kendo
+		DropDownsModule,
 		// Route
 		AuthRouteModule
 	],
@@ -34,7 +39,8 @@ import {LoginComponent} from './components/login/login.component';
 		LoginService
 	],
 	declarations: [
-		LoginComponent
+		LoginComponent,
+		ForgotPasswordComponent
 	]
 })
 export class AuthModule {

@@ -31,6 +31,12 @@ div.login-component {
     }
 
     form.login-form {
+      div.has-authority {
+        kendo-dropdownlist {
+          width: 100%;
+        }
+      }
+
       .btn.submit-button {
         font-size: 14px;
       }
@@ -55,6 +61,10 @@ div.login-component {
       div.modal-footer {
         margin-top: 15px;
       }
+    }
+
+    a#forgot-your-password {
+      font-weight: normal;
     }
   }
 

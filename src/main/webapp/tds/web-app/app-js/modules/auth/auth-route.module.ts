@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Components
 import {LoginComponent} from './components/login/login.component';
+import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
 
 /**
  * Auth Route States
@@ -13,9 +14,13 @@ export class AuthRouteStates {
 	public static readonly LOGIN = {
 		url: 'auth/login'
 	};
+	public static readonly FORGOT_PASSWORD = {
+		url: 'auth/forgot'
+	};
 }
 
 export const LoginRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: AuthRouteStates.LOGIN.url},
 	{
 		path: AuthRouteStates.LOGIN.url,
 		data: {
@@ -25,6 +30,16 @@ export const LoginRoute: Routes = [
 			}
 		},
 		component: LoginComponent
+	},
+	{
+		path: AuthRouteStates.FORGOT_PASSWORD.url,
+		data: {
+			page: {
+				hideTopNav: true,
+				title: 'LOGIN.FORGOT_PASSWORD', instruction: '', menu: []
+			}
+		},
+		component: ForgotPasswordComponent
 	}
 ];
 
