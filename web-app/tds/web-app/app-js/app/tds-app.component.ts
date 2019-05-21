@@ -2,9 +2,11 @@
  * Main Configuration for TDS App.
  * Do not add anything to this level, it works as the bootstrap entry point only
  */
+
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
+import {MandatoryNoticesValidatorService} from './services/mandatory-notices-validator.service';
 
 @Component({
 	selector: 'tds-app',
@@ -29,7 +31,8 @@ export class TDSAppComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private mandatoryNoticesValidatorService: MandatoryNoticesValidatorService) {
 	}
 
 	ngOnInit(): void {
@@ -48,5 +51,7 @@ export class TDSAppComponent implements OnInit {
 					route: event
 				});
 			});
+
+		this.mandatoryNoticesValidatorService.setupCheck();
 	}
 }
