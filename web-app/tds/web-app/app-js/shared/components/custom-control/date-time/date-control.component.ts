@@ -2,6 +2,9 @@ import {
 	Component,
 	forwardRef,
 	OnInit,
+	Input,
+	Output,
+	EventEmitter,
 	OnChanges,
 	SimpleChanges
 } from '@angular/core';
@@ -21,6 +24,8 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 	template: `
 		<kendo-datepicker
 			[title]="title"
+			[min]="minimum"
+			[max]="maximum"
 			[value]="dateValue"
 			(blur)="onTouched()"
 			[format]="displayFormat"
@@ -47,6 +52,9 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class TDSDateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
+	@Output() valueChange: EventEmitter<any> = new EventEmitter();
+	@Input('minimum') minimum;
+	@Input('maximum') maximum;
 	protected displayFormat: string;
 	protected dateValue: Date;
 
@@ -76,12 +84,15 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnInit,
 			this.value = null;
 		}
 		this.onTouched();
+		this.valueChange.emit(value);
 	}
 
 	ngOnChanges(inputs: SimpleChanges) {
 		const dateConstraints = {
 			required: this.required
 		};
-		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
+		if (inputs['_value']) {
+			this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
+		}
 	}
 }

@@ -49,6 +49,8 @@
                             title="{{'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate}}"
                             id="activationDate"
                             name="activationDate"
+                            [maximum]="maxDate"
+                            (valueChange)="setMinDate($event)"
                             [value]="model.activationDate"
                             [(ngModel)]="model.activationDate">
                         </tds-date-control>
@@ -61,6 +63,8 @@
                             title="{{'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate}}"
 		                    id="expirationDate"
                             name="expirationDate"
+                            [minimum]="minDate"
+                            (valueChange)="setMaxDate($event)"
                             [value]="model.expirationDate"
                             [(ngModel)]="model.expirationDate">
                         </tds-date-control>

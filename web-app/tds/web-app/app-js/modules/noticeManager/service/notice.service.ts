@@ -36,11 +36,6 @@ export class NoticeService {
 				let result = res.json();
 				result.notices.forEach( (notice: any) => {
 					notice = this.cleanNotice(notice);
-					notice.activationDate = notice.activationDate
-						? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
-
-					notice.expirationDate = notice.expirationDate
-						? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return result && result.notices;
 			})
@@ -154,6 +149,11 @@ export class NoticeService {
 	private cleanNotice(notice: NoticeModel): any {
 		notice.typeId = notice.typeId.toString();
 		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		notice.activationDate = notice.activationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		notice.expirationDate = notice.expirationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
 
 		return notice;
 	}

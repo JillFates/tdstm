@@ -7,6 +7,7 @@ import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
@@ -34,6 +35,10 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	noticeType: any;
 	noticeIsLocked: boolean;
 	typeDataSource = [...NoticeTypes];
+	minDate = null;
+	maxDate = null;
+	minAvailableDate = DateUtils.getMinAvailableDate();
+	maxAvailableDate = DateUtils.getMaxAvailableDate();
 	constructor(
 		private translate: TranslatePipe,
 		private originalModel: NoticeModel,
@@ -55,6 +60,15 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
 		this.noticeType = {typeId: this.model.typeId};
+
+		if (this.model.expirationDate) {
+			this.setMaxDate(this.model.expirationDate);
+		}
+
+		if (this.model.activationDate) {
+			this.setMinDate(this.model.activationDate);
+		}
+
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
@@ -202,5 +216,19 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	onRawValueChange(value: string) {
 		this.model.rawText = value;
+	}
+
+	/**
+	 * Set the maximum value for the date range
+	 */
+	setMaxDate(value: any) {
+		this.maxDate = value;
+	}
+
+	/**
+	 * Set the minimu value for the date range
+	*/
+	setMinDate(value: any) {
+		this.minDate = value;
 	}
 }
