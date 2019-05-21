@@ -531,10 +531,15 @@ function createBehaviorHandler () {
 			var event = d3.event.sourceEvent
 			dragging = false
 			if (clicked) {
+				var selectionList = [d]
 				var mode = GraphUtil.SELECT_MODES.REPLACE
+				// check if one of the multiselect tools are being used
 				if (event.ctrlKey || GraphUtil.toolStates.selectionAdd) 
 					mode = GraphUtil.SELECT_MODES.TOGGLE
-				modifyNodeSelection([d], mode)
+				// else user is normal clicking on a node so select the adjacent nodes
+				else
+					selectionList = _.union(selectionList, getAdjacentNodes(d))
+				modifyNodeSelection(selectionList, mode)
 			}
 			d3.event.sourceEvent.preventDefault()
 			GraphUtil.captureEvent()
@@ -726,14 +731,15 @@ function modifyNodeSelection (delta, mode, skipRender) {
 			linksToCheck = _.union(linksToCheck, GraphUtil.getAdjacentLinks(node))
 		})
 		linksToCheck.each(function (link) {
-			link.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
+			if (link.source.selected == GraphUtil.SELECTION_STATES.NOT_SELECTED && link.target.selected == GraphUtil.SELECTION_STATES.NOT_SELECTED)
+				link.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
 		})
 		
 	// if we are in replace mode, change the selection to the current set of nodes
 	} else if (mode == GraphUtil.SELECT_MODES.REPLACE) {
 		toSelect = _.difference(delta, selectedNodes)
 		toDeselect = _.difference(selectedNodes, delta)
-		if (delta.size() == 1 && _.isEqual(delta, selectedNodes)) {
+		if (delta.size() == 1 || (delta.length == _.intersection(delta, selectedNodes).length)) {
 			toSelect = []
 			toDeselect = delta
 		}
@@ -1378,6 +1384,14 @@ function getParents (node) {
 		for (var i = 0; i < node.supports.length; ++i)
 			nodes.push(links[node.supports[i]].source)
 	return nodes
+}
+
+// gets the list of adjacent nodes (parents ∪ children) for the specified nodes
+function getAdjacentNodes (node) {
+	var adjacentNodes = []
+	if (node)
+		adjacentNodes = _.union(getChildren(node), getParents(node))
+	return adjacentNodes
 }
 
 // gets the list of nodes with dependencies involving for the specified node
