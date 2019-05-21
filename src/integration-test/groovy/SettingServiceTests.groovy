@@ -1,5 +1,4 @@
 import com.tdsops.tm.enums.domain.SettingType
-import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
@@ -33,12 +32,8 @@ class SettingServiceTests extends Specification {
         return jsonBuilder.toString()
     }
 
-    private String createSampleJson(boolean withUpdatedField=false) {
-        String base64EncodedJson = "ew0KICAic2V0dGluZ19rZXlfMSI6ICJ2YWx1ZSIsDQogICJzZXR0aW5nX2tleV8yIjogMSwNCiAgInNldHRpbmdfa2V5XzMiOiAidXBkYXRlZCINCn0="
-        if (withUpdatedField) {
-            base64EncodedJson = "ew0KICAic2V0dGluZ19rZXlfMSI6ICJ2YWx1ZSIsDQogICJzZXR0aW5nX2tleV8yIjogMiwNCiAgInNldHRpbmdfa2V5XzMiOiAidXBkYXRlZCINCn0="
-        }
-        return StringUtil.base64DecodeToString(base64EncodedJson)
+    private String createSampleJson() {
+        return '{"setting_key_1": "value", "setting_key_2": 2, "setting_key_3": "updated"}'
     }
 
     void 'Scenario 1: Calling getAsJson to get a project specific setting'() {
@@ -184,7 +179,7 @@ class SettingServiceTests extends Specification {
     void 'Scenario 2: Calling save to update an existing project scoped setting'() {
         given:
             def json = createSampleJson()
-            def jsonWithUpdatedField = createSampleJson(true)
+            def jsonWithUpdatedField = createSampleJson()
             def project = createProject()
             settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, CustomDomainService.ALL_ASSET_CLASSES, json, 0)
             settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, CustomDomainService.ALL_ASSET_CLASSES, jsonWithUpdatedField, 0)

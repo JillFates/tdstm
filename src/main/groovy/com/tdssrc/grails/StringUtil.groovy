@@ -340,15 +340,6 @@ class StringUtil {
 	}
 
 	/**
-	 * Decode a Base64 encoded string
-	 * @param str
-	 * @return
-	 */
-	static String base64DecodeToString(String str) {
-		return new String(Base64.decodeBase64(str))
-	}
-
-	/**
 	 * Returns a copy of the original string showing a number of characters in the edges and the rest of it
 	 * is changed to the given one
 	 *
