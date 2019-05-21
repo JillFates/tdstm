@@ -12,6 +12,7 @@ import net.transitionmanager.exception.InvalidParamException
 @CompileStatic
 class ExtraFilter {
 
+	String domain
 	/**
 	 * This field defines a property for extra filters.
 	 * It could have different meaning based on the following rules: <br/>
@@ -31,7 +32,8 @@ class ExtraFilter {
 	String filter
 	FieldSpec fieldSpec
 
-	ExtraFilter(String property, String filter, FieldSpec fieldSpec = null) {
+	ExtraFilter(String property, String filter, String domain = null, FieldSpec fieldSpec = null) {
+		this.domain = domain
 		this.property = property
 		this.filter = filter
 		this.fieldSpec = fieldSpec
@@ -73,7 +75,25 @@ class ExtraFilterBuilder {
 	String filter
 
 	/**
-	 * //TODO @dcorrea Complete docs
+	 * Builder implementation for {@code ExtraFilter} instances.
+	 * After configuring {@code ExtraFilter#property} and {@code ExtraFilter#filter},
+	 * this Builder implementation creates a new instance of {@code ExtraFilter}
+	 * based on the following rules:
+	 *  1) A named filter:
+	 *  <pre>
+	 *  	{"property" : "_ufp", "filter": "true"}
+	 *  </pre>
+	 *  A custom filter:
+	 *  <pre>
+	 *  	{"property" : "_event", "filter": "364"}
+	 *  </pre>
+	 *	Or a simple asset field filter:
+	 *  <pre>
+	 *		{"property" : "assetName", "filter": "FOOBAR"}
+	 *  	{"property" : "common_assetName", "filter": "FOOBAR"}
+	 *  	{"property" : "appTech", "filter": "Apple"}
+	 *  	{"property" : "application_appTech", "filter": "Apple"}
+	 *  </pre>
 	 *
 	 * @param domains
 	 * @param fieldSpecProject
@@ -86,13 +106,13 @@ class ExtraFilterBuilder {
 		} else if (this.property.contains('_')) {
 			def (String domain, String field) = this.property.split(DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER) as List<String>
 			FieldSpec fieldSpec = fieldSpecProject.getFieldSpec(domain, field)
-			return new ExtraFilter(field, this.filter, fieldSpec)
+			return new ExtraFilter(field, this.filter, domain, fieldSpec)
 	 	} else {
-			FieldSpec fieldSpec = fieldSpecProject.lookupFieldSpec(domains, this.property)
+			def (String domain, FieldSpec fieldSpec) = fieldSpecProject.lookupFieldSpec(domains, this.property)
 			if (!fieldSpec){
 				throw new InvalidParamException("Field Spec '$property' not found")
 			}
-			return new ExtraFilter(fieldSpec.field, this.filter, fieldSpec)
+			return new ExtraFilter(fieldSpec.field, this.filter, domain, fieldSpec)
 		}
 	}
 

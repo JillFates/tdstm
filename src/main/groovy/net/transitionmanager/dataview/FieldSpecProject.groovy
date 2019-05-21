@@ -92,20 +92,20 @@ class FieldSpecProject {
 	 * it return an instance of  {@code FieldSpec}, otherwise it return null.
 	 * @param 	domains a List of domain definitions
 	 * @param 	assetFieldName a valid asset field spec name
-	 * @return an instance of {@code FieldSpec}
+	 * @return an List with 2 values, selected domain with an instance of {@code FieldSpec} found
 	 */
-	FieldSpec lookupFieldSpec(List<String> domains, String assetFieldName) {
+	List lookupFieldSpec(List<String> domains, String assetFieldName) {
 		FieldSpec fieldSpec = null
-		domains.each { String domain ->
+		String selectedDomain = domains.find { String domain ->
 			String key = domain.toUpperCase()
-
-			if (fieldsSpecMap.containsKey(key)
-				&& fieldsSpecMap[key].containsKey(assetFieldName)) {
-				fieldSpec = fieldsSpecMap[key][assetFieldName]
-			}
+			fieldsSpecMap.containsKey(key) && fieldsSpecMap[key].containsKey(assetFieldName)
+		}
+		if (selectedDomain){
+			return [selectedDomain, fieldsSpecMap[selectedDomain.toUpperCase()][assetFieldName]]
+		} else {
+			return []
 		}
 
-		return fieldSpec
 
 	}
 }

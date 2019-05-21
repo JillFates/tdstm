@@ -6,9 +6,10 @@ import net.transitionmanager.asset.AssetType
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
+import net.transitionmanager.service.dataview.ExtraFilter
 import org.apache.commons.lang3.RandomStringUtils
-import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -20,7 +21,7 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 	Project defaultProject
 
 	void setupSpec() {
-		mockDomains(Project, Dataview)
+		mockDomains(Project, Dataview, MoveEvent)
 	}
 
 	void setup() {
@@ -45,9 +46,11 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 
 		setup: 'and instance of DataviewCustomFilterHQLBuilder'
 			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
+		and: 'an instance of ExtraFilter created'
+			ExtraFilter extraFilter = new ExtraFilter('_filter', namedFilter)
 
 		expect:
-			builder.buildQueryNamedFilters(namedFilter) == [
+			builder.buildQueryNamedFilter(extraFilter) == [
 				hqlExpression: hqlExpression,
 				hqlParams    : hqlParams
 			]
@@ -60,68 +63,39 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 			'storage'        || " AE.assetType IN (:namedStorageTypes) "                              | ['namedStorageTypes': AssetType.storageTypes]
 			'virtualServer'  || " AE.assetType IN (:namedFilterVirtualServerTypes) "                  | ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
 			'other'          || " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "     | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
-			'runbook'        || " AE.moveBundle.runbookStatus = :namedFilterRunBookStatus "           | ['namedFilterRunBookStatus': 'Done']
 
 	}
 
-	void 'test can prepare hql where statement and params for extra filters using property ufp'() {
+	void 'test can prepare hql where statement nd params for extra filters using property ufp'() {
 
 		given: 'and instance of DataviewCustomFilterHQLBuilder'
 			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
 
-		and: 'a Map with extra fields defined by ?ufp=true url params'
-			Map<String, String> extraFilters = [
-				filter  : 'true',
-				property: 'ufp'
-			]
+		and: 'a Map with extra fields defined by ?_ufp=true url params'
+			ExtraFilter extraFilter = new ExtraFilter('_ufp', 'true')
 
 		when: 'builds results for extra filters'
-			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilters)
+			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilter)
 
 		then: 'an hql sentence is created'
 			results.hqlExpression == " AE.moveBundle in (:extraFilterMoveBundles) "
 			results.hqlParams == [extraFilterMoveBundles: []]
 	}
 
-	void 'test can prepare hql where statement and params for extra filters using assetName property'() {
+	void 'test can prepare hql where statement and params for extra filters using event filter'() {
 
 		given: 'and instance of DataviewCustomFilterHQLBuilder'
 			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
 
-		and: 'a Map with extra fields defined by ?runbook= url params'
-			Map<String, String> extraFilters = [
-				filter  : 'FOO',
-				property: 'assetName',
-				domain  : 'common'
-			]
+		and: 'an extra field defined'
+			ExtraFilter extraFilter = new ExtraFilter('_event', '329')
 
 		when: 'builds results for extra filters'
-			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilters)
+			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilter)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " AE.assetName like :extraFilterAssetName "
-			results.hqlParams == [extraFilterAssetName: '%FOO%']
-
-	}
-
-	void 'test can prepare hql where statement and params for extra filters using asset fields'() {
-
-		given: 'and instance of DataviewCustomFilterHQLBuilder'
-			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
-
-		and: 'a Map with extra fields defined'
-			Map<String, String> extraFilters = [
-				domain  : 'common',
-				filter  : 'FOO',
-				property: 'assetName'
-			]
-
-		when: 'builds results for extra filters'
-			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilters)
-
-		then: 'an hql sentence is created'
-			results.hqlExpression == "  "
-			results.hqlParams['assetName'] == 'assetName'
+			results.hqlExpression == " AE.moveBundle in (:extraFilterMoveBundles) "
+			results.hqlParams['extraFilterMoveBundles'] == null
 
 	}
 }

@@ -5,8 +5,10 @@ import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.imports.DataviewHqlWhereCollector
 import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.search.FieldSearchData
+import net.transitionmanager.service.dataview.ExtraFilter
 
 import java.sql.Timestamp
 
@@ -32,25 +34,34 @@ class DataviewCustomFilterHQLBuilder {
 	 *
 	 * @param extraFilter * @return
 	 */
-	Map buildQueryExtraFilters(Map extraFilter) {
+	Map buildQueryExtraFilters(ExtraFilter extraFilter) {
 		String hqlExpression
 		Map<String, ?> hqlParams
 
-		String domain = extraFilter['domain']
-		String property = extraFilter['property']
-		Object filter = extraFilter['filter']
-
-		switch (property) {
-			case 'ufp':
+		switch (extraFilter.property) {
+			case '_ufp':
 				hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
 				hqlParams = [
 					extraFilterMoveBundles: MoveBundle.where {
-						project == queryProject && useForPlanning == filter
+						project == queryProject && useForPlanning == new Boolean(extraFilter.filter)
 					}.list()
 				]
 				break
+			case '_event':
+				//TODO: dcorrea. John, what can we do if there isn't moveBundle associated to a MoveEvent
+				List<MoveBundle> moveBundleList  = MoveEvent.read(extraFilter.filter.toLong())?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
+				hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
+				hqlParams = [
+					extraFilterMoveBundles: moveBundleList*.id
+				]
+				break
+			case '_filter':
+				Map<String, ?> namedFilterResults = buildQueryNamedFilter(extraFilter)
+				hqlExpression = namedFilterResults.hqlExpression
+				hqlParams = namedFilterResults.hqlParams
+				break
 			default:
-				throw new RuntimeException('Invalid filter definition:' + property)
+				throw new RuntimeException('Invalid filter definition:' + extraFilter.property)
 		}
 
 		return [
@@ -67,11 +78,11 @@ class DataviewCustomFilterHQLBuilder {
 	 * @return a Map with 2 values, sqlExpression and sqlParams
 	 * 			to be used in an hql sentence
 	 */
-	public Map<String, ?> buildQueryNamedFilters(String namedFilter) {
+	public Map<String, ?> buildQueryNamedFilter(ExtraFilter extraFilter) {
 		String hqlExpression
 		Map<String, ?> hqlParams
 
-		switch (namedFilter) {
+		switch (extraFilter.filter) {
 			case 'physical':
 				hqlExpression = " COALESCE(AE.assetType,'') NOT IN (:namedFilterVirtualServerTypes) "
 				hqlParams = ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
@@ -96,107 +107,13 @@ class DataviewCustomFilterHQLBuilder {
 				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 				break
-			case 'justPlanning':
-				hqlExpression = " AE.moveBundle in (:namedFilterMoveBundles) "
-				hqlParams = [
-					namedFilterMoveBundles: MoveBundle.where {
-						project == queryProject && useForPlanning == true
-					}.list()
-				]
-				break
-
 			default:
-				throw new RuntimeException('Invalid filter definition:' + namedFilter)
+				throw new RuntimeException('Invalid filter definition:' + extraFilter.property)
 		}
 
 		return [
 			hqlExpression: hqlExpression,
 			hqlParams    : hqlParams
 		]
-	}
-
-	/**
-	 * <p>Add a column filter results in HSQL sentence.</p>
-	 * <p>It uses {@code DataviewHqlWhereCollector} </p>
-	 * @param column
-	 * @param project
-	 * @param whereCollector
-	 * @param mixedKeys
-	 * @param mixedFieldsInfo
-	 */
-	private void addColumnFilter(Map<String, ?> column,
-								 Project project,
-								 DataviewHqlWhereCollector whereCollector,
-								 Map<String, List> mixedFieldsInfo) {
-
-		// The keys for all the declared mixed fields.
-		Set mixedKeys = mixedFields.keySet()
-
-		Class type = typeFor(column)
-		String filter = filterFor(column)
-
-		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
-			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
-			// Create a basic FieldSearchData with the info for filtering an individual field.
-			FieldSearchData fieldSearchData = new FieldSearchData([
-				column           : propertyFor(column),
-				columnAlias      : namedParameterFor(column),
-				domain           : domainFor(column),
-				filter           : filterFor(column),
-				type             : type,
-				whereProperty    : wherePropertyFor(column),
-				manyToManyQueries: manyToManyQueriesFor(column),
-				fieldSpec        : column.fieldSpec
-			])
-
-			String property = propertyFor(column)
-			// Check if the current column requires special treatment (e.g. startupBy, etc.)
-
-			if (property in mixedKeys) {
-				// Flag the fieldSearchData as mixed.
-				fieldSearchData.setMixed(true)
-				// Retrieve the additional results (e.g: persons matching the filter).
-				Closure sourceForField = sourceFor(property)
-				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
-				if (additionalResults) {
-					// Keep a copy of this results for later use.
-					mixedFieldsInfo[property] = additionalResults
-					// Add additional information for the query (e.g: the staff ids for IN clause).
-					Closure paramsInjector = injectWhereParamsFor(property)
-					paramsInjector(fieldSearchData, property, additionalResults)
-					// Add the sql where clause for including the additional fields in the query
-					Closure whereInjector = injectWhereClauseFor(property)
-					whereInjector(fieldSearchData, property)
-				} else {
-					// If no additional results, then unset the flag as no additional filtering should be required.
-					fieldSearchData.setMixed(false)
-				}
-			}
-
-			// Trigger the parsing of the parameter.
-			SqlUtil.parseParameter(fieldSearchData)
-
-			if (fieldSearchData.sqlSearchExpression) {
-				// Append the where clause to the list of conditions.
-				// hqlWhereConditions << fieldSearchData.sqlSearchExpression
-				whereCollector.addCondition(fieldSearchData.sqlSearchExpression)
-			}
-
-			if (fieldSearchData.sqlSearchParameters) {
-				// Add the parameters required for this field.
-				// hqlWhereParams += fieldSearchData.sqlSearchParameters
-				whereCollector.addParams(fieldSearchData.sqlSearchParameters)
-			}
-
-			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
-		} else {
-			String property = propertyFor(column)
-			if (property in mixedKeys) {
-				Closure sourceForField = sourceFor(property)
-				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
-				// Keep a copy of this results for later use.
-				mixedFieldsInfo[property] = additionalResults
-			}
-		}
 	}
 }

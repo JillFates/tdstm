@@ -646,15 +646,10 @@ class DataviewService implements ServiceMethods {
      * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
-		List<?> columsAndExtraFilters = dataviewSpec.columns + dataviewSpec.extraFilters
-		columsAndExtraFilters = columsAndExtraFilters.unique { Map a, Map b ->
-			return a['domain'] <=> b['domain'] ?: a['property'] <=> b['property']
-		}
-		return columsAndExtraFilters.collect { Map column ->
-            "${joinFor(column)}"
-        }.join(" ")
-    }
-
+		return dataviewSpec.columns.collect { Map column ->
+			"${joinFor(column)}"
+		}.join(" ")
+	}
 
 	/**
 	 * Creates a String with all the columns correctly set for select clause
@@ -711,7 +706,7 @@ class DataviewService implements ServiceMethods {
 		// 2) More complex and well defined extra filters resolved in {@code DataviewCustomFilterHQLBuilder} class
 		dataviewSpec.extraFilters?.each { ExtraFilter extraFilter ->
 			if (extraFilter.isAssetField()) {
-				addColumnFilter(extraFilter, project, whereCollector, mixedFieldsInfo)
+				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
 			} else {
 				Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
 				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
