@@ -14,7 +14,6 @@ import {SharedModule} from '../shared/shared.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 import {UserModule} from '../modules/user/user.module';
-import {MandatoryNoticesValidatorService} from './services/mandatory-notices-validator.service';
 
 @NgModule({
 	imports: [
@@ -33,7 +32,6 @@ import {MandatoryNoticesValidatorService} from './services/mandatory-notices-val
 	providers: [
 		AuthGuardService,
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
-		MandatoryNoticesValidatorService
 	],
 	bootstrap: [
 		TDSAppComponent
