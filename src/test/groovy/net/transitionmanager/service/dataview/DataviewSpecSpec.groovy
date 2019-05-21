@@ -1,11 +1,14 @@
 package net.transitionmanager.service.dataview
 
+
 import com.tdsops.etl.FieldSpecValidateableTrait
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.common.Timezone
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
@@ -14,7 +17,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
-class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest {
+class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest, AssertionTest {
 
 	@Shared
 	Project defaultProject
@@ -43,7 +46,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 		fieldSpecProject = createFieldSpecProject()
 	}
 
-	void 'test can create a DataviewSpec from DataviewUserParamsCommand'() {
+	void 'test can create a DataviewSpec'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
@@ -55,7 +58,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 	}
 
-	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview'() {
+	void 'test can create a DataviewSpec from a Dataview'() {
 
 		given: 'an instance of DataviewUserParamsCommand'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
@@ -66,9 +69,8 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsDataviewJsonContent
+				reportSchema: allAssetsDataviewReportSchema
 			)
-			//dataview.save()
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
 			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
@@ -77,12 +79,16 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 	}
 
-	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters'() {
+	void 'test can create a DataviewSpec from a Dataview with extra filters physicalServer'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
-			// Filter on UI like this: ?_filter=physicalServer
-			command.filters.named = 'physicalServer,validateTo'
+			command.filters.extra = [
+				[
+					property: '_filter',
+					filter  : 'physicalServer'
+				]
+			]
 
 		and: 'an instance of Dataview'
 			Dataview dataview = new Dataview(
@@ -90,7 +96,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsDataviewJsonContent
+				reportSchema: allAssetsDataviewReportSchema
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
@@ -98,19 +104,26 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.namedFilters == ['physicalServer', 'validateTo']
+
+		and: 'extra filter where created'
+			dataviewSpec.extraFilters.size() == 1
+			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
+				assertWith(extraFilter, ExtraFilter) {
+					property == '_filter'
+					filter == 'physicalServer'
+					fieldSpec == null
+				}
+			}
 	}
 
-	void 'test can create a DataviewSpec from DataviewUserParamsCommand and a Dataview adding named filters and extra filters'() {
+	void 'test can create a DataviewSpec from a Dataview with extra filters using asset field name defined'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters and extra filters added'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
-			command.filters.named = 'physicalServer,validateTo'
 			command.filters.extra = [
 				[
-					domain  : 'common',
-					filter  : 'FOO',
-					property: 'assetName'
+					property: 'assetName',
+					filter  : '111-222-333'
 				]
 			]
 
@@ -120,7 +133,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 				name: 'ALL ASSETS',
 				isSystem: false,
 				isShared: false,
-				reportSchema: allAssetsDataviewJsonContent
+				reportSchema: allAssetsDataviewReportSchema
 			)
 
 		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
@@ -128,14 +141,114 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'dataviewSpec is created correctly'
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
-			dataviewSpec.namedFilters == ['physicalServer', 'validateTo']
-			dataviewSpec.extraFilters == [
-				[
-					domain  : 'common',
-					filter  : 'FOO',
-					property: 'assetName'
-				]
-			]
+
+		and: 'extra filter where created'
+			dataviewSpec.extraFilters.size() == 1
+			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
+				assertWith(extraFilter, ExtraFilter) {
+					property == 'assetName'
+					filter == '111-222-333'
+					assertWith(fieldSpec, FieldSpec) {
+						field == 'assetName'
+						label == 'Name'
+					}
+				}
+			}
 	}
 
+	void 'test can create a DataviewSpec from a Dataview with extra filters using asset field name and domain defined'() {
+
+		given: 'an instance of DataviewUserParamsCommand with named filters and extra filters added'
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
+			command.filters.extra = [
+				[
+					property: 'common_assetName',
+					filter  : '111-222-333'
+				]
+			]
+
+		and: 'an instance of Dataview'
+			Dataview dataview = new Dataview(
+				project: defaultProject,
+				name: 'ALL ASSETS',
+				isSystem: false,
+				isShared: false,
+				reportSchema: allAssetsDataviewReportSchema
+			)
+
+		when: 'a dataviewSpec is created using only that instance of DataviewUserParamsCommand'
+			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
+
+		then: 'dataviewSpec is created correctly'
+			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
+
+		and: 'extra filter where created'
+			dataviewSpec.extraFilters.size() == 1
+			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
+				assertWith(extraFilter, ExtraFilter) {
+					property == null
+					filter == '111-222-333'
+					assertWith(fieldSpec, FieldSpec) {
+						field == 'assetName'
+						label == 'Name'
+					}
+				}
+			}
+	}
+
+	void 'test can throw an exception creating a DataviewSpec with extra incorrect filters'() {
+
+		given: 'an instance of DataviewUserParamsCommand with named filters added'
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
+			command.filters.extra = [
+				[
+					property: 'application_assetName',
+					filter  : '111-222-333'
+				]
+			]
+
+		and: 'an instance of Dataview'
+			Dataview dataview = new Dataview(
+				project: defaultProject,
+				name: 'ALL ASSETS',
+				isSystem: false,
+				isShared: false,
+				reportSchema: allAssetsDataviewReportSchema
+			)
+
+		when: 'a dataviewSpec is created'
+			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
+
+		then: 'an InvalidParamException is thrown'
+			InvalidParamException e = thrown InvalidParamException
+			e.message == "Domain application and field assetName not found in cache"
+	}
+
+	void 'test can throw an exception creating a DataviewSpec with extra unknown filters'() {
+
+		given: 'an instance of DataviewUserParamsCommand with named filters added'
+			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
+			command.filters.extra = [
+				[
+					property: 'unknown',
+					filter  : 'unknown'
+				]
+			]
+
+		and: 'an instance of Dataview'
+			Dataview dataview = new Dataview(
+				project: defaultProject,
+				name: 'ALL ASSETS',
+				isSystem: false,
+				isShared: false,
+				reportSchema: allAssetsDataviewReportSchema
+			)
+
+		when: 'a dataviewSpec is created'
+			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
+
+		then: 'an InvalidParamException is thrown'
+			InvalidParamException e = thrown InvalidParamException
+			e.message == "Field Spec 'unknown' not found"
+	}
 }

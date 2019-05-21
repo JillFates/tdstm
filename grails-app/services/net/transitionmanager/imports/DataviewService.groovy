@@ -37,6 +37,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataviewCustomFilterHQLBuilder
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
+import net.transitionmanager.service.dataview.ExtraFilter
 import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
@@ -685,16 +686,11 @@ class DataviewService implements ServiceMethods {
 			])
 		}
 
-		String justPlanning = dataviewSpec.justPlanning
-		if (justPlanning == null) {
-			justPlanning = userPreferenceService.getPreference(null, UserPreferenceEnum.ASSET_JUST_PLANNING, null)
-		}
-
-		if (justPlanning != null) {
+		if (dataviewSpec.justPlanning != null) {
 			whereCollector.addCondition("AE.moveBundle in (:moveBundles)")
 				.addParams([
 				moveBundles: MoveBundle.where {
-					project == project && useForPlanning == justPlanning
+					project == project && useForPlanning == dataviewSpec.justPlanning
 				}.list()
 			])
 		}
@@ -710,16 +706,11 @@ class DataviewService implements ServiceMethods {
 		// Applied named and extra filters from TM-14768
 		DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(project)
 
-		dataviewSpec.namedFilters?.each { String namedFilter ->
-			Map<String, ?> hqlNamedFilters = builder.buildQueryNamedFilters(namedFilter)
-			whereCollector.addCondition(hqlNamedFilters.hqlExpression).addParams(hqlNamedFilters.hqlParams)
-		}
-
 		// There is 2 types of extra filters:
 		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple'
 		// 2) More complex and well defined extra filters resolved in {@code DataviewCustomFilterHQLBuilder} class
-		dataviewSpec.extraFilters?.each { Map<String, ?> extraFilter ->
-			if (extraFilter.fieldSpec) {
+		dataviewSpec.extraFilters?.each { ExtraFilter extraFilter ->
+			if (extraFilter.isAssetField()) {
 				addColumnFilter(extraFilter, project, whereCollector, mixedFieldsInfo)
 			} else {
 				Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
@@ -743,10 +734,11 @@ class DataviewService implements ServiceMethods {
 	 * @param mixedKeys
 	 * @param mixedFieldsInfo
 	 */
-	private void addColumnFilter(Map<String, ?> column,
-								 Project project,
-								DataviewHqlWhereCollector whereCollector,
-								Map<String, List> mixedFieldsInfo) {
+	private void addColumnFilter(
+		Map<String, ?> column,
+		Project project,
+		DataviewHqlWhereCollector whereCollector,
+		Map<String, List> mixedFieldsInfo) {
 
 		// The keys for all the declared mixed fields.
 		Set mixedKeys = mixedFields.keySet()

@@ -59,30 +59,53 @@ class FieldSpecProject {
 
 	/**
 	 * Returns an instance of {@code FieldSpec} based on an assetclass definition and a field name
-	 * @param assetClassName
+	 * @param domain
 	 * @param fieldName
 	 * @return
 	 */
-	FieldSpec getFieldSpec(String assetClassName, String fieldName) {
+	FieldSpec getFieldSpec(String domain, String fieldName) {
 
-		String key = assetClassName.toUpperCase()
+		String key = domain.toUpperCase()
 		if (! fieldsSpecMap.containsKey(key)) {
-			throw new InvalidParamException("Domain $assetClassName not found in cache")
+			throw new InvalidParamException("Domain $domain not found in cache")
 		}
 		if (!fieldsSpecMap[key].containsKey(fieldName)) {
-			throw new InvalidParamException("Domain $assetClassName and field $fieldName not found in cache")
+			throw new InvalidParamException("Domain $domain and field $fieldName not found in cache")
 		}
 		return fieldsSpecMap[key][fieldName]
 	}
 
 	/**
 	 * Retrieve a {@code Map} with all customFields for an asset class definition.
-	 * @param assetClassName a Class name in AssetEntity hierarchy
+	 * @param 	assetClassName a Class name in AssetEntity hierarchy
 	 * @return a {@code Map} with all custom fields
 	 * @see FieldSpec#isCustom()
 	 */
 	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
 		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(AssetClass.getDomainForAssetType(assetClassName).toUpperCase())
 		return allFieldSpecs.findAll { it.value?.isCustom() }
+	}
+
+	/**
+	 * Lookups a {@code FieldSpec} instance combining all domains passed as argument.
+	 * If it finds a valid combination of domain and field name,
+	 * it return an instance of  {@code FieldSpec}, otherwise it return null.
+	 * @param 	domains a List of domain definitions
+	 * @param 	assetFieldName a valid asset field spec name
+	 * @return an instance of {@code FieldSpec}
+	 */
+	FieldSpec lookupFieldSpec(List<String> domains, String assetFieldName) {
+		FieldSpec fieldSpec = null
+		domains.each { String domain ->
+			String key = domain.toUpperCase()
+
+			if (fieldsSpecMap.containsKey(key)
+				&& fieldsSpecMap[key].containsKey(assetFieldName)) {
+				fieldSpec = fieldsSpecMap[key][assetFieldName]
+			}
+		}
+
+		return fieldSpec
+
 	}
 }

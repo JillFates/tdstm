@@ -3,10 +3,9 @@ package net.transitionmanager.service.dataview
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
+import net.transitionmanager.command.DataviewExtraFilterParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.Dataview
 import org.grails.web.json.JSONObject
 
@@ -64,19 +63,18 @@ class DataviewSpec {
 	private Map<String, Integer> args
 	private Map<String, String> order
 	private Boolean justPlanning
-	/**
-	 * Named filers are used by All Assets for custom filtering from Planing dashboard
-	 */
-	List<String> namedFilters
 	/*
 		Extra Filters are used by All Assets for custom filtering from Planing dashboard
 		"extra": [ {
-        	"domain": "common",
+        	"property": "assetName",
         	"filter": "FOO",
-        	"property": "assetName"
+      	},
+      	{
+        	"property": "_filter",
+        	"filter": "physicalServer",
       	}]
 	 */
-	private List<Map<String, ?>> extraFilters
+	private List<ExtraFilter> extraFilters
 	/**
 	 * Character separator used for named filters
 	 */
@@ -123,6 +121,7 @@ class DataviewSpec {
 	}
 
 	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null, FieldSpecProject fieldSpecProject = null) {
+		// 1) Prepares the spec definition
 		spec = [
 			domains: command.filters.domains,
 			columns: command.filters.columns.collect {
@@ -141,15 +140,7 @@ class DataviewSpec {
 			args.max = command.limit
 		}
 
-		namedFilters = command.filters.namedFilterList
-		extraFilters = command.filters.extra.collect {
-			[
-				domain  : it.domain,
-				property: it.property,
-				filter  : it.filter
-			]
-		}
-
+		//2) Complte the spec definition with Dataview instance
 		if (dataview) {
 			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
 			spec.domains = ((jsonDataview.domains.collect { it.toLowerCase() } as Set) + (spec.domains as Set)) as List
@@ -160,11 +151,12 @@ class DataviewSpec {
 					it.domain == dataviewColumn.domain && it.property == dataviewColumn.property
 				}
 				if (!specColumn) {
-					addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter, fieldSpecProject)
+					addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter)
 				}
 			}
 		}
 
+		//3) Defines the order in results
 		order = [
 			domain   : command.sortDomain,
 			property : command.sortProperty,
@@ -172,20 +164,21 @@ class DataviewSpec {
 			fieldSpec: fieldSpecProject?.getFieldSpec(command.sortDomain, command.sortProperty)
 		]
 
+		//4) Add Field Spec for each spce column
 		this.spec.columns.each { Map<String, ?> column ->
 			column.fieldSpec = fieldSpecProject?.getFieldSpec(column.domain, column.property)
 		}
 
-		this.extraFilters.each { Map<String, ?> extraFilter ->
-			// Extra filter could be a valid field spec or other options.
-			// For more details take a look {@code DataviewCustomFilterHQLBuilder} implementation
-			if (extraFilter.domain && extraFilter.property){
-				extraFilter.fieldSpec = fieldSpecProject?.getFieldSpec(extraFilter.domain, extraFilter.property)
-			}
+		//5) Add extra filter from UI params in command Object
+		extraFilters = command.filters.extra.collect { extraFilter ->
+			ExtraFilter.builder()
+				.withProperty(extraFilter.property)
+				.withFilter(extraFilter.filter)
+				.build(spec.domains, fieldSpecProject)
 		}
 	}
 
-	void addColumn(domain, property, filter = null) {
+	void addColumn(String domain, String property, Object filter = null) {
 		spec.columns += [
 			domain  : domain,
 			property: property,
@@ -288,22 +281,12 @@ class DataviewSpec {
 	}
 
 	/**
-	 * Used to determine if there are named filters for a DataviewSpec request
-	 *
-	 * @return null if the variable wasn't set or a String value if DataviewSpec is prepared for filtering using named filters
-	 * @See DataviewSpec#namedFilters
-	 */
-	List<String> getNamedFilters() {
-		return namedFilters
-	}
-
-	/**
 	 * Used to determine if there is extra filters for a DataviewSpec request
 	 *
 	 * @return null if the variable wasn't set or a List value if DataviewSpec is prepared for filtering using extra filters
 	 * @See DataviewSpec#extraFilters
 	 */
-	List<Map<String, ?>> getExtraFilters() {
+	List<ExtraFilter> getExtraFilters() {
 		return extraFilters
 	}
 }

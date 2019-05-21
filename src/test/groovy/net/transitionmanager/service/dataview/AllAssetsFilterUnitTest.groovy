@@ -4,8 +4,8 @@ import spock.lang.Shared
 
 /**
  * This trait defines the "All Assets" request used by the client side tries to filter its content.
- * It can manages the {@code allAssetsDataviewMap} with a Map object that contains "All Assets" UI body request.
- * It can manages the {@code allAssetsDataviewJsonContent} with a String object that contains "All Assets" UI body JSON request.
+ * It can manages the {@code allAssetsDataviewMap] with a Map object that contains "All Assets" UI body request.
+ * It can manages the {@code allAssetsDataviewReportSchema] with a String object that contains "All Assets" UI body JSON request.
  */
 trait AllAssetsFilterUnitTest {
 
@@ -473,114 +473,112 @@ trait AllAssetsFilterUnitTest {
 	]
 
 	@Shared
-	String allAssetsDataviewJsonContent = """
+	String allAssetsDataviewReportSchema = """
 		{
-		   "offset":0,
-		   "limit":25,
-		   "sortDomain":"common",
-		   "sortProperty":"assetName",
-		   "sortOrder":"a",
-		   "filters":{
-			  "domains":[
-				 "common",
-				 "application",
-				 "database",
-				 "device",
-				 "storage"
-			  ],
-			  "columns":[
-				 [
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Name",
-					"locked":true,
-					"property":"assetName",
-					"width":220
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Asset Class",
-					"locked":true,
-					"property":"assetClass",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Description",
-					"locked":false,
-					"property":"description",
-					"width":220
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Environment",
-					"locked":false,
-					"property":"environment",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Bundle",
-					"locked":false,
-					"property":"moveBundle",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Validation",
-					"locked":false,
-					"property":"validation",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Plan Status",
-					"locked":false,
-					"property":"planStatus",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Support",
-					"locked":false,
-					"property":"supportType",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"External Ref Id",
-					"locked":false,
-					"property":"externalRefId",
-					"width":140
-				 },
-				 {
-					"domain":"common",
-					"edit":false,
-					"filter":"",
-					"label":"Modified Date",
-					"locked":false,
-					"property":"lastUpdated",
-					"width":140
-				 }
-			  ]
-		   }
+		   "domains":[
+			  "common",
+			  "application",
+			  "database",
+			  "device",
+			  "storage"
+		   ],
+		   "sort":{
+			  "domain":"common",
+			  "order":"a",
+			  "property":"assetName"
+		   },
+		   "columns":[
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Name",
+				 "locked":true,
+				 "property":"assetName",
+				 "width":220
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Asset Class",
+				 "locked":true,
+				 "property":"assetClass",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Description",
+				 "locked":false,
+				 "property":"description",
+				 "width":220
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Environment",
+				 "locked":false,
+				 "property":"environment",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Bundle",
+				 "locked":false,
+				 "property":"moveBundle",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Validation",
+				 "locked":false,
+				 "property":"validation",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Plan Status",
+				 "locked":false,
+				 "property":"planStatus",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Support",
+				 "locked":false,
+				 "property":"supportType",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"External Ref Id",
+				 "locked":false,
+				 "property":"externalRefId",
+				 "width":140
+			  },
+			  {
+				 "domain":"common",
+				 "edit":false,
+				 "filter":"",
+				 "label":"Modified Date",
+				 "locked":false,
+				 "property":"lastUpdated",
+				 "width":140
+			  }
+		   ]
 		}"""
 
 }

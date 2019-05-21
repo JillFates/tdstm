@@ -39,28 +39,12 @@ class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFi
 			command.validate()
 	}
 
-	void 'test can create a all assets command object content with named filters'() {
-
-		given: 'All Assets Map filter content'
-			allAssetsDataviewMap.filters.named = 'server,toValidate'
-
-		when: 'creates an instance of DataviewUserParamsCommand with "All Assets" filters Map'
-			DataviewUserParamsCommand command = new DataviewUserParamsCommand(allAssetsDataviewMap)
-
-		then: 'command is valid'
-			command.validate()
-
-		and: 'and extra filters where correctly parsed'
-			command.filters.namedFilterList == ['server', 'toValidate']
-	}
-
 	@Unroll
-	void 'test can create a all assets command object content with extra filters #domain, #property and #filter'() {
+	void 'test can create a all assets command object content with extra filters #property and #filter'() {
 
 		setup: 'All Assets Map filter content'
 			allAssetsDataviewMap.filters.extra = [
 				[
-					domain  : domain,
 					property: property,
 					filter  : filter
 				]
@@ -73,13 +57,23 @@ class DataviewUserParamsCommandSpec extends Specification implements AllAssetsFi
 			command.validate() == valid
 
 		where: 'it defines domain, property and filter'
-			domain        | property    | filter   || valid
-			'common'      | 'assetName' | 'FOOBAR' || true
-			'application' | 'appTech'   | 'Apple'  || true
-			'application' | 'appTech'   | ''       || true
-			'application' | 'appTech'   | null     || false
-			'application' | null        | 'Apple'  || false
+			property              | filter           || valid
+			'assetName'           | 'FOOBAR'         || true
+			'common_assetName'    | 'FOOBAR'         || true
+			'appTech'             | 'Apple'          || true
+			'application_appTech' | 'Apple'          || true
+			'appTech'             | ''               || true
+			'appTech'             | null             || false
+			null                  | 'Apple'          || false
+			'_filter'             | 'physicalServer' || true
+			'_event'              | '364'            || true
+			'_ufp'                | 'true'           || true
+			'_ufp'                | 'false'          || true
+			'_ufp'                | ''               || true
+			'validation'          | 'Unknown'        || true
+			'common_validation'   | 'Unknown'        || true
+			'sme'                 | '364'            || true
+			'plannedStatus'       | 'Moved'          || true
 	}
-
 
 }
