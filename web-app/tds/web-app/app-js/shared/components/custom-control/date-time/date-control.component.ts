@@ -69,8 +69,7 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnInit,
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
-		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
-		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
+		this.updateDateValue();
 	}
 
 	/**
@@ -92,7 +91,22 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnInit,
 			required: this.required
 		};
 		if (inputs['_value']) {
+			if (!inputs['_value'].currentValue) {
+				this.updateDateValue();
+			}
+
 			this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 		}
+	}
+
+	/**
+	 * Based on the current value set the corresponding formatted date value
+	 */
+	updateDateValue() {
+		if (this.value) {
+			let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+			this.dateValue = DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);
+		}
+		this.dateValue = this.value;
 	}
 }

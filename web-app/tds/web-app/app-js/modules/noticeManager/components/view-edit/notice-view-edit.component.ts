@@ -223,6 +223,9 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	setMaxDate(value: any) {
 		this.maxDate = value;
+		if (this.model.activationDate && value <  this.convertToDate(this.model.activationDate)) {
+			this.model.expirationDate = '';
+		}
 	}
 
 	/**
@@ -230,5 +233,17 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	*/
 	setMinDate(value: any) {
 		this.minDate = value;
+		if (this.model.expirationDate && value >  this.convertToDate(this.model.expirationDate)) {
+			this.model.activationDate = '';
+		}
+	}
+
+	/**
+	 * Could receive a string or date, based in the type make sure returns a date  object
+	 * @param {any} value:  String or Date to cast
+	 * @returns {date}
+	 */
+	private convertToDate(value: any): any {
+		return (value && value.toDateString) ? value : new Date(DateUtils.getDateFromGMT(value));
 	}
 }
