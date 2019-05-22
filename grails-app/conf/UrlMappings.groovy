@@ -624,9 +624,6 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
-			constraints {
-				id(matches:/[0-9]{1,}/)
-			}
 		}
 
 		// Licensing Information
