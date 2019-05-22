@@ -297,6 +297,7 @@ class AssetEntity {
 
 	static mapping = {
 		appOwner column: 'app_owner_id'
+		model ignoreNotFound: true
 		autoTimestamp false
 		id column: 'asset_entity_id'
 		maintExpDate sqltype: 'date'
