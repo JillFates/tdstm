@@ -42,12 +42,13 @@ export class PostNoticesComponent implements OnInit {
 				const redirect = (response && response.redirectUri) || '';
 				this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
 
-				this.postNotices = response.notices.map((notice: NoticeModel) => {
-					notice.sequence = notice.sequence || 0;
-					return notice;
-				});
-
-				this.showNotices();
+				if (this.redirectUri) {
+					this.postNotices = response.notices.map((notice: NoticeModel) => {
+						notice.sequence = notice.sequence || 0;
+						return notice;
+					});
+					this.showNotices();
+				}
 			});
 	}
 
