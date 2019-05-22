@@ -77,7 +77,10 @@
                                 <div class="optionsButton" *ngIf="column.property=='action'">
                                     <span class="glyphicon glyphicon-option-vertical" (click)="items = [{text: 'Data goes here'}]"></span>
                                 </div>
-                                <span *ngIf="column.property!='action'" [class]="column.property == 'status' ? dataItem.css : ''" >{{dataItem[column.property]}}</span>
+                                <a *ngIf="column.property=='related'" (click)="openAssetDialog(dataItem.assetId,dataItem.assetClass)">{{dataItem[column.property]}}</a>
+                                <span *ngIf="column.property!='action' && column.property!='related'" [class]="column.property == 'status' ? dataItem.css : ''" >
+                                    {{dataItem[column.property]}}
+                                </span>
                             </ng-template>
                         </kendo-grid-column>
                     </kendo-grid>
