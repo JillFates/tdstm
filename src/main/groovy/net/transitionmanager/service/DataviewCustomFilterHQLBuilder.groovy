@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.sql.SqlUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.imports.DataviewHqlWhereCollector
@@ -25,12 +26,6 @@ class DataviewCustomFilterHQLBuilder {
 	}
 
 	/**
-	 * Defines a custom filter name used from the UI
-	 * for adding custom filters like 'physicalServer' or 'virtualServer'
-	 */
-	public static final String CUSTOM_FILTER = '_filter'
-
-	/**
 	 *
 	 * @param extraFilter * @return
 	 */
@@ -50,9 +45,9 @@ class DataviewCustomFilterHQLBuilder {
 			case '_event':
 				//TODO: dcorrea. John, what can we do if there isn't moveBundle associated to a MoveEvent
 				List<MoveBundle> moveBundleList  = MoveEvent.read(extraFilter.filter.toLong())?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
-				hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
+				hqlExpression = " AE.moveBundle.event.id = :extraFilterMoveEventId "
 				hqlParams = [
-					extraFilterMoveBundles: moveBundleList*.id
+					extraFilterMoveEventId: NumberUtil.toPositiveLong(extraFilter.filter, 0)
 				]
 				break
 			case '_filter':
