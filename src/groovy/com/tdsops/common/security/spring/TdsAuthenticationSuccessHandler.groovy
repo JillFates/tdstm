@@ -77,7 +77,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
-				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(userLogin.person)
+				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(userLogin.person)
 				if (hasUnacknowledgedNotices) {
 					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
 					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)

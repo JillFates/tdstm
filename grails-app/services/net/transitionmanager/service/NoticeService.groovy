@@ -105,15 +105,29 @@ class NoticeService implements ServiceMethods {
 	}
 
 	/**
+	 * Determine whether or not the person logging in has unacknowledged notices.
+	 *
+	 * @param person - the person logging in into the application.
+	 * @return whether or not the person has unacknowledge notices.
+	 */
+	Boolean hasUnacknowledgedNoticesForLogin(Person person) {
+		Project project = securityService.userCurrentProject
+		return hasUnacknowledgedNotices(person, project, false, true)
+	}
+
+
+	/**
 	 * Check for any unacknowledged notices
 	 * @param person
 	 * @param project - the project currently selected in the user's context
 	 * @param requiredNoticesOnly - defaulted to false, this flag signals if only required notices are needed.
+	 * @param forLogin - if true the presence of the HAS_UNACKNOWLEDGED_NOTICES attribute in the session will be
+	 *  bypassed. This is to take into account that, during the login process, this attribute hasn't been set, yet.
 	 * @return
 	 */
-	Boolean hasUnacknowledgedNotices(Person person, Project project, boolean requiredNoticesOnly = false) {
+	Boolean hasUnacknowledgedNotices(Person person, Project project, boolean requiredNoticesOnly = false, boolean forLogin = false) {
 		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return false.
-		if (session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+		if (!forLogin && session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
 			return false
 		}
 
