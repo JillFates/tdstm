@@ -1654,7 +1654,7 @@ class PersonService implements ServiceMethods {
 
 		save person
 		if (person.hasErrors()) {
-			throw new DomainUpdateException('An error occurred while attempting to save person changes')
+			throw new InvalidParamException('An error occurred while attempting to save person changes')
 		}
 
 		UserLogin userLogin = securityService.getPersonUserLogin(person)
@@ -1796,7 +1796,7 @@ class PersonService implements ServiceMethods {
 			save person, true
 
 			if (person.hasErrors()) {
-				throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
+				throw new InvalidParamException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
 			}
 
 			auditService.logMessage("$byWhom created person $person as staff of $companyParty")
