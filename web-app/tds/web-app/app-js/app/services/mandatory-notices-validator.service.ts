@@ -30,10 +30,7 @@ export class MandatoryNoticesValidatorService {
 		this.router.events
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
-				switchMap((e) => {
-					console.log('The event is:', e);
-					return this.userService.hasMandatoryNoticesPending();
-				})
+				switchMap((e) => this.userService.hasMandatoryNoticesPending())
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)
 			.subscribe(() => this.router.navigate([Paths.notice]),
