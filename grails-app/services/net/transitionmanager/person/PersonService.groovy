@@ -1635,7 +1635,7 @@ class PersonService implements ServiceMethods {
 
 		save person
 		if (person.hasErrors()) {
-			throw new DomainUpdateException('An error occurred while attempting to save person changes')
+			throw new InvalidParamException('An error occurred while attempting to save person changes')
 		}
 
 		UserLogin userLogin = securityService.getPersonUserLogin(person)
