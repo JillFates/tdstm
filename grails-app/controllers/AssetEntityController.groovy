@@ -1211,7 +1211,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
 
-		final String DEFAULT_SORT = 'DEFAULT_EMPTY_SORT'
+		final String DEFAULT_SORT = ''  // We set this as EMPTY string for compatibility
 		Set<String> definedSortableFields = [
 				  'taskNumber',
 				  'comment',
