@@ -68,8 +68,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.providerList.push({ id: 0, name: 'Select...' });
-					this.dataScriptModel.provider = this.providerList[0];
+					this.dataScriptModel.provider = { id: 0, name: 'Select...' };
 				}
 				this.providerList.push(...result);
 				let copy = {...this.dataScriptModel};
