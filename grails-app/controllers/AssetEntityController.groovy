@@ -1097,26 +1097,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.CommentView)
 	def listCommentJson() {
 
-		def getDefinedSortableField  = { String key ->
-			List<String> definedSortableFields = [
-					  'comment',
-					  'commentType',
-					  'category',
-					  'lastUpdated',
-					  'assetType',
-					  'assetName'
-			]
+		Set<String> definedSortableFields = [
+				  'comment',
+				  'commentType',
+				  'category',
+				  'lastUpdated',
+				  'assetType',
+				  'assetName'
+		]
 
-			if ( !key ) {
-				return 'lastUpdated'
-			} else if (definedSortableFields.contains(key) ) {
-				return key
-			} else {
-				throw PAGINATION_INVALID_ORDER_BY_EXCEPTION
-			}
-		}
-
-		String sortIndex = getDefinedSortableField(params.sidx)
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', 'lastUpdated')
 		String sortOrder = paginationSortOrder('sord')
 		// Get the pagination and set the user preference appropriately
 		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
@@ -1184,29 +1174,25 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
-		def getDefinedSortableField  = { String key ->
-			List<String> definedSortableFields = [
-				'taskNumber',
-				'comment',
-				'assetName',
-				'dueDate',
-				'status',
-				'assignedTo',
-				'instructionsLink',
-				'category',
-				'role',
-				'assetType',
-				'score'
-			]
 
-			if ( definedSortableFields.contains(key) ) {
-				return key
-			} else {
-				return session.TASK?.JQ_FILTERS?.sidx
-			}
-		}
+		final String DEFAULT_SORT = 'DEFAULT_EMPTY_SORT'
+		Set<String> definedSortableFields = [
+				  'taskNumber',
+				  'comment',
+				  'assetName',
+				  'dueDate',
+				  'status',
+				  'assignedTo',
+				  'instructionsLink',
+				  'category',
+				  'role',
+				  'assetType',
+				  'score',
+				  DEFAULT_SORT
+		]
 
-		String sortIndex =  getDefinedSortableField(params.sidx)
+		String defaultSIdx = session.TASK?.JQ_FILTERS?.sidx ?: DEFAULT_SORT
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', defaultSIdx)
 		String sortOrder =  paginationSortOrder('sord', session.TASK?.JQ_FILTERS?.sord)
 
 		// Get the pagination and set the user preference appropriately
@@ -1492,7 +1478,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (assigned) {
 				'in'('assignedTo', assigned)
 			}
-			if (sortIndex && sortOrder) {
+			if (sortIndex && sortIndex != DEFAULT_SORT && sortOrder) {
 				String sortIdx
 				switch(sortIndex) {
 					case "assetName":
