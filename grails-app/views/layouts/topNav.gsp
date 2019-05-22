@@ -95,14 +95,14 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <g:if test="${isLicenseManagerEnabled}">
-                        <asset:image id="logo-header" src="images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />
+                        <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
                     </g:if>
                     <g:else>
                         <g:if test="${setImage}">
                             <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
                         </g:if>
                         <g:else>
-                            <asset:image id="logo-header" src="images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
+                            <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
                         </g:else>
                     </g:else>
                 </div>
@@ -172,29 +172,6 @@
     </header>
     <!-- Full Width Column -->
     <div class="content-wrapper">
-        <g:if test="${currProject}">
-        <%-- Include the News crawler if there is an event in progress --%>
-            <g:if test="${currProject?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
-                <g:if test="${moveEvent?.newsBarMode == 'auto'}">
-                    <g:if test="${moveEvent?.estStartTime.getTime() < new Date().getTime()}">
-                        <g:set var="showNewsBar" value="true" />
-                    </g:if>
-                </g:if>
-                <g:elseif test="moveEvent?.newsBarMode == 'on'">
-                    <g:set var="showNewsBar" value="true" />
-                </g:elseif>
-
-                <g:if test="${showNewsBar}">
-                    <div class="menu3" id="head_crawler" >
-                        <div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
-                        <div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
-                    </div>
-                    <script type="text/javascript">
-                        ${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEvent.id+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
-                    </script>
-                </g:if>
-            </g:if>
-        </g:if>
         <div class="container">
             <g:layoutBody />
         </div>
@@ -223,6 +200,3 @@
 
 </body>
 </html>
-<%
-    flash.remove('message');
-%>

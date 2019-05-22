@@ -485,7 +485,7 @@ class UrlMappings {
 			action = [ GET: "modelForUserDashboard" ]
 		}
 
-		"/ws/user/assignedEvents" {
+		"/ws/user/assignedEvents/$showActive" {
 			controller = "wsUser"
 			action = [ GET: "getAssignedEvents" ]
 		}
@@ -1031,7 +1031,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateUnique/$name" {
+		"/ws/dataingestion/provider/validateUnique" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
@@ -1254,6 +1254,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/applicationConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getApplicationConflicts"
+			]
+		}
+
+		"/ws/reports/databaseConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getDatabaseConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [
@@ -1268,10 +1282,67 @@ class UrlMappings {
             ]
         }
 
+		"/ws/reports/moveBundlesForSelection" {
+			controller = "wsReports"
+			action = [
+				GET: 'getMoveBundles'
+			]
+		}
+
+		"/ws/reports/appOwnersForBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+				GET: 'getOwnersForMoveBundle'
+			]
+		}
+
         "/ws/reports/generateServerConflicts" {
             controller = "wsReports"
             action = [
                     POST: "generateServerConflicts"
+            ]
+        }
+
+        "/ws/reports/smeList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "smeList"
+            ]
+        }
+
+        "/ws/reports/appOwnerList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "appOwnerList"
+            ]
+        }
+
+        "/ws/reports/generateApplicationMigration/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "applicationMigrationLists",
+                    POST: "generateApplicationMigration"
+            ]
+        }
+
+        "/ws/reports/generateApplicationProfiles" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateApplicationProfiles"
+            ]
+        }
+
+        "/ws/reports/projectMetricsLists" {
+            controller = "wsReports"
+            action = [
+                    GET: "projectMetricsLists"
+            ]
+        }
+
+        "/ws/reports/generateProjectMetrics" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateProjectMetrics"
             ]
         }
 

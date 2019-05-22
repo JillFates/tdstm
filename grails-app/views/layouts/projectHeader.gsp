@@ -73,7 +73,7 @@ int minPasswordLength = tds.minPasswordLength()
 						<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
 					</g:if>
 					<g:else>
-						<asset:image src="images/TMMenuLogo.png" style="float: left;border: 0px;height: 30px;" />
+						<asset:image src="images/TMHeaderLogo_v4.7.png" style="float: left;border: 0px;height: 30px;" />
 					</g:else>
 				</div>
 				<div class="title">&nbsp;TransitionManager&trade;
@@ -487,30 +487,6 @@ int minPasswordLength = tds.minPasswordLength()
 			</td>
 			</tr></table>
 		</div>
-
-		<%-- Include the News crawler if there is an event in progress --%>
-		<g:if test="${currProject?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
-			<g:if test="${moveEvent?.newsBarMode == 'auto'}">
-				<g:if test="${moveEvent?.estStartTime.getTime() < new Date().getTime()}">
-					<g:set var="showNewsBar" value="true" />
-				</g:if>
-			</g:if>
-			<g:elseif test="moveEvent?.newsBarMode == 'on'">
-				<g:set var="showNewsBar" value="true" />
-			</g:elseif>
-
-			<g:if test="${showNewsBar}">
-				<div class="menu3" id="head_crawler" >
-					<div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
-					<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
-				</div>
-				<script type="text/javascript">
-
-				${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=' + moveEvent.id + '\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
-				</script>
-			</g:if>
-
-		</g:if>
 
 
 	</g:if>

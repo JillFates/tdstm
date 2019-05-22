@@ -226,12 +226,12 @@
 							<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
 							<g:each in="${moveBundleList}" status="i" var="moveBundle">
 								<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
-									<g:each in="${MoveBundleStep.findAll('FROM MoveBundleStep mbs where mbs.moveBundle='+moveBundle.id+' ORDER BY mbs.transitionId')}"
-											status="j" var="moveBundleStep">
+									<g:if test="${moveBundleSteps.size() > 0}">
+										<g:each in="${moveBundleSteps}" status="j" var="moveBundleStep">
 										<div style="float: left; width: 130px;">
 											<ul class="bdetails">
 												<li class="heading" title="${moveBundleStep.label}">
-													<g:if test="${moveBundleStep.label.length()>10}">
+													<g:if test="${moveBundleStep?.label?.length()>10}">
 														${moveBundleStep.label.substring(0,11)}..
 													</g:if>
 													<g:else>
@@ -261,6 +261,7 @@
 														</div> -->
 										</div>
 									</g:each>
+									</g:if>
 								</div>
 							</g:each>
 						</div>

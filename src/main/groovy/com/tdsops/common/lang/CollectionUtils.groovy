@@ -1,5 +1,6 @@
 package com.tdsops.common.lang
 
+import com.tdssrc.grails.HtmlUtil
 import org.springframework.util.ObjectUtils
 
 /**
@@ -14,7 +15,27 @@ class CollectionUtils {
 	 */
 	static List asList(object) {
 		(object == null || object instanceof List) ? object :
-				isCollectionOrArray(object) ? (object as List) : [object]
+			isCollectionOrArray(object) ? (object as List) : [object]
+	}
+
+	/**
+	 * Provides a "safe" version of asList to send values to the front-end.
+	 * @param object - a discrete value or list.
+	 * @return a list where string values are escaped correctly. Null if the parameter is also null.
+	 */
+	static List asHTMLSanitizedList(object) {
+		List list =  asList(object)
+		List sanitizedList = null
+		if (list != null) {
+			sanitizedList = list.collect { listElement ->
+				if (listElement instanceof String) {
+					HtmlUtil.escape(listElement)
+				} else {
+					listElement
+				}
+			}
+		}
+		return sanitizedList
 	}
 
 	/**

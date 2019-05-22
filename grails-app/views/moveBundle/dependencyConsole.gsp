@@ -104,9 +104,6 @@
 								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-12">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
-						</div>
 						<div id="processDiv" style="display: none;">
 							<asset:image src="images/processing.gif" />
 						</div>
@@ -416,15 +413,16 @@
 			function setGroupTablePosition () {
 				var windowWidth = $(window).width();
 				var dependencyDiv = $('#dependencyDivId')
+                var dependencyTable = $('#dependencyTableWrapperId')
 				var rightOffset = dependencyDiv.parent().offset().left;
 				var leftOffset = dependencyDiv.offset().left;
 				var extraOffset = $('#graphToolbarId').outerWidth() ? $('#graphToolbarId').outerWidth() : 0;
 				if (dependencyDiv.hasClass('floating'))
-					dependencyDiv.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
+					dependencyTable.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
 				else
-					dependencyDiv.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
+					dependencyTable.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 
-                $('#dependencyDivId').css('overflow-x', 'scroll');
+                $('#dependencyTableWrapperId').css('overflow-x', 'scroll');
 			}
 
 			$(document).ready(function () {

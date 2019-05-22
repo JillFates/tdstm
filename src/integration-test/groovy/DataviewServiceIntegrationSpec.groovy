@@ -3,15 +3,14 @@ import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.imports.Dataview
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.imports.DataviewService
-import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
-import spock.lang.Ignore
 import spock.lang.Specification
 
 @Integration
@@ -43,30 +42,6 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, project, dataviewJson)
 		when: 'creating a second dataview with same name and project'
 			dataviewService.create(person, project, dataviewJson)
-		then: 'throws domain update exception'
-			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
-	}
-
-	@Ignore
-	// This test is ignored since the Dataview update does not update the name
-	void '3. test update dataview with duplicate name within same project throws exception'() {
-		setup:
-			Project project = projectTestHelper.createProject()
-			Person person = personHelper.createPerson()
-			dataviewService.securityService = [
-				hasPermission        : { return true },
-				getUserCurrentProject: { return project },
-				loadCurrentPerson    : { return person },
-				isLoggedIn           : { return true },
-				getCurrentPersonId   : { return person.id }] as SecurityService
-
-			JSONObject dataviewJson1 = createDataview(null)
-			JSONObject dataviewJson2 = createDataview(null)
-			Dataview dataview1 = dataviewService.create(person, project, dataviewJson1)
-			Dataview dataview2 = dataviewService.create(person, project, dataviewJson2)
-		when: 'creating a updating dataview with name of an existing one and project'
-			dataviewService.update(person, project, dataview2.id, dataviewJson1)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
 			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/

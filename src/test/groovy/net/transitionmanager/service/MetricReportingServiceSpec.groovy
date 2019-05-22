@@ -665,7 +665,7 @@ class MetricReportingServiceSpec extends Specification implements ServiceUnitTes
 			List<MetricResult> results = MetricResult.list()
 
 		then: 'The results are 3 metrics run, and 3 results in the db.'
-			metrics == [metrics: 3, errors: 0]
+			metrics == [metrics:3, errorCount:0, errors: '']
 			writeData == 3
 	}
 

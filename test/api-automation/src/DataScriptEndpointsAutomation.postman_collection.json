@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "a8eb1501-bac4-4663-83ae-207badaa2b66",
+		"_postman_id": "1f727cbc-114b-40d5-9633-1b22bfa4ca84",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login",
+			"name": "Login - Datascript",
 			"event": [
 				{
 					"listen": "test",
@@ -17,13 +17,6 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
-							"});",
-							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
-							"}); ",
 							"",
 							"pm.test(\"User Menu is displayed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Admin\");",

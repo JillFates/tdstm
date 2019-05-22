@@ -55,7 +55,7 @@ class HtmlUtil {
 			def value = optionValue ? it."${optionValue}" : it
 			selected = key == optionSelected ? 'selected="selected"' : ''
 			def optionClass = params.containsKey('optionClass') ? "class ='${getCssClassForStatus(it)}' ": ''
-			html.append("""<option value="${key}" ${selected} ${optionClass}>${value}</option>""")
+			html.append("""<option value="${key}" ${selected} ${optionClass}>${escape(value)}</option>""")
 		}
 		html.append('</select>')
 
@@ -238,11 +238,11 @@ class HtmlUtil {
 	}
 
 	/**
-	 * Used return text as safe HTML
+	 * Used encode/escape text into safe to render HTML
 	 * @param text
 	 * @return text that has been encoded for HTML or blank if the text is NULL
 	 */
-	static String safe(Object text) {
+	static String escape(Object text) {
 		if (text) {
 			return (text instanceof CharSequence) ? StringEscapeUtils.escapeHtml(text.toString()) : "$text"
 		} else {

@@ -611,6 +611,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 */
 	Element extract(Integer index) {
 		validateStack()
+		checkReadLabelCommandAlreadyInvoked()
 		index--
 		rangeCheck(index, currentRow.size())
 
@@ -632,6 +633,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 */
 	Element extract(String columnName) {
 		validateStack()
+
+		checkReadLabelCommandAlreadyInvoked()
 
 		String rootColumnName = columnName
 		String columnNamePath = null
@@ -1297,6 +1300,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	private void checkColumnName(String columnName) {
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
+		}
+	}
+	/**
+	 * Checks if "read labels" command was already use in an ETL Script.
+	 * Once the "read labels" command is executed,
+	 * {@code ETLProcessor} defines an internal representation
+	 * of the column map in {@code ETLProcessor#columnsMap}.
+	 */
+	private void checkReadLabelCommandAlreadyInvoked() {
+		if (!columnsMap) {
+			throw ETLProcessorException.extractRequiresNameReadLabelsFirst()
 		}
 	}
 

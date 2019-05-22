@@ -4,10 +4,10 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 /**
@@ -35,8 +35,8 @@ class PartyGroupService implements ServiceMethods {
 	 * @return a map containing [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	 */
 	def list(Map filterParams, String sortIndex, String sortOrder, int maxRows, int currentPage, int rowOffset) {
+		def queryParams = [:]
 		Person whom = securityService.userLoginPerson
-		Map queryParams = [:]
 
 		StringBuilder query = new StringBuilder("""
 					SELECT new map(pg.name as companyName, pg.id as companyId, p.dateCreated as dateCreated, p.lastUpdated AS lastUpdated, (CASE WHEN pr.partyIdFrom.id is NULL THEN '' ELSE 'Yes' END)as partner)
@@ -51,12 +51,12 @@ class PartyGroupService implements ServiceMethods {
 					GROUP BY pg.id, pr.id 
 		""")
 
-
 		queryParams.whomCompanyId = whom.company.id
+
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 
-		filterParams.each { LinkedHashMap.Entry<String,String> param ->
+		filterParams.each { LinkedHashMap.Entry<String, String> param ->
 			if (param.value) {
 				if (firstWhere) {
 					query.append(" HAVING ")
@@ -68,7 +68,7 @@ class PartyGroupService implements ServiceMethods {
 				if (param.key == 'partner') {
 					if (param.value.toLowerCase() in ['y', 'ye', 'yes']) {
 						query.append('pr.partyIdFrom.id IS NOT NULL')
-					}else{
+					} else {
 						query.append('pr.partyIdFrom.id IS NULL')
 					}
 				} else {
@@ -91,14 +91,8 @@ class PartyGroupService implements ServiceMethods {
 			companies = companies[rowOffset..Math.min(rowOffset + maxRows - 1, totalRows - 1)]
 		}
 
-		String showUrl = grailsLinkGenerator.link(controller: 'partyGroup', action: 'show')
-
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
-		def results = companies?.collect {
-			[cell: ['<a href="' + showUrl + '/' + it.companyId + '">' + it.companyName + '</a>',
-					it.partner, it.dateCreated, it.lastUpdated],
-			 id  : it.companyId]
-		}
+		def results = companies?.collect { [cell: [it.companyName, it.partner, it.dateCreated, it.lastUpdated], id: it.companyId] }
 
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	}

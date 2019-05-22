@@ -68,8 +68,6 @@ class MoveBundleService implements ServiceMethods {
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
 	private static final Map<String, Number> defaultsLarge =  [force: -500, linkSize: 120, friction: 0.7, theta: 1, maxCutAttempts: 100]
 
-	static final String dependecyBundlingAssetTypesJoined = '("' + MoveBundle .dependecyBundlingAssetTypes.join('","') + '")'
-
 	/**
 	 * @param  : moveBundleId
 	 * @return : assets count for a specified move bundle
@@ -825,7 +823,6 @@ class MoveBundleService implements ServiceMethods {
 			WHERE ae.project_id = $projectId # AND ae.dependency_bundle IS NULL
 			AND adb.asset_id IS NULL
 			AND move_bundle_id in ($moveBundleText)
-			AND ae.asset_type in $dependecyBundlingAssetTypesJoined
 		"""
 
 		jdbcTemplate.execute(sql)

@@ -1,32 +1,34 @@
 package net.transitionmanager.asset
 
-
-import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import net.transitionmanager.search.FieldSearchData
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.exception.LogicException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.search.FieldSearchData
+import net.transitionmanager.security.Permission
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.exception.LogicException
+import org.apache.commons.lang3.BooleanUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class FilesController implements ControllerMethods {
+class FilesController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -63,17 +65,18 @@ class FilesController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listJson() {
-		String sortIndex = params.sidx ?: 'assetName'
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows')
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+		String sortIndex = paginationOrderBy(Files, 'sidx', 'assetName')
+		String sortOrder = paginationSortOrder('sord')
+
 
 		Project project = securityService.userCurrentProject
 		def moveBundleList
 		session.FILES = [:]
 
-		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 		if (params.event && params.event.isNumber()) {
 			def moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
@@ -100,8 +103,17 @@ class FilesController implements ControllerMethods {
 			}
 		}
 
-		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
-		def justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
+		def justPlanning = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: true)
+
+		def query = new StringBuilder("""
+			SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+			me.move_event_id AS event,
+			(SELECT if (count(ac_task.comment_type) = 0, 'noTasks','tasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+			(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
+		""")
+
+		def queryParams = [:]
+
 		//TODO:need to move the code to AssetEntityService
 		String temp=""
 		String joinQuery=""
@@ -151,33 +163,32 @@ class FilesController implements ControllerMethods {
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-		def query = new StringBuilder("""
-			SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-			me.move_event_id AS event,
-			(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
-			(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
-			""")
 
 		if (temp) {
 			query.append(temp)
 		}
-		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
-			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
+
 		query.append(""" ae.validation AS validation,ae.plan_status AS planStatus
 				FROM files f
 				LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
-		if (joinQuery)
+
+		if (joinQuery) {
 			query.append(joinQuery)
+		}
 
 		query.append("""\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = $project.id """)
+				WHERE ae.project_id = :projectId """)
+		queryParams.projectId = NumberUtil.toPositiveLong(project.id)
 
-		if (justPlanning == 'true')
-			query.append(" AND mb.use_for_planning=$justPlanning ")
+		if (justPlanning) {
+			query.append(" AND mb.use_for_planning = true ")
+		}
 
-		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append(" AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})")
+		if (params.event && params.event.isNumber() && moveBundleList) {
+			query.append(" AND ae.move_bundle_id IN (:moveBundleIdList) ")
+			queryParams.moveBundleIdList = moveBundleList*.id
+		}
 
 		if (params.unassigned) {
 			List<Long> unassignedMoveBundleIds = MoveBundle.executeQuery('''
@@ -187,23 +198,16 @@ class FilesController implements ControllerMethods {
 				  AND useForPlanning=:useForPlanning
 				  AND project=:project
 			''', [useForPlanning: true, project: project])
+
 			if (unassignedMoveBundleIds) {
-				def unasgnmbId = WebUtil.listAsMultiValueString(unassignedMoveBundleIds)
-				query.append(" AND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id IS NULL)")
+				query.append(" AND (ae.move_bundle_id IN (:unasgnmbId) OR ae.move_bundle_id IS NULL)")
+				queryParams.unasgnmbId = unassignedMoveBundleIds
 			}
 		}
 
 		query.append(" GROUP BY files_id) AS files ")
 
-		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
-			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
-			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN ($unknownQuestioned)
-			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN ($validUnkownQuestioned)
-				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id
-			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
-				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 		def whereConditions = []
-		def queryParams = [:]
 		filterParams.each {key, val ->
 			if (val && val.trim().size()) {
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -227,8 +231,9 @@ class FilesController implements ControllerMethods {
 
 		if (params.moveBundleId) {
 			if (params.moveBundleId!='unAssigned') {
-				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" WHERE files.moveBundle  = '$bundleName' ")
+				String bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append(" WHERE files.moveBundle  = :bundleName ")
+				queryParams.bundleName = bundleName
 			} else {
 				query.append(" WHERE files.moveBundle IS NULL ")
 			}
@@ -237,17 +242,14 @@ class FilesController implements ControllerMethods {
 			query.append(" WHERE files.validation='${ValidationType.UNKNOWN}'")
 		}
 		if (params.plannedStatus) {
-			query.append(" WHERE files.planStatus='$params.plannedStatus'")
+			query.append(" WHERE files.planStatus=:plannedStatus")
+			queryParams.plannedStatus = params.plannedStatus
 		}
 		query.append(" ORDER BY $sortIndex $sortOrder")
 
 		def filesList
 		try {
-			if (queryParams) {
-				filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
-			} else {
-				filesList = jdbcTemplate.queryForList(query.toString())
-			}
+			filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} catch(e) {
 			log.error "listJson() encountered SQL error : ${e.getMessage()}"
 			throw new LogicException("Unabled to perform query based on parameters and user preferences")

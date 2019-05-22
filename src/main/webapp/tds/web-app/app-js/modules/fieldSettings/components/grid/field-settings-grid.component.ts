@@ -474,35 +474,35 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {number} actionType
 	 */
 	private openFieldSettingsPopup(dataItem: FieldSettingsModel): void {
-		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.String) {
-			this.dialogService.open(MinMaxConfigurationPopupComponent, [
+		let component: any;
+		const services = [
 				{ provide: FieldSettingsModel, useValue: dataItem },
 				{ provide: 'domain', useValue: this.data.domain }
-			]).then(result => {
+		];
+
+		switch (dataItem.control) {
+			case CUSTOM_FIELD_CONTROL_TYPE.String:
+				component = MinMaxConfigurationPopupComponent;
+				break;
+
+			case CUSTOM_FIELD_CONTROL_TYPE.List:
+				component = SelectListConfigurationPopupComponent;
+				break;
+
+			default:
+				component = NumberConfigurationPopupComponent;
+				break;
+		}
+		this.dialogService.open(component, services).then(result => {
+			if (result) {
+				this.setIsDirty(true);
+			}
 				// when popup closes ..
-			}).catch(result => {
-				console.log('Dismissed MinMaxConfigurationPopupComponent Dialog');
-			});
-		} else if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
-			this.dialogService.open(SelectListConfigurationPopupComponent, [
-				{ provide: FieldSettingsModel, useValue: dataItem },
-				{ provide: 'domain', useValue: this.data.domain }
-			]).then(result => {
-				// when popup closes ..
-			}).catch(result => {
-				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
-			});
-		} else {
-			this.dialogService.open(NumberConfigurationPopupComponent, [
-				{ provide: FieldSettingsModel, useValue: dataItem },
-				{ provide: 'domain', useValue: this.data.domain }
-			]).then(result => {
-				// when popup closes ..
-			}).catch(result => {
+		}).catch(error => {
+			console.error(error);
 				// when popup is Cancelled.
 			});
 		}
-	}
 
 	/**
 	 * Check if selected field control has configuration available.

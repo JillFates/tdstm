@@ -96,11 +96,11 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'assets/images'
 
-	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
-	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1008,7 +1008,8 @@ class ProjectService implements ServiceMethods {
 			fillUsersMetrics(metrics, projects, sqlSearchDate)
 
 			// Deletes any existing record
-			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
+			ProjectDailyMetric.where{metricDate == searchDate}.deleteAll()
+			//jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
 
 			metrics.each { metric ->
 				metric.save(flush:true)
@@ -1024,7 +1025,7 @@ class ProjectService implements ServiceMethods {
 	 * Search for the last date that the process had been executed.
 	 * If no date is found then it returns current date.
 	 */
-	private Date findProjectDailyMetricsLastRunDay() {
+	Date findProjectDailyMetricsLastRunDay() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList('SELECT max(metric_date) as last_date FROM project_daily_metric')
 		if (rows[0]['last_date'] == null) {
 			new Date()
@@ -1835,9 +1836,9 @@ class ProjectService implements ServiceMethods {
 		} else {
 			String filename
 			if (licenseCommonService.isManagerEnabled()) {
-				filename = DEFAULT_TRANSITIONMANAGER_LOGO
-			} else {
 				filename = DEFAULT_LIC_MANAGER_LOGO
+			} else {
+				filename = DEFAULT_TRANSITIONMANAGER_LOGO
 			}
 			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}

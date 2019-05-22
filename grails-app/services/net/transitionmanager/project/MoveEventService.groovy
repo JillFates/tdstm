@@ -70,10 +70,6 @@ class MoveEventService implements ServiceMethods {
 														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
 														'actStart', 'actFinish', 'workflow']
-	/**
-	 * Number of days to use as a cutoff for events in the user dashboard.
-	 */
-	private static final Integer COMPLETION_DATE_CUTOFF = 14
 
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
@@ -105,7 +101,6 @@ class MoveEventService implements ServiceMethods {
 			runbookBridge1: event.runbookBridge1,
 			runbookBridge2: event.runbookBridge2,
 			videolink: event.videolink,
-			newsBarMode: event.newsBarMode,
 			estStartTime: event.estStartTime,
 			estCompletionTime: event.estCompletionTime,
 			apiActionBypass: event.apiActionBypass
@@ -451,7 +446,7 @@ class MoveEventService implements ServiceMethods {
 			moveBundleService.issueExport(assets,           serverCols,     book.getSheet('Servers'),      tzId, userDTFormat, 5, viewUnpublished)
 			moveBundleService.issueExport(applications,     impactedCols,   book.getSheet('Applications'), tzId, userDTFormat, 5, viewUnpublished)
 			moveBundleService.issueExport(databases,        dbCols,         book.getSheet('Database'),     tzId, userDTFormat, 4, viewUnpublished)
-			moveBundleService.issueExport(files,            fileCols,       book.getSheet('Storage'),      tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(files,            fileCols,       book.getSheet('Storage'),      tzId, userDTFormat, 4, viewUnpublished)
 			moveBundleService.issueExport(others,           otherCols,      book.getSheet('Other'),        tzId, userDTFormat, 1, viewUnpublished)
 			moveBundleService.issueExport(unresolvedIssues, unresolvedCols, book.getSheet('Issues'),       tzId, userDTFormat, 1, viewUnpublished)
 			moveBundleService.issueExport(sheduleIssue,     scheduleCols,   scheduleSheet,                    tzId, userDTFormat, 7, viewUnpublished)
@@ -503,37 +498,48 @@ class MoveEventService implements ServiceMethods {
 	 * @param person - the person to find assigned event for
 	 * @param currentProject - the individual project to find events for, if null then the
 	 *  events of all projects that the user is assigned will be returned
-	 * @param completionCutoff - the date cut off the list based on the estCompletionDate.
-	 *  If the field is set then only events where the estCompletionDate >= to
-	 *  completionCutoff or completionCutoff is null will appear.
+	 * @param active - flag that signals if active or past events should be listed.
+	 *
+	 * @return a list of events (active or completed) for the given project (or projects the person has access to).
 	 */
-	List<MoveEvent> getAssignedEvents(Person person, Project currentProject =null, Date completionCutoff=null) {
+	List<MoveEvent> getAssignedEvents(Person person, Project currentProject = null, boolean active) {
+		Date now = TimeUtil.nowGMT()
+		String sortProperty
+		String sortOrder
 
+		if (active) {
+			sortProperty = 'estCompletionTime'
+			sortOrder = 'asc'
+		} else {
+			sortProperty = 'actualCompletionTime'
+			sortOrder = 'desc'
+		}
 		return MoveEvent.where {
 			if (currentProject) {
 				project == currentProject
 			} else {
 				project.id in securityService.getUserProjectIds(null, person.userLogin)
 			}
-			if (completionCutoff) {
-				estCompletionTime < completionCutoff || estCompletionTime == null
+			if (active) {
+				estCompletionTime > now || estCompletionTime == null
+			} else {
+				estCompletionTime < now
 			}
-		}.list()
+		}.order(sortProperty, sortOrder).list()
 
 	}
 
-	/**
-	 * Query and return the events the given person has access to.
-	 * @param person - the person for whom the assigned events are retrieved.
-	 * @param projectId - if a project is specified, use that id to narrow down results.
-	 * @return a list of events the person has access to.
-	 */
-	List<MoveEvent> getAssignedEventsForDashboard(Person person, Long projectId) {
-		Project project
-		if (projectId > 0) {
-			project = Project.read(projectId)
+	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
+		List<MoveBundleStep> moveBundleSteps = []
+
+		moveBundleList.each { MoveBundle moveBundle ->
+			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle} ORDER BY mbs.transitionId")
+
+			if (step) {
+				moveBundleSteps.addAll(step)
+			}
 		}
-		Date completionCutoff = TimeUtil.nowGMT().minus(COMPLETION_DATE_CUTOFF)
-		return getAssignedEvents(person, project, completionCutoff)
+
+		return moveBundleSteps
 	}
 }

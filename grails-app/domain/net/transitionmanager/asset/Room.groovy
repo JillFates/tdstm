@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.project.Project
 
@@ -73,11 +73,12 @@ class Room {
 	}
 
 	String getRoomAddress(String forWhom) {
-		(address ? (forWhom == 'link' ? address : address + '<br/>') : '') +
-				(city ?: '') +
-				(stateProv ? ', ' + stateProv : '') +
-				(postalCode ? '  ' + postalCode : '') +
-				(country ? ' ' + country : '')
+		String safeAddress = HtmlUtil.escape(address)
+		return (safeAddress ? (forWhom == 'link' ? safeAddress : safeAddress + '<br/>') : '') +
+				(HtmlUtil.escape(city)) +
+				(stateProv ? ", ${HtmlUtil.escape(stateProv)}" : '') +
+				(postalCode ? '  ' + HtmlUtil.escape(postalCode) : '') +
+				(country ? ' ' + HtmlUtil.escape(country) : '')
 	}
 
 	private static final String[] BEFORE_DELETE_HQL = [

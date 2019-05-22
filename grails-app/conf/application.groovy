@@ -350,14 +350,11 @@ List staticSecurityRules = [
 	[pattern: '/module/**', access: 'permitAll'], // Angular2  - router access
 	[pattern: '/test/**', access: 'permitAll'], // Angular - Tes]t
 	[pattern: '/dist/**', access: 'permitAll'],
-	[pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
 	[pattern: '/greenmail/**', access: 'permitAll'],
 	[pattern: '/components/**', access: 'permitAll'],
 	[pattern: '/templates/**', access: 'permitAll'],
 	[pattern: '/jasper/**', access: 'permitAll'],
 	[pattern: '/oauth/access_token', access: 'permitAll'],
-	[pattern: '/health/**', access: 'ROLE_ADMIN'],
-	[pattern: '/info/**', access: 'ROLE_ADMIN']
 ]
 
 grails {
@@ -420,19 +417,22 @@ grails {
 	}
 }
 
-environments {
-	development {
-		grails {
-			plugin {
-				springsecurity {
-					staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-					staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-					controllerAnnotations.staticRules = staticSecurityRules
-				}
+if (System.getProperty("tdstm.gconsole")) {
+	grails {
+		plugin {
+			console.enabled = true
+			springsecurity {
+				staticSecurityRules << [pattern: '/health/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/info/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				controllerAnnotations.staticRules = staticSecurityRules
 			}
 		}
 	}
 }
+
 
 // Graph Properties
 graph {

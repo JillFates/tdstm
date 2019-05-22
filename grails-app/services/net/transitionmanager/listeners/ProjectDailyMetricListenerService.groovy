@@ -2,24 +2,17 @@ package net.transitionmanager.listeners
 
 import grails.events.annotation.gorm.Listener
 import grails.events.bus.EventBusAware
-import net.transitionmanager.metric.ProjectDailyMetric
 import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.metric.ProjectDailyMetric
 import org.apache.commons.codec.digest.DigestUtils
-import org.grails.datastore.mapping.engine.event.PreInsertEvent
-import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.engine.event.ValidationEvent
 
 class ProjectDailyMetricListenerService implements EventBusAware {
 	LicenseAdminService licenseAdminService
 
 	@Listener(ProjectDailyMetric)
-	void onLicensedClientPreUpdate(PreUpdateEvent event) {
-		beforeValidate(event.getEntity())
-	}
-
-	@Listener(ProjectDailyMetric)
-	void onLicensedClientPreInsert(PreInsertEvent event) {
-		beforeValidate(event.getEntity())
-
+	void onLicensedClientPreUpdate(ValidationEvent event) {
+		beforeValidate(event.entityAccess.entity)
 	}
 
 	void beforeValidate(ProjectDailyMetric projectDailyMetric) {

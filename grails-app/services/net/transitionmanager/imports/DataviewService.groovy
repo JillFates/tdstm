@@ -3,42 +3,42 @@
  */
 package net.transitionmanager.imports
 
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.sql.SqlUtil
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.Color
-import com.tdsops.tm.enums.domain.SizeScale
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.JsonUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import grails.gorm.transactions.Transactional
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.command.DataviewApiFilterParam
-import net.transitionmanager.command.DataviewApiParamsCommand
-import net.transitionmanager.command.DataviewNameValidationCommand
-import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.dataview.FieldSpec
-import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.person.FavoriteDataview
-import net.transitionmanager.person.Person
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
-import net.transitionmanager.search.FieldSearchData
-import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataviewCustomFilterHQLBuilder
 import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.service.dataview.DataviewSpec
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.service.dataview.ExtraFilter
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.Color
+import com.tdsops.tm.enums.domain.SizeScale
+import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import grails.gorm.transactions.Transactional
+import net.transitionmanager.command.DataviewApiFilterParam
+import net.transitionmanager.command.DataviewApiParamsCommand
+import net.transitionmanager.command.DataviewNameValidationCommand
+import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.person.FavoriteDataview
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.search.FieldSearchData
+import net.transitionmanager.security.Permission
+import net.transitionmanager.service.dataview.DataviewSpec
 import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
@@ -427,8 +427,7 @@ class DataviewService implements ServiceMethods {
             select count(DISTINCT AE)
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project 
-			   and $conditions
+             where AE.project = :project and $conditions
         """
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
@@ -637,19 +636,17 @@ class DataviewService implements ServiceMethods {
 	}
 
     /**
-	 * <p>Used to prepare the left outer join sentence based on
-	 * columns of a dataview Spec columns and extra filters and
-	 * transformations for HQL query.</p>
-	 * <p>It adds joins for columns and it also adds joins for extra filters.
-	 * Those are necessary when extra filters add a column that requieres a join.</p>
+	 * Used to prepare the left outer join sentence based on
+	 * columns of a dataview Spec and transformations for HQL query
      * @param dataviewSpec
      * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
 		return dataviewSpec.columns.collect { Map column ->
-			"${joinFor(column)}"
-		}.join(" ")
-	}
+            "${joinFor(column)}"
+        }.join(" ")
+    }
+
 
 	/**
 	 * Creates a String with all the columns correctly set for select clause
@@ -661,7 +658,6 @@ class DataviewService implements ServiceMethods {
 			"${projectionPropertyFor(column)}"
 		}.join(", ")
 	}
-
 
     /**
      * Creates a String with all the columns correctly set for where clause
@@ -806,7 +802,7 @@ class DataviewService implements ServiceMethods {
 		}
 	}
 
-	/**
+    /**
      * Columnn filters value could be split by '|' separator
 	 * @param column - a set of column attributes
 	 * @return one or more strings based on filter being spilt
@@ -951,6 +947,17 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String manyToManyParameterNameFor(Map column) {
 		return transformations[column.property].manyToManyParameterName
+	}
+
+
+	/**
+	 * Return the domain alias for the domain of the given field. This will be useful for handling special cases,
+	 * such as custom fields, where additional columns need to be queried.
+	 * @param column
+	 * @return
+	 */
+	private static domainAliasFor(Map column) {
+		return transformations[column.property].domainAlias
 	}
 
 
@@ -1204,7 +1211,7 @@ class DataviewService implements ServiceMethods {
 		],
 
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where", domainAlias: "AE"]
     }
 
 	/**

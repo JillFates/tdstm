@@ -70,9 +70,6 @@ class MoveBundle extends Party {
 		project ? findAllByProjectAndUseForPlanning(project, true) : []
 	}
 
-	static final List<String> dependecyBundlingAssetTypes = (AssetType.allServerTypes + ['Application', 'Files',
-	     'Database', 'Storage', 'NAS', 'Array', 'SAN']).asImmutable()
-
 	boolean belongsToClient(client) {
 		project.clientId == client?.id
 	}

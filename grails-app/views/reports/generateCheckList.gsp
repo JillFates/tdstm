@@ -1,7 +1,6 @@
-<%@page expressionCodec="none" %>
 <div class="generated-check-list">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>${project.name} : ${moveEvent.name }</b>
+			<b>${project.name} : ${moveEvent.name}</b>
 		</div>
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
@@ -23,12 +22,6 @@
 				<td></td>
 				<td>
 					${raw(errorForEventTime)}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td>
-					${raw(newsBarModeError)}
 				</td>
 			</tr>
 			<tr>
@@ -79,18 +72,18 @@
 			<tr>
 				<td><g:if test="${allErrors.contains('EventsBundle')}">
 						<span style="color: red;"><h2>
-								<b>Event/Bundle</b>
+								<h2>Event/Bundle</h2>
 							</h2></span>
 					</g:if> <g:else>
 						<span style="color: green;"><h2>
-								<b>Event/Bundle</b>
+								<h2>Event/Bundle</h2>
 							</h2></span>
 					</g:else></td>
 			</tr>
 			<tr>
 				<td></td>
 				<td><span style="color: green;"><b>Bundles: OK
-							&nbsp;&nbsp; ${moveBundleSize} Bundles;&nbsp;${moveBundles.toString().replace('[','').replace(']','')}
+							&nbsp;&nbsp; ${moveBundleSize} Bundles;&nbsp;${moveBundles.toString().replace('[', '').replace(']', '')}
 					</b></span></td>
 			</tr>
 			<tr>

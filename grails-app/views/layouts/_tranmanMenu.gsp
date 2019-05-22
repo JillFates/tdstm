@@ -377,16 +377,16 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
-                                <a href="/tdstm/reports/applicationProfiles">Application Profiles</a>
+                                <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-application-conflicts">
-                                <a href="/tdstm/reports/applicationConflicts">Application Conflicts</a>
+                                <g:link controller="module" action="reports" id="applicationConflicts" elementId="applicationConflicts">Application Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-server-conflicts">
                                 <g:link controller="module" action="reports" id="serverConflicts" elementId="serverConflicts">Server Conflicts</g:link>
                             </li>
                             <li class="menu-child-item menu-reports-database-conflicts">
-                                <a href="/tdstm/reports/databaseConflicts">Database Conflicts</a>
+                                <g:link controller="module" action="reports" id="databaseConflicts" elementId="databaseConflicts">Database Conflicts</g:link>
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-reports-task-report">
@@ -395,14 +395,14 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewProjectDailyMetrics}">
                                 <li class="menu-child-item menu-reports-activity-metrics">
-                                    <a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a>
+                                    <g:link controller="module" action="reports" id="projectActivityMetrics" elementId="projectActivityMetrics">Activity Metrics</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">
                                 <li class="divider"></li>
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
-                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
+                                    <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>
