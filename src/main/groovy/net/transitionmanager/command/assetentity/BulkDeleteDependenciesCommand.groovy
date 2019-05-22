@@ -12,7 +12,7 @@ import net.transitionmanager.command.CommandObject
  * @param dependencies  The list of dependency ids to delete.
  */
 class BulkDeleteDependenciesCommand implements CommandObject {
-    List dependencies
+    List<String> dependencies
 
     static constraints = {
         nullable: false
