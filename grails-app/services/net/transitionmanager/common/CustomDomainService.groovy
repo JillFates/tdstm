@@ -270,6 +270,7 @@ class CustomDomainService implements ServiceMethods {
      */
     List<String> getDistinctAssetCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
         assert project
+
         return AssetEntity.where {
             project == project
 
@@ -279,9 +280,12 @@ class CustomDomainService implements ServiceMethods {
 
             projections {
                 distinct(fieldName)
+                isNotNull(fieldName)
             }
 
-        }.list([sort: fieldName, order: 'asc'])
+        }.list([sort: fieldName, order: 'asc']){
+            ne(fieldName, '')
+        }
     }
 
     /**
