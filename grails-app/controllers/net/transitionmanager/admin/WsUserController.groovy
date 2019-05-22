@@ -133,7 +133,7 @@ class WsUserController implements ControllerMethods {
 		Project project = getProjectForWs()
 		Person currentPerson = currentPerson()
 		Long projectId = NumberUtil.toPositiveLong(params.project)
-		boolean active = params.showActive == "true"
+		boolean active = StringUtil.toBoolean(params.active)
 
 		if (projectId) {
 			if (securityService.hasAccessToProject(projectId)) {
