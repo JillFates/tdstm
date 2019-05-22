@@ -80,14 +80,16 @@ class License {
 	Map toJsonMap() {
 		PartyGroup client = getClient()
 		Map dProject = [
-		        id:"",
-				name:"all"
+				  id:   "",
+				  name: "all",
+				  guid: ""
 		]
 
 		if(project != "all"){
 			Project prj = Project.get(project)
 			dProject.id = prj?.id
 			dProject.name = prj?.name
+			dProject.guid = prj?.guid
 		}
 
 		String toEmail = (grailsApplication.config.tdstm?.license?.request_email) ?: ''
