@@ -1,20 +1,19 @@
 package net.transitionmanager.domain
 
-import net.transitionmanager.service.PartyRelationshipService
-
-// Domain classes that Person is associated with that are impacted by merging which are not in
-// this package.
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
+import com.tdssrc.grails.HtmlUtil
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
-import net.transitionmanager.UserAudit
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.NoticeAcknowledgment
+import net.transitionmanager.service.PartyRelationshipService
+// Domain classes that Person is associated with that are impacted by merging which are not in
+// this package.
 
 class Person extends Party {
 
@@ -258,7 +257,7 @@ class Person extends Party {
 	}
 
 	String toString() {
-		firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : '')
+		HtmlUtil.escape(firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
 	}
 
 	def beforeValidate() {
