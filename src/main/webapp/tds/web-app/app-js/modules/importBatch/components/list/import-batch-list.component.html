@@ -92,31 +92,32 @@
 
                         <!-- Action -->
                         <kendo-grid-column *ngIf="!viewArchived"
-                                           title="Action" [locked]="true" [filterable]="false" [width]="70">
+                                           title="Action"
+																					 [locked]="true"
+																					 [filterable]="false"
+																					 [width]="60"
+																					 [resizable]="false">
                             <ng-template kendoGridHeaderTemplate>
                                 <label class="action-header"> Action </label>
                             </ng-template>
                             <ng-template kendoGridCellTemplate let-dataItem>
-                                <div class="k-grid-ignore-click text-center" style="cursor: default">
-                                    <button *ngIf="dataItem.status.code === 'PENDING'"
-                                            (click)="onPlayButton(dataItem)"
-                                            class="btn btn-action btn-default"
-                                            title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
-                                        <i class="fa fa-play-circle-o"></i>
-                                    </button>
-                                    <button *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
-                                            (click)="onStopButton(dataItem)"
-                                            class="btn btn-action btn-default"
-                                            title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
-                                        <i class="fa fa-stop"></i>
-                                    </button>
-                                    <button *ngIf="dataItem.status.code === 'QUEUED'"
-                                            (click)="onEjectButton(dataItem)"
-                                            class="btn btn-action btn-default"
-                                            title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
-                                        <i class="fa fa-eject"></i>
-                                    </button>
-                                </div>
+															<div class="k-grid-ignore-click text-center tds-action-button-set" style="cursor: default">
+																<tds-button-custom
+																	*ngIf="dataItem.status.code === 'PENDING'"
+																	(click)="onPlayButton(dataItem)"
+																	[tooltip]="'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate"
+																	[icon]="'play-circle-o'"></tds-button-custom>
+																<tds-button-custom
+																	*ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
+																	(click)="onStopButton(dataItem)"
+																	[tooltip]="'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate"
+																	[icon]="'stop'"></tds-button-custom>
+																<tds-button-custom
+																	*ngIf="dataItem.status.code === 'QUEUED'"
+																	(click)="onEjectButton(dataItem)"
+																	[tooltip]="'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate"
+																	[icon]="'eject'"></tds-button-custom>
+															</div>
                             </ng-template>
                         </kendo-grid-column>
 
