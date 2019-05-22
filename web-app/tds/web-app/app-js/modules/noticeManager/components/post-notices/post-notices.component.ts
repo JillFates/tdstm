@@ -56,15 +56,23 @@ export class PostNoticesComponent implements OnInit {
 	 * Because the bootstrap modal is necessary a delay among them
 	*/
 	showNotices(): void {
+		const hasStandardNotices = this.filterPostNotices(false).length > 0;
+
 		this.showMandatoryNotices()
 			.then(() => {
-				setTimeout(() => {
-					this.showStandardNotices()
-						.then(() => {
-							this.navigateTo(this.redirectUri);
-						})
-						.catch((error) => this.navigateTo(this.redirectUri));
-				}, 600);
+				if (hasStandardNotices) {
+					setTimeout(() => {
+						this.showStandardNotices()
+							.then(() => {
+								this.noticeService.notifyContinue()
+									.subscribe(() => this.navigateTo(this.redirectUri))
+							})
+							.catch((error) => this.navigateTo(this.redirectUri));
+					}, 600);
+				} else {
+					this.noticeService.notifyContinue()
+						.subscribe(() => this.navigateTo(this.redirectUri))
+				}
 			})
 			.catch(() => {
 				// navigate throught the window service because the route is not handled

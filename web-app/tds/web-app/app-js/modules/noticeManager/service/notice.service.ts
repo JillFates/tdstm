@@ -161,4 +161,13 @@ export class NoticeService {
 		return notice;
 	}
 
+	/**
+    * Call the endpoint to se the flag that filter the notices pending
+    * @returns any
+    */
+	notifyContinue(): Observable<any> {
+		return this.http.get(`${this.singleNoticeUrl}/continue`)
+			.map((res: Response) =>  res.json())
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+	}
 }

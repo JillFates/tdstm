@@ -23,17 +23,20 @@ export class MandatoryNoticesValidatorService {
 
 	/**
 	 * Evaluates route changes, if the user has pending mandatory notices to agree
-	 * he is redirected to the login page.
+	 * user is sent back to the notices
 	 * The only route which doesn't have the restriction is /notice
 	 */
 	setupCheck(): void {
 		this.router.events
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
-				switchMap(() => this.userService.hasMandatoryNoticesPending())
+				switchMap((e) => {
+					console.log('The event is:', e);
+					return this.userService.hasMandatoryNoticesPending();
+				})
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)
-			.subscribe(() => this.windowService.navigateTo(this.signOutUri),
+			.subscribe(() => this.router.navigate([Paths.notice]),
 				(error) => console.error(error));
 	}
 }
