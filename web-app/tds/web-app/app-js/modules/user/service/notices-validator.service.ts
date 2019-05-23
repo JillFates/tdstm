@@ -10,16 +10,14 @@ import {UserPostNoticesContextService} from './user-post-notices-context.service
 import {Paths} from '../../../app/tds-routing.states';
 
 @Injectable()
-export class MandatoryNoticesValidatorService {
-	private baseUri = '/tdstm'
-
+export class NoticesValidatorService {
 	constructor(
 		private router: Router,
 		private userContext: UserPostNoticesContextService) {
 	}
 
 	/**
-	 * Evaluates route changes, if the user has pending mandatory notices to agree
+	 * Evaluates route changes, if the user has pending notices
 	 * user is sent back to the notices
 	 * The only route which doesn't have the restriction is /notice
 	 */
@@ -28,7 +26,7 @@ export class MandatoryNoticesValidatorService {
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
 				switchMap((event) => this.userContext.getUserContext()),
-				switchMap((context) => context.postNoticesManager.hasMandatoryNoticesPending()),
+				switchMap((context) => context.postNoticesManager.hasNoticesPending()),
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)
 			.subscribe(() => this.router.navigate([Paths.notice]),

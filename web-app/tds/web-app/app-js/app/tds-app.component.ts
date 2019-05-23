@@ -6,7 +6,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
-import {MandatoryNoticesValidatorService} from '../modules/user/service/mandatory-notices-validator.service';
+import {NoticesValidatorService} from '../modules/user/service/notices-validator.service';
 
 @Component({
 	selector: 'tds-app',
@@ -32,7 +32,7 @@ export class TDSAppComponent implements OnInit {
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private notifierService: NotifierService,
-		private mandatoryNoticesValidatorService: MandatoryNoticesValidatorService) {
+		private noticesValidatorService: NoticesValidatorService) {
 	}
 
 	ngOnInit(): void {
@@ -52,6 +52,6 @@ export class TDSAppComponent implements OnInit {
 				});
 			});
 
-		this.mandatoryNoticesValidatorService.setupValidation();
+		this.noticesValidatorService.setupValidation();
 	}
 }

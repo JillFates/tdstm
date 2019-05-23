@@ -33,14 +33,13 @@ export class UserPostNoticesManagerService {
 			);
 	}
 
-	hasMandatoryNoticesPending(): Observable<any> {
+	hasNoticesPending(): Observable<any> {
 		return this.getNotices()
 			.pipe(
 				switchMap((postNotices) => {
-					const hasNotices =  (postNotices && postNotices.notices || [])
-					.filter((notice) => notice.needAcknowledgement).length > 0;
+					const itemsCounter =  (postNotices && postNotices.notices || []).length > 0;
 
-					return Observable.of(hasNotices);
+					return Observable.of(itemsCounter);
 				})
 			);
 	}
