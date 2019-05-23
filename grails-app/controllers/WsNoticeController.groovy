@@ -5,9 +5,12 @@ import net.transitionmanager.command.NoticeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.NoticeService
 import net.transitionmanager.service.EmptyResultException
+
+import javax.servlet.http.HttpSession
 
 /**
  * @author oluna
@@ -93,7 +96,8 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def acknowledge(Long id) {
-		boolean result = noticeService.acknowledge(id, currentPerson() )
+		Project project = getProjectForWs()
+		boolean result = noticeService.acknowledge(project, request.getSession(), id, currentPerson() )
 		renderSuccessJson()
 	}
 
@@ -120,11 +124,9 @@ class WsNoticeController implements ControllerMethods {
 	@HasPermission(Permission.UserGeneralAccess)
 	def clearNoticesWhenNoMandatoryLeft() {
 		Person currentPerson = securityService.loadCurrentPerson()
-		boolean hasMandatoryUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(currentPerson, true)
-		if (!hasMandatoryUnacknowledgedNotices) {
-			session.removeAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES)
-			session.removeAttribute(SecurityUtil.REDIRECT_URI)
-		}
+		Project project = getProjectForWs()
+		HttpSession session = request.getSession()
+		boolean hasMandatoryUnacknowledgedNotices = noticeService.clearNoticesWhenNoMandatoryLeft(project, session, currentPerson)
 		renderSuccessJson([unacknowledgedNotices: hasMandatoryUnacknowledgedNotices])
 	}
 }
