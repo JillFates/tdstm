@@ -67,8 +67,10 @@ class CustomDomainServiceTests extends Specification {
     private static final List ASSETS = [
         [name:RSU.randomAlphabetic(10), description: 'Red'],
         [name:RSU.randomAlphabetic(10), description: 'Green'],
-        [name:RSU.randomAlphabetic(10), description: 'Blue'],
-        [name:RSU.randomAlphabetic(10), description: 'Blue']
+        [name: RSU.randomAlphabetic(10), description: 'Blue'],
+        [name: RSU.randomAlphabetic(10), description: 'Blue'],
+        [name: RSU.randomAlphabetic(10), description: ''],
+        [name: RSU.randomAlphabetic(10), description: null]
     ]
 
     /**
