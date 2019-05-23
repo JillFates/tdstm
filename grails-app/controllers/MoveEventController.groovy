@@ -77,7 +77,7 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 			if (newsBM) {
 				'in'('newsBarMode', newsBM)
 			}
-			order(sortOrder == 'DESC' ? Order.desc(sortIndex).ignoreCase() : Order.asc(sortIndex).ignoreCase())
+			order(new Order(sortIndex, sortOrder == 'asc').ignoreCase())
 		}
 
 		int totalRows = events.totalCount

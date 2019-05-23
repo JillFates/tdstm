@@ -18,6 +18,7 @@ export abstract class TDSCustomControl implements ControlValueAccessor {
 	@Input('value') _value: any;
 	@Input() tabindex = null;
 	@Input() required = false;
+	@Input() title = '';
 	onTouched = () => { /* Default on touched */} ;
 
 	private propagateChange: any = () => { /* Notify changes to host */ };

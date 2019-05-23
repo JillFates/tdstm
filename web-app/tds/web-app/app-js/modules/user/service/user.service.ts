@@ -131,4 +131,18 @@ export class UserService {
 				return res.json();
 			}).catch((error: any) => error.json());
 	}
+	/**
+	 * Determines if the user has mandatory notices pending to be agree
+	 * @returns boolean
+	 */
+	hasMandatoryNoticesPending(): Observable<any> {
+		return this.http.get(`${this.baseURL}/ws/notices/fetchPostLoginNotices`)
+			.map((res: Response) => {
+				let result = res.json();
+				let notices = result.data && result.data.notices || [];
+				const mandatoryPending = notices.filter((notice) => notice.needAcknowledgement);
+				return Boolean(mandatoryPending.length > 0);
+			})
+			.catch((error: any) => error.json());
+	}
 }

@@ -430,10 +430,6 @@ export class FieldSettingsGridComponent implements OnInit {
 			}
 		}
 
-		if (!dataItem.errorMessage && !dataItem.label.trim()) {
-			dataItem.errorMessage = 'Label is required';
-		}
-
 		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 
 		if (dataItem.errorMessage)  {

@@ -212,7 +212,7 @@ class ControlTagLib {
 	 * @return the SELECT Component HTML
 	 */
 	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		List options = fieldSpec.constraints?.values
+		List options = fieldSpec.constraints?.values ?: []
 
 		StringBuilder sb = new StringBuilder('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
