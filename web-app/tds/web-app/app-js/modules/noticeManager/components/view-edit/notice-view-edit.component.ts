@@ -37,8 +37,6 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	typeDataSource = [...NoticeTypes];
 	minDate = null;
 	maxDate = null;
-	minAvailableDate = DateUtils.getMinAvailableDate();
-	maxAvailableDate = DateUtils.getMaxAvailableDate();
 	constructor(
 		private translate: TranslatePipe,
 		private originalModel: NoticeModel,

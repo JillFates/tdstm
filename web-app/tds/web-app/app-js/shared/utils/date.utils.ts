@@ -14,8 +14,6 @@ export interface IncrementDateArgument {
 	unit: DatePartUnit
 }
 
-const MaxDateValue = 8640000000000000;
-
 export class DateUtils {
 
 	// As managed by the server, due the difference on the Lowercase and Upercase
@@ -350,22 +348,4 @@ export class DateUtils {
 		}
 		return null;
 	}
-
-	/**
-	 * Get the maximum available date supported by Javascript
-	 * http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
-	 * @returns {Date}
-	 */
-	public static getMaxAvailableDate(): any {
-		return new Date(MaxDateValue);
-	}
-
-	/**
-	 * Get the minimum available date supported by JavaScript
-	 * @returns {Date}
-	 */
-	public static getMinAvailableDate(): any {
-		return new Date(MaxDateValue * -1);
-	}
-
 }
