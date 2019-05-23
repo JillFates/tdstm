@@ -1097,16 +1097,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.CommentView)
 	def listCommentJson() {
 
-		Map<String, String> definedSortableFields = [
-			'comment': 'comment',
-			'commentType': 'commentType',
-			'category': 'category',
-			'lastUpdated': 'lastUpdated',
-			'assetType': 'assetType',
-			'assetName': 'assetName'
-		].withDefault { key -> throw PAGINATION_INVALID_ORDER_BY_EXCEPTION }
+		Set<String> definedSortableFields = [
+				  'comment',
+				  'commentType',
+				  'category',
+				  'lastUpdated',
+				  'assetType',
+				  'assetName'
+		]
 
-		String sortIndex = params.sidx ? definedSortableFields[params.sidx] : 'lastUpdated'
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', 'lastUpdated')
 		String sortOrder = paginationSortOrder('sord')
 		// Get the pagination and set the user preference appropriately
 		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
@@ -1175,20 +1175,24 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
 
-		Map<String, String> definedSortableFields = [
-			'taskNumber': 'taskNumber',
-			'comment': 'comment',
-			'assetName': 'assetName',
-			'dueDate': 'dueDate',
-			'status': 'status',
-			'assignedTo': 'assignedTo',
-			'instructionsLink': 'instructionsLink',
-			'category': 'category',
-		   'role': 'role',
-			'score': 'score'
-		].withDefault { key -> session.TASK?.JQ_FILTERS?.sidx }
+		final String DEFAULT_SORT = ''  // We set this as EMPTY string for compatibility
+		Set<String> definedSortableFields = [
+				  'taskNumber',
+				  'comment',
+				  'assetName',
+				  'dueDate',
+				  'status',
+				  'assignedTo',
+				  'instructionsLink',
+				  'category',
+				  'role',
+				  'assetType',
+				  'score',
+				  DEFAULT_SORT
+		]
 
-		String sortIndex =  definedSortableFields[params.sidx]
+		String defaultSIdx = session.TASK?.JQ_FILTERS?.sidx ?: DEFAULT_SORT
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', defaultSIdx)
 		String sortOrder =  paginationSortOrder('sord', session.TASK?.JQ_FILTERS?.sord)
 
 		// Get the pagination and set the user preference appropriately
