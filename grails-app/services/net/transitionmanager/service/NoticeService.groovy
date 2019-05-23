@@ -117,7 +117,7 @@ class NoticeService implements ServiceMethods {
 	 */
 	Boolean hasUnacknowledgedNotices(Project project, HttpSession session, Person person, boolean requiredNoticesOnly = false, boolean forLogin = false) {
 		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return false.
-		if (!forLogin && session?.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+		if (!forLogin && session && session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
 			return false
 		}
 
