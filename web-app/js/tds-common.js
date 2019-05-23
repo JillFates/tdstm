@@ -221,7 +221,11 @@ var tdsCommon = {
                 if (response.errors) {
                     alert(response.errors);
                 } else {
-                    alert("An error occurred while updating and/or updating information");
+                	if(response.responseText) {
+                        alert(JSON.parse(response.responseText).errors);
+					} else {
+                        alert("An error occurred while updating and/or updating information");
+                    }
                 }
             }
         }
