@@ -13,6 +13,8 @@ import net.transitionmanager.domain.Project
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 
+import javax.servlet.http.HttpSession
+
 /**
  * @author octavio
  */
@@ -26,7 +28,7 @@ class NoticeService implements ServiceMethods {
 	 * @return void
 	 */
 	@Transactional
-	void acknowledge(Long id, Person person) {
+	void acknowledge(Project project, HttpSession session, Long id, Person person) {
 		log.info 'Person: {}, is acknowledging notice: {}', person, id
 		Notice notice = Notice.read(id)
 		if (!notice) {
@@ -35,7 +37,7 @@ class NoticeService implements ServiceMethods {
 		NoticeAcknowledgement acknowledgement = new NoticeAcknowledgement(notice: notice, person: person)
 		acknowledgement.save(failOnError: true)
 
-		if (!hasUnacknowledgedNotices(person)) {
+		if (session && !hasUnacknowledgedNotices(project, session, person)) {
 			session.removeAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES)
 			session.removeAttribute(SecurityUtil.REDIRECT_URI)
 		}
@@ -92,42 +94,30 @@ class NoticeService implements ServiceMethods {
 		return notice
 	}
 
-
-	/**
-	 * Check for any unacknowledged notices for a user using their current project context
-	 * @param person
-	 * @param requiredNoticesOnly - defaulted to false, this flag signals if only required notices are needed.
-	 * @return true if there are any unacknowledged notices
-	 */
-	Boolean hasUnacknowledgedNotices(Person person, boolean requiredNoticesOnly = false) {
-		Project project = securityService.userCurrentProject
-		return  hasUnacknowledgedNotices(person, project, requiredNoticesOnly)
-	}
-
 	/**
 	 * Determine whether or not the person logging in has unacknowledged notices.
 	 *
 	 * @param person - the person logging in into the application.
 	 * @return whether or not the person has unacknowledge notices.
 	 */
-	Boolean hasUnacknowledgedNoticesForLogin(Person person) {
-		Project project = securityService.userCurrentProject
-		return hasUnacknowledgedNotices(person, project, false, true)
+	Boolean hasUnacknowledgedNoticesForLogin(Project project, HttpSession session, Person person) {
+		return hasUnacknowledgedNotices(project, session, person,false, true)
 	}
 
 
 	/**
 	 * Check for any unacknowledged notices
-	 * @param person
 	 * @param project - the project currently selected in the user's context
+	 * @param session - HTTP Session
+	 * @param person
 	 * @param requiredNoticesOnly - defaulted to false, this flag signals if only required notices are needed.
 	 * @param forLogin - if true the presence of the HAS_UNACKNOWLEDGED_NOTICES attribute in the session will be
 	 *  bypassed. This is to take into account that, during the login process, this attribute hasn't been set, yet.
 	 * @return
 	 */
-	Boolean hasUnacknowledgedNotices(Person person, Project project, boolean requiredNoticesOnly = false, boolean forLogin = false) {
+	Boolean hasUnacknowledgedNotices(Project project, HttpSession session, Person person, boolean requiredNoticesOnly = false, boolean forLogin = false) {
 		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return false.
-		if (!forLogin && session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+		if (!forLogin && session && session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
 			return false
 		}
 
@@ -201,5 +191,24 @@ class NoticeService implements ServiceMethods {
 				gt('expirationDate', now)
 			}
 		}
+	}
+
+	/**
+	 * If there are no mandatory notices pending acknowledgement, clear out the HAS_UNACKNOWLEDGED_NOTICES and
+	 * REDIRECT_URI variables in the session (if any) to prevent any future notifications redirect during this
+	 * session.
+	 *
+	 * @param project - user's current project
+	 * @param session - HTTP Session
+	 * @param person - current person.
+	 * @return whether or not the user has any unacknowledged mandatory notice.
+	 */
+	boolean clearNoticesWhenNoMandatoryLeft(Project project, HttpSession session, Person person) {
+		boolean hasMandatoryUnacknowledgedNotices = hasUnacknowledgedNotices(project, session, person, true)
+		if (session && !hasMandatoryUnacknowledgedNotices) {
+			session.removeAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES)
+			session.removeAttribute(SecurityUtil.REDIRECT_URI)
+		}
+		return hasMandatoryUnacknowledgedNotices
 	}
 }

@@ -583,7 +583,7 @@ class UrlMappings {
 		"/ws/notices/continue" {
 			controller = 'wsNotice'
 			action = [
-			    GET: 'hasMandatoryUnacknowledgedNotices'
+			    GET: 'clearNoticesWhenNoMandatoryLeft'
 			]
 		}
 
