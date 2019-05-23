@@ -269,28 +269,21 @@ class CustomDomainService implements ServiceMethods {
      */
     List<String> getDistinctAssetCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
         assert project
-        StringBuilder query = new StringBuilder("SELECT * FROM (SELECT DISTINCT ${fieldName} COLLATE latin1_bin AS ${fieldName} ")
-        query.append("FROM asset_entity WHERE ${fieldName} IS NOT NULL AND project_id = ? ")
 
-        // If shared then it won't filter on the individual asset class in order to get all distinct values
-        if (!shared) {
-            query.append(" AND asset_class = ? ")
-        }
+        return AssetEntity.where {
+            project == project
+            isNotNull(fieldName)
+            ne(fieldName, '')
 
-        // Set the sort order to be case sensitive
-        query.append(") tmp ORDER BY ${fieldName} COLLATE latin1_general_ci ASC")
+            if (!shared) {
+                assetClass == assetClass
+            }
 
-        List<String> result = []
-        List<Map<String, Object>> values = null
-        if (shared) {
-            values = jdbcTemplate.queryForList(query.toString(), project.id)
-        } else {
-            values = jdbcTemplate.queryForList(query.toString(), project.id, assetClass.toString())
-        }
-        for (Map<String, Object> value : values) {
-            result.add(value[fieldName])
-        }
-        return result
+            projections {
+                distinct(fieldName)
+            }
+
+        }.list([sort: fieldName, order: 'asc'])
     }
 
     /**
