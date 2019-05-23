@@ -19,10 +19,17 @@
   .k-grid
     margin-top: 24px
     max-height: 400px
+    .k-plus::before
+      font-family: fontawesome
+      content: "\f101"!important
+    .k-minus::before
+      font-family: fontawesome
+      content: "\f103"!important
     a
       color: #666
       font-weight: bold
       text-decoration: none
+      cursor: pointer
     .k-grid-content
       font-family: helvetica, arial, sans-serif
       font-size: 12px
@@ -38,6 +45,61 @@
       font-size: 14px
     td
       padding: 2px 6px
+    .status-column
+      padding: 0
+      text-overflow: unset
+      span
+        padding: 1000% 38px 1000% 6px
+      .task_hold
+        background-color: #FFFF33 !important
+        color: black
+        font-weight: bold
+      .task_hold_overtime
+        background-color: #FF0000
+        color: black
+        font-weight: bold
+      .task_planned
+        background-color: #FFFFFF
+        color: gray
+        font-weight: bold
+      .task_pending
+        background-color: #FFFFFF
+        color: black
+        font-weight: bold
+      .task_ready
+        background-color: green !important
+        color: white
+        font-weight: bold
+      .task_started
+        background-color: darkturquoise !important
+        color: white
+        font-weight: bold
+      .task_completed2
+        background-color: #5478BA
+      .task_completed5
+        background-color: #4468AA
+      .task_completed
+        background-color: #24488A
+        color: white
+        font-weight: bold
+      .task_done2
+        background-color: #5478BA
+      .task_done5
+        background-color: #4468AA
+      .task_done
+        background-color: #24488A
+        color: white
+        font-weight: bold
+      .task_na
+        background-color: lightgray
+      .task_term
+        background-color: black
+      .task_tardy
+        background-color: #FFC266
+      .task_late
+        background-color: #FF9900
+      .task_overdue
+        color: red
   .k-grid.clickable-grid
     td
       cursor: pointer

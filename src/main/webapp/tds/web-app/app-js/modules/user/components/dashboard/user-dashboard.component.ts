@@ -206,9 +206,13 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public handleApplicationClicked(event): void {
+		this.openAssetDialog(event.dataItem.appId, event.dataItem.assetClass);
+	}
+
+	public openAssetDialog(id, assetClass): void {
 		this.dialogService.open(AssetShowComponent, [
-			{provide: 'ID', useValue: event.dataItem.appId},
-			{provide: 'ASSET', useValue: event.dataItem.assetClass}
+			{provide: 'ID', useValue: id},
+			{provide: 'ASSET', useValue: assetClass}
 		], DIALOG_SIZE.LG);
 	}
 
