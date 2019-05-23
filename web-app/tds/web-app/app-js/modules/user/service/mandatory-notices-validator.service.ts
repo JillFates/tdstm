@@ -6,19 +6,16 @@ import { Injectable } from '@angular/core';
 import {NavigationStart, Router} from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 
-import {WindowService} from '../../shared/services/window.service';
-import {UserService} from '../../modules/user/service/user.service';
-import {Paths} from '../tds-routing.states';
+import {UserPostNoticesContextService} from './user-post-notices-context.service';
+import {Paths} from '../../../app/tds-routing.states';
 
 @Injectable()
 export class MandatoryNoticesValidatorService {
 	private baseUri = '/tdstm'
-	private signOutUri = `${this.baseUri}/auth/signOut`
 
 	constructor(
 		private router: Router,
-		private userService: UserService,
-		private windowService: WindowService) {
+		private userContext: UserPostNoticesContextService) {
 	}
 
 	/**
@@ -26,11 +23,12 @@ export class MandatoryNoticesValidatorService {
 	 * user is sent back to the notices
 	 * The only route which doesn't have the restriction is /notice
 	 */
-	setupCheck(): void {
+	setupValidation(): void {
 		this.router.events
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
-				switchMap((e) => this.userService.hasMandatoryNoticesPending())
+				switchMap((event) => this.userContext.getUserContext()),
+				switchMap((context) => context.postNoticesManager.hasMandatoryNoticesPending()),
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)
 			.subscribe(() => this.router.navigate([Paths.notice]),

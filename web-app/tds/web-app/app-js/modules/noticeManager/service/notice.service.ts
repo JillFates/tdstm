@@ -102,6 +102,7 @@ export class NoticeService {
 	 * Get the post Notices to process
 	 * @returns any
 	 */
+	/*
 	getPostNotices(): Observable<PostNoticeResponse> {
 		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
 			.map((res: Response) => {
@@ -115,19 +116,7 @@ export class NoticeService {
 			})
 			.catch((error: any) => error.json());
 	}
-
-	/**
-	 * Set the Acknowledge state for a notice
-	 * @param {number} id:  Id of the notice
-	 * @returns NoticeModel
-	 */
-	setAcknowledge(id: number): Observable<NoticeModel> {
-		return this.http.post(`${this.singleNoticeUrl}/${id}/acknowledge`, '')
-			.map((res: Response) =>  {
-				return res.json();
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
-	}
+	*/
 
 	/**
 	 * Check the response, in case this is an JSON error coming from the server, respond appripately
@@ -159,15 +148,5 @@ export class NoticeService {
 			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
 
 		return notice;
-	}
-
-	/**
-    * Call the endpoint to se the flag that filter the notices pending
-    * @returns any
-    */
-	notifyContinue(): Observable<any> {
-		return this.http.get(`${this.singleNoticeUrl}/continue`)
-			.map((res: Response) =>  res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 }

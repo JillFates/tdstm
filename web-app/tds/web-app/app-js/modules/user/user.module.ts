@@ -23,6 +23,9 @@ import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {UserService} from './service/user.service';
 import {UserManageStaffComponent} from './components/manage-staff/user-manage-staff.component';
+import {UserPostNoticesManagerService} from './service/user-post-notices-manager.service';
+import {UserPostNoticesService} from './service/user-post-notices.service';
+import {MandatoryNoticesValidatorService} from './service/mandatory-notices-validator.service';
 
 @NgModule({
 	imports: [
@@ -40,7 +43,10 @@ import {UserManageStaffComponent} from './components/manage-staff/user-manage-st
 		ModuleResolveService,
 		UserResolveService,
 		// Service
-		UserService
+		UserService,
+		UserPostNoticesManagerService,
+		UserPostNoticesService,
+		MandatoryNoticesValidatorService
 	],
 	declarations: [
 		UserDateTimezoneComponent,

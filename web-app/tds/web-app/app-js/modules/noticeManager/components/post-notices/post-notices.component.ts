@@ -6,6 +6,7 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
 // Model
 import {NoticeModel, Notices, PostNoticeResponse } from '../../model/notice.model';
 // Components
@@ -17,6 +18,7 @@ import {MandatoryNoticesComponent} from '../mandatory-notices/mandatory-notices.
 	template: '<div></div>'
 })
 export class PostNoticesComponent implements OnInit {
+	private postNoticesManager: any;
 	private postNotices: NoticeModel[] = [];
 	private redirectUri: string;
 	private baseUri = '/tdstm'
@@ -30,6 +32,7 @@ export class PostNoticesComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private windowService: WindowService,
+		protected userContextService: UserPostNoticesContextService,
 		private router: Router) {
 	}
 
@@ -37,19 +40,23 @@ export class PostNoticesComponent implements OnInit {
 	 * Get the post notices and extract the redirectUri value
 	*/
 	ngOnInit() {
-		this.noticeService.getPostNotices()
-			.subscribe((response: PostNoticeResponse) => {
-				const redirect = (response && response.redirectUri) || '';
-				this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
+		this.userContextService.getUserContext()
+		.subscribe((context) => {
+			this.postNoticesManager = context.postNoticesManager;
+			this.postNoticesManager.getNotices()
+				.subscribe((response) => {
+					const redirect = (response && response.redirectUri) || '';
+					this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
 
-				if (this.redirectUri) {
-					this.postNotices = response.notices.map((notice: NoticeModel) => {
-						notice.sequence = notice.sequence || 0;
-						return notice;
-					});
-					this.showNotices();
-				}
-			});
+					if (this.redirectUri) {
+						this.postNotices = response.notices.map((notice: NoticeModel) => {
+							notice.sequence = notice.sequence || 0;
+							return notice;
+						});
+						this.showNotices();
+					}
+				})
+		});
 	}
 
 	/**
@@ -65,13 +72,13 @@ export class PostNoticesComponent implements OnInit {
 					setTimeout(() => {
 						this.showStandardNotices()
 							.then(() => {
-								this.noticeService.notifyContinue()
+								this.postNoticesManager.notifyContinue()
 									.subscribe(() => this.navigateTo(this.redirectUri))
 							})
 							.catch((error) => this.navigateTo(this.redirectUri));
 					}, 600);
 				} else {
-					this.noticeService.notifyContinue()
+					this.postNoticesManager.notifyContinue()
 						.subscribe(() => this.navigateTo(this.redirectUri))
 				}
 			})

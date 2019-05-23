@@ -4,8 +4,8 @@ import { DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
 // Service
 import {NoticeService} from '../../service/notice.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
@@ -17,17 +17,23 @@ import {NoticeCommonComponent} from './../notice-common'
 export class StandardNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
 	acceptAgreement: boolean;
+	private postNoticesManager: any;
 
 	constructor(
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
+		protected userContextService: UserPostNoticesContextService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
 
 	ngOnInit() {
 		this.notices = this.model.notices;
+		this.userContextService.getUserContext()
+			.subscribe((context) => {
+				this.postNoticesManager = context.postNoticesManager;
+			})
 	}
 
 	/**
@@ -36,7 +42,7 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 	onAccept() {
 		const updates = this.notices
 			.filter((notice) => notice.notShowAgain)
-			.map((notice) => this.noticeService.setAcknowledge(notice.id));
+			.map((notice) => this.postNoticesManager.setAcknowledge(notice.id));
 
 		if (updates.length) {
 			Observable.forkJoin(updates)
