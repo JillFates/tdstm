@@ -216,7 +216,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
-		'PROJECT_LIST': 'Project List',
+		'PROJECT': 'Project',
 		'CREATE_CUSTOM': 'Add Custom Field',
 		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
 		'MIN_MAX': {
