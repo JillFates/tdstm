@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f5544356-248a-4885-85af-05086121c9ee",
+		"_postman_id": "d3f0263d-c8d9-42bd-a821-bc805332a1f2",
 		"name": "DataBaseDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -50,12 +50,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -152,10 +152,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
 					"host": [

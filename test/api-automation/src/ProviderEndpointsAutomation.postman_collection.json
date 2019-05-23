@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6185007f-84bc-40d9-a847-65e432d138cc",
+		"_postman_id": "396cdeeb-4c8d-4a71-afa6-2b2ed0c15463",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -39,12 +39,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
