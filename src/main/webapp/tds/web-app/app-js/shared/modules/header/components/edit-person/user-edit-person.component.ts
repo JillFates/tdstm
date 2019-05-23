@@ -15,6 +15,7 @@ export class UserEditPersonComponent {
 	public startPageOptions;
 	public editableUserPreferences;
 	public savedPersonModel;
+	public canUpdateAccount
 
 	constructor(
 		public personModel: PersonModel,
@@ -25,6 +26,7 @@ export class UserEditPersonComponent {
 		this.startPageOptions = [];
 		this.editableUserPreferences = [];
 		this.savedPersonModel = {};
+		this.canUpdateAccount = false;
 		this.retrieveStartPageOptions();
 		this.loadComponentModel();
 	}
@@ -92,6 +94,7 @@ export class UserEditPersonComponent {
 				this.personModel = personModel;
 				this.savedPersonModel = Object.assign({},  this.personModel, this.savedPersonModel);
 				this.currentPersonId = result.person.id;
+				this.canUpdateAccount = result.canUpdateAccount;
 			},
 			(err) => console.log(err));
 	}

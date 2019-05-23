@@ -8,6 +8,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.security.PermissionsService
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -40,6 +41,7 @@ class WsUserController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
 	PersonService personService
+    PermissionsService permissionsService
 	PartyRelationshipService partyRelationshipService
 	UserService userService
 	ProjectService projectService
@@ -73,7 +75,8 @@ class WsUserController implements ControllerMethods {
         Map model = [
             fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
             person: person,
-            preferences: userPreferenceService.preferenceListForEdit(userLogin)
+            preferences: userPreferenceService.preferenceListForEdit(userLogin),
+            canUpdateAccount: securityService.hasPermission('UserUpdateOwnAccount')
         ]
     	renderSuccessJson(model)
     }
