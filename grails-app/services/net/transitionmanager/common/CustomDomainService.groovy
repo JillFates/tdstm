@@ -270,8 +270,11 @@ class CustomDomainService implements ServiceMethods {
      */
     List<String> getDistinctAssetCustomFieldValues(Project project, String fieldName, boolean shared, AssetClass assetClass) {
         assert project
+
         return AssetEntity.where {
             project == project
+            isNotNull(fieldName)
+            ne(fieldName, '')
 
             if (!shared) {
                 assetClass == assetClass
