@@ -272,6 +272,8 @@ class CustomDomainService implements ServiceMethods {
 
         return AssetEntity.where {
             project == project
+            isNotNull(fieldName)
+            ne(fieldName, '')
 
             if (!shared) {
                 assetClass == assetClass
@@ -279,12 +281,9 @@ class CustomDomainService implements ServiceMethods {
 
             projections {
                 distinct(fieldName)
-                isNotNull(fieldName)
             }
 
-        }.list([sort: fieldName, order: 'asc']) {
-            ne(fieldName, '')
-        }
+        }.list([sort: fieldName, order: 'asc'])
     }
 
     /**
