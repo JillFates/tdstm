@@ -72,14 +72,14 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 			DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(defaultProject)
 
 		and: 'a Map with extra fields defined by ?_ufp=true url params'
-			ExtraFilter extraFilter = new ExtraFilter('_ufp', 'true')
+			ExtraFilter extraFilter = new ExtraFilter('_moveBundle', '5689')
 
 		when: 'builds results for extra filters'
 			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilter)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " AE.moveBundle in (:extraFilterMoveBundles) "
-			results.hqlParams == [extraFilterMoveBundles: []]
+			results.hqlExpression == " AE.moveBundle.id = (:extraFilterMoveBundle) "
+			results.hqlParams == [extraFilterMoveBundles: [5689l]]
 	}
 
 	void 'test can prepare hql where statement and params for extra filters using event filter'() {
