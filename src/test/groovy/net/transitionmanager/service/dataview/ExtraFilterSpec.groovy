@@ -1,4 +1,4 @@
-package net.transitionmanager.service
+package net.transitionmanager.service.dataview
 
 
 import net.transitionmanager.asset.AssetType

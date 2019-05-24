@@ -694,7 +694,7 @@ class DataviewService implements ServiceMethods {
 
 		// There is 2 types of extra filters:
 		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple'
-		// 2) More complex and well defined extra filters resolved in {@code DataviewExtraFilterHQLBuilder} class
+		// 2) More complex and well defined extra filters resolved in {@code ExtraFilter} class
 		dataviewSpec.extraFilters?.each { ExtraFilter extraFilter ->
 			if (extraFilter.isAssetField()) {
 				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
