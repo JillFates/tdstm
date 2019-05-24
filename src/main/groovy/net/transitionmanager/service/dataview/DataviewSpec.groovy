@@ -3,9 +3,10 @@ package net.transitionmanager.service.dataview
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
-import net.transitionmanager.command.DataviewExtraFilterParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.Dataview
 import org.grails.web.json.JSONObject
 
@@ -115,7 +116,7 @@ class DataviewSpec {
 
 		this.spec.columns = this.spec.columns.collect {
 			Map map = it as Map
-			map.put('fieldSpec', fieldSpecProject?.getFieldSpec(map.domain, map.property))
+			map.put('fieldSpec', lookupFieldSpec(fieldSpecProject, map.domain, map.property))
 			map
 		}
 	}
@@ -161,12 +162,12 @@ class DataviewSpec {
 			domain   : command.sortDomain,
 			property : command.sortProperty,
 			sort     : command.sortOrder == ASCENDING ? 'asc' : 'desc',
-			fieldSpec: fieldSpecProject?.getFieldSpec(command.sortDomain, command.sortProperty)
+			fieldSpec: lookupFieldSpec(fieldSpecProject, command.sortDomain, command.sortProperty)
 		]
 
 		//4) Add Field Spec for each spce column
 		this.spec.columns.each { Map<String, ?> column ->
-			column.fieldSpec = fieldSpecProject?.getFieldSpec(column.domain, column.property)
+			column.fieldSpec = lookupFieldSpec(fieldSpecProject, column.domain, column.property)
 		}
 
 		//5) Add extra filter from UI params in command Object
@@ -177,6 +178,23 @@ class DataviewSpec {
 				.build(spec.domains, fieldSpecProject)
 		}
 	}
+
+	/**
+	 * Lookup {@code FieldSpec} from {@code FieldSpecProject}.
+	 * If it did not find a valid instance of {@code FieldSpec} then it throws Exception
+	 * @param fieldSpecProject an instance of {@code FieldSpecProject} used to lookup a {@code FieldSpec}
+	 * @param domain an asset entity domain String value
+	 * @param fieldName an asset entity field name String value
+	 * @return an instance of {@code FieldSpec}
+	 */
+	private FieldSpec lookupFieldSpec(FieldSpecProject fieldSpecProject, String domain, String fieldName) {
+		FieldSpec fieldSpec = fieldSpecProject?.getFieldSpec(domain, fieldName)
+		if (!fieldSpec) {
+			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
+		}
+		return fieldSpec
+	}
+
 
 	void addColumn(String domain, String property, Object filter = null) {
 		spec.columns += [

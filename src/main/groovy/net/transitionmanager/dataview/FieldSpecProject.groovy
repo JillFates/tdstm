@@ -58,21 +58,20 @@ class FieldSpecProject {
 	}
 
 	/**
-	 * Returns an instance of {@code FieldSpec} based on an assetclass definition and a field name
-	 * @param domain
-	 * @param fieldName
-	 * @return
+	 * Returns an instance of {@code FieldSpec} based on an domain definition and a field name
+	 * @param domain a asset entity definition. See {@code ETLDomain}
+	 * @param fieldName an asset entity field
+	 * @return an instance of {@code FieldSpec}
+	 * 		or null if it was not found in cache
 	 */
 	FieldSpec getFieldSpec(String domain, String fieldName) {
-
 		String key = domain.toUpperCase()
-		if (! fieldsSpecMap.containsKey(key)) {
-			throw new InvalidParamException("Domain $domain not found in cache")
+		if (fieldsSpecMap.containsKey(key)
+			&& fieldsSpecMap[key].containsKey(fieldName)) {
+			return fieldsSpecMap[key][fieldName]
+		} else {
+			return null
 		}
-		if (!fieldsSpecMap[key].containsKey(fieldName)) {
-			throw new InvalidParamException("Domain $domain and field $fieldName not found in cache")
-		}
-		return fieldsSpecMap[key][fieldName]
 	}
 
 	/**
@@ -84,28 +83,5 @@ class FieldSpecProject {
 	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
 		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(AssetClass.getDomainForAssetType(assetClassName).toUpperCase())
 		return allFieldSpecs.findAll { it.value?.isCustom() }
-	}
-
-	/**
-	 * Lookups a {@code FieldSpec} instance combining all domains passed as argument.
-	 * If it finds a valid combination of domain and field name,
-	 * it return an instance of  {@code FieldSpec}, otherwise it return null.
-	 * @param 	domains a List of domain definitions
-	 * @param 	assetFieldName a valid asset field spec name
-	 * @return an List with 2 values, selected domain with an instance of {@code FieldSpec} found
-	 */
-	List lookupFieldSpec(List<String> domains, String assetFieldName) {
-		FieldSpec fieldSpec = null
-		String selectedDomain = domains.find { String domain ->
-			String key = domain.toUpperCase()
-			fieldsSpecMap.containsKey(key) && fieldsSpecMap[key].containsKey(assetFieldName)
-		}
-		if (selectedDomain){
-			return [selectedDomain, fieldsSpecMap[selectedDomain.toUpperCase()][assetFieldName]]
-		} else {
-			return []
-		}
-
-
 	}
 }

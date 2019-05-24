@@ -66,8 +66,6 @@ class ExtraFilter {
  *     {"property" : "appTech", "filter": "Apple"}
  *     {"property" : "application_appTech", "filter": "Apple"}
  * </pre>
- *
- *
  */
 class ExtraFilterBuilder {
 
@@ -104,16 +102,46 @@ class ExtraFilterBuilder {
 		if (this.property in ['_filter', '_event', '_ufp'] ) {
 			return new ExtraFilter(this.property, this.filter)
 		} else if (this.property.contains('_')) {
-			def (String domain, String field) = this.property.split(DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER) as List<String>
-			FieldSpec fieldSpec = fieldSpecProject.getFieldSpec(domain, field)
-			return new ExtraFilter(field, this.filter, domain, fieldSpec)
+			return buildExtraFilterWithDomainDefinedInProperty(fieldSpecProject)
 	 	} else {
-			def (String domain, FieldSpec fieldSpec) = fieldSpecProject.lookupFieldSpec(domains, this.property)
-			if (!fieldSpec){
-				throw new InvalidParamException("Field Spec '$property' not found")
-			}
-			return new ExtraFilter(fieldSpec.field, this.filter, domain, fieldSpec)
+			return buildExtraFilterSelectingDomainFromDataview(domains, fieldSpecProject)
 		}
+	}
+
+	/**
+	 * It builds an instance of {@code ExtraFilter} using {@code DataviewSpec} columns.
+	 * It lookups an instance of {@code FieldSpec} combining columns defined in {@code DataviewSpec}.
+	 *
+	 * @param domains a list of asset entity domain.
+	 * @param fieldSpecProject and instance of {@code FieldSpecProject}
+	 * @return an instance of {@code ExtraFilter}
+	 */
+	private ExtraFilter buildExtraFilterSelectingDomainFromDataview(List<String> domains, fieldSpecProject) {
+		FieldSpec fieldSpec = null
+		String selectedDomain = domains.find { String domain ->
+			fieldSpec = fieldSpecProject.getFieldSpec(domain, this.property)
+			return fieldSpec != null
+		}
+
+		if (!fieldSpec) {
+			throw new InvalidParamException("Field Spec '$property' not found")
+		}
+		return new ExtraFilter(this.property, this.filter, selectedDomain, fieldSpec)
+	}
+
+	/**
+	 * Builds an instance of {@code ExtraFilter} using {@code FieldSpecProject}
+	 * to add {@FieldSpec} as a creation param
+	 * @param fieldSpecProject an instance of {@code FieldSpecProject}
+	 * @return an instance of {@code ExtraFilter}
+	 */
+	private ExtraFilter buildExtraFilterWithDomainDefinedInProperty(FieldSpecProject fieldSpecProject) {
+		def (String domain, String fieldName) = this.property.split(DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER) as List<String>
+		FieldSpec fieldSpec = fieldSpecProject.getFieldSpec(domain, fieldName)
+		if (!fieldSpec) {
+			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
+		}
+		return new ExtraFilter(fieldName, this.filter, domain, fieldSpec)
 	}
 
 	ExtraFilterBuilder withProperty(String property) {

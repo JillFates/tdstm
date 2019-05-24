@@ -94,8 +94,8 @@ class DataviewCustomFilterHQLBuilderSpec extends Specification implements DataTe
 			Map<String, ?> results = builder.buildQueryExtraFilters(extraFilter)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " AE.moveBundle in (:extraFilterMoveBundles) "
-			results.hqlParams['extraFilterMoveBundles'] == null
+			results.hqlExpression == " AE.moveBundle.event.id = :extraFilterMoveEventId "
+			results.hqlParams['extraFilterMoveEventId'] == 329
 
 	}
 }

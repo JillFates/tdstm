@@ -1,6 +1,5 @@
 package net.transitionmanager.service.dataview
 
-
 import com.tdsops.etl.FieldSpecValidateableTrait
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
@@ -221,7 +220,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		then: 'an InvalidParamException is thrown'
 			InvalidParamException e = thrown InvalidParamException
-			e.message == "Domain application and field assetName not found in cache"
+			e.message == "Unresolved domain application and field assetName"
 	}
 
 	void 'test can throw an exception creating a DataviewSpec with extra unknown filters'() {

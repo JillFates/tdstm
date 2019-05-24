@@ -43,9 +43,7 @@ class DataviewCustomFilterHQLBuilder {
 				]
 				break
 			case '_event':
-				//TODO: dcorrea. John, what can we do if there isn't moveBundle associated to a MoveEvent
-				List<MoveBundle> moveBundleList  = MoveEvent.read(extraFilter.filter.toLong())?.moveBundles?.findAll { it.useForPlanning }?.flatten() as List<MoveBundle>
-				hqlExpression = " AE.moveBundle.event.id = :extraFilterMoveEventId "
+				hqlExpression = " AE.moveBundle.moveEvent.id = :extraFilterMoveEventId "
 				hqlParams = [
 					extraFilterMoveEventId: NumberUtil.toPositiveLong(extraFilter.filter, 0)
 				]
