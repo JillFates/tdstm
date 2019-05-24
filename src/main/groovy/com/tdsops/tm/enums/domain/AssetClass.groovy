@@ -107,11 +107,6 @@ enum AssetClass {
 	}
 
 	/**
-	 * Defines domains used in UI for filtering dataviews or retrieves field specs
-	 */
-	static List<String> domainAssetTypeList =  ['common', 'application', 'database', 'device', 'storage'].asImmutable()
-
-	/**
 	 * This method determines the domain for a given Asset Type.
 	 * Presently, the only domains supported are:
 	 *	- Application

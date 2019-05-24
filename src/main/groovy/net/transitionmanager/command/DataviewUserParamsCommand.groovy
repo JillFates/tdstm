@@ -54,7 +54,7 @@ class DataviewUserParamsCommand implements CommandObject {
 	DataviewUserFilterParamsCommand filters
 
 	static constraints = {
-		sortDomain blank: false, inList: AssetClass.domainAssetTypeList
+		sortDomain blank: false, inList: ['common', 'application', 'database', 'device', 'storage']
 		sortProperty blank: false
 		sortOrder blank: false, inList: ['a', 'd']
 		offset min: 0

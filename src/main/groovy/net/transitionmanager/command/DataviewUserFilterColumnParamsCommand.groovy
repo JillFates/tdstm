@@ -23,7 +23,7 @@ class DataviewUserFilterColumnParamsCommand implements CommandObject {
 	String width
 
 	static constraints = {
-		domain nullable: false, inList: AssetClass.domainAssetTypeList
+		domain nullable: false, inList: ['common', 'application', 'database', 'device', 'storage']
 		edit nullable: false
 		filter nullable: false
 		label nullable: false
