@@ -101,7 +101,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
-                        <li class="mesnu-child-item menu-projects-active-projects">
+                        <li class="menu-child-item menu-projects-active-projects">
                             <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
                         </li>
                         <li class="divider"></li>
