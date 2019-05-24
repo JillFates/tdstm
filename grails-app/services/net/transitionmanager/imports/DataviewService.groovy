@@ -1128,6 +1128,7 @@ class DataviewService implements ServiceMethods {
 		'id'             : [property: 'AE.id', type: Long, namedParameter: 'id', join: ''],
 		'assetClass'     : [property: 'str(AE.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
 		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
+		'moveBundle.id'  : [property: 'AE.moveBundle.id', type: Long, namedParameter: 'moveBundleId', join: 'left outer join AE.moveBundle'],
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
 		'appOwner'       : [property: SqlUtil.personFullName('appOwner', 'AE'),

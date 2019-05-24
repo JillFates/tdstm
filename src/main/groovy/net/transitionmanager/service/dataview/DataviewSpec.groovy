@@ -141,7 +141,7 @@ class DataviewSpec {
 			args.max = command.limit
 		}
 
-		//2) Complte the spec definition with Dataview instance
+		//2) Complete the spec definition with Dataview instance
 		if (dataview) {
 			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
 			spec.domains = ((jsonDataview.domains.collect { it.toLowerCase() } as Set) + (spec.domains as Set)) as List

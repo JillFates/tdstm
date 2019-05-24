@@ -53,13 +53,10 @@ class ExtraFilter {
  * It can defines if extra filter is:
  * 1) A named filter:
  * <pre>
- *     {"property" : "_ufp", "filter": "true"}
- * </pre>
- * A custom filter:
- * <pre>
+ *     {"property" : "_moveBundle", "filter": "3239"}
  *     {"property" : "_event", "filter": "364"}
  * </pre>
- * Or a simple asset field filter:
+ * 2) Or a simple asset field filter:
  * <pre>
  *     {"property" : "assetName", "filter": "FOOBAR"}
  *     {"property" : "common_assetName", "filter": "FOOBAR"}
@@ -71,7 +68,6 @@ class ExtraFilterBuilder {
 
 	String property
 	String filter
-
 	/**
 	 * Builder implementation for {@code ExtraFilter} instances.
 	 * After configuring {@code ExtraFilter#property} and {@code ExtraFilter#filter},
@@ -99,7 +95,7 @@ class ExtraFilterBuilder {
 	 */
 	ExtraFilter build(List<String> domains, FieldSpecProject fieldSpecProject) {
 
-		if (this.property in ['_filter', '_event', '_ufp'] ) {
+		if (this.property in ['_filter', '_event', '_moveBundle'] ) {
 			return new ExtraFilter(this.property, this.filter)
 		} else if (this.property.contains('_')) {
 			return buildExtraFilterWithDomainDefinedInProperty(fieldSpecProject)
@@ -144,6 +140,11 @@ class ExtraFilterBuilder {
 		return new ExtraFilter(fieldName, this.filter, domain, fieldSpec)
 	}
 
+	/**
+	 * Defines {@code ExtraFilterBuilder#property} and determines if this is a request for an id
+	 * @param property
+	 * @return
+	 */
 	ExtraFilterBuilder withProperty(String property) {
 		this.property = property
 		return this

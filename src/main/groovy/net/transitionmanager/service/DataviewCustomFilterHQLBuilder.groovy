@@ -34,12 +34,10 @@ class DataviewCustomFilterHQLBuilder {
 		Map<String, ?> hqlParams
 
 		switch (extraFilter.property) {
-			case '_ufp':
-				hqlExpression = " AE.moveBundle in (:extraFilterMoveBundles) "
+			case '_moveBundle':
+				hqlExpression = " AE.moveBundle.id = (:extraFilterMoveBundle) "
 				hqlParams = [
-					extraFilterMoveBundles: MoveBundle.where {
-						project == queryProject && useForPlanning == new Boolean(extraFilter.filter)
-					}.list()
+					extraFilterMoveBundle: NumberUtil.toPositiveLong(extraFilter.filter, 0)
 				]
 				break
 			case '_event':
