@@ -1,12 +1,10 @@
 import com.tds.asset.AssetEntity
-import grails.converters.JSON
-import groovy.json.JsonOutput
-import org.apache.commons.text.StringEscapeUtils
+import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import groovy.json.JsonOutput
 import net.transitionmanager.service.InvalidParamException
-import com.tdsops.tm.enums.ControlType
-
+import org.apache.commons.text.StringEscapeUtils
 /**
  * This TabLib is a clone of the ControlTagLib. The original lib was used to render the various data elements and input controls for the
  * asset CRUD forms. This lib was created to support the rendering of the asset CRUD forms that will render the forms as html templates
@@ -308,7 +306,7 @@ class ControlAngularTagLib {
 	 * @return the SELECT Component HTML
 	 */
 	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
-		List options = fieldSpec.constraints?.values
+		List options = fieldSpec.constraints?.values ?: []
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')

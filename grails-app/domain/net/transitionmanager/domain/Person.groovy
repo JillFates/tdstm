@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.HtmlUtil
 import net.transitionmanager.service.PartyRelationshipService
 
 // Domain classes that Person is associated with that are impacted by merging which are not in
@@ -252,7 +253,7 @@ class Person extends Party {
 	}
 
 	String toString() {
-		firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : '')
+		HtmlUtil.escape(firstName+ (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
 	}
 
 	def beforeValidate() {

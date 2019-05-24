@@ -595,14 +595,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/notices/$id/ack" {
+		"/ws/notices/$id/acknowledge" {
 			controller = "wsNotice"
 			action = [
 					POST: "acknowledge"
 			]
 		}
 
-		"/ws/notice/fetchPostNotices" {
+		"/ws/notices/fetchPostLoginNotices" {
 			controller = "wsNotice"
 			action = [
 					GET: "fetchPostLoginNotices"
@@ -624,9 +624,6 @@ class UrlMappings {
 					GET: "getLicense",
 					DELETE: "deleteLicense"
 			]
-			constraints {
-				id(matches:/[0-9]{1,}/)
-			}
 		}
 
 		// Licensing Information
@@ -986,7 +983,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateUnique/$name" {
+		"/ws/dataingestion/provider/validateUnique" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"

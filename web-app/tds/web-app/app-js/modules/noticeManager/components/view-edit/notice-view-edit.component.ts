@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
@@ -8,43 +8,58 @@ import {ViewHtmlComponent} from '../view-html/view-html.component';
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NoticeModel, NoticeTypes} from '../../model/notice.model';
+// import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
+import {NoticeModel, NoticeTypes, NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
-
 @Component({
 	selector: 'tds-notice-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
 })
-export class NoticeViewEditComponent {
+export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
-	@ViewChild('noticeForm') noticeForm: FormControl;
 
 	private dataSignature: string;
 	protected model: NoticeModel;
 	protected defaultItem: any = {
 		typeId: null, name: 'Select a Type'
 	};
-
+	MANDATORY = NOTICE_TYPE_MANDATORY;
+	noticeType: any;
+	noticeIsLocked: boolean;
 	typeDataSource = [...NoticeTypes];
-
 	constructor(
-		model: NoticeModel,
+		private translate: TranslatePipe,
+		private originalModel: NoticeModel,
 		public action: Number,
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {
+	}
 
-		this.model = {...model};
-		// this.model.typeId = parseInt(this.model.typeId, 10);
+	ngOnInit() {
+		this.model = {...this.originalModel};
 		this.model.typeId = this.model.typeId;
+		this.noticeIsLocked = this.model.locked;
+		this.model.active = StringUtils.stringToBoolean(this.model.active);
+
+		if (this.model.needAcknowledgement) {
+			this.model.typeId = NOTICE_TYPE_MANDATORY;
+		}
+		this.noticeType = {typeId: this.model.typeId};
 		this.dataSignature = JSON.stringify(this.model);
+	}
+
+	ngAfterViewInit() {
+		setTimeout(() => this.htmlText.editor.editorContainer.title = this.translate.transform('NOTICE.TOOLTIP_MESSAGE'));
 	}
 
 	protected cancelCloseDialog(): void {
@@ -71,28 +86,56 @@ export class NoticeViewEditComponent {
 					this.noticeService.deleteNotice(this.model.id.toString())
 						.subscribe(
 							res => this.activeDialog.close(),
-							error => this.activeDialog.dismiss(error));
+							error => console.error(error));
 				}
 			});
+	}
+
+	/**
+	 * Get and clean the payload to be sent to the server to create or edit a notice
+	*/
+	private getPayloadFromModel(): any {
+		this.model.typeId = (this.noticeType && this.noticeType.typeId);
+
+		const payload = {...this.model};
+
+		if (payload.typeId === this.MANDATORY) {
+			payload.typeId = NOTICE_TYPE_POST_LOGIN;
+			payload.needAcknowledgement = true;
+		} else {
+			payload.needAcknowledgement = false;
+			delete payload['acknowledgeLabel'];
+		}
+		payload.locked = payload.locked || false;
+		// remove esc sequences
+		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
+
+		// use zero for empty sequences
+		payload.sequence = payload.sequence === null || typeof payload.sequence === 'undefined' ? 0 : payload.sequence;
+		// don't send '' for empty dates, instead use null
+		payload.activationDate = payload.activationDate === '' ? null : payload.activationDate;
+		payload.expirationDate = payload.expirationDate === '' ? null : payload.expirationDate;
+
+		return payload;
 	}
 
 	/**
 	 * Save the current status fo the Notice
 	 */
 	protected saveNotice(): void {
-		if (this.model.id) {
-			this.noticeService.editNotice(this.model)
+		const payload = this.getPayloadFromModel();
+
+		if (payload.id) {
+			this.noticeService.editNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
+					error => console.error(error));
 		} else {
-			this.noticeService.createNotice(this.model)
+			this.noticeService.createNotice(payload)
 				.subscribe(
 					notice => this.activeDialog.close(notice),
-					error => this.activeDialog.dismiss(error));
-
+					error => console.error(error));
 		}
-
 	}
 
 	/**
@@ -108,10 +151,25 @@ export class NoticeViewEditComponent {
 			.catch(error => console.log('View HTML Closed'));
 	}
 
+	/**
+	 * Determines if all the field forms comply with the validation rules
+	*/
 	protected formValid(): boolean {
-		console.log('TypeId:', !!this.model.typeId);
-		console.log('Html', this.htmlText.valid());
-		return this.noticeForm.valid && this.htmlText.valid() && !!this.model.typeId;
+		const noticeType = this.noticeType && this.noticeType.typeId;
+		const isValid =  this.model && this.model.title &&
+				this.isValidHtmlText() && (noticeType || noticeType === 0);
+
+		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.acknowledgeLabel && this.model.acknowledgeLabel.trim() !== '')) : isValid;
+
+		return returnValue;
+	}
+
+	private isValidHtmlText(): boolean {
+		return this.htmlText &&
+				this.htmlText.value &&
+				this.htmlText.value.trim()  &&
+				this.htmlText.valid();
+
 	}
 
 	protected isCreateEditAvailable(): boolean {
@@ -131,6 +189,7 @@ export class NoticeViewEditComponent {
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.model);
 	}
+
 	/**
 	 * Grab the current html value emitted by rich text editor
 	 */

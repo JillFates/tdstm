@@ -17,6 +17,7 @@ class NoticeAcknowledgement {
 	static belongsTo = [notice: Notice, person: Person]
 
 	static constraints = {
+		person unique: 'notice'
 		ipAddress blank: true, nullable: false
 		browserType blank: true, nullable: false
 	}

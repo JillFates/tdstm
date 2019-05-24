@@ -95,7 +95,21 @@
             margin-top: 24px;
         }
 
-</style>
+        .event-status-toolbar {
+            display: inline;
+            margin-left: 20px;
+        }
+        .event-status-toolbar input[type='radio'] {
+            margin: 4px 4px 0;
+            vertical-align: top;
+        }
+        .event-status-toolbar #event-status-completed {
+            margin-left: 12px;
+        }
+        .event-status-toolbar label {
+            font-weight: 600;
+        }
+    </style>
 
 </head>
 
@@ -131,6 +145,19 @@
                     #: status #
                 </td>
             </tr>
+        </script>
+
+        <script type="text/x-kendo-template" id="event-toolbar-template">
+            <strong>
+                <img src="${resource(dir: 'icons', file: 'calendar.png')}" /> Events
+            </strong> - Your assigned events and your team
+
+            <div class="event-status-toolbar">
+                <input type="radio" name="event-status" value="true" id="event-status-active" checked onclick="loadEventTable();"> <label for="event-status-active">Active</label>
+                <input type="radio" name="event-status" value="false" id="event-status-completed" onclick="loadEventTable();"> <label for="event-status-completed">Completed</label>
+            </div>
+
+            <div onclick="loadEventTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
         </script>
 
         <!-- Body Starts here-->
@@ -295,6 +322,7 @@
         function loadEventTable(id) {
 
             var projectId = id ? id : $("#userProjectId").val();
+            var activeStatus = ($( 'input[name=event-status]:checked' ).val()? $( 'input[name=event-status]:checked' ).val(): true);
 
             var grid = $("#gridEvents").data("kendoGrid");
             if(grid) {
@@ -308,13 +336,13 @@
             }
 
             $("#gridEvents").kendoGrid({
-                toolbar: kendo.template('<strong><img src="${resource(dir: 'icons', file: 'calendar.png')}" /> Events</strong> - Your assigned events and your team <div onclick="loadEventTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+				toolbar: kendo.template($("#event-toolbar-template").html()),
                 dataSource: {
                     type: "json",
                     transport: {
                         read: {
                             url: contextPath + '/dashboard/retrieveEventsList',
-                            data: { project:  projectId }
+                            data: { project:  projectId, active: activeStatus }
                         }
                     },
                     schema: {
@@ -382,7 +410,7 @@
             }
 
             $("#gridEventsNews").kendoGrid({
-                toolbar: kendo.template('<strong> <img src="${resource(dir: 'icons', file: 'newspaper.png')}" /> Event News</strong> - Active news for your events <div onclick="loadEventNewsTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+				toolbar: kendo.template('<strong> <img src="${resource(dir: 'icons', file: 'newspaper.png')}" /> Event News</strong> - Active news for your events <div onclick="loadEventNewsTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
                 dataSource: {
                     type: "json",
                     transport: {
