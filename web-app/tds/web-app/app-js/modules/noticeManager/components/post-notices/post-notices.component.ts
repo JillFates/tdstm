@@ -40,7 +40,7 @@ export class PostNoticesComponent implements OnInit {
 	 * Get the post notices and extract the redirectUri value
 	*/
 	ngOnInit() {
-		this.userContextService.getUserContext()
+		this.userContextService.getUserPostNoticesContext()
 		.subscribe((context) => {
 			this.postNoticesManager = context.postNoticesManager;
 			this.postNoticesManager.getNotices()

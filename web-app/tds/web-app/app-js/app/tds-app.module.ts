@@ -38,7 +38,7 @@ import {UserModule} from '../modules/user/user.module';
 		NoticesValidatorService,
 		{
 			provide: APP_INITIALIZER,
-			useFactory: (provider: UserPostNoticesContextService) => () => provider.initializeUserContext(),
+			useFactory: (provider: UserPostNoticesContextService) => () => provider.initializeUserPostNoticesContext(),
 			deps: [UserPostNoticesContextService],
 			multi: true
 		}

@@ -29,7 +29,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	}
 
 	ngOnInit() {
-		this.userContextService.getUserContext()
+		this.userContextService.getUserPostNoticesContext()
 		.subscribe((context) => {
 			this.postNoticesManager = context.postNoticesManager;
 			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);

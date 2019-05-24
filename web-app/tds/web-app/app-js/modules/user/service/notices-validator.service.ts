@@ -1,5 +1,5 @@
 /**
- * Services to restrict the access to Angular routes when the user has mandatory notices pendings to accept
+ * Services to restrict the access to Angular routes when the user has notices left to accept
  */
 
 import { Injectable } from '@angular/core';
@@ -25,7 +25,7 @@ export class NoticesValidatorService {
 		this.router.events
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
-				switchMap((event) => this.userContext.getUserContext()),
+				switchMap((event) => this.userContext.getUserPostNoticesContext()),
 				switchMap((context) => context.postNoticesManager.hasNoticesPending()),
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)

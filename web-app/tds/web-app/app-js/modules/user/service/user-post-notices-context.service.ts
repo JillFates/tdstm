@@ -1,6 +1,6 @@
 /**
- * User Context is an early service injected at the beginning of the App that initialize the App Object that contains
- * multiple information necessary to run the application, like permissions, user info, license management, etc.
+ * UserPostNoticesContextService is an early service injected at the beginning of the App that initialize the App Object that contains
+ * information to handle state of the user the post notices info
  */
 // Angular
 import {Injectable} from '@angular/core';
@@ -23,14 +23,14 @@ export class UserPostNoticesContextService {
 	/**
 	 * Get the User Context
 	 */
-	public getUserContext(): Observable<UserPostNoticesContextModel> {
+	public getUserPostNoticesContext(): Observable<UserPostNoticesContextModel> {
 		return Observable.from(this.userContext);
 	}
 
 	/**
 	 * Being call in the Bootstrap of the Application
 	 */
-	public initializeUserContext() {
+	public initializeUserPostNoticesContext() {
 		let contextPromises = [];
 		contextPromises.push(Observable.of(this.userPostNoticesManagerService));
 

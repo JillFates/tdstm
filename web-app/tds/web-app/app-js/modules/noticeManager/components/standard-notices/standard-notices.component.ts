@@ -30,7 +30,7 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 
 	ngOnInit() {
 		this.notices = this.model.notices;
-		this.userContextService.getUserContext()
+		this.userContextService.getUserPostNoticesContext()
 			.subscribe((context) => {
 				this.postNoticesManager = context.postNoticesManager;
 			})
