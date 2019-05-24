@@ -2027,7 +2027,8 @@ function bulkDeleteDependencies() {
         if (confirm("You are about to delete all of the selected dependencies for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")) {
             jQuery.ajax({
                 url: tdsCommon.createAppURL('/wsAsset/bulkDeleteDependencies'),
-                data: { 'dependencyIds': dependencyArr },
+                data: { 'dependencies': dependencyArr },
+                traditional: true, // This removes the annoying '[]' in the back end parameter name, that prevents us from using a command object
                 type: 'POST',
                 success: function (data) {
                     $(".ui-icon-refresh").click();

@@ -16,6 +16,7 @@ import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
+import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
@@ -167,25 +168,15 @@ class WsAssetController implements ControllerMethods {
 
    /**
     * Delete multiple Asset Dependencies.
-    * @param : dependencyIds[]  : list of ids for which assets are requested to be deleted
+    * @param : dependencies : list of ids for which assets are requested to be deleted
     */
    @HasPermission(Permission.AssetEdit)
    def bulkDeleteDependencies(){
 	   Project project = projectForWs
 
-	   Map requestParams = null
-
-	   withFormat {
-		   js {
-			   requestParams = request.JSON
-		   }
-		   html {
-			   params.dependencies = params.list('dependencyIds[]')
-			   requestParams = params
-		   }
-	   }
-
-	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, requestParams.dependencies))
+	   BulkDeleteDependenciesCommand command = populateCommandObject(BulkDeleteDependenciesCommand)
+	   validateCommandObject(command)
+	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, command.dependencies))
    }
 
 	/**
