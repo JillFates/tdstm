@@ -198,6 +198,9 @@ class LicensedClient {
 			lc.status = json.status as License.Status
 		}
 		if(json.project != null) {
+			if( json.project.guid && json.project.metricsGathering == null ) {
+				json.project.metricsGathering = false
+			}
 			lc.project = json.project?.toString()
 		}
 		if(json.client != null) {
