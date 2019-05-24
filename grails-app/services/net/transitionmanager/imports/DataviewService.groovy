@@ -3,19 +3,6 @@
  */
 package net.transitionmanager.imports
 
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.DataviewCustomFilterHQLBuilder
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.service.dataview.ExtraFilter
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -25,20 +12,31 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.imports.Dataview
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.FavoriteDataview
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
+import net.transitionmanager.service.dataview.ExtraFilter
+import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
@@ -694,17 +692,14 @@ class DataviewService implements ServiceMethods {
 			addColumnFilter(column, project, whereCollector, mixedFieldsInfo)
 		}
 
-		// Applied named and extra filters from TM-14768
-		DataviewCustomFilterHQLBuilder builder = new DataviewCustomFilterHQLBuilder(project)
-
 		// There is 2 types of extra filters:
 		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple'
-		// 2) More complex and well defined extra filters resolved in {@code DataviewCustomFilterHQLBuilder} class
+		// 2) More complex and well defined extra filters resolved in {@code DataviewExtraFilterHQLBuilder} class
 		dataviewSpec.extraFilters?.each { ExtraFilter extraFilter ->
 			if (extraFilter.isAssetField()) {
 				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
 			} else {
-				Map<String,?> hqlExtraFilters = builder.buildQueryExtraFilters(extraFilter)
+				Map<String,?> hqlExtraFilters = extraFilter.buildHQLQueryAndParams()
 				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
 			}
 		}
