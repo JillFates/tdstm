@@ -82,7 +82,8 @@ class License {
 		Map dProject = [
 				  id:   "",
 				  name: "all",
-				  guid: ""
+				  guid: "",
+				  // metricsGathering: false  // TODO: this is the client part of "Metrics Gathering" variable used by "tmci" to gather info is required in the CLIENT?
 		]
 
 		if(project != "all"){
