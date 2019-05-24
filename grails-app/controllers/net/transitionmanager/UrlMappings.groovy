@@ -475,6 +475,11 @@ class UrlMappings {
 			action = [GET: "getLoginInfo"]
 		}
 
+		"/auth/sendResetPasswordEmail" {
+			controller = "auth"
+			action = [GET: "sendResetPasswordEmail"]
+		}
+
 		"/ws/user/modelForPreferenceManager" {
 			controller = "wsUser"
 			action = [ GET: "modelForPreferenceManager" ]

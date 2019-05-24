@@ -199,6 +199,7 @@ class AuthController implements ControllerMethods {
 	 * This will send the email notice to the user and then redirect them to the login form with a flash message
 	 * explaining the next step.
 	 */
+	@Deprecated
 	def sendResetPassword() {
 		def email = params.email
 		def success = true
@@ -211,6 +212,21 @@ class AuthController implements ControllerMethods {
 		}
 
 		render( view:'_forgotMyPassword', model: [email: params.email, success: success] )
+	}
+
+	/**
+	 * Send the reset password email notification for the given email address.
+	 * @return whether or not the process was successful.
+	 */
+	def sendResetPasswordEMail() {
+		String email = params.email
+		boolean success = true
+		try {
+			securityService.sendResetPasswordEmail(email, request.getRemoteAddr(), PasswordResetType.FORGOT_MY_PASSWORD)
+		} catch (ServiceException e) {
+			success = false
+		}
+		renderSuccessJson([success: success])
 	}
 
 	/**
