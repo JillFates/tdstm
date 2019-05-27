@@ -8,7 +8,6 @@ import com.tdssrc.grails.NumberUtil
  * Parses and validates the configuration security related properties.
  */
 class SecurityConfigParser {
-	private static final int DEFAULT_INACTIVITY_DAYS_LOCKOUT = 60
 	private static final String propNamePrefix = 'tdstm.security'
 
 	private static final validLocalUserSettingsNames = [
@@ -168,9 +167,6 @@ class SecurityConfigParser {
 		if (uph != '') {
 			map.usernamePlaceholder = uph
 		}
-
-		map.inactiveDaysLockout = prop(props.inactiveDaysLockout ?: null, DEFAULT_INACTIVITY_DAYS_LOCKOUT)
-		map.inactivityWhitelist = prop(props.inactivityWhitelist ?: null, [])
 
 		return map
 	}
