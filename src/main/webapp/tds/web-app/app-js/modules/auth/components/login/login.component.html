@@ -17,7 +17,7 @@
             </h1>
 
             <form action="signIn" name="loginForm" class="login-form">
-                <div class="form-group has-authority">
+                <div class="form-group has-authority" *ngIf="loginInfo.config.authorityList && loginInfo.config.authorityList.length > 0">
                     {{'LOGIN.DOMAIN' | translate}}:
                     <kendo-dropdownlist
                             [defaultItem]="'LOGIN.PLEASE_SELECT' | translate"

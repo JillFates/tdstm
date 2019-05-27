@@ -31,4 +31,16 @@ export class LoginService {
 			})
 			.catch((error: any) => error);
 	}
+
+	/**
+	 * Send an email to restore password
+	 * @returns {Observable<R>}
+	 */
+	forgotPassword(userEmail: string): Observable<any[]> {
+		return this.http.get(`${this.authUrl}sendResetPasswordEmail?email=${userEmail}`)
+			.map((response: any) => {
+				return response && response.data;
+			})
+			.catch((error: any) => error);
+	}
 }
