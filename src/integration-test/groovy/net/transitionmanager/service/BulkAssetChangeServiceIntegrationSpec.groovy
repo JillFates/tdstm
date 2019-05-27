@@ -31,6 +31,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
@@ -44,7 +45,7 @@ import test.helper.PersonTestHelper
 
 @Integration
 @Rollback
-class BulkAssetChangeServiceIntegrationSpec extends  Specification{
+class BulkAssetChangeServiceIntegrationSpec extends  Specification implements AllAssetsFilterUnitTest {
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
 
@@ -187,12 +188,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 
 			now = TimeUtil.nowGMT().clearTime()
 
-			dataviewUserParamsCommand = [
-				sortDomain  : 'device',
-				sortProperty: 'id',
-				filters     : ['id': [1, 2, 3]]
-			] as DataviewUserParamsCommand
-
+			dataviewUserParamsCommand = new DataviewUserParamsCommand(allAssetsDataviewMap)
 			bulkChangeCommand = new BulkChangeCommand(
 				userParams: dataviewUserParamsCommand,
 				dataViewId: 1,
