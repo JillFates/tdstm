@@ -295,7 +295,7 @@ class AuthController implements ControllerMethods {
 	def getLoginInfo() {
 		renderSuccessJson([
 			buildVersion: environmentService.getVersionText(),
-			config: securityService.getLoginConfig(),
+			config: securityService.getConfigForLogin(),
 			notices: noticeService.getPreLoginNotices(),
 			sessionExpired: session.getAttribute(TdsHttpSessionRequestCache.SESSION_EXPIRED),
 			accountLockedOut: session.getAttribute(SecurityUtil.ACCOUNT_LOCKED_OUT)
