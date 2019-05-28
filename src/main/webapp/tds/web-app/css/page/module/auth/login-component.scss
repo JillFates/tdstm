@@ -25,9 +25,8 @@ div.login-component {
       font-weight: bold;
     }
 
-    .emailStatus {
-      padding: 8px 0px;
-      margin: 0em;
+    .ng-invalid-not-touched {
+      border: 1px solid $color--darkgray2;
     }
 
     form.login-form {
@@ -45,7 +44,7 @@ div.login-component {
       }
     }
 
-    div.login-iframe {
+    div.login-forgot-password-link {
       margin-top: 14px;
     }
 

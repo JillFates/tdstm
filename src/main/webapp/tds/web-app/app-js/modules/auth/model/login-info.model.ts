@@ -15,3 +15,16 @@ export class LoginInfoModel {
 		};
 	}
 }
+
+export interface ILoginModel {
+	authority: string;
+	username: string;
+	password: string;
+}
+
+export enum AuthorityOptions {
+	SELECT = 'select',
+	PROMPT = 'prompt',
+	HIDDEN = 'hidden',
+	NA = 'na'
+}
