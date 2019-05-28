@@ -1573,6 +1573,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				def defaultPrefs = [colorBy: 'group', appLbl: 'true', maxEdgeCount: '4']
 				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH)
 				def prefsObject = graphPrefs ? JSON.parse(graphPrefs) : defaultPrefs
+				def legendTwistiePref = userPreferenceService.getPreference(PREF.LEGEND_TWISTIE_STATE) ?: 'no'
 
 				// front end labels for the Color By groups
 				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocationName': 'Source Location', 'targetLocationName': 'Target Location']
@@ -1807,6 +1808,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.defaultsJson = defaults as JSON
 				model.defaultPrefs = defaultPrefs as JSON
 				model.graphPrefs = prefsObject
+				model.legendTwistiePref = legendTwistiePref
 				model.showControls = params.showControls
 				model.fullscreen = params.fullscreen ?: false
 				model.nodes = graphNodes as JSON
