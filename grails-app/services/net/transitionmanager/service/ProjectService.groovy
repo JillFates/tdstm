@@ -1100,9 +1100,9 @@ class ProjectService implements ServiceMethods {
 			roleTypeCodeFrom.id == 'COMPANY'
 			roleTypeCodeTo.id == 'STAFF'
 			partyIdFrom.id in partyGroupIds
-		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		}.projections {
+			property 'partyIdTo.id'
+		}.list()
 	}
 
 	/**
