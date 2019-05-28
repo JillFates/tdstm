@@ -5,7 +5,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
-
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
@@ -48,7 +48,8 @@ export class DataScriptViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataScriptService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+        private translatePipe: TranslatePipe) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
@@ -68,7 +69,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.dataScriptModel.provider = { id: 0, name: 'Select...' };
+					this.dataScriptModel.provider = { id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
 				}
 				this.providerList.push(...result);
 				let copy = {...this.dataScriptModel};
