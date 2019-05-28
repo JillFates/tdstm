@@ -1,21 +1,14 @@
-import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.SettingType
-import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.StringUtil
+import com.tdsops.tm.enums.domain.SettingType
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.SettingService
+import net.transitionmanager.service.ProjectService
 import org.apache.commons.lang3.BooleanUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
-import groovy.json.JsonSlurper
 import org.apache.commons.lang3.RandomStringUtils as RSU
-
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -60,7 +53,9 @@ class CustomDomainServiceTests extends Specification {
         [name:RSU.randomAlphabetic(10), description: 'Red'],
         [name:RSU.randomAlphabetic(10), description: 'Green'],
         [name:RSU.randomAlphabetic(10), description: 'Blue'],
-        [name:RSU.randomAlphabetic(10), description: 'Blue']
+        [name: RSU.randomAlphabetic(10), description: 'Blue'],
+        [name: RSU.randomAlphabetic(10), description: ''],
+        [name: RSU.randomAlphabetic(10), description: null]
     ]
 
     /**
