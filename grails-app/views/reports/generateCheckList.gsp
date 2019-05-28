@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess.toString().replace('[','').replace(']',''))}
+				<td><span style="color: green"><b>Staff</b></span>:${raw(clientAccess)}
 				</td>
 			</tr>
 			<tr>
@@ -64,26 +64,26 @@
 							<th>Team</th>
 						</thead>
 						<tbody>
-							<g:each in="${list}" var="staff" status="i">
-								<g:if test="${ list.size()>0}">
-									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-										<td>
-											${staff.name}
-										</td>
-										<td>
-											${staff.company}
-										</td>
-										<td>
-											${staff.role}
-										</td>
-									</tr>
-								</g:if>
-								<g:else>
-									<tr>
-										<td>No Staff for the Project</td>
-									</tr>
-								</g:else>
+						<g:if test="${projectStaffList}">
+							<g:each in="${projectStaffList}" var="staff" status="i">
+								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+									<td>
+										${staff.name}
+									</td>
+									<td>
+										${staff.company}
+									</td>
+									<td>
+										${staff.role}
+									</td>
+								</tr>
 							</g:each>
+						</g:if>
+						<g:else>
+							<tr>
+								<td>No Staff for the Project</td>
+							</tr>
+						</g:else>
 						</tbody>
 					</table>
 				</td>
