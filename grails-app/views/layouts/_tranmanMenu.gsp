@@ -102,7 +102,7 @@
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
-                            <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Project List</g:link>
+                            <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
                         </li>
                         <li class="divider"></li>
                         <g:if test="${currProject}">
