@@ -17,7 +17,7 @@
             </h1>
 
             <form action="signIn" name="loginForm" class="login-form"  #loginForm='ngForm' >
-                <div class="form-group has-authority" *ngIf="loginInfo.config.authorityPrompt === authorityOptions.SELECT">
+                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
                     {{loginInfo.config?.authorityLabel}}
                     <kendo-dropdownlist
                             [defaultItem]="'Select ' +loginInfo.config?.authorityLabel"
@@ -28,7 +28,7 @@
                     >
                     </kendo-dropdownlist>
                 </div>
-                <div class="form-group has-authority" *ngIf="loginInfo.config.authorityPrompt === authorityOptions.PROMPT">
+                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT">
                     {{'LOGIN.DOMAIN' | translate}}:
                     <input type="text" class="form-control authority" [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}" name="authority" [(ngModel)]="loginModel.authority" placeholder="Enter {{loginInfo.config?.authorityLabel}}" title="Enter {{loginInfo.config?.authorityLabel}}" autocorrect="off" autocapitalize="off" required>
                 </div>

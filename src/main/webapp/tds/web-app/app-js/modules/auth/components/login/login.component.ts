@@ -1,5 +1,5 @@
 // Angular
-import {AfterViewInit, Component} from '@angular/core';
+import {Component} from '@angular/core';
 // Service
 import {LoginService} from '../../service/login.service';
 // Models
@@ -10,7 +10,7 @@ import {AuthorityOptions, ILoginModel, LoginInfoModel} from '../../model/login-i
 	templateUrl: 'login.component.html',
 })
 
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent {
 
 	public loginInfo: LoginInfoModel = new LoginInfoModel();
 	public authorityOptions = AuthorityOptions;
@@ -24,24 +24,25 @@ export class LoginComponent implements AfterViewInit {
 		this.getLoginInfo();
 	}
 
-	ngAfterViewInit(): void {
-		setTimeout(() => {
-			let selector = '.username';
+	private loadFocus(): void {
+		let selector = '.username';
+		if (this.loginInfo && this.loginInfo.config) {
 			if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
 				selector = '.k-dropdown-wrap';
 			} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
 				selector = '.authority';
 			}
-			let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
-			if (inputField) {
-				inputField.focus();
-			}
-		}, 1000);
+		}
+		let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
+		if (inputField) {
+			inputField.focus();
+		}
 	}
 
 	private getLoginInfo(): void {
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
+			this.loadFocus();
 		});
 	}
 
