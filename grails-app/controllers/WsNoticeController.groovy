@@ -106,7 +106,7 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def fetchPostLoginNotices() {
-		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), getProjectForWs())
+		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), getProjectForWs(), request.getSession())
 		Map result = [
 				notices: notices,
 				redirectUri: session[SecurityUtil.REDIRECT_URI]

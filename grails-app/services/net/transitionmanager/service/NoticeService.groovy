@@ -140,13 +140,14 @@ class NoticeService implements ServiceMethods {
 	 * Return a list of person post login notices that has not been acknowledged that are either
 	 * global or based on the user's selected project
 	 * @param person - person requesting list notices
-	 * @param project - the project in the user's contect
+	 * @param project - the project in the user's context
+	 * @param session - current HTTP Session
 	 * @return
 	 */
-	List<Notice> fetchPostLoginNotices(Person person, Project project) {
+	List<Notice> fetchPostLoginNotices(Person person, Project project, HttpSession session) {
 
 		// If the HAS_UNACKNOWLEDGED_NOTICES variable is not set in the session, return an empty list.
-		if (session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+		if (session && session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
 			return []
 		}
 
