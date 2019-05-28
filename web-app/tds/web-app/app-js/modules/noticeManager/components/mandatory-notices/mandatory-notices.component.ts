@@ -4,6 +4,7 @@ import { DomSanitizer} from '@angular/platform-browser';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
@@ -16,18 +17,24 @@ import {NoticeCommonComponent} from './../notice-common'
 export class MandatoryNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
 	private currentNoticeIndex: number;
+	private postNoticesManager;
 
 	constructor(
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
+		protected userContextService: UserPostNoticesContextService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
 
 	ngOnInit() {
-		this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);
-		this.currentNoticeIndex = 0;
+		this.userContextService.getUserPostNoticesContext()
+		.subscribe((context) => {
+			this.postNoticesManager = context.postNoticesManager;
+			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);
+			this.currentNoticeIndex = 0;
+		});
 	}
 
 	/**
@@ -48,14 +55,14 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	 * On accept call the endpoint to marck the notice to not be shown again
 	*/
 	onAccept() {
-		this.noticeService
-		.setAcknowledge(this.notices[this.currentNoticeIndex].id)
-			.subscribe(() => {
-				if ((this.currentNoticeIndex + 1) >= this.notices.length) {
-					this.activeDialog.close();
-				} else {
-					this.currentNoticeIndex += 1;
-				}
-			}, (err) => console.error(err));
+		this.postNoticesManager
+			.setAcknowledge(this.notices[this.currentNoticeIndex].id)
+				.subscribe(() => {
+					if ((this.currentNoticeIndex + 1) >= this.notices.length) {
+						this.activeDialog.close();
+					} else {
+						this.currentNoticeIndex += 1;
+					}
+				}, (err) => console.error(err));
 	}
 }

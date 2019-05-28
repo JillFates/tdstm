@@ -7,6 +7,7 @@ import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
@@ -34,6 +35,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	noticeType: any;
 	noticeIsLocked: boolean;
 	typeDataSource = [...NoticeTypes];
+	minDate = null;
+	maxDate = null;
 	constructor(
 		private translate: TranslatePipe,
 		private originalModel: NoticeModel,
@@ -55,6 +58,15 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
 		this.noticeType = {typeId: this.model.typeId};
+
+		if (this.model.expirationDate) {
+			this.setMaxDate(this.model.expirationDate);
+		}
+
+		if (this.model.activationDate) {
+			this.setMinDate(this.model.activationDate);
+		}
+
 		this.dataSignature = JSON.stringify(this.model);
 	}
 
@@ -202,5 +214,34 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	onRawValueChange(value: string) {
 		this.model.rawText = value;
+	}
+
+	/**
+	 * Set the maximum value for the date range
+	 */
+	setMaxDate(value: any) {
+		this.maxDate = value;
+		if (this.model.activationDate && value <  this.convertToDate(this.model.activationDate)) {
+			this.model.expirationDate = '';
+		}
+	}
+
+	/**
+	 * Set the minimu value for the date range
+	*/
+	setMinDate(value: any) {
+		this.minDate = value;
+		if (this.model.expirationDate && value >  this.convertToDate(this.model.expirationDate)) {
+			this.model.activationDate = '';
+		}
+	}
+
+	/**
+	 * Could receive a string or date, based in the type make sure returns a date  object
+	 * @param {any} value:  String or Date to cast
+	 * @returns {date}
+	 */
+	private convertToDate(value: any): any {
+		return (value && value.toDateString) ? value : new Date(DateUtils.getDateFromGMT(value));
 	}
 }

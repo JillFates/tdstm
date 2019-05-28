@@ -348,5 +348,4 @@ export class DateUtils {
 		}
 		return null;
 	}
-
 }

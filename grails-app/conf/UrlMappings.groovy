@@ -578,6 +578,15 @@ class UrlMappings {
 		}
 
 		///// NOTICES API /////////
+
+
+		"/ws/notices/continue" {
+			controller = 'wsNotice'
+			action = [
+			    GET: 'clearNoticesWhenNoMandatoryLeft'
+			]
+		}
+
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [

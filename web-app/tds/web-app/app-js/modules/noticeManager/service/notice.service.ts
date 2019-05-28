@@ -4,7 +4,7 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {Observable} from 'rxjs/Observable';
 
-import {NoticeModel, PostNoticeResponse} from '../model/notice.model';
+import {NoticeModel, PostNoticeResponse, NOTICE_TYPE_POST_LOGIN, NOTICE_TYPE_MANDATORY} from '../model/notice.model';
 
 import 'rxjs/add/operator/map';
 
@@ -36,6 +36,9 @@ export class NoticeService {
 				let result = res.json();
 				result.notices.forEach( (notice: any) => {
 					notice = this.cleanNotice(notice);
+					if (notice.typeId === NOTICE_TYPE_POST_LOGIN && notice.needAcknowledgement) {
+						notice.typeId = NOTICE_TYPE_MANDATORY;
+					}
 				});
 				return result && result.notices;
 			})
@@ -99,6 +102,7 @@ export class NoticeService {
 	 * Get the post Notices to process
 	 * @returns any
 	 */
+	/*
 	getPostNotices(): Observable<PostNoticeResponse> {
 		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
 			.map((res: Response) => {
@@ -112,19 +116,7 @@ export class NoticeService {
 			})
 			.catch((error: any) => error.json());
 	}
-
-	/**
-	 * Set the Acknowledge state for a notice
-	 * @param {number} id:  Id of the notice
-	 * @returns NoticeModel
-	 */
-	setAcknowledge(id: number): Observable<NoticeModel> {
-		return this.http.post(`${this.singleNoticeUrl}/${id}/acknowledge`, '')
-			.map((res: Response) =>  {
-				return res.json();
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
-	}
+	*/
 
 	/**
 	 * Check the response, in case this is an JSON error coming from the server, respond appripately
@@ -148,11 +140,13 @@ export class NoticeService {
 	 */
 	private cleanNotice(notice: NoticeModel): any {
 		notice.typeId = notice.typeId.toString();
-		notice.expirationDate = notice.expirationDate ? new Date(notice.expirationDate) : '';
-		notice.activationDate = notice.activationDate ? new Date(notice.activationDate) : '';
 		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		notice.activationDate = notice.activationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		notice.expirationDate = notice.expirationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
 
 		return notice;
 	}
-
 }

@@ -56,6 +56,7 @@ export class NoticeListComponent implements OnInit {
 	protected resultSet: any[];
 	protected dateFormat = '';
 	protected notices = [];
+	protected noticesTypeDescriptions = {};
 
 	/**
 	 * @constructor
@@ -71,8 +72,7 @@ export class NoticeListComponent implements OnInit {
 		private windowService: WindowService) {
 		this.resultSet = this.route.snapshot.data['notices'];
 		this.gridData = process(this.resultSet, this.state);
-		this.noticeTypes = NoticeTypes.filter((noticeType) => noticeType.typeId !== NOTICE_TYPE_MANDATORY);
-
+		this.noticeTypes = [...NoticeTypes];
 	}
 
 	/**
@@ -82,6 +82,12 @@ export class NoticeListComponent implements OnInit {
 		this.notices = this.noticeTypes
 			.map((notice) => notice.name);
 
+		// Get the description text of the notices types
+		NoticeTypes.forEach((notice: any) => {
+			this.noticesTypeDescriptions[notice.typeId] = notice.name;
+		});
+
+		// Get the preferences to format dates
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 		.subscribe((dateFormat) => {
 			this.dateFormat = dateFormat;

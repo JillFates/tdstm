@@ -278,7 +278,7 @@ export const en_DICTIONARY: Object = {
 		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
 Post Login: Used for general notices after Login
 Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
-		'TOOLTIP_ACTIVE': 'Message will only appear when active as long as it is within the active / expiration date if set',
+		'TOOLTIP_ACTIVE': 'Notice will only appear when Active as long as it is within the Activation/Expiration date range if set',
 		'TOOLTIP_ACTIVATION_DATE': 'When set the notice will not appear before the date set otherwise it will be shown',
 		'TOOLTIP_EXPIRATION_DATE': 'When set the notice will stop being shown after the date',
 		'TOOLTIP_LOCKED': 'Once a notice is locked the Message Text and Post Message Text fields will become permanently read-only and can not be unlocked',
