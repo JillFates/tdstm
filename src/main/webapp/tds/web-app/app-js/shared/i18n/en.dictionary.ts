@@ -56,6 +56,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
+		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
 			'ARCHITECTURE_GRAPH': 'Arch Graph',
 			'ASSET' : 'Asset',
