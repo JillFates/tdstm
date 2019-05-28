@@ -17,6 +17,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public availableTeamNames;
 	public salaryOptions;
 	public activeOptions;
+	public canEditPerson = false;
 	public defaultImageURL = '../images/blankPerson.jpg'
 	public currentImageURL;
 	private teamKeys;
@@ -123,6 +124,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 				for (let i = 0; i < result.availableTeams.length; i++) {
 					this.teamKeys[result.availableTeams[i].description] = result.availableTeams[i].id;
 				}
+				this.canEditPerson = result.canEditPerson;
 			},
 			(err) => console.log(err));
 	}
@@ -175,7 +177,9 @@ export class UserManageStaffComponent extends UIExtraDialog {
 					}
 				});
 		} else {
-			this.editing = true;
+			if (this.canEditPerson) {
+				this.editing = true;
+			}
 		}
 	}
 }

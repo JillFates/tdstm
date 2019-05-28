@@ -52,7 +52,7 @@
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="getPersonList(${personList as JSON}, ${canCreatePerson})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="29" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
@@ -73,7 +73,7 @@
 													[defaultItem]="defaultItem"
 													[textField]="'fullName'"
 													[valueField]="'personId'"
-													[data]="getPersonList(${personList as JSON})">
+													[data]="getPersonList(${personList as JSON}, ${canCreatePerson})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}" tabindex="30"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
@@ -93,7 +93,7 @@
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="getPersonList(${personList as JSON}, ${canCreatePerson})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>

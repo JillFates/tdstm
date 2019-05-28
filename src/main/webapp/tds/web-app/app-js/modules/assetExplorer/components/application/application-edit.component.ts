@@ -159,10 +159,12 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
-		getPersonList(personList: any[]): any[] {
+		getPersonList(personList: any[], canCreatePerson): any[] {
 			if (!this.personList) {
 				this.personList = personList;
-				this.personList.unshift(this.addPersonItem)
+				if (canCreatePerson) {
+					this.personList.unshift(this.addPersonItem)
+				}
 			}
 			return this.personList;
 		}
