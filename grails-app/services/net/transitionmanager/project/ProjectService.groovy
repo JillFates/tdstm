@@ -1071,9 +1071,9 @@ class ProjectService implements ServiceMethods {
 			roleTypeCodeFrom.id == 'ROLE_PROJECT'
 			roleTypeCodeTo.id == 'ROLE_PARTNER'
 			partyIdFrom.id == projectId
-		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		}.projections {
+			property 'partyIdTo.id'
+		}.list()
 	}
 
 	/**
@@ -1105,9 +1105,9 @@ class ProjectService implements ServiceMethods {
 			roleTypeCodeFrom.id == 'ROLE_COMPANY'
 			roleTypeCodeTo.id == 'ROLE_STAFF'
 			partyIdFrom.id in partyGroupIds
-		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		}.projections {
+			property 'partyIdTo.id'
+		}.list()
 	}
 
 	/**
@@ -1154,29 +1154,38 @@ class ProjectService implements ServiceMethods {
 	 * @return
 	 */
 	List<Person> getAssociatedStaffByName(Project project, String nameFilter) {
+		List<Person> personList
+
 		// Fetch the ids of the staff associated with the project
 		List<Long> staffIds = getAssociatedStaffIds(project)
 
-		// Query that should retrieve all the invidividuals for this project matching the filter, if any.
-		String hqlQuery = "FROM Person p where id in (:staffIds)"
+		if( staffIds ) {
+			// Query that should retrieve all the invidividuals for this project matching the filter, if any.
+			String hqlQuery = "FROM Person p where id in (:staffIds)"
 
-		Map params = [staffIds: staffIds]
-		if (nameFilter && nameFilter.trim()) {
-			FieldSearchData fieldSearchData = new FieldSearchData([
-					column     : SqlUtil.personFullName(),
-					columnAlias: "personName",
-					domain     : Person,
-					filter     : nameFilter
-			])
+			Map params = [staffIds: staffIds]
+			if (nameFilter && nameFilter.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						  column     : SqlUtil.personFullName(),
+						  columnAlias: "personName",
+						  domain     : Person,
+						  filter     : nameFilter
+				])
 
-			SqlUtil.parseParameter(fieldSearchData)
+				SqlUtil.parseParameter(fieldSearchData)
 
-			String nameCondition = fieldSearchData.sqlSearchExpression
-			params.putAll(fieldSearchData.sqlSearchParameters)
-			hqlQuery += " AND $nameCondition"
+				String nameCondition = fieldSearchData.sqlSearchExpression
+				params.putAll(fieldSearchData.sqlSearchParameters)
+				hqlQuery += " AND $nameCondition"
+			}
+
+			personList = Person.executeQuery ( hqlQuery, params )
+
+		} else {
+			personList = []
 		}
 
-		return Person.executeQuery ( hqlQuery, params )
+		return personList
 	}
 
 
