@@ -136,6 +136,23 @@ class NoticeService implements ServiceMethods {
 		return result ? (result[0] > 0) : false
 	}
 
+
+	/**
+	 * Fetch all the valid pre login notices. These must be active and be between the activation/expiration
+	 * date range. Results are sorted by their sequence number.
+	 * @return a list with the valid pre login notices.
+	 */
+	List<Notice> fetchPreLoginNotices() {
+		Date now = new Date()
+		return Notice.where {
+			typeId == NoticeType.PRE_LOGIN
+			active == true
+			activationDate == null || activationDate < now
+			expirationDate == null || expirationDate > now
+
+		}.order('sequence').list()
+	}
+
 	/**
 	 * Return a list of person post login notices that has not been acknowledged that are either
 	 * global or based on the user's selected project
