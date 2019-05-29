@@ -56,6 +56,7 @@ import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.component';
 import {BreadcrumbNavigationComponent} from './modules/header/components/breadcrumb-navigation/breadcrumb-navigation.component';
 import {HeaderComponent} from './modules/header/components/header/header.component';
+import {FooterComponent} from './modules/footer/components/footer.component';
 import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
 import {LicenseWarningComponent} from './modules/header/components/license-warning/license-warning.component';
 import {UserManageStaffComponent} from './modules/header/components/manage-staff/user-manage-staff.component';
@@ -121,6 +122,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UIDialogDirective,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		FooterComponent,
 		UserPreferencesComponent,
 		UserEditPersonComponent,
 		UserDateTimezoneComponent,
@@ -183,6 +185,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		EscapeUrlEncodingPipe,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		FooterComponent,
 		UserPreferencesComponent,
 		UserEditPersonComponent,
 		UserDateTimezoneComponent,

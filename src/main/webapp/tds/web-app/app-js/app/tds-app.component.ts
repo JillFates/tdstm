@@ -27,6 +27,7 @@ import {NotifierService} from '../shared/services/notifier.service';
             </div>
             <!-- /.container -->
         </div>
+		<tds-footer></tds-footer>
 	`,
 })
 
