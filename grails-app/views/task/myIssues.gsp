@@ -404,7 +404,7 @@ setFocus();
 	var progressTimer;
 
 	$(document).ready(function() {
-		progressTimer = new ProgressTimer(40, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.MYTASKS_REFRESH}', null);
+		progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.MYTASKS_REFRESH}', null);
 
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#createEntityView").dialog({ autoOpen: false })
