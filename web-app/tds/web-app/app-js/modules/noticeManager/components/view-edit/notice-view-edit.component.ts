@@ -216,6 +216,13 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	}
 
 	/**
+	 * Change to edit mode
+	 */
+	protected editNotice(): void {
+		this.action = ActionType.Edit;
+	}
+
+	/**
 	 * Grab the current html value emitted by rich text editor
 	 */
 	onValueChange(value: string) {
