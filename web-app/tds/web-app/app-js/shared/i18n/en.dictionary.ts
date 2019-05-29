@@ -265,6 +265,7 @@ export const en_DICTIONARY: Object = {
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'CREATE_NOTICE': 'Create Notice',
+		'SHOW_NOTICE': 'Notice Detail',
 		'EULA': 'End User License Agreement',
 		'EDIT_NOTICE': 'Edit Notice',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
