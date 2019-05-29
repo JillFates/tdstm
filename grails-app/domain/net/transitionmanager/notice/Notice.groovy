@@ -3,6 +3,7 @@ package net.transitionmanager.notice
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 
@@ -55,7 +56,7 @@ class Notice {
 
 	Person createdBy
 	Date   dateCreated
-	Date   lastModified
+	Date   lastModified = new Date()
 
 	Collection noticeAcknowledgements
 
@@ -84,34 +85,37 @@ class Notice {
 		}
 	}
 
-	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.nowGMT()
+		// Prevent users from unlocking a record
+		if ( this.isDirty('locked') && this.locked == false ) {
+			if ( this.getPersistentValue('locked') == true ) {
+				throw new InvalidParamException('Previous locked Notices can not be unlocked')
+			}
+		}
 	}
 
 	private static final Map<String, Class> MARSHALLER_TYPES = [
+		acknowledgeLabel:	Object,
+		activationDate:  	Date,
+		active:          	Object,
+		createdBy:       	Person,
+		dateCreated:     	Object,
+		expirationDate:  	Date,
+		htmlText:        	Object,
+		id:              	Object,
+		lastModified:    	Object,
+		locked:			 	Object,
 		needAcknowledgement: Object,
-		active:          Object,
-		createdBy:       Person,
-		dateCreated:     Object,
-		expirationDate:  Object,
-		htmlText:        Object,
-		id:              Object,
-		lastModified:    Object,
-		project:         Project,
-		rawText:         Object,
-		title:           Object,
-		typeId:          NoticeType,
-		activationDate:  Date,
-		expirationDate:  Date
+		project:         	Project,
+		rawText:         	Object,
+		sequence:		 	Object,
+		title:           	Object,
+		typeId:          	NoticeType
 	]
 
 	static void registerObjectMarshaller() {
 		JSON.registerObjectMarshaller(Notice) { Notice notice ->
 			Map jsonData = [:]
-
 			MARSHALLER_TYPES.each { String name, Class type ->
 				def value = notice[name]
 
