@@ -222,10 +222,18 @@ var tdsCommon = {
                     alert(response.errors);
                 } else {
                 	if(response.responseText) {
-                        alert(JSON.parse(response.responseText).errors);
-					} else {
+                        var responseJson = JSON.parse(response.responseText);
+                        if (responseJson.errors) {
+                            alert(responseJson.errors);
+                        } else {
+							isValid = true;
+							if(responseJson.data) {
+                                data = responseJson.data;
+                            }
+						}
+                    } else {
                         alert("An error occurred while updating and/or updating information");
-                    }
+					}
                 }
             }
         }
