@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.notice.NoticeService
@@ -77,7 +78,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
-				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(userLogin.person)
+				Project project = securityService.userCurrentProject
+				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
 				if (hasUnacknowledgedNotices) {
 					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
 					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
