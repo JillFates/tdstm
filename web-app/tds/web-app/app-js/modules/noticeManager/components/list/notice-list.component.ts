@@ -216,7 +216,8 @@ export class NoticeListComponent implements OnInit {
 
 	/**
 	 * Open a notice view
-	 * @param {NoticeModel} dataItem
+	 * @param {NoticeModel} dataItem Contain the notice object
+	 * @param {ActionType} action Mode in which open the view (Create, Edit, etc...)
 	 */
 	public openNotice(dataItem: NoticeModel, action: ActionType): void {
 		this.noticeService.getNotice(dataItem.id)

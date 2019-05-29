@@ -14,7 +14,7 @@
                             title="{{'NOTICE.TOOLTIP_TITLE' | translate}}"
                             [(ngModel)]="model.title" required>
                         <ng-template #noticeTitleView>
-                            <div>{{model.title}}</div>
+                            <label class="control-label label-detail">{{model.title}}</label>
                         </ng-template>
                     </div>
                 </div>
@@ -37,20 +37,20 @@
                         </kendo-dropdownlist>
 
                         <ng-template #noticeTypeView>
-                            <div>{{typeName}}</div>
+                            <label class="control-label label-detail">{{typeName}}</label>
                         </ng-template>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="checkActive" class="col-sm-3 control-label">Active:</label>
-                    <div class="col-sm-9 checkbox">
+                    <div class="col-sm-9">
                         <label  *ngIf="action !== EnumActionType.View; else noticeActiveView">
-                            <input title="{{'NOTICE.TOOLTIP_ACTIVE' | translate}}" 
+                            <input class="checkbox" title="{{'NOTICE.TOOLTIP_ACTIVE' | translate}}" 
                             id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
                         </label>
 
                         <ng-template #noticeActiveView>
-                            <div>{{model.active ? 'Yes' : 'No'}}</div>
+                            <label class="control-label label-detail">{{model.active | tdsUIBoolean}}</label>
                         </ng-template>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             [(ngModel)]="model.activationDate">
                         </tds-date-control>
                         <ng-template #noticeActivationDateView>
-                            <div *ngIf="model.activationDate">{{model.activationDate | tdsDate : userDateFormat}}</div>
+                            <label class="control-label label-detail" *ngIf="model.activationDate">{{model.activationDate | tdsDate : userDateFormat}}</label>
                         </ng-template>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                             [(ngModel)]="model.expirationDate">
                         </tds-date-control>
                         <ng-template #noticeExpirationDateView>
-                            <div *ngIf="model.expirationDate">{{model.expirationDate | tdsDate : userDateFormat}}</div>
+                            <label class="control-label label-detail" *ngIf="model.expirationDate">{{model.expirationDate | tdsDate : userDateFormat}}</label>
                         </ng-template>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                             [autoCorrect]="true">
                         </kendo-numerictextbox>
                         <ng-template #noticeSequenceView>
-                            <div>{{model.sequence}}</div>
+                            <label class="control-label label-detail">{{model.sequence}}</label>
                         </ng-template>
                     </div>
 	                <div class="col-sm-2">
@@ -114,9 +114,10 @@
                 </div>
                 <div class="form-group">
 		            <label for="locked" class="col-sm-3 control-label">Locked:</label>
-                    <div class="col-sm-9 checkbox">
+                    <div class="col-sm-9">
                         <label *ngIf="action !== EnumActionType.View; else noticeLockedView">
                             <input 
+                                class="checkbox"
                                 [disabled]="noticeIsLocked" 
                                 [ngClass]="{'is-disabled': noticeIsLocked}" 
                                 title="{{'NOTICE.TOOLTIP_LOCKED' | translate}}"
@@ -126,14 +127,14 @@
                                 [(ngModel)]="model.locked">
                         </label>
                         <ng-template #noticeLockedView>
-                            <div>{{model.locked ? 'Yes' : 'No'}}</div>
+                            <label class="control-label label-detail">{{model.locked | tdsUIBoolean }}</label>
                         </ng-template>
 	                </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-12 control-label required-field vertical-label">Message:</label>
-                    <div class="col-sm-12">
+                    <div class="col-sm-12" [ngClass]="{'readonly-control': noticeIsLocked}">
                         <rich-text-editor
                             [readonly]="noticeIsLocked || action === EnumActionType.View"
                             #htmlTextField
@@ -160,7 +161,7 @@
                             [(ngModel)]="model.acknowledgeLabel">
 
                         <ng-template #noticeAcknowledgeView>
-                            <div>{{model.acknowledgeLabel}}</div>
+                            <label class="control-label label-detail">{{model.acknowledgeLabel}}</label>
                         </ng-template>                            
                     </div>
                 </div>
