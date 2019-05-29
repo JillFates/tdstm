@@ -172,7 +172,7 @@
         <button (click)="editNotice()" *ngIf="action === EnumActionType.View" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-pencil"></span>{{ 'GLOBAL.EDIT' | translate }}</button>
         <button (click)="saveNotice()" *ngIf="action !== EnumActionType.View" [disabled]="!formValid() || !isCreateEditAvailable() || !isDirty()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
         <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
-        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action === EnumActionType.Edit" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
+        <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action !== EnumActionType.Create" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
         <button (click)="cancelCloseDialog()" *ngIf="action === EnumActionType.Edit || action === EnumActionType.Create" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
         <button (click)="cancelCloseDialog()" *ngIf="action === EnumActionType.View" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
     </div>
