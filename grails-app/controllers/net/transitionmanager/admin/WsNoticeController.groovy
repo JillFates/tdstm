@@ -5,6 +5,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.NoticeCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.notice.Notice
 import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.security.Permission
@@ -18,24 +19,18 @@ class WsNoticeController implements ControllerMethods {
 	NoticeService noticeService
 
 	/**
-	 * Fetch using pType
+	 * Fetch using Type
 	 * We might expand this to add different type of filters
 	 */
 	@HasPermission(Permission.NoticeView)
 	def fetch(Integer typeId) {
-		try {
-			Notice.NoticeType type
-
-			if (typeId) {
-				type = Notice.NoticeType.forId(typeId)
-			}
-
-			List<Notice> notices = noticeService.fetch(type)
-			renderAsJson(notices: notices)
+		Notice.NoticeType type
+		if (typeId) {
+			type = Notice.NoticeType.forId(typeId)
 		}
-		catch (e) {
-			renderError500 e
-		}
+
+		List<Notice> notices = noticeService.fetch(type)
+		renderAsJson(notices: notices)
 	}
 
 	/**
@@ -43,23 +38,18 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.NoticeView)
 	def fetchById(Long id) {
-		try {
-			Notice notice = noticeService.get(id)
-			if (!notice) {
-				response.status = 404
-			}
-			renderAsJson notice
+		Notice notice = noticeService.get(id)
+		if (!notice) {
+			throw new EmptyResultException()
 		}
-		catch (e) {
-			renderError500 e
-		}
+		renderAsJson notice
 	}
 
 	/**
 	 * Insert/Update Notice
 	 *
 	 * Example:
-	 *{* 		"title":"titulo",
+	 *{* 	"title":"titulo",
 	 * 		"rawText":"este es el Mensaje",
 	 * 		"htmlText":"<strong>este es el Mensaje</strong>",
 	 * 		"type":"PRE_LOGIN"
@@ -90,51 +80,35 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.NoticeDelete)
 	def delete(Long id) {
-		try {
-			boolean result = noticeService.delete(id)
-			if (!result) {
-				response.status = 404
-			}
-			renderAsJson(notices: [])
+		boolean result = noticeService.delete(id)
+		if (!result) {
+			throw new EmptyResultException()
 		}
-		catch (e) {
-			renderError500 e
-		}
+		renderSuccessJson()
 	}
 
 	/**
 	 * Mark a Note Acknowledged by a User
-	 * TODO: (oluna) Still need to review the case of don't having a Person for the UserLogin (@see NoticeService::ack)
+	 * @param id - the id of the notice that the current user is acknowledging
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
-	def acknowledge(Long id, String username) {
-		try {
-			boolean result = noticeService.ack(id, username)
-			if (!result) {
-				response.status = 404
-			}
-			render("")
-		}
-		catch (e) {
-			renderError500 e
-		}
+	def acknowledge(Long id) {
+		boolean result = noticeService.acknowledge(id, currentPerson() )
+		renderSuccessJson()
 	}
 
 	/**
 	 * Fetch a list of person post notices that has not been acknowledged
 	 */
-	@HasPermission(Permission.NoticeView)
+	@HasPermission(Permission.UserGeneralAccess)
 	def fetchPostLoginNotices() {
-		def result = [
-				notices: noticeService.fetchPersonPostLoginNotices(currentPerson()),
-				redirectUri: session[SecurityUtil.REDIRECT_URI]
+		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), getProjectForWs())
+		Map result = [
+			notices: notices,
+			redirectUri: session[SecurityUtil.REDIRECT_URI]
 		]
 
 		renderSuccessJson(result)
 	}
 
-	private void renderError500(Exception e) {
-		response.status = 500
-		renderAsJson(errors: [e.message])
-	}
 }

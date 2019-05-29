@@ -4,45 +4,34 @@ package net.transitionmanager.notice
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.NoticeCommand
-import net.transitionmanager.notice.Notice
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.notice.Notice.NoticeType
 import net.transitionmanager.person.Person
-import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
-import org.springframework.context.MessageSource
 
 /**
  * @author octavio
  */
 class NoticeService implements ServiceMethods {
 
-	MessageSource messageSource
-	PersonService personService
-
 	/**
-	 * Set Acknowledment of a Note for a User
-	 * TODO: (oluna) What Happen if the user doesn't have a Person associated should we change this to UserLogin Type?
+	 *  Used to record when a user has acknowledged a notice
+	 * @param id - the ID of the notice to be acknowledged
+	 * @param person - the person whom is acknowledging the notice
+	 * @return void
 	 */
 	@Transactional
-	boolean ack(Long id, String username) {
-		log.info('User: {}, is acknowledging notice: {}', username, id)
-
-		Notice notice = get(id)
+	void acknowledge(Long id, Person person) {
+		log.info 'Person: {}, is acknowledging notice: {}', person, id
+		Notice notice = Notice.read(id)
 		if (!notice) {
-			return false
+			throw new EmptyResultException()
 		}
-
-		Person person = personService.findByUsername(username)
-		if (!person) {
-			return false
-		}
-
-		NoticeAcknowledgement notack = new NoticeAcknowledgement(notice: notice, person: person)
-		notack.save(failOnError: true)
-
-		return !notack.hasErrors()
+		NoticeAcknowledgement acknowledgement = new NoticeAcknowledgement(notice: notice, person: person)
+		acknowledgement.save(failOnError: true)
 	}
 
 	/**
@@ -60,8 +49,12 @@ class NoticeService implements ServiceMethods {
 	 * @param type - notice type filter
 	 * @return - a list of notices filtered by type or all if filter is null
 	 */
-	List<Notice> fetch(Notice.NoticeType type = null) {
-		type ? Notice.findAllByTypeId(type) : Notice.list()
+	List<Notice> fetch(Notice.NoticeType noticeType = null) {
+		Notice.where {
+			if (noticeType) {
+				typeId == noticeType
+			}
+		}.list()
 	}
 
 	/**
@@ -93,72 +86,82 @@ class NoticeService implements ServiceMethods {
 	}
 
 	/**
-	 * Check for any unacknowledged notices
+	 * Check for any unacknowledged notices for a user using their current project context
 	 * @param person
-	 * @return
+	 * @return true if there are any unacknowledged notices
 	 */
 	Boolean hasUnacknowledgedNotices(Person person) {
-		Date now = TimeUtil.nowGMT()
-		log.info('Check if person: [{}] has unacknowledged notices.', person.id)
-
-		def result = Notice.withCriteria {
-			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ack.person", person))
-			eq('active', true)
-			eq('project', securityService.userCurrentProject)
-			and {
-				or {
-					isNull('activationDate')
-					lt('activationDate', now)
-				}
-				or {
-					isNull('expirationDate')
-					gt('expirationDate', now)
-				}
-			}
-			isNull('ack.person')
-
-			projections {
-				count()
-			}
-		}
-
-		if (!result) {
-			return false
-		}
-
-		return result[0] > 0
+		Project project = securityService.userCurrentProject
+		return  hasUnacknowledgedNotices(person, project)
 	}
 
 	/**
-	 * Return a list of person post login notices that has not been acknowledged
-	 * @param person - person requesting list notices
+	 * Check for any unacknowledged notices
+	 * @param person
+	 * @param project - the project currently selected in the user's context
 	 * @return
 	 */
-	List<Notice> fetchPersonPostLoginNotices(Person person) {
-		Date now = TimeUtil.nowGMT()
-		log.info('List person: [{}] post login notices.', person.id)
+	Boolean hasUnacknowledgedNotices(Person person, Project project) {
+		Closure criteriaClosure = {
+			unacknowledgedNoticesCriteriaClosure.delegate = delegate
+			unacknowledgedNoticesCriteriaClosure(person, project, new Date())
 
-		def result = Notice.withCriteria {
-			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
-			eq('active', true)
-			eq('typeId', NoticeType.POST_LOGIN)
-			eq('project', securityService.userCurrentProject)
-			and {
-				or {
-					isNull('activationDate')
-					lt('activationDate', now)
-				}
-				or {
-					isNull('expirationDate')
-					gt('expirationDate', now)
-				}
-			}
-			isNull('ack.person')
+			projections { count () }
+		}
+
+		List result = Notice.createCriteria().list(criteriaClosure)
+		return result ? (result[0] > 0) : false
+	}
+
+	/**
+	 * Return a list of person post login notices that has not been acknowledged that are either
+	 * global or based on the user's selected project
+	 * @param person - person requesting list notices
+	 * @param project - the project in the user's contect
+	 * @return
+	 */
+	List<Notice> fetchPostLoginNotices(Person person, Project project) {
+		Closure criteriaClosure = {
+			unacknowledgedNoticesCriteriaClosure.delegate = delegate
+			unacknowledgedNoticesCriteriaClosure(person, project, new Date())
 
 			order('needAcknowledgement', 'desc')
 			order('sequence', 'desc')
+			order('dateCreated', 'asc')
 		}
 
-		return result
+		List<Notice> list = Notice.createCriteria().list(criteriaClosure)
+
+		return list
+	}
+
+
+	/**
+	 * Returns a criteria that has the query to find active Notices that have not been
+	 * acknowledged by a particular person and optional project as of this moment
+	 * @param person - person requesting list notices
+	 * @param project - the project in the user's contect
+	 * @param now - the current datetime
+	 * @return a closure for the query
+	 */
+	Closure unacknowledgedNoticesCriteriaClosure = { Person person, Project project, Date now ->
+		createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
+		eq('active', true)
+		eq('typeId', NoticeType.POST_LOGIN)
+		isNull('ack.person')
+		or {
+			isNull('project')
+			eq('project', project)
+		}
+		and {
+			or {
+				isNull('activationDate')
+				lt('activationDate', now)
+			}
+			or {
+				isNull('expirationDate')
+				gt('expirationDate', now)
+			}
+		}
 	}
 }

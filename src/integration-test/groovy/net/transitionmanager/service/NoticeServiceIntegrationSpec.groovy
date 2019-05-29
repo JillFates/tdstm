@@ -44,6 +44,9 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		project = projectHelper.createProject()
 
+		// Delete all notices
+		Notice.executeUpdate('delete from Notice')
+
 		whom = personHelper.createPerson()
 		user = personHelper.createUserLoginWithRoles(whom, [], project, false)
 
@@ -172,7 +175,7 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		when: 'person acknowledge a notice'
 			println(GormUtil.domainObjectToMap(user))
-			noticeService.ack(notice.id, user.username)
+			noticeService.acknowledge(notice.id, user.person)
 
 		then: 'person does not have more notices to acknowledge'
 			!noticeService.hasUnacknowledgedNotices(whom)
