@@ -1,7 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import groovy.transform.CompileStatic
-import net.transitionmanager.command.DataviewApiFilterParam
+import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.InvalidParamException

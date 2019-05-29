@@ -1,9 +1,9 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.command.DataviewApiFilterParam
-import net.transitionmanager.command.DataviewApiParamsCommand
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewApiFilterParam
+import net.transitionmanager.command.dataview.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.InvalidParamException

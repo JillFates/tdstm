@@ -13,10 +13,10 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.command.DataviewApiFilterParam
-import net.transitionmanager.command.DataviewApiParamsCommand
-import net.transitionmanager.command.DataviewNameValidationCommand
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewApiFilterParam
+import net.transitionmanager.command.dataview.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewNameValidationCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject

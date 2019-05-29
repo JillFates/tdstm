@@ -1,4 +1,4 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
 import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import spock.lang.Specification

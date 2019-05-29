@@ -3,7 +3,7 @@ package net.transitionmanager.service.dataview
 import com.tdsops.etl.FieldSpecValidateableTrait
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject

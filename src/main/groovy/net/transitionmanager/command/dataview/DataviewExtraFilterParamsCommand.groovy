@@ -1,6 +1,7 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
 import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.command.CommandObject
 import net.transitionmanager.service.dataview.ExtraFilter
 
 /**

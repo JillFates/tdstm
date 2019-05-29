@@ -1,6 +1,7 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.command.CommandObject
 
 /**
  * The DataviewApiParamsCommand is used to filter API dataviews requests

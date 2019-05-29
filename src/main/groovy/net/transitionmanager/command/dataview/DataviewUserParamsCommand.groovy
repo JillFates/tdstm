@@ -1,6 +1,7 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
 import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.command.CommandObject
 
 /**
  * The {@code DataviewUserParamsCommand} represents the various parameters that make up the properties

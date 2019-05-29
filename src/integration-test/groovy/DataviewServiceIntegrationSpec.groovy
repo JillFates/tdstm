@@ -2,7 +2,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.imports.DataviewService

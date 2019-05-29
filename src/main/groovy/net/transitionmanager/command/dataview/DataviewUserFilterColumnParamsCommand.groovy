@@ -1,6 +1,6 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
-import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.command.CommandObject
 
 /**
  * <p>It represents a column part in the dataview filters used in the client side to filter a dataview content.</p>
