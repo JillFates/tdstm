@@ -55,6 +55,7 @@ export class HeaderComponent {
 	private pageMetaData: {
 		id: any,
 		title: string,
+		pageTitle?: string,
 		instruction: string,
 		menu: Array<string>,
 		topMenu: any
@@ -111,7 +112,7 @@ export class HeaderComponent {
 				const {report} = event.route.snapshot.data;
 				this.pageMetaData.id = report && report.id;
 				// Set Title
-				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));
+				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.pageTitle || this.pageMetaData.title || '', []));
 				this.selectTopMenuSections();
 			}
 		});
