@@ -215,6 +215,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onAddCustom(): void {
 		this.setIsDirty(true);
+		this.formHasError = true;
 
 		this.addEmitter.emit((custom) => {
 			this.state.sort = [
