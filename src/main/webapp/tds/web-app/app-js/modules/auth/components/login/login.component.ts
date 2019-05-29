@@ -1,5 +1,5 @@
 // Angular
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 // Service
 import {LoginService} from '../../service/login.service';
 // Models
@@ -10,7 +10,7 @@ import {AuthorityOptions, ILoginModel, LoginInfoModel} from '../../model/login-i
 	templateUrl: 'login.component.html',
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 	public loginInfo: LoginInfoModel = new LoginInfoModel();
 	public authorityOptions = AuthorityOptions;
@@ -19,30 +19,32 @@ export class LoginComponent {
 		username: '',
 		password: ''
 	};
+	public defaultAuthorityItem: string;
 
 	constructor(private loginService: LoginService) {
-		this.getLoginInfo();
 	}
 
-	private loadFocus(): void {
-		let selector = '.username';
-		if (this.loginInfo && this.loginInfo.config) {
-			if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
-				selector = '.k-dropdown-wrap';
-			} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
-				selector = '.authority';
-			}
-		}
-		let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
-		if (inputField) {
-			inputField.focus();
-		}
-	}
-
-	private getLoginInfo(): void {
+	ngOnInit(): void {
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
-			this.loadFocus();
+			setTimeout(() => {
+				let selector = '.username';
+				if (this.loginInfo && this.loginInfo.config) {
+					if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
+						this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
+						this.loginModel.authority = this.defaultAuthorityItem;
+						selector = '.k-dropdown-wrap';
+					} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
+						selector = '.authority';
+					} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.HIDDEN) {
+						this.loginModel.authority = this.loginInfo.config.authorityName;
+					}
+				}
+				let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
+				if (inputField) {
+					inputField.focus();
+				}
+			});
 		});
 	}
 

@@ -20,7 +20,8 @@
                 <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
                     {{loginInfo.config?.authorityLabel}}
                     <kendo-dropdownlist
-                            [defaultItem]="'Select ' +loginInfo.config?.authorityLabel"
+                            name="authority"
+                            [defaultItem]="defaultAuthorityItem"
                             [valuePrimitive]="true"
                             [(ngModel)]="loginModel.authority"
                             [data]="loginInfo.config.authorityList"
