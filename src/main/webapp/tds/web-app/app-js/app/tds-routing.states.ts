@@ -20,6 +20,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'license/manager', loadChildren: '../modules/licenseManager/license-manager.module#LicenseManagerModule'},
 	{path: 'notice', loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'},
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
+	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
 ];
 
 @NgModule({
