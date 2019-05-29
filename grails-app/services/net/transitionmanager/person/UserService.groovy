@@ -2,6 +2,7 @@ package net.transitionmanager.person
 
 import net.transitionmanager.asset.Application
 import com.tdsops.common.builder.UserAuditBuilder
+import net.transitionmanager.common.EnvironmentService
 import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -47,6 +48,7 @@ class UserService implements ServiceMethods {
 	AuditService             auditService
 	MetricReportingService   metricReportingService
 	MoveEventService         moveEventService
+	EnvironmentService 		 environmentService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -762,7 +764,8 @@ class UserService implements ServiceMethods {
 			moveBundle: moveBundle,
 			timezone: timezone,
 			dateFormat: dateFormat,
-			logoUrl: projectService.getProjectLogoUrl(project)
+			logoUrl: projectService.getProjectLogoUrl(project),
+			buildVersion: environmentService.getVersionText(),
 		]
 		return new UserContext(contextParams)
 	}

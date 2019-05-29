@@ -1,5 +1,5 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 // Component
 import {UserPreferencesComponent} from '../preferences/user-preferences.component';
 import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
@@ -22,7 +22,7 @@ declare var jQuery: any;
 	templateUrl: 'header.component.html',
 })
 
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
 	public userContext: UserContextModel;
 	public pageMetaData: PageMetadataModel = new PageMetadataModel();
@@ -33,16 +33,6 @@ export class HeaderComponent implements OnInit {
 		private notifierService: NotifierService) {
 		this.getUserContext();
 		this.headerListeners();
-	}
-
-	ngOnInit(): void {
-		/**
-		 * AdminLTE is main js that handles the layout, this could me removed later when implementing the footer
-		 */
-		if (jQuery.AdminLTE && jQuery.AdminLTE.layout) {
-			jQuery.AdminLTE.layout.fix();
-		}
-		jQuery('.main-footer').show();
 	}
 
 	/**

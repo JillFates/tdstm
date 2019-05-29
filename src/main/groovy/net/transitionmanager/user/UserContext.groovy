@@ -24,6 +24,8 @@ class UserContext {
 
 	String logoUrl
 
+	String buildVersion
+
 
 	/**
 	 * Create and return a map representation of the User's context with only a selection of fields.
@@ -62,7 +64,8 @@ class UserContext {
 			event: eventMap,
 			bundle: bundleMap,
 			timezone: timezone,
-			dateFormat: dateFormat
+			dateFormat: dateFormat,
+			buildVersion: buildVersion,
 		]
 	}
 }

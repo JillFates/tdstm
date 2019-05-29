@@ -8,6 +8,7 @@ export class UserContextModel {
 	user: any;
 	licenseInfo: any;
 	permissions: any[];
+	buildVersion: string;
 }
 
 export enum USER_CONTEXT_REQUEST {
