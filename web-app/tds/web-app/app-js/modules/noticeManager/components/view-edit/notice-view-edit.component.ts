@@ -68,7 +68,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		if (this.model.needAcknowledgement) {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
-		this.noticeType = {typeId: this.model.typeId};
+
+		this.noticeType = {typeId: this.model && this.model.typeId || null};
 
 		if (this.model.expirationDate) {
 			this.setMaxDate(this.model.expirationDate);

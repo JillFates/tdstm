@@ -10,7 +10,7 @@
                     <label for="inputTitle" class="col-sm-3 control-label required-field">Title:</label>
                     <div class="col-sm-9">
                         <input *ngIf="action !== EnumActionType.View; else noticeTitleView" 
-                            type="text" name="title" id="inputTitle" class="form-control" placeholder="Notice Title"
+                            type="text" name="title" id="inputTitle" class="form-control"
                             title="{{'NOTICE.TOOLTIP_TITLE' | translate}}"
                             [(ngModel)]="model.title" required>
                         <ng-template #noticeTitleView>
