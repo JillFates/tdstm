@@ -294,7 +294,7 @@
 				        [(ngModel)]="dataItem.default"
 				        [disabled]="dataItem.toBeDeleted"
 				        [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}">
-					<option value="">Select...</option>
+					<option value="">{{ 'GLOBAL.SELECT_PLACEHOLDER' | translate }}</option>
 					<option *ngFor="let c of dataItem.constraints.values" [ngValue]="c">{{c}}</option>
 				</select>
 			</div>
