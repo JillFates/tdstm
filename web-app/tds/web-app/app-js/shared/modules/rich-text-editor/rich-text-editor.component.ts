@@ -4,7 +4,9 @@ import {
 	AfterViewInit,
 	EventEmitter,
 	Input,
-	Output
+	Output,
+	SimpleChanges,
+	OnChanges
 } from '@angular/core';
 
 declare var tinymce: any;
@@ -14,7 +16,7 @@ declare var tinymce: any;
 	template: `<textarea name="{{name}}" id="{{elementId}}" [required]="required">{{value}}</textarea>`,
 	exportAs: 'richTextEditor'
 })
-export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
+export class RichTextEditorComponent implements AfterViewInit, OnDestroy, OnChanges {
 
 	private isPristine = true;
 
@@ -39,7 +41,6 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 			statusbar: false,
 			menu: {},
 			height: 250,
-			content_style: this.readonly ? 'body#tinymce {background-color: #eee; cursor: not-allowed}' : '',
 			readonly: this.readonly,
 			skin_url: '../../dist/js/vendors/tinymce/lightgray',
 			setup: editor => {
@@ -92,5 +93,18 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy {
 	setPristine(): void {
 		this.editor.setContent('');
 		this.isPristine = true;
+	}
+
+	/**
+	 * On changes on readonly property update the control  mode
+	 */
+	ngOnChanges(changes: SimpleChanges) {
+		if (changes.readonly && this.editor) {
+			if (changes.readonly.currentValue) {
+				this.editor.setMode('readonly');
+			} else {
+				this.editor.setMode('design');
+			}
+		}
 	}
 }
