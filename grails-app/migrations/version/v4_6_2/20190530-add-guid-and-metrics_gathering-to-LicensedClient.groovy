@@ -2,18 +2,26 @@ package version.v4_6_2
 
 databaseChangeLog = {
 
-	changeSet(author: "oluna", id: "20190530 TM-14902") {
- 		comment('Adding guid and metrics_gathering columns')
+	changeSet(author: "oluna", id: "20190530 TM-14902-1") {
+		comment('Adding guid column')
 		preConditions(onFail: 'MARK_RAN') {
 			not {
 				columnExists(tableName: 'licensed_client', columnName: 'guid')
-				columnExists(tableName: 'licensed_client', columnName: 'metrics_gathering')
 			}
 		}
 
 		addColumn(tableName: 'licensed_client') {
 			column(name: 'guid', type: 'char(36)') {
 				constraints(nullable: true)
+			}
+		}
+	}
+
+	changeSet(author: "oluna", id: "20190530 TM-14902-2") {
+		comment('Adding metrics_gathering columns')
+		preConditions(onFail: 'MARK_RAN') {
+			not {
+				columnExists(tableName: 'licensed_client', columnName: 'metrics_gathering')
 			}
 		}
 
