@@ -65,7 +65,6 @@ class LicensedClient {
 		hash             nullable: true
 		bannerMessage    nullable: true
 		guid             nullable: true
-		metricsGathering nullable: true
 	}
 
 	Map toMap() {
