@@ -4,6 +4,7 @@ import {PersonModel} from '../../../../components/add-person/model/person.model'
 import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {PasswordChangeModel} from '../../model/password-change.model';
+import {PermissionService} from '../../../../services/permission.service';
 
 @Component({
 	selector: 'user-edit-person',
@@ -21,14 +22,15 @@ export class UserEditPersonComponent {
 		public personModel: PersonModel,
 		public passwordChangeModel: PasswordChangeModel,
 		private headerService: HeaderService,
+		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService) {
 		this.startPageOptions = [];
 		this.editableUserPreferences = [];
 		this.savedPersonModel = {};
-		this.canUpdateAccount = false;
 		this.retrieveStartPageOptions();
 		this.loadComponentModel();
+		this.canUpdateAccount = this.permissionService.hasPermission('UserUpdateOwnAccount');
 	}
 
 	/**
@@ -94,7 +96,6 @@ export class UserEditPersonComponent {
 				this.personModel = personModel;
 				this.savedPersonModel = Object.assign({},  this.personModel, this.savedPersonModel);
 				this.currentPersonId = result.person.id;
-				this.canUpdateAccount = result.canUpdateAccount;
 			},
 			(err) => console.log(err));
 	}

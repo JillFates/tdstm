@@ -5,6 +5,7 @@ import {PersonModel} from '../../../../components/add-person/model/person.model'
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {UIActiveDialogService, UIExtraDialog} from '../../../../services/ui-dialog.service';
 import {DecoratorOptions} from '../../../../model/ui-modal-decorator.model';
+import {PermissionService} from '../../../../services/permission.service';
 
 @Component({
 	selector: 'user-manage-staff',
@@ -17,7 +18,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public availableTeamNames;
 	public salaryOptions;
 	public activeOptions;
-	public canEditPerson = false;
+	public canEditPerson;
 	public defaultImageURL = '../images/blankPerson.jpg'
 	public currentImageURL;
 	private teamKeys;
@@ -26,6 +27,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	constructor(
 		public personModel: PersonModel,
 		private headerService: HeaderService,
+		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
@@ -34,6 +36,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		this.salaryOptions = ['Contractor', 'Hourly', 'Salary'];
 		this.activeOptions = ['Y', 'N'];
 		this.loadComponentModel();
+		this.canEditPerson = this.permissionService.hasPermission('PersonEdit');
 		this.editing = false;
 		this.teamKeys = {};
 	}
@@ -124,7 +127,6 @@ export class UserManageStaffComponent extends UIExtraDialog {
 				for (let i = 0; i < result.availableTeams.length; i++) {
 					this.teamKeys[result.availableTeams[i].description] = result.availableTeams[i].id;
 				}
-				this.canEditPerson = result.canEditPerson;
 			},
 			(err) => console.log(err));
 	}

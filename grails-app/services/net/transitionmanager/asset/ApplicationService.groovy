@@ -91,7 +91,6 @@ class ApplicationService implements ServiceMethods {
 		def testingById = testingBy instanceof Person ? testingBy.id : -1
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
-		boolean canCreatePerson = securityService.hasPermission("PersonCreate")
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
 		Map commonModel = this.getCommonModel(false, project, app, params)
@@ -100,7 +99,7 @@ class ApplicationService implements ServiceMethods {
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
 				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
-		        personList: personList, canCreatePerson: canCreatePerson, currentUserId: securityService.currentPersonId] +
+		        personList: personList, currentUserId: securityService.currentPersonId] +
 				commonModel
 
 	}
@@ -117,7 +116,6 @@ class ApplicationService implements ServiceMethods {
 		List moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 
 		List personList = partyRelationshipService.getProjectApplicationStaff(project)
-		boolean canCreatePerson = securityService.hasPermission("PersonCreate")
 		List availableRoles = partyRelationshipService.getStaffingRoles()
 		List partyGroupList = partyRelationshipService.getCompaniesList()
 		Map commonModel = this.getCommonModel(true, project, application, params)
@@ -128,8 +126,7 @@ class ApplicationService implements ServiceMethods {
 			availableRoles: availableRoles,
 			partyGroupList: partyGroupList,
 			staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
-			personList: personList,
-			canCreatePerson: canCreatePerson
+			personList: personList
 		] + commonModel
 	}
 

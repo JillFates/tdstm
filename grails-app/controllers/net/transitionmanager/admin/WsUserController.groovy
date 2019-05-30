@@ -73,8 +73,7 @@ class WsUserController implements ControllerMethods {
         Map model = [
             fixedPreferenceCodes: userPreferenceService.FIXED_PREFERENCE_CODES,
             person: person,
-            preferences: userPreferenceService.preferenceListForEdit(userLogin),
-            canUpdateAccount: securityService.hasPermission('UserUpdateOwnAccount')
+            preferences: userPreferenceService.preferenceListForEdit(userLogin)
         ]
     	renderSuccessJson(model)
     }
@@ -93,7 +92,7 @@ class WsUserController implements ControllerMethods {
 		Person person = Person.get(Long.valueOf(id))
 		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
 
-		renderSuccessJson(person: person.toMap(project), availableTeams: teams, canEditPerson: securityService.hasPermission('PersonEdit'))
+		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
 	}
 
 	/**
