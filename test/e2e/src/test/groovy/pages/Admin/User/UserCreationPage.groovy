@@ -19,12 +19,12 @@ class UserCreationPage extends Page {
         ucPassword              { ucPageForm.find("input#passwordId")}
         ucConfirmPassword       { ucPageForm.find("input#confirmPasswordId")}
 
-        ucAdminRoleCB           { ucPageForm.find("input#role_ADMIN")}
-        ucClientAdmiRoleCB      { ucPageForm.find("input#role_CLIENT_ADMIN")}
-        ucClientMgrRoleCB       { ucPageForm.find("input#role_CLIENT_MGR")}
-        ucEditorRoleCB          { ucPageForm.find("input#role_EDITOR")}
-        ucSupervisorRoleCB      { ucPageForm.find("input#role_SUPERVISOR")}
-        ucUserRoleCB            { ucPageForm.find("input#role_USER")}
+        ucAdminRoleCB           { ucPageForm.find("input#role_ROLE_ADMIN")}
+        ucClientAdmiRoleCB      { ucPageForm.find("input#role_ROLE_CLIENT_ADMIN")}
+        ucClientMgrRoleCB       { ucPageForm.find("input#role_ROLE_CLIENT_MGR")}
+        ucEditorRoleCB          { ucPageForm.find("input#role_ROLE_EDITOR")}
+        ucSupervisorRoleCB      { ucPageForm.find("input#role_ROLE_SUPERVISOR")}
+        ucUserRoleCB            { ucPageForm.find("input#role_ROLE_USER")}
 
         ucActiveSelector        { ucPageForm.find("select#active")}
         ucProjectSelector       { ucPageForm.find("select#projectId")}
