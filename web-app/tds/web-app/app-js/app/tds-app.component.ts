@@ -4,9 +4,11 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
 import {NoticesValidatorService} from '../modules/user/service/notices-validator.service';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-app',
@@ -18,8 +20,9 @@ import {NoticesValidatorService} from '../modules/user/service/notices-validator
         <router-outlet></router-outlet>
 	`,
 })
-
 export class TDSAppComponent implements OnInit {
+
+	private readonly DISABLE_HEADER_ON_NAVIGATION_START = ['/notice'];
 
 	/**
 	 * Inject the Router since it is the Route App
@@ -36,6 +39,16 @@ export class TDSAppComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		// On Route Navigation Start
+		this.router.events
+			.filter(event => event instanceof NavigationStart)
+			.subscribe((event: NavigationStart) => {
+				// For some specific routes(cases) like notices we don't want the user to have
+				// any interaction with the topNav menu, so we must do the following.
+				if (this.DISABLE_HEADER_ON_NAVIGATION_START.includes(event.url)) {
+					jQuery('.main-header').css('pointer-events', 'none');
+				}
+			});
 		this.router.events
 			.filter((event) => event instanceof NavigationEnd)
 			.map(() => this.activatedRoute)
