@@ -104,7 +104,7 @@ function changePersonDetails () {
             url: tdsCommon.createAppURL('/person/updateAccount'),
             type:'POST',
 			data: parameters,
-            success: function(response) {
+            complete: function(response) {
             	tdsCommon.prepareJQueryAjaxResponse(response);
                 updateWelcome(response);
             },
