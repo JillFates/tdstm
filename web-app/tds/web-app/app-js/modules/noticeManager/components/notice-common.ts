@@ -1,9 +1,12 @@
 // Angular
 import { DomSanitizer} from '@angular/platform-browser';
 
+declare var jQuery: any;
+
 export abstract class NoticeCommonComponent {
 	constructor(
 		protected sanitizer: DomSanitizer) {
+		jQuery('.main-header').css('pointer-events', 'all');
 	}
 
 	/**

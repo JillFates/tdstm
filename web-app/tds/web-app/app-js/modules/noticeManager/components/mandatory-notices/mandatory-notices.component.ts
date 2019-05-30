@@ -5,7 +5,6 @@ import { DomSanitizer} from '@angular/platform-browser';
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
