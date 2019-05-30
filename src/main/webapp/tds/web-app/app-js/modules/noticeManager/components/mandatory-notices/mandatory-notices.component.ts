@@ -4,7 +4,7 @@ import { DomSanitizer} from '@angular/platform-browser';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
@@ -12,7 +12,7 @@ import {NoticeCommonComponent} from './../notice-common'
 
 @Component({
 	selector: 'tds-mandatory-notices',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/mandatory-notices/mandatory-notices.component.html'
+	templateUrl: 'mandatory-notices.component.html'
 })
 export class MandatoryNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
@@ -23,13 +23,13 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
-		protected userContextService: UserPostNoticesContextService,
+		protected userContextService: UserContextService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
 
 	ngOnInit() {
-		this.userContextService.getUserPostNoticesContext()
+		this.userContextService.getUserContext()
 		.subscribe((context) => {
 			this.postNoticesManager = context.postNoticesManager;
 			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);

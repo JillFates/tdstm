@@ -51,7 +51,7 @@ import {NoticeService} from './service/notice.service';
 		ModuleResolveService,
 		NoticeResolveService,
 		// Service
-		NoticeService
+		NoticeService,
 	],
 	exports: [
 		NoticeListComponent,

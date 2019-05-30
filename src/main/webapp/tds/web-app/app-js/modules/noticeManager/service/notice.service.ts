@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Response, Headers, RequestOptions} from '@angular/http';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {Observable} from 'rxjs/Observable';
 
@@ -20,10 +20,9 @@ export class NoticeService {
 
 	// private instance variable to hold base url
 	private noticeListUrl = '../ws/notices';
-	private singleNoticeUrl = '/tdstm/ws/notices';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -97,26 +96,6 @@ export class NoticeService {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
 	}
-
-	/**
-	 * Get the post Notices to process
-	 * @returns any
-	 */
-	/*
-	getPostNotices(): Observable<PostNoticeResponse> {
-		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
-			.map((res: Response) => {
-				let result = res.json();
-				let notices = result.data && result.data.notices || [];
-				notices.forEach( (notice: any) => {
-					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
-				});
-
-				return result && result.data || [];
-			})
-			.catch((error: any) => error.json());
-	}
-	*/
 
 	/**
 	 * Check the response, in case this is an JSON error coming from the server, respond appripately

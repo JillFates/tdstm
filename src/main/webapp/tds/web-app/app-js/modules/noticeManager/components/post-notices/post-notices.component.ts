@@ -6,7 +6,7 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 // Model
 import {NoticeModel, Notices, PostNoticeResponse } from '../../model/notice.model';
 // Components
@@ -32,7 +32,7 @@ export class PostNoticesComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private windowService: WindowService,
-		protected userContextService: UserPostNoticesContextService,
+		protected userContextService: UserContextService,
 		private router: Router) {
 	}
 
@@ -40,7 +40,7 @@ export class PostNoticesComponent implements OnInit {
 	 * Get the post notices and extract the redirectUri value
 	*/
 	ngOnInit() {
-		this.userContextService.getUserPostNoticesContext()
+		this.userContextService.getUserContext()
 		.subscribe((context) => {
 			this.postNoticesManager = context.postNoticesManager;
 			this.postNoticesManager.getNotices()

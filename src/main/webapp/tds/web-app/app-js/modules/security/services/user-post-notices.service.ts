@@ -4,7 +4,7 @@
  */
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {HttpClient} from '@angular/common/http';
 
 import {StringUtils} from '../../../shared/utils/string.utils';
 
@@ -12,7 +12,7 @@ import {StringUtils} from '../../../shared/utils/string.utils';
 export class UserPostNoticesService {
 	private baseURL = '/tdstm/ws/notices';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpClient) {
 	}
 
 	/**
@@ -21,8 +21,7 @@ export class UserPostNoticesService {
 	*/
 	getUserPostNotices(): Observable<any> {
 		return this.http.get(`${this.baseURL}/fetchPostLoginNotices`)
-			.map((res) => {
-				let result = res.json();
+			.map((result: any) => {
 				let notices = result.data && result.data.notices || [];
 				notices.forEach( (notice: any) => {
 					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
@@ -30,7 +29,7 @@ export class UserPostNoticesService {
 
 				return result && result.data || [];
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -39,8 +38,8 @@ export class UserPostNoticesService {
     */
 	notifyContinue(): Observable<any> {
 		return this.http.get(`${this.baseURL}/continue`)
-			.map((res) =>  res.json())
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((result: any) =>  result)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -50,9 +49,9 @@ export class UserPostNoticesService {
 	 */
 	setAcknowledge(id: number): Observable<any> {
 		return this.http.post(`${this.baseURL}/${id}/acknowledge`, '')
-			.map((res) =>  {
-				return res.json();
+			.map((result: any) =>  {
+				return result;
 			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.catch((error: any) => error);
 	}
 }

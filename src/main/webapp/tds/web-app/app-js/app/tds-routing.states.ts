@@ -22,7 +22,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'dependencies', loadChildren: '../modules/dependencies/dependencies.module#DependenciesModule'},
 	{path: 'license/admin', loadChildren: '../modules/licenseAdmin/license-admin.module#LicenseAdminModule'},
 	{path: 'license/manager', loadChildren: '../modules/licenseManager/license-manager.module#LicenseManagerModule'},
-	{path: Paths.notice, loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'}
+	{path: Paths.notice, loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'},
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
 ];
 

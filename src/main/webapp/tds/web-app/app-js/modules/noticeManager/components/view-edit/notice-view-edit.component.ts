@@ -20,7 +20,7 @@ import {NoticeModel, NoticeTypes, NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN}
 import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'tds-notice-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
+	templateUrl: 'notice-view-edit.component.html'
 })
 export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;

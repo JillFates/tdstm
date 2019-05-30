@@ -6,7 +6,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationStart, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
-import {NoticesValidatorService} from '../modules/user/service/notices-validator.service';
+import {NoticesValidatorService} from '../modules/security/services/notices-validator.service';
 
 @Component({
 	selector: 'tds-app',

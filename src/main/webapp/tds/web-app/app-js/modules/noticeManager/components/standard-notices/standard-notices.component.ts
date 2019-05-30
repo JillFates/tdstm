@@ -5,14 +5,14 @@ import {Observable} from 'rxjs';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserPostNoticesContextService} from '../../../user/service/user-post-notices-context.service';
+import {UserContextService} from '../../../security/services/user-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
 
 @Component({
 	selector: 'tds-standard-notices',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/standard-notices/standard-notices.component.html'
+	templateUrl: 'standard-notices.component.html'
 })
 export class StandardNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
@@ -23,14 +23,14 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
-		protected userContextService: UserPostNoticesContextService,
+		protected userContextService: UserContextService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
 
 	ngOnInit() {
 		this.notices = this.model.notices;
-		this.userContextService.getUserPostNoticesContext()
+		this.userContextService.getUserContext()
 			.subscribe((context) => {
 				this.postNoticesManager = context.postNoticesManager;
 			})

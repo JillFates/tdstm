@@ -6,14 +6,15 @@ import { Injectable } from '@angular/core';
 import {NavigationStart, Router} from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 
-import {UserPostNoticesContextService} from './user-post-notices-context.service';
+// import {UserPostNoticesContextService} from './user-post-notices-context.service';
+import {UserContextService} from './user-context.service';
 import {Paths} from '../../../app/tds-routing.states';
 
 @Injectable()
 export class NoticesValidatorService {
 	constructor(
 		private router: Router,
-		private userContext: UserPostNoticesContextService) {
+		private userContext: UserContextService) {
 	}
 
 	/**
@@ -25,7 +26,7 @@ export class NoticesValidatorService {
 		this.router.events
 			.filter((event) => event instanceof NavigationStart && event.url !== `/${Paths.notice}`)
 			.pipe(
-				switchMap((event) => this.userContext.getUserPostNoticesContext()),
+				switchMap((event) => this.userContext.getUserContext()),
 				switchMap((context) => context.postNoticesManager.hasNoticesPending()),
 			)
 			.filter((hasPendings: boolean) => hasPendings === true)

@@ -10,7 +10,7 @@ import 'rxjs/add/operator/finally';
 
 @Component({
 	selector: 'tds-notice-view-html',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-html/view-html.component.html'
+	templateUrl: 'view-html.component.html'
 })
 export class ViewHtmlComponent extends UIExtraDialog {
 

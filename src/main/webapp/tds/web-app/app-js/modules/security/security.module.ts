@@ -11,6 +11,11 @@ import {ErrorPageComponent} from './components/error-page/error-page.component';
 import {UnauthorizedPageComponent} from './components/unauthorized-page/unauthorized-page.component';
 import {NotFoundPageComponent} from './components/not-found-page/not-found-page.component';
 
+// Services
+// import {UserPostNoticesManagerService} from '../security/services/user-post-notices-manager.service';
+// import {UserPostNoticesService} from '../security/services/user-post-notices.service';
+// import {NoticesValidatorService} from '../security/services/notices-validator.service';
+
 @NgModule({
 	imports: [
 		// Angular
@@ -24,6 +29,11 @@ import {NotFoundPageComponent} from './components/not-found-page/not-found-page.
 		ErrorPageComponent,
 		UnauthorizedPageComponent,
 		NotFoundPageComponent
+	],
+	providers: [
+		// UserPostNoticesManagerService,
+		// UserPostNoticesService,
+		// NoticesValidatorService
 	],
 	exports: [
 		ErrorPageComponent,
