@@ -1,11 +1,16 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {NoticeModel} from '../model/notice.model';
-import {Observable} from 'rxjs';
+import {Response, Headers, RequestOptions} from '@angular/http';
+import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {StringUtils} from '../../../shared/utils/string.utils';
+import {Observable} from 'rxjs/Observable';
+
+import {NoticeModel, PostNoticeResponse, NOTICE_TYPE_POST_LOGIN, NOTICE_TYPE_MANDATORY} from '../model/notice.model';
 
 import 'rxjs/add/operator/map';
+
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name NoticeService
@@ -15,9 +20,10 @@ export class NoticeService {
 
 	// private instance variable to hold base url
 	private noticeListUrl = '../ws/notices';
+	private singleNoticeUrl = '/tdstm/ws/notices';
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpInterceptor) {
 	}
 
 	/**
@@ -26,82 +32,48 @@ export class NoticeService {
 	 */
 	getNoticesList(): Observable<NoticeModel[]> {
 		return this.http.get(this.noticeListUrl)
-			.map((response: any) => {
-				response.notices.forEach( (notice: any) => {
-					notice.typeId = notice.typeId.toString();
+			.map((res: Response) => {
+				let result = res.json();
+				result.notices.forEach( (notice: any) => {
+					notice = this.cleanNotice(notice);
+					if (notice.typeId === NOTICE_TYPE_POST_LOGIN && notice.needAcknowledgement) {
+						notice.typeId = NOTICE_TYPE_MANDATORY;
+					}
 				});
-				return response && response.notices;
+				return result && result.notices;
 			})
-			.catch((error: any) => error);
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get a specific notice
+	 * @returns {Observable<R>}
+	 * @param {number} id: Notice id to fetch
+	 */
+	getNotice(id: number): Observable<NoticeModel> {
+		return this.http.get(`${this.noticeListUrl}/${id}`)
+			.map((res: Response) => {
+				return this.cleanNotice(res.json());
+			})
+			.catch((error: any) => error.json());
 	}
 
 	createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
-			.map((response: any) => response)
-			.catch((error: any) => Observable.throw(error || 'Server error'));
+			.map((res: Response) => this.handleJSONError(res))
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 	editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
 		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
-			.map((response: any) => response)
+			.map((res: Response) => this.handleJSONError(res))
 			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
-	deleteNotice(noticeId: string): Observable<NoticeModel[]> {
-		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
-			.map((response: any) => response)
-			.catch((error: any) => Observable.throw(error || 'Server error'));
-	}
-
-	/**
-	 * Based on provided column, update the structure which holds the current selected filters
-	 * @param {any} column: Column to filter
-	 * @param {any} state: Current filters state
-	 * @returns {any} Filter structure updated
-	 */
-	filterColumn(column: any, state: any): any {
-		let root = state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(item => item.field === column.property);
-
-		if (column.type === 'text') {
-			if (!column.filter) {
-				column.filter = '';
-			}
-
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'boolean') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'eq',
-					value: column.filter
-				});
-			} else {
-				if (column.filter !== null) {
-					filter = root.filters.find((r) => {
-						return r['field'] === column.property;
-					});
-					filter.value = column.filter
-				}
-			}
-		}
-
-		return root;
+	deleteNotice(id: string): Observable<NoticeModel[]> {
+		return this.http.delete(`${this.noticeListUrl}/${id}`)
+			.map((res: Response) => this.handleJSONError(res))
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 	/**
@@ -124,5 +96,57 @@ export class NoticeService {
 	getFiltersExcluding(excludeFilterName: string, state: any): any {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
+	}
+
+	/**
+	 * Get the post Notices to process
+	 * @returns any
+	 */
+	/*
+	getPostNotices(): Observable<PostNoticeResponse> {
+		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
+			.map((res: Response) => {
+				let result = res.json();
+				let notices = result.data && result.data.notices || [];
+				notices.forEach( (notice: any) => {
+					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+				});
+
+				return result && result.data || [];
+			})
+			.catch((error: any) => error.json());
+	}
+	*/
+
+	/**
+	 * Check the response, in case this is an JSON error coming from the server, respond appripately
+	 * @param {Respone} res:  Service Response
+	 * @returns any : Response in JSON format / or error
+	 */
+	private handleJSONError(res: Response): any {
+		const result = res.json();
+
+		if (result && result.status === 'error') {
+			throw new Error(result);
+		} else {
+			return result
+		}
+	}
+
+	/**
+	 * Set the default values for empty fields, and clean html coming with escape sequences
+	 * @param {NoticeModel} notice:  Notice received
+	 * @returns any : Notice with the default values and html content in place
+	 */
+	private cleanNotice(notice: NoticeModel): any {
+		notice.typeId = notice.typeId.toString();
+		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		notice.activationDate = notice.activationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		notice.expirationDate = notice.expirationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		return notice;
 	}
 }
