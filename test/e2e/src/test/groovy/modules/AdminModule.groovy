@@ -108,8 +108,8 @@ class AdminModule extends Module{
     }
 
     def goToListUsers(){
-        selectMenu(adminItem)
-        selectItem(adminUsersItem)
+        waitFor (30) {selectMenu(adminItem)}
+        waitFor (30){selectItem(adminUsersItem)}
     }
 
     def goToImportAccounts(){
