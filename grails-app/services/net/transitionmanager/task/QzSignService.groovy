@@ -1,9 +1,15 @@
 package net.transitionmanager.task
 
 import grails.gorm.transactions.Transactional
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.openssl.PEMDecryptorProvider
+import org.bouncycastle.openssl.PEMEncryptedKeyPair
+import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.PasswordFinder
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder
 import org.bouncycastle.util.encoders.Base64
 
 import java.security.KeyPair
@@ -78,14 +84,11 @@ class QzSignService {
 
 	def sign(String message) {
 		String passphrase = getPassphrase()
-
 		File privateKeyFile = findPrivateKeyFile()
 
-		char[] passph = passphrase.toCharArray()
 		Security.addProvider(new BouncyCastleProvider())
 
-		KeyPair keyPair = readKeyPair(privateKeyFile, passph)
-		PrivateKey privKey = keyPair.getPrivate()
+		PrivateKey privKey = readPrivateKey(privateKeyFile, passphrase)
 
 		Signature signature = Signature.getInstance("SHA1withRSA") //Encryption Algorithm
 		signature.initSign(privKey)
@@ -95,30 +98,25 @@ class QzSignService {
 		return new String(Base64.encode(signatureBytes))
 	}
 
-	private static KeyPair readKeyPair(File privateKeyFile, char [] keyPassword) throws IOException {
-		FileReader fileReader = new FileReader(privateKeyFile)
-		PEMParser r = new PEMParser(fileReader, new DefaultPasswordFinder(keyPassword))
-		try {
-			return (KeyPair) r.readObject()
-		} catch (IOException ex) {
-			throw new IOException("The private key could not be decrypted", ex)
-		} finally {
-			r.close()
-			fileReader.close()
+	private PrivateKey readPrivateKey(File privateKeyPath, String keyPassword) throws IOException {
+
+		FileReader fileReader = new FileReader(privateKeyPath)
+		PEMParser keyReader = new PEMParser(fileReader)
+
+		JcaPEMKeyConverter converter = new JcaPEMKeyConverter()
+		PEMDecryptorProvider decryptionProv = new JcePEMDecryptorProviderBuilder().build(keyPassword.toCharArray())
+
+		Object keyPair = keyReader.readObject()
+		PrivateKeyInfo keyInfo
+
+		if (keyPair instanceof PEMEncryptedKeyPair) {
+			PEMKeyPair decryptedKeyPair = ((PEMEncryptedKeyPair) keyPair).decryptKeyPair(decryptionProv)
+			keyInfo = decryptedKeyPair.getPrivateKeyInfo()
+		} else {
+			keyInfo = ((PEMKeyPair) keyPair).getPrivateKeyInfo()
 		}
+		keyReader.close()
+		return converter.getPrivateKey(keyInfo)
 	}
 
-	private static class DefaultPasswordFinder implements PasswordFinder {
-
-		private final char [] password
-
-		private DefaultPasswordFinder(char [] password) {
-			this.password = password
-		}
-
-		@Override
-		public char[] getPassword() {
-			return Arrays.copyOf(password, password.length)
-		}
-	}
 }
