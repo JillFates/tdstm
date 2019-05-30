@@ -53,7 +53,7 @@ class UserPreferenceService {
 	private static final List<String> archGraphCheckboxLabels = [
 		'showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	// ac:Asset Classes, de: Dependencies, hb: Highlight By
-	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb']
+	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb', '!']
 
 	private static final EnumMap<PREF, Map> prefCodeConstraints = [
 			(PREF.VIEW_UNPUBLISHED): 		[type: 'boolean'],
