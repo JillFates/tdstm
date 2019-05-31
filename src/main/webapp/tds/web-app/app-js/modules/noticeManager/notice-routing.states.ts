@@ -44,7 +44,7 @@ export const NoticeManagerRoute: Routes = [
 		path: NoticeManagerStates.NOTICE_POST.url,
 		data: {
 			page: {
-				pageTitle: 'NOTICE.NOTICES',
+				title: 'NOTICE.NOTICES',
 				instruction: '',
 				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'NOTICE.POST_NOTICES'],
 			},
