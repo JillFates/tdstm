@@ -370,6 +370,11 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/listTasks" {
+			controller = "wsTask"
+			action = [POST:"listTasks"]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
