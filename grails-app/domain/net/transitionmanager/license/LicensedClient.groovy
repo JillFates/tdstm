@@ -18,49 +18,53 @@ import java.text.ParseException
  * @author oluna
  */
 class LicensedClient {
-	String id
-	String installationNum
-	String email
+	String  id
+	String  installationNum
+	String  email
 	Environment environment
-	Status status
-	Type   type
-	String project
-	String client
-	String owner
-	Method method
-	int    max = 0
-	Date   requestDate
-	Date   activationDate
-	Date   expirationDate
-	String requestNote
-	String hostName
-	String websitename
-	String hash
-	String bannerMessage
-	int	   gracePeriodDays = 5
+	Status  status
+	Type    type
+	String  project
+	// A unique string value that will be used when aggregating data across multiple instances
+	String  guid
+	boolean collectMetrics = false
+	String  client
+	String  owner
+	Method  method
+	int     max = 0
+	Date    requestDate
+	Date    activationDate
+	Date    expirationDate
+	String  requestNote
+	String  hostName
+	String  websitename
+	String  hash
+	String  bannerMessage
+	int     gracePeriodDays = 5
 
 	/** Date when the change was performed */
 	Date dateCreated
 	Date lastUpdated
 
 	static mapping = {
-		id 			generator: 'assigned'
-		requestNote type:'text'
-		hash 		type:'text'
-		version		false
+		id generator: 'assigned'
+		requestNote type: 'text'
+		hash type: 'text'
+		version false
 		tablePerHierarchy false
-		activationDate	column:'valid_start'
-		expirationDate	column:'valid_end'
-		bannerMessage type:'text'
+		activationDate column: 'valid_start'
+		expirationDate column: 'valid_end'
+		bannerMessage type: 'text'
 	}
 
 	static constraints = {
-		method 			nullable:true
-		activationDate 	nullable:true
-		expirationDate 	nullable:true
-		requestNote 	nullable:true
-		hash 			nullable:true
-		bannerMessage	nullable:true
+		method         nullable: true
+		activationDate nullable: true
+		expirationDate nullable: true
+		requestNote    nullable: true
+		hash           nullable: true
+		bannerMessage  nullable: true
+		guid           nullable: true
 	}
 
 	Map toMap() {
@@ -198,9 +202,7 @@ class LicensedClient {
 			lc.status = json.status as License.Status
 		}
 		if(json.project != null) {
-			if( json.project.guid && json.project.metricsGathering == null ) {
-				json.project.metricsGathering = false
-			}
+			lc.guid = json.project.guid
 			lc.project = json.project?.toString()
 		}
 		if(json.client != null) {

@@ -57,4 +57,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_0/20190328-usability-and-style-changes-to-system-views-part2.groovy'
 	include file: 'version/v4_7_0/20190502-move-event-table-drop-column-news-bar-mode.groovy'
 	include file: 'version/v4_7_0/20190516-asset-entity-table-rename-column-hinfo-to-os.groovy'
+	include file: 'version/v4_6_2/20190530-add-guid-and-metrics_gathering-to-LicensedClient.groovy'
 }
