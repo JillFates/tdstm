@@ -21,6 +21,7 @@ import {TaskManagerRouteModule} from './task-manager-routing.states';
 import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {TaskListComponent} from './components/list/task-list.component';
+import {ReportsService} from '../reports/service/reports.service';
 
 @NgModule({
 	imports: [
@@ -48,7 +49,9 @@ import {TaskListComponent} from './components/list/task-list.component';
 		TagsResolveService,
 		ModuleResolveService,
 		// Services
-		TaskService],
+		TaskService,
+		ReportsService
+	],
 })
 
 export class TaskManagerModule {
