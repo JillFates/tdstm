@@ -77,7 +77,9 @@ class AdminModule extends Module{
     }
 
     def goToAdminListStaff(){
+        waitFor (30) {adminItem}
         selectMenu(adminItem)
+        waitFor (30) {adminStaffItem}
         selectItem(adminStaffItem)
     }
 
