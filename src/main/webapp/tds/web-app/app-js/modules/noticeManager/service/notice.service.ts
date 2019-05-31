@@ -31,8 +31,7 @@ export class NoticeService {
 	 */
 	getNoticesList(): Observable<NoticeModel[]> {
 		return this.http.get(this.noticeListUrl)
-			.map((res: Response) => {
-				let result = res.json();
+			.map((result: any) => {
 				result.notices.forEach( (notice: any) => {
 					notice = this.cleanNotice(notice);
 					if (notice.typeId === NOTICE_TYPE_POST_LOGIN && notice.needAcknowledgement) {
@@ -41,7 +40,7 @@ export class NoticeService {
 				});
 				return result && result.notices;
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -51,28 +50,28 @@ export class NoticeService {
 	 */
 	getNotice(id: number): Observable<NoticeModel> {
 		return this.http.get(`${this.noticeListUrl}/${id}`)
-			.map((res: Response) => {
-				return this.cleanNotice(res.json());
+			.map((res: any) => {
+				return this.cleanNotice(res);
 			})
-			.catch((error: any) => error.json());
+			.catch((error: any) => error);
 	}
 
-	createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
+	createNotice(notice: NoticeModel): Observable<any> {
 		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
-			.map((res: Response) => this.handleJSONError(res))
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((res: any) => res)
+			.catch((error: any) => error);
 	}
 
-	editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
+	editNotice(notice: NoticeModel): Observable<any> {
 		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
-			.map((res: Response) => this.handleJSONError(res))
-			.catch((error: any) => Observable.throw(error || 'Server error'));
+			.map((res: any) => res)
+			.catch((error: any) => error);
 	}
 
-	deleteNotice(id: string): Observable<NoticeModel[]> {
+	deleteNotice(id: string): Observable<any> {
 		return this.http.delete(`${this.noticeListUrl}/${id}`)
-			.map((res: Response) => this.handleJSONError(res))
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			.map((res: any) => res)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -95,21 +94,6 @@ export class NoticeService {
 	getFiltersExcluding(excludeFilterName: string, state: any): any {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
-	}
-
-	/**
-	 * Check the response, in case this is an JSON error coming from the server, respond appripately
-	 * @param {Respone} res:  Service Response
-	 * @returns any : Response in JSON format / or error
-	 */
-	private handleJSONError(res: Response): any {
-		const result = res.json();
-
-		if (result && result.status === 'error') {
-			throw new Error(result);
-		} else {
-			return result
-		}
 	}
 
 	/**

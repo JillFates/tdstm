@@ -125,8 +125,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		// use zero for empty sequences
 		payload.sequence = payload.sequence === null || typeof payload.sequence === 'undefined' ? 0 : payload.sequence;
 		// don't send '' for empty dates, instead use null
-		payload.activationDate = payload.activationDate === '' ? null : payload.activationDate;
-		payload.expirationDate = payload.expirationDate === '' ? null : payload.expirationDate;
+		payload.activationDate = !payload.activationDate  ? null : this.convertToDate(payload.activationDate);
+		payload.expirationDate = !payload.expirationDate  ? null : this.convertToDate(payload.expirationDate);
 
 		return payload;
 	}
@@ -242,6 +242,9 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 * @returns {date}
 	 */
 	private convertToDate(value: any): any {
-		return (value && value.toDateString) ? value : new Date(DateUtils.getDateFromGMT(value));
+		return (value && value.toDateString) ?
+			value :
+			DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(value), DateUtils.SERVER_FORMAT_DATE);
+			// new Date(DateUtils.getDateFromGMT(value));
 	}
 }
