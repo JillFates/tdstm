@@ -29,12 +29,6 @@ import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {UserService} from './service/user.service';
 
-/*
-import {UserPostNoticesManagerService} from '../security/services/user-post-notices-manager.service';
-import {UserPostNoticesService} from '../security/services/user-post-notices.service';
-import {NoticesValidatorService} from '../security/services/notices-validator.service';
-*/
-
 @NgModule({
 	imports: [
 		// Angular
@@ -64,11 +58,6 @@ import {NoticesValidatorService} from '../security/services/notices-validator.se
 		UserResolveService,
 		// Service
 		UserService,
-		/*
-		UserPostNoticesManagerService,
-		UserPostNoticesService,
-		NoticesValidatorService
-		*/
 	],
 	exports: [
 		UserListComponent

@@ -11,7 +11,6 @@ import {TDSAppComponent} from './tds-app.component';
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
 import {UserService} from '../modules/security/services/user.service';
 import {UserContextService} from '../modules/security/services/user-context.service';
-// import {UserPostNoticesManagerService} from '../modules/security/services/user-post-notices-manager.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';

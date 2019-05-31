@@ -28,8 +28,8 @@ import {ValidationRulesDefinitionsService} from './services/validation-rules-def
 import {HttpRequestInterceptor, HTTPFactory} from './providers/http-request-interceptor.provider.';
 import {KendoFileUploadInterceptor, HTTPKendoFactory} from './providers/kendo-file-upload.interceptor';
 import {KendoFileHandlerService} from './services/kendo-file-handler.service';
-import {UserPostNoticesManagerService} from '../modules/security/services/user-post-notices-manager.service';
-import {UserPostNoticesService} from '../modules/security/services/user-post-notices.service';
+import {PostNoticesManagerService} from '../modules/security/services/post-notices-manager.service';
+import {PostNoticesService} from '../modules/security/services/post-notices.service';
 import {NoticesValidatorService} from '../modules/security/services/notices-validator.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
@@ -289,8 +289,8 @@ export class SharedModule {
 				},
 				ValidationRulesFactoryService,
 				ValidationRulesDefinitionsService,
-				UserPostNoticesManagerService,
-				UserPostNoticesService,
+				PostNoticesManagerService,
+				PostNoticesService,
 				NoticesValidatorService,
 			]
 		};

@@ -4,15 +4,15 @@
  */
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {UserPostNoticesService} from './user-post-notices.service';
+import {PostNoticesService} from './post-notices.service';
 
 import {switchMap} from 'rxjs/operators';
 
 @Injectable()
-export class UserPostNoticesManagerService {
+export class PostNoticesManagerService {
 	private postNotices: any;
 
-	constructor(private userPostNoticesService: UserPostNoticesService) {
+	constructor(private postNoticesService: PostNoticesService) {
 		this.postNotices = null;
 	}
 
@@ -23,7 +23,7 @@ export class UserPostNoticesManagerService {
 		}
 
 		// otherwise call the endpoint
-		return this.userPostNoticesService
+		return this.postNoticesService
 			.getUserPostNotices()
 			.pipe(
 				switchMap((postNotices) => {
@@ -50,7 +50,7 @@ export class UserPostNoticesManagerService {
 	 * @returns NoticeModel
 	 */
 	setAcknowledge(id: number) {
-		return this.userPostNoticesService.setAcknowledge(id)
+		return this.postNoticesService.setAcknowledge(id)
 		.pipe(
 			switchMap((result) => {
 				this.removeNoticeFromCollection(id);
@@ -68,7 +68,7 @@ export class UserPostNoticesManagerService {
     * @returns any
     */
 	notifyContinue()  {
-		return this.userPostNoticesService.notifyContinue()
+		return this.postNoticesService.notifyContinue()
 			.pipe(
 				switchMap((result) => {
 					console.log(this.postNotices);

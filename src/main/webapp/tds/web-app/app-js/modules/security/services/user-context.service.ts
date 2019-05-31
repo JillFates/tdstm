@@ -9,7 +9,7 @@ import {UserContextModel, USER_CONTEXT_REQUEST} from '../model/user-context.mode
 // Services
 import {UserService} from './user.service';
 import {PermissionService} from '../../../shared/services/permission.service';
-import {UserPostNoticesManagerService} from './user-post-notices-manager.service';
+import {PostNoticesManagerService} from './post-notices-manager.service';
 // Others
 import {BehaviorSubject, Observable} from 'rxjs';
 
@@ -22,7 +22,7 @@ export class UserContextService {
 	constructor(
 		private userService: UserService,
 		private permissionService: PermissionService,
-		private userPostNoticesManagerService: UserPostNoticesManagerService) {
+		private postNoticesManagerService: PostNoticesManagerService) {
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class UserContextService {
 					let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
 					userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
 					userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
-					userContext.postNoticesManager = this.userPostNoticesManagerService;
+					userContext.postNoticesManager = this.postNoticesManagerService;
 
 					this.userContextSubject.next(userContext);
 					resolve(true);

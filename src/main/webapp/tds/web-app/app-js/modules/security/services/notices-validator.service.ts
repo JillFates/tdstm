@@ -6,7 +6,6 @@ import { Injectable } from '@angular/core';
 import {NavigationStart, Router} from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 
-// import {UserPostNoticesContextService} from './user-post-notices-context.service';
 import {UserContextService} from './user-context.service';
 import {Paths} from '../../../app/tds-routing.states';
 

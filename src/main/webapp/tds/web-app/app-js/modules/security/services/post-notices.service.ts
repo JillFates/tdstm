@@ -9,7 +9,7 @@ import {HttpClient} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 
 @Injectable()
-export class UserPostNoticesService {
+export class PostNoticesService {
 	private baseURL = '/tdstm/ws/notices';
 
 	constructor(private http: HttpClient) {
