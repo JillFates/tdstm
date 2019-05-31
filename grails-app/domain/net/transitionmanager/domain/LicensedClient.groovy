@@ -27,7 +27,7 @@ class LicensedClient {
 	String  project
 	// A unique string value that will be used when aggregating data across multiple instances
 	String  guid
-	boolean metricsGathering = false
+	boolean collectMetrics = false
 	String  client
 	String  owner
 	Method  method
