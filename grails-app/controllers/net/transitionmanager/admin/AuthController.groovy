@@ -77,10 +77,6 @@ class AuthController implements ControllerMethods {
 		 preLoginList: preLoginList, postLoginList: postLoginList]
 	}
 
-	private signIn() {
-		// Now redirect back to the login page.
-		redirect(action: 'login')
-	}
 
 	private void redirectToPrefPage() {
 
