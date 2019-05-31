@@ -10,7 +10,7 @@ import {UserContextService} from './user-context.service';
 import {Paths} from '../../../app/tds-routing.states';
 
 @Injectable()
-export class NoticesValidatorService {
+export class PostNoticesValidatorService {
 	constructor(
 		private router: Router,
 		private userContext: UserContextService) {

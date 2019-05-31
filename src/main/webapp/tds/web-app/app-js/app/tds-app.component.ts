@@ -6,7 +6,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationStart, NavigationEnd, GuardsCheckStart, Router} from '@angular/router';
 import {NotifierService} from '../shared/services/notifier.service';
-import {NoticesValidatorService} from '../modules/security/services/notices-validator.service';
+import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
 
 declare var jQuery: any;
 
@@ -40,7 +40,7 @@ export class TDSAppComponent implements OnInit {
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private notifierService: NotifierService,
-		private noticesValidatorService: NoticesValidatorService) {
+		private noticesValidatorService: PostNoticesValidatorService) {
 	}
 
 	ngOnInit(): void {

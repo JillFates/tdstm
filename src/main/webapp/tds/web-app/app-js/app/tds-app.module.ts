@@ -34,7 +34,6 @@ import {UserModule} from '../modules/user/user.module';
 	providers: [
 		AuthGuardService,
 		UserService,
-		// UserPostNoticesManagerService,
 		UserContextService,
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
 		{

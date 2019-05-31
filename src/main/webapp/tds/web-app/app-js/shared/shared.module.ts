@@ -30,7 +30,7 @@ import {KendoFileUploadInterceptor, HTTPKendoFactory} from './providers/kendo-fi
 import {KendoFileHandlerService} from './services/kendo-file-handler.service';
 import {PostNoticesManagerService} from '../modules/security/services/post-notices-manager.service';
 import {PostNoticesService} from '../modules/security/services/post-notices.service';
-import {NoticesValidatorService} from '../modules/security/services/notices-validator.service';
+import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -291,7 +291,7 @@ export class SharedModule {
 				ValidationRulesDefinitionsService,
 				PostNoticesManagerService,
 				PostNoticesService,
-				NoticesValidatorService,
+				PostNoticesValidatorService,
 			]
 		};
 	}
