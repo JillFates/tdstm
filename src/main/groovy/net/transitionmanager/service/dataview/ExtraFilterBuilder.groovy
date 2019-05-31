@@ -9,20 +9,36 @@ import net.transitionmanager.exception.InvalidParamException
 /**
  * Builder class logic for building an instance of {@code ExtraFilter}.
  * It can defines if extra filter is:
- * 1) A named filter:
+ * 1) A custom extra filter:
  * <pre>
  * 	{
  * 		"property" : "moveBundle.id",
  * 		"filter": "3239"
  * 	}
  * 	{
- * 		"property" : "moveEvent.id",
+ * 		"property" : "_event.id",
  * 		"filter": "364"
  * 	}
  * </pre>
  * 2) Or a simple asset field filter:
  * <pre>
- *{"property" : "assetName", "filter": "FOOBAR"}*{"property" : "common_assetName", "filter": "FOOBAR"}*{"property" : "appTech", "filter": "Apple"}*{"property" : "application_appTech", "filter": "Apple"}* </pre>
+ *	{
+ *		"property" : "assetName",
+ *		"filter": "FOOBAR"
+ *	}
+ *	{
+ *		"property" : "common_assetName",
+ *		"filter": "FOOBAR"
+ *	}
+ *	{
+ *		"property" : "appTech",
+ *		"filter": "Apple"
+ *	}
+ *	{
+ *		"property" : "application_appTech",
+ *		"filter": "Apple"
+ *	}
+ *	</pre>
  */
 @CompileStatic
 class ExtraFilterBuilder {

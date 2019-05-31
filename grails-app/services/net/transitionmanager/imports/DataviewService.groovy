@@ -734,19 +734,23 @@ class DataviewService implements ServiceMethods {
 
 		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
 			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
+
+			String property = propertyFor(column)
+
 			// Create a basic FieldSearchData with the info for filtering an individual field.
 			FieldSearchData fieldSearchData = new FieldSearchData([
-				column           : propertyFor(column),
+				column           : property,
 				columnAlias      : namedParameterFor(column),
 				domain           : domainFor(column),
-				filter           : filterFor(column),
+				filter           : filter,
 				type             : type,
 				whereProperty    : wherePropertyFor(column),
 				manyToManyQueries: manyToManyQueriesFor(column),
+				referenceProperty: column.referenceProperty,
 				fieldSpec        : column.fieldSpec
 			])
 
-			String property = propertyFor(column)
+
 			// Check if the current column requires special treatment (e.g. startupBy, etc.)
 
 			if (property in mixedKeys) {
@@ -817,8 +821,18 @@ class DataviewService implements ServiceMethods {
 		return "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
+	/**
+	 * Defines a named parameers
+	 * @param column
+	 * @return
+	 */
     private static String namedParameterFor(Map column) {
-		return transformations[column.property].namedParameter
+
+		if (column.referenceProperty) {
+			return column.property
+		} else {
+			return  transformations[column.property].namedParameter
+		}
     }
 
 	/**
@@ -828,11 +842,13 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String propertyFor(Map column) {
 
-		String property = transformations[column.property].property
-		FieldSpec fieldSpec = column.fieldSpec
-
-		if(fieldSpec?.isCustom()){
-			property = fieldSpec.getHibernateCastSentence(property)
+		String property
+		if (column.referenceProperty) {
+			property = 'AE.' + column.property + '.' + column.referenceProperty
+		} else if (column.fieldSpec?.isCustom()) {
+			property = column.fieldSpec.getHibernateCastSentence(property)
+		}  else {
+			property = transformations[column.property].property
 		}
 
 		return property
@@ -853,11 +869,13 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static Class typeFor(Map column) {
 
-		Class type = transformations[column.property].type
-		FieldSpec fieldSpec = column.fieldSpec
-
-		if (fieldSpec?.isCustom()) {
-			type = fieldSpec.getClassType()
+		Class type
+		if (column.referenceProperty) {
+			type = Long
+		} else if (column.fieldSpec?.isCustom()) {
+			type = column.fieldSpec.getClassType()
+		} else {
+			type = transformations[column.property].type
 		}
 
 		return type
@@ -1123,7 +1141,6 @@ class DataviewService implements ServiceMethods {
 		'id'             : [property: 'AE.id', type: Long, namedParameter: 'id', join: ''],
 		'assetClass'     : [property: 'str(AE.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
 		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
-		'moveBundle.id'  : [property: 'AE.moveBundle.id', type: Long, namedParameter: 'moveBundleId', join: 'left outer join AE.moveBundle'],
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
 		'appOwner'       : [property: SqlUtil.personFullName('appOwner', 'AE'),

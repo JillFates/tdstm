@@ -46,12 +46,6 @@ class ExtraFilter {
 		Map<String, ?> hqlParams
 
 		switch (this.property) {
-			case '_moveBundle':
-				hqlExpression = " AE.moveBundle.id = (:extraFilterMoveBundle) "
-				hqlParams = [
-					extraFilterMoveBundle: NumberUtil.toPositiveLong(this.filter, 0)
-				]
-				break
 			case '_event':
 				hqlExpression = " AE.moveBundle.moveEvent.id = :extraFilterMoveEventId "
 				hqlParams = [
