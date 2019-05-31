@@ -11,7 +11,15 @@ import net.transitionmanager.exception.InvalidParamException
  * It can defines if extra filter is:
  * 1) A named filter:
  * <pre>
- *{"property" : "_moveBundle", "filter": "3239"}*{"property" : "_event", "filter": "364"}* </pre>
+ * 	{
+ * 		"property" : "moveBundle.id",
+ * 		"filter": "3239"
+ * 	}
+ * 	{
+ * 		"property" : "moveEvent.id",
+ * 		"filter": "364"
+ * 	}
+ * </pre>
  * 2) Or a simple asset field filter:
  * <pre>
  *{"property" : "assetName", "filter": "FOOBAR"}*{"property" : "common_assetName", "filter": "FOOBAR"}*{"property" : "appTech", "filter": "Apple"}*{"property" : "application_appTech", "filter": "Apple"}* </pre>
@@ -20,6 +28,7 @@ import net.transitionmanager.exception.InvalidParamException
 class ExtraFilterBuilder {
 
 	String property
+	String referenceProperty
 	String filter
 	/**
 	 * Builder implementation for {@code ExtraFilter} instances.
@@ -43,7 +52,10 @@ class ExtraFilterBuilder {
 	ExtraFilter build(List<String> domains, FieldSpecProject fieldSpecProject) {
 
 		if (this.property in ['_filter', '_event', '_moveBundle']) {
-			return new ExtraFilter(this.property, this.filter)
+			return new ExtraFilter(
+				property: this.property,
+				filter: this.filter
+			)
 		} else if (this.property.contains('_')) {
 			return buildExtraFilterWithDomainDefinedInProperty(fieldSpecProject)
 		} else {
@@ -69,7 +81,13 @@ class ExtraFilterBuilder {
 		if (!fieldSpec) {
 			throw new InvalidParamException("Field Spec '$property' not found")
 		}
-		return new ExtraFilter(this.property, this.filter, selectedDomain, fieldSpec)
+		return new ExtraFilter(
+			property: this.property,
+			referenceProperty: this.referenceProperty,
+			filter: this.filter,
+			fieldSpec: fieldSpec,
+			domain: selectedDomain
+		)
 	}
 
 	/**
@@ -81,22 +99,42 @@ class ExtraFilterBuilder {
 
 	private ExtraFilter buildExtraFilterWithDomainDefinedInProperty(FieldSpecProject fieldSpecProject) {
 		String[] parts = this.property.split(DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER)
+		if (parts.size() != 2){
+			throw new InvalidParamException("Unresolved filter property $property")
+		}
 		String domain = parts[0]
 		String fieldName = parts[1]
 		FieldSpec fieldSpec = fieldSpecProject.getFieldSpec(domain, fieldName)
 		if (!fieldSpec) {
 			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
 		}
-		return new ExtraFilter(fieldName, this.filter, domain, fieldSpec)
+		return new ExtraFilter(
+			property: this.property,
+			referenceProperty: this.referenceProperty,
+			filter: this.filter,
+			fieldSpec: fieldSpec,
+			domain: domain
+		)
 	}
 
 	/**
-	 * Defines {@code ExtraFilterBuilder#property} and determines if this is a request for an id
+	 * Defines {@code ExtraFilterBuilder#property}
+	 * and determines if this is a request for a reference property
 	 * @param property
-	 * @return
+	 * @return an instance of {@code ExtraFilterBuilder}
 	 */
 	ExtraFilterBuilder withProperty(String property) {
-		this.property = property
+		List<String> propertyParts = property.split('\\.') as List<String>
+		if (propertyParts.size() == 1) {
+			this.property = property
+			this.referenceProperty = null
+		} else if (propertyParts.size() == 2) {
+			this.property = propertyParts[0]
+			this.referenceProperty = propertyParts[1]
+		} else {
+			throw new InvalidParamException("Unresolved filter property $property")
+		}
+
 		return this
 	}
 

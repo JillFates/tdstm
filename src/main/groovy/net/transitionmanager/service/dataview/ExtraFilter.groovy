@@ -25,14 +25,12 @@ class ExtraFilter {
 	 */
 	String property
 	String filter
+	/**
+	 * Field used to to validate filters like:
+	 * "moveBundle.id" or "sme.id"
+	 */
+	String referenceProperty
 	FieldSpec fieldSpec
-
-	ExtraFilter(String property, String filter, String domain = null, FieldSpec fieldSpec = null) {
-		this.domain = domain
-		this.property = property
-		this.filter = filter
-		this.fieldSpec = fieldSpec
-	}
 
 	boolean isAssetField() {
 		return this.fieldSpec != null
