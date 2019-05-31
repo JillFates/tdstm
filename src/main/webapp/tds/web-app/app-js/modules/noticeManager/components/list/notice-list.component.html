@@ -1,5 +1,5 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid license-admin-list-component">
+<div class="content body tds-kendo-grid notice-list-component">
     <section>
         <div *ngIf="noticeColumnModel">
             <div class="box-body box-with-empty-header">
@@ -19,7 +19,7 @@
                         (cellClick)="cellClick($event)"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button [disabled]="!isCreateAvailable()" class="btn btn-default button-create-license" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
+                        <button [disabled]="!isCreateAvailable()" class="btn btn-default button-create-notice" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
                     <kendo-grid-column *ngFor="let column of noticeColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
@@ -84,7 +84,7 @@
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                             <div class="text-center">
-                                <button [disabled]="!isEditAvailable()" class="btn btn-default" (click)="openNoticeViewEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+                                <button [disabled]="!isEditAvailable()" class="btn btn-default" (click)="openNotice(dataItem, actionType.Edit)"><span class="glyphicon glyphicon-pencil"></span></button>
                                 <button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
                             </div>
                         </ng-template>

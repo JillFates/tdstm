@@ -12,12 +12,15 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 // import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
 import {NoticeModel, NoticeTypes, NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN} from '../../model/notice.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {ActionType} from '../../../../shared/model/action-type.enum';
 @Component({
 	selector: 'tds-notice-view-edit',
 	templateUrl: 'notice-view-edit.component.html'
@@ -26,6 +29,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField') typeId: DropDownListComponent;
 
+	public EnumActionType = ActionType;
 	private dataSignature: string;
 	protected model: NoticeModel;
 	protected defaultItem: any = {
@@ -37,6 +41,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	typeDataSource = [...NoticeTypes];
 	minDate = null;
 	maxDate = null;
+	typeName = '';
+	userDateFormat = '';
 	constructor(
 		private translate: TranslatePipe,
 		private originalModel: NoticeModel,
@@ -45,7 +51,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		private dialogService: UIDialogService,
 		private noticeService: NoticeService,
 		private promptService: UIPromptService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private preferenceService: PreferenceService) {
 	}
 
 	ngOnInit() {
@@ -53,11 +60,16 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		this.model.typeId = this.model.typeId;
 		this.noticeIsLocked = this.model.locked;
 		this.model.active = StringUtils.stringToBoolean(this.model.active);
+		const currentType = this.typeDataSource
+		.find((typeData) => typeData.typeId === this.model.typeId);
+		if (currentType) {
+			this.typeName = currentType.name;
+		}
 
 		if (this.model.needAcknowledgement) {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
-		this.noticeType = {typeId: this.model.typeId};
+		this.noticeType = {typeId: this.model && this.model.typeId || null};
 
 		if (this.model.expirationDate) {
 			this.setMaxDate(this.model.expirationDate);
@@ -66,6 +78,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		if (this.model.activationDate) {
 			this.setMinDate(this.model.activationDate);
 		}
+		this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 
 		this.dataSignature = JSON.stringify(this.model);
 	}
@@ -246,5 +259,33 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			value :
 			DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(value), DateUtils.SERVER_FORMAT_DATE);
 			// new Date(DateUtils.getDateFromGMT(value));
+	}
+
+	/**
+	 * Change to edit mode
+	 */
+	protected editNotice(): void {
+		this.action = ActionType.Edit;
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.Edit) {
+			return this.translate.transform('NOTICE.EDIT_NOTICE');
+		}
+
+		if (modalType === ActionType.Create) {
+			return this.translate.transform('NOTICE.CREATE_NOTICE');
+		}
+
+		if (modalType === ActionType.View) {
+			return this.translate.transform('NOTICE.SHOW_NOTICE');
+		}
+
+		return '';
 	}
 }

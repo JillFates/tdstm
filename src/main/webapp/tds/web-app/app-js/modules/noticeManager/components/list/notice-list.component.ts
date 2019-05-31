@@ -143,7 +143,7 @@ export class NoticeListComponent implements OnInit {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			this.openNoticeViewEdit(event['dataItem']);
+			this.openNotice(event['dataItem'], ActionType.View);
 		}
 	}
 
@@ -215,15 +215,16 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	/**
-	 * Edit a Notice
-	 * @param {NoticeModel} dataItem
+	 * Open a notice view
+	 * @param {NoticeModel} dataItem Contain the notice object
+	 * @param {ActionType} action Mode in which open the view (Create, Edit, etc...)
 	 */
-	public openNoticeViewEdit(dataItem: NoticeModel): void {
+	public openNotice(dataItem: NoticeModel, action: ActionType): void {
 		this.noticeService.getNotice(dataItem.id)
 			.subscribe((notice: NoticeModel) => {
 				this.dialogService.open(NoticeViewEditComponent, [
 					{provide: NoticeModel, useValue: notice as NoticeModel},
-					{provide: Number, useValue: ActionType.Edit}
+					{provide: Number, useValue: action}
 				]).then(result => {
 					this.reloadData();
 				}, error => {
