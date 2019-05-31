@@ -154,7 +154,7 @@ export class UserDashboardComponent implements OnInit {
 
 	public fetchEventsForGrid(): void {
 		let projectId = this.selectedProject ? this.selectedProject.id : 0;
-		this.userService.getAssignedEvents(projectId,this.showActiveEvents)
+		this.userService.getAssignedEvents(projectId, this.showActiveEvents)
 			.subscribe((result) => {
 				this.eventList = result.events;
 			});
