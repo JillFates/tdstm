@@ -9,6 +9,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 import javax.servlet.http.HttpServletRequest
+import org.apache.commons.lang.StringEscapeUtils
 
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
@@ -54,7 +55,7 @@ class HtmlUtil {
 			def value = optionValue ? it."${optionValue}" : it
 			selected = key == optionSelected ? 'selected="selected"' : ''
 			def optionClass = params.containsKey('optionClass') ? "class ='${getCssClassForStatus(it)}' ": ''
-			html.append("""<option value="${key}" ${selected} ${optionClass}>${value}</option>""")
+			html.append("""<option value="${key}" ${selected} ${optionClass}>${escape(value)}</option>""")
 		}
 		html.append('</select>')
 
@@ -234,5 +235,18 @@ class HtmlUtil {
 	 */
 	static String appUrl(String controller, String action='', String fragment='', Boolean absolute=false) {
 		'/tdstm/app#' + controller + (action ?: '/' + action) + fragment
+	}
+
+	/**
+	 * Used encode/escape text into safe to render HTML
+	 * @param text
+	 * @return text that has been encoded for HTML or blank if the text is NULL
+	 */
+	static String escape(Object text) {
+		if (text) {
+			return (text instanceof CharSequence) ? StringEscapeUtils.escapeHtml(text.toString()) : "$text"
+		} else {
+			return ''
+		}
 	}
 }

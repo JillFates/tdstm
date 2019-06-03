@@ -26,12 +26,12 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
                 $(document).on('entityAssetUpdated',function (e,obj) {
-                    $("#messageId").html(obj.asset.assetName + ' Updated').show();
+                    $("#messageId").html(_.escape(obj.asset.assetName) + ' Updated').show();
                     $('#storageIdGrid').trigger("reloadGrid")
                 });
                 $(document).on('entityAssetCreated',function (e,obj) {
                     if(obj != null) {
-                    	$("#messageId").html(obj.asset.assetName + ' Created').show();
+                    	$("#messageId").html(_.escape(obj.asset.assetName) + ' Created').show();
                     }
                     $('#storageIdGrid').trigger("reloadGrid")
                 });

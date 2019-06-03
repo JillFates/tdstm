@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "7.2.4",
     "@angular/router": "7.2.4",
     "@progress/kendo-angular-buttons": "4.3.3",
+    "@progress/kendo-angular-menu": "^1.2.0",
     "@progress/kendo-angular-dateinputs": "3.5.4",
     "@progress/kendo-angular-dialog": "3.10.1",
     "@progress/kendo-angular-dropdowns": "3.4.2",

@@ -1,16 +1,17 @@
 package net.transitionmanager.admin
 
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.WebUtil
 import net.transitionmanager.asset.Application
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
-import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.user.SavePreferenceCommand
@@ -40,9 +41,9 @@ class WsUserController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	PersonService personService
 	PartyRelationshipService partyRelationshipService
-	MoveEventService moveEventService
 	UserService userService
 	ProjectService projectService
+	MoveEventService moveEventService
 
 	/**
 	 * Access a list of one or more user preferences
@@ -130,12 +131,43 @@ class WsUserController implements ControllerMethods {
 	 */
 	def getAssignedEvents() {
 		Project project = getProjectForWs()
-		List events = userService.getEventDetails(project).values().collect { value -> [
-				eventId: value.moveEvent.id, projectName: value.moveEvent.project.name,
-				name: value.moveEvent.name, startDate: moveEventService.getEventTimes(value.moveEvent.id).start,
-				days: value.daysToGo + ' days', teams: value.teams]
+		Person currentPerson = currentPerson()
+		Long projectId = NumberUtil.toPositiveLong(params.project)
+		boolean active = StringUtil.toBoolean(params.active)
+
+		if (projectId) {
+			if (securityService.hasAccessToProject(projectId)) {
+				project = Project.read(projectId)
+			} else {
+				throw new InvalidParamException('Invalid project id for filtering events.')
+			}
 		}
-		renderSuccessJson(events: events)
+
+		List<MoveEvent> events = moveEventService.getAssignedEvents(currentPerson, project, active)
+		Date now = TimeUtil.nowGMT()
+		DateFormat formatter = TimeUtil.createFormatter("MM/dd/yyyy hh:mm a")
+
+		List<Map> eventsMap = events.collect { MoveEvent moveEvent ->
+			List<MoveEventStaff> teams = MoveEventStaff.findAllByMoveEventAndPerson(moveEvent, currentPerson)
+			String teamsString = WebUtil.listAsMultiValueString(teams.collect { team -> team.role.toString() })
+			moveEvent.with {
+				String daysToGo
+				if (estStartTime) {
+					daysToGo = estStartTime > now ? estStartTime - now : (" + " + (now - estStartTime))
+					daysToGo = "${daysToGo} days"
+				}
+				return [
+						eventId    : id,
+						name       : name,
+						projectName: project.name,
+						startDate  : TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, estStartTime, formatter),
+						endDate    : estCompletionTime,
+						days       : daysToGo,
+						teams      : teamsString
+				]
+			}
+		}
+		renderSuccessJson(events: eventsMap)
 	}
 
 	/**

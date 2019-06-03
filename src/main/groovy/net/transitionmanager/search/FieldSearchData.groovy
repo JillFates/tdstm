@@ -41,7 +41,8 @@ class FieldSearchData {
                     type: type,
                     whereProperty: whereProperty,
 	                manyToManyQueries: manyToManyQueries,
-                    fieldSpec: fieldSpec
+                    fieldSpec: fieldSpec,
+                    domainAlias: domainAlias
             ]
         }
 
@@ -136,7 +137,8 @@ class FieldSearchData {
                This is so when the user mixes custom fields from different domains, nothing is returned. */
             AssetClass assetClass = AssetClass.lookup(domain)
             String parameterName = "${assetClass.toString()}_assetClass"
-            expression = "($expression AND assetClass = :$parameterName)"
+            String assetClassField = "${getDomainAlias()}.assetClass"
+            expression = "($expression AND $assetClassField = :$parameterName)"
             addSqlSearchParameter(parameterName, assetClass)
         }
         return expression
@@ -184,5 +186,9 @@ class FieldSearchData {
 
     boolean isCustomField() {
         return searchInfo.fieldSpec?.isUserDefinedField
+    }
+
+    String getDomainAlias() {
+        return searchInfo.domainAlias
     }
 }

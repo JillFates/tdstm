@@ -4,10 +4,8 @@ import grails.util.Metadata
 import net.transitionmanager.common.CoreService
 import org.grails.config.NavigableMap
 import org.grails.core.exceptions.GrailsConfigurationException
-import spock.lang.Ignore
 import spock.lang.Specification
 
-@Ignore
 @Integration
 @Rollback
 class CoreServiceTests extends Specification {
@@ -18,6 +16,7 @@ class CoreServiceTests extends Specification {
 		expect: 'Should return the application name'
 			coreService.getAppName() == Metadata.current.getApplicationName()
 	}
+
 
 	void "getAppConfig"() {
 		expect: 'getAppConfig() should not return null'
@@ -44,6 +43,7 @@ class CoreServiceTests extends Specification {
 		then: 'Should return String valid setting from grails-app/conf/Config.groovy'
 		setting instanceof String
 	}
+
 
 	void "getAppConfigSetting"() {
 		when:

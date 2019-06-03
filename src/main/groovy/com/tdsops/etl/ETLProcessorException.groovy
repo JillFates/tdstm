@@ -264,5 +264,9 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException unrecognizedArguments() {
         new ETLProcessorException("unrecognized argument")
     }
+
+    static ETLProcessorException extractRequiresNameReadLabelsFirst() {
+        new ETLProcessorException("Extract by name requires that 'read labels' is performed first")
+    }
 }
 

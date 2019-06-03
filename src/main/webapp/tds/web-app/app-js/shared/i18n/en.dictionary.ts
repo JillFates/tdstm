@@ -56,6 +56,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
+		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
 			'ARCHITECTURE_GRAPH': 'Arch Graph',
 			'ASSET' : 'Asset',
@@ -200,10 +201,13 @@ export const en_DICTIONARY: Object = {
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
+		'APPLICATION_CONFLICTS': 'Application Conflicts',
+		'DATABASE_CONFLICTS': 'Database Conflicts',
 		'REPORT': 'Report',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'TASK_REPORT': 'Task Report',
-		'SERVER_CONFLICTS': 'Server Conflicts'
+		'SERVER_CONFLICTS': 'Server Conflicts',
+		'APPLICATION_EVENT_RESULTS': 'Application Event Results'
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
@@ -213,7 +217,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
-		'PROJECT_LIST': 'Project List',
+		'PROJECT': 'Project',
 		'CREATE_CUSTOM': 'Add Custom Field',
 		'PLAN_METHODOLOGY_DELETE_WARNING': 'Field is used as Project Plan Methodology, it can\'t be deleted.',
 		'MIN_MAX': {

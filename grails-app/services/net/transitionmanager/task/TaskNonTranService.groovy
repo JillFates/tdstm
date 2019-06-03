@@ -1,16 +1,15 @@
 package net.transitionmanager.task
 
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.asset.CommentService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.GormUtil
-import net.transitionmanager.person.Person
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionStatus
-
 /**
  * A subset of the TaskService class for the purpose of updateTaskSuccessors which requires a non-transactional service in order to control when the
  * transaction actual starts due to the concurrency of the update of tasks through the Quartz Job and the database transaction isolation level.
@@ -37,7 +36,7 @@ class TaskNonTranService implements ServiceMethods {
 
 		def whom = Person.read(whomId)
 		if (! whom) {
-			log.error "updateTaskSuccessors: for task(#:$task.taskNumber Id:$task.id) unable to find person $whomId"
+			log.error "updateTaskSuccessors: for task(Id:$taskId) unable to find person $whomId"
 			return	'failed'
 		}
 

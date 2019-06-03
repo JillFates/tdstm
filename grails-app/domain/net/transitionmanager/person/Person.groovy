@@ -1,5 +1,6 @@
 package net.transitionmanager.person
 
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -276,7 +277,7 @@ class Person extends Party {
 	}
 
 	String toString() {
-		firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : '')
+		HtmlUtil.escape(firstName+ (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
 	}
 
 	def beforeValidate() {

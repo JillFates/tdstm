@@ -58,26 +58,25 @@ class FieldSpecProject {
 	}
 
 	/**
-	 * Returns an instance of {@code FieldSpec} based on an assetclass definition and a field name
-	 * @param assetClassName
-	 * @param fieldName
-	 * @return
+	 * Returns an instance of {@code FieldSpec} based on an domain definition and a field name
+	 * @param domain a asset entity definition. See {@code ETLDomain}
+	 * @param fieldName an asset entity field
+	 * @return an instance of {@code FieldSpec}
+	 * 		or null if it was not found in cache
 	 */
-	FieldSpec getFieldSpec(String assetClassName, String fieldName) {
-		FieldSpec fieldSpec = null
-		String key = assetClassName.toUpperCase()
-		if (! fieldsSpecMap.containsKey(key)) {
-			throw new InvalidParamException("Domain $assetClassName not found in cache")
+	FieldSpec getFieldSpec(String domain, String fieldName) {
+		String key = domain.toUpperCase()
+		if (fieldsSpecMap.containsKey(key)
+			&& fieldsSpecMap[key].containsKey(fieldName)) {
+			return fieldsSpecMap[key][fieldName]
+		} else {
+			return null
 		}
-		if (fieldsSpecMap[key].containsKey(fieldName)) {
-			fieldSpec = fieldsSpecMap[key][fieldName]
-		}
-		return fieldSpec
 	}
 
 	/**
 	 * Retrieve a {@code Map} with all customFields for an asset class definition.
-	 * @param assetClassName a Class name in AssetEntity hierarchy
+	 * @param 	assetClassName a Class name in AssetEntity hierarchy
 	 * @return a {@code Map} with all custom fields
 	 * @see FieldSpec#isCustom()
 	 */

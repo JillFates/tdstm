@@ -717,10 +717,10 @@ function showManufacturer(id){
 		onComplete:function(e){
 			var data = eval('(' + e.responseText + ')')
 			var manufacturer = data.manufacturer
-			$("#showManuName").html( manufacturer.name )
-			$("#showManuAka").html( data.aliases )
-			$("#showManuDescription").html( manufacturer.description )
-			$("#show_manufacturerId").val( manufacturer.id )
+			$("#showManuName").html( _.escape(manufacturer.name) )
+			$("#showManuAka").html( _.escape(data.aliases) )
+			$("#showManuDescription").html( _.escape(manufacturer.description) )
+			$("#show_manufacturerId").val( _.escape(manufacturer.id) )
 			$("#manufacturerShowDialog").dialog("open")
 		}
 	})
@@ -732,11 +732,11 @@ function showModel(id){
 		onComplete:function(e){
 			var model = eval('(' + e.responseText + ')')
 			$("#show_modelId").val( model.id )
-			$("#showManufacturer").html( model.manufacturer )
-			$("#showModelName").html( model.modelName )
-			$("#showModelAka").html( model.aka )
-			$("#showModelNotes").html( model.description )
-			$("#showModelAssetType").html( model.assetType )
+			$("#showManufacturer").html(_.escape(model.manufacturer))
+			$("#showModelName").html( _.escape(model.modelName ))
+			$("#showModelAka").html(_.escape(model.aka))
+			$("#showModelNotes").html(_.escape(model.description))
+			$("#showModelAssetType").html(_.escape(model.assetType))
 			$("#showModelUsize").html( model.usize )
 			$("#namePlatePowerSpanId").html( model.powerNameplate )
 			$("#PowerDesignSpanId").html( model.powerDesign )

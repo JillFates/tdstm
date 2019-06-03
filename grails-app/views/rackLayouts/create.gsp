@@ -21,7 +21,7 @@
 
 <body>
 <tds:subHeader title="Rack Elevations" crumbs="['Data Center', 'Rack Elevations']"/>
-<div class="body" style="width:98%; min-width:1225px" ng-app="tdsComments"
+<div class="body" style="width:98%; min-width:1385px" ng-app="tdsComments"
      ng-controller="tds.comments.controller.MainController as comments">
 
     <g:if test="${flash.message}">
@@ -213,7 +213,7 @@
                 }
 
                 reqLoadRack = jQuery.ajax({
-                    url: $(form).attr('action'),
+                    url: tdsCommon.createAppURL('/rackLayouts/generateElevations'),
                     data: $(form).serialize(),
                     type: 'POST',
                     success: function (data) {
@@ -300,5 +300,6 @@
         $(".menu-parent-data-centers").addClass('active');
     </script>
 </div>
+    <div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 </body>
 </html>

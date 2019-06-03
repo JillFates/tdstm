@@ -208,7 +208,7 @@
 
 		</tr>
 		<g:render template="/assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
-		<g:render template="/comment/assetTagsShow"></g:render>
+		<g:render template="/comment/assetTagsShow" model="[tagAssetList: tagAssetList, tagAssetsFromServer: tagAssetsFromServer]"></g:render>
 	</tbody>
 </table>
 

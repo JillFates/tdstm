@@ -1,8 +1,9 @@
 package net.transitionmanager.asset
 
-
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -15,7 +16,7 @@ import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class ManufacturerController implements ControllerMethods {
+class ManufacturerController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -31,11 +32,11 @@ class ManufacturerController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ManufacturerList)
 	def listJson() {
-		String sortIndex = params.sidx ?: 'modelName'
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows')
- 		int currentPage = params.int('page') ?: 1
-		int rowOffset = (currentPage - 1) * maxRows
+		String sortIndex = paginationOrderBy(Manufacturer, 'sidx', 'modelName')
+		String sortOrder  = paginationSortOrder('sord')
+		int maxRows = paginationMaxRowValue('rows')
+ 		int currentPage = paginationPage()
+		int rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		session.MAN = [:]
 		List<Manufacturer> manufacturers = Manufacturer.createCriteria().list(max: maxRows, offset: rowOffset) {
@@ -55,7 +56,7 @@ class ManufacturerController implements ControllerMethods {
 				ilike('website', "%$params.website%")
 			}
 
-			order((sortOrder == 'asc' ? Order.asc(sortIndex) : Order.desc(sortIndex)).ignoreCase())
+			order((sortOrder == 'ASC' ? Order.asc(sortIndex) : Order.desc(sortIndex)).ignoreCase())
 		}
 
 		int totalRows = manufacturers.totalCount
@@ -147,15 +148,16 @@ class ManufacturerController implements ControllerMethods {
 	@HasPermission(Permission.ManufacturerCreate)
 	def save() {
 		def manufacturer = new Manufacturer(params)
+
 		try {
 			if (manufacturerService.save(manufacturer, params.list('aka'))) {
-				render(text: "Manufacturer ${manufacturer.name} created")
+				render(text: "Manufacturer ${HtmlUtil.escape(manufacturer.name)} created")
 			} else {
 				render(view: 'create', model: [manufacturerInstance: manufacturer])
 			}
 		} catch (ServiceException e) {
 			//log.error(e.message, e)
-			render(text: e.message)
+			render(text: HtmlUtil.escape(e.message))
 		}
 	}
 

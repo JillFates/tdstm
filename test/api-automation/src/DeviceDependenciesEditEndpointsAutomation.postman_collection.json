@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "898cfd41-fda8-4790-aad7-2b762610eb7f",
+		"_postman_id": "447a3257-6962-410d-b9ab-1d43071e1599",
 		"name": "DeviceDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "TranMan Login",
+			"name": "Login - Device Dependency Edit",
 			"event": [
 				{
 					"listen": "test",
@@ -50,12 +50,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -108,10 +108,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
@@ -233,10 +229,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
 					"host": [
@@ -286,10 +278,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/listDepJson?sidx=assetName",
 					"host": [

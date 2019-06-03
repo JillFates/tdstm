@@ -58,7 +58,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form action="save" method="post" name="createUserForm" autocomplete="off">
+			<g:form action="save" method="post" name="createUserForm" autocomplete="off" useToken="true">
 				<div class="dialog loginView">
 					<table>
 						<tbody>
@@ -66,7 +66,7 @@
 								<td colspan="2">
 									<div class="required"> Fields marked ( * ) are mandatory </div>
 									<input name="companyId" type="hidden" value="${companyId}" />
-									<input name="personId" type="hidden" value="${personInstance.id}" />
+									<input name="personId" type="hidden" value="${personInstance?.id}" />
 								</td>
 							</tr>
 
@@ -75,7 +75,7 @@
 									<label for="person">Company:</label>
 								</td>
 								<td valign="top" class="value">
-									${personInstance.company}
+									${personInstance?.company}
 								</td>
 							</tr>
 
@@ -93,7 +93,7 @@
 									<label for="username">Username (use email):</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${personInstance.email}" autocomplete="off" />
+									<input class="requiredInput" type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${username ? username : personInstance?.email}" autocomplete="off" />
 									<g:hasErrors bean="${userLoginInstance}" field="username">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -106,8 +106,8 @@
 									<label for="email">Email:</label>
 								</td>
 								<td valign="top" class="value">
-									<input type="text" id="emailInputId" name="email" value="${personInstance?.email}" autocomplete="off" />
-									<span id="emailDisplayId" style="display:none;">${personInstance?.email}</span>
+									<input class="requiredInput" type="text" id="emailInputId" name="email" value="${email ? email : personInstance?.email}" autocomplete="off" />
+									<span id="emailDisplayId" style="display:none;">${personInstance?.email ? personInstance.email : email}</span>
 								</td>
 							</tr>
 							<tr>
@@ -115,7 +115,7 @@
 									<label for="isLocal">Local Account:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}
+									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${isLocal == "true"? 'checked="checked"' : ''}
 										onchange="togglePasswordEditFields( $(this) )"/>
 								</td>
 							</tr>
@@ -124,7 +124,7 @@
 									<label for="forcePasswordChange">Force password change:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" />
+									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="true" ${forcePasswordChange == 'true' ? 'checked="checked"' : ''} />
 								</td>
 							</tr>
 							<tr class="prop passwordsEditFields">
@@ -132,7 +132,7 @@
 									<label for="passwordNeverExpiresId">Password never expires:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'passwordNeverExpires','errors')}">
-									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" />
+									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" ${passwordNeverExpires == 'true' ? 'checked="checked"' : ''} />
 								</td>
 							</tr>
 
@@ -146,13 +146,24 @@
 									<script type="text/javascript">
 										jQuery(function($){ $("#expiryDate").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
-									<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
-										value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
-									<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
-										<div class="errors">
-											<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
-										</div>
-									</g:hasErrors>
+									<g:if test="${expiryDate}">
+										<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
+											   value="${URLDecoder.decode(expiryDate,'UTF-8')}"/>
+										<g:hasErrors bean="${params}" field="expiryDate">
+											<div class="errors">
+												<g:renderErrors bean="${params}" as="list" field="expiryDate"/>
+											</div>
+										</g:hasErrors>
+									</g:if>
+									<g:else>
+										<input type="text" class="dateRange" id="expiryDate" name="expiryDate"
+											   value="<tds:convertDateTime date="${userLoginInstance?.expiryDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
+										<g:hasErrors bean="${userLoginInstance}" field="expiryDate">
+											<div class="errors">
+												<g:renderErrors bean="${userLoginInstance}" as="list" field="expiryDate"/>
+											</div>
+										</g:hasErrors>
+									</g:else>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -163,13 +174,19 @@
 									<script type="text/javascript">
 										jQuery(function($){ $("#passwordExpirationDateId").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()}); });
 									</script>
-									<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
-										value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" format="12hrs" />"/>
-									<g:hasErrors bean="${userLoginInstance}" field="passwordExpirationDate">
-										<div class="errors">
-											<g:renderErrors bean="${userLoginInstance}" as="list" field="passwordExpirationDate"/>
-										</div>
-									</g:hasErrors>
+									<g:if test="${passwordExpirationDate}">
+										<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
+											   value="${URLDecoder.decode(passwordExpirationDate,'UTF-8')}"/>
+									</g:if>
+									<g:else>
+										<input type="text" class="dateRange" id="passwordExpirationDateId" name="passwordExpirationDate"
+											   value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}"  formate="12hrs" timeZone="${tds.timeZone()}"/>"/>
+										<g:hasErrors bean="${userLoginInstance}" field="passwordExpirationDate">
+											<div class="errors">
+												<g:renderErrors bean="${userLoginInstance}" as="list" field="passwordExpirationDate"/>
+											</div>
+										</g:hasErrors>
+									</g:else>
 								</td>
 							</tr>
 
@@ -178,7 +195,7 @@
 									<label for="active">Active:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
-									<g:select id="active" name="active" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(userLoginInstance.class).active.inList}" value="${userLoginInstance.active}" ></g:select>
+									<g:select id="active" name="active" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(userLoginInstance.class).active.inList}" value="${active ? params.active : userLoginInstance?.active}" ></g:select>
 									<g:hasErrors bean="${userLoginInstance}" field="active">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="active"/>
@@ -192,7 +209,8 @@
 									<label for="active">Project:</label>
 								</td>
 								<td valign="top" class="value">
-									<g:select id="projectId" name="projectId" from="${projectList}"
+									<g:select class="requiredInput" id="projectId" name="projectId" from="${projectList}"
+										value="${projectId}"
 										noSelection="${['':'Select a project...']}"
 										optionKey="id" optionValue="name"/>
 								</td>
@@ -203,7 +221,7 @@
 										<label for="role_${role.id}">${role}:</label>
 									</td>
 									<td valign="top" class="value" >
-										<input type="checkbox" name="assignedRole"  value="${role.id}" id="role_${role.id}" <g:if test="${role.level > maxLevel}">disabled</g:if> />
+										<input type="checkbox" name="assignedRole"  value="${role.id}" id="role_${role.id}" <g:if test="${role.level > maxLevel}">disabled</g:if> <g:else>${params[role.id.replaceAll('_','')] == 'true' ? 'checked="checked"' : ''}</g:else> />
 										<label for="role_${role.id}">&nbsp; ${role.help ? role.help : ''} &nbsp;</label>
 									</td>
 								</tr>
@@ -313,12 +331,43 @@
 					</table>
 				</div>
 				<div class="buttons">
-					<span class="button"><input class="save" type="submit" value="Save" onclick="selectAllAssigned()"/></span>
+					<span class="button"><input class="save disableButton" type="submit" value="Save" disabled="disabled" onclick="selectAllAssigned()"/></span>
 				</div>
 			</g:form>
 		</div>
 	<script>
 
+        function checkIfDisableSave() {
+            var empty = false;
+            $('.requiredInput').each(function () {
+                if ($(this).val().length == 0) {
+                    empty = true;
+                }
+            });
+
+            var passwordsMatch = $('#passwordId').val() == $('#confirmPasswordId').val();
+
+            if (empty || !passwordsMatch) {
+                $('.save').attr('disabled', 'disabled');
+                $('.save').addClass('disableButton');
+            } else {
+                $('.save').removeAttr('disabled');
+                $('.save').removeClass('disableButton');
+            }
+        }
+
+        $(document).ready(function() {
+            checkIfDisableSave();
+            $('.requiredInput').change(function() {
+                checkIfDisableSave();
+            });
+            $('.requiredInput').on('input', function() {
+                checkIfDisableSave();
+            });
+            $('.passwordField').on('input', function() {
+                checkIfDisableSave();
+            });
+        });
 
 		var form = $("form[name='createUserForm']")[0]
 		$(form).submit(function(event){

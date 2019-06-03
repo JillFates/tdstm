@@ -819,9 +819,9 @@ var EntityCrud = (function ($) {
 	var modelSelectFormatResult = function (item) {
 		if (item.text) {
 			if (item.isValid) {
-				return '<b>' + item.text + '</b>';
+				return '<b>' + _.escape(item.text) + '</b>';
 			} else {
-				return '<i>' + item.text + '</i>';
+				return '<i>' + _.escape(item.text) + '</i>';
 			}
 		} else {
 			return '';
@@ -831,9 +831,9 @@ var EntityCrud = (function ($) {
 	var modelSelectFormatSelection = function (item) {
 		if (item.text) {
 			if ((('isValid' in item) && item.isValid) || item.text.indexOf('?') == -1) {
-				return '<b>' + item.text + '</b>';
+				return '<b>' + _.escape(item.text) + '</b>';
 			} else {
-				return '<i>' + item.text + '</i>';
+				return '<i>' + _.escape(item.text) + '</i>';
 			}
 		} else {
 			return '';
@@ -1852,7 +1852,7 @@ function reloadDependencyGroupsSection() {
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
             setTimeout( function () {
-                $('#dependencyDivId').css('overflow-x', 'scroll');
+                $('#dependencyTableWrapperId').css('overflow-x', 'scroll');
             }, 200);
 		}
 	});
@@ -2027,7 +2027,8 @@ function bulkDeleteDependencies() {
         if (confirm("You are about to delete all of the selected dependencies for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")) {
             jQuery.ajax({
                 url: tdsCommon.createAppURL('/wsAsset/bulkDeleteDependencies'),
-                data: { 'dependencyIds': dependencyArr },
+                data: { 'dependencies': dependencyArr },
+                traditional: true, // This removes the annoying '[]' in the back end parameter name, that prevents us from using a command object
                 type: 'POST',
                 success: function (data) {
                     $(".ui-icon-refresh").click();

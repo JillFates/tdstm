@@ -1,9 +1,5 @@
 package net.transitionmanager.tasks
 
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.task.TaskDependency
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -16,29 +12,35 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import groovy.time.TimeDuration
-import net.transitionmanager.connector.AbstractConnector
-import net.transitionmanager.connector.DictionaryItem
-import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.action.ApiAction
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
+import net.transitionmanager.command.task.AssignToMeCommand
+import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.common.GraphvizService
+import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.connector.DictionaryItem
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -121,13 +123,8 @@ class TaskController implements ControllerMethods {
 				flash.message = map.error
 			}
 
-			def redirParams = [view: requestParams.view]
-			if (requestParams.containsKey('tab') && requestParams.tab) {
-				redirParams.tab = requestParams.tab
-			}
-			if (requestParams.containsKey('sort') && requestParams.sort) {
-				redirParams.sort = requestParams.sort
-			}
+			def redirParams = []
+
 			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
@@ -145,24 +142,13 @@ class TaskController implements ControllerMethods {
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
 	@HasPermission(Permission.TaskEdit)
-	def assignToMe() {
-		Map requestParams
-
-		withFormat {
-			js {
-				requestParams = request.JSON
-			}
-
-			html {
-				requestParams = params
-			}
-		}
+	def assignToMe(AssignToMeCommand params) {
 
 		String errorMsg = ''
 		String assignedToName = ''
 
 		try {
-			Person assignedTo = taskService.assignToMe(requestParams.id as Long, requestParams.status)
+			Person assignedTo = taskService.assignToMe(params.id as Long, params.status)
 			assignedToName = assignedTo.toString()
 		} catch (EmptyResultException | ServiceException e) {
 			errorMsg = e.message
@@ -872,33 +858,28 @@ digraph runbook {
 	}
 
 	/**
-	 * Used in MyTask to set user preference for printername and quantity, we can get a key-vaulue or
+	 * Used in MyTask to set user preference for printername and quantity, we can get a key-value or
 	 * a json with a list of permissions to Change
 	 * @param preference - Key
 	 * @param value
 	 */
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
-		Map preferencesMap
-		withFormat {
-			js {
-				preferencesMap = request.JSON
-
-			}
-			html {
-				preferencesMap = [:]
-				def key = params.preference
-				def value = params.value
-				if (value) {
-					preferencesMap[key] = value
-				}
-			}
+		Map preferencesMap = [:]
+		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand)
+		if (commandObject.hasErrors()) {
+			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObject) ) )
+			return
 		}
-
+	/*  If there are json properties present, set them in preferenceMap */
+		preferencesMap = commandObject.preferenceMap
+	/* If there are values sent in key-value format, set them in preferenceMap */
+		if(preferencesMap.value) {
+			preferencesMap[params.preference] = params.value
+		}
 		preferencesMap.each { key, value ->
 			userPreferenceService.setPreference(key, value)
 		}
-
 		render true
 	}
 

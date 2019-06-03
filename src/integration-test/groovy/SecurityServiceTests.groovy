@@ -1,4 +1,3 @@
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
@@ -7,16 +6,16 @@ import grails.test.mixin.integration.Integration
 import grails.util.GrailsWebMockUtil
 import groovy.time.TimeCategory
 import net.transitionmanager.common.EmailDispatch
-import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.exception.UnauthorizedException
-import spock.lang.Ignore
+import net.transitionmanager.security.UserLogin
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -473,7 +472,6 @@ class SecurityServiceTests extends Specification {
 			ex.message.startsWith("The password reset token has expired")
 	}
 
-	@Ignore //TODO Grails Upgrade There is a transaction issue running this from an integration test using either @Rollback or @Transactional, which are now required.
 	def '15. Test Password Reset expiration Cron cleanup'() {
 		setup: 'a valid username and Reset Data'
 			long THREE_SECONDS_AGO = -3000

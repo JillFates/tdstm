@@ -320,7 +320,7 @@
 				$("#rack_"+rackId).addClass("objectSelected")
 
 				var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-				new Ajax.Request('/rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
+				new Ajax.Request(tdsCommon.createAppURL('/rackLayouts/generateElevations'),{asynchronous:true,evalScripts:true,
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
@@ -349,5 +349,6 @@
 
 	</script>
 		<g:render template="/assetEntity/initAssetEntityData"/>
+	    <div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	</body>
 </html>

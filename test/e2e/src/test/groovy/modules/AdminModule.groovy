@@ -5,6 +5,7 @@ import geb.Module
 class AdminModule extends Module{
 
     static at = {
+        waitFor {adminMenu.displayed}
         adminItem.text().trim() == "Admin"
         adminSections[0].text().trim() == "Administration"
         adminSections[1].text().trim() == "Manage Clients"
@@ -24,16 +25,14 @@ class AdminModule extends Module{
         adminManufItem.text().trim() == "List Manufacturers"
         adminModelsItem.text().trim() == "List Models"
         adminExportManModItem.text().trim() == "Export Mfg & Models"
-
     }
 
     static content = {
-        menuContainer { $("div", class: "container menu-top-container menu-top-container-full-menu") }
+        menuContainer { $("div", class: "menu-top-container") }
         menuBar { menuContainer.find("div#navbar-collapse") }
-
         adminItem { menuBar.find("li.menu-parent-admin") }
         adminMenu { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
-        adminSections { adminMenu.find("li", class: "menu-parent-item") }
+        adminSections { adminMenu.find("li", class: "menu-parent-admin") }
         adminPortalItem { adminMenu.find("li.menu-admin-portal") }
         adminLMItem { adminMenu.find("li.menu-admin-license-admin").find("a", "href": "/tdstm/module/license/admin/list") }
         adminNoticesItem { adminMenu.find("li.menu-admin-notice-manager").find("a", "href": "/tdstm/module/notice/list") }
@@ -78,7 +77,9 @@ class AdminModule extends Module{
     }
 
     def goToAdminListStaff(){
+        waitFor (30) {adminItem}
         selectMenu(adminItem)
+        waitFor (30) {adminStaffItem}
         selectItem(adminStaffItem)
     }
 
@@ -103,13 +104,14 @@ class AdminModule extends Module{
     }
 
     def goToListCompanies(){
+        waitFor (30) {adminItem}
         selectMenu(adminItem)
-        selectItem(adminCompaniesItem)
+        waitFor (30){selectItem(adminCompaniesItem)}
     }
 
     def goToListUsers(){
-        selectMenu(adminItem)
-        selectItem(adminUsersItem)
+        waitFor (30) {selectMenu(adminItem)}
+        waitFor (30){selectItem(adminUsersItem)}
     }
 
     def goToImportAccounts(){

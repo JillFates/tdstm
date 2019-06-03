@@ -7,7 +7,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.security.PermissionsService
 
 @Secured('isAuthenticated()')
-// TODO BB need more fine-grained rules here
 class PermissionsController implements ControllerMethods {
 
 	static defaultAction = 'list'
@@ -26,7 +25,12 @@ class PermissionsController implements ControllerMethods {
 
 	@HasPermission(Permission.RolePermissionEdit)
 	def update() {
-		permissionsService.update(params)
+		withForm {
+			permissionsService.update(params)
+		}.invalidToken {
+			flash.message = message(code: 'invalid.csrf.token')
+		}
+
 		redirect(action: "show")
 	}
 }

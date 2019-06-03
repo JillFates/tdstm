@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "0b604edc-c89b-447d-ba08-a802ecdd4ddd",
-		"name": "DataBaseEdit",
+		"_postman_id": "7750425d-10a8-46dc-9a5e-9a2e084f84b3",
+		"name": "DataBaseEdit UPDATE",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -50,12 +50,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -85,7 +85,7 @@
 						"exec": [
 							"pm.test(\"Set the DB ID for later\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
-							"    var dbID = jsonObject.data.assets[0].common_id; ",
+							"    var dbID = jsonObject.data.assets[0].common_id;",
 							"    postman.setGlobalVariable(\"dataBaseID\", dbID);",
 							"    ",
 							"});"
@@ -149,10 +149,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
 					"host": [

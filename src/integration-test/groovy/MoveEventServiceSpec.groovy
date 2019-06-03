@@ -22,10 +22,11 @@ class MoveEventServiceSpec extends Specification {
 	ProjectService projectService
 
 	// Initialized by setup()
-	private ProjectTestHelper projectHelper = new ProjectTestHelper()
-	private Project           project
+	private ProjectTestHelper projectHelper
+	private Project project
 
 	void setup() {
+		projectHelper = new ProjectTestHelper()
 		project = projectHelper.createProject()
 	}
 
@@ -34,14 +35,12 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
 		then: 'move event is saved to db'
 			moveEvent
 			moveEvent.id
-			moveEvent.newsBarMode == 'off'
 			moveEvent.runbookStatus == 'Pending'
 	}
 
@@ -51,7 +50,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
@@ -60,7 +58,6 @@ class MoveEventServiceSpec extends Specification {
 		then: 'Move event is retrieved from db'
 			foundMoveEvent
 			foundMoveEvent.id
-			foundMoveEvent.newsBarMode == 'off'
 			foundMoveEvent.runbookStatus == 'Pending'
 		when: 'Finding a non existing move event'
 			moveEventService.findById(-1l, true)
@@ -74,7 +71,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)
@@ -82,14 +78,12 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand updateCommand = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent updatedMoveEvent = moveEventService.update(moveEvent.id, updateCommand)
 		then: 'Move event is updated in db'
 			updatedMoveEvent
 			updatedMoveEvent.id
-			updatedMoveEvent.newsBarMode == 'off'
 			updatedMoveEvent.runbookStatus == 'Pending'
 		when: 'Updating a move event missing constraints DomainUpdateException is thrown'
 			updateCommand.name = ''
@@ -113,7 +107,6 @@ class MoveEventServiceSpec extends Specification {
 			CreateEventCommand command = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					newsBarMode: 'off',
 					runbookStatus: 'Pending'
 			)
 			MoveEvent moveEvent = moveEventService.save(command, project)

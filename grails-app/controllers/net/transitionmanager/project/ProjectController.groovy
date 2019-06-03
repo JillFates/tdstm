@@ -176,21 +176,22 @@ class ProjectController implements ControllerMethods {
 			}
 
 			return [
-				company: company,
-				projectInstance : project,
-				projectPartner: projectDetails.projectPartner,
-				projectManager: projectDetails.projectManager,
-				moveManager: projectDetails.moveManager,
-				companyStaff: projectDetails.companyStaff,
-				clientStaff: projectDetails.clientStaff,
-				partnerStaff: projectDetails.partnerStaff,
-				companyPartners: projectDetails.companyPartners,
+				company              : company,
+				projectInstance      : project,
+				projectPartner       : projectDetails.projectPartner,
+				projectManager       : projectDetails.projectManager,
+				moveManager          : projectDetails.moveManager,
+				companyStaff         : projectDetails.companyStaff,
+				clientStaff          : projectDetails.clientStaff,
+				partnerStaff         : projectDetails.partnerStaff,
+				companyPartners      : projectDetails.companyPartners,
 				projectLogoForProject: projectDetails.projectLogoForProject,
-				workflowCodes: projectDetails.workflowCodes,
-				projectPartners: projectPartners,
-				projectManagers: projectManagers,
-				moveBundles:moveBundles,
-				planMethodologies: planMethodologies
+				workflowCodes        : projectDetails.workflowCodes,
+				projectPartners      : projectPartners,
+				projectManagers      : projectManagers,
+				moveBundles          : moveBundles,
+				planMethodologies    : planMethodologies,
+				timezone             : project.timezone
 			]
 		}
 	}

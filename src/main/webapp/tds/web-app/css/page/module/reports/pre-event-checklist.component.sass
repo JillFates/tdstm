@@ -3,6 +3,7 @@
   $report-primary-foreground-color: #000
   $report-alternate-background-color: #e0e0e0
   $report-secondary-background-color: #CCCCCC
+  $report-border-color: #63a242
 
   background-color: $report-primary-background-color
   .report-controls
@@ -39,3 +40,6 @@
 
   .generated-check-list
     padding: 0 15px
+    & > table
+      border: 1px solid $report-border-color
+      width: 100%

@@ -158,13 +158,15 @@ class SearchQueryHelper {
 				// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
 				Person existingPerson = entityInstance ? entityInstance[fieldName] : null
 				String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-				String errorMsg
-				(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-				if (errorMsg) {
-					// If no entity was found then we want to capture the error message to save in the cache
-					entity = errorMsg
-					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-					recordError(context, errorMsg)
+				if (searchValue){
+					String errorMsg
+					(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+					if (errorMsg) {
+						// If no entity was found then we want to capture the error message to save in the cache
+						entity = errorMsg
+						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+						recordError(context, errorMsg)
+					}
 				}
 				break
 
@@ -337,13 +339,13 @@ class SearchQueryHelper {
 					String classShortName = GormUtil.domainShortName(domainClassToCreate)
 					if (classShortName == 'AssetEntity') {
 						// Try looking for the exact class type in the find.query
-						List query = fieldsInfo[propertyName].find?.query
+						List query = fieldsInfo[propertyName]?.find?.query
 						if (query?.size() > 0) {
 							ed = ETLDomain.lookup(query[0].domain)
 							domainClassToCreate = ed.getClazz()
 						} else {
 							// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
-							Map createInfo = fieldsInfo[propertyName].create ?: [:]
+							Map createInfo = fieldsInfo[propertyName]?.create ?: [:]
 							if (createInfo.containsKey('assetClass')) {
 								ed = ETLDomain.lookup(createInfo['assetClass'])
 								domainClassToCreate = ed.getClazz()
@@ -372,7 +374,7 @@ class SearchQueryHelper {
 	 * @return the Dependency if found
 	 * @test None
 	 */
-	private static AssetDependency fetchAssetDependencyByAssets(JSONObject fieldsInfo, Map context ) {
+	private static AssetDependency fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
 		Object primary
 		AssetEntity supporting
 		AssetDependency dependency
@@ -615,7 +617,9 @@ class SearchQueryHelper {
 			switch (refDomainName) {
 				case 'Room':
 					// Get the Location field
-					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
+					if (referenceFieldName == 'roomSource'){
+						extraCriteria.put('source',  1)
+					}
 					List parts = searchValue.split('/')
 					if (parts.size() != 2) {
 						result.error = 'Room must be formatted as Location/Name'

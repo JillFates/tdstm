@@ -1,14 +1,5 @@
 package net.transitionmanager.person
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
@@ -18,18 +9,27 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.PersonCommand
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 /**
@@ -1635,7 +1635,7 @@ class PersonService implements ServiceMethods {
 
 		save person
 		if (person.hasErrors()) {
-			throw new DomainUpdateException('An error occurred while attempting to save person changes')
+			throw new InvalidParamException('An error occurred while attempting to save person changes')
 		}
 
 		UserLogin userLogin = securityService.getPersonUserLogin(person)
@@ -1752,7 +1752,7 @@ class PersonService implements ServiceMethods {
 			save person, true
 
 			if (person.hasErrors()) {
-				throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
+				throw new InvalidParamException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
 			}
 
 			auditService.logMessage("$byWhom created person $person as staff of $companyParty")

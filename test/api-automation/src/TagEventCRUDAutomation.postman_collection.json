@@ -1,22 +1,23 @@
 {
 	"info": {
-		"_postman_id": "dacac277-2caa-4a95-9f04-e02b2ec8d255",
-		"name": "New Tags Events",
+		"_postman_id": "e3c28637-4fe4-4b4d-b6e4-444101ddd260",
+		"name": "Tag Event CRUD",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Login - Tag Event CRUD",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
+						"id": "d1d477e2-d41c-4ef4-a861-40866070aa1f",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -37,12 +38,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -92,10 +93,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
 					"host": [
@@ -269,10 +266,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/moveEvent/listJson?_search=false&nd=15453170873241&sidx=name",
 					"host": [
@@ -416,10 +409,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
 					"host": [
@@ -660,10 +649,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
 					"host": [
@@ -775,10 +760,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
 					"host": [
@@ -831,10 +812,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event2}}",
 					"host": [
@@ -887,10 +864,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event3}}",
 					"host": [
@@ -942,10 +915,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
 					"host": [
@@ -1052,10 +1021,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
 					"host": [
@@ -1107,10 +1072,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event2}}",
 					"host": [
@@ -1161,10 +1122,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event3}}",
 					"host": [
@@ -1215,10 +1172,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
 					"host": [
@@ -1335,10 +1288,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
 					"host": [
