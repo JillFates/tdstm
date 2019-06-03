@@ -5752,32 +5752,30 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			// now with all this, build a row
-			[ cell: [
-					'',	// 0
-					it.taskNumber,	// 1
-					it.comment, // 2
-					userSelectedCols[0], // getColumnValue(taskPref["1"],it), // 3
-					userSelectedCols[1], // getColumnValue(taskPref["2"],it), // 4
-					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '', // 5
-					dueDate, // 6
-					status ?: '', // 7
-					userSelectedCols[2], // getColumnValue(taskPref["3"],it), // 8
-					userSelectedCols[3], // getColumnValue(taskPref["4"],it), // 9
-					userSelectedCols[4], // getColumnValue(taskPref["5"],it), // 10
-					nGraphUrl, // 11
-					it.score ?: 0, // 12
-					status ? 'task_' + it.status.toLowerCase() : 'task_na', // 13
-					dueClass, // 14
-					it.assetEntity?.id, // 15
-					it.assetEntity?.assetType , // 16
-					it.assetEntity?.assetClass?.toString(), // 17
-					instructionsLinkURL, // 18
-					estStartClass,	// 19
-					estFinishClass,	// 20
-					it.isPublished, // 21
-					updatedClass // 22
-			],
-			  id:it.id
+			[
+				id:it.id,
+				taskNumber:  it.taskNumber,
+				comment:  it.comment,
+				userSelectedCol0: userSelectedCols[0], // getColumnValue(taskPref["1"],it),
+				userSelectedCol1: userSelectedCols[1], // getColumnValue(taskPref["2"],it),
+				updatedTime: updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
+				dueDate: dueDate,
+				status:  status ?: '',
+				userSelectedCol2: userSelectedCols[2], // getColumnValue(taskPref["3"],it),
+				userSelectedCol3: userSelectedCols[3], // getColumnValue(taskPref["4"],it),
+				userSelectedCol4: userSelectedCols[4], // getColumnValue(taskPref["5"],it),
+				nGraphUrl: nGraphUrl,
+				score: it.score ?: 0,
+				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
+				dueClass: dueClass,
+				assetEntityId: it.assetEntity?.id,
+				assetEntityAssetType: it.assetEntity?.assetType ,
+				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
+				instructionsLinkURL: instructionsLinkURL,
+				estStartClass: estStartClass,
+				estFinishClass: estFinishClass,
+				isPublished: it.isPublished,
+				updatedClass: updatedClass
 			]
 		}
 		return [rows: results, totalCount: totalCount, numberOfPages: numberOfPages]
