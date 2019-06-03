@@ -125,7 +125,7 @@ class ExtraFilterBuilder {
 			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
 		}
 		return new ExtraFilter(
-			property: this.property,
+			property: fieldName,
 			referenceProperty: this.referenceProperty,
 			filter: this.filter,
 			fieldSpec: fieldSpec,
