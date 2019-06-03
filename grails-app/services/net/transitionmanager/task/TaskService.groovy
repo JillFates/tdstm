@@ -5681,16 +5681,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * 				totalCounts: The total number of rows.
 	 * 				numberOfPages: The number of pages that will be used to show this rows.
 	 */
-	Map getTaskRows(Project project, Map params, String sortIndex, String sortOrder, Integer maxRows, Integer rowOffset) {
+	Map getTaskRows(Project project, Map params, String sortIndex, String sortOrder) {
 
 		Date today = new Date().clearTime()
 
 		// Fetch the tasks, and the total count.
-		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder, maxRows, rowOffset)
+		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder)
 		List<AssetComment> tasks = filterResults.tasks
-		Integer totalCount = filterResults.totalCount
+		Integer totalCount = tasks.size()
 
-		Integer numberOfPages = Math.ceil(totalCount / maxRows)
 		Date updatedTime
 		String dueClass
 		String estStartClass
@@ -5778,7 +5777,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				updatedClass: updatedClass
 			]
 		}
-		return [rows: results, totalCount: totalCount, numberOfPages: numberOfPages]
+		return [rows: results, totalCount: totalCount]
 	}
 
 	/**

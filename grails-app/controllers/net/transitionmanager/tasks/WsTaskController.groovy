@@ -298,10 +298,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 
 		String sortIndex =  definedSortableFields[params.sidx]
 		String sortOrder =  paginationSortOrder('sord')
-		// Get the pagination and set the user preference appropriately
-		Integer maxRows = paginationMaxRowValue('rows', UserPreferenceEnum.TASK_LIST_SIZE, true)
-		Integer currentPage = paginationPage()
-		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = getProjectForWs()
 		// Determine if only unpublished tasks need to be fetched.
@@ -311,7 +307,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
 		}
 		// Fetch the tasks, the total count and the number of pages.
-		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder, maxRows, rowOffset)
-		renderAsJson(rows: taskRows.rows, page: currentPage, totalCount: taskRows.totalCount, numberOfpages: taskRows.numberOfPages)
+		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
+		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)
 	}
 }
