@@ -100,7 +100,7 @@ class ExtraFilter {
 				hqlParams = ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
 				break
 			case 'other':
-				hqlExpression = " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "
+				hqlExpression = " COALESCE(AE.assetType,'') NOT IN (:namedFilterNonOtherTypes) "
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 				break
 			default:
