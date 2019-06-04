@@ -15,6 +15,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel} from '../../model/api-action.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	COLUMN_MIN_WIDTH,
 	ActionType,
@@ -102,7 +103,7 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.apiActionService.filterColumn(column, this.state);
+		const root = GridColumnModel.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
