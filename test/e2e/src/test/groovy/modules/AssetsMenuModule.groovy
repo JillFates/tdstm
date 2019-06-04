@@ -142,8 +142,9 @@ class AssetsMenuModule extends Module {
     }
 
     def goToAllAssets(){
-        waitFor{assetsItem.displayed}
+        waitFor(5){assetsItem.displayed}
         selectMenu(assetsItem)
+        waitFor{assetsAllAssetsItem.displayed}
         selectItem(assetsAllAssetsItem)
     }
 

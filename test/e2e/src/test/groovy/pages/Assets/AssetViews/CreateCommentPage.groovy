@@ -19,8 +19,8 @@ class CreateCommentPage extends Page{
     static content = {
         commentsModal { $("div#single-comment-component")}
         modalTitle { commentsModal.find(".modal-title")}
-        saveButton { commentsModal.find("button span.fa-floppy-o")}
-        cancelButton { commentsModal.find("button span.glyphicon-ban-circle")}
+        saveButton { commentsModal.find("tds-button-save")}
+        cancelButton { commentsModal.find("button.tds-button-cancel")}
         textArea { commentsModal.find("#singleComment")}
         categoryDropdownArrow { commentsModal.find("kendo-dropdownlist span.k-select")}
         categories { $("kendo-list li.k-item")}
