@@ -143,10 +143,14 @@ class PersonTestHelper {
 	UserLogin createUserLoginWithRoles(Person person, List roles=[], Project project=null, Boolean signIn=false) {
 
 		UserLogin u
-		if (project) {
-			u = createUserLogin(person, [:], project, signIn)
+		if(person.userLogin){
+			u = person.userLogin
 		} else {
-			u = createUserLogin(person, [:], signIn)
+			if (project) {
+				u = createUserLogin(person, [:], project, signIn)
+			} else {
+				u = createUserLogin(person, [:], signIn)
+			}
 		}
 
 		if (roles.size()) {
