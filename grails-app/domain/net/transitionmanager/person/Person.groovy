@@ -35,6 +35,9 @@ class Person extends Party {
 	// Data of Special Person Required by the System
 	static final Map<String, String> SYSTEM_USER_AT = [lastName: 'Task', firstName: 'Automated']
 
+	// The fullName valueMapKey when user is looking for a person using fullName within the ETL
+	static final String FULLNAME_KEY = 'fullName'
+
 	String firstName
 	String middleName = ''
 	String lastName = ''

@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.person.Person
 import org.grails.datastore.mapping.model.PersistentProperty
 
 class ETLFieldsValidator {
@@ -33,6 +34,10 @@ class ETLFieldsValidator {
 	 * @return an instance of ETLFieldDefinition with fieldNameOrLabel name, label and type
 	 */
 	ETLFieldDefinition lookup(ETLDomain domain, String fieldNameOrLabel) {
+
+		if (domain == ETLDomain.Person && fieldNameOrLabel == Person.FULLNAME_KEY) {
+			return new ETLFieldDefinition([field: fieldNameOrLabel, label: fieldNameOrLabel, type: 'String'])
+		}
 
 		if (cacheContains(domain, fieldNameOrLabel)) {
 			return getFromCache(domain, fieldNameOrLabel)
