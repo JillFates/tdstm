@@ -26,7 +26,7 @@ class ProvidersPage extends Page{
         firstProviderName(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[0]}
         firstProviderDesc(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[1]}
         firstProviderDeleteButton(wait:true) { $('td#k-grid0-r2c0').find("button span.fa-trash")}
-        firstProviderEditPencilBtn(wait:true) {$("div", class: "text-center").find("span", class: "glyphicon glyphicon-pencil")}
+        firstProviderEditPencilBtn(wait:true) {$("div", class: "tds-action-button-set").find("tds-button-edit")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
         projectsModule { module ProjectsMenuModule}
