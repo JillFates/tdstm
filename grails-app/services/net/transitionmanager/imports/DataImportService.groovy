@@ -1527,8 +1527,9 @@ class DataImportService implements ServiceMethods {
 					// Create the domain and set any of the require properties that are required
 					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
 					boolean isPerson = Person.isAssignableFrom(entity.class)
-					// check if isPerson and fieldsValueMap contains 'fullName' which means that user is lookign for a person by fullName
-					// so we need to replace that with the correct parsing of full name into [firstName, lastName, middlename]
+                  
+					// Check if isPerson and fieldsValueMap contains 'fullName' which means that user is looking for a person by fullName
+					// so we need to replace that with the correct parsing of full name into [firstName, lastName and middleName]
 					if (isPerson && fieldsValueMap.containsKey(Person.FULLNAME_KEY)) {
 						replaceFullnameEntryByPersonFullnameMap(fieldsValueMap)
 					}
