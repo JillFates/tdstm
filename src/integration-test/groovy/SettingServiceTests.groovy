@@ -4,6 +4,7 @@ import grails.test.mixin.integration.Integration
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -19,6 +20,7 @@ class SettingServiceTests extends Specification {
 
     SettingService settingService
 
+
     private Project createProject() {
         ProjectTestHelper projectTestHelper = new ProjectTestHelper()
         return projectTestHelper.createProject()
@@ -33,6 +35,10 @@ class SettingServiceTests extends Specification {
 
     private String createSampleJson() {
         return '{"setting_key_1": "value", "setting_key_2": 2, "setting_key_3": "updated"}'
+    }
+
+    private String createSampleJsonWithUpdatedField() {
+        return '{"setting_key_1": "value", "setting_key_2": 12, "setting_key_3": "updated"}'
     }
 
     void 'Scenario 1: Calling getAsJson to get a project specific setting'() {
@@ -173,12 +179,12 @@ class SettingServiceTests extends Specification {
             parseJson(json) == settingService.getAsJson(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, CustomDomainService.ALL_ASSET_CLASSES)
     }
 
-    @Ignore
+    //@Ignore
     // GRAILS-9862
     void 'Scenario 2: Calling save to update an existing project scoped setting'() {
         given:
             def json = createSampleJson()
-            def jsonWithUpdatedField = createSampleJson()
+            def jsonWithUpdatedField = createSampleJsonWithUpdatedField()
             def project = createProject()
             settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, CustomDomainService.ALL_ASSET_CLASSES, json, 0)
             settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, CustomDomainService.ALL_ASSET_CLASSES, jsonWithUpdatedField, 0)

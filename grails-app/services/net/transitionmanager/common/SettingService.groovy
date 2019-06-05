@@ -167,7 +167,7 @@ class SettingService implements ServiceMethods {
 
         try {
             setting.json = jsonValidatedAndOptimized
-            setting.save()
+            setting.save(flush:true)
         } catch (Exception e) {
             log.error(e.message, e)
             throw new DomainUpdateException("Unable to save Setting")
