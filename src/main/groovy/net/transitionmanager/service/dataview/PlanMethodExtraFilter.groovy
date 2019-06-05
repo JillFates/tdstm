@@ -2,6 +2,7 @@ package net.transitionmanager.service.dataview
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.asset.Application
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 import org.apache.commons.lang.StringEscapeUtils
 
@@ -33,8 +34,8 @@ class PlanMethodExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGe
 	Map<String, ?> generateHQL(Project project) {
 
 		String customField = project.planMethodology
-		if (!customField){
-			throw new RuntimeException('Invalid filter definition for '
+		if (!customField) {
+			throw new InvalidParamException('Invalid filter definition for '
 				+ ExtraFilterName.PLAN_METHOD.name
 				+ '. Project.planMethodology must be defined first.'
 			)
@@ -45,7 +46,7 @@ class PlanMethodExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGe
 		if (planMethodology == Application.UNKNOWN) {
 
 			return [
-				hqlExpression: " (AE.${customField} is NULL OR AE.${customField} = '') ",
+				hqlExpression: " COALESCE(AE.${customField}, '') = '' ",
 				hqlParams    : [:]
 			]
 
