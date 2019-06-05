@@ -843,7 +843,7 @@ class CommentService implements ServiceMethods {
 	 * @param rowOffset - used for paginating results.
 	 * @return A map with the tasks found plus the total number of tasks.
 	 */
-	Map filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
+	Map  filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
 		List<AssetComment> tasksList = []
 		Map resultMap = [:]
 		if (!params.containsKey('viewUnpublished')) {

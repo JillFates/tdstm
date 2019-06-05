@@ -15,6 +15,7 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
@@ -22,6 +23,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import grails.web.mapping.LinkGenerator
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -32,6 +34,7 @@ import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.command.task.TaskGenerationCommand
@@ -65,6 +68,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.TransactionStatus
+import net.transitionmanager.asset.AssetEntityService
 
 import java.text.DateFormat
 
@@ -95,12 +99,17 @@ class TaskService implements ServiceMethods {
 	def                        sequenceService
 	CustomDomainService        customDomainService
 	MoveEventService           moveEventService
+	CommentService             commentService
+	AssetEntityService         assetEntityService
+	LinkGenerator              grailsLinkGenerator
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
 
 	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.COMPLETED]
+	private static Integer MINUTES_CONSIDERED_TARDY = 300
+	private static Integer MINUTES_CONSIDERED_LATE = 600
 
 	// The RoleTypes for Staff (populated in init())
 	private static List staffingRoles
@@ -5655,5 +5664,304 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		comment.save(flush: true)
 		return comment
+	}
+
+	/**
+	 * Returns a Map with the rows that will be used to render the Task Manager contents.
+	 *
+	 * @project  The current project.
+	 * @params  A map with the params that will be used to build the rows.
+	 * @sortIndex  The column name that will be used to sort the values.
+	 * @sortOrder  'ASC' or 'DESC'.
+	 * @maxRows  The maximum number of rows.
+	 * @rowOffset  The offset of the rows.
+	 *
+	 * @return  A Map with
+	 * 				rows:  The actual Task Manager rows.
+	 * 				totalCounts: The total number of rows.
+	 * 				numberOfPages: The number of pages that will be used to show this rows.
+	 */
+	Map getTaskRows(Project project, Map params, String sortIndex, String sortOrder) {
+
+		Date today = new Date().clearTime()
+
+		// Fetch the tasks, and the total count.
+		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder)
+		List<AssetComment> tasks = filterResults.tasks
+		Integer totalCount = tasks.size()
+
+		Date updatedTime
+		String dueClass
+		String estStartClass
+		String estFinishClass
+		String updatedClass
+		Date nowGMT = TimeUtil.nowGMT()
+
+		// Get the list of the user's column preferences
+		Map taskPref = assetEntityService.getExistingPref(UserPreferenceEnum.Task_Columns)
+
+		// Build the rows (results) that will be returned in the final map
+		def results = tasks?.collect {
+
+			updatedTime =  it.isRunbookTask() ? it.statusUpdated : it.lastUpdated
+
+			TimeDuration elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
+			long elapsedSec = elapsed.toMilliseconds() / 1000
+
+			// Calculate CSS classes for:
+			// updated column
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
+
+			// estimated start and estimated finish columns
+			if (it.estFinish < nowGMT) {
+				Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
+				estStartClass = estimatedColumnsCSS['estStartClass']
+				estFinishClass = estimatedColumnsCSS['estFinishClass']
+			}
+			// and due date column
+			dueClass = getDueColumnCSS(it, today, nowGMT)
+
+			// get value for the due date column
+			String dueDate = TimeUtil.formatDate(it.dueDate)
+
+			List deps = TaskDependency.findAllByPredecessor(it)
+			Integer depCount = 0
+			deps.each {
+				if (params.viewUnpublished || (it.assetComment?.isPublished && it.predecessor?.isPublished))
+					++depCount
+			}
+			// Have the dependency count be a link to the Task Graph if there are dependencies
+			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + grailsLinkGenerator.link(controller:'task', action:'taskGraph') +
+					'?neighborhoodTaskId=' + it.id + '" target="_blank">' + depCount + '</a>'
+
+			// Get the column value for each user column
+			String status = it.status
+			List userSelectedCols = []
+			(1..5).each { colId ->
+				String value = getColumnValue(taskPref[colId.toString()], it)
+				userSelectedCols << (value?.getClass()?.isEnum() ? value?.value() : value)
+			}
+
+			// build instructionsLinkURL
+			String instructionsLinkURL
+			if (HtmlUtil.isMarkupURL(it.instructionsLink)) {
+				instructionsLinkURL = HtmlUtil.parseMarkupURL(it.instructionsLink)[1]
+			} else {
+				instructionsLinkURL = it.instructionsLink
+			}
+
+			// now with all this, build a row
+			[
+				id:it.id,
+				taskNumber:  it.taskNumber,
+				comment:  it.comment,
+				userSelectedCol0: userSelectedCols[0], // getColumnValue(taskPref["1"],it),
+				userSelectedCol1: userSelectedCols[1], // getColumnValue(taskPref["2"],it),
+				updatedTime: updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
+				dueDate: dueDate,
+				status:  status ?: '',
+				userSelectedCol2: userSelectedCols[2], // getColumnValue(taskPref["3"],it),
+				userSelectedCol3: userSelectedCols[3], // getColumnValue(taskPref["4"],it),
+				userSelectedCol4: userSelectedCols[4], // getColumnValue(taskPref["5"],it),
+				nGraphUrl: nGraphUrl,
+				score: it.score ?: 0,
+				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
+				dueClass: dueClass,
+				assetEntityId: it.assetEntity?.id,
+				assetEntityAssetType: it.assetEntity?.assetType ,
+				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
+				instructionsLinkURL: instructionsLinkURL,
+				estStartClass: estStartClass,
+				estFinishClass: estFinishClass,
+				isPublished: it.isPublished,
+				updatedClass: updatedClass
+			]
+		}
+		return [rows: results, totalCount: totalCount]
+	}
+
+	/**
+	 * Returns a String with the updated column CSS class name, according to
+	 * the relation between now and a particular amount of time (elapsedSec = current time - statusUpdate).
+	 * If a task estimate value is not late or tardy, it returns an empty string for the class name.
+	 * For more information see TM-11565.
+	 *
+	 * @param  task : The task.
+	 * @param  elapsedSec : The elapsed time in milliseconds (elapsedSec = current time - statusUpdate).
+	 * @return  A String with updateClass.
+	 *
+	 * TODO NOTE: This was refactored from AssetEntityController into this class.
+	 * TODO As we want to have one copy of this code around, this was hooked into AssetEntityController that for now
+	 * TODO it continues using this, so we had to change the method visibility from private to public for now, but
+	 * TODO once the code in AssetEntityController for the Task Manager that uses this method is definitely removed,
+	 * TODO this should be changed back to private.
+	 */
+	String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
+
+		String updatedClass = ''
+		if (task.status == AssetCommentStatus.READY) {
+			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
+				updatedClass = 'task_late'
+			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
+				updatedClass = 'task_tardy'
+			}
+		} else if (task.status == AssetCommentStatus.STARTED) {
+			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
+			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
+				updatedClass='task_late'
+			} else if (dueInSecs >= MINUTES_CONSIDERED_TARDY) {
+				updatedClass='task_tardy'
+			}
+		}
+		return updatedClass
+	}
+
+	/**
+	 * Returns a string for the due date class. The possible returning values are
+	 * 'task_late', 'task_overdue', 'task_tardy' or an empty string.
+	 *
+	 * @param task
+	 * @param today
+	 * @param nowGMT
+	 * @return  'task_late', 'task_overdue', 'task_tardy' or an empty string.
+	 *
+	 * TODO NOTE: This was refactored from AssetEntityController into this class.
+	 * TODO As we want to have one copy of this code around, this was hooked into AssetEntityController that for now
+	 * TODO it continues using this, so we had to change the method visibility from private to public for now, but
+	 * TODO once the code in AssetEntityController for the Task Manager that uses this method is definitely removed,
+	 * TODO this should be changed back to private.
+	 */
+	String getDueColumnCSS(AssetComment task, Date today, Date nowGMT) {
+		String dueClass = ''
+		if (task.dueDate && task.dueDate < nowGMT) {
+			dueClass = 'task_overdue'
+		}
+		// Clears time portion of dueDate for date comparison
+		Date due = task.dueDate?.clearTime()
+
+		// Highlight Due Date column for tardy and late tasks
+		if (task.dueDate && task.isActionable()) {
+			if (due > today) {
+				dueClass = ''
+			} else {
+				if (due < today)
+					dueClass = 'task_late'
+				else
+					dueClass = 'task_tardy' // due == today
+			}
+		}
+		return dueClass
+	}
+
+	/**
+	 * Returns a Map with the Estimated Start and Estimated Finish columns CSS class names, according to
+	 * the relation between those estimates and the current date/time. Also uses the Actual Start value
+	 * to make the calculations in case the task is in STARTED status, and a tardy factor value to
+	 * determine when a task is not late yet but it's going to be soon.
+	 * If a task estimate values are not late or tardy, it returns an empty string for the class name.
+	 * For more information see TM-6318.
+	 *
+	 * @param task : The task.
+	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
+	 * @param nowGMT : The actual time in GMT timezone.
+	 * @return : A Map with estStartClass and estFinishClass
+	 * @todo: create test cases
+	 *
+	 * TODO NOTE: This was refactored from AssetEntityController into this class.
+	 * TODO As we want to have one copy of this code around, this was hooked into AssetEntityController that for now
+	 * TODO it continues using this, so we had to change the method visibility from private to public for now, but
+	 * TODO once the code in AssetEntityController for the Task Manager that uses this method is definitely removed,
+	 * TODO this should be changed back to private.
+	 */
+	Map getEstimatedColumnsCSS(AssetComment task, Date nowGMT) {
+
+		String estStartClass = ''
+		String estFinishClass = ''
+
+		Integer durationInMin = task.durationInMinutes()
+		Integer tardyFactor = computeTardyFactor(durationInMin)
+
+		Integer nowInMin = TimeUtil.timeInMinutes(nowGMT)
+		Integer estStartInMin = TimeUtil.timeInMinutes(task.estStart)
+		Integer estFinishInMin = TimeUtil.timeInMinutes(task.estFinish)
+		Integer actStartInMin = TimeUtil.timeInMinutes(task.actStart)
+
+		boolean taskIsActionable = task.isActionable()
+
+		// Determine the Estimated Start CSS
+		if (estStartInMin && (task.status in [ AssetCommentStatus.PENDING, AssetCommentStatus.READY ]) )  {
+			// Note that in the future when we have have slack calculations in the tasks, we can
+			// flag tasks that started late and won't finished by critical path finish times but for
+			// now we will just flag tasks that didn't start by their est start.
+			if (estStartInMin < nowInMin) {
+				estStartClass = 'task_late'
+			} else if ( (estStartInMin - tardyFactor) < nowInMin) {
+				estStartClass = 'task_tardy'
+			}
+		}
+
+		// Determine the Estimated Finish CSS
+		if (estFinishInMin && taskIsActionable) {
+			if (actStartInMin) {
+				// If the task was started then see if it should have completed by now and should be
+				// considered tardy started early but didn't finish by duration + tardy factor.
+				if (estFinishInMin < nowInMin) {
+					estFinishClass = 'task_late'
+				} else if ( (actStartInMin + durationInMin + tardyFactor) < nowInMin ) {
+					// This will clue the PM that the task should have been completed by now
+					estFinishClass = 'task_tardy'
+				}
+			} else {
+				// Check if it would finish late
+				if ( (estFinishInMin - durationInMin) < nowInMin) {
+					estFinishClass = 'task_late'
+				} else if ( (estFinishInMin - durationInMin - tardyFactor) < nowInMin ) {
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
+	}
+
+	/**
+	 * Computes the tardy factor.
+	 * The intent is to adjust the factor as a percent of the duration of the task to factor in
+	 * the additional buffer of time with a minimum factor of 5 minutes and a maximum of 30 minutes.
+	 * @param date : The task duration in minutes.
+	 * @return : the tardy factor.
+	 */
+	private Integer computeTardyFactor(Integer durationInMin) {
+		return Math.min(30, Math.max(5, (Integer)(durationInMin * 0.1)))
+	}
+
+	/**
+	 * Get a formatted value from task for a Task Manager column, based on field from fieldName.
+	 *
+	 * @param task  The AssetComment entity from where the value referred in fieldName will be retrieved.
+	 * @param fieldName  The property name
+	 * 	 TODO NOTE: This was refactored from AssetEntityController into this class.
+	 * 	 TODO As we want to have one copy of this code around, this was hooked into AssetEntityController that for now
+	 * 	 TODO it continues using this, so we had to change the method visibility from private to public for now, but
+	 * 	 TODO once the code in AssetEntityController for the Task Manager that uses this method is definitely removed,
+	 * 	 TODO this should be changed back to private.
+	 */
+	String getColumnValue(String fieldName, AssetComment task) {
+		def result
+		switch (fieldName) {
+			case 'assetName': result = task.assetEntity?.assetName; break
+			case 'assetType': result = task.assetEntity?.assetType; break
+			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
+			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
+			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
+			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
+				result = TimeUtil.formatDateTime(task[fieldName])
+				break
+			case "event": result = task.moveEvent?.name; break
+			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			default:
+				result = task[fieldName]
+				result = result instanceof String ? result : result.toString()
+		}
+		return result
 	}
 }
