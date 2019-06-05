@@ -1,8 +1,31 @@
 <div class="event-dashboard-component">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <span>{{'EVENT.EVENT' | translate}}:</span>
-            <!-- <kendo-dropdownlist [data]="projectList" [(ngModel)]="selectedProject" (ngModelChange)="onChangeProject()" textField="name" valueField="id"></kendo-dropdownlist> -->
+            <div class="row">
+                <div class="col-md-1">
+                    <span>{{'EVENT.EVENT' | translate}}:</span>
+                </div>
+                <div class="col-md-2">
+                    <kendo-dropdownlist 
+                        [data]="eventList" 
+                        [(ngModel)]="selectedEvent" 
+                        (ngModelChange)="onChangeEvent($event)" 
+                        textField="name" 
+                        valueField="id">
+                    </kendo-dropdownlist>   
+                </div>
+                <div class="col-md-3 pull-left">
+                    <label for="agreement" class="pull-left aligned-label dontshow-again"> 
+                            <input type="checkbox"  class="aligned-checkbox"
+                                name="agreement" 
+                                id="agreement" 
+                                [(ngModel)]="includeUnpublished"> {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                    </label>                
+                </div>                
+                <div class="col-md-3 pull-right">
+                    <tds-countdown></tds-countdown>
+                </div>
+            </div>
         </div>
         <div class="panel-body">
             <div class="col-md-6 cell-container">

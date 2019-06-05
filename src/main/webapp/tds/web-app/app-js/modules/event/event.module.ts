@@ -21,6 +21,7 @@ import {EventDashboardComponent} from './components/dashboard/event-dashboard.co
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
+import {EventsService} from './service/events.service';
 
 @NgModule({
 	imports: [
@@ -48,6 +49,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 		// Resolve
 		ModuleResolveService,
 		// Service
+		EventsService
 	],
 	exports: [
 		EventDashboardComponent

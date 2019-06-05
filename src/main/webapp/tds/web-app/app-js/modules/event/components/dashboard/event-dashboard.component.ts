@@ -4,6 +4,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../security/services/user-context.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {EventsService} from './../../service/events.service';
 // Components
 // Model
 
@@ -19,14 +20,29 @@ import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 })
 
 export class EventDashboardComponent implements OnInit {
+	public eventList = [];
+	public includeUnpublished = true;
+
 	constructor(
+		private eventsService: EventsService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
 		private userContextService: UserContextService) {
 	}
 
 	ngOnInit() {
-		console.log('Init Event dashboard');
+		this.populateDate();
+	}
+
+	private populateDate(): void {
+		this.eventsService.getEvents()
+			.subscribe((events) => {
+				this.eventList = events;
+		});
+	}
+
+	onChangeEvent(event): void {
+		console.log(event);
 	}
 
 }

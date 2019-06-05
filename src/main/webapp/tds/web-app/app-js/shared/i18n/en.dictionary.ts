@@ -283,7 +283,8 @@ export const en_DICTIONARY: Object = {
 	'EVENT': {
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
-		'EVENT': 'Event'
+		'EVENT': 'Event',
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
 	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
