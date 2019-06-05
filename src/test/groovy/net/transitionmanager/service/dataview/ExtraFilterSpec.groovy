@@ -195,7 +195,7 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 			Map<String, ?> results = extraFilter.generateHQL(defaultProject)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " (AE.custom5 is NULL OR AE.custom5 = '') "
+			results.hqlExpression == " COALESCE(AE.custom5, '') = '' "
 			results.hqlParams == [:]
 	}
 
