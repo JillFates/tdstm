@@ -11,7 +11,7 @@ import groovy.time.TimeDuration
 import groovy.transform.Memoized
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.Files
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.party.PartyGroup

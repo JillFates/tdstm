@@ -8,17 +8,18 @@ import net.transitionmanager.project.Project
 class NoticeCommand implements CommandObject {
 
 	Long              id
-	String            title
-	String            rawText
-	String            htmlText
-	Notice.NoticeType typeId
-	Boolean           active = false
-	Project           project
-	Boolean           needAcknowledgement = false
 	String            acknowledgeLabel = ''
-	Integer           sequence = 0
 	Date              activationDate
+	Boolean           active = false
 	Date              expirationDate
+	String            htmlText
+	Boolean           locked = false
+	Boolean           needAcknowledgement = false
+	Project           project
+	String            rawText
+	Integer           sequence = 0
+	String            title
+	Notice.NoticeType typeId
 
 	static constraints = {
 		id nullable: true

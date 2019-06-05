@@ -21,11 +21,12 @@ class ProvidersPage extends Page{
         refreshBtn {$("div" , class:"kendo-grid-toolbar__refresh-btn")}
         commonsModule { module CommonsModule }
         //First Element of the Providers Table
-        firstProviderDate(wait:true) { $('td#k-grid0-r2c3')}
-        firstProviderName(wait:true) { $('td#k-grid0-r2c1')}
-        firstProviderDesc(wait:true) { $('td#k-grid0-r2c2')}
+        firstProviderTable(wait:true) { $("div", class:"k-virtual-content").find("div" , class:"k-grid-table-wrap")}
+        firstProviderDate(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[2]}
+        firstProviderName(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[0]}
+        firstProviderDesc(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[1]}
         firstProviderDeleteButton(wait:true) { $('td#k-grid0-r2c0').find("button span.fa-trash")}
-        firstProviderEditPencilBtn(wait:true) {$("div", class: "text-center").find("span", class: "glyphicon glyphicon-pencil")}
+        firstProviderEditPencilBtn(wait:true) {$("div", class: "tds-action-button-set").find("tds-button-edit")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
         projectsModule { module ProjectsMenuModule}

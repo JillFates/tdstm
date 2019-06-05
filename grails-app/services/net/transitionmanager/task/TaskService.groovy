@@ -546,7 +546,7 @@ class TaskService implements ServiceMethods {
 				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction')
 			}
 
-			if ((remoteInvocation && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) || (!remoteInvocation && !securityService.hasPermission(who, Permission.ActionInvoke))) {
+			if ((remoteInvocation && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) || (!remoteInvocation && !securityService.hasPermission(whom, Permission.ActionInvoke))) {
 				throwException(ApiActionException, 'apiAction.task.message.noPermission')
 			}
 

@@ -18,9 +18,9 @@ class CommentDetailsPage extends Page{
     static content = {
         commentsModal { $("div#single-comment-component")}
         modalTitle { commentsModal.find(".modal-title")}
-        editButton { commentsModal.find("button span.glyphicon-pencil")}
-        cancelButton { commentsModal.find("button span.glyphicon-ban-circle")}
-        deleteButton { commentsModal.find("button span.fa-trash")}
+        editButton { commentsModal.find("button[type=button]", text: "Edit")}
+        cancelButton { commentsModal.find("button.tds-button-cancel")}
+        deleteButton { commentsModal.find("button.tds-button-delete")}
         comment { commentsModal.find("div.single-component div")}
         category { commentsModal.find("label", text: contains("Category:")).siblings("div").children()}
         archiveInput { commentsModal.find("#singleCommentArchive")}

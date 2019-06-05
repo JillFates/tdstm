@@ -40,7 +40,8 @@ class ReportsMenuModule extends Module {
     }
 
     def goToReportsMenu(){
-        reportsItem.click()
+        waitFor{reportsItem.displayed}
+        waitFor(30) {reportsItem.click()}
     }
 
     def goToApplicationProfiles(){

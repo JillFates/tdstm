@@ -1,6 +1,6 @@
-package net.transitionmanager.command
+package net.transitionmanager.command.dataview
 
-
+import net.transitionmanager.command.CommandObject
 
 
 class DataviewNameValidationCommand implements CommandObject{

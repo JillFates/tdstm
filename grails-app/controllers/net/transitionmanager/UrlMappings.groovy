@@ -624,6 +624,14 @@ class UrlMappings {
 		}
 
 		///// NOTICES API /////////
+
+		"/ws/notices/continue" {
+			controller = 'wsNotice'
+			action = [
+				GET: 'clearNoticesWhenNoMandatoryLeft'
+			]
+		}
+
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
@@ -641,14 +649,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/notices/$id/ack" {
+		"/ws/notices/$id/acknowledge" {
 			controller = "wsNotice"
 			action = [
 					POST: "acknowledge"
 			]
 		}
 
-		"/ws/notice/fetchPostNotices" {
+		"/ws/notices/fetchPostLoginNotices" {
 			controller = "wsNotice"
 			action = [
 					GET: "fetchPostLoginNotices"

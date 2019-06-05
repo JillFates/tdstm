@@ -141,6 +141,7 @@ class ReportsService implements ServiceMethods {
             errorForEventTime      : eventsProjectInfo.errorForEventTime,
             project                : project,
             clientAccess           : eventsProjectInfo.clientAccess,
+            projectStaffList       : eventsProjectInfo.projectStaffList,
             list                   : eventsProjectInfo.list,
             workFlowCodeSelected   : eventBundleInfo.workFlowCodeSelected,
             steps                  : eventBundleInfo.steps,
@@ -641,24 +642,32 @@ class ReportsService implements ServiceMethods {
             moveEventCompletiondate = lastMoveBundleDate[-1]
         }
 
-        List<Map> list = partyRelationshipService.getProjectStaff(currProj)
-        list.sort { a, b -> a.company?.toString() <=> b.company?.toString() ?: a.role?.toString() <=> b.role?.toString() }
+        // Get the list of staff assigned to the Event and sort it by company/role/name
+        List<Map> projectStaffList = partyRelationshipService.getProjectStaff(currProj)
+        projectStaffList.sort {
+            a, b ->
+                a.company?.toString() <=> b.company?.toString() ?:
+                    a.role?.toString() <=> b.role?.toString() ?:
+                        a.name?.toString() <=> b.name?.toString()
+        }
 
         def projectStaff = PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id=?
 			  and roleTypeCodeFrom = 'ROLE_PROJECT'
+			  and roleTypeCodeTo = 'ROLE_STAFF'
 		''', [currProj.toLong()])
 
         String userLoginError = ''
+
         projectStaff.each { staff ->
             Person person = staff.partyIdTo
             UserLogin user = person.userLogin
 
             if (!user) {
                 eventErrorList << 'Project'
-                userLoginError += redSpan(HtmlUtil.escape(person.toString()) + ' login disabled', 'margin-left:50px;')
+                userLoginError += redSpan(HtmlUtil.escape(person.toString()) + ' no login', 'margin-left:50px;')
             } else if (user.active == 'N') {
                 eventErrorList << 'Project'
                 userLoginError += greenSpan(HtmlUtil.escape(user.toString()) + ' login inactive', 'margin-left:50px;')
@@ -680,7 +689,9 @@ class ReportsService implements ServiceMethods {
             clientAccess = redSpan('No Client Access', '', false)
             eventErrorList << 'Project'
         } else {
-            clientAccess = greenSpan('Client Access:&nbsp;' + HtmlUtil.escape(persons.toString()), '', false)
+            clientAccess = greenSpan(
+                'Client Access:&nbsp;' + persons.collect { HtmlUtil.escape(it.toString()) }.join(', ')
+                , '', false)
         }
 
         [
@@ -689,7 +700,7 @@ class ReportsService implements ServiceMethods {
             errorForEventTime: errorForEventTime,
             userLoginError   : userLoginError,
             clientAccess     : clientAccess,
-            list             : list,
+            projectStaffList: projectStaffList,
             eventErrorList   : eventErrorList
         ]
     }

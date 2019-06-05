@@ -2,7 +2,7 @@ package net.transitionmanager.command.bulk
 
 import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.command.CommandObject
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 
 /**
  * Represents a list of bulk changes.

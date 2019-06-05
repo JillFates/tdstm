@@ -1,6 +1,6 @@
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import net.transitionmanager.command.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import spock.lang.Specification
 
 

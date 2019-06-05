@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {DomainModel} from '../model/domain.model';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { DomainModel } from '../model/domain.model';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
 import {HttpClient} from '@angular/common/http';
 import {equals} from 'ramda';
@@ -82,7 +82,7 @@ export class FieldSettingsService {
 		// when the label compares to itself.
 		return fields.filter(
 			item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
-				&& item.label.trim() !== '').length > 1;
+			&& item.label.trim() !== '').length > 1;
 	}
 
 	/**
@@ -97,7 +97,7 @@ export class FieldSettingsService {
 	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
 		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
 		return fields.filter(
-			item => item.field.toLowerCase().trim() === cleanLabel
+				item => item.field.toLowerCase().trim() === cleanLabel
 				&& item.label.trim() !== '').length > 0;
 	}
 
@@ -138,8 +138,7 @@ export class FieldSettingsService {
 					return true;
 				}
 			}
-		}
-		;
+		};
 		return false;
 	}
 
