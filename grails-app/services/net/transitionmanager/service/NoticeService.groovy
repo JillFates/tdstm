@@ -150,7 +150,7 @@ class NoticeService implements ServiceMethods {
 			activationDate == null || activationDate < now
 			expirationDate == null || expirationDate > now
 
-		}.order('sequence').list()
+		}.order('sequence').order('dateCreated').list()
 	}
 
 	/**
@@ -173,7 +173,7 @@ class NoticeService implements ServiceMethods {
         	unacknowledgedNoticesCriteriaClosure(person, project, new Date())
 
 			order('needAcknowledgement', 'desc')
-			order('sequence', 'desc')
+			order('sequence', 'asc')
 			order('dateCreated', 'asc')
 		}
 
