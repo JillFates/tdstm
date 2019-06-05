@@ -40,17 +40,20 @@ class ExtraFilterBuilder {
 	 * based on the following rules:
 	 *  1) A named filter:
 	 *  <pre>
-	 *{"property" : "_ufp", "filter": "true"}*  </pre>
-	 *  A custom filter:
-	 *  <pre>
-	 *{"property" : "_event", "filter": "364"}*  </pre>
+	 *		{"property" : "_event", "filter": "364"}
+	 * 		{"property" : "_planMethod", "filter": "Unknown"}
+	 *	</pre>
 	 * 	Or a simple asset field filter:
 	 *  <pre>
-	 *{"property" : "assetName", "filter": "FOOBAR"}*{"property" : "common_assetName", "filter": "FOOBAR"}*{"property" : "appTech", "filter": "Apple"}*{"property" : "application_appTech", "filter": "Apple"}*  </pre>
+	 *		{"property" : "assetName", "filter": "FOOBAR"}
+	 *		{"property" : "common_assetName", "filter": "FOOBAR"}
+	 *		{"property" : "appTech", "filter": "Apple"}
+	 *		{"property" : "application_appTech", "filter": "Apple"}
+	 *	</pre>
 	 *
 	 * @param domains
 	 * @param fieldSpecProject
-	 * @return
+	 * @return and instance of {@code ExtraFilterHqlGenerator}
 	 */
 	ExtraFilterHqlGenerator build(List<String> domains, FieldSpecProject fieldSpecProject) {
 
@@ -63,7 +66,13 @@ class ExtraFilterBuilder {
 			return buildExtraFilterSelectingDomainFromDataview(domains, fieldSpecProject)
 		}
 	}
-
+	/**
+	 * <p>Creates an instance of {@code ExtraFilterHqlGenerator} based on
+	 * {@code ExtraFilterName#name}</p>
+	 *
+	 * @param extraFilterName an instance of {@code ExtraFilterName}
+	 * @return and instance of {@code ExtraFilterHqlGenerator}
+	 */
 	ExtraFilterHqlGenerator buildExtraNamedFilter(ExtraFilterName extraFilterName) {
 
 		ExtraFilterHqlGenerator hqlGenerator

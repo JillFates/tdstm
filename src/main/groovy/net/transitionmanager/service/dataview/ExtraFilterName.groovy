@@ -5,7 +5,9 @@ import groovy.transform.CompileStatic
 /**
  * enum definition for Special extra filter keys.
  * <code>
- *     assert ExtraFilterName.lookup('_filter') ==  ExtraFilterName.FILTER
+ *     assert ExtraFilterName.lookupByName('_filter') ==  ExtraFilterName.FILTER
+ *     assert ExtraFilterName.lookupByName('_event') ==  ExtraFilterName.EVENT
+ *     assert ExtraFilterName.lookupByName('_planMethod') ==  ExtraFilterName.PLAN_METHOD
  * </code>
  */
 @CompileStatic
@@ -21,6 +23,10 @@ enum ExtraFilterName {
 		this.name = name
 	}
 
+	/**
+	 * Map of {@code ExtraFilterName} to be used in
+	 * {@code ExtraFilterName#lookupByName} method.
+	 */
 	private static final Map<String, ExtraFilterName> nameIndex = [:]
 
 	static {
