@@ -17,9 +17,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest, AssertionTest {
-
 	@Shared
 	Project defaultProject
+
 	@Shared
 	FieldSpecProject fieldSpecProject
 

@@ -67,7 +67,7 @@ class ExtraFilterBuilder {
 	 */
 	ExtraFilter build(List<String> domains, FieldSpecProject fieldSpecProject) {
 
-		if (this.property in ['_filter', '_event', '_moveBundle']) {
+		if (SpecialExtraFilterType.lookupByName(this.property)) {
 			return new ExtraFilter(
 				property: this.property,
 				filter: this.filter

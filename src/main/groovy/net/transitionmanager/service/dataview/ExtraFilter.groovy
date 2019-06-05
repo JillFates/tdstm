@@ -2,8 +2,11 @@ package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.NumberUtil
 import groovy.transform.CompileStatic
+import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.project.Project
+import org.apache.commons.lang.StringEscapeUtils
 
 /**
  * Defines extra filter structure for {@code Dataview}
@@ -41,18 +44,32 @@ class ExtraFilter {
 	 * @return A Map with 2 pair of key/value.
 	 * 		One for HQL sentence and the other one for hql params
 	 */
-	Map buildHQLQueryAndParams() {
+	Map buildHQLQueryAndParams(Project project) {
 		String hqlExpression
 		Map<String, ?> hqlParams
 
 		switch (this.property) {
-			case '_event':
+			case SpecialExtraFilterType.EVENT.name:
 				hqlExpression = " AE.moveBundle.moveEvent.id = :extraFilterMoveEventId "
 				hqlParams = [
 					extraFilterMoveEventId: NumberUtil.toPositiveLong(this.filter, 0)
 				]
 				break
-			case '_filter':
+			case SpecialExtraFilterType.PLAN_METHOD.name:
+				String customField = project.planMethodology
+				// Unescaping the parameter since it can include HTML encoded characters (like \' == &#39; )
+				String planMethodology = StringEscapeUtils.unescapeHtml(this.filter)
+				if (planMethodology == Application.UNKNOWN) {
+					hqlExpression = " (AE.${customField} is NULL OR AE.${customField} = '') "
+					hqlParams = [:]
+				} else {
+					hqlExpression = " AE.${customField} = :planMethodology "
+					hqlParams = [
+						planMethodology: planMethodology
+					]
+				}
+ 				break
+			case SpecialExtraFilterType.FILTER.name:
 				Map<String, ?> namedFilterResults = buildQueryNamedFilter()
 				hqlExpression = namedFilterResults.hqlExpression
 				hqlParams = (Map<String, ?>)namedFilterResults.hqlParams

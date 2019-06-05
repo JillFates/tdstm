@@ -1,10 +1,19 @@
 package net.transitionmanager.service.dataview
 
 import com.tdsops.etl.FieldSpecValidateableTrait
+import com.tdssrc.grails.StringUtil
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.imports.Dataview
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.dataview.ExtraFilter
+import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -13,12 +22,32 @@ import spock.lang.Unroll
  * TM-14768. It builds custom filters for Planning Dashboard defined by
  * https://docs.google.com/spreadsheets/d/11_DjdACYvy5IB7Zup3VH4mb6pChF1NgAnjHH2rgaSQ8/edit?ts=5cb64b90#gid=1016467595
  */
-class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrait, AssertionTest {
+class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AssertionTest {
+
+	@Shared
+	Project defaultProject
 
 	@Shared
 	FieldSpecProject fieldSpecProject
 
+	void setupSpec() {
+		mockDomains(Project, Person)
+	}
 	void setup() {
+		defaultProject = new Project()
+		defaultProject.with {
+			client = new PartyGroup(name: RandomStringUtils.randomAlphabetic(10))
+			projectCode = RandomStringUtils.randomAlphabetic(10)
+			name = 'Project ' + projectCode
+			description = 'Test project created by the ProjectTestHelper'
+			startDate = new Date()
+			completionDate = startDate + 30
+			guid = StringUtil.generateGuid()
+			workflowCode = 'STD_PROCESS'
+			timezone = Timezone.findByCode('GMT')
+			guid = StringUtil.generateGuid()
+			planMethodology = 'custom5'
+		}
 		fieldSpecProject = createFieldSpecProject()
 	}
 
@@ -124,7 +153,7 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 			'server'         || " AE.assetType IN (:namedAllServerTypes) "                            | ['namedAllServerTypes': AssetType.allServerTypes]
 			'storage'        || " AE.assetType IN (:namedStorageTypes) "                              | ['namedStorageTypes': AssetType.storageTypes]
 			'virtualServer'  || " AE.assetType IN (:namedFilterVirtualServerTypes) "                  | ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
-			'other'          || " COALESCE(ae.assetType,'') NOT IN  (:namedFilterNonOtherTypes) "     | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
+			'other'          || " COALESCE(AE.assetType,'') NOT IN (:namedFilterNonOtherTypes) "     | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 
 	}
 
@@ -138,10 +167,27 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 				.build(['common', 'application'], fieldSpecProject)
 
 		when: 'builds results for extra filters'
-			Map<String, ?> results = extraFilter.buildHQLQueryAndParams()
+			Map<String, ?> results = extraFilter.buildHQLQueryAndParams(defaultProject)
 
 		then: 'an hql sentence is created'
 			results.hqlExpression == " AE.moveBundle.moveEvent.id = :extraFilterMoveEventId "
 			results.hqlParams['extraFilterMoveEventId'] == 329
 	}
+
+	void 'test can prepare hql where statement and params for extra filters using plan methodology filter'() {
+
+		given: 'an extra field defined defined by ?_event=329 in url params'
+			ExtraFilter extraFilter = ExtraFilter.builder()
+				.withProperty('_planMethod')
+				.withFilter('Unknown')
+				.build(['common', 'application'], fieldSpecProject)
+
+		when: 'builds results for extra filters'
+			Map<String, ?> results = extraFilter.buildHQLQueryAndParams(defaultProject)
+
+		then: 'an hql sentence is created'
+			results.hqlExpression == " (AE.`custom5` is Null OR ae.`custom5` = '') "
+			results.hqlParams == [:]
+	}
+
 }

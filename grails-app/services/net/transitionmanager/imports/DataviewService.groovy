@@ -699,7 +699,7 @@ class DataviewService implements ServiceMethods {
 			if (extraFilter.isAssetField()) {
 				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
 			} else {
-				Map<String,?> hqlExtraFilters = extraFilter.buildHQLQueryAndParams()
+				Map<String,?> hqlExtraFilters = extraFilter.buildHQLQueryAndParams(project)
 				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
 			}
 		}
