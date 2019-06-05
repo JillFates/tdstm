@@ -18,7 +18,6 @@ import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -34,8 +33,9 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.service.dataview.AssetFieldExtraFilter
 import net.transitionmanager.service.dataview.DataviewSpec
-import net.transitionmanager.service.dataview.ExtraFilter
+import net.transitionmanager.service.dataview.ExtraFilterHqlGenerator
 import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
@@ -694,12 +694,13 @@ class DataviewService implements ServiceMethods {
 
 		// There is 2 types of extra filters:
 		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple'
-		// 2) More complex and well defined extra filters resolved in {@code ExtraFilter} class
-		dataviewSpec.extraFilters?.each { ExtraFilter extraFilter ->
-			if (extraFilter.isAssetField()) {
+		// 2) More complex and well defined extra filters resolved in {@code NamedExtraFilter} class
+		dataviewSpec.extraFilters?.each { ExtraFilterHqlGenerator extraFilter ->
+
+			if (extraFilter instanceof AssetFieldExtraFilter) {
 				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
 			} else {
-				Map<String,?> hqlExtraFilters = extraFilter.buildHQLQueryAndParams(project)
+				Map<String,?> hqlExtraFilters = extraFilter.generateHQL(project)
 				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
 			}
 		}
@@ -746,6 +747,7 @@ class DataviewService implements ServiceMethods {
 				type             : type,
 				whereProperty    : wherePropertyFor(column),
 				manyToManyQueries: manyToManyQueriesFor(column),
+				domainAlias: 	'AE',
 				referenceProperty: column.referenceProperty,
 				fieldSpec        : column.fieldSpec
 			])
@@ -846,7 +848,7 @@ class DataviewService implements ServiceMethods {
 		if (column.referenceProperty) {
 			property = 'AE.' + column.property + '.' + column.referenceProperty
 		} else if (column.fieldSpec?.isCustom()) {
-			property = column.fieldSpec.getHibernateCastSentence(property)
+			property = column.fieldSpec.getHibernateCastSentence(column.property)
 		}  else {
 			property = transformations[column.property].property
 		}

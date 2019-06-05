@@ -75,7 +75,7 @@ class DataviewSpec {
         	"filter": "physicalServer",
       	}]
 	 */
-	private List<ExtraFilter> extraFilters
+	private List<ExtraFilterHqlGenerator> extraFilters
 	/**
 	 * Character separator used for named filters
 	 */
@@ -172,7 +172,7 @@ class DataviewSpec {
 
 		//5) Add extra filter from UI params in command Object
 		extraFilters = command.filters.extra.collect { extraFilter ->
-			ExtraFilter.builder()
+			new ExtraFilterBuilder()
 				.withProperty(extraFilter.property)
 				.withFilter(extraFilter.filter)
 				.build(spec.domains, fieldSpecProject)
@@ -304,7 +304,7 @@ class DataviewSpec {
 	 * @return null if the variable wasn't set or a List value if DataviewSpec is prepared for filtering using extra filters
 	 * @See DataviewSpec#extraFilters
 	 */
-	List<ExtraFilter> getExtraFilters() {
+	List<ExtraFilterHqlGenerator> getExtraFilters() {
 		return extraFilters
 	}
 }

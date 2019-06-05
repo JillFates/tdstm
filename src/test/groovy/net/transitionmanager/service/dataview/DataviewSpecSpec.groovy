@@ -106,11 +106,10 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		and: 'extra filter where created'
 			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
+			dataviewSpec.extraFilters.each { ExtraFilterHqlGenerator extraFilter ->
+				assertWith(extraFilter, AssetTypeExtraFilter) {
 					property == '_filter'
 					filter == 'physicalServer'
-					fieldSpec == null
 				}
 			}
 	}
@@ -143,8 +142,8 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		and: 'extra filter where created'
 			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
+			dataviewSpec.extraFilters.each { ExtraFilterHqlGenerator extraFilter ->
+				assertWith(extraFilter, AssetFieldExtraFilter) {
 					property == 'assetName'
 					filter == '111-222-333'
 					assertWith(fieldSpec, FieldSpec) {
@@ -183,8 +182,8 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		and: 'extra filter where created'
 			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
+			dataviewSpec.extraFilters.each { ExtraFilterHqlGenerator extraFilter ->
+				assertWith(extraFilter, AssetFieldExtraFilter) {
 					property == null
 					filter == '111-222-333'
 					assertWith(fieldSpec, FieldSpec) {

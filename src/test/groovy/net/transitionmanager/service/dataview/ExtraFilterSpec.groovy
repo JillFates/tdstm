@@ -7,13 +7,10 @@ import net.transitionmanager.asset.AssetType
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.service.dataview.ExtraFilter
 import org.apache.commons.lang3.RandomStringUtils
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -33,6 +30,7 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 	void setupSpec() {
 		mockDomains(Project, Person)
 	}
+
 	void setup() {
 		defaultProject = new Project()
 		defaultProject.with {
@@ -51,16 +49,30 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 		fieldSpecProject = createFieldSpecProject()
 	}
 
+	@Unroll
+	void 'test can lookup ExtraFilterName instances by filter #filterName'() {
+		expect:
+			ExtraFilterName.lookupByName(filterName) == extraFilterName
+
+		where:
+			filterName    || extraFilterName
+			'_event'      || ExtraFilterName.EVENT
+			'_filter'     || ExtraFilterName.FILTER
+			'_planMethod' || ExtraFilterName.PLAN_METHOD
+			'FOO'         || null
+	}
+
+
 	void 'test can create an ExtraFilter using field name and filter value'() {
 
 		when: 'an instance of ExtraFilter is built by ExtraFilterBuilder'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('assetName')
 				.withFilter('FOO')
 				.build(['common', 'application'], fieldSpecProject)
 
 		then: 'it contains a property name, filter and fieldSpec associated'
-			assertWith(extraFilter, ExtraFilter) {
+			assertWith(extraFilter, AssetFieldExtraFilter) {
 				domain == 'common'
 				property == 'assetName'
 				filter == 'FOO'
@@ -75,13 +87,13 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 	void 'test can create an ExtraFilter using domain, field name and filter value'() {
 
 		when: 'an instance of ExtraFilter is built by ExtraFilterBuilder'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('common_assetName')
 				.withFilter('FOO')
 				.build(['common', 'application'], fieldSpecProject)
 
 		then: 'it contains a property name, filter and fieldSpec associated'
-			assertWith(extraFilter, ExtraFilter) {
+			assertWith(extraFilter, AssetFieldExtraFilter) {
 				domain == 'common'
 				property == 'assetName'
 				filter == 'FOO'
@@ -95,31 +107,28 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 
 	void 'test can create an ExtraFilter using a custom property'() {
 		when: 'an instance of ExtraFilter is built by ExtraFilterBuilder'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('_event')
 				.withFilter('3233')
 				.build(['common', 'device'], fieldSpecProject)
 
 		then: 'it contains a property name, filter and fieldSpec associated'
-			assertWith(extraFilter, ExtraFilter) {
-				domain == null
+			assertWith(extraFilter, EventExtraFilter) {
 				property == '_event'
 				filter == '3233'
-				referenceProperty == null
-				fieldSpec == null
 			}
 	}
 
 	void 'test can create an ExtraFilter using a referenced property'() {
 
 		when: 'an instance of ExtraFilter is built by ExtraFilterBuilder'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('moveBundle.id')
 				.withFilter('1810')
 				.build(['common', 'application'], fieldSpecProject)
 
 		then: 'it contains a property name, filter and fieldSpec associated'
-			assertWith(extraFilter, ExtraFilter) {
+			assertWith(extraFilter, AssetFieldExtraFilter) {
 				domain == 'common'
 				property == 'moveBundle'
 				filter == 'FOO'
@@ -136,12 +145,12 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 	void 'test can prepare hql where statement and params for extra filters #namedFilter'() {
 
 		setup: 'an instance of ExtraFilter created'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('_filter')
 				.withFilter(namedFilter)
 				.build(['common', 'application'], fieldSpecProject)
 		expect:
-			extraFilter.buildQueryNamedFilter() == [
+			extraFilter.generateHQL(defaultProject) == [
 				hqlExpression: hqlExpression,
 				hqlParams    : hqlParams
 			]
@@ -153,7 +162,7 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 			'server'         || " AE.assetType IN (:namedAllServerTypes) "                            | ['namedAllServerTypes': AssetType.allServerTypes]
 			'storage'        || " AE.assetType IN (:namedStorageTypes) "                              | ['namedStorageTypes': AssetType.storageTypes]
 			'virtualServer'  || " AE.assetType IN (:namedFilterVirtualServerTypes) "                  | ['namedFilterVirtualServerTypes': AssetType.virtualServerTypes]
-			'other'          || " COALESCE(AE.assetType,'') NOT IN (:namedFilterNonOtherTypes) "     | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
+			'other'          || " COALESCE(AE.assetType,'') NOT IN (:namedFilterNonOtherTypes) "      | ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 
 	}
 
@@ -161,33 +170,51 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 	void 'test can prepare hql where statement and params for extra filters using event filter'() {
 
 		given: 'an extra field defined defined by ?_event=329 in url params'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('_event')
 				.withFilter('329')
 				.build(['common', 'application'], fieldSpecProject)
 
 		when: 'builds results for extra filters'
-			Map<String, ?> results = extraFilter.buildHQLQueryAndParams(defaultProject)
+			Map<String, ?> results = extraFilter.generateHQL(defaultProject)
 
 		then: 'an hql sentence is created'
 			results.hqlExpression == " AE.moveBundle.moveEvent.id = :extraFilterMoveEventId "
 			results.hqlParams['extraFilterMoveEventId'] == 329
 	}
 
-	void 'test can prepare hql where statement and params for extra filters using plan methodology filter'() {
+	void 'test can prepare hql where statement and params for extra filters using plan methodology filter Unknown'() {
 
 		given: 'an extra field defined defined by ?_event=329 in url params'
-			ExtraFilter extraFilter = ExtraFilter.builder()
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
 				.withProperty('_planMethod')
 				.withFilter('Unknown')
 				.build(['common', 'application'], fieldSpecProject)
 
 		when: 'builds results for extra filters'
-			Map<String, ?> results = extraFilter.buildHQLQueryAndParams(defaultProject)
+			Map<String, ?> results = extraFilter.generateHQL(defaultProject)
 
 		then: 'an hql sentence is created'
-			results.hqlExpression == " (AE.`custom5` is Null OR ae.`custom5` = '') "
+			results.hqlExpression == " (AE.custom5 is NULL OR AE.custom5 = '') "
 			results.hqlParams == [:]
+	}
+
+	void 'test can prepare hql where statement and params for extra filters using plan methodology filter defiend'() {
+
+		given: 'an extra field defined defined by ?_event=329 in url params'
+			ExtraFilterHqlGenerator extraFilter = new ExtraFilterBuilder()
+				.withProperty('_planMethod')
+				.withFilter('FOOBAR')
+				.build(['common', 'application'], fieldSpecProject)
+
+		when: 'builds results for extra filters'
+			Map<String, ?> results = extraFilter.generateHQL(defaultProject)
+
+		then: 'an hql sentence is created'
+			results.hqlExpression == " AE.custom5 = :planMethodology "
+			results.hqlParams == [
+				planMethodology: 'FOOBAR'
+			]
 	}
 
 }
