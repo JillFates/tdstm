@@ -241,10 +241,26 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
+	 * Handle cases where the resulting expression is 'field != someValue'
+	 */
+	Closure notEqIfSetBuilder = { String field, Map fieldMap ->
+		if (StringUtil.toBoolean(requestParams[field])) {
+			comparisonBuilder(field, fieldMap, '<>')
+		}
+	}
+
+	/**
 	 * Handle cases where the resulting expression is 'field = someValue'
 	 */
 	Closure eqBuilder = { String field, Map fieldMap ->
-		def value = requestParams[field]
+		comparisonBuilder(field, fieldMap, '=')
+	}
+
+	/**
+	 * Implement common functionality for constructing '=' and '<>' expressions.
+	 */
+	Closure comparisonBuilder = { String field, Map fieldMap, String operator ->
+		def value = fieldMap.containsKey('value') ? fieldMap['value'] : requestParams[field]
 		// Parse to Integer in case the the field is number and the parameter is a string.
 		if (fieldMap['type'] == Integer) {
 			value = NumberUtil.toInteger(value)
@@ -252,7 +268,7 @@ class AssetCommentQueryBuilder {
 		if (value == null) {
 			invalidCriterion = true
 		} else {
-			processField(field, fieldMap, '=', ":${field}", value)
+			processField(field, fieldMap, operator, ":${field}", value)
 		}
 	}
 
@@ -438,7 +454,7 @@ class AssetCommentQueryBuilder {
 		'hardAssigned':         [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
 		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.actionableStatusList],
 		'justMyTasks':          [builder: justMyTasksBuilder],
-		'justRemaining':        [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.justRemainingStatusList],
+		'justRemaining':        [property: 'ac.status', builder: notEqIfSetBuilder, value:AssetCommentStatus.COMPLETED],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
 		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
