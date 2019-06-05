@@ -955,6 +955,10 @@ class MoveBundleService implements ServiceMethods {
                 id: entry.id,
                 name: entry.name,
                 description: entry.description,
+				planning: entry.useForPlanning,
+				assetqty: entry.assetQty,
+				startDate: entry.startTime,
+				completion: entry.completionTime
         ]}
     }
 }
