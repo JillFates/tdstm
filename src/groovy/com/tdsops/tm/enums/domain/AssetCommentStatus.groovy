@@ -24,6 +24,5 @@ class AssetCommentStatus {
 	static final List<String> topStatusList = [PENDING, READY, STARTED, HOLD, COMPLETED].asImmutable()
 
 	static final List<String> actionableStatusList = [READY, STARTED].asImmutable()
-
-	static final List<String> justRemainingStatusList = [READY, STARTED, HOLD, PENDING, PLANNED].asImmutable()
+	
 }
