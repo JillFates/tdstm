@@ -116,7 +116,7 @@ class AbstractConnector {
 				case ContextType.DATABASE:
 				case ContextType.DEVICE:
 				case ContextType.STORAGE:
-					if (task.assetEntity) {
+					if (task && task.assetEntity) {
 						// This line prevents the @CompileStatic
 						value = task.assetEntity[param.fieldName]
 					} else {
