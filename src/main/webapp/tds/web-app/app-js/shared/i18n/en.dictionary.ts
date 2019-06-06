@@ -215,7 +215,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
-		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
+		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
 		'PROJECT': 'Project',
 		'CREATE_CUSTOM': 'Add Custom Field',
