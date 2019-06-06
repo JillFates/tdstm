@@ -25,13 +25,15 @@ class ProvidersPage extends Page{
         firstProviderDate(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[2]}
         firstProviderName(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[0]}
         firstProviderDesc(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[1]}
-        firstProviderDeleteButton(wait:true) { $('td#k-grid0-r2c0').find("button span.fa-trash")}
+        firstProviderDeleteButton(wait:true) {$("div", class:"tds-action-button-set").find("tds-button-delete")}
         firstProviderEditPencilBtn(wait:true) {$("div", class: "tds-action-button-set").find("tds-button-edit")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
         projectsModule { module ProjectsMenuModule}
         arrayOfProviders {$(class:"k-virtual-content").find(class:"k-grid-table-wrap", role:"presentation").find("tbody", role:"presentation").find("tr")}
-
+        deleteConfirmationModal(required: false) {$(id:"providerAssociated").find(class:"modal-md").find(class:"modal-content")}
+        deleteConfirmationNoBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-right")}
+        deleteConfirmationYesBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-left")}
     }
 
     def filterByName(provName){
@@ -39,7 +41,7 @@ class ProvidersPage extends Page{
     }
 
     def clickOnFirstProviderName(){
-        waitFor {firstProviderName.click()}
+        waitFor(30) {firstProviderName.click()}
     }
 
     def noRecordsRowSize(){
