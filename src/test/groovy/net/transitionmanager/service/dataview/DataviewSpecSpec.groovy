@@ -12,14 +12,18 @@ import net.transitionmanager.imports.Dataview
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
+import net.transitionmanager.service.dataview.filter.special.AssetTypeExtraFilter
+import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
-class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest, AssertionTest {
+class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest {
 
 	@Shared
 	Project defaultProject
+
 	@Shared
 	FieldSpecProject fieldSpecProject
 
@@ -84,7 +88,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
 			command.filters.extra = [
 				[
-					property: '_filter',
+					property: '_assetType',
 					filter  : 'physicalServer'
 				]
 			]
@@ -105,12 +109,12 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 
 		and: 'extra filter where created'
-			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
-					property == '_filter'
+			dataviewSpec.fieldNameExtraFilters.size() == 0
+			dataviewSpec.specialExtraFilters.size() == 1
+			dataviewSpec.specialExtraFilters.each { SpecialExtraFilter extraFilter ->
+				with(extraFilter, AssetTypeExtraFilter) {
+					property == '_assetType'
 					filter == 'physicalServer'
-					fieldSpec == null
 				}
 			}
 	}
@@ -142,12 +146,12 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 
 		and: 'extra filter where created'
-			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
+			dataviewSpec.fieldNameExtraFilters.size() == 1
+			dataviewSpec.fieldNameExtraFilters.each { FieldNameExtraFilter extraFilter ->
+				with(extraFilter, FieldNameExtraFilter) {
 					property == 'assetName'
 					filter == '111-222-333'
-					assertWith(fieldSpec, FieldSpec) {
+					with(fieldSpec, FieldSpec) {
 						field == 'assetName'
 						label == 'Name'
 					}
@@ -182,12 +186,12 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.spec.domains == ["common", "application", "database", "device", "storage"]
 
 		and: 'extra filter where created'
-			dataviewSpec.extraFilters.size() == 1
-			dataviewSpec.extraFilters.each { ExtraFilter extraFilter ->
-				assertWith(extraFilter, ExtraFilter) {
-					property == null
+			dataviewSpec.fieldNameExtraFilters.size() == 1
+			dataviewSpec.fieldNameExtraFilters.each { FieldNameExtraFilter extraFilter ->
+				with(extraFilter, FieldNameExtraFilter) {
+					property == 'assetName'
 					filter == '111-222-333'
-					assertWith(fieldSpec, FieldSpec) {
+					with(fieldSpec, FieldSpec) {
 						field == 'assetName'
 						label == 'Name'
 					}
