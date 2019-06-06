@@ -5,7 +5,6 @@ import {Router} from '@angular/router';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {UserContextService} from '../../../security/services/user-context.service';
 // Model
 import {NoticeModel, Notices, PostNoticeResponse } from '../../model/notice.model';
@@ -98,9 +97,7 @@ export class PostNoticesComponent implements OnInit {
 			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};
-			})
-			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
-
+			});
 	}
 
 	/**
