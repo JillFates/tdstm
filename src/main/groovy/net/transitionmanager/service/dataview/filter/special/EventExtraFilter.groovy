@@ -1,4 +1,4 @@
-package net.transitionmanager.service.dataview
+package net.transitionmanager.service.dataview.filter.special
 
 import com.tdssrc.grails.NumberUtil
 import groovy.transform.CompileStatic
@@ -16,7 +16,7 @@ import net.transitionmanager.project.Project
  * </code>
  */
 @CompileStatic
-class EventExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGenerator {
+class EventExtraFilter extends SpecialExtraFilter {
 
 	@Override
 	Map<String, ?> generateHQL(Project project) {

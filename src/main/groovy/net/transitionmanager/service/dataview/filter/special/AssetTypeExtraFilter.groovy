@@ -1,11 +1,11 @@
-package net.transitionmanager.service.dataview
+package net.transitionmanager.service.dataview.filter.special
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.project.Project
 
 @CompileStatic
-class AssetTypeExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGenerator {
+class AssetTypeExtraFilter extends SpecialExtraFilter {
 
 	/**
 	 * <p>Prepares a named filter used by UI for filtering assets using business rules about assets.

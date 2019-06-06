@@ -1,11 +1,11 @@
-package net.transitionmanager.service.dataview
+package net.transitionmanager.service.dataview.filter
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.project.Project
 
 @CompileStatic
-class AssetFieldExtraFilter implements ExtraFilterHqlGenerator {
+class FieldNameExtraFilter {
 
 	String domain
 	/**
@@ -16,7 +16,7 @@ class AssetFieldExtraFilter implements ExtraFilterHqlGenerator {
 	 * 		{"property" : "common_assetName", "filter": "FOOBAR"}
 	 * 		{"property" : "common_moveBundle.id", "filter": "3885"}
 	 * 	</pre>
-	 * @see ExtraFilterBuilder#build(java.util.List, net.transitionmanager.dataview.FieldSpecProject)
+	 * @see net.transitionmanager.service.dataview.ExtraFilterBuilder#build(java.util.List, net.transitionmanager.dataview.FieldSpecProject)
 	 */
 	String property
 	String filter
@@ -27,8 +27,4 @@ class AssetFieldExtraFilter implements ExtraFilterHqlGenerator {
 	String referenceProperty
 	FieldSpec fieldSpec
 
-	@Override
-	Map<String, ?> generateHQL(Project project) {
-		throw new RuntimeException('Can not generate HQL directly using an instance of AssetFieldExtraFilter')
-	}
 }

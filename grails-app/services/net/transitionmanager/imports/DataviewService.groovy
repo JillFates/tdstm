@@ -33,9 +33,9 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.service.dataview.AssetFieldExtraFilter
 import net.transitionmanager.service.dataview.DataviewSpec
-import net.transitionmanager.service.dataview.ExtraFilterHqlGenerator
+import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
+import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
@@ -692,17 +692,16 @@ class DataviewService implements ServiceMethods {
 			addColumnFilter(column, project, whereCollector, mixedFieldsInfo)
 		}
 
-		// There is 2 types of extra filters:
-		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple'
-		// 2) More complex and well defined extra filters resolved in {@code NamedExtraFilter} class
-		dataviewSpec.extraFilters?.each { ExtraFilterHqlGenerator extraFilter ->
+		// There are 2 types of extra filters:
+		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple' or 'moveBundle.id' == '2323'
+		dataviewSpec.fieldNameExtraFilters?.each { FieldNameExtraFilter extraFilter ->
+			addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
+		}
 
-			if (extraFilter instanceof AssetFieldExtraFilter) {
-				addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
-			} else {
-				Map<String,?> hqlExtraFilters = extraFilter.generateHQL(project)
-				whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
-			}
+		// 2) Special extra filters resolved in {@code SpecialExtraFilter} class hierarchy
+		dataviewSpec.specialExtraFilters?.each { SpecialExtraFilter extraFilter ->
+			Map<String, ?> hqlExtraFilters = extraFilter.generateHQL(project)
+			whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
 		}
 
 		return [

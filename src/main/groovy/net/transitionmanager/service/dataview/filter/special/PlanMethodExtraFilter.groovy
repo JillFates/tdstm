@@ -1,9 +1,10 @@
-package net.transitionmanager.service.dataview
+package net.transitionmanager.service.dataview.filter.special
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.asset.Application
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
+import net.transitionmanager.service.dataview.filter.ExtraFilterType
 import org.apache.commons.lang.StringEscapeUtils
 
 /**
@@ -28,7 +29,7 @@ import org.apache.commons.lang.StringEscapeUtils
  * </code>
  */
 @CompileStatic
-class PlanMethodExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGenerator {
+class PlanMethodExtraFilter extends SpecialExtraFilter {
 
 	@Override
 	Map<String, ?> generateHQL(Project project) {
@@ -36,7 +37,7 @@ class PlanMethodExtraFilter extends NamedExtraFilter implements ExtraFilterHqlGe
 		String customField = project.planMethodology
 		if (!customField) {
 			throw new InvalidParamException('Invalid filter definition for '
-				+ ExtraFilterName.PLAN_METHOD.name
+				+ ExtraFilterType.PLAN_METHOD.name
 				+ '. Project.planMethodology must be defined first.'
 			)
 		}
