@@ -2,6 +2,7 @@ package net.transitionmanager.service.dataview.filter.special
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 
 @CompileStatic
@@ -46,7 +47,7 @@ class AssetTypeExtraFilter extends SpecialExtraFilter {
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 				break
 			default:
-				throw new RuntimeException('Invalid filter definition:' + this.property)
+				throw new InvalidParamException('Invalid filter definition:' + this.property)
 		}
 
 		return [

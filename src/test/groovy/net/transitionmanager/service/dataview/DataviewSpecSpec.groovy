@@ -19,7 +19,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
-class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest, AssertionTest {
+class DataviewSpecSpec extends Specification implements FieldSpecValidateableTrait, DataTest, AllAssetsFilterUnitTest {
 
 	@Shared
 	Project defaultProject
@@ -112,8 +112,8 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			dataviewSpec.fieldNameExtraFilters.size() == 0
 			dataviewSpec.specialExtraFilters.size() == 1
 			dataviewSpec.specialExtraFilters.each { SpecialExtraFilter extraFilter ->
-				assertWith(extraFilter, AssetTypeExtraFilter) {
-					property == '_filter'
+				with(extraFilter, AssetTypeExtraFilter) {
+					property == '_assetType'
 					filter == 'physicalServer'
 				}
 			}
@@ -148,10 +148,10 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 		and: 'extra filter where created'
 			dataviewSpec.fieldNameExtraFilters.size() == 1
 			dataviewSpec.fieldNameExtraFilters.each { FieldNameExtraFilter extraFilter ->
-				assertWith(extraFilter, FieldNameExtraFilter) {
+				with(extraFilter, FieldNameExtraFilter) {
 					property == 'assetName'
 					filter == '111-222-333'
-					assertWith(fieldSpec, FieldSpec) {
+					with(fieldSpec, FieldSpec) {
 						field == 'assetName'
 						label == 'Name'
 					}
@@ -188,10 +188,10 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 		and: 'extra filter where created'
 			dataviewSpec.fieldNameExtraFilters.size() == 1
 			dataviewSpec.fieldNameExtraFilters.each { FieldNameExtraFilter extraFilter ->
-				assertWith(extraFilter, FieldNameExtraFilter) {
-					property == null
+				with(extraFilter, FieldNameExtraFilter) {
+					property == 'assetName'
 					filter == '111-222-333'
-					assertWith(fieldSpec, FieldSpec) {
+					with(fieldSpec, FieldSpec) {
 						field == 'assetName'
 						label == 'Name'
 					}

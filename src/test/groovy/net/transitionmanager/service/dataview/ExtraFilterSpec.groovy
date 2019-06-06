@@ -21,13 +21,11 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.lang.reflect.Field
-
 /**
  * TM-14768. It builds custom filters for Planning Dashboard defined by
  * https://docs.google.com/spreadsheets/d/11_DjdACYvy5IB7Zup3VH4mb6pChF1NgAnjHH2rgaSQ8/edit?ts=5cb64b90#gid=1016467595
  */
-class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrait, AllAssetsFilterUnitTest, DataTest, AssertionTest {
+class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrait, AllAssetsFilterUnitTest, DataTest {
 
 	@Shared
 	Project defaultProject
@@ -87,12 +85,12 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 		then: 'it contains a property name, filter and fieldSpec associated'
 			dataviewSpec.specialExtraFilters.size() == 0
 			dataviewSpec.fieldNameExtraFilters.size() == 1
-			assertWith(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
+			with(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
 				domain == 'common'
 				property == 'assetName'
 				filter == 'FOO'
 				referenceProperty == null
-				assertWith(fieldSpec, FieldSpec) {
+				with(fieldSpec, FieldSpec) {
 					field == 'assetName'
 					label == 'Name'
 				}
@@ -116,12 +114,12 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 		then: 'it contains a property name, filter and fieldSpec associated'
 			dataviewSpec.specialExtraFilters.size() == 0
 			dataviewSpec.fieldNameExtraFilters.size() == 1
-			assertWith(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
+			with(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
 				domain == 'common'
 				property == 'assetName'
 				filter == 'FOO'
 				referenceProperty == null
-				assertWith(fieldSpec, FieldSpec) {
+				with(fieldSpec, FieldSpec) {
 					field == 'assetName'
 					label == 'Name'
 				}
@@ -145,7 +143,7 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 		then: 'it contains a property name, filter and fieldSpec associated'
 			dataviewSpec.specialExtraFilters.size() == 1
 			dataviewSpec.fieldNameExtraFilters.size() == 0
-			assertWith(dataviewSpec.specialExtraFilters[0], EventExtraFilter) {
+			with(dataviewSpec.specialExtraFilters[0], EventExtraFilter) {
 				property == '_event'
 				filter == '3233'
 			}
@@ -168,12 +166,12 @@ class ExtraFilterSpec extends Specification implements FieldSpecValidateableTrai
 		then: 'it contains a property name, filter and fieldSpec associated'
 			dataviewSpec.specialExtraFilters.size() == 0
 			dataviewSpec.fieldNameExtraFilters.size() == 1
-			assertWith(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
+			with(dataviewSpec.fieldNameExtraFilters[0], FieldNameExtraFilter) {
 				domain == 'common'
 				property == 'moveBundle'
-				filter == 'FOO'
+				filter == '1810'
 				referenceProperty == 'id'
-				assertWith(fieldSpec, FieldSpec) {
+				with(fieldSpec, FieldSpec) {
 					field == 'moveBundle'
 					label == 'Bundle'
 				}
