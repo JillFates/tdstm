@@ -15,7 +15,7 @@ class TaskReportPage extends Page {
 
     static content = {
         taskReportPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        taskReportPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        taskReportPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }

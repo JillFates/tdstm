@@ -7,6 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
+import {catchError, map} from 'rxjs/operators';
 
 /**
  * @name TaskService
@@ -16,6 +17,7 @@ export class TaskService {
 
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
+	private readonly TASK_LIST = `${this.baseURL}/ws/task/listTasks`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -143,6 +145,7 @@ export class TaskService {
 				.catch((error: any) => error);
 		}
 	}
+
 	/**
 	 *
 	 * Search assets
@@ -214,7 +217,7 @@ export class TaskService {
 			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
-			{name: 'filter[filters][0][value]', value: query }
+			{name: 'filter[filters][0][value]', value: query}
 		];
 
 		if (metaParam.eventId) {
@@ -223,7 +226,7 @@ export class TaskService {
 		}
 
 		const queryString = params
-			.map((param) =>  `${param.name}=${param.value}`)
+			.map((param) => `${param.name}=${param.value}`)
 			.join('&');
 
 		return this.http.get(`${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
@@ -370,7 +373,7 @@ export class TaskService {
 	getClassForAsset(assetId: string): Observable<any> {
 		if (assetId) {
 			return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
-				.map((response: any) =>  response.data || null)
+				.map((response: any) => response.data || null)
 				.catch((error: any) => error);
 		}
 		return Observable.empty();
@@ -393,5 +396,25 @@ export class TaskService {
 		};
 
 		return assetTypes[assetClass];
+	}
+
+	/**
+	 * POST - Get the List of Task presented on Task Management list.
+	 */
+	getTaskList(eventId: number, justRemaining: boolean, justMyTasks: boolean, viewUnpublished: boolean): Observable<any> {
+		const request = {
+			moveEvent: eventId,
+			justRemaining: justRemaining ? 1 : 0,
+			justMyTasks: justMyTasks ? 1 : 0,
+			viewUnpublished: viewUnpublished ? 1 : 0,
+			sord: 'asc',
+		}
+		return this.http.post(this.TASK_LIST, request).pipe(
+			map((response: any) => response),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
 	}
 }

@@ -9,17 +9,20 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 // Components
 import {NoticeListComponent} from './components/list/notice-list.component';
+import {PostNoticesComponent} from './components/post-notices/post-notices.component';
 
 export class NoticeManagerStates {
 	public static readonly NOTICE_LIST = {
 		url: 'list'
+	};
+	public static readonly NOTICE_POST = {
+		url: ''
 	};
 }
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-admin';
 
 export const NoticeManagerRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: NoticeManagerStates.NOTICE_LIST.url},
 	{
 		path: NoticeManagerStates.NOTICE_LIST.url,
 		data: {
@@ -35,8 +38,23 @@ export const NoticeManagerRoute: Routes = [
 		resolve: {
 			notices: NoticeResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+	},
+	{
+		path: NoticeManagerStates.NOTICE_POST.url,
+		data: {
+			page: {
+				title: 'NOTICE.NOTICES',
+				instruction: '',
+				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'NOTICE.POST_NOTICES'],
+			},
+			requiresAuth: true,
+		},
+		component: PostNoticesComponent,
+		resolve: {},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
+
 ];
 
 @NgModule({

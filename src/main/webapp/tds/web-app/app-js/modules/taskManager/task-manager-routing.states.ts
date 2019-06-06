@@ -1,62 +1,51 @@
-// /**
-//  * Created by Jorge Morayta on 3/15/2017.
-//  */
-//
-// import { Ng2StateDeclaration } from '@uirouter/angular';
-// import { TaskListComponent } from './components/list/task-list.component';
-// import { TaskCreateComponent } from './components/create/task-create.component';
-// import { HeaderComponent } from '../../shared/modules/header/header.component';
-//
-// /**
-//  * Task States
-//  * @class
-//  * @classdesc Represent the possible states and access on Task Routing
-//  */
-// export class TaskStates {
-// 	public static readonly LIST = {
-// 		name: 'tds.tasklist',
-// 		url: '/task/list'
-// 	};
-// 	public static readonly CREATE = {
-// 		name: 'tds.taskcreate',
-// 		url: '/task/create'
-// 	};
-// }
-//
-// /**
-//  * This state displays the Task List.
-//  */
-// export const taskListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-// 	name: TaskStates.LIST.name,
-// 	url: TaskStates.LIST.url,
-// 	data: {
-// 		page: { title: 'TASK_MANAGER.TASK_MANAGER', instruction: 'TASK_MANAGER.CURRENTLY_LIST_OF_AVAILABLE_TASKS', menu: ['TASK_MANAGER.TASK', 'GLOBAL.LIST'] },
-// 		requiresAuth: true
-// 	},
-// 	views: {
-// 		'headerView@tds': { component: HeaderComponent },
-// 		'containerView@tds': { component: TaskListComponent }
-// 	}
-// };
-//
-// /**
-//  * This state displays the Task Creation View
-//  */
-// export const taskViewState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-// 	name: TaskStates.CREATE.name,
-// 	url: TaskStates.CREATE.url,
-// 	data: {
-// 		page: { title: 'TASK_MANAGER.CREATE_TASK', instruction: 'Please provide the information required to create a task', menu: ['TASK_MANAGER.TASK', 'GLOBAL.LIST', 'TASK_MANAGER.CREATE'] },
-// 		requiresAuth: true,
-// 		hasPendingChanges: true
-// 	},
-// 	views: {
-// 		'headerView@tds': { component: HeaderComponent },
-// 		'containerView@tds': { component: TaskCreateComponent }
-// 	}
-// };
-//
-// export const TASK_MANAGER_STATES = [
-// 	taskListState,
-// 	taskViewState
-// ];
+// Angular
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+// Services
+import {AuthGuardService} from '../security/services/auth.guard.service';
+import {TaskListComponent} from './components/list/task-list.component';
+// Components
+
+/**
+ * Top menu parent section class for all Reports module.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-tasks';
+
+export class TaskManagerRoutingStates {
+	public static readonly TASK_MANAGER_LIST = {
+		url: 'list'
+	};
+}
+
+export const TaskManagerRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: TaskManagerRoutingStates.TASK_MANAGER_LIST.url},
+	{
+		path: TaskManagerRoutingStates.TASK_MANAGER_LIST.url,
+		data: {
+			page: {
+				title: 'Task Manager',
+				instruction: '',
+				menu: ['Task', 'Task Manager'],
+				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-task-manager', subMenu: true}
+			},
+			requiresAuth: true,
+		},
+		component: TaskListComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	}
+];
+
+@NgModule({
+	exports: [RouterModule],
+	imports: [RouterModule.forChild(TaskManagerRoute)]
+})
+export class TaskManagerRouteModule {
+}
