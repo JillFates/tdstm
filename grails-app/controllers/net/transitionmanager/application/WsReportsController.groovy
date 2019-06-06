@@ -1,5 +1,6 @@
 package net.transitionmanager.application
 
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -9,14 +10,18 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
@@ -33,6 +38,8 @@ class WsReportsController implements ControllerMethods {
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
     CustomDomainService customDomainService
+    ControllerService controllerService
+    PartyRelationshipService partyRelationshipService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -90,6 +97,63 @@ class WsReportsController implements ControllerMethods {
     def moveBundles() {
         Project project = getProjectForWs()
         renderSuccessJson(moveBundleService.moveBundlesByProject(project))
+    }
+
+    def modelForBundleShow(String moveBundleId) {
+        Project project = controllerService.getProjectForPage(this)
+        if (!project) return
+
+        MoveBundle moveBundle = controllerService.getBundleForPage(this, project, moveBundleId ?: userPreferenceService.moveBundleId)
+        if (!moveBundle) {
+            redirect(action: 'list')
+            return
+        }
+
+        userPreferenceService.setMoveBundleId(moveBundle.id)
+        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "PROJ_MGR")
+        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "MOVE_MGR")
+
+        // get the list of Manual Dashboard Steps that are associated to moveBundle.project
+        def moveBundleSteps = MoveBundleStep.executeQuery(
+                'FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',
+                [mb: moveBundle])
+        def dashboardSteps = []
+
+        moveBundleSteps.each {
+            def stepSnapshot = StepSnapshot.executeQuery(
+                    'FROM StepSnapshot WHERE moveBundleStep=:msb ORDER BY dateCreated DESC',
+                    [msb: it], [max: 1])[0]
+            dashboardSteps << [moveBundleStep : it, stepSnapshot: stepSnapshot, planDuration : it.getPlanDuration()]
+        }
+
+        renderSuccessJson([moveBundleInstance: moveBundle.toMap(), projectId: project.id, projectManager: projectManager, moveManager: moveManager,
+         dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id])
+    }
+
+    @HasPermission(Permission.BundleDelete)
+    def deleteBundle(String moveBundleId) {
+        String message = moveBundleService.deleteBundle(MoveBundle.get(moveBundleId),
+                securityService.loadUserCurrentProject())
+        renderSuccessJson(message: message)
+    }
+
+    @HasPermission(Permission.BundleDelete)
+    def deleteBundleAndAssets(String moveBundleId) {
+        MoveBundle moveBundle = MoveBundle.get(moveBundleId)
+        String message
+        if (moveBundle) {
+            try{
+                moveBundleService.deleteBundleAndAssets(moveBundle)
+                message = "MoveBundle $moveBundle deleted"
+            }
+            catch (e) {
+                message = "Unable to Delete MoveBundle and Assets: $e.message"
+            }
+        }
+        else {
+            message = "MoveBundle not found with id $moveBundleId"
+        }
+        renderSuccessJson(message: message)
     }
 
     def smeList(String moveBundleId) {

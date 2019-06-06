@@ -20,7 +20,7 @@ export class BundleStates {
 		url: 'list'
 	};
 	public static readonly BUNDLE_SHOW = {
-		url: 'show'
+		url: ':id/show'
 	}
 }
 
