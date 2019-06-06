@@ -170,7 +170,7 @@ export class APIActionViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService,
-        private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe) {
 		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.getModalTitle();
 	}

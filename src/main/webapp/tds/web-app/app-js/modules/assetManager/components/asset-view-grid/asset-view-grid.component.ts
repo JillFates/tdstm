@@ -70,7 +70,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
-	@Input() hiddenFilters: boolean = false;
+	@Input() hiddenFilters = false;
 
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;

@@ -56,6 +56,6 @@ export class AssetGlobalFiltersService {
 				}
 			});
 		}
-		return justPlanning !== null? justPlanning[1] === 'true' : null;
+		return justPlanning !== null ? justPlanning[1] === 'true' : null;
 	}
 }

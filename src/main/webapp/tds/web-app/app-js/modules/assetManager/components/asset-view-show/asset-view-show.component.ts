@@ -163,9 +163,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			params['justPlanning'] = true;
 		}
 
-
-
-
 		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 			this.data = result;
 			jQuery('[data-toggle="popover"]').popover();
