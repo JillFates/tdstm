@@ -49,7 +49,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private dataIngestionService: DataScriptService,
 		private dialogService: UIDialogService,
-        private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();

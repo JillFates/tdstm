@@ -66,9 +66,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	@Output() modelChange = new EventEmitter<void>();
 	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
+	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
+	@Input() hiddenFilters: boolean = false;
+
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
@@ -209,7 +212,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		return obj;
 	}
 
-	onClearFilters(): void {
+	public onClearFilters(): void {
 		this.model.columns.forEach((c: ViewColumn) => {
 			c.filter = '';
 		});
@@ -219,8 +222,19 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		}
 	}
 
+	/**
+	 * Clear all hidden filters
+	 */
+	public onClearHiddenFilters(): void {
+		this.hiddenFilters = false;
+		this.justPlanning = false;
+		this.justPlanningChange.emit(this.justPlanning);
+		this.hiddenFiltersChange.emit(this.hiddenFilters);
+		this.onClearFilters();
+	}
+
 	hasFilterApplied(): boolean {
-		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0 || this.hiddenFilters;
 	}
 
 	clearText(column: ViewColumn): void {
@@ -613,7 +627,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	public  cellClick(e): void {
+	public cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
 			this.onShow(e.dataItem);
 		}
