@@ -354,7 +354,7 @@
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-parent-dashboard-planning-dashboard">
-                                    <g:link controller="moveBundle" action="planningStats">Planning Dashboard</g:link>
+                                    <a href="/tdstm/module/planning/dashboard">Planning Dashboard</a>
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-dashboard-event-dashboard">

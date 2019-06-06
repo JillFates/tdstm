@@ -23,7 +23,7 @@
 
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 20px">
 					<tds:hasPermission permission="${Permission.BundleEdit}">
-						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
+						<span class="menuButton"><a href="/tdstm/module/planning/dashboard">Planning Dashboard</a></span>
 					</tds:hasPermission>
 				</div>
 			<br/>
