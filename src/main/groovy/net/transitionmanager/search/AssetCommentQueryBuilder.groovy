@@ -268,7 +268,6 @@ class AssetCommentQueryBuilder {
 		if (value == null) {
 			invalidCriterion = true
 		} else {
-			processField(field, fieldMap, '=', ":${field}", value)
 			processField(field, fieldMap, operator, ":${field}", value)
 		}
 	}
