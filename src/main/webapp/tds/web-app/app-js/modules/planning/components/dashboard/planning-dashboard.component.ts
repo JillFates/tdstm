@@ -31,8 +31,8 @@ export class PlanningDashboardComponent {
 						type: 'Physical Servers',
 						img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_filter: 'physicalServer'},
-						queryParam: {common_validation: 'Unknown', _filter: 'physicalServer'},
+						queryParamMain: {_assetType: 'physicalServer'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'physicalServer'},
 						total: 0,
 						toValidate: 0
 					},
@@ -40,8 +40,8 @@ export class PlanningDashboardComponent {
 						type: 'Virtual Servers',
 						img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_filter: 'virtualServer'},
-						queryParam: {common_validation: 'Unknown', _filter: 'virtualServer'},
+						queryParamMain: {_assetType: 'virtualServer'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'virtualServer'},
 						total: 0,
 						toValidate: 0
 					},
@@ -76,8 +76,8 @@ export class PlanningDashboardComponent {
 						type: 'Other Devices',
 						img: '/tdstm/assets/icons/svg/other_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_filter: 'other'},
-						queryParam: {common_validation: 'Unknown', _filter: 'other'},
+						queryParamMain: {_assetType: 'other'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'other'},
 						total: 0,
 						toValidate: 0
 					}

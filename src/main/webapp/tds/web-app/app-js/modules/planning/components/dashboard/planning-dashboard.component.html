@@ -111,8 +111,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethodology:'Unknown', _ufp: 'true'}">{{planningDashboardModel.analysis.activeTasks}}</a></td>
-                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethodology:'Unknown', _ufp: 'true'}">Active Tasks</a></td>
+                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod:'Unknown', _ufp: 'true'}">{{planningDashboardModel.analysis.activeTasks}}</a></td>
+                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod:'Unknown', _ufp: 'true'}">Active Tasks</a></td>
                     </tr>
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
                         <td><a href="/tdstm/application/list?filter=dueOpenIssue&planMethodology=Unknown&ufp=true">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
@@ -123,8 +123,8 @@
             <h4>Application Plans</h4>
             <table class="dashboard-stat-table">
                 <tr *ngFor="let row of planningDashboardModel.analysis.groupPlanMethodologyCount">
-                    <td class="dashboard-stat-td-l"><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethodology: row.type, _ufp: 'true'}">{{row.value}}</a></td>
-                    <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{ _ufp: 'true'}">{{row.type}}</a></td>
+                    <td class="dashboard-stat-td-l"><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod: row.type, _ufp: 'true'}">{{row.value}}</a></td>
+                    <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod: row.type, _ufp: 'true'}">{{row.type}}</a></td>
                 </tr>
             </table>
         </div>
@@ -219,33 +219,33 @@
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverPhysical_menu.svg"/></td>
                                 <td>
-                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_filter: 'physicalServer'}" >Physical Server</a>
+                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'physicalServer'}" >Physical Server</a>
                                 </td>
-                                <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'Unassigned', _filter: 'physicalServer'}">{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedPhyServerPerc}}%)</a></td>
+                                <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'Unassigned', _assetType: 'physicalServer'}">{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedPhyServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.phyServerList" class="execution-data-column">
                                     <span *ngIf="server.count==0" class='colorGrey'>0</span>
-                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: server.moveEvent, _filter: 'physicalServer'}" *ngIf="server.count!=0">
+                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: server.moveEvent, _assetType: 'physicalServer'}" *ngIf="server.count!=0">
                                         {{server.count}}
                                     </a>
                                 </td>
                                 <td class="execution-data-column">
-                                    <a *ngIf="planningDashboardModel.execution.phyServerDonePerc > 0" [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'Moved', _filter: 'physicalServer'}">{{planningDashboardModel.execution.phyServerDonePerc}}%</a>
+                                    <a *ngIf="planningDashboardModel.execution.phyServerDonePerc > 0" [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'Moved', _assetType: 'physicalServer'}">{{planningDashboardModel.execution.phyServerDonePerc}}%</a>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverVirtual_menu.svg"/></td>
                                 <td>
-                                    <a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{_filter: 'virtualServer'}">Virtual Server</a>
+                                    <a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{_assetType: 'virtualServer'}">Virtual Server</a>
                                 </td>
-                                <td class="execution-data-column"><a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Unassigned', _filter: 'virtualServer'}">{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedVirtServerPerc}}%)</a></td>
+                                <td class="execution-data-column"><a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Unassigned', _assetType: 'virtualServer'}">{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedVirtServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.virtServerList" class="execution-data-column">
                                     <span *ngIf="server.count==0" class='colorGrey'>0</span>
-                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: server.moveEvent, _filter: 'virtualServer'}" *ngIf="server.count!=0">
+                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: server.moveEvent, _assetType: 'virtualServer'}" *ngIf="server.count!=0">
                                         {{server.count}}
                                     </a>
                                 </td>
                                 <td class="execution-data-column">
-                                    <a *ngIf="planningDashboardModel.execution.virtServerDonePerc > 0" [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Moved', _filter: 'virtualServer'}">{{planningDashboardModel.execution.virtServerDonePerc}}%</a>
+                                    <a *ngIf="planningDashboardModel.execution.virtServerDonePerc > 0" [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Moved', _assetType: 'virtualServer'}">{{planningDashboardModel.execution.virtServerDonePerc}}%</a>
                                 </td>
                             </tr>
                             <tr>
@@ -294,9 +294,9 @@
                             </tr>
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/other_menu.svg"/></td>
-                                <td><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_filter: 'other'}">Other</a>
+                                <td><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other'}">Other</a>
                                 </td>
-                                <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_filter: 'other', common_planStatus:'Unassigned'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
+                                <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
                                 <td *ngFor="let other of planningDashboardModel.execution.otherList" class="execution-data-column">
                                     <span *ngIf="other.count==0" class='colorGrey'>0</span>
                                     <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: other.moveEvent}" *ngIf="other.count!=0">
@@ -304,7 +304,7 @@
                                     </a>
                                 </td>
                                 <td class="execution-data-column">
-                                    <a *ngIf="planningDashboardModel.execution.otherDonePerc > 0" [routerLink]="['/asset','views',4,'show']" [queryParams]="{_filter: 'other', common_planStatus:'Moved'}">{{planningDashboardModel.execution.otherDonePerc}}%</a>
+                                    <a *ngIf="planningDashboardModel.execution.otherDonePerc > 0" [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Moved'}">{{planningDashboardModel.execution.otherDonePerc}}%</a>
                                 </td>
                             </tr>
                             <tr>
