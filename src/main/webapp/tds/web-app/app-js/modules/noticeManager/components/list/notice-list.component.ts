@@ -6,6 +6,7 @@ import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {WindowService} from '../../../../shared/services/window.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -22,6 +23,8 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
 import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-notice-list',
@@ -42,7 +45,7 @@ export class NoticeListComponent implements OnInit {
 	};
 	protected skip = 0;
 	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
-	protected defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected noticeTypes = [];
@@ -63,6 +66,7 @@ export class NoticeListComponent implements OnInit {
 	 * @param {NoticeService} noticeService
 	 */
 	constructor(
+		private notifier: NotifierService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
@@ -71,7 +75,7 @@ export class NoticeListComponent implements OnInit {
 		private route: ActivatedRoute,
 		private windowService: WindowService) {
 		this.resultSet = this.route.snapshot.data['notices'];
-		this.gridData = process(this.resultSet, this.state);
+		this.updateGrid();
 		this.noticeTypes = [...NoticeTypes];
 	}
 
@@ -96,11 +100,30 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	/**
+	 * Refresh the data grid info and update the grid heigth
+	 */
+	private updateGrid(): void {
+		this.gridData = process(this.resultSet, this.state);
+		this.fixGridHeight();
+	}
+
+	/**
+	 * Notify the event to update the grid height
+	 */
+	private fixGridHeight(): void {
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
 	 *  On filter change grab the current filter value and process the notices list
 	 */
 	protected filterChange(filter: CompositeFilterDescriptor): void {
 		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
+		this.updateGrid();
 	}
 
 	/**
@@ -108,7 +131,7 @@ export class NoticeListComponent implements OnInit {
 	 */
 	protected sortChange(sort): void {
 		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
+		this.updateGrid();
 	}
 
 	/**
@@ -123,7 +146,7 @@ export class NoticeListComponent implements OnInit {
 	 * Clear the column filter value currently selected
 	 * @param {Any} column Column to clear out filter
 	*/
-	protected clearValue(column: any): void {
+	protected clearText(column: any): void {
 		this.noticeService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
@@ -133,7 +156,7 @@ export class NoticeListComponent implements OnInit {
 	 * @param {Any} column Column to reset the filter
 	*/
 	protected resetTypeFilter(column: any): void {
-		this.clearValue(column);
+		this.clearText(column);
 		column.filter = null;
 	}
 
@@ -182,7 +205,7 @@ export class NoticeListComponent implements OnInit {
 			.subscribe(
 			(result: any) => {
 				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
+				this.updateGrid();
 			},
 			(err) => console.log(err));
 	}
@@ -196,7 +219,7 @@ export class NoticeListComponent implements OnInit {
 		this.state.skip = this.skip;
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
+		this.updateGrid();
 	}
 
 	/**
