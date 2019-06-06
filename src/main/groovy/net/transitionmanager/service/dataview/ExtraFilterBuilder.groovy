@@ -202,6 +202,11 @@ class ExtraFilterBuilder {
 		} else if (propertyParts.size() == 2) {
 			this.property = propertyParts[0]
 			this.referenceProperty = propertyParts[1]
+			// dcorrea: Add Validation for TM-14768
+			// It's only available for '.id' references.
+			if (this.referenceProperty != 'id'){
+				throw new InvalidParamException("Unsupported filter property $property")
+			}
 		} else {
 			throw new InvalidParamException("Unresolved filter property $property")
 		}
