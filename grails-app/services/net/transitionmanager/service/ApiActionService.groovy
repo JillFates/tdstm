@@ -157,7 +157,7 @@ class ApiActionService implements ServiceMethods {
 
 				// try to construct action request object and execute preScript if there is any
 				try {
-					actionRequest = createActionRequest(action)
+					actionRequest = createActionRequest(action, context)
 				} catch (ApiActionException preScriptException) {
 					addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 					String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
@@ -237,17 +237,21 @@ class ApiActionService implements ServiceMethods {
 	/**
 	 * Create action request object containing all necessary data for the api connector to invoke an api action.
 	 * It executes the action pre-scripts if there is any.
-	 * @param action
+	 * @param action - an ApiAction that contains all parameters definitions
+	 * @param context - an AssetComment that can have an AssetEntity linked to it so
+	 * when building methods parameters from context the connection can have access to
+	 * AssetEntity fields that can be referenced by the ApiAction method params.
+	 *
 	 * @return
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	ActionRequest createActionRequest(ApiAction action) {
+	ActionRequest createActionRequest(ApiAction action, Object context) {
 		if (!action) {
 			throw new InvalidRequestException('No action was provided to the invoke command')
 		}
 
 		// methodParams will hold the parameters to pass to the remote method
-		Map remoteMethodParams = buildMethodParamsWithContext(action, null)
+		Map remoteMethodParams = buildMethodParamsWithContext(action, context)
 
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
 		Map optionalRequestParams = [
