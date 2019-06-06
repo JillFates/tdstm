@@ -100,10 +100,17 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	/**
-	 * Refresh the data grid
+	 * Refresh the data grid info and update the grid heigth
 	 */
-	private updateGrid() {
+	private updateGrid(): void {
 		this.gridData = process(this.resultSet, this.state);
+		this.fixGridHeight();
+	}
+
+	/**
+	 * Notify the event to update the grid height
+	 */
+	private fixGridHeight(): void {
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
