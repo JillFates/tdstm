@@ -15,6 +15,7 @@ import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
 
@@ -143,34 +144,51 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeLocalAction() {
-		AssetComment assetComment = fetchDomain(AssetComment, params)
+		AssetComment task = fetchDomain(AssetComment, params)
 		Person whom = securityService.loadCurrentPerson()
-		String status = taskService.invokeAction(assetComment, whom, false)
-		renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
+
+		task = taskService.invokeLocalAction(task, whom)
+
+		Map results = [
+			assetComment: task,
+			status: task.status,
+			statusCss: taskService.getCssClassForStatus(task.status)
+		]
+
+		renderAsJson(results)
 	}
 
 	/**
-	 * Fetch an api action execution context and return it for remote invocation
+	 * Fetch an api action execution context and return it for remote invocation. If for what ever reason
+	 * the action can not be invoked then an exception will be thrown with the cause.
 	 * @param id - task id where api action is linked to
-	 * @return
+	 * @param publicKey - the public key to encrypt the pertainent data
+	 * @return JSON object containing an ActionRequest context object
 	 */
-	@HasPermission(Permission.ActionInvoke)
-	def invokeRemoteAction() {
-		Project project = getProjectForWs()
-		AssetComment assetComment = fetchDomain(AssetComment, params)
+	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
+	def fetchRemoteAction() {
+
+		AssetComment task = fetchDomain(AssetComment, params)
+		Person whom = securityService.loadCurrentPerson()
+
+		task = taskService.recordRemoteActionStarted(task, whom)
+
 		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
 
-		if (! actionRequest.options.apiAction.isRemote) {
-			throw new InvalidRequestException('Local actions was incorrectly invoke as Remote')
-		}
 		Map<String,?> actionRequestMap = actionRequest.toMap()
 
 		// check if api action has credentials so to include credentials password unencrypted
+		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
 		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
 			// Need to create new map because credentials map originally is immutable
 			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
 			credentials.password = credentialService.decryptPassword(assetComment.apiAction.credential)
 			actionRequestMap.options.credentials = credentials
+
+			// TODO : JM 6/19 : Encrypt the credentials appropriately using the publicKey
+			// Encrypt the credentials appropriately
+			// if (actionRequest.options.credentails.type == x) {
+			// }
 		}
 
 		renderAsJson([actionRequest: actionRequest.toMap()])

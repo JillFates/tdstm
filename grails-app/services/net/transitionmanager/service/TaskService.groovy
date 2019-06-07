@@ -423,91 +423,59 @@ class TaskService implements ServiceMethods {
 	*/
 
 	/**
-	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
-	 * @param task
-	 * @param status
-	 * @return AssetComement	task that was updated by method
+	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
+	 * plan to set the status to HOLD and add a note to the task.
+	 * @param task - the Task to invoke the method on
+	 * @return The status that the task should be set to
 	 */
-	AssetComment setTaskStatus(AssetComment task, String status) {
-		def currentPerson = securityService.getUserLoginPerson()
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
-		return setTaskStatus(task, status, currentPerson, isPM)
+	@Transactional(noRollbackFor=[Throwable])
+	AssetComment invokeLocalAction(AssetComment task, Person whom) {
+		log.debug "invokeLocalAction() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+
+		markActionStarted(task.id, whom, true)
+
+		// Try running the action
+		apiActionService.invoke(task.apiAction, task)
+
+		return task
 	}
 
 	/**
 	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
 	 * plan to set the status to HOLD and add a note to the task.
 	 * @param task - the Task to invoke the method on
-	 * @return The status that the task should be set to
+	 * @return the updated task
 	 */
-	@NotTransactional
-	String invokeAction(AssetComment task, Person whom, Boolean remoteInvocation = false) {
-		def status = task.status
-		//return status
-		// For tasks that are actionable and has an assigned action, this logic will attempt to invoke and
-		// update the task accordingly.
-		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
-		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
-		if (task.hasAction() && ACTIONABLE_STATUSES.contains(status)) {
-			if (task.isActionInvocableLocally()) {
-				String errMsg
+	@Transactional(noRollbackFor=[Throwable])
+	AssetComment recordRemoteActionStarted(AssetComment task, Person whom) {
+		log.debug "recordRemoteActionStarted() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
-				if (task.apiAction.isSync()) {
-					log.error "invokeAction() task has synchronous action that is not supported (taskId=${task.id})"
-					errMsg = 'Task has an synchronous action which are not supported'
-				} else {
-					try {
-						markActionStarted(task.id, whom, remoteInvocation)
+		markActionStarted(task.id, whom, false)
 
-						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
-
-						// Need to refresh the task with changes that were just committed in separate transaction
-						AssetComment.withTransaction { TransactionStatus ts ->
-							task.refresh()
-							status = task.status
-
-							// Kick of the async method and mark the task STARTED
-							addNote(task, whom, "Invoked action ${task.apiAction.name}")
-
-							apiActionService.invoke(task.apiAction, task)
-						}
-					} catch (InvalidRequestException e) {
-						errMsg = e.getMessage()
-					} catch (InvalidConfigurationException e) {
-						errMsg = e.getMessage()
-					} catch (CannotAcquireLockException e) {
-						errMsg = e.getMessage()
-					} catch (ApiActionException e) {
-						errMsg = e.getMessage()
-					} catch (e) {
-						errMsg = 'A runtime error occurred while attempting to process the action'
-						log.error ExceptionUtil.stackTraceToString('invokeAction() failed ', e)
-					}
-				}
-
-				if (errMsg) {
-					log.warn "invokeAction() error $errMsg"
-					addNote(task, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
-				}
-			}
-		}
-		return status
+		return task
 	}
 
 	/**
 	 * Try to mark a task as started by locking it before, if lock fails
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
-	 * @param id - the id of the task to mark as started
+	 * @param taskId - the id of the task to mark as started
 	 * @param whom - the id whos invoking the action
-	 * @param remoteInvocation - whether is a remote or local api action invokation
+	 * @param invokingLocally - Flag to indicate if the intent is to invoke the action local (true) or remotely (false)
 	 */
-	@NotTransactional
-	void markActionStarted(Long id, Person whom, Boolean remoteInvocation = false) {
-		log.debug "Attempting to action as started for task.id={}", id
-		AssetComment.withTransaction { TransactionStatus ts ->
-			def taskWithLock = AssetComment.lock(id)
+	@Transactional(noRollbackFor=[Throwable])
+	private void markActionStarted(Long taskId, Person whom, Boolean invokingLocally) {
+		log.debug "markActionStarted() Attempting to mark action as started for task.id={}", taskId
+		String errMsg
+		AssetComment taskWithLock
+
+		try {
+			taskWithLock = AssetComment.lock(taskId)
 			log.debug 'Locked out AssetComment: {}', taskWithLock
+
+			if (! ACTIONABLE_STATUSES.contains(taskWithLock.status)) {
+				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState')
+			}
 
 			if (!taskWithLock.hasAction()) {
 				throwException(InvalidRequestException, 'apiAction.task.message.noAction')
@@ -525,22 +493,26 @@ class TaskService implements ServiceMethods {
 				throwException(ApiActionException, 'apiAction.task.message.syncActionNotSupported')
 			}
 
-			if (!remoteInvocation && taskWithLock.isActionInvocableRemotely()) {
+			// Attempting to invoke a remote action locally?
+			if (invokingLocally && taskWithLock.isActionInvocableRemotely()) {
 				throwException(ApiActionException, 'apiAction.task.message.notLocalAction')
 			}
 
-			if (remoteInvocation && !taskWithLock.isActionInvocableLocally()) {
+			// Attempting to invoke a local action remotely?
+			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
 				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction')
 			}
 
-			if ((remoteInvocation && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) || (!remoteInvocation && !securityService.hasPermission(whom, Permission.ActionInvoke))) {
+			// Make sure the use has permission to invoke the action
+			if ( !securityService.hasPermission(whom, Permission.ActionInvoke) ||
+				( ! invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) ) {
 				throwException(ApiActionException, 'apiAction.task.message.noPermission')
 			}
 
+			// Prevent action from occuring if the reaction scripts are invalid
 			if (!taskWithLock.apiAction.reactionScriptsValid == 1) {
 				throwException(ApiActionException, 'apiAction.task.message.invalidReactionScript')
 			}
-
 			// Update the task so that the we track that the action was invoked
 			taskWithLock.apiActionInvokedAt = new Date()
 
@@ -548,10 +520,35 @@ class TaskService implements ServiceMethods {
 			taskWithLock.actStart = taskWithLock.apiActionInvokedAt
 
 			// Make sure that the status is STARTED instead
-			taskWithLock.status = AssetCommentStatus.STARTED
+			if (taskWithLock.status != AssetCommentStatus.STARTED) {
+				setTaskStatus(taskWithLock, AssetCommentStatus.STARTED)
+			}
 			taskWithLock.save(flush: true, failOnError: true)
 
-			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${remoteInvocation ? 'Remotely' : 'Locally'})")
+			// Note to the task indicating that the action was being invoked
+			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${ invokingLocally ? 'Server' : 'Desktop' })")
+
+		// Catch the Exceptions that the error message can be used directly
+		} catch (InvalidRequestException e) {
+			errMsg = e.getMessage()
+		} catch (InvalidConfigurationException e) {
+			errMsg = e.getMessage()
+		} catch (CannotAcquireLockException e) {
+			errMsg = e.getMessage()
+		} catch (ApiActionException e) {
+			errMsg = e.getMessage()
+
+		} catch (e) {
+			errMsg = 'A runtime error occurred while attempting to process the action'
+			log.error ExceptionUtil.stackTraceToString('invokeLocalAction() failed ', e)
+		}
+
+		if (errMsg) {
+			addNote(taskWithLock, whom, "Invoke action ${taskWithLock.apiAction.name} failed : $errMsg")
+			setTaskStatus(taskWithLock, AssetCommentStatus.HOLD)
+
+			// TODO : JPM 6/2019 : We should have a general TM exception that we know the message can displayed to the user
+			throw new InvalidParamException(errMsg)
 		}
 	}
 
@@ -596,6 +593,18 @@ class TaskService implements ServiceMethods {
 			}
 		}
 		return status
+	}
+
+	/**
+	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
+	 * @param task
+	 * @param status
+	 * @return AssetComement	task that was updated by method
+	 */
+	AssetComment setTaskStatus(AssetComment task, String status) {
+		def currentPerson = securityService.getUserLoginPerson()
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
+		return setTaskStatus(task, status, currentPerson, isPM)
 	}
 
 	/**
@@ -985,10 +994,10 @@ class TaskService implements ServiceMethods {
 		def taskNote = new CommentNote(createdBy: person, note: note, isAudit: isAudit, assetComment: task)
 		taskNote.validate()
 		if (taskNote.hasErrors()) {
-			log.error "addNote: failed to save note : ${GormUtil.allErrorsString(taskNote)}"
+			log.error "addNote(): failed to save note : {}", GormUtil.allErrorsString(taskNote)
 			return false
 		}
-
+		log.debug "addNote() Note was created"
 		task.addToNotes(taskNote)
 		true
 	}
