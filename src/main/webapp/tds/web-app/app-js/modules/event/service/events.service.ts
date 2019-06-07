@@ -15,7 +15,7 @@ export class EventsService {
 	// private instance variable to hold base url
 	private readonly baseURL = '/tdstm/ws';
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
-	private readonly APP_EVENT_NEWS = `${this.baseURL}/ws/moveEventNews`;
+	private readonly APP_EVENT_NEWS = `${this.baseURL}/moveEventNews`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {

@@ -7,6 +7,7 @@ import {UserContextService} from '../../../security/services/user-context.servic
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {EventsService} from './../../service/events.service';
+import {News} from '../news/model/news.model';
 // Components
 // Model
 
@@ -23,8 +24,10 @@ import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 
 export class EventDashboardComponent implements OnInit {
 	public eventList = [];
+	public newsList = [];
 	public selectedEvent = null;
 	public includeUnpublished = true;
+	public userTimeZone: string;
 
 	constructor(
 		private eventsService: EventsService,
@@ -49,6 +52,10 @@ export class EventDashboardComponent implements OnInit {
 				const [eventList, preference] = results;
 				this.eventList = eventList;
 				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
+				if (this.selectedEvent) {
+					this.eventsService.getNewsFromEvent(this.selectedEvent.id)
+						.subscribe((news: News[]) => this.newsList = news);
+				}
 			});
 	}
 
