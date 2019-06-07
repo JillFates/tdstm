@@ -1,0 +1,64 @@
+@mixin pie-countdown-timer($time) {
+  animation:
+    spin ($time/2) + s linear infinite,
+    bg $time + s step-end infinite;
+}
+
+.pie-countdown {
+  // border: 1px solid blue;
+}
+  .pie-countdown-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+      .pie-countdown-timer {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: yellowgreen;
+        background-image: linear-gradient(to right, transparent 50%, #655 0);
+        color: #655;
+      }
+      
+      .pie-countdown-timer::before {
+        content: '';
+        display: block;
+        margin-left: 50%;
+        height: 100%;
+        border-radius: 0 100% 100% 0 / 50%;
+        background-color: inherit;
+        transform-origin: left;
+      }
+      
+      
+      @keyframes spin {
+        to { transform: rotate(.5turn); }
+      }
+      
+      @keyframes bg {
+        50% { background: #655; }
+      }
+      
+      .timer-30-seconds::before {
+        @include pie-countdown-timer(30);
+      }
+      
+      .timer-60-seconds::before {
+        @include pie-countdown-timer(60);
+      }
+      
+      .timer-120-seconds::before {
+        @include pie-countdown-timer(120);
+      }
+      
+      .timer-300-seconds::before {
+        @include pie-countdown-timer(300);
+      }
+      
+      .timer-600-seconds::before {
+        @include pie-countdown-timer(600);
+      }
+
+

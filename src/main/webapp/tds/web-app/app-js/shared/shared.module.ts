@@ -90,7 +90,7 @@ import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-
 import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
-import {CountdownComponent} from './components/countdown/countdown.component';
+import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -166,7 +166,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
-		CountdownComponent
+		PieCountdownComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -225,7 +225,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
-		CountdownComponent
+		PieCountdownComponent
 	],
 	entryComponents: [
 		DynamicComponent,
