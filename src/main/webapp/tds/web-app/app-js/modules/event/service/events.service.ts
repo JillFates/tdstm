@@ -15,6 +15,7 @@ export class EventsService {
 	// private instance variable to hold base url
 	private readonly baseURL = '/tdstm/ws';
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
+	private readonly APP_EVENT_NEWS = `${this.baseURL}/ws/moveEventNews`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -29,6 +30,19 @@ export class EventsService {
 		return this.http.get(`${this.APP_EVENT_LISTS_URL}`)
 			.map((response: any) => {
 				return response && response.data || [];
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get the news associated to the event
+ 	 * @param {number} eventId
+	 * @returns {Observable<any[]>}
+	 */
+	getNewsFromEvent(eventId: number): Observable<any[]> {
+		return this.http.get(`${this.APP_EVENT_NEWS}/${eventId}`)
+			.map((response: any) => {
+				return response || [];
 			})
 			.catch((error: any) => error);
 	}

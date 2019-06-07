@@ -16,8 +16,10 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs'
 import {ContextMenuModule} from '@progress/kendo-angular-menu';
+import {LayoutModule} from '@progress/kendo-angular-layout';
 // Components
 import {EventDashboardComponent} from './components/dashboard/event-dashboard.component';
+import {NewsComponent} from './components/news/news.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -39,11 +41,13 @@ import {EventsService} from './service/events.service';
 		InputsModule,
 		DateInputsModule,
 		ContextMenuModule,
+		LayoutModule,
 		// Route
 		EventRouteModule
 	],
 	declarations: [
-		EventDashboardComponent
+		EventDashboardComponent,
+		NewsComponent
 	],
 	providers: [
 		// Resolve
@@ -52,7 +56,8 @@ import {EventsService} from './service/events.service';
 		EventsService
 	],
 	exports: [
-		EventDashboardComponent
+		EventDashboardComponent,
+		NewsComponent
 	],
 	entryComponents: [
 	]

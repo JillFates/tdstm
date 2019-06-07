@@ -43,7 +43,7 @@ export class PieCountdownComponent implements OnInit {
 	}
 
 	/**
-	 * On input changes set the corresponding refresh event parameter 
+	 * On input changes set the corresponding refresh event parameter
 	 */
 	ngOnInit() {
 		this.preferenceService.getPreferences(PREFERENCES_LIST.EVENTDB_REFRESH)
@@ -70,7 +70,7 @@ export class PieCountdownComponent implements OnInit {
 	}
 
 	getTimerClass(): string {
-		const seconds = this.selectedTimerOption.seconds;
+		const seconds = this.selectedTimerOption && this.selectedTimerOption.seconds || '';
 
 		return seconds ? `timer-${seconds}-seconds` : '';
 	}

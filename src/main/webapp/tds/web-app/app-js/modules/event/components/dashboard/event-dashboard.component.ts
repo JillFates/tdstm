@@ -5,6 +5,7 @@ import {forkJoin} from 'rxjs';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../security/services/user-context.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {EventsService} from './../../service/events.service';
 // Components
 // Model
@@ -22,11 +23,12 @@ import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 
 export class EventDashboardComponent implements OnInit {
 	public eventList = [];
+	public selectedEvent = null;
 	public includeUnpublished = true;
-	public refreshEverySeconds = 0;
 
 	constructor(
 		private eventsService: EventsService,
+		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
 		private userContextService: UserContextService) {
@@ -39,11 +41,14 @@ export class EventDashboardComponent implements OnInit {
 	private populateDate(): void {
 		const services = [
 			this.eventsService.getEvents(),
+			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
 		];
+
 		forkJoin(services)
 			.subscribe((results: any[]) => {
-				const [eventList] = results;
+				const [eventList, preference] = results;
 				this.eventList = eventList;
+				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
 			});
 	}
 
@@ -51,4 +56,10 @@ export class EventDashboardComponent implements OnInit {
 		console.log(event);
 	}
 
+	getDefaultEvent(defaultEventId: string): any {
+		if (defaultEventId) {
+			return this.eventList.find((event) => event.id.toString() === defaultEventId) || null;
+		}
+		return null;
+	}
 }
