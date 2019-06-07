@@ -1,4 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {CountDownItem} from './model/pie-countdown.model';
+
+import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.service';
 
 @Component({
 	selector: 'tds-pie-countdown',
@@ -14,38 +17,61 @@ import {Component} from '@angular/core';
 				</tds-button-custom>
 
 				<kendo-dropdownlist
-					[defaultItem]="defaultTimerOption"
+					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
-					[valueField]="'value'"
+					[valueField]="'seconds'"
 					(valueChange)="onSelectedTimerOption($event)"
-					[textField]="'name'">
+					[textField]="'description'">
 				</kendo-dropdownlist>
 
-				<div class="pie-countdown-timer" [ngClass]="selectedTimer.value"></div>
+				<div
+					class="pie-countdown-timer"
+					[ngClass]="getTimerClass()">
+				</div>
 			</div>
 		</div>
 	`
 })
-export class PieCountdownComponent {
-	public defaultTimerOption = {
-		value: '', name: 'Manual'
-	};
-	public selectedTimer = this.defaultTimerOption;
+export class PieCountdownComponent implements OnInit {
+	@Input() refreshEverySeconds = 0;
+	public selectedTimerOption: CountDownItem = null;
 
-	public timerOptions = [
-		{value: 'timer-30-seconds', name: '30 Sec'},
-		{value: 'timer-60-seconds', name: '1 Min'},
-		{value: 'timer-120-seconds', name: '2 Min'},
-		{value: 'timer-300-seconds', name: '5 Min'},
-		{value: 'timer-600-seconds', name: '10 Min'}
+	constructor(
+		private preferenceService: PreferenceService,
+	) {
+		console.log('on constructor');
+	}
+
+	/**
+	 * On input changes set the corresponding refresh event parameter 
+	 */
+	ngOnInit() {
+		this.preferenceService.getPreferences(PREFERENCES_LIST.EVENTDB_REFRESH)
+			.subscribe((preferences: any[]) => {
+				this.selectedTimerOption =  {
+					seconds: parseInt(preferences[PREFERENCES_LIST.EVENTDB_REFRESH] || '0', 10),
+					description: ''
+				};
+			});
+	}
+
+	public timerOptions: Array<CountDownItem> = [
+		{seconds: 0, description: 'Manual'},
+		{seconds: 30, description: '30 Sec'},
+		{seconds: 60, description: '1 Min'},
+		{seconds: 120, description: '2 Min'},
+		{seconds: 300, description: '5 Min'},
+		{seconds: 600, description: '10 Min'}
 	];
 
 	onSelectedTimerOption(timerOption: any): void {
-		this.selectedTimer = {value : '', name: ''};
-		setTimeout(() => this.selectedTimer = timerOption, 0);
+		this.selectedTimerOption = {seconds : 0, description: ''};
+		setTimeout(() => this.selectedTimerOption = timerOption, 0);
 	}
 
-	constructor() {
-		console.log('on constructor');
+	getTimerClass(): string {
+		const seconds = this.selectedTimerOption.seconds;
+
+		return seconds ? `timer-${seconds}-seconds` : '';
 	}
 }

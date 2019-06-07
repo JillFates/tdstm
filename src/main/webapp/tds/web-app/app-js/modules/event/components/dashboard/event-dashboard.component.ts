@@ -1,5 +1,6 @@
 // Angular
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {forkJoin} from 'rxjs';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../security/services/user-context.service';
@@ -22,6 +23,7 @@ import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 export class EventDashboardComponent implements OnInit {
 	public eventList = [];
 	public includeUnpublished = true;
+	public refreshEverySeconds = 0;
 
 	constructor(
 		private eventsService: EventsService,
@@ -35,10 +37,14 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	private populateDate(): void {
-		this.eventsService.getEvents()
-			.subscribe((events) => {
-				this.eventList = events;
-		});
+		const services = [
+			this.eventsService.getEvents(),
+		];
+		forkJoin(services)
+			.subscribe((results: any[]) => {
+				const [eventList] = results;
+				this.eventList = eventList;
+			});
 	}
 
 	onChangeEvent(event): void {
