@@ -7,7 +7,7 @@ import 'rxjs/add/operator/catch';
 import {catchError, map} from 'rxjs/operators';
 
 import {EventModel} from '../model/event.model';
-import {NewsModel} from '../model/news.model';
+import {NewsModel, NewsDetailModel} from '../model/news.model';
 
 /**
  * @name EventsService
@@ -19,6 +19,7 @@ export class EventsService {
 	private readonly baseURL = '/tdstm/ws';
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
 	private readonly APP_EVENT_NEWS = `${this.baseURL}/moveEventNews`;
+	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/../newsEditor/retrieveCommetOrNewsData`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -46,6 +47,14 @@ export class EventsService {
 		return this.http.get(`${this.APP_EVENT_NEWS}/${eventId}`)
 			.map((response: any) => {
 				return response || [];
+			})
+			.catch((error: any) => error);
+	}
+
+	getNewsDetail(newsId: number): Observable<NewsDetailModel> {
+		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=N`)
+			.map((response: any) => {
+				return response && response.shift() || null;
 			})
 			.catch((error: any) => error);
 	}

@@ -286,6 +286,10 @@ export const en_DICTIONARY: Object = {
 		'EVENT': 'Event',
 		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
 	},
+	'NEWS': {
+		'EDIT_NEWS': 'News Edit',
+		'CREATE_NEWS': 'News Create'
+	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',

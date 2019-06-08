@@ -14,7 +14,7 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-import {NewsModel} from '../../model/news.model';
+import {NewsDetailModel} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'tds-news-create-edit',
@@ -22,7 +22,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class NewsCreateEditComponent implements OnInit {
 	constructor(
-		private model: NewsModel,
+		public model: NewsDetailModel,
 		public activeDialog: UIActiveDialogService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService) {

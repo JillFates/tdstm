@@ -10,7 +10,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {EventsService} from './../../service/events.service';
-import {NewsModel} from './../../model/news.model';
+import {NewsModel, NewsDetailModel} from './../../model/news.model';
 import {EventModel} from './../../model/event.model';
 // Components
 import {NewsCreateEditComponent} from '../news-create-edit/news-create-edit.component';
@@ -70,16 +70,11 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	onSelectedNews(id: number): void {
-		this.getNewsDetails(id)
-			.subscribe((news: NewsModel) => {
+		this.eventsService.getNewsDetail(id)
+			.subscribe((news: NewsDetailModel) => {
 				this.openCreateEdiceNews(news)
 			})
 		console.log(id);
-	}
-
-	getNewsDetails(id: number): Observable<NewsModel> {
-		return this.eventsService.getNewsFromEvent(this.selectedEvent.id)
-			.pipe(map((news: NewsModel[]) => news.find((item: NewsModel) => item.id === id)));
 	}
 
 	getDefaultEvent(defaultEventId: string): any {
@@ -89,9 +84,9 @@ export class EventDashboardComponent implements OnInit {
 		return null;
 	}
 
-	openCreateEdiceNews(model: NewsModel) {
+	openCreateEdiceNews(model: NewsDetailModel) {
 		this.dialogService.open(NewsCreateEditComponent, [
-			{provide: NewsModel, useValue: model},
+			{provide: NewsDetailModel, useValue: model},
 		]).then(result => {
 			console.log('this.reloadData()');
 		}, error => {
