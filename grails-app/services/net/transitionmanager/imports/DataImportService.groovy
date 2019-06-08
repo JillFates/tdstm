@@ -1195,9 +1195,9 @@ class DataImportService implements ServiceMethods {
 						if (hasWhenFoundUpdate(fieldName, fieldsInfo)) {
 							// Process the 'whenFound update' logic if it was specified on the reference
 							Map fieldsValueMap = fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY]
-							errMsg = updateReferenceEntityFromWhenFound(fieldName, fieldsValueMap, context)
-							if (errMsg) {
-								recordErrorHelper(fieldName, errMsg)
+							List<String> errMsgList = updateReferenceEntityFromWhenFound(valueToSet, fieldsValueMap, context)
+							if (errMsgList && errMsgList.size() > 0) {
+								recordErrorHelper(fieldName, errMsgList.join(','))
 							}
 						}
 				}
@@ -1596,7 +1596,7 @@ class DataImportService implements ServiceMethods {
 
 		// Get the list of all the fields to be set from the create section of the fieldsInfo of the referenceField
 		fieldsValueMap.each { fieldName, value ->
-			failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+			String failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap, context)
 			if (failureMsg) {
 				errMsgs << failureMsg
 			}

@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import grails.util.Holders
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -430,13 +430,14 @@ class DomainClassQueryHelper {
 
 			// eval conditions to see if it has 'fullName' and create specific query to use Person fullName
 			if (clazz.isAssignableFrom(Person) && condition.propertyName == Person.FULLNAME_KEY) {
-				PersonService personService = Holders.getGrailsApplication().getMainContext().getBean('personService')
-				Map personFullName = personService.findPerson(condition.value, project)
+				PersonService personService = ApplicationContextHolder.getService('personService')
+				Map personFullNameMap = personService.parseName(condition.value)
+				List<Person> personsList = personService.findAllPersons(personFullNameMap, project)
 
-				// personService will return only 1 person only if 1 is found, else null
-				if (personFullName?.person) {
-					hqlParams['personIdHqlParam'] = personFullName.person.id
-					return  " ${DOMAIN_ALIAS}.id = :personIdHqlParam "
+				if (personsList && personsList.size() > 0) {
+					List<Long> personsIds = personsList.collect { it.id }
+					hqlParams['personsIdsHqlParam'] = personsIds
+					return  " ${DOMAIN_ALIAS}.id in ( :personsIdsHqlParam ) "
 				} else {
 					// return this where clause to simulate that person was not found
 					return ' 1 <> 1 '

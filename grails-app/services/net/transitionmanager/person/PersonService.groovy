@@ -275,7 +275,7 @@ class PersonService implements ServiceMethods {
 		String mn = 'findPerson()'
 		Map results = [person: null, isAmbiguous: false, partial: false]
 
-		log.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
+		log.debug '{} attempting to find nameMap={} in project {}', mn, nameMap, project
 
 		// Make sure we have a person
 		if (!nameMap || !nameMap.containsKey('first')) {
@@ -283,8 +283,42 @@ class PersonService implements ServiceMethods {
 			return results
 		}
 
+		List<Person> persons = findAllPersons(nameMap, project, staffList, clientStaffOnly, checkAmbiguity)
+		int s = persons?.size()
+		if (s > 1) {
+			results.isAmbiguous = true
+			results.partial = true
+		} else if (s == 1) {
+			results.person = persons[0]
+			results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
+			results.partial = true
+		}
+
+		log.debug '{} results={}', mn, results
+		return results
+	}
+
+	/**
+	 * Find persons associated with a given project using a parsed name map
+	 * @param nameMap - a Map containing person name elements
+	 * @param project - the project object that the person is associated with
+	 * @param staffList - deprecated argument that is no longer used
+	 * @param clientStaffOnly - a flag to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @param checkAmbiguity - a flag to indicate if the search should include lastName and middleName if present
+	 * in the nameMap as part of the where clause
+	 * @return A list of persons found by fullName passed as nameMap
+	 */
+	List<Person> findAllPersons(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true, boolean checkAmbiguity = false) {
+		String mn = 'findAllPersons()'
+		log.debug '{} attempting to find nameMap={} in project {}', mn, nameMap, project
+
+		// Make sure we have a person
+		if (!nameMap || !nameMap.containsKey('first')) {
+			return null
+		}
+
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-			  "and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
+				"and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 
@@ -313,17 +347,8 @@ class PersonService implements ServiceMethods {
 		}
 		log.debug '{} findPerson() Initial search found {} {}', mn, persons.size(), nameMap
 
-		int s = persons.size()
-		if (s > 1) {
-			persons.each { person -> log.debug '{} person {} {}', mn, person.id, person }
-			// results.person = persons[0]
-			results.isAmbiguous = true
-		} else if (s == 1) {
-			results.person = persons[0]
-		} else {
-
+		if (!persons) {
 			// Try to find match on partial
-
 			// Closure to construct the where and queryParams used below
 			def addQueryParam = { name, value ->
 				if (!StringUtil.isBlank(value)) {
@@ -344,20 +369,10 @@ class PersonService implements ServiceMethods {
 				persons = persons.collect({ it[1] })
 			}
 			log.debug '{} partial search found {}', mn, persons.size()
-
-			s = persons.size()
-			if (s > 1) {
-				results.isAmbiguous = true
-				results.partial = true
-			} else if (s == 1) {
-				results.person = persons[0]
-				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
-				results.partial = true
-			}
 		}
 
-		log.debug '{} results={}', mn, results
-		return results
+		log.debug '{} results={}', mn, persons
+		return persons
 	}
 
 	/**
