@@ -20,6 +20,7 @@ import {LayoutModule} from '@progress/kendo-angular-layout';
 // Components
 import {EventDashboardComponent} from './components/dashboard/event-dashboard.component';
 import {NewsComponent} from './components/news/news.component';
+import {NewsCreateEditComponent} from './components/news-create-edit/news-create-edit.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -47,6 +48,7 @@ import {EventsService} from './service/events.service';
 	],
 	declarations: [
 		EventDashboardComponent,
+		NewsCreateEditComponent,
 		NewsComponent
 	],
 	providers: [
@@ -57,9 +59,11 @@ import {EventsService} from './service/events.service';
 	],
 	exports: [
 		EventDashboardComponent,
+		NewsCreateEditComponent,
 		NewsComponent
 	],
 	entryComponents: [
+		NewsCreateEditComponent
 	]
 })
 

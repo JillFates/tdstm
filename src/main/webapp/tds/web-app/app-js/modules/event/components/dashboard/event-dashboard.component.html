@@ -9,7 +9,7 @@
                     <kendo-dropdownlist 
                         [data]="eventList" 
                         [(ngModel)]="selectedEvent" 
-                        (ngModelChange)="onChangeEvent($event)" 
+                        (ngModelChange)="onSelectedEvent($event.id)" 
                         textField="name" 
                         valueField="id">
                     </kendo-dropdownlist>   
@@ -36,7 +36,7 @@
                     Resume
                 </div>
                 <div class="col-md-6">
-                    <tds-news [news]="newsList"></tds-news>
+                    <tds-news [news]="newsList" (selected)="onSelectedNews($event)"></tds-news>
                 </div>
             </div>
         </div>

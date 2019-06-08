@@ -6,6 +6,9 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {catchError, map} from 'rxjs/operators';
 
+import {EventModel} from '../model/event.model';
+import {NewsModel} from '../model/news.model';
+
 /**
  * @name EventsService
  */
@@ -26,7 +29,7 @@ export class EventsService {
 	 * @returns {Observable<any>}
 	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
-	getEvents(): Observable<any[]> {
+	getEvents(): Observable<EventModel[]> {
 		return this.http.get(`${this.APP_EVENT_LISTS_URL}`)
 			.map((response: any) => {
 				return response && response.data || [];
@@ -37,9 +40,9 @@ export class EventsService {
 	/**
 	 * Get the news associated to the event
  	 * @param {number} eventId
-	 * @returns {Observable<any[]>}
+	 * @returns {Observable<NewsModel[]>}
 	 */
-	getNewsFromEvent(eventId: number): Observable<any[]> {
+	getNewsFromEvent(eventId: number): Observable<NewsModel[]> {
 		return this.http.get(`${this.APP_EVENT_NEWS}/${eventId}`)
 			.map((response: any) => {
 				return response || [];
