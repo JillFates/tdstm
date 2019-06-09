@@ -19,6 +19,7 @@ export class EventsService {
 	private readonly baseURL = '/tdstm/ws';
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
 	private readonly APP_EVENT_NEWS = `${this.baseURL}/moveEventNews`;
+	private readonly APP_EVENT_UPDATE_NEWS = `${this.baseURL}/../newsEditor/updateNews`;
 	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/../newsEditor/retrieveCommetOrNewsData`;
 
 	// Resolve HTTP using the constructor
@@ -58,4 +59,26 @@ export class EventsService {
 			})
 			.catch((error: any) => error);
 	}
+
+	/*
+	http://localhost:8080/tdstm/newsEditor/updateNews
+	&mode=ajax
+	&displayOption=U
+
+		id=2
+		&message=Running+20+minutes+ahead+of+schedule
+		&isArchived=1
+		&resolution=.asd
+	*/
+
+	updateNews(news: any): Observable<NewsDetailModel> {
+		news.mode = 'ajax';
+		return this.http.post(`${this.APP_EVENT_UPDATE_NEWS}`, JSON.stringify(news))
+			.map((response: any) => {
+				console.log(response);
+				return response || null;
+			})
+			.catch((error: any) => error);
+	}
+
 }

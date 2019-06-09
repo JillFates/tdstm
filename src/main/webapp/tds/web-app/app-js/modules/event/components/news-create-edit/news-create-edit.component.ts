@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild, OnInit} from '@angular/core';
+import {Component, ViewChild, OnInit, Output, EventEmitter} from '@angular/core';
 import {FormControl} from '@angular/forms';
 // Component
 // Service
@@ -10,6 +10,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {EventsService} from '../../service/events.service';
 
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
@@ -25,7 +26,8 @@ export class NewsCreateEditComponent implements OnInit {
 		public model: NewsDetailModel,
 		public activeDialog: UIActiveDialogService,
 		private promptService: UIPromptService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private eventsService: EventsService) {
 	}
 
 	ngOnInit() {
@@ -67,16 +69,28 @@ export class NewsCreateEditComponent implements OnInit {
 	 * Get and clean the payload to be sent to the server to create or edit a notice
 	*/
 	private getPayloadFromModel(): any {
-		const payload = {};
+		const payload = {
+			id: this.model.commentObject.id,
+			message: this.model.commentObject.message,
+			isArchived: this.model.commentObject.isArchived ? 1 : 0,
+			resolution: this.model.commentObject.resolution
+		};
 
 		return payload;
 	}
 
 	/**
-	 * Save the current status fo the Notice
+	 * Save the changes to the news
 	 */
-	protected saveNotice(): void {
+	protected onSave(): void {
 		const payload = this.getPayloadFromModel();
+
+		this.eventsService.updateNews(payload)
+			.subscribe((val) => {
+				this.activeDialog.close();
+			}, (error) => {
+				console.error('Error:', error);
+			});
 	}
 
 	/**

@@ -35,6 +35,7 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 export class NewsComponent implements OnChanges {
 	@Input() news: Array<NewsModel> = [];
 	@Output() selected: EventEmitter<number> = new EventEmitter<number>();
+	@Output() save: EventEmitter<any> = new EventEmitter<any>();
 	public archivedNews: Array<NewsModel> = [];
 	public eventNews: Array<NewsModel> = [];
 	public userTimeZone: string;
