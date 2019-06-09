@@ -38,6 +38,7 @@
                 <div class="col-md-6">
                     <tds-news 
                         [news]="newsList" 
+                        (create)="onCreate()"
                         (selected)="onSelectedNews($event)"></tds-news>
                 </div>
             </div>

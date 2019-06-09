@@ -24,6 +24,7 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 			</ng-template>
 			</kendo-tabstrip-tab>
 		</kendo-tabstrip>
+		<tds-button-create (click)="onCreate()"></tds-button-create>
 	`,
 	styles: [`
 		kendo-tabstrip p {
@@ -35,7 +36,7 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 export class NewsComponent implements OnChanges {
 	@Input() news: Array<NewsModel> = [];
 	@Output() selected: EventEmitter<number> = new EventEmitter<number>();
-	@Output() save: EventEmitter<any> = new EventEmitter<any>();
+	@Output() create: EventEmitter<void> = new EventEmitter<void>();
 	public archivedNews: Array<NewsModel> = [];
 	public eventNews: Array<NewsModel> = [];
 	public userTimeZone: string;
@@ -56,5 +57,9 @@ export class NewsComponent implements OnChanges {
 
 	onSelectedNews(id: number): void {
 		this.selected.emit(id);
+	}
+
+	onCreate(): void {
+		this.create.emit();
 	}
 }

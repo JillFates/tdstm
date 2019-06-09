@@ -20,6 +20,8 @@ export class EventsService {
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
 	private readonly APP_EVENT_NEWS = `${this.baseURL}/moveEventNews`;
 	private readonly APP_EVENT_UPDATE_NEWS = `${this.baseURL}/../newsEditor/updateNews`;
+	private readonly APP_EVENT_SAVE_NEWS = `${this.baseURL}/../newsEditor/saveNews`;
+	private readonly APP_EVENT_DELETE_NEWS = `${this.baseURL}/../newsEditor/deleteNews`;
 	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/../newsEditor/retrieveCommetOrNewsData`;
 
 	// Resolve HTTP using the constructor
@@ -74,6 +76,26 @@ export class EventsService {
 	updateNews(news: any): Observable<NewsDetailModel> {
 		news.mode = 'ajax';
 		return this.http.post(`${this.APP_EVENT_UPDATE_NEWS}`, JSON.stringify(news))
+			.map((response: any) => {
+				console.log(response);
+				return response || null;
+			})
+			.catch((error: any) => error);
+	}
+
+	saveNews(news: any): Observable<NewsDetailModel> {
+		news.mode = 'ajax';
+		return this.http.post(`${this.APP_EVENT_SAVE_NEWS}`, JSON.stringify(news))
+			.map((response: any) => {
+				console.log(response);
+				return response || null;
+			})
+			.catch((error: any) => error);
+	}
+
+	deleteNews(news: any): Observable<NewsDetailModel> {
+		news.mode = 'ajax';
+		return this.http.get(`${this.APP_EVENT_DELETE_NEWS}/?id=${news.id}`)
 			.map((response: any) => {
 				console.log(response);
 				return response || null;

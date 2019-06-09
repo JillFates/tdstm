@@ -27,4 +27,27 @@ export class NewsDetailModel {
 	dtCreated: string;
 	dtResolved: string;
 	assetName: string;
+
+	constructor() {
+		this.commentObject = {
+			id: null,
+			message: '',
+			resolution: '',
+			dateCreated: '',
+			isArchived: null,
+			archivedBy: '',
+			createdBy: {
+				id: null
+			},
+			dateArchived: '',
+			moveEvent: {
+				id: null
+			}
+		};
+		this.personCreateObj = '';
+		this.personResolvedObj = '';
+		this.dtCreated = '';
+		this.dtResolved = '';
+		this.assetName = '';
+	}
 }

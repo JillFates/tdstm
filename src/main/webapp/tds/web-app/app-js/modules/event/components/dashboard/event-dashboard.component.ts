@@ -70,8 +70,11 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	onSelectedNews(id: number): void {
-		this.eventsService.getNewsDetail(id)
+		const getNewsDetail = id ? this.eventsService.getNewsDetail(id) : Observable.of(new NewsDetailModel());
+
+		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
+				news.commentObject.moveEvent.id = this.selectedEvent.id;
 				this.openCreateEdiceNews(news)
 			})
 		console.log(id);
@@ -100,5 +103,12 @@ export class EventDashboardComponent implements OnInit {
 			text: '',
 			state: 'L'
 		} ;
+	}
+
+	onCreate(): void {
+		const model = new NewsDetailModel();
+
+		model.commentObject.moveEvent.id = this.selectedEvent.id;
+		this.openCreateEdiceNews(model);
 	}
 }

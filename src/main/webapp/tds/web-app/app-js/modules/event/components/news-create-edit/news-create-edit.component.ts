@@ -51,16 +51,14 @@ export class NewsCreateEditComponent implements OnInit {
 		}
 	}
 
-	protected deleteNotice(): void {
+	protected onDelete(): void {
 		this.promptService.open('Confirmation Required', 'You are about to delete the selected item. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					/*
-					this.noticeService.deleteNotice(this.model.id.toString())
+					this.eventsService.deleteNews(this.getPayloadFromModel())
 						.subscribe(
 							res => this.activeDialog.close(),
 							error => console.error(error));
-					*/
 				}
 			});
 	}
@@ -70,11 +68,16 @@ export class NewsCreateEditComponent implements OnInit {
 	*/
 	private getPayloadFromModel(): any {
 		const payload = {
-			id: this.model.commentObject.id,
 			message: this.model.commentObject.message,
 			isArchived: this.model.commentObject.isArchived ? 1 : 0,
 			resolution: this.model.commentObject.resolution
 		};
+
+		if (this.isCreate()) {
+			payload['moveEventId'] = this.model.commentObject.moveEvent.id;
+		} else {
+			payload['id'] = this.model.commentObject.id;
+		}
 
 		return payload;
 	}
@@ -85,7 +88,9 @@ export class NewsCreateEditComponent implements OnInit {
 	protected onSave(): void {
 		const payload = this.getPayloadFromModel();
 
-		this.eventsService.updateNews(payload)
+		const updateMethod = payload.id ? this.eventsService.updateNews(payload) : this.eventsService.saveNews(payload);
+
+		updateMethod
 			.subscribe((val) => {
 				this.activeDialog.close();
 			}, (error) => {
@@ -114,5 +119,9 @@ export class NewsCreateEditComponent implements OnInit {
 	 */
 	protected isDirty(): boolean {
 		return false;
+	}
+
+	isCreate(): boolean {
+		return !Boolean(this.model.commentObject.id);
 	}
 }
