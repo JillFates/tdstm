@@ -357,7 +357,7 @@ class SqlUtil {
 				break
 
 			/* Scenario 4: Starts with '<' or '>' and any literal follows. */
-			case ~ /^(<|>)*/:
+			case ~ /^(<|>).*/:
 				fieldSearchData.filter = originalFilter.substring(1)
 				buildSingleValueParameter(fieldSearchData, originalFilter[0])
 				break
