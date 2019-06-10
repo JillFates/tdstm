@@ -771,6 +771,9 @@ var GraphUtil = (function ($) {
 		for (var i = 0; i < twisties.length; ++i)
 			if ($(twisties[i]).hasClass('open'))
 				pref.push($(twisties[i]).attr('groupType'));
+		if (pref == '') {
+			pref = ['!']
+		}
 		return pref.join(',');
 	}
 

@@ -1,5 +1,4 @@
 import {TagModel} from '../../../assetTags/model/tag.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -17,6 +16,7 @@ import {takeUntil} from 'rxjs/operators';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 import {UserContextService} from '../../../security/services/user-context.service';
 import {UserContextModel} from '../../../security/model/user-context.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 declare var jQuery: any;
 
@@ -41,6 +41,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		protected model: any,
 		protected activeDialog: UIActiveDialogService,
 		protected userContextService: UserContextService,
+		protected permissionService: PermissionService,
 		protected assetExplorerService: AssetExplorerService,
 		protected dialogService: UIDialogService,
 		protected notifierService: NotifierService,

@@ -7,6 +7,7 @@ import {CredentialService} from '../../service/credential.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType} from '../../../../shared/model/data-list-grid.model';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {NgForm} from '@angular/forms';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
@@ -82,7 +83,8 @@ export class CredentialViewEditComponent {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private credentialService: CredentialService) {
+		private credentialService: CredentialService,
+		private translatePipe: TranslatePipe) {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
@@ -106,7 +108,7 @@ export class CredentialViewEditComponent {
 		this.credentialService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.providerList.push({ id: 0, name: 'Select...' });
+					this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 					this.credentialModel.provider = this.providerList[0];
 					this.modifySignatureByProperty('provider');
 				}

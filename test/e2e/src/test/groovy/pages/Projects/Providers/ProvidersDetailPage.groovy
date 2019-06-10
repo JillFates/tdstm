@@ -18,6 +18,9 @@ class ProvidersDetailPage extends Page{
         editBtn {$("button", class:"btn btn-primary pull-left" , type:"button")}
         deleteBtn {$("button", class:"btn btn-danger")}
         closeXIcon {$("button", "aria-label":"Close" , class:"close" , type:"button").find("span", "aria-hidden":"true")[0]}
+        deleteConfirmationModal {$(id:"providerAssociated").find(class:"modal-md").find(class:"modal-content")}
+        deleteConfirmationNoBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-right")}
+        deleteConfirmationYesBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-left")}
         commonsModule { module CommonsModule }
     }
 
