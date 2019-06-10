@@ -2,6 +2,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Observable, forkJoin} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {pathOr} from 'ramda';
 
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -11,7 +12,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {EventsService} from './../../service/events.service';
 import {NewsModel, NewsDetailModel} from './../../model/news.model';
-import {EventModel} from './../../model/event.model';
+import {EventModel, EventPlanStatus} from './../../model/event.model';
 // Components
 import {NewsCreateEditComponent} from '../news-create-edit/news-create-edit.component';
 // Model
@@ -32,8 +33,10 @@ export class EventDashboardComponent implements OnInit {
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;
+	public selectedEventBundle = null;
 	public includeUnpublished = true;
 	public userTimeZone: string;
+	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 
 	constructor(
 		private eventsService: EventsService,
@@ -59,14 +62,34 @@ export class EventDashboardComponent implements OnInit {
 				this.eventList = eventList;
 				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
 				if (this.selectedEvent) {
-					this.eventsService.getNewsFromEvent(this.selectedEvent.id)
-						.subscribe((news: NewsModel[]) => this.newsList = news);
+					this.onSelectedEvent(this.selectedEvent.id);
+
 				}
 			});
 	}
 
 	onSelectedEvent(id: number): void {
-		console.log(id);
+		this.eventsService.getNewsFromEvent(id)
+			.subscribe((news: NewsModel[]) => this.newsList = news);
+
+		this.eventsService.getListBundles(id)
+		.subscribe((results: any[]) => {
+			this.selectedEventBundle = results.length > 0 ? results.shift() : null;
+			this.eventPlanStatus = new EventPlanStatus();
+			if (this.selectedEventBundle) {
+				this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
+					.subscribe((statusDetails: any) => {
+						console.log('The event status details are');
+						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
+						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
+						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
+						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
+						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
+						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunBook'], statusDetails);
+					});
+			}
+		});
+
 	}
 
 	onSelectedNews(id: number): void {
@@ -91,7 +114,7 @@ export class EventDashboardComponent implements OnInit {
 		this.dialogService.open(NewsCreateEditComponent, [
 			{provide: NewsDetailModel, useValue: model},
 		]).then(result => {
-			console.log('this.reloadData()');
+			console.log('reloading data');
 		}, error => {
 			console.log(error);
 		});
@@ -110,5 +133,20 @@ export class EventDashboardComponent implements OnInit {
 
 		model.commentObject.moveEvent.id = this.selectedEvent.id;
 		this.openCreateEdiceNews(model);
+	}
+
+	onChangeStatus(value: number) {
+		this.eventsService.updateStatusDetails({
+			moveEventId: this.selectedEvent.id,
+			value: value,
+			checkbox: true
+		})
+		.subscribe((result) => {
+			console.log('The resulting of update is:');
+			console.log(result);
+		}, error => {
+			console.log('here error is');
+			console.log(error);
+		});
 	}
 }

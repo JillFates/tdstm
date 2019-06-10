@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {pathOr} from 'ramda'
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -16,13 +17,16 @@ import {NewsModel, NewsDetailModel} from '../model/news.model';
 export class EventsService {
 
 	// private instance variable to hold base url
-	private readonly baseURL = '/tdstm/ws';
-	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/moveEvent/list`;
-	private readonly APP_EVENT_NEWS = `${this.baseURL}/moveEventNews`;
-	private readonly APP_EVENT_UPDATE_NEWS = `${this.baseURL}/../newsEditor/updateNews`;
-	private readonly APP_EVENT_SAVE_NEWS = `${this.baseURL}/../newsEditor/saveNews`;
-	private readonly APP_EVENT_DELETE_NEWS = `${this.baseURL}/../newsEditor/deleteNews`;
-	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/../newsEditor/retrieveCommetOrNewsData`;
+	private readonly baseURL = '/tdstm';
+	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/ws/moveEvent/list`;
+	private readonly APP_EVENT_NEWS = `${this.baseURL}/ws/moveEventNews`;
+	private readonly APP_EVENT_UPDATE_NEWS = `${this.baseURL}/newsEditor/updateNews`;
+	private readonly APP_EVENT_SAVE_NEWS = `${this.baseURL}/newsEditor/saveNews`;
+	private readonly APP_EVENT_DELETE_NEWS = `${this.baseURL}/newsEditor/deleteNews`;
+	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/newsEditor/retrieveCommetOrNewsData`;
+	private readonly APP_EVENT_LIST_BUNDLES = `${this.baseURL}/ws/event/listBundles`;
+	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
+	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/moveEvent/updateEventSumamry`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -62,22 +66,10 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
-	/*
-	http://localhost:8080/tdstm/newsEditor/updateNews
-	&mode=ajax
-	&displayOption=U
-
-		id=2
-		&message=Running+20+minutes+ahead+of+schedule
-		&isArchived=1
-		&resolution=.asd
-	*/
-
 	updateNews(news: any): Observable<NewsDetailModel> {
 		news.mode = 'ajax';
 		return this.http.post(`${this.APP_EVENT_UPDATE_NEWS}`, JSON.stringify(news))
 			.map((response: any) => {
-				console.log(response);
 				return response || null;
 			})
 			.catch((error: any) => error);
@@ -87,7 +79,6 @@ export class EventsService {
 		news.mode = 'ajax';
 		return this.http.post(`${this.APP_EVENT_SAVE_NEWS}`, JSON.stringify(news))
 			.map((response: any) => {
-				console.log(response);
 				return response || null;
 			})
 			.catch((error: any) => error);
@@ -97,10 +88,29 @@ export class EventsService {
 		news.mode = 'ajax';
 		return this.http.get(`${this.APP_EVENT_DELETE_NEWS}/?id=${news.id}`)
 			.map((response: any) => {
-				console.log(response);
 				return response || null;
 			})
 			.catch((error: any) => error);
 	}
 
+	getListBundles(eventId: number): Observable<any[]> {
+		return this.http.get(`${this.APP_EVENT_LIST_BUNDLES}/${eventId}`)
+			.map((response: any) => pathOr(null, ['data', 'list'], response))
+			.catch((error: any) => error);
+	}
+
+	getEventStatusDetails(bundleId: number, eventId: number) {
+		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
+			.map((response: any) => pathOr(null, ['snapshot'], response))
+			.catch((error: any) => error);
+	}
+
+	updateStatusDetails(payload: any): Observable<any> {
+		return this.http.post(`${this.APP_EVENT_STATUS_UPDATE}`, JSON.stringify(payload))
+			.catch((error: any) => {
+				console.log('The error is');
+				console.log(error);
+				return error
+			});
+	}
 }

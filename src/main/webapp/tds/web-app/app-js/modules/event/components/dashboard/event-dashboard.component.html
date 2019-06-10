@@ -30,7 +30,10 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-3">
-                    Gauge
+                    <tds-plan-versus-status 
+                        (changeProgress)="onChangeStatus($event)"
+                        [currentProgress]="eventPlanStatus.dialIndicator">
+                    </tds-plan-versus-status>
                 </div>
                 <div class="col-md-3">
                     Resume
