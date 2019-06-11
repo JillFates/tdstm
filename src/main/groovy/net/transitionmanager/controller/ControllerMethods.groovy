@@ -22,7 +22,6 @@ import net.transitionmanager.exception.InvalidSyntaxException
 import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.exception.ProjectRequiredException
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.exception.UnauthorizedException
 import org.grails.web.databinding.bindingsource.InvalidRequestBodyException
@@ -55,8 +54,6 @@ trait ControllerMethods {
 	LicenseAdminService licenseAdminService
 
 	SecurityService securityService
-
-	ProjectService projectService
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
 

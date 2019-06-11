@@ -6,6 +6,7 @@ import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.person.UserPreferenceService
 
@@ -16,6 +17,7 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
+	ProjectService projectService
 
 	/**
 	 * <p>This endpoint is used by the DataView framework to retrieve the data.</p>

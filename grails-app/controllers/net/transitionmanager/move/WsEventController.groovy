@@ -9,6 +9,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.project.EventService
 import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.ProjectService
+
 /**
  * Handles WS calls of the EventService.
  *
@@ -18,8 +20,8 @@ import net.transitionmanager.project.MoveEventService
 class WsEventController implements ControllerMethods {
 
 	EventService eventService
-
 	MoveEventService moveEventService
+	ProjectService projectService
 
 	@HasPermission(Permission.EventView)
 	def listEventsAndBundles() {

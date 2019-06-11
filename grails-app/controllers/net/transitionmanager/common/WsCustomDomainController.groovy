@@ -6,11 +6,13 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import grails.gorm.transactions.Transactional
 
 @Secured('isAuthenticated()')
 class WsCustomDomainController implements ControllerMethods {
     CustomDomainService customDomainService
+    ProjectService projectService
 
     @HasPermission(Permission.UserGeneralAccess)
     @Transactional(readOnly = true)

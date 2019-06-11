@@ -24,6 +24,7 @@ import net.transitionmanager.exception.LogicException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -47,6 +48,7 @@ class ApplicationController implements ControllerMethods, PaginationMethods {
 	UserPreferenceService userPreferenceService
 	AssetService assetService
 	AssetOptionsService assetOptionsService
+	ProjectService projectService
 
 	@HasPermission(Permission.AssetView)
 	def list() {

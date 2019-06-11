@@ -13,8 +13,8 @@ import net.transitionmanager.project.ProjectService
 @Secured('isAuthenticated()')
 class EventController implements ControllerMethods {
 
-	ProjectService projectService
 	MoveEventService moveEventService
+	ProjectService projectService
 
 	/**
 	 * List all available Move Events for the user's current project including more detailed list of fields.

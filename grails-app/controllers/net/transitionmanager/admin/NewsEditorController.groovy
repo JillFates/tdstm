@@ -18,6 +18,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.NewsEditorService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.ProjectService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -34,6 +35,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 	ControllerService           controllerService
 	NamedParameterJdbcTemplate  namedParameterJdbcTemplate
 	UserPreferenceService       userPreferenceService
+	ProjectService              projectService
 
 	static defaultAction = 'newsEditorList'
 
