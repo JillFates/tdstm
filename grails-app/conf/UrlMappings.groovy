@@ -414,9 +414,9 @@ class UrlMappings {
 			action = [POST:"invokeLocalAction"]
 		}
 
-		"/ws/task/$id/invokeRemoteAction" {
+		"/ws/task/$id/recordRemoteActionStarted" {
 			controller = "wsTask"
-			action = [POST:"invokeRemoteAction"]
+			action = [POST:"recordRemoteActionStarted"]
 		}
 
 		"/ws/task/$id/resetAction" {

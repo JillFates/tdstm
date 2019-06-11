@@ -579,6 +579,8 @@ class HttpProducerService {
                 break;
         }
 
+        log.info "executeHttpCall() Calling URL{}", url.toURI()
+
         // perform and set authentication if present
         if (actionRequest.options.credentials) {
             if (actionRequest.options.credentials.status == CredentialStatus.INACTIVE.name()) {

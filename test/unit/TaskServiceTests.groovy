@@ -36,44 +36,44 @@ class TaskServiceTests extends Specification {
 
 	void testSetTaskStatus() {
 		when:
-		Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
+			Person whom = new Person(firstName: 'Robin', lastName: 'Banks')
 
-		TestAssetComment task = new TestAssetComment(previousStatus: AssetCommentStatus.PENDING)
-		task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
+			TestAssetComment task = new TestAssetComment(previousStatus: AssetCommentStatus.PENDING)
+			task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom, true)
 
 		then:
-		task.actStart != null
-		task.assignedTo != null
-		AssetCommentStatus.STARTED == task.status
-		task.actFinish == null
-		task.dateResolved == null
+			task.actStart != null
+			task.assignedTo != null
+			AssetCommentStatus.STARTED == task.status
+			task.actFinish == null
+			task.dateResolved == null
 
 		when:
-		// Test bumping status to COMPLETED after STARTED
-		task.previousStatus = task.status
-		service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
+			// Test bumping status to COMPLETED after STARTED
+			task.previousStatus = task.status
+			service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom, true)
 
 		then:
-		task.actStart != null
-		task.actFinish != null
-		task.assignedTo != null
-		task.resolvedBy != null
-		AssetCommentStatus.COMPLETED == task.status
-		task.dateResolved != null
+			task.actStart != null
+			task.actFinish != null
+			task.assignedTo != null
+			task.resolvedBy != null
+			AssetCommentStatus.COMPLETED == task.status
+			task.dateResolved != null
 
 		when:
-		// Test reverting status TO STARTED from COMPLETED
-		def prevStarted = task.actStart
-		task.previousStatus = task.status
-		service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
+			// Test reverting status TO STARTED from COMPLETED
+			def prevStarted = task.actStart
+			task.previousStatus = task.status
+			service.setTaskStatus(task, AssetCommentStatus.STARTED, whom, true)
 
 		then:
-		task.actStart != null
-		task.actFinish == null
-		task.assignedTo != null
-		task.resolvedBy == null
-		AssetCommentStatus.STARTED == task.status
-		null == task.dateResolved
+			task.actStart != null
+			task.actFinish == null
+			task.assignedTo != null
+			task.resolvedBy == null
+			AssetCommentStatus.STARTED == task.status
+			null == task.dateResolved
 	}
 
 	void testGetMoveEventRunbookRecipe() {

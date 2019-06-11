@@ -137,7 +137,7 @@ class ApiCatalogTestHelper {
         "description": "Call endpoint",
         "endpointUrl": "https://{HOSTNAME}.about.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
-        "method": "fetchAssetList",
+        "method": "invokeHttpRequest",
         "httpMethod": "GET",
         "producesData": 1,
         "params": [
@@ -172,19 +172,19 @@ class ApiCatalogTestHelper {
         },
         "scriptDef": {
           "ERROR_SCRIPT": "// Put the task on hold and add a comment with the cause of the error
-          task.error( response.error )", 
+          task.error( response.error )",
           "200_SUCCESS_SCRIPT": "// Update the task status that the task completed
-          task.done()", 
+          task.done()",
           "204_SUCCESS_SCRIPT": "// Success script for 204 status code - nocontent
           task.hold( 'Moving the task to hold since no content was received' )"
         },
         "script": {
           "STATUS": "// Check the HTTP response code for a 200 OK
-          if (response.status == SC.OK) { 
-            return SUCCESS 
-        } else { 
-            return ERROR 
-        }",  
+          if (response.status == SC.OK) {
+            return SUCCESS
+        } else {
+            return ERROR
+        }",
           "ERROR": "$scriptDef.ERROR_SCRIPT$",
           "SUCCESS": "$scriptDef.200_SUCCESS_SCRIPT$"
         },
