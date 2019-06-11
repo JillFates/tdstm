@@ -375,6 +375,14 @@ class UrlMappings {
 			action = [POST:"listTasks"]
 		}
 
+        "/ws/task/customColumns" {
+            controller = "wsTask"
+            action = [
+                    GET:"listCustomColumns",
+                    POST: "setCustomColumns"
+            ]
+        }
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]

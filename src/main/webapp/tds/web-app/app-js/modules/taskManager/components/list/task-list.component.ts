@@ -7,6 +7,9 @@ import {TaskService} from '../../service/task.service';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {forkJoin} from 'rxjs';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
+import { taskListColumnsModel } from '../../model/task-list-columns.model';
 
 @Component({
 	selector: 'task-list',
@@ -78,13 +81,30 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 					</div>
 					<kendo-grid
 						#gridComponent
+						*ngIf="!hideGrid"
 						class="task-grid"
 						[data]="grid.gridData"
 						[loading]="loading"
 						[pageSize]="grid.state.take"
 						[skip]="grid.state.skip"
 						[pageable]="{pageSizes: grid.defaultPageOptions, info: true}"
-						(pageChange)="grid.pageChange($event)">
+						(pageChange)="grid.pageChange($event)"
+						[resizable]="true"
+						[columnMenu]="true">
+						<!-- Column Menu -->
+						<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
+							<div class="k-column-list">
+								<label *ngFor="let custom of customColumns;"
+											 [ngClass]="{'invisible': custom.property === currentCustomColumns[column.field]}"
+											 class="k-column-list-item ng-star-inserted">
+										<input type="radio"
+													 value="{{custom.property}}"
+													 (ngModelChange)="onCustomColumnChange(column.field, custom, service)"
+													 [(ngModel)]="selectedCustomColumn[column.field]">
+										<span class="k-checkbox-label"> {{custom.label}} </span>
+								</label>
+							</div>
+						</ng-template>
 						<!-- Toolbar -->
 						<ng-template kendoGridToolbarTemplate [position]="'top'">
 							<tds-button-create
@@ -104,7 +124,7 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 							</label>
 						</ng-template>
 						<!-- Action -->
-						<kendo-grid-command-column [width]="70" [locked]="true">
+						<kendo-grid-command-column [width]="50" [locked]="true" [columnMenu]="false">
 							<ng-template kendoGridHeaderTemplate>
 								<div class="text-center">
 									<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -127,11 +147,21 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 															 [headerStyle]="column.headerStyle ? column.headerStyle : ''"
 															 [class]="column.cellClass ? column.cellClass : ''"
 															 [style]="column.cellStyle ? column.cellStyle : ''"
-															 [width]="!column.width ? 100 : column.width">
+															 [width]="!column.width ? 100 : column.width"
+															 [columnMenu]="column.columnMenu">
+							<!-- Header -->
 							<ng-template kendoGridHeaderTemplate>
 								<div class="sortable-column">
 									<label> {{column.label}}</label>
 								</div>
+							</ng-template>
+							<!-- updated -->
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
+								<span class="task-status-cell {{dataItem.updatedClass}}">{{dataItem.updatedTime}}</span>
+							</ng-template>
+							<!-- status -->
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
+								<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
 							</ng-template>
 						</kendo-grid-column>
 					</kendo-grid>
@@ -141,7 +171,7 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 	`
 })
 
-export class TaskListComponent implements OnInit {
+export class TaskListComponent {
 
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	private readonly allEventsOption = {id: 0, name: 'All Events'};
@@ -153,9 +183,13 @@ export class TaskListComponent implements OnInit {
 	timerList = ['Manual', '1 Min', '2 Min', '3 Min', '4 Min', '5 Min'];
 	timerValue = 'Manual';
 	grid: DataGridOperationsHelper = new DataGridOperationsHelper([]);
-	columnsModel: Array<GridColumnModel> = columnsModel;
+	columnsModel: Array<GridColumnModel> = taskListColumnsModel;
 	loading = true;
+	hideGrid = true;
 	private pageSize: number;
+	private currentCustomColumns: any = {};
+	private customColumns: Array<any>;
+	selectedCustomColumn = {};
 
 	constructor(
 		private taskService: TaskService,
@@ -167,6 +201,7 @@ export class TaskListComponent implements OnInit {
 	private onLoad(): void {
 		this.loading = true;
 		const observables = forkJoin(
+			this.taskService.getCustomColumns(),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER),
@@ -175,33 +210,63 @@ export class TaskListComponent implements OnInit {
 		);
 		observables.subscribe({
 				next: value => {
-					console.log(value);
-					// Task list size, value[1]
-					this.pageSize = value[1] ? parseInt(value[1], 0) : GRID_DEFAULT_PAGE_SIZE;
-					// Task Refresh Timer, value[2]
-					// Task View Unpublished, value[3]
-					this.viewUnpublished = value[3] ? value[3] === 'true' : false;
-					// Just Remaining, value [4]
-					this.justRemaining = value[4] ? value[4] === '1' : false;
-					// Current event, value[0]
-					this.reportService.getEventList().subscribe(result => {
-						this.eventList = [this.allEventsOption].concat(result.data);
-						const match = this.eventList.find(item => item.id === parseInt(value[0], 0));
-						if (match) {
-							this.selectedEvent = match;
-						} else {
-							this.selectedEvent = this.allEventsOption;
-						}
-						this.search();
-					});
+					// Custom Columns, TaskPref value[0]
+					this.builCustomColumns(value[0].customColumns	, value[0].assetCommentFields);
+					// Current event, value[1]
+					this.loadEventListAndSearch(value[1]);
+					// Task list size, value[2]
+					this.pageSize = value[2] ? parseInt(value[2], 0) : GRID_DEFAULT_PAGE_SIZE;
+					// Task Refresh Timer, value[3]
+					// Task View Unpublished, value[4]
+					this.viewUnpublished = value[4] ? value[4] === 'true' : false;
+					// Just Remaining, value [5]
+					this.justRemaining = value[5] ? value[5] === '1' : false;
 				},
 				complete: () => {
-					// nothing.
+					this.hideGrid = false;
 				}
 			}
 		);
 	}
 
+	/**
+	 * Loads the event list from api, sets the current event selected and runs search().
+	 * @param currentEventId
+	 */
+	private loadEventListAndSearch(currentEventId: any): void {
+		this.reportService.getEventList().subscribe(result => {
+			this.eventList = [this.allEventsOption].concat(result.data);
+			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 0));
+			if (match) {
+				this.selectedEvent = match;
+			} else {
+				this.selectedEvent = this.allEventsOption;
+			}
+			this.search();
+		});
+	}
+
+	/**
+	 * Sets the custom columns headers into the column grid definition
+	 * and builds the available custom columns.
+	 */
+	private builCustomColumns(customColumns: any, assetCommentFields: any): void {
+		Object.values(customColumns).forEach((custom: string, index: number) => {
+			const column = `userSelectedCol${index}`;
+			let match = this.columnsModel.find(item => item.property === column);
+			match.label = assetCommentFields[custom];
+			this.currentCustomColumns[column] = custom;
+		});
+		this.customColumns = [];
+		Object.entries(assetCommentFields).forEach(entry => {
+			this.customColumns.push({property: entry[0], label: entry[1]});
+		});
+		this.customColumns = this.customColumns.sort((a, b) => SortUtils.compareByProperty(a, b, 'label'));
+	}
+
+	/**
+	 * Search Tasks based on UI filters.
+	 */
 	private search(): void {
 		this.loading = true;
 		this.taskService.getTaskList(this.selectedEvent.id, this.justRemaining, this.justMyTasks, this.viewUnpublished).subscribe( result => {
@@ -209,12 +274,16 @@ export class TaskListComponent implements OnInit {
 			console.log(this.grid.gridData);
 			this.loading = false;
 		});
-	}
+	}F
 
-	ngOnInit(): void {
-		// setTimeout(() => {
-		// 	this.gridComponent.autoFitColumns();
-		// }, 300);
+	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
+		service.close();
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
+			.subscribe(result => {
+				this.builCustomColumns(result.customColumns, result.assetCommentFields);
+				this.search();
+			});
 	}
 
 	/**
@@ -222,97 +291,6 @@ export class TaskListComponent implements OnInit {
 	 * @param selection: Array<any>
 	 */
 	onFiltersChange($event ?: any) {
-		console.log(this.selectedEvent);
-		console.log('justRemaining', this.justRemaining);
-		console.log('justMyTasks', this.justMyTasks);
-		console.log('viewUnpublished', this.viewUnpublished);
 		this.search();
 	}
 }
-
-const columnsModel: Array<GridColumnModel> = [
-	{
-		label: 'Task',
-		property: 'taskNumber',
-		type: 'number',
-		width: 70,
-		locked: false
-	},
-	{
-		label: 'Description',
-		property: 'comment',
-		type: 'text',
-		width: 250,
-		locked: false
-	},
-	{
-		label: 'Asset Name',
-		property: 'assetName',
-		type: 'text',
-		width: 130,
-		locked: false
-	},
-	{
-		label: 'Asset Type',
-		property: 'assetName',
-		type: 'text',
-		width: 130,
-		locked: false
-	},
-	{
-		label: 'Updated',
-		property: 'updatedTime',
-		type: 'text',
-		width: 80,
-		locked: false
-	},
-	{
-		label: 'Due Date',
-		property: 'dueDate',
-		type: 'text',
-		width: 80,
-		locked: false
-	},
-	{
-		label: 'Status',
-		property: 'status',
-		type: 'text',
-		width: 80,
-		locked: false
-	},
-	{
-		label: 'Assigned To',
-		property: 'assetName',
-		type: 'text',
-		width: 130,
-		locked: false
-	},
-	{
-		label: 'Team',
-		property: 'assetName',
-		type: 'text',
-		width: 130,
-		locked: false
-	},
-	{
-		label: 'Category',
-		property: 'assetName',
-		type: 'text',
-		width: 80,
-		locked: false
-	},
-	{
-		label: 'Suc.',
-		property: 'assetName',
-		type: 'text',
-		width: 50,
-		locked: false
-	},
-	{
-		label: 'Score',
-		property: 'score',
-		type: 'number',
-		width: 80,
-		locked: false
-	},
-]

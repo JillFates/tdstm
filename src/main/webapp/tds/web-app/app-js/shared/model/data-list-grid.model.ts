@@ -35,6 +35,7 @@ export class GridColumnModel {
 	cellStyle?: any;
 	cellClass?: string | Array<string>;
 	sort?: SortInfo;
+	columnMenu ? = false;
 
 	constructor() {
 		this.type = 'text';

@@ -3,6 +3,7 @@ package net.transitionmanager.tasks
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
@@ -43,6 +44,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	ApiActionService apiActionService
 	CredentialService credentialService
     UserPreferenceService userPreferenceService
+    AssetEntityService assetEntityService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -285,7 +287,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
 		Map params = request.JSON
-        println(params)
         if (params.containsKey("justRemaining") && params.justRemaining in [0, 1]) {
             userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
         }
@@ -323,4 +324,41 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
 		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)
 	}
+
+    @HasPermission(Permission.TaskManagerView)
+    def listCustomColumns() {
+        Map taskPref = assetEntityService.getExistingPref(UserPreferenceEnum.Task_Columns)
+        def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
+        Map modelPref = [:]
+        /*String[] modelPref2 = new String[taskPref.keySet().size()]*/
+        taskPref.eachWithIndex { key, value, index -> modelPref[index] = value }
+        /* taskPref.eachWithIndex { key, value, index -> modelPref['userSelectedCol' + index] = assetCommentFields[value] } */
+        renderAsJson(customColumns: modelPref, assetCommentFields: assetCommentFields)
+    }
+
+    /**
+     * used to set the Application custom columns pref as JSON
+     * @param columnValue
+     * @param from
+     * @render true
+     */
+    @HasPermission(Permission.TaskManagerView)
+    def setCustomColumns() {
+        Map requestParams = request.JSON
+        def column = requestParams.columnValue
+        String fromKey = requestParams.from
+        def prefCode = requestParams.type as UserPreferenceEnum
+        println(requestParams)
+        assert prefCode
+        def existingColsMap = assetEntityService.getExistingPref(prefCode)
+        String key = existingColsMap.find { it.value == column }?.key
+        if (key) {
+            existingColsMap[key] = requestParams.previousValue
+        }
+
+        existingColsMap[fromKey] = column
+        userPreferenceService.setPreference(prefCode, existingColsMap as JSON)
+        def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
+        renderAsJson(customColumns: existingColsMap, assetCommentFields: assetCommentFields)
+    }
 }

@@ -17,7 +17,8 @@ export class TaskService {
 
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
-	private readonly TASK_LIST = `${this.baseURL}/ws/task/listTasks`;
+	private readonly TASK_LIST_URL = `${this.baseURL}/ws/task/listTasks`;
+	private readonly CUSTOM_COLUMNS_URL = `${this.baseURL}/ws/task/customColumns`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -409,8 +410,40 @@ export class TaskService {
 			viewUnpublished: viewUnpublished ? 1 : 0,
 			sord: 'asc',
 		}
-		return this.http.post(this.TASK_LIST, request).pipe(
+		return this.http.post(this.TASK_LIST_URL, request).pipe(
 			map((response: any) => response),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
+	}
+
+	/**
+	 * GET - Get the custom columns tasks.
+	 */
+	getCustomColumns(): Observable<any> {
+		return this.http.get(this.CUSTOM_COLUMNS_URL).pipe(
+			map(response => response),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
+	}
+
+	/**
+	 * POST - Set the new custom columns configuration.
+	 */
+	setCustomColumn(oldColumn: string, newColumn: string, index: number): Observable<any> {
+		const request = {
+			columnValue: newColumn,
+			from: index.toString(),
+			previousValue: oldColumn,
+			type: 'Task_Columns'
+		};
+		return this.http.post(this.CUSTOM_COLUMNS_URL, request).pipe(
+			map(response => response),
 			catchError(error => {
 				console.error(error);
 				return error;

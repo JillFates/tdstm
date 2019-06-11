@@ -1,5 +1,5 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import { Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject } from '@angular/core';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
@@ -10,25 +10,25 @@ import {
 	EVENT_BEFORE_CALL_TEXT,
 	Languages
 } from '../../model/api-action.model';
-import {ProviderModel} from '../../../provider/model/provider.model';
-import {Permission} from '../../../../shared/model/permission.model';
-import {APIActionService} from '../../service/api-action.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
-import {DictionaryModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
-import {DataScriptModel} from '../../../dataScript/model/data-script.model';
-import {NgForm} from '@angular/forms';
-import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
-import {ObjectUtils} from '../../../../shared/utils/object.utils';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {DateUtils} from '../../../../shared/utils/date.utils';
-import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import { ProviderModel } from '../../../provider/model/provider.model';
+import { Permission } from '../../../../shared/model/permission.model';
+import { APIActionService } from '../../service/api-action.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { ActionType, COLUMN_MIN_WIDTH } from '../../../../shared/model/data-list-grid.model';
+import { INTERVAL, INTERVALS, KEYSTROKE } from '../../../../shared/model/constants';
+import { DictionaryModel, AgentMethodModel, CredentialModel } from '../../model/agent.model';
+import { DataScriptModel } from '../../../dataScript/model/data-script.model';
+import { NgForm } from '@angular/forms';
+import { CustomDomainService } from '../../../fieldSettings/service/custom-domain.service';
+import { ObjectUtils } from '../../../../shared/utils/object.utils';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
+import { DateUtils } from '../../../../shared/utils/date.utils';
+import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {forkJoin, Observable} from 'rxjs';
-import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import { forkJoin, Observable } from 'rxjs';
+import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -44,22 +44,26 @@ enum NavigationTab {
 	selector: 'api-action-view-edit',
 	templateUrl: 'api-action-view-edit.component.html',
 	styles: [`
-        .has-error, .has-error:focus {
-            border: 1px #f00 solid;
-        }
-		.invalid-form {
-			color: red;
-			font-weight: bold;
-		}
-		.script-error {
-			margin-bottom: 18px;
-		}
-		label.url-label {
-            width: 146px;
-		}
-        .url-input {
-	        width: 82%;
-        }
+      .has-error, .has-error:focus {
+          border: 1px #f00 solid;
+      }
+
+      .invalid-form {
+          color: red;
+          font-weight: bold;
+      }
+
+      .script-error {
+          margin-bottom: 18px;
+      }
+
+      label.url-label {
+          width: 146px;
+      }
+
+      .url-input {
+          width: 82%;
+      }
 	`]
 })
 export class APIActionViewEditComponent implements OnInit {
@@ -70,14 +74,11 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
-
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
-
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
-
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
 	public dictionaryList = new Array<DictionaryModel>();
@@ -98,14 +99,14 @@ export class APIActionViewEditComponent implements OnInit {
 	private intervals = INTERVALS;
 	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
-	public selectedInterval = {value: 0, interval: ''};
-	public selectedLapsed = {value: 0, interval: ''};
-	public selectedStalled = {value: 0, interval: ''};
+	public selectedInterval = { value: 0, interval: '' };
+	public selectedLapsed = { value: 0, interval: '' };
+	public selectedStalled = { value: 0, interval: '' };
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
 	protected actionTypesList = [];
-	protected  remoteCredentials = [];
-	protected defaultItem = {id: '', value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
+	protected remoteCredentials = [];
+	protected defaultItem = { id: '', value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') };
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -137,7 +138,6 @@ export class APIActionViewEditComponent implements OnInit {
 		rows: 10,
 		cols: 4
 	};
-
 	public validInfoForm = false;
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
@@ -170,7 +170,7 @@ export class APIActionViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService,
-        private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe) {
 		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.getModalTitle();
 	}
@@ -178,20 +178,16 @@ export class APIActionViewEditComponent implements OnInit {
 	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
-
 		// set the default empty values for dictionary in case it is not defined
 		if (!this.apiActionModel.dictionary) {
 			this.apiActionModel.dictionary = this.defaultDictionaryModel;
 		}
-
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
-
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
-
 		// Fork Join load list api calls.
 		const observables = forkJoin<any>(
 			this.apiActionService.getProviders(),
@@ -225,13 +221,11 @@ export class APIActionViewEditComponent implements OnInit {
 			if (this.simpleInfoForm) {
 				this.formValidStates.simpleInfoForm.isConfiguredValidators = true;
 			}
-
 			if (this.apiActionForm) {
 				this.apiActionForm.valueChanges.subscribe(val => {
 					this.verifyIsValidForm();
 				});
 			}
-
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
 		}, 0);
@@ -242,12 +236,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getProviders(result): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.provider = this.providerList[0];
 			this.modifySignatureByProperty('provider');
 		}
 		this.providerList.push(...result);
-
 		this.getCredentials();
 	}
 
@@ -256,7 +249,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getAgents(result: any): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.dictionary = this.dictionaryList[0];
 			this.modifySignatureByProperty('dictionary');
 		}
@@ -264,7 +257,7 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -273,23 +266,21 @@ export class APIActionViewEditComponent implements OnInit {
 		if (!this.apiActionModel.httpMethod) {
 			this.apiActionModel.httpMethod = this.httpMethodList[0];
 		}
-
 		if (result && result.data.actionTypes) {
 			this.actionTypesList = [];
 			const keys = Object.keys(result.data.actionTypes);
 			keys.forEach((key: string) => {
-				this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
+				this.actionTypesList.push({ id: key, name: result.data.actionTypes[key] });
 			});
 			if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
-				this.apiActionModel.actionType = { id: this.WEB_API};
+				this.apiActionModel.actionType = { id: this.WEB_API };
 			}
 		}
-
 		if (result && result.data.remoteCredentialMethods) {
 			this.remoteCredentials = [];
 			const keys = Object.keys(result.data.remoteCredentialMethods);
 			keys.forEach((key: string) => {
-				this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+				this.remoteCredentials.push({ id: key, value: result.data.remoteCredentialMethods[key] });
 			});
 		}
 	}
@@ -301,7 +292,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getCredentials().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
-					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
 				}
@@ -320,7 +311,7 @@ export class APIActionViewEditComponent implements OnInit {
 			(result: any) => {
 				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
 				if (this.modalType === ActionType.CREATE) {
-					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
@@ -488,7 +479,6 @@ export class APIActionViewEditComponent implements OnInit {
 				}, 1000);
 			}
 		}
-
 		if (tab === NavigationTab.Script) {
 			if (!this.formValidStates.scriptForm.isConfiguredValidators) {
 				setTimeout(() => {
@@ -498,7 +488,6 @@ export class APIActionViewEditComponent implements OnInit {
 				}, 1000);
 			}
 		}
-
 		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();
@@ -506,7 +495,6 @@ export class APIActionViewEditComponent implements OnInit {
 		if (tab === NavigationTab.Info) {
 			this.prepareFormListener();
 		}
-
 		if (tab === NavigationTab.Reactions) {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
@@ -517,7 +505,6 @@ export class APIActionViewEditComponent implements OnInit {
 				});
 			});
 		}
-
 		this.currentTab = tab;
 	}
 
@@ -527,15 +514,12 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected isTabEnabled(actionType: APIActionType): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
-
 		if (actionType === APIActionType.HTTP_API) {
 			return actionTypeId === this.WEB_API;
 		}
-
 		if (actionType === APIActionType.SCRIPT) {
 			return actionTypeId !== null && actionTypeId !== this.WEB_API;
 		}
-
 		return false;
 	}
 
@@ -551,7 +535,6 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.editModeFromView) {
 			this.validInfoForm = this.editModeFromView;
 		}
-
 		if (this.apiActionParametersForm) {
 			this.validParametersForm = this.apiActionParametersForm.valid;
 		}
@@ -562,9 +545,8 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	protected onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
-		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
+		dictionaryModel = dictionaryModel ? dictionaryModel : this.defaultDictionaryModel;
 		this.apiActionModel.dictionary = dictionaryModel;
-
 		if (this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
@@ -581,23 +563,20 @@ export class APIActionViewEditComponent implements OnInit {
 				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-
+						this.agentMethodList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
 						}
-
 						if (!this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = this.agentMethodList[0];
 						}
-
 						this.modifySignatureByProperty('agentMethod');
 						this.agentMethodList = result;
 					},
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+				this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -641,7 +620,6 @@ export class APIActionViewEditComponent implements OnInit {
 			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
 			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
-
 			this.guardParams();
 			this.parameterList = this.apiActionModel.agentMethod.methodParams;
 			this.parameterList.forEach((parameter) => {
@@ -673,7 +651,7 @@ export class APIActionViewEditComponent implements OnInit {
 		APIActionModel.createBasicReactions(this.apiActionModel);
 		for (let reactionType in methodScripts) {
 			if (methodScripts[reactionType]) {
-				let match = this.apiActionModel.eventReactions.find( item => item.type === reactionType);
+				let match = this.apiActionModel.eventReactions.find(item => item.type === reactionType);
 				if (match) {
 					match.value = methodScripts[reactionType];
 					match.open = true;
@@ -688,7 +666,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	private populateHttpMethod(): void {
 		const httpMethod = this.apiActionModel.agentMethod.httpMethod;
-		const match = this.httpMethodList.find( item => item === httpMethod);
+		const match = this.httpMethodList.find(item => item === httpMethod);
 		if (match) {
 			this.apiActionModel.httpMethod = httpMethod;
 		}
@@ -706,7 +684,6 @@ export class APIActionViewEditComponent implements OnInit {
 			if (!item.context || item.context === 'null' || item.context === null) {
 				this.apiActionModel.agentMethod.methodParams.splice(index, 1);
 			}
-
 			if (item.param) {
 				if (item.param === 'null' || item.param === null) {
 					item.param = '';
@@ -714,7 +691,6 @@ export class APIActionViewEditComponent implements OnInit {
 				item['paramName'] = item.param;
 				delete item.param;
 			}
-
 			if (item.property) {
 				if (item.property === 'null' || item.property === null) {
 					item.property = '';
@@ -735,6 +711,7 @@ export class APIActionViewEditComponent implements OnInit {
 		pollingObject.interval = interval.interval;
 		pollingObject.value = newVal;
 	}
+
 	/**
 	 * On a new Provider Value change
 	 * @param value
@@ -742,18 +719,15 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Populate only the Credentials that are related to the provider
 		this.providerCredentialList = new Array<CredentialModel>();
-		this.providerCredentialList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		this.providerCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
-
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		this.providerDatascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
-
 		if (previousValue) {
 			this.apiActionModel.defaultDataScript = this.providerDatascriptList.find((datascript) => datascript.id === this.apiActionModel.defaultDataScript.id);
 			this.modifySignatureByProperty('defaultDataScript');
-
 			this.apiActionModel.credential = this.providerCredentialList.find((credential) => credential.id === this.apiActionModel.credential.id);
 			this.modifySignatureByProperty('credential');
 		} else {
@@ -788,7 +762,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	showsEventLabel(): boolean {
 		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
-
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
 				return eventReaction.type === event;
@@ -803,7 +776,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	showsCustomizeLabel(): boolean {
 		let events = [EventReactionType.PRE, EventReactionType.FINAL];
-
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
 				return eventReaction.type === event;
@@ -861,7 +833,6 @@ export class APIActionViewEditComponent implements OnInit {
 					dataItem.fieldName = property;
 				}
 			}
-
 			this.verifyIsValidForm();
 		}
 	}
@@ -897,14 +868,14 @@ export class APIActionViewEditComponent implements OnInit {
 			// Doing a single Event reaction Validation
 			if (singleEventReaction) {
 				if (singleEventReaction.value !== '') {
-					scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
+					scripts.push({ code: singleEventReaction.type, script: singleEventReaction.value });
 				}
 			} else {
 				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
 					eventReaction.state = this.checkActionModel.UNKNOWN;
 					eventReaction.error = '';
 					if (eventReaction.value !== '') {
-						scripts.push({code: eventReaction.type, script: eventReaction.value});
+						scripts.push({ code: eventReaction.type, script: eventReaction.value });
 					}
 				});
 			}
@@ -1013,37 +984,32 @@ export class APIActionViewEditComponent implements OnInit {
 
 	canSave(): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
-
-		if (this.hasEarlyAccessTMRPermission &&  actionTypeId === this.WEB_API) {
+		if (this.hasEarlyAccessTMRPermission && actionTypeId === this.WEB_API) {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
 				(this.httpAPIForm && this.httpAPIForm.valid) &&
 				this.validParametersForm
 			);
 		}
-
 		if (this.hasEarlyAccessTMRPermission && actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
-				(this.scriptForm && this.scriptForm.valid)	 &&
+				(this.scriptForm && this.scriptForm.valid) &&
 				this.validParametersForm
 			);
 		}
-
 		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm);
 	}
 
 	onChangeType(type: any): void {
 		const language = Languages[type.id];
-
 		if (language) {
 			this.codeMirror.mode = language
 		}
 	}
 
 	getClonedCodeMirrorSettings(properties: any): any {
-		const cloned =  Object.assign({}, this.codeMirror, properties);
-
+		const cloned = Object.assign({}, this.codeMirror, properties);
 		return cloned;
 	}
 }
