@@ -11,7 +11,9 @@ import {BundleModel} from '../model/bundle.model';
 
 @Injectable()
 export class BundleService {
+
 	private jobProgressUrl = '../ws/progress';
+
 	constructor(private http: HttpClient) {
 	}
 
@@ -95,12 +97,12 @@ export class BundleService {
 					operator: 'eq',
 					value: column.filter,
 				});
-			} else{
+			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
 				});
 				filter.value = column.filter;
-				if(filter.value == undefined) {
+				if (filter.value == undefined) {
 					this.clearFilter(column, state);
 				}
 			}
