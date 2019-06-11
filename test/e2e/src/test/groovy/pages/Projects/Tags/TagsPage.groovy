@@ -25,10 +25,10 @@ class TagsPage extends Page{
         nameFilterRemove { nameFilter.next("span")}
         descFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "3").find("input")}
         descFilterRemove { descFilter.next("span")}
-        //First Element of the Providers Table
+        //First Element of the Tags Table
         firstTagActions { tagsGridActionsRows.find("td", "aria-colindex": "1")[0]}
-        firstTagSaveButton { firstTagActions.find(".k-grid-save-command")}
-        firstTagCancelButton { firstTagActions.find(".k-grid-cancel-command")}
+        firstTagSaveButton { firstTagActions.find(".k-grid-save-command").find("button", title:"Save")}
+        firstTagCancelButton { firstTagActions.find(".k-grid-cancel-command").find("button", title:"Cancel")}
         firstTagEditButton { firstTagActions.find(".k-grid-edit-command")}
         firstTagRemoveButton { firstTagActions.find(".k-grid-remove-command")}
         firstTagName { tagsGridDataRows.find("td", "aria-colindex": "2")[0]}
