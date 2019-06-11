@@ -1,11 +1,10 @@
-<div class="body">
+<div class="bundle-show-component">
     <div class="nav" style="border: 1px solid #CCCCCC; width: 300px; margin:9px 14px 0px">
-        <span class="menuButton"><a class="list">Bundle List</a></span>
-        PERMISSION HERE
-        <span class="menuButton"><a class="create">Create Bundle</a></span>
+        <span class="menuButton"><a href="bundle/list"><input type="submit" name="_action_List" value="Bundle List" class="list"></a></span>
+        <span *ngIf="canCreateBundle" class="menuButton"><input type="submit" name="_action_Create" value="Create Bundle" class="create"></span>
     </div>
 
-    <div class="body" style="width: 330px;">
+    <div class="body" style="width: 330px; float: left">
         <div class="steps_table" style="float: none;">
             <span class="span"><b>Bundle Details</b></span>
             <table>
@@ -15,8 +14,8 @@
                     <td valign="top" class="name">Name:</td>
 
                     <td valign="top" class="value">
-                        name
-                        If is default... (Default)
+                        {{moveBundleInstance?.name}}
+                        <span *ngIf="isDefaultBundle">(Default)</span>
                     </td>
 
                 </tr>
@@ -24,35 +23,35 @@
                 <tr class="prop">
                     <td valign="top" class="name">Description:</td>
 
-                    <td valign="top" class="value">description</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.description}}</td>
 
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">From:</td>
 
-                    <td valign="top" class="value">sourceRoom</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.sourceRoom}}</td>
 
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">To:</td>
 
-                    <td valign="top" class="value">targetRoom</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.targetRoom}}</td>
 
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">Start Time:</td>
 
-                    <td valign="top" class="value">startTime</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.startTime | tdsDateTime: userTimeZone}}</td>
 
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">Completion Time:</td>
 
-                    <td valign="top" class="value">completionTime</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.completionTime | tdsDateTime: userTimeZone}}</td>
 
                 </tr>
 
@@ -60,7 +59,7 @@
                     <td valign="top" class="name">Project Manager:</td>
 
                     <td valign="top" class="value">
-                        If project manager... partyIdTo?.lastNameFirstAndTitle
+                        <span *ngIf="projectManager">partyIdTo?.lastNameFirstAndTitle</span>
                     </td>
 
                 </tr>
@@ -69,7 +68,7 @@
                     <td valign="top" class="name">Event Manager:</td>
 
                     <td valign="top" class="value">
-                            if moveManager... moveManager?.partyIdTo?.lastNameFirstAndTitle
+                        <span *ngIf="moveManager">moveManager?.partyIdTo?.lastNameFirstAndTitle</span>
                     </td>
 
                 </tr>
@@ -77,8 +76,7 @@
                     <td valign="top" class="name">Event:</td>
 
                     <td valign="top" class="value">
-                        <li><a controller="moveEvent" action="show"
-                               id="id">for each move event... e?.encodeAsHTML()</a></li>
+                        <li><a href="/tdstm/moveEvent/show/{{moveBundleInstance?.moveEvent.id}}">{{moveBundleInstance?.moveEvent.name}}</a></li>
                     </td>
 
                 </tr>
@@ -86,15 +84,13 @@
                 <tr class="prop">
                     <td valign="top" class="name">Order:</td>
 
-                    <td valign="top"
-                        class="value">operationalOrder</td>
-
+                    <td valign="top" class="value">{{moveBundleInstance?.operationalOrder}}</td>
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">WorkFlow Code</td>
 
-                    <td valign="top" class="value">workflowCode</td>
+                    <td valign="top" class="value">{{moveBundleInstance?.workflowCode}}</td>
 
                 </tr>
 
@@ -102,11 +98,9 @@
                     <td valign="top" class="name">Use For Planning:</td>
 
                     <td valign="top" class="value">
-                        If useForPlanning...
-                            <input type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"
+                            <input *ngIf="moveBundleInstance?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"
                                    disabled="disabled"/>
-                        Otherwise...
-                            <input type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled"/>
+                            <input *ngIf="!moveBundleInstance?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled"/>
                     </td>
                 </tr>
                 </tbody>
@@ -116,16 +110,14 @@
         <div class="buttons" style="float: left;">
             <input type="hidden" name="id" value="id"/>
             <input type="hidden" name="projectId" value="projectId"/>
-                If haspermission BundleEdit...
-                    <span class="button">Edit</span>
-                    if isDefaultBundle...
-                        <span class="button">Delete</span>
-                        <span class="button">Delete Bundle</span>
+            <span class="button"><input type="submit" name="_action_Edit" value="Edit" class="edit"></span>
+            <span *ngIf="!isDefaultBundle" class="button"><input type="submit" (click)="deleteBundle()" name="_action_Delete" value="Delete" class="delete"></span>
+            <span class="button"><input type="submit" (click)="deleteBundleAndAssets()" name="_action_deleteBundleAndAssets" value="Delete Bundle & Assets" class="delete"></span>
         </div>
     </div>
 
     <div class="body" style="margin: 0;">
-        <div class="steps_table">
+        <div class="steps_table" style="display:inline-block;">
             <span class="span"><b>Dashboard Steps</b></span>
             <table id="assetEntityTable">
                 <thead>
@@ -141,29 +133,26 @@
                 </tr>
                 </thead>
                 <tbody id="commetAndNewsBodyId">
-                forEach in Dashboard Steps...
-                    <tr class="evenodd" id="commentsRowId_id">
+                    <tr *ngFor="let step of dashboardSteps; let i = index" class="{{i % 2 ? 'odd' : 'even'}}" id="commentsRowId_{{step.moveBundleStep.id}}">
                         <td>
-                            label
+                            {{step.moveBundleStep.label}}
                         </td>
-                        <td>planStartTime</td>
-                        <td>planCompletionTime</td>
-                        <td>planDuration</td>
-                        <td>
-                            if calcMethod != 'L'
-                                Manual
-                            else
-                                Linear
+                        <td>{{step.moveBundleStep.planStartTime | tdsDateTime: userTimeZone}}</td>
+                        <td>{{step.moveBundleStep.planCompletionTime | tdsDateTime: userTimeZone}}</td>
+                        <td>{{step.planDuration}}</td>
+                        <td *ngIf="step.moveBundleStep.calcMethod != 'L'">
+                            Manual
+                        </td>
+                        <td *ngIf="step.moveBundleStep.calcMethod == 'L'">
+                            Linear
                         </td>
                         <td>
-                            <span id="beGreenDiv_id" style="text-align: center;">
-                                if showInGreen
-                                    <input type="checkbox" name="beGreen_id"
-                                           id="beGreen_id" checked="checked"
+                            <span id="beGreenDiv_{{step.moveBundleStep.id}}" style="text-align: center;">
+                                    <input *ngIf="step.moveBundleStep.showInGreen" type="checkbox" name="beGreen_{{step.moveBundleStep.id}}"
+                                           id="beGreen_{{step.moveBundleStep.id}}" checked="checked"
                                            disabled="disabled"/>
-                                else
-                                    <input type="checkbox" name="beGreen_id"
-                                           id="beGreen_${dashboardStep.moveBundleStep.id}" disabled="disabled"/>
+                                    <input *ngIf="!step.moveBundleStep.showInGreen" type="checkbox" name="beGreen_{{step.moveBundleStep.id}}"
+                                           id="beGreen_{{step.moveBundleStep.id}}" disabled="disabled"/>
                             </span>
                         </td>
                     </tr>
@@ -171,3 +160,4 @@
             </table>
         </div>
     </div>
+</div>
