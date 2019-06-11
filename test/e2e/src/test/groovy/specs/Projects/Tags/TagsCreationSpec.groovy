@@ -42,7 +42,7 @@ class TagsCreationSpec extends GebReportingSpec {
         given: 'The User is logged in'
             at MenuPage
         when: 'The User clicks on Projects > Tags'
-            projectsModule.goToTagsPage()
+            waitFor(30){projectsModule.goToTagsPage()}
         then: 'Manage Tags Page is displayed'
             at TagsPage
     }
@@ -54,7 +54,7 @@ class TagsCreationSpec extends GebReportingSpec {
             clickOnCreateTagButton()
         then: 'Cancel button is displayed and enabled'
             isCancelButtonDisplayed() == true
-        and: 'Cancel button is displayed and disabled'
+        and: 'Save button is displayed and disabled'
             isSaveButtonDisplayed() == true
             isSaveButtonDisabled() == "true"
         when: 'The User clicks on Cancel button'
