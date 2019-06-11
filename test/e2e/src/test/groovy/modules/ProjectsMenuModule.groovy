@@ -93,7 +93,9 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToTagsPage(){
+        waitFor(30){projectsItem}
         selectMenu projectsItem
+        waitFor(30) {projectsTags}
         selectItem projectsTags
     }
 
