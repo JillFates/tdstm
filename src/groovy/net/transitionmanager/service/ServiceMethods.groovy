@@ -206,7 +206,7 @@ trait ServiceMethods {
 	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
 	 */
 	void throwException(Class exception, String messageCode, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
-		throwException(exception, messageCode, [] as Object[], defaultMessage, locale)
+		throwException(exception, messageCode, [] as List, defaultMessage, locale)
 	}
 
 	/**
