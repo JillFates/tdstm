@@ -1234,6 +1234,11 @@ class UrlMappings {
 		"/api/${controller}/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
 		"/api/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
 
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "GET")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "POST")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "PUT")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "DELETE")
+
 		"/api/${controller}/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
 		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
 		"/api/${controller}(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")

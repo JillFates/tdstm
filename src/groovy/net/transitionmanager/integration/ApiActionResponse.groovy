@@ -9,12 +9,13 @@ class ApiActionResponse {
 	boolean readonly = false
 	Object data
 	Long elapsed
+	String output
 	String error
 	Map<String, String> headers = [:]
 	List<Map> files
 	String filename
 	String originalFilename
-	int status
+	int status //1: success, 0: error
 	Boolean successful
 
 	void setReadonly (boolean value) {
