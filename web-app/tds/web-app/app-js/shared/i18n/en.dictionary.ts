@@ -283,7 +283,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'TOOLTIP_ACTIVATION_DATE': 'When set the notice will not appear before the date set otherwise it will be shown',
 		'TOOLTIP_EXPIRATION_DATE': 'When set the notice will stop being shown after the date',
 		'TOOLTIP_LOCKED': 'Once a notice is locked the Message Text and Post Message Text fields will become permanently read-only and can not be unlocked',
-		'TOOLTIP_SEQUENCE': 'Used to control the order of notices when 2 or more a being displayed with lowest numbers first',
+		'TOOLTIP_SEQUENCE': 'Used to control the order of notices when 2 or more are being displayed with lowest numbers first',
 		'TOOLTIP_MESSAGE': 'HTML text to display in main user dialog window',
 		'TOOLTIP_POSTMESSAGE': 'Appears above the Accept button for Mandatory Acknowledgements'
 	},
