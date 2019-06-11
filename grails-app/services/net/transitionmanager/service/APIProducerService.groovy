@@ -29,7 +29,7 @@ class APIProducerService implements ServiceMethods {
 	AssetService      assetService
 
 	/**
-	 * Handles updating the status of the action and running the reaction script if the status is either SUCCESS or ERROR.
+	 * Handles updating the action status when the action was started.
 	 *
 	 * @param action the ActionCommand object
 	 * @see net.transitionmanager.command.task.ActionCommand *
@@ -37,37 +37,82 @@ class APIProducerService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 * @param currentProject The current project that the person belongs to.
 	 */
-	void updateRemoteActionStatus(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
+	void actionStarted(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
 		AssetComment task = get(AssetComment, taskId, currentProject)
+		updateTask(action.message, task, currentPerson, currentProject)
 
+		taskService.addNote(task, currentPerson, "${task?.apiAction?.name ?: ''} started at ${new Date().format(TimeUtil.FORMAT_DATE_ISO8601)}")
+
+	}
+
+	/**
+	 * Handles updating the action status when there is progress.
+	 *
+	 * @param action the ActionCommand object
+	 * @see net.transitionmanager.command.task.ActionCommand *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 * @param currentProject The current project that the person belongs to.
+	 */
+	void actionProgress(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
+		AssetComment task = get(AssetComment, taskId, currentProject)
+		updateTask(action.message, task, currentPerson, currentProject)
+
+		task.apiActionPercentDone = action.progress
+		task.save()
+
+	}
+
+	/**
+	 * Handles updating the action status when it is done/successful
+	 *
+	 * @param action the ActionCommand object
+	 * @see net.transitionmanager.command.task.ActionCommand *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 * @param currentProject The current project that the person belongs to.
+	 */
+	void actionDone(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
+		AssetComment task = get(AssetComment, taskId, currentProject)
+		updateTask(action.message, task, currentPerson, currentProject)
+
+		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.stdout, action.stderr, 1, action.data, action.datafile)
+		task.apiActionCompletedAt = new Date()
+		task.apiActionPercentDone = 100
+		task.save()
+	}
+
+	/**
+	 * Handles updating the action status in the case of an error.
+	 *
+	 * @param action the ActionCommand object
+	 * @see net.transitionmanager.command.task.ActionCommand *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 * @param currentProject The current project that the person belongs to.
+	 */
+	void actionError(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
+		AssetComment task = get(AssetComment, taskId, currentProject)
+		updateTask(action.message, task, currentPerson, currentProject)
+
+		invokeReactionScript(ReactionScriptCode.ERROR, task, action.stdout, action.stderr, 0)
+	}
+
+	/**
+	 * Checks the task to see if it's associated with an asset, and adds a note to the task if there is a message.
+	 *
+	 * @param message the optional message
+	 * @param task the task to update
+	 * @param currentPerson The currently logged in person.
+	 * @param currentProject The current project that the person belongs to.
+	 */
+	private void updateTask(String message, AssetComment task, Person currentPerson, Project currentProject) {
 		if (!task.assetEntity) {
 			throw new InvalidParamException("The task $task.comment, is not associated with an asset.")
 		}
 
-		if (action.message) {
-			taskService.addNote(task, currentPerson, action.message)
-		}
-
-		switch (action.state) {
-			case ActionCommand.State.started:
-				taskService.addNote(task, currentPerson, "${task?.apiAction?.name ?: ''} started at ${new Date().format(TimeUtil.FORMAT_DATE_ISO8601)}")
-				break
-
-			case ActionCommand.State.progress:
-				task.apiActionPercentDone = action.progress
-				task.save()
-				break
-
-			case ActionCommand.State.success:
-				invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.stdout, action.stderr, 1, action.data, action.datafile)
-				task.apiActionCompletedAt = new Date()
-				task.apiActionPercentDone = 100
-				task.save()
-				break
-
-			case ActionCommand.State.error:
-				invokeReactionScript(ReactionScriptCode.ERROR, task, action.stdout, action.stderr, 0)
-				break
+		if (message) {
+			taskService.addNote(task, currentPerson, message)
 		}
 	}
 

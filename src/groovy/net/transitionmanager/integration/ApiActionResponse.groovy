@@ -9,7 +9,7 @@ class ApiActionResponse {
 	boolean readonly = false
 	Object data
 	Long elapsed
-	String output
+	String output //a place to store standard out so that reaction scripts can access them.
 	String error
 	Map<String, String> headers = [:]
 	List<Map> files

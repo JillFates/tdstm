@@ -61,9 +61,6 @@ class APIProducerServiceSpec extends Specification {
 	@Shared
 	String reactionScripts = '{"STATUS": "// do nothing", "SUCCESS": "// do nothing", "DEFAULT": "// do nothing", "ERROR": "//do nothing"}'
 
-	@Shared
-	boolean initialized = false
-
 
 	private static final String paramsJson = """
 		[
@@ -192,7 +189,7 @@ class APIProducerServiceSpec extends Specification {
 				datafile: null
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+			service.actionStarted(action, assetComment.id, whom, project)
 		then: 'task notes are added and the apiActionPercentDone is updated'
 			notes.size() ==2
 			notes.contains('some message')
@@ -211,7 +208,7 @@ class APIProducerServiceSpec extends Specification {
 				datafile: null
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+			service.actionProgress(action, assetComment.id, whom, project)
 		then:
 			notes.size() == 1
 			notes.contains('some message')
@@ -230,7 +227,7 @@ class APIProducerServiceSpec extends Specification {
 				datafile: null
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+			service.actionError(action, assetComment.id, whom, project)
 		then: 'Task notes are added'
 			notes.size() == 2
 			notes.contains('some message')
@@ -249,7 +246,7 @@ class APIProducerServiceSpec extends Specification {
 				datafile: null
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+			service.actionDone(action, assetComment.id, whom, project)
 		then: 'task node are added, and the apiActionPercentDone is set to 100'
 			notes.size() == 2
 			notes.contains('some message')
@@ -286,7 +283,7 @@ class APIProducerServiceSpec extends Specification {
 					}
 				] as ApiActionService
 			when: 'updating the action status'
-				service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+				service.actionError(action, assetComment.id, whom, project)
 			then: 'Task notes are added'
 				notes.size() == 3
 				notes.contains('some message')
@@ -323,7 +320,7 @@ class APIProducerServiceSpec extends Specification {
 					}
 				] as ApiActionService
 			when: 'updating the action status'
-				service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+				service.actionDone(action, assetComment.id, whom, project)
 			then: 'Task notes are added'
 				notes.size() == 3
 				notes.contains('some message')
@@ -365,7 +362,7 @@ class APIProducerServiceSpec extends Specification {
 						 }
 					] as ApiActionService
 				when: 'updating the action status'
-					service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+					service.actionDone(action, assetComment.id, whom, project)
 				then: 'Task notes are added'
 					notes.size() == 2
 					notes.contains('some message')
