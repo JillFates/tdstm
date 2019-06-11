@@ -1289,6 +1289,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/createBundleModel" {
+			controller = "wsReports"
+			action = [
+					GET: "getModelForBundleCreate"
+			]
+		}
+
+		"/ws/reports/saveBundle" {
+			controller = "wsReports"
+			action = [
+					POST: "saveBundle"
+			]
+		}
+
 		"/ws/reports/deleteBundle/$moveBundleId" {
 			controller = "wsReports"
 			action = [

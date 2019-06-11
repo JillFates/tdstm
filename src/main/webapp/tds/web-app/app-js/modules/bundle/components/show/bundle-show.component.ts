@@ -19,10 +19,11 @@ export class BundleShowComponent implements OnInit {
 	public canCreateBundle;
 	private bundleId;
 	protected userTimeZone: string;
-	constructor(private bundleService: BundleService,
-	            private permissionService: PermissionService,
-	            private route: ActivatedRoute,
-	            private preferenceService: PreferenceService) {
+	constructor(
+		private bundleService: BundleService,
+		private permissionService: PermissionService,
+		private route: ActivatedRoute,
+		private preferenceService: PreferenceService) {
 		this.canCreateBundle = this.permissionService.hasPermission('BundleCreate');
 		this.bundleId = this.route.params['_value']['id'];
 	}

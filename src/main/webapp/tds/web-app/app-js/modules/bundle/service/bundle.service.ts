@@ -44,12 +44,42 @@ export class BundleService {
 
 	}
 
+	getModelForBundleCreate() {
+		return this.http.get(`../ws/reports/createBundleModel`)
+			.map((response: any) => {
+				return response;
+			})
+			.catch((error: any) => error);
+
+	}
+
 	deleteBundle(id) {
 		return this.http.delete(`../ws/reports/deleteBundle/${id}`)
 			.map((response: any) => {
 				return response;
 			})
 			.catch((error: any) => error);
+	}
+
+	saveBundle(model: BundleModel): Observable<any> {
+		let postRequest = {
+			name: model.name,
+			description: model.description,
+			fromId: model.fromId,
+			toId: model.toId,
+			startTime: model.startTime,
+			completionTime: model.completionTime,
+			projectManagerId: model.projectManagerId,
+			moveManagerId: model.moveManagerId,
+			operationalOrder: model.operationalOrder,
+			workflowCode: model.workflowCode,
+			useForPlanning: model.useForPlanning
+		};
+		return this.http.post(`../ws/reports/saveBundle`, JSON.stringify(postRequest))
+				.map((response: any) => {
+					return response;
+				})
+				.catch((error: any) => error);
 	}
 
 	deleteBundleAndAssets(id) {
@@ -61,9 +91,9 @@ export class BundleService {
 	}
 
 	convertDurationToHHmm(duration) {
-		var hours = (duration - (duration % 3600)) / 3600,
-			minutes = Math.floor((duration - (hours * 3600))/60);
-		return hours + ":" + minutes;
+		let hours = (duration - (duration % 3600)) / 3600,
+			minutes = Math.floor ((duration - (hours * 3600)) / 60);
+		return hours + ':' + minutes;
 	}
 
 	/**
@@ -133,12 +163,12 @@ export class BundleService {
 					operator: 'eq',
 					value: column.filter,
 				});
-			} else{
+			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
 				});
 				filter.value = column.filter;
-				if(filter.value == undefined) {
+				if (filter.value == undefined) {
 					this.clearFilter(column, state);
 				}
 			}

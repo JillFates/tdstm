@@ -6,13 +6,18 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.Room
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
@@ -21,6 +26,7 @@ import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.StateEngineService
 import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
@@ -40,6 +46,7 @@ class WsReportsController implements ControllerMethods {
     CustomDomainService customDomainService
     ControllerService controllerService
     PartyRelationshipService partyRelationshipService
+    StateEngineService stateEngineService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -128,6 +135,60 @@ class WsReportsController implements ControllerMethods {
 
         renderSuccessJson([moveBundleInstance: moveBundle.toMap(), projectId: project.id, projectManager: projectManager, moveManager: moveManager,
          dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id])
+    }
+
+    @HasPermission(Permission.BundleCreate)
+    def getModelForBundleCreate() {
+        Project project = securityService.userCurrentProject
+        renderSuccessJson([managers: partyRelationshipService.getProjectStaff(project.id),
+         projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)])
+    }
+
+    @HasPermission(Permission.BundleCreate)
+    def saveBundle() {
+        // SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
+        // implement the way dates are sent to backend
+        params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
+        params.completionTime = TimeUtil.parseDateTime(params.completionTime)
+
+        def projectManagerId = params.projectManager
+        def moveManagerId = params.moveManager
+
+        Project currentUserProject = controllerService.getProjectForPage(this)
+        MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
+        command.useForPlanning = params.getBoolean('useForPlanning', false)
+        if (params?.moveEvent?.id) {
+            command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
+        }
+        command.operationalOrder = params.getInt('operationalOrder', 1)
+        command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
+        command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
+
+        if (command.validate()) {
+            try {
+                MoveBundle moveBundle = moveBundleService.save(command)
+
+                if (projectManagerId) {
+                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
+                            Party.load(projectManager), "PROJ_MGR")
+                }
+                if (moveManagerId) {
+                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
+                            Party.load(moveManager), "ROLE_MOVE_MGR")
+                }
+
+                flash.message = "MoveBundle $moveBundle created"
+                renderSuccessJson()
+
+            } catch (ServiceException e) {
+                flash.message = e.message
+            }
+        } else {
+            flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.allErrorsString(command)
+        }
+
+        // in case of error saving new move bundle
+        renderErrorJson(error: flash.message)
     }
 
     @HasPermission(Permission.BundleDelete)

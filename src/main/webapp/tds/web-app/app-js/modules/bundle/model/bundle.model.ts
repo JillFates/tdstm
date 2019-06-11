@@ -1,4 +1,17 @@
+import {ModalType} from '../../../shared/model/constants';
+
 export class BundleModel {
+	public name: string;
+	public description: string;
+	public fromId: number;
+	public toId: number;
+	public startTime: string;
+	public completionTime: string;
+	public projectManagerId: number;
+	public moveManagerId: number;
+	public operationalOrder: number;
+	public workflowCode: string;
+	public useForPlanning: boolean;
 }
 
 export class BundleColumnModel {
