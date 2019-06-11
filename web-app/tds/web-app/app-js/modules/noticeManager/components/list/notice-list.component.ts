@@ -21,8 +21,6 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
 import {CellClickEvent} from '@progress/kendo-angular-grid';
 
-declare var jQuery: any;
-
 @Component({
 	selector: 'tds-notice-list',
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
@@ -90,6 +88,7 @@ export class NoticeListComponent implements OnInit {
 					[{ dir: 'asc', field: 'name'}], // initial sort config.
 					{ mode: 'single', checkboxOnly: false}, // selectable config.
 					{ useColumn: 'id' } ); // checkbox config.
+				this.gridSettings.setNotifier(this.notifier);
 			},
 			(err) => console.log(err));
 
@@ -114,11 +113,13 @@ export class NoticeListComponent implements OnInit {
 	 * Notify the event to update the grid height
 	 */
 	private fixGridHeight(): void {
+		/*
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+		*/
 	}
 
 	/**

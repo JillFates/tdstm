@@ -9,6 +9,9 @@ import {
 } from '@progress/kendo-angular-grid';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../model/constants';
 import {DateUtils} from './date.utils';
+import { NotifierService } from '../services/notifier.service';
+
+declare var jQuery: any;
 
 export class DataGridOperationsHelper {
 
@@ -32,6 +35,7 @@ export class DataGridOperationsHelper {
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private notifier: NotifierService;
 
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		this.state.sort = defaultSort;
@@ -295,6 +299,7 @@ export class DataGridOperationsHelper {
 			this.state.skip = 0;
 			this.gridData = process(this.resultSet, this.state);
 		}
+		this.notifyUpdateGridHeight();
 	}
 
 	/**
@@ -315,5 +320,25 @@ export class DataGridOperationsHelper {
 			this.gridData.data.splice(index, 1);
 			this.reloadData(this.gridData.data);
 		}
+	}
+	/**
+	 * Notify the event to update the grid height
+	 */
+	private notifyUpdateGridHeight(): void {
+		if (this.notifier) {
+			this.notifier.broadcast({
+				name: 'grid.header.position.change'
+			});
+			// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+			jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+		}
+	}
+
+	/**
+	 * Set the notifier used to comunicate grid layout changes
+	 * @param {NotifierService} notifier
+	 */
+	public setNotifier(notifier: NotifierService) {
+		this.notifier = notifier;
 	}
 }
