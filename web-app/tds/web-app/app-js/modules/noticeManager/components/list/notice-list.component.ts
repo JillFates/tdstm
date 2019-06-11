@@ -10,19 +10,16 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 // Model
 import {Permission} from '../../../../shared/model/permission.model';
-import {NoticeColumnModel, NoticeModel, Notices, NoticeTypes,
-		NOTICE_TYPE_PRE_LOGIN, NOTICE_TYPE_POST_LOGIN, PostNoticeResponse, NOTICE_TYPE_MANDATORY} from '../../model/notice.model';
+import {NoticeColumnModel, NoticeModel, NoticeTypes, NOTICE_TYPE_PRE_LOGIN } from '../../model/notice.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {YesNoList} from '../../../../shared/model/constants';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 // Kendo
-import {GridDataResult, CellClickEvent} from '@progress/kendo-angular-grid';
-import {process, State, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 declare var jQuery: any;
 
@@ -32,20 +29,8 @@ declare var jQuery: any;
 })
 
 export class NoticeListComponent implements OnInit {
+	protected gridSettings: DataGridOperationsHelper;
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
-		filter: {
-			filters: [],
-			logic: 'and'
-		}
-	};
-	protected skip = 0;
-	protected pageSize = GRID_DEFAULT_PAGE_SIZE;
-	protected maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected noticeTypes = [];
@@ -55,8 +40,6 @@ export class NoticeListComponent implements OnInit {
 
 	protected PRE_LOGIN = NOTICE_TYPE_PRE_LOGIN;
 	protected actionType = ActionType;
-	private gridData: GridDataResult;
-	protected resultSet: any[];
 	protected dateFormat = '';
 	protected notices = [];
 	protected noticesTypeDescriptions = {};
@@ -71,11 +54,7 @@ export class NoticeListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
-		private prompt: UIPromptService,
-		private route: ActivatedRoute,
-		private windowService: WindowService) {
-		this.resultSet = this.route.snapshot.data['notices'];
-		this.updateGrid();
+		private prompt: UIPromptService) {
 		this.noticeTypes = [...NoticeTypes];
 	}
 
@@ -96,15 +75,39 @@ export class NoticeListComponent implements OnInit {
 		.subscribe((dateFormat) => {
 			this.dateFormat = dateFormat;
 			this.noticeColumnModel = new NoticeColumnModel(`{0:${dateFormat}}`);
+			this.onLoad();
 		});
 	}
 
 	/**
-	 * Refresh the data grid info and update the grid height
+	 * Get the notices list and defines the gridSettings helper
 	 */
-	private updateGrid(): void {
-		this.gridData = process(this.resultSet, this.state);
+	private onLoad(): void {
+		this.noticeService.getNoticesList()
+			.subscribe(
+			(result: any) => {
+				this.gridSettings = new DataGridOperationsHelper(result,
+					[{ dir: 'asc', field: 'name'}], // initial sort config.
+					{ mode: 'single', checkboxOnly: false}, // selectable config.
+					{ useColumn: 'id' } ); // checkbox config.
+			},
+			(err) => console.log(err));
+
+		/*
 		this.fixGridHeight();
+		*/
+	}
+
+	/**
+	 * Reloads the current notices list from grid.
+	 */
+	private reloadNotices(): void {
+		this.noticeService.getNoticesList()
+			.subscribe(
+			(result: any) => {
+				this.gridSettings.reloadData(result.data);
+			},
+			(err) => console.log(err));
 	}
 
 	/**
@@ -119,49 +122,16 @@ export class NoticeListComponent implements OnInit {
 	}
 
 	/**
-	 *  On filter change grab the current filter value and process the notices list
-	 */
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.updateGrid();
-	}
-
-	/**
-	 *  On sort change grab the current sort value and process the notices list
-	 */
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.updateGrid();
-	}
-
-	/**
-	 * Get the reference to the column that was filtered and throws the filter event
-	*/
-	protected onFilter(column: any): void {
-		const root = GridColumnModel.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	/**
-	 * Clear the column filter value currently selected
-	 * @param {Any} column Column to clear out filter
-	*/
-	protected clearText(column: any): void {
-		this.noticeService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
-	}
-
-	/**
-	 * Reset the filter type to the original value
+	 * Reset the filter boolean type to the original value
 	 * @param {Any} column Column to reset the filter
 	*/
-	protected resetTypeFilter(column: any): void {
-		this.clearText(column);
+	protected resetBooleanFilter(column: any): void {
+		this.gridSettings.clearValue(column);
 		column.filter = null;
 	}
 
 	/**
-	 * Catch the Selected Row
+	 * On cell click open the notice dialog
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
@@ -186,59 +156,32 @@ export class NoticeListComponent implements OnInit {
 	 */
 	protected onDelete(dataItem: any): void {
 		this.prompt.open('Confirmation Required', 'You are about to delete the selected notice. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.noticeService.deleteNotice(dataItem.id).subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
+			.then((confirmation: boolean) => {
+				if (confirmation) {
+					this.noticeService.deleteNotice(dataItem.id)
+					.subscribe(
+						(result) => this.reloadNotices(),
+						(err) => console.error(err)
+					);
 				}
 			});
 	}
 
 	/**
-	 * Reload the list with the latest created/edited license
-	 */
-	protected reloadData(): void {
-		this.noticeService.getNoticesList()
-			.subscribe(
-			(result: any) => {
-				this.resultSet = result;
-				this.updateGrid();
-			},
-			(err) => console.log(err));
-	}
-
-	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
-	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.updateGrid();
-	}
-
-	/**
-	 * Create a new Notice
+	 * Open the dialog to create a new Notice
 	 * @listens onCreateNotice
 	 */
 	public onCreateNotice(): void {
 		this.dialogService.open(NoticeViewEditComponent, [
 			{provide: NoticeModel, useValue: new NoticeModel()},
 			{provide: Number, useValue: ActionType.Create}
-		]).then(result => {
-			this.reloadData();
-		}, error => {
-			console.log(error);
-		});
+		]).then(result => this.reloadNotices(),
+			error =>  console.error(error)
+		);
 	}
 
 	/**
-	 * Open a notice view
+	 * Open the dialog with the notice details
 	 * @param {NoticeModel} dataItem Contain the notice object
 	 * @param {ActionType} action Mode in which open the view (Create, Edit, etc...)
 	 */
@@ -248,12 +191,10 @@ export class NoticeListComponent implements OnInit {
 				this.dialogService.open(NoticeViewEditComponent, [
 					{provide: NoticeModel, useValue: notice as NoticeModel},
 					{provide: Number, useValue: action}
-				]).then(result => {
-					this.reloadData();
-				}, error => {
-					console.error(error);
-				});
-			})
+				]).then(result => this.reloadNotices(),
+					error => console.error(error)
+				);
+			});
 	}
 
 	protected isEditAvailable(): boolean {

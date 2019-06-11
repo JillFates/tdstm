@@ -74,13 +74,13 @@ export class DataGridOperationsHelper {
 				root.filters.push({
 					field: column.property,
 					operator: operator ? operator : 'eq',
-					value: column.filter
+					value: Number(column.filter)
 				});
 			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
 				});
-				filter.value = column.filter;
+				filter.value = Number(column.filter);
 			}
 		}
 
@@ -115,7 +115,7 @@ export class DataGridOperationsHelper {
 				root.filters.push({
 					field: column.property,
 					operator: 'eq',
-					value: (column.filter === 'True')
+					value: (column.filter === 'True' || column.filter === true)
 				});
 			} else {
 				if (column.filter === DefaultBooleanFilterData) {
@@ -124,7 +124,7 @@ export class DataGridOperationsHelper {
 					filter = root.filters.find((r) => {
 						return r['field'] === column.property;
 					});
-					filter.value = (column.filter === 'True');
+					filter.value = (column.filter === 'True' || column.filter === true);
 				}
 			}
 		}
