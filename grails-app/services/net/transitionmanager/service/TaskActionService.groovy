@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile
  * A service to hand status updates, from invoking remote actions on TMD.
  */
 @Transactional
-class APIProducerService implements ServiceMethods {
+class TaskActionService implements ServiceMethods {
 
 	TaskService       taskService
 	FileSystemService fileSystemService
