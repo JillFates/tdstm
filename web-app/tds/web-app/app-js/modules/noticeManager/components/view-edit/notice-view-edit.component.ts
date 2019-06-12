@@ -1,6 +1,8 @@
 // Angular
 import {Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import {FormControl} from '@angular/forms';
+import {pathOr} from 'ramda';
+
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
 import {ViewHtmlComponent} from '../view-html/view-html.component';
@@ -242,9 +244,12 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	setMaxDate(value: any) {
 		this.maxDate = value;
+		console.log('Setting max date');
+		/*
 		if (this.model.activationDate && value <  this.convertToDate(this.model.activationDate)) {
 			this.model.expirationDate = '';
 		}
+		*/
 	}
 
 	/**
@@ -252,20 +257,30 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	*/
 	setMinDate(value: any) {
 		this.minDate = value;
+		console.log('Setting min date');
+		/*
 		if (this.model.expirationDate && value >  this.convertToDate(this.model.expirationDate)) {
 			this.model.activationDate = '';
 		}
+		*/
 	}
 
 	/**
-	 * Could receive a string or date, based in the type make sure returns a date  object
-	 * @param {any} value:  String or Date to cast
-	 * @returns {date}
+	 * Get a field from the form by control name
+	 * @param {any} form  - Main form holding all the field
+	 * @param {string} controlName - Name of th field to get
+	 * @returns {any} - Returns the field or null if not found
 	 */
-	private convertToDate(value: any): any {
-		return (value && value.toDateString) ? value : new Date(DateUtils.getDateFromGMT(value));
-	}
+	public getFormField(form: any, controlName: string): any {
+		const field = pathOr(null, ['controls', controlName], form);
 
+		return  field === null ? null : {
+			valid: field.valid,
+			touched: field.touched,
+			dirty: field.dirty,
+			errors: field.errors || {}
+		};
+	}
 	/**
 	 * Based on modalType action returns the corresponding title
 	 * @param {ActionType} modalType

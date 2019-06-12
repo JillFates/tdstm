@@ -4,7 +4,7 @@
         <h4 class="modal-title">{{ getModalTitle(action) }}</h4>
     </div>
     <div class="modal-body">
-        <form novalidate role="form" class="form-horizontal left-alignment">
+        <form novalidate role="form" class="form-horizontal left-alignment"  #form='ngForm' name="form">
             <div class="box-body">
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-3 control-label required-field">Title:</label>
@@ -57,16 +57,26 @@
                 <div class="form-group">
                     <label for="activationDate" class="col-sm-3 control-label">Activation Date:</label>
                     <div class="col-sm-9">
-                        <tds-date-control
-                            *ngIf="action !== EnumActionType.View; else noticeActivationDateView"
-                            title="{{'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate}}"
-                            id="activationDate"
-                            name="activationDate"
-                            [maximum]="maxDate"
-                            (valueChange)="setMinDate($event)"
-                            [value]="model.activationDate"
-                            [(ngModel)]="model.activationDate">
-                        </tds-date-control>
+                        <div *ngIf="action !== EnumActionType.View; else noticeActivationDateView">
+                            <tds-date-control
+                                title="{{'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate}}"
+                                id="activationDate"
+                                name="activationDate"
+                                #activationDate="ngModel"
+                                [maximum]="maxDate"
+                                (blur)="setMinDate($event)"
+                                [value]="model.activationDate"
+                                [(ngModel)]="model.activationDate">
+                            </tds-date-control>
+                            <tds-custom-validation-errors 
+                                *ngIf="getFormField(form,'activationDate'); let field"
+                                [userDateFormat]="userDateFormat"
+                                [errors]="field.errors"
+                                [valid]="field.valid"
+                                [touched]="field.touched"
+                                [dirty]="field.dirty">
+                            </tds-custom-validation-errors>
+                        </div>
                         <ng-template #noticeActivationDateView>
                             <label class="control-label label-detail" *ngIf="model.activationDate">{{model.activationDate | tdsDate : userDateFormat}}</label>
                         </ng-template>
@@ -75,16 +85,27 @@
                 <div class="form-group">
                     <label for="expirationDate" class="col-sm-3 control-label">Expiration Date:</label>
                     <div class="col-sm-9">
-                        <tds-date-control
-                            *ngIf="action !== EnumActionType.View; else noticeExpirationDateView"
-                            title="{{'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate}}"
-		                    id="expirationDate"
-                            name="expirationDate"
-                            [minimum]="minDate"
-                            (valueChange)="setMaxDate($event)"
-                            [value]="model.expirationDate"
-                            [(ngModel)]="model.expirationDate">
-                        </tds-date-control>
+                        <div *ngIf="action !== EnumActionType.View; else noticeExpirationDateView">
+                            <tds-date-control
+                                title="{{'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate}}"
+                                id="expirationDate"
+                                name="expirationDate"
+                                #expirationDate="ngModel"
+                                [minimum]="minDate"
+                                (blur)="setMaxDate($event)"
+                                [value]="model.expirationDate"
+                                [(ngModel)]="model.expirationDate">
+                            </tds-date-control>
+                            <tds-custom-validation-errors 
+                                *ngIf="getFormField(form,'expirationDate'); let field"
+                                [userDateFormat]="userDateFormat"
+                                [errors]="field.errors"
+                                [valid]="field.valid"
+                                [touched]="field.touched"
+                                [dirty]="field.dirty">
+                            </tds-custom-validation-errors>
+                        </div>
+
                         <ng-template #noticeExpirationDateView>
                             <label class="control-label label-detail" *ngIf="model.expirationDate">{{model.expirationDate | tdsDate : userDateFormat}}</label>
                         </ng-template>

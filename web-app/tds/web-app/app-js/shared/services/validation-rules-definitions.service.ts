@@ -5,6 +5,8 @@
 import {Injectable} from '@angular/core'
 import {isNil, isEmpty} from 'ramda';
 
+import {DateUtils} from './../../shared/utils/date.utils';
+
 @Injectable()
 export class ValidationRulesDefinitionsService {
 	/**
@@ -54,6 +56,51 @@ export class ValidationRulesDefinitionsService {
 			};
 
 			return () => (!isNil(c.value) && c.value < 0) ? err : null;
+		}
+	}
+
+	/**
+	 *	Defines the rule function to validate that a date cannot be greather than a max date
+	 * 	@return Curried function that determines if the provided range meets the rule
+	 */
+	maxDateValidationRule(maxDate: Date): Function {
+		return (c: any) => {
+			const err = {
+				'maxDate': {
+					given: c.value,
+					max: maxDate
+				}
+			};
+
+			return () => {
+				// if value comes as string cast it to date
+				const value = DateUtils.stringDateToDate(c.value);
+				// (c.value && c.value.toDateString) ? c.value : new Date(DateUtils.getDateFromGMT(c.value));
+
+				return !isNil(value) && (value > maxDate) ? err : null;
+			};
+		}
+	}
+
+	/**
+	 *	Defines the rule function to validate that a date cannot be lower than a min date
+	 * 	@return Curried function that determines if the provided range meets the rule
+	 */
+	minDateValidationRule(minDate: Date): Function {
+		return (c: any) => {
+			const err = {
+				'minDate': {
+					given: c.value,
+					min: minDate
+				}
+			};
+
+			return () => {
+				// if value comes as string cast it to date
+				const value = DateUtils.stringDateToDate(c.value);
+
+				return !isNil(value) && (value < minDate) ? err : null;
+			};
 		}
 	}
 

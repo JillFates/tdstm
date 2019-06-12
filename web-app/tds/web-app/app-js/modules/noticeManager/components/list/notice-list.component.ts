@@ -1,11 +1,9 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 // Components
 import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {WindowService} from '../../../../shared/services/window.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
@@ -28,7 +26,6 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 export class NoticeListComponent implements OnInit {
 	protected gridSettings: DataGridOperationsHelper;
-
 	protected noticeColumnModel = null;
 	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected noticeTypes = [];
@@ -91,10 +88,6 @@ export class NoticeListComponent implements OnInit {
 				this.gridSettings.setNotifier(this.notifier);
 			},
 			(err) => console.log(err));
-
-		/*
-		this.fixGridHeight();
-		*/
 	}
 
 	/**
@@ -103,23 +96,8 @@ export class NoticeListComponent implements OnInit {
 	private reloadNotices(): void {
 		this.noticeService.getNoticesList()
 			.subscribe(
-			(result: any) => {
-				this.gridSettings.reloadData(result.data);
-			},
-			(err) => console.log(err));
-	}
-
-	/**
-	 * Notify the event to update the grid height
-	 */
-	private fixGridHeight(): void {
-		/*
-		this.notifier.broadcast({
-			name: 'grid.header.position.change'
-		});
-		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		*/
+			(result: any) => this.gridSettings.reloadData(result),
+			(err) => console.error(err));
 	}
 
 	/**
@@ -198,10 +176,16 @@ export class NoticeListComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Determine if the user has the permission to edit notices
+	*/
 	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeEdit);
 	}
 
+	/**
+	 * Determine if the user has the permission to create notices
+	*/
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeCreate);
 	}
