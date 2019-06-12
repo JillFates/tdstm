@@ -7,7 +7,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.APIProducerService
+import net.transitionmanager.service.TaskActionService
 
 /**
  * A controller for handling API remote action's status updates, and invoking reaction scripts.
@@ -23,7 +23,7 @@ class TaskController implements ControllerMethods {
 		update: ['POST', 'PUT']
 	]
 
-	APIProducerService APIProducerService
+	TaskActionService taskActionService
 
 	/**
 	 * Updates the remote APIs status for when the action starts.
@@ -40,7 +40,7 @@ class TaskController implements ControllerMethods {
 		Person currentPerson = currentPerson()
 		Project currentProject = projectForWs
 
-		APIProducerService.actionStarted(action, id, currentPerson, currentProject)
+		taskActionService.actionStarted(action, id, currentPerson, currentProject)
 
 		renderSuccessJson()
 	}
@@ -60,7 +60,7 @@ class TaskController implements ControllerMethods {
 		Person currentPerson = currentPerson()
 		Project currentProject = projectForWs
 
-		APIProducerService.actionProgress(action, id, currentPerson, currentProject)
+		taskActionService.actionProgress(action, id, currentPerson, currentProject)
 
 		renderSuccessJson()
 	}
@@ -80,7 +80,7 @@ class TaskController implements ControllerMethods {
 		Person currentPerson = currentPerson()
 		Project currentProject = projectForWs
 
-		APIProducerService.actionDone(action, id, currentPerson, currentProject)
+		taskActionService.actionDone(action, id, currentPerson, currentProject)
 
 		renderSuccessJson()
 	}
@@ -100,7 +100,7 @@ class TaskController implements ControllerMethods {
 		Person currentPerson = currentPerson()
 		Project currentProject = projectForWs
 
-		APIProducerService.actionError(action, id, currentPerson, currentProject)
+		taskActionService.actionError(action, id, currentPerson, currentProject)
 
 		renderSuccessJson()
 	}
