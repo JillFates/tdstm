@@ -32,10 +32,10 @@ import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper
 import test.helper.mock.ProjectMock
 
-@TestFor(APIProducerService)
+@TestFor(TaskActionService)
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Project, Provider, ApiCatalog, ApiAction, AssetComment])
-class APIProducerServiceSpec extends Specification {
+class TaskActionServiceSpec extends Specification {
 
 	@Shared
 	List<String> notes = []
