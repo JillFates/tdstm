@@ -289,6 +289,7 @@ class PersonService implements ServiceMethods {
 			results.isAmbiguous = true
 			results.partial = true
 		} else if (s == 1) {
+			String lastName = lastNameWithSuffix(nameMap)
 			results.person = persons[0]
 			results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
 			results.partial = true
